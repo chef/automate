@@ -31,13 +31,6 @@ const (
 		cert = """%v"""
 		key = """%v"""`
 
-	CHEFSERVER_ROOTCA_CONFIG = `
-	[cs_nginx.v1.sys.ngx.http]
-		ssl_verify_depth = 6
-	[global.v1.external.automate.ssl]
-		server_name = "https://%v"
-		root_cert = """%v"""`
-
 	POSTGRES_CONFIG = `
 	[ssl]
 		enable = true
@@ -290,20 +283,6 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 		return err
 	}
 
-	// ignore root-ca when node flag is provided
-	if flagsObj.node != "" {
-		return nil
-	}
-
-	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
-	if flagsObj.automate {
-		skipIpsList := c.getFrontEndIpsForSkippingRootCAPatching(AUTOMATE, certs.rootCA, infra, currentCertsInfo)
-		c.skipMessagePrinter(CHEF_SERVER, SKIP_FRONT_END_IPS_MSG_A2, "", skipIpsList)
-		err = c.patchRootCAinCS(sshUtil, certs.rootCA, timestamp, infra, flagsObj, skipIpsList)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -561,42 +540,6 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	return nil
 }
 
-// patchRootCAinCS will rotate the root-ca in the ChefServer to maintain the connection.
-func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, skipIpsList []string) error {
-
-	fileName := "rotate-root_CA.toml"
-	remoteService := CHEF_SERVER
-	cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
-	ips := c.getIps(remoteService, infra)
-	if len(ips) == 0 {
-		return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
-	}
-	sshUtil.getSSHConfig().hostIP = ips[0]
-	fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
-	if err != nil {
-		return err
-	}
-
-	config := fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
-
-	patchFnParam := &patchFnParameters{
-		sshUtil:       sshUtil,
-		config:        config,
-		fileName:      fileName,
-		timestamp:     timestamp,
-		remoteService: remoteService,
-		infra:         infra,
-		flagsObj:      flagsObj,
-		skipIpsList:   skipIpsList,
-	}
-
-	err = c.patchConfig(patchFnParam)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // copyAndExecute will copy the toml file to each required node and then execute the set of commands.
 func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
 
@@ -691,7 +634,7 @@ func (c *certRotateFlow) getAllIPs(infra *AutomateHAInfraDetails) []string {
 func (c *certRotateFlow) getFilteredIps(serviceIps, skipIpsList []string) []string {
 	filteredIps := []string{}
 	for _, ip := range serviceIps {
-		if stringutils.SliceContains(skipIpsList, ip) == false {
+		if !stringutils.SliceContains(skipIpsList, ip) {
 			filteredIps = append(filteredIps, ip)
 		}
 	}
@@ -703,9 +646,6 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 	skipIpsList := []string{}
 	isCertsSame := true
 	if remoteService == AUTOMATE {
-		if flagsObj.node == "" {
-			isCertsSame = strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newCerts.rootCA
-		}
 		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.AutomateCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
@@ -860,8 +800,8 @@ func (c *certRotateFlow) getCerts(infra *AutomateHAInfraDetails, flagsObj *certR
 		return nil, errors.New("Please provide the valid certificate for public-cert")
 	}
 
-	// Root CA is mandatory for A2, PG and OS nodes. But root CA is ignored when node flag is provided
-	if flagsObj.automate || flagsObj.postgres || flagsObj.opensearch {
+	// Root CA is mandatory for PG and OS nodes. But root CA is ignored when node flag is provided
+	if flagsObj.postgres || flagsObj.opensearch {
 		if rootCaPath == "" && flagsObj.node == "" {
 			return nil, errors.New("Please provide root-ca flag")
 		}

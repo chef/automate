@@ -41,7 +41,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of automate cluster:
 
-`chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --root-ca <path of root certificate of automate load balancer> --a2`
+`chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --a2`
 
 You can also use `--automate` or `-a` instead of a2 flag
 
