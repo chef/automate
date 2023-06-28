@@ -29,6 +29,7 @@ var (
 
 const (
 	mountLocation = "test-mount"
+	TYPE          = "self-managed"
 
 	nfsMountResponse = `{
 		"status": "SUCCESS",
@@ -635,7 +636,8 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Passed Response for chef-server,automate,opensearch and postgresql",
 			args: args{
 				config: &models.Config{
-					Hardware: hardware,
+					ExternalDbType: TYPE,
+					Hardware:       hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -654,7 +656,8 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Failure Mount Response for chef-server,automate,opensearch and postgresql",
 			args: args{
 				config: &models.Config{
-					Hardware: hardware,
+					ExternalDbType: TYPE,
+					Hardware:       hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -674,7 +677,8 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Recived Internal Server Error From the API",
 			args: args{
 				config: &models.Config{
-					Hardware: hardware,
+					ExternalDbType: TYPE,
+					Hardware:       hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -693,7 +697,8 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Invalid Response from service",
 			args: args{
 				config: &models.Config{
-					Hardware: hardware,
+					ExternalDbType: TYPE,
+					Hardware:       hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -713,6 +718,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Checking for Same Front end Nodes",
 			args: args{
 				config: &models.Config{
+					ExternalDbType: TYPE,
 					Hardware: &models.Hardware{
 						AutomateNodeIps:        hardware.AutomateNodeIps,
 						ChefInfraServerNodeIps: hardware.AutomateNodeIps,
@@ -732,6 +738,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			httpStatusCode:        http.StatusOK,
 			isError:               false,
 			wantRequest: models.NFSMountRequest{
+				ExternalDbType:         TYPE,
 				AutomateNodeIPs:        hardware.AutomateNodeIps,
 				ChefInfraServerNodeIPs: hardware.AutomateNodeIps,
 				PostgresqlNodeIPs:      hardware.PostgresqlNodeIps,
@@ -820,6 +827,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, pars
 
 func getRequest() models.NFSMountRequest {
 	return models.NFSMountRequest{
+		ExternalDbType:         TYPE,
 		AutomateNodeIPs:        hardware.AutomateNodeIps,
 		ChefInfraServerNodeIPs: hardware.ChefInfraServerNodeIps,
 		PostgresqlNodeIPs:      hardware.PostgresqlNodeIps,

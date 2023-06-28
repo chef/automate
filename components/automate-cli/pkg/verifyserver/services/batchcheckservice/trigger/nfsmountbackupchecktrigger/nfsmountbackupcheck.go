@@ -40,6 +40,7 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	}
 
 	nfsMountReq := models.NFSMountRequest{
+		ExternalDbType:         config.ExternalDbType,
 		AutomateNodeIPs:        config.Hardware.AutomateNodeIps,
 		ChefInfraServerNodeIPs: config.Hardware.ChefInfraServerNodeIps,
 		PostgresqlNodeIPs:      config.Hardware.PostgresqlNodeIps,

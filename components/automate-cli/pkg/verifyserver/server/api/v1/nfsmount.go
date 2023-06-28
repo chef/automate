@@ -14,10 +14,16 @@ func (h *Handler) NFSMount(c *fiber.Ctx) error {
 		h.Logger.Error(err.Error())
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
-	if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 || len(reqBody.PostgresqlNodeIPs) == 0 || len(reqBody.OpensearchNodeIPs) == 0 {
-		return fiber.NewError(http.StatusBadRequest, "AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty")
-	}
 
+	if reqBody.ExternalDbType == "self-managed" {
+		if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 {
+			return fiber.NewError(http.StatusBadRequest, "AutomateNodeIPs or ChefInfraServerNodeIPs cannot be empty")
+		}
+	} else {
+		if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 || len(reqBody.PostgresqlNodeIPs) == 0 || len(reqBody.OpensearchNodeIPs) == 0 {
+			return fiber.NewError(http.StatusBadRequest, "AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty")
+		}
+	}
 	if reqBody.MountLocation == "" {
 		return fiber.NewError(http.StatusBadRequest, "Mount Location cannot be empty")
 	}
