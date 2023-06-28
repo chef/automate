@@ -32,17 +32,11 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.RotationMaxFiles = w.Int32(10)
 	c.V1.Sys.Log.MaxErrorLogsPerSecond = w.Int32(1000)
 
-	c.V1.Sys.Sql.Timeout = w.Int32(5000)
-	c.V1.Sys.Sql.PoolInitSize = w.Int32(10)
-	c.V1.Sys.Sql.PoolMaxSize = w.Int32(20)
+	c.V1.Sys.Sql.Timeout = w.Int32(30000)
+	c.V1.Sys.Sql.PoolInitSize = w.Int32(25)
+	c.V1.Sys.Sql.PoolMaxSize = w.Int32(100)
 	c.V1.Sys.Sql.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Sql.PoolQueueTimeout = w.Int32(2000)
-
-	c.V1.Sys.Ocid.SqlRetryCount = w.Int32(0)
-	c.V1.Sys.Ocid.SqlRetryDelay = w.Int32(10)
-	c.V1.Sys.Ocid.AbandonedUploadCleanupInterval = w.Int32(1140000)
-	c.V1.Sys.Ocid.DeletedDataCleanupInterval = w.Int32(420000)
-	c.V1.Sys.Ocid.StreamDownload = w.Bool(true)
 
 	return c
 }
