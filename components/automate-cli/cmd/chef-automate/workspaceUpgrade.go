@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const habpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path smudassi/automate-ha-deployment"
+const habpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/automate-ha-deployment"
 const saashabpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/chef-saas-deployment"
 const pkgName = "automate-ha-deployment"
 const saaspkgName = "chef-saas-deployment"
