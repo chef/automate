@@ -205,7 +205,7 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 	if err := validatePort(automateSettings.TeamsPort, "teams_port", false); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateFqdnRootCA(automateSettings.FqdnRootCA, true); err != nil {
+	if err := validateFqdnRootCA(automateSettings.FqdnRootCA, AUTOMATE); err != nil {
 		errorList.PushBack(err)
 	}
 	if automateSettings.EnableCustomCerts {
@@ -225,8 +225,13 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 func (c *HaDeployConfig) verifyChefServerSettings() error {
 	chefServerSettings := c.ChefServer.Config
 	errorList := list.New()
-
+	if err := validateFQDN(chefServerSettings.ChefServerFqdn, "chefserver fqdn"); err != nil {
+		errorList.PushBack(err)
+	}
 	if err := validateNumberField(chefServerSettings.InstanceCount, "chef server instance_count", true); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateFqdnRootCA(chefServerSettings.RootCA, CHEFSERVER); err != nil {
 		errorList.PushBack(err)
 	}
 	if chefServerSettings.EnableCustomCerts {

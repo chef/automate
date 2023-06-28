@@ -453,15 +453,13 @@ func validateS3Endpoint(endpoint string) error {
 	return nil
 }
 
-func validateFqdnRootCA(RootCA string, isRequired bool) error {
-	if !isRequired && len(RootCA) < 1 {
-		return nil
-	}
+func validateFqdnRootCA(RootCA string, value string) error {
+
 	if len(strings.TrimSpace(RootCA)) < 1 {
-		return fmt.Errorf("automate root_ca is missing")
+		return fmt.Errorf("%s root_ca is missing", value)
 	}
 
 	return checkCertValid([]keydetails{
-		{key: RootCA, certtype: ROOT_CA, svc: AUTOMATE},
+		{key: RootCA, certtype: ROOT_CA, svc: value},
 	})
 }
