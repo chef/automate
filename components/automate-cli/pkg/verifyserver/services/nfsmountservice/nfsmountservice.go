@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
@@ -188,7 +186,8 @@ func prepareMountResp(ip, nodeType, mountLocation string, mountLocResp *models.N
 	node.NodeType = nodeType
 
 	if err != nil {
-		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
+		checkList := createCheck("NFS mount", false, "", "NFS mount location not found", "NFS volume should be mounted on "+mountLocation)
+		node.CheckList = append(node.CheckList, checkList)
 		return node
 	}
 	checkMount(mountLocation, &node, mountLocResp)

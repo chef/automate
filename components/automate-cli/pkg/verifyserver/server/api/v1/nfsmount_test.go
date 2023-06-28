@@ -519,6 +519,7 @@ func TestNFSMount(t *testing.T) {
 				]
 			}`,
 			RequestBody: `{
+				"external_db_type":"",
 				"automate_node_ips": [
 					"localhost",
 					"localhost"
@@ -554,7 +555,7 @@ func TestNFSMount(t *testing.T) {
 			RequestBody: "Invalid Body",
 		},
 		{
-			TestName:     "Not Given all the required IPs",
+			TestName:     "Not Given all the required IPs in On-Prem chef managed",
 			ExpectedCode: 400,
 			ExpectedBody: `{
 				"status": "FAILED",
@@ -565,6 +566,23 @@ func TestNFSMount(t *testing.T) {
 				}
 			}`,
 			RequestBody: `{
+				"external_db_type":"",
+				"automate_node_ips": []
+			}`,
+		},
+		{
+			TestName:     "Not Given all the required IPs in On-Prem self managed",
+			ExpectedCode: 400,
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "AutomateNodeIPs or ChefInfraServerNodeIPs cannot be empty"
+				}
+			}`,
+			RequestBody: `{
+				"external_db_type":"self-managed",
 				"automate_node_ips": []
 			}`,
 		},

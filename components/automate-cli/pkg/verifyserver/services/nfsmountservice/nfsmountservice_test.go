@@ -348,21 +348,27 @@ func TestGetNFSMountDetails(t *testing.T) {
 			Response: []models.NFSMountResponse{
 				{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
 					{Passed: true},
-					{Passed: true},
+					{Passed: false},
 				}, Error: nil},
-				{IP: "192.168.54.34", NodeType: "automate", CheckList: nil, Error: errors.New("")},
+				{IP: "192.168.54.34", NodeType: "automate", CheckList: []models.Checks{
+					{Passed: false},
+					{Passed: false},
+				}, Error: nil},
 				{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
 					{Passed: true},
-					{Passed: true},
+					{Passed: false},
 				}, Error: nil},
-				{IP: "anything.com", NodeType: "postgresql", CheckList: nil, Error: errors.New("")},
+				{IP: "anything.com", NodeType: "postgresql", CheckList: []models.Checks{
+					{Passed: false},
+					{Passed: false},
+				}, Error: nil},
 				{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
 					{Passed: true},
-					{Passed: true},
+					{Passed: false},
 				}, Error: nil},
 				{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
 					{Passed: true},
-					{Passed: true},
+					{Passed: false},
 				}, Error: nil},
 			},
 		},
