@@ -1,4 +1,4 @@
-# ======================== Elasticsearch Configuration =========================
+# ======================== ElasticSearch Configuration =========================
 # The es_yaml top level key contains whatever data will be written to elasticsearch.yml
 #
 [es_yaml]
