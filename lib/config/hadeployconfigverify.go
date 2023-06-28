@@ -206,7 +206,7 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 		errorList.PushBack(err)
 	}
 	if automateSettings.EnableCustomCerts {
-		if err := validateAutomateCerts(automateSettings); err != nil {
+		if err := validateAutomateCerts(c); err != nil {
 			errorList.PushBack(err)
 		}
 		if c.IsExistingInfra() {
@@ -227,7 +227,7 @@ func (c *HaDeployConfig) verifyChefServerSettings() error {
 		errorList.PushBack(err)
 	}
 	if chefServerSettings.EnableCustomCerts {
-		if err := validateChefServerCerts(chefServerSettings); err != nil {
+		if err := validateChefServerCerts(c); err != nil {
 			errorList.PushBack(err)
 		}
 		if c.IsExistingInfra() {
@@ -248,7 +248,7 @@ func (c *HaDeployConfig) verifyOpensearchSettings() error {
 		errorList.PushBack(err)
 	}
 	if opensearchSettings.EnableCustomCerts {
-		if err := validateOpensearchCerts(opensearchSettings); err != nil {
+		if err := validateOpensearchCerts(c); err != nil {
 			errorList.PushBack(err)
 		}
 		if c.IsExistingInfra() {
@@ -269,7 +269,7 @@ func (c *HaDeployConfig) verifyPostgresqlSettings() error {
 		errorList.PushBack(err)
 	}
 	if postgresqlSettings.EnableCustomCerts {
-		if err := validatePostgresqlCerts(postgresqlSettings); err != nil {
+		if err := validatePostgresqlCerts(c); err != nil {
 			errorList.PushBack(err)
 		}
 		if c.IsExistingInfra() {
