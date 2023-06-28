@@ -99,12 +99,20 @@ You can also use `--opensearch` or `-o` instead of the os flag
 
 ### Rotate Automate Load Balancer Root CA
 
-Below is the configuration needs to be patched on Chef-Server, if you want to rotate the Automate Load balancer root certificate: 
+To rotate the Automate Load balancer root certificate: 
 
-```sh
-[cs_nginx.v1.sys.ngx.http]
-	ssl_verify_depth = 6
-[global.v1.external.automate.ssl]
-	server_name = "https://<automate.example.com>"
-	root_cert = """<Root_CA_Content>"""
-```
+1. Create a root_ca.toml file with the following content. Replace server_name with Automate Fqdn and root_cert with Automate Load balancer root certificate. 
+
+    ```toml
+    [cs_nginx.v1.sys.ngx.http]
+      ssl_verify_depth = 6
+    [global.v1.external.automate.ssl]
+      server_name = "https://<automatefqdn.example.com>"
+      root_cert = """<Root_CA_Content>"""
+    ```
+
+1. Run the following command to apply your configuration on Chef-Server from bastion:
+
+    ```shell
+    chef-automate config patch root_ca.toml --cs
+    ```
