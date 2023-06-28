@@ -129,7 +129,7 @@ The first column in the table below represents the source of the connection. The
 | Infra Server  | 443            |                   | 7432                                | 9200                                 |         |               |
 | PostgreSQL    |                |                   | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |               |
 | OpenSearch    |                |                   |                                     | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |               |
-| Bastion       | 22, 9631, 9638 | 22, 9631, 9638    | 22, 9631, 9638, 7432                | 22, 9631, 9638, 9200                 |         | 22            |
+| Bastion       | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7799    | 22, 9631, 9638, 7432, 7799                | 22, 9631, 9638, 9200, 7799                 |         | 22            |
 | Load Balancer | 443, 80        | 443, 80           |                                     |                                      |         |               |
 
 {{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
