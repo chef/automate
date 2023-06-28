@@ -292,12 +292,6 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 
 	// Get config required for batch-check API call
 	batchCheckConfig := models.NewConfig()
-
-	err := batchCheckConfig.PopulateWith(v.Config)
-	if err != nil {
-		return err
-	}
-
 	if v.Config.IsExistingInfra() {
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
 
@@ -330,6 +324,10 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		return errors.New("Invalid config")
 	}
 
+	err := batchCheckConfig.PopulateWith(v.Config)
+	if err != nil {
+		return err
+	}
 	var batchCheckResultBastion, batchCheckResultRemote models.BatchCheckResponse
 	var batchCheckResults []models.BatchCheckResult
 

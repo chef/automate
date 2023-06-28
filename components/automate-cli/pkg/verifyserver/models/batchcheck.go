@@ -295,14 +295,14 @@ func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 	automateConfig := haConfig.Automate.Config
 	cert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.FqdnRootCA, config.AUTOMATE)
 	if automateConfig.EnableCustomCerts {
-		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, c.Hardware.AutomateNodeIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
 	}
 	c.Certificate = append(c.Certificate, cert)
 	chefserverConfig := haConfig.ChefServer.Config
 	//We can populate this later as well in config
 	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
 	if chefserverConfig.EnableCustomCerts {
-		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, c.Hardware.ChefInfraServerNodeIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
 	}
 
 	c.Certificate = append(c.Certificate, cert)
@@ -310,14 +310,14 @@ func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 	postgresqlConfig := haConfig.Postgresql.Config
 	if postgresqlConfig.EnableCustomCerts {
 		cert = addCertificatesInConfig("", "", config.POSTGRESQL)
-		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", postgresqlConfig.RootCA)
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, c.Hardware.PostgresqlNodeIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", postgresqlConfig.RootCA)
 		c.Certificate = append(c.Certificate, cert)
 	}
 
 	openSearchConfig := haConfig.Opensearch.Config
 	if openSearchConfig.EnableCustomCerts {
 		cert = addCertificatesInConfig("", "", config.OPENSEARCH)
-		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert, openSearchConfig.RootCA)
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, c.Hardware.OpenSearchNodeIps, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert, openSearchConfig.RootCA)
 		c.Certificate = append(c.Certificate, cert)
 	}
 }
