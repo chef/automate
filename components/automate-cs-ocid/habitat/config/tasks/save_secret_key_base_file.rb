@@ -1,4 +1,3 @@
-require 'securerandom'
 require 'base64'
 
 class SecretKeyBaseGenerator
@@ -6,6 +5,8 @@ class SecretKeyBaseGenerator
   # which will be encrypted to generate the secret_key_base for OCID rails app.
   WEBUI_KEY_SUBSTRING_LEN = 75
   class << self
+    # We will save the secret_key_base in a file which will later be used
+    # to set it in the OCID environment configuration
     def save_secret_key_base_in_file
       begin
         custom_secret_key_base = ENV['CUSTOM_SECRET_KEY_BASE']
@@ -32,15 +33,14 @@ class SecretKeyBaseGenerator
         
         File.write(secret_key_base_file_path, secret_key_base)  
       rescue StandardError => e
-        puts "ERROR: Failed to generate secret_key_base for OCID."
-        puts "SYS ERROR: #{e.inspect}"
+        puts "ERROR: Failed to generate secret_key_base file for OCID. Error Details: #{e.inspect}"
+        puts "OCID secret_key_base will be assigned a default value..."
       end  
     end
 
+    # Logic to generate a dynamic secret_key_base for OCID
     def generate_secret_key_base
       webui_priv_pem_path = ENV['WEBUI_SRC_PATH']
-      puts "webui_priv_pem_path"
-      puts webui_priv_pem_path
       secret_key_base = nil
       begin
         webui_priv_key = File.read(webui_priv_pem_path)
@@ -48,8 +48,8 @@ class SecretKeyBaseGenerator
         webui_key_substring_for_encryption = webui_priv_key[0..(WEBUI_KEY_SUBSTRING_LEN-1)]
         secret_key_base = Base64.encode64(webui_key_substring_for_encryption)
       rescue StandardError => e
-        puts e.inspect
-        puts StandardError.new("Could not find the webui key in erchef service for generation of secret_key_base for OCID. Pls wait for erchef to be running...")
+        puts "Could not find the webui key in erchef service for generation of secret_key_base for OCID. OCID secret_key_base will assume the default value..."
+        return nil
       end
       secret_key_base = tidy_up_secret_key_base(secret_key_base)
     end
