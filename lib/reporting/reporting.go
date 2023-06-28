@@ -121,7 +121,7 @@ func (r *ReportingModule) ChangeColour(fgColor int, msg string) string {
 	case Yellow:
 		return color.New(color.FgYellow).Sprint(msg)
 	case Grey:
-		return color.New(90).Sprint(msg)
+		return color.New(color.FgHiBlack).Sprint(msg)
 	default:
 		return msg
 	}

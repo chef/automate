@@ -97,7 +97,14 @@ func updateTablesWithData(reporting Reporting, nodeInfo map[string][]Info, keyMa
 	}
 }
 
+func sortTablesByIps(info []Info) {
+	sort.Slice(info, func(i, j int) bool {
+		return info[i].Hostip < info[j].Hostip
+	})
+}
+
 func createSingleNodeRowsForBothTables(title string, nodeInfo []Info, reporting Reporting, summaryMap map[string]SummaryInfo) ([]table.Row, []table.Row) {
+	sortTablesByIps(nodeInfo)
 	var statusTableRows []table.Row
 	var summaryTableRows []table.Row
 	for idx, value := range nodeInfo {
