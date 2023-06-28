@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"path/filepath"
 	"testing"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -71,7 +72,11 @@ Target version: 4.2.59
 }
 
 func TestRemoveCommonContentFromAwsAutoTfvar(t *testing.T) {
-	err := removeCommonContentFromAwsAutoTfvar("../../pkg/testfiles/aws.auto.tfvars")
+	tempDir := t.TempDir()
+	sourceFile := "../../pkg/testfiles/aws.auto.tfvars"
+	destFile := filepath.Join(tempDir, "aws.auto.tfvars")
+	copyFileContents(sourceFile, destFile)
+
+	err := removeCommonContentFromAwsAutoTfvar(destFile)
 	assert.NoError(t, err)
-	copyFileContents("../../pkg/testfiles/copy/aws.auto.tfvars", "../../pkg/testfiles/aws.auto.tfvars")
 }
