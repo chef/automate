@@ -100,8 +100,6 @@ func NewConfig() *Config {
 		Hardware:    &Hardware{},
 		Certificate: []*Certificate{},
 		SSHUser:     &SSHUser{},
-		ExternalOS:  &ExternalOS{},
-		ExternalPG:  &ExternalPG{},
 	}
 }
 
@@ -324,23 +322,26 @@ func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 
 func (c *Config) populateAwsManagedServicesConfig(haConfig *config.HaDeployConfig) {
 	awsManagedServicesConfig := haConfig.Aws.Config
+	if c.ExternalPG == nil {
+		c.ExternalPG = &ExternalPG{}
+	}
+
 	c.ExternalPG.PGDbUserName = awsManagedServicesConfig.ManagedRdsDbuserUsername
 	c.ExternalPG.PGDbUserPassword = awsManagedServicesConfig.ManagedRdsDbuserPassword
 	c.ExternalPG.PGInstanceURL = awsManagedServicesConfig.ManagedRdsInstanceURL
-
-	// pg root-ca might be nil in pre deploy state
 	c.ExternalPG.PGRootCert = awsManagedServicesConfig.ManagedRdsCertificate
 	c.ExternalPG.PGSuperuserName = awsManagedServicesConfig.ManagedRdsSuperuserUsername
 	c.ExternalPG.PGSuperuserPassword = awsManagedServicesConfig.ManagedRdsSuperuserPassword
 
+	if c.ExternalOS == nil {
+		c.ExternalOS = &ExternalOS{}
+	}
+
 	c.ExternalOS.OSDomainName = awsManagedServicesConfig.ManagedOpensearchDomainName
 	c.ExternalOS.OSDomainURL = awsManagedServicesConfig.ManagedOpensearchDomainURL
-
-	// os root-ca might be nil in pre deploy state
 	c.ExternalOS.OSCert = awsManagedServicesConfig.ManagedOpensearchCertificate
 	c.ExternalOS.OSUserPassword = awsManagedServicesConfig.ManagedOpensearchUserPassword
 	c.ExternalOS.OSUsername = awsManagedServicesConfig.ManagedOpensearchUsername
-	c.ExternalOS.OSRoleArn = awsManagedServicesConfig.AwsOsSnapshotRoleArn
 }
 
 func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConfig) {
@@ -378,20 +379,24 @@ func addCertificatesInConfig(fqdn, rootCA, nodeType string) *Certificate {
 
 func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
 	externalPgConfig := haConfig.External.Database.PostgreSQL
+	if c.ExternalPG == nil {
+		c.ExternalPG = &ExternalPG{}
+	}
 	c.ExternalPG.PGDbUserName = externalPgConfig.DbuserUsername
 	c.ExternalPG.PGDbUserPassword = externalPgConfig.DbuserPassword
 	c.ExternalPG.PGInstanceURL = externalPgConfig.InstanceURL
-
-	// pg root-ca might be nil in pre deploy state
 	c.ExternalPG.PGRootCert = externalPgConfig.PostgresqlRootCert
 	c.ExternalPG.PGSuperuserName = externalPgConfig.SuperuserUsername
 	c.ExternalPG.PGSuperuserPassword = externalPgConfig.SuperuserPassword
 
 	externalOsConfig := haConfig.External.Database.OpenSearch
+
+	if c.ExternalOS == nil {
+		c.ExternalOS = &ExternalOS{}
+	}
+
 	c.ExternalOS.OSDomainName = externalOsConfig.OpensearchDomainName
 	c.ExternalOS.OSDomainURL = externalOsConfig.OpensearchDomainURL
-
-	// os root-ca might be nil in pre deploy state
 	c.ExternalOS.OSCert = externalOsConfig.OpensearchRootCert
 	c.ExternalOS.OSUserPassword = externalOsConfig.OpensearchUserPassword
 	c.ExternalOS.OSUsername = externalOsConfig.OpensearchUsername

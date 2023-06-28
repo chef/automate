@@ -311,9 +311,13 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		v.postgresqlIPs = configDetails.PostgresqlIps
 		v.opensearchIPs = configDetails.OpensearchIps
 
-		batchCheckConfig.ExternalOS.OSRoleArn = configDetails.OsSnapshotRoleArn
-		batchCheckConfig.ExternalOS.OsSnapshotUserAccessKeyId = configDetails.OsSnapshotUserID
-		batchCheckConfig.ExternalOS.OsSnapshotUserAccessKeySecret = configDetails.OsSnapshotUserSecret
+		if v.Config.Aws.Config.SetupManagedServices {
+			batchCheckConfig.ExternalOS = &models.ExternalOS{
+				OSRoleArn:                     configDetails.OsSnapshotRoleArn,
+				OsSnapshotUserAccessKeyId:     configDetails.OsSnapshotUserID,
+				OsSnapshotUserAccessKeySecret: configDetails.OsSnapshotUserSecret,
+			}
+		}
 		// assign ip's to models.Hardware
 		batchCheckHardware := batchCheckConfig.Hardware
 		batchCheckHardware.AutomateNodeIps = configDetails.AutomateIps
