@@ -246,7 +246,8 @@ func Check(profilePath string) (CheckResult, error) {
 	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
 
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
+		logrus.Errorf("%s\n%s", err.Error(), stderr)
+		e := fmt.Sprintf("%s", err.Error())
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
 	}
 
