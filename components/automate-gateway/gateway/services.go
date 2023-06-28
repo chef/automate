@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -472,17 +473,22 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		profileVersion = t.Version
 	case "multipart/form-data":
 		var content bytes.Buffer
-		file, _, err := r.FormFile("file")
+		file, fileHeader, err := r.FormFile("file")
 		if err != nil {
 			log.Errorf("Received error while getting file from request : %s", err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, RemoveFilePath(err.Error()), http.StatusBadRequest)
+			return
+		}
+		if !IsFileNameValid(fileHeader.Filename) {
+			log.Errorf("Invalid file name. Special characters are not allowed.")
+			http.Error(w, "Invalid file name. Special characters are not allowed.", http.StatusBadRequest)
 			return
 		}
 		defer file.Close() // nolint: errcheck
 
 		_, err = io.Copy(&content, file)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, RemoveFilePath(err.Error()), http.StatusBadRequest)
 			return
 		}
 
@@ -515,7 +521,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	stream, err := profilesClient.Create(ctx)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, RemoveFilePath(err.Error()), http.StatusInternalServerError)
 		return
 	}
 
@@ -532,14 +538,14 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = stream.Send(&request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, RemoveFilePath(err.Error()), http.StatusBadRequest)
 		return
 	}
 	log.Info("Request successfully sent to backend service")
 
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, RemoveFilePath(err.Error()), http.StatusBadRequest)
 		return
 	}
 	data, err := json.Marshal(reply)
@@ -580,7 +586,7 @@ func (s *Server) cdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 
 	stream, err := client.DownloadContentItem(ctx, &request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, RemoveFilePath(err.Error()), http.StatusInternalServerError)
 		return
 	}
 	for {
@@ -589,7 +595,7 @@ func (s *Server) cdsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			http.Error(w, RemoveFilePath(err.Error()), http.StatusNotFound)
 			return
 		}
 		w.Write(data.GetContent()) // nolint: errcheck
@@ -649,7 +655,7 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 
 	stream, err := profilesClient.ReadTar(ctx, &profiles.ProfileDetails{Name: profileName, Version: profileVersion, Owner: profileOwner})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, RemoveFilePath(err.Error()), http.StatusInternalServerError)
 		return
 	}
 	for {
@@ -658,7 +664,7 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			http.Error(w, RemoveFilePath(err.Error()), http.StatusNotFound)
 			return
 		}
 		contentLength := strconv.Itoa(len(data.GetData()))
@@ -1149,4 +1155,50 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 	log.Info("User not authorized for the action", action)
 	return nil, errors.Errorf("unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
 		subjects, action, resource, projects)
+}
+
+func IsFileNameValid(fileName string) bool {
+	// Define the regular expression pattern for prohibited characters
+	regexPattern := "[<>:\"/\\|?*\x00-\x1F!&%#@+=]"
+
+	regex, err := regexp.Compile(regexPattern)
+	if err != nil {
+		fmt.Println("Error compiling regular expression:", err)
+		return false
+	}
+
+	// Check if the file name matches the regular expression pattern
+	if regex.MatchString(fileName) {
+		// Prohibited characters found in the file name
+		return false
+	}
+
+	// File name is valid
+	return true
+}
+
+func RemoveFilePath(input string) string {
+	// Define a regular expression pattern to match file paths
+	regexPattern := `\b\S+/\S+\b`
+
+	// Compile the regular expression pattern
+	regex, err := regexp.Compile(regexPattern)
+	if err != nil {
+		return input
+	}
+
+	// Find the first match in the input string
+	match := regex.FindString(input)
+
+	// If no match is found, return an error
+	if match == "" {
+		return input
+	}
+
+	fileName := match[strings.LastIndex(match, "/")+1:]
+
+	// Replace the file path with just the file name
+	result := strings.ReplaceAll(input, match, fileName)
+
+	return result
 }
