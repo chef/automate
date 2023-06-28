@@ -38,12 +38,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Sql.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Sql.PoolQueueTimeout = w.Int32(2000)
 
-	c.V1.Sys.Ocid.SqlRetryCount = w.Int32(0)
-	c.V1.Sys.Ocid.SqlRetryDelay = w.Int32(10)
-	c.V1.Sys.Ocid.AbandonedUploadCleanupInterval = w.Int32(1140000)
-	c.V1.Sys.Ocid.DeletedDataCleanupInterval = w.Int32(420000)
-	c.V1.Sys.Ocid.StreamDownload = w.Bool(true)
-
 	return c
 }
 
