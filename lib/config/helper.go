@@ -16,6 +16,11 @@ import (
 	"github.com/chef/automate/components/local-user-service/password"
 )
 
+var (
+	returnErrorPublicKeyMsg = "cannot find public key for ip %s"
+	returnErrorPrivetKeyMsg = "cannot find private key for ip %s"
+)
+
 type keydetails struct {
 	key      string
 	certtype string
@@ -208,10 +213,10 @@ func validateAutomateCerts(depConfig *HaDeployConfig) error {
 	// If CertByIp available then check it's availabe for all the nodes
 	for _, v := range *depConfig.Automate.Config.CertsByIP {
 		if v.PrivateKey == "" {
-			return fmt.Errorf("cannot find private key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPrivetKeyMsg, v.IP)
 		}
 		if v.PublicKey == "" {
-			return fmt.Errorf("cannot find public key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPublicKeyMsg, v.IP)
 		}
 
 		if err := checkCertValid([]keydetails{
@@ -242,10 +247,10 @@ func validateChefServerCerts(depConfig *HaDeployConfig) error {
 	// If CertByIp available then check it's availabe for all the nodes
 	for _, v := range *depConfig.ChefServer.Config.CertsByIP {
 		if v.PrivateKey == "" {
-			return fmt.Errorf("cannot find private key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPrivetKeyMsg, v.IP)
 		}
 		if v.PublicKey == "" {
-			return fmt.Errorf("cannot find public key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPublicKeyMsg, v.IP)
 		}
 
 		if err := checkCertValid([]keydetails{
@@ -313,11 +318,11 @@ func validatePostgresqlCerts(depConfig *HaDeployConfig) error {
 	// If CertByIp available then check it's availabe for all the nodes
 	for _, v := range *depConfig.Postgresql.Config.CertsByIP {
 		if v.PrivateKey == "" {
-			return fmt.Errorf("cannot find private key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPrivetKeyMsg, v.IP)
 		}
 
 		if v.PublicKey == "" {
-			return fmt.Errorf("cannot find public key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPublicKeyMsg, v.IP)
 		}
 
 		if err := checkCertValid([]keydetails{
@@ -361,10 +366,10 @@ func validateOpensearchCerts(depConfig *HaDeployConfig) error {
 	// If CertByIp available then check it's availabe for all the nodes
 	for _, v := range *depConfig.Opensearch.Config.CertsByIP {
 		if v.PrivateKey == "" {
-			return fmt.Errorf("cannot find private key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPrivetKeyMsg, v.IP)
 		}
 		if v.PublicKey == "" {
-			return fmt.Errorf("cannot find public key for ip %s", v.IP)
+			return fmt.Errorf(returnErrorPublicKeyMsg, v.IP)
 		}
 
 		if err := checkCertValid([]keydetails{
