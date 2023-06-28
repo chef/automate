@@ -36,20 +36,27 @@ func NewSoftwareVersionService(logger logger.Logger, CheckPath func(cmd string) 
 }
 
 const (
-	AVAILABILITY              = " availability"
-	ENSURE                    = "Ensure "
-	OSFILEPATH                = "/etc/os-release"
-	KERNELFILEPATH            = "/proc/sys/kernel/osrelease"
-	LINUX_VERSION_CHECK       = "Linux Version Check"
-	KERNAL_VERSION_CHECK      = "Kernal Version Check"
-	UBUNTU                    = "Ubuntu"
-	RED_HAT                   = "Red Hat"
-	DEBIAN                    = "Debian"
-	RED_HAT_SUPPORTED_VERSION = 7
-	KERNAL_SUPPORTED_VERSION  = 3.2
+	AVAILABILITY                          = " availability"
+	ENSURE                                = "Ensure "
+	OSFILEPATH                            = "/etc/os-release"
+	KERNELFILEPATH                        = "/proc/sys/kernel/osrelease"
+	LINUX_VERSION_CHECK                   = "Linux Version Check"
+	KERNAL_VERSION_CHECK                  = "Kernal Version Check"
+	UBUNTU                                = "Ubuntu"
+	RED_HAT                               = "Red Hat"
+	AMAZON_LINUX                          = "Amazon Linux"
+	SUSE_LINUX                            = "SUSE Linux"
+	RED_HAT_SUPPORTED_VERSION             = 7
+	KERNAL_SUPPORTED_VERSION              = 3.2
+	KERNAL_SUPPORTED_VERSION_AMAZON_LINUX = 5.10
 )
 
-var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "mv", "systemd", "wget", "exec", "rsync"}
+var cmdCheckArray = []string{"mkdir", "useradd", "usermod", "groupadd", "chown", "chmod",
+	"rm", "touch", "truncate", "echo", "sleep", "ls", "ln",
+	"grep", "which", "cp", "curl", "bash", "sh",
+	"sysctl", "cat", "sed", "mount", "mv", "systemctl",
+	"wget", "rsync", "tar", "find", "sort", "awk",
+	"xargs", "tail", "id"}
 
 func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*models.SoftwareVersionDetails, error) {
 	sv.logger.Debug("The query parameter entered: ", query)
@@ -78,14 +85,14 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 		}
 		serviceResponseArray = append(serviceResponseArray, checkResponse)
 	}
-	osResponse, err := sv.checkOsVersion(sv.osFilePath)
+	osResponse, osName, err := sv.checkOsVersion(sv.osFilePath)
 	if err != nil {
 		sv.logger.Error("Error while getting the OS Version: ", osResponse.ErrorMsg)
 	}
 	if !osResponse.Passed {
 		serviceResponse.Passed = false
 	}
-	kernelResponse, err := sv.checkKernelVersion(sv.kernelFilePath)
+	kernelResponse, err := sv.checkKernelVersion(sv.kernelFilePath, osName)
 	if err != nil {
 		sv.logger.Error("Error while getting the Kernal Version: ", kernelResponse.ErrorMsg)
 	}
@@ -110,20 +117,20 @@ func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Ch
 	return successResponse(cmdName+AVAILABILITY, cmdName+" is available")
 }
 
-func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Checks, error) {
+func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Checks, string, error) {
 	osVersions := map[string][]string{
 		"Red Hat":      {"7,8,9"},
 		"Ubuntu":       {"16.04.x", "18.04.x", "20.04.x", "22.04.x"},
-		"Centos":       {"7"},
+		"CentOS":       {"7"},
 		"Amazon Linux": {"2"},
-		"SUSE Linux":   {"12"},
+		"SUSE Linux":   {"12.5"},
 		"Debian":       {"9", "10", "11", "12"},
 	}
 	checkResponse := &models.Checks{}
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as the file on the path does not exist: ", err)
-		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run automate on the supported platforms."), err
+		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run automate on the supported platforms."), osName, err
 	}
 	sv.logger.Debug("Got the OS Version: ", osVersion)
 	sv.logger.Debug("Got the OS Name: ", osName)
@@ -139,7 +146,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 		}
 		checkResponse = failureResponse(LINUX_VERSION_CHECK, osName+" version is not supported by automate", ENSURE+osName+" correct version is installed on the node")
 	}
-	return checkResponse, nil
+	return checkResponse, osName, nil
 }
 
 func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVersion string, osName string) bool {
@@ -172,7 +179,7 @@ func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVers
 	return correctVersion
 }
 
-func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath string) (*models.Checks, error) {
+func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath, osName string) (*models.Checks, error) {
 	kernelVersion, err := getosutils.GetKernelVersion(kernelFilePath)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
@@ -180,6 +187,12 @@ func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath string) (*mo
 	}
 	sv.logger.Debug("Got the kernal version:", kernelVersion)
 	checkVersion, _ := strconv.ParseFloat(kernelVersion, 64)
+	if strings.Contains(strings.ToLower(osName), strings.ToLower(AMAZON_LINUX)) {
+		if checkVersion == KERNAL_SUPPORTED_VERSION_AMAZON_LINUX {
+			return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+fmt.Sprintf("%.2f", checkVersion)), nil
+		}
+		return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is not equal to 5.10", "Use a linux version whose kernel version is equal to 5.10"), nil
+	}
 	if checkVersion >= KERNAL_SUPPORTED_VERSION {
 		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+fmt.Sprintf("%.2f", checkVersion)), nil
 	}

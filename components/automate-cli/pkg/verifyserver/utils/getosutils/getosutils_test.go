@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const successfile = "../../services/softwareversionservice/testfiles/success.txt"
+const successfile = "../../services/softwareversionservice/testfiles/os_release_ubuntu.txt"
 const failurefile = "../../services/softwareversionservice/testfiles/wrongfile.txt"
 const successKernelfile = "../../services/softwareversionservice/testfiles/successkernel.txt"
 
