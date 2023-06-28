@@ -82,7 +82,7 @@ root_ca = """-----BEGIN CERTIFICATE-----\nMIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQ
 
 [chef_server.config]
 ## === INPUT NEEDED ===
-fqdn = "A2-cba94fe5-automate-lb-1993603048.ap-northeast-2.elb.amazonaws.com"
+fqdn = "chefautomate.example.com"
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = "2"
 
