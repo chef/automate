@@ -226,7 +226,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			} else {
 				if tt.name == "Nil OS and Object storage" {
 					assert.Len(t, got, 1)
-					assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
+					assert.Equal(t, "-", got[0].Host)
 					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
 					assert.True(t, got[0].Result.Skipped)

@@ -27,7 +27,7 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.ExternalOS == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
-			trigger.SkippedTriggerCheckResp(constants.UNKNOWN_HOST, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
+			trigger.SkippedTriggerCheckResp("-", constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
 		}
 	}
 

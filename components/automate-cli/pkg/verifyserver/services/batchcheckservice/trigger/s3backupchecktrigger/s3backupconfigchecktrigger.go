@@ -23,10 +23,14 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 }
 
 func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	if config.Hardware == nil || config.Backup.ObjectStorage == nil {
+	if config.Hardware == nil {
 		return []models.CheckTriggerResponse{
-			trigger.SkippedTriggerCheckResp(constants.UNKNOWN_HOST, constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
+			trigger.SkippedTriggerCheckResp("-", constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
 		}
+	}
+
+	if config.Backup.ObjectStorage == nil {
+		return s3ConfigSkippedResponse(config, constants.S3_BACKUP_CONFIG)
 	}
 
 	if isObjectStorage(config.Backup) {
@@ -35,6 +39,20 @@ func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTrigger
 
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
+}
+
+func s3ConfigSkippedResponse(config *models.Config, checkType string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE))
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER))
+	}
+
+	return triggerResps
 }
 
 func (ss *S3BackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
