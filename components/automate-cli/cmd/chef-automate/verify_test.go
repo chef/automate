@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/lib/reporting"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/version"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -664,6 +665,49 @@ func TestBuildReports(t *testing.T) {
 							SuccessfulCount: 2,
 							FailedCount:     0,
 							ToResolve:       nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Error was there form the handler or Trigger response",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip: "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed: false,
+								Message: "SSH User Access Check",
+								Check: "ssh-user",
+								Checks: nil,
+								Error: &fiber.Error{
+									Code: 400,
+									Message: "Permissions on the ssh key file do not satisfy the requirement",
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: "ssh-user",
+						Status:    "Failed",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "SSH User Access Check - Failed",
+							SubMessage: nil,
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 0,
+							FailedCount: 1,
+							ToResolve: []string{"Permissions on the ssh key file do not satisfy the requirement"},
 						},
 					},
 				},

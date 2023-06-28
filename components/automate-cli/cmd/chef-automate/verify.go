@@ -654,7 +654,7 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 			var errorMsgs, resolutionMsgs []string
 			var successfulCount, failedCount int
 
-			if test.Checks == nil {
+			if test.Error != nil {
 				resolutionMsgs = append(resolutionMsgs, test.Error.Message)
 				failedCount++
 			}
