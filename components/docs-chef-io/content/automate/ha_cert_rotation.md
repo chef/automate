@@ -95,3 +95,16 @@ You can also use `--opensearch` or `-o` instead of the os flag
 
 {{< note >}} Since admin-cert and admin-key are common in all nodes, So if you want to rotate admin-cert and admin-key, you must first run this open search cluster command: 
 `chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os`{{< /note >}}
+
+
+### Rotate Automate Load Balancer Root CA
+
+Below is the configuration needs to be patched on Chef-Server, if you want to rotate the Automate Load balancer root certificate: 
+
+```sh
+[cs_nginx.v1.sys.ngx.http]
+	ssl_verify_depth = 6
+[global.v1.external.automate.ssl]
+	server_name = "https://<automate.example.com>"
+	root_cert = """<Root_CA_Content>"""
+```
