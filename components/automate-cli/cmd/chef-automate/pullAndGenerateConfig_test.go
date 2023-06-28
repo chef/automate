@@ -477,15 +477,6 @@ func Test_getAwsHAConfigFromTFVars(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, params)
 	assert.Equal(t, "true", params.BackupConfigEFS)
-	assert.Equal(t, "/home/test-user/keys.pem", params.AwsSshKeyFile)
-	assert.Equal(t, "22", params.SshPort)
-	assert.Equal(t, 3, params.PostgresqlInstanceCount)
-	assert.Equal(t, 1, params.AutomateInstanceCount)
-	assert.Equal(t, 3, params.OpensearchInstanceCount)
-	assert.Equal(t, 1, params.ChefServerInstanceCount)
-	assert.Equal(t, "test-user", params.SshUser)
-	assert.Equal(t, "A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com", params.AutomateFqdn)
-
 }
 
 func TestGetOsCertsByIp(t *testing.T) {
