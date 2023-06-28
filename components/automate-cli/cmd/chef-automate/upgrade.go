@@ -541,7 +541,10 @@ func removeCommonContentFromAwsAutoTfvar(filePath string) error {
 		}
 		if line == "################################################################################" && line1 {
 			line2 = true
-			truncateAwsAutoTfvar(file, buffer)
+			err := truncateAwsAutoTfvar(file, buffer)
+			if err != nil {
+				return err
+			}
 		}
 		if !line1 && !line2 {
 			buffer.WriteString(line)

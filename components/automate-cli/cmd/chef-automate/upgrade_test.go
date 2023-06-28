@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -79,4 +81,20 @@ func TestRemoveCommonContentFromAwsAutoTfvar(t *testing.T) {
 
 	err := removeCommonContentFromAwsAutoTfvar(destFile)
 	assert.NoError(t, err)
+
+	exist, err := stringExistsInFile(destFile, "# Common")
+	assert.NoError(t, err)
+	assert.False(t, exist)
+}
+
+func stringExistsInFile(filePath string, searchStr string) (bool, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return false, err
+	}
+	fileContent := string(content)
+	if strings.Contains(fileContent, searchStr) {
+		return true, nil
+	}
+	return false, nil
 }
