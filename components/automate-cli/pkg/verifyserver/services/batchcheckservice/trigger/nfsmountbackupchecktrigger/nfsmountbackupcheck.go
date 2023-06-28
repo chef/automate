@@ -3,7 +3,6 @@ package nfsmountbackupchecktrigger
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -92,7 +91,7 @@ func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMount
 // constructErrorResult constructs the error response when recived from the API
 func constructErrorResult(config *models.Config, errMessage string, statusCode int) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
-	fmt.Errorf("Inside the custruct error=%v", errMessage)
+
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
