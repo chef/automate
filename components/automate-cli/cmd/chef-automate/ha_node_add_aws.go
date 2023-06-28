@@ -156,6 +156,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
+	ani.config.Architecture.ConfigInitials.Architecture = "deployment"
 	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
 		return err
