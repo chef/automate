@@ -213,6 +213,13 @@ func validateAutomateCerts(depConfig *HaDeployConfig) error {
 		if v.PublicKey == "" {
 			return fmt.Errorf("cannot find public key for ip %s", v.IP)
 		}
+
+		if err := checkCertValid([]keydetails{
+			{key: v.PrivateKey, certtype: PRIVATE_KEY, svc: AUTOMATE},
+			{key: v.PublicKey, certtype: PUBLIC_KEY, svc: AUTOMATE},
+		}); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -239,6 +246,13 @@ func validateChefServerCerts(depConfig *HaDeployConfig) error {
 		}
 		if v.PublicKey == "" {
 			return fmt.Errorf("cannot find public key for ip %s", v.IP)
+		}
+
+		if err := checkCertValid([]keydetails{
+			{key: v.PrivateKey, certtype: PRIVATE_KEY, svc: CHEFSERVER},
+			{key: v.PublicKey, certtype: PUBLIC_KEY, svc: CHEFSERVER},
+		}); err != nil {
+			return err
 		}
 	}
 
@@ -292,14 +306,28 @@ func validatePostgresqlCerts(depConfig *HaDeployConfig) error {
 		})
 	}
 
+	if depConfig.Postgresql.Config.RootCA == "" {
+		return fmt.Errorf("cannot find root_ca for ip for PostgresSQL")
+	}
+
 	// If CertByIp available then check it's availabe for all the nodes
 	for _, v := range *depConfig.Postgresql.Config.CertsByIP {
 		if v.PrivateKey == "" {
 			return fmt.Errorf("cannot find private key for ip %s", v.IP)
 		}
+
 		if v.PublicKey == "" {
 			return fmt.Errorf("cannot find public key for ip %s", v.IP)
 		}
+
+		if err := checkCertValid([]keydetails{
+			{key: depConfig.Postgresql.Config.RootCA, certtype: ROOT_CA, svc: POSTGRESQL},
+			{key: v.PrivateKey, certtype: PRIVATE_KEY, svc: POSTGRESQL},
+			{key: v.PublicKey, certtype: PUBLIC_KEY, svc: POSTGRESQL},
+		}); err != nil {
+			return err
+		}
+
 	}
 
 	return nil
@@ -324,6 +352,12 @@ func validateOpensearchCerts(depConfig *HaDeployConfig) error {
 		})
 	}
 
+	if len(strings.TrimSpace(depConfig.Opensearch.Config.RootCA)) < 1 ||
+		len(strings.TrimSpace(depConfig.Opensearch.Config.AdminKey)) < 1 ||
+		len(strings.TrimSpace(depConfig.Opensearch.Config.AdminCert)) < 1 {
+		return fmt.Errorf("opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
+	}
+
 	// If CertByIp available then check it's availabe for all the nodes
 	for _, v := range *depConfig.Opensearch.Config.CertsByIP {
 		if v.PrivateKey == "" {
@@ -332,6 +366,17 @@ func validateOpensearchCerts(depConfig *HaDeployConfig) error {
 		if v.PublicKey == "" {
 			return fmt.Errorf("cannot find public key for ip %s", v.IP)
 		}
+
+		if err := checkCertValid([]keydetails{
+			{key: depConfig.Opensearch.Config.RootCA, certtype: ROOT_CA, svc: OPENSEARCH},
+			{key: depConfig.Opensearch.Config.AdminKey, certtype: ADMIN_KEY, svc: OPENSEARCH},
+			{key: depConfig.Opensearch.Config.AdminCert, certtype: ROOT_CA, svc: OPENSEARCH},
+			{key: v.PrivateKey, certtype: PRIVATE_KEY, svc: OPENSEARCH},
+			{key: v.PublicKey, certtype: PUBLIC_KEY, svc: OPENSEARCH},
+		}); err != nil {
+			return err
+		}
+
 	}
 
 	return nil

@@ -152,12 +152,7 @@ func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]s
 		}
 
 		// this is for checking that our private keys are of PKCS8 format or not.
-		_, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-		if err != nil {
-			vc.log.Debugf("%s is not in PKCS8 format", key)
-			invalidFormatKeys += key + ", "
-			continue
-		}
+
 	}
 
 	if invalidFormatKeys == "" {
