@@ -6,22 +6,27 @@ import (
 	"github.com/chef/automate/lib/config"
 )
 
+var GetModeOfDeployment func() string = getModeOfDeployment
+
 func PopulateHaCommonConfig(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
-	existingInfraConfig, err := configPuller.fetchInfraConfig()
-	if err != nil {
-		return nil, err
-	}
-	if existingInfraConfig != nil {
-		return CopyExistingInfra(existingInfraConfig), nil
-	}
+	modeOfDeployment := GetModeOfDeployment()
+	if modeOfDeployment == EXISTING_INFRA_MODE {
+		existingInfraConfig, err := configPuller.fetchInfraConfig()
+		if err != nil {
+			return nil, err
+		}
+		if existingInfraConfig != nil {
+			return CopyExistingInfra(existingInfraConfig), nil
+		}
+	} else if modeOfDeployment == AWS_MODE {
+		awsConfig, err := configPuller.fetchAwsConfig()
+		if err != nil {
+			return nil, err
+		}
 
-	awsConfig, err := configPuller.fetchAwsConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	if awsConfig != nil {
-		return CopyAws(awsConfig), nil
+		if awsConfig != nil {
+			return CopyAws(awsConfig), nil
+		}
 	}
 
 	return nil, errors.New("deployed config was not found")

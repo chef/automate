@@ -5,6 +5,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/lib/config"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -308,53 +309,107 @@ func (m *MockPullConfigs) getOsCertsByIp(configKeysMap map[string]*ConfigKeys) [
 	return m.getOsCertsByIpFunc(configKeysMap)
 }
 
-func TestPopulateHaCommonConfig_ExistingInfraConfig(t *testing.T) {
-	mockPullConfigs := &MockPullConfigs{
-		fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-			return existingInfraConfig, nil
+func TestPopulateHaCommonConfig(t *testing.T) {
+	tests := []struct {
+		name                string
+		mockPullConfigs     *MockPullConfigs
+		getModeOfDeployment func() string
+		err                 string
+		wantErr             bool
+	}{
+		{
+			name: "ExistingInfraConfig passed",
+			mockPullConfigs: &MockPullConfigs{
+				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+					return existingInfraConfig, nil
+				},
+				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+					return nil, nil
+				},
+			},
+			getModeOfDeployment: func() string {
+				return EXISTING_INFRA_MODE
+			},
+			wantErr: false,
 		},
-		fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-			return nil, nil
+		{
+			name: "ExistingInfraConfig failed",
+			mockPullConfigs: &MockPullConfigs{
+				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+					return nil, errors.New("Error while config generation")
+				},
+				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+					return nil, nil
+				},
+			},
+			getModeOfDeployment: func() string {
+				return EXISTING_INFRA_MODE
+			},
+			err:     "Error while config generation",
+			wantErr: true,
+		},
+		{
+			name: "AwsConfig passed",
+			mockPullConfigs: &MockPullConfigs{
+				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+					return nil, nil
+				},
+				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+					return awsConfig, nil
+				},
+			},
+			getModeOfDeployment: func() string {
+				return AWS_MODE
+			},
+			wantErr: false,
+		},
+		{
+			name: "AwsConfig failed",
+			mockPullConfigs: &MockPullConfigs{
+				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+					return nil, nil
+				},
+				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+					return nil, errors.New("Error while config generation")
+				},
+			},
+			getModeOfDeployment: func() string {
+				return AWS_MODE
+			},
+			err:     "Error while config generation",
+			wantErr: true,
+		},
+		{
+			name: "NoConfigFound",
+			mockPullConfigs: &MockPullConfigs{
+				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+					return nil, nil
+				},
+				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+					return nil, nil
+				},
+			},
+			getModeOfDeployment: func() string {
+				return AWS_MODE
+			},
+			err:     "deployed config was not found",
+			wantErr: true,
 		},
 	}
-
-	haDeployConfig, err := PopulateHaCommonConfig(mockPullConfigs)
-
-	assert.Nil(t, err)
-	assert.NotNil(t, haDeployConfig)
-}
-
-func TestPopulateHaCommonConfig_AwsConfig(t *testing.T) {
-	// Create a mock instance of PullConfigs
-	mockPullConfigs := &MockPullConfigs{
-		fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-			return nil, nil
-		},
-		fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-			return awsConfig, nil
-		},
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			GetModeOfDeployment = tt.getModeOfDeployment
+			haDeployConfig, err := PopulateHaCommonConfig(tt.mockPullConfigs)
+			if tt.wantErr {
+				assert.Nil(t, haDeployConfig)
+				assert.Error(t, err)
+				assert.EqualError(t, err, tt.err)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, haDeployConfig)
+			}
+		})
 	}
-
-	haDeployConfig, err := PopulateHaCommonConfig(mockPullConfigs)
-
-	assert.Nil(t, err)
-	assert.NotNil(t, haDeployConfig)
-}
-
-func TestPopulateHaCommonConfig_NoConfigFound(t *testing.T) {
-	mockPullConfigs := &MockPullConfigs{
-		fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-			return nil, nil
-		},
-		fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-			return nil, nil
-		},
-	}
-
-	haDeployConfig, err := PopulateHaCommonConfig(mockPullConfigs)
-	assert.NotNil(t, err)
-	assert.Nil(t, haDeployConfig)
-	assert.EqualError(t, err, "deployed config was not found")
 }
 
 func TestCopyCertsByIP(t *testing.T) {
