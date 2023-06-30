@@ -53,7 +53,7 @@ admin_password = ""
 fqdn = ""
 
 # Add Automate Load Balancer root-ca
-# root_ca = """automate_root_ca_contents"""
+# root_ca = """automate_lb_root_ca_contents"""
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -81,7 +81,7 @@ enable_custom_certs = false
 fqdn = ""
 
 # Add Chefserver Load Balancer root-ca
-# lb_root_ca = """chef_server_root_ca_contents"""
+# lb_root_ca = """chef_server_lb_root_ca_contents"""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -369,7 +369,7 @@ admin_password = ""
 fqdn = ""
 
 # Add Automate Load Balancer root-ca
-root_ca = ""
+# root_ca = """automate_lb_root_ca_contents"""
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -398,7 +398,7 @@ enable_custom_certs = false
 fqdn = ""
 
 # Add Chefserver Load Balancer root-ca
-lb_root_ca = ""
+# lb_root_ca = """chef_server_lb_root_ca_contents"""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
