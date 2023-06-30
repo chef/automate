@@ -1,9 +1,9 @@
 package constants
 
 const (
-	MIN_CPU_COUNT = 4
+	MIN_CPU_COUNT = 2
 	MIN_CPU_SPEED = 2.0
-	MIN_MEMORY    = 14
+	MIN_MEMORY    = 7
 
 	HAB_FREE_DISK_BEFORE_DEP_A2      = 80
 	HAB_FREE_DISK_BEFORE_DEP_CS      = 80
