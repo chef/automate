@@ -662,3 +662,65 @@ func TestGetOpensearchDetails(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPGDetails(t *testing.T) {
+	type testCaseInfo struct {
+		testCaseDescreption string
+		InstanceURL         string
+		SuperUsername       string
+		SuperUserPassword   string
+		DBUserName          string
+		DBUserPassword      string
+		rootCert            string
+		ExpectedPGToml      *ExternalPostgreSQLToml
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescreption: "With cert",
+			InstanceURL:         "testopensearch:5432",
+			SuperUsername:       "admin",
+			SuperUserPassword:   "pass",
+			DBUserName:          "admin",
+			DBUserPassword:      "pass",
+			rootCert:            "----certs----",
+			ExpectedPGToml: &ExternalPostgreSQLToml{
+				PostgreSQLInstanceURL:       "testopensearch:5432",
+				PostgreSQLSuperUserName:     "admin",
+				PostgreSQLSuperUserPassword: "pass",
+				PostgreSQLDBUserName:        "admin",
+				PostgreSQLDBUserPassword:    "pass",
+				PostgreSQLRootCert:          "----certs----",
+			},
+		},
+		{
+			testCaseDescreption: "With empty cert",
+			InstanceURL:         "testopensearch:5432",
+			SuperUsername:       "admin",
+			SuperUserPassword:   "pass",
+			DBUserName:          "admin",
+			DBUserPassword:      "pass",
+			rootCert:            "",
+			ExpectedPGToml: &ExternalPostgreSQLToml{
+				PostgreSQLInstanceURL:       "testopensearch:5432",
+				PostgreSQLSuperUserName:     "admin",
+				PostgreSQLSuperUserPassword: "pass",
+				PostgreSQLDBUserName:        "admin",
+				PostgreSQLDBUserPassword:    "pass",
+				PostgreSQLRootCert:          "",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
+			externalPGConfig := setExternalPGDetails(testCase.InstanceURL, testCase.SuperUsername, testCase.SuperUserPassword, testCase.DBUserName, testCase.DBUserPassword, testCase.rootCert)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLInstanceURL, externalPGConfig.PostgreSQLInstanceURL)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLSuperUserName, externalPGConfig.PostgreSQLSuperUserName)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLSuperUserPassword, externalPGConfig.PostgreSQLSuperUserPassword)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLDBUserName, externalPGConfig.PostgreSQLDBUserName)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLDBUserPassword, externalPGConfig.PostgreSQLDBUserPassword)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLRootCert, externalPGConfig.PostgreSQLRootCert)
+		})
+	}
+}

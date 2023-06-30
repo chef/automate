@@ -366,6 +366,9 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = externalOsDetails.OpensearchRootCert
 			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = externalOsDetails.OpensearchSuperUserName
 			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = externalOsDetails.OpensearchSuperUserPassword
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = externalOsDetails.AWS.AwsOsSnapshotRoleArn
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = externalOsDetails.AWS.OsUserAccessKeyId
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = externalOsDetails.AWS.OsUserAccessKeySecret
 		}
 		externalPgDetails := getExternalPGDetails(a2ConfigMap)
 		if externalPgDetails != nil {
@@ -439,18 +442,21 @@ func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *Ex
 		if ele.Global.V1.External.Opensearch != nil &&
 			ele.Global.V1.External.Opensearch.Auth != nil &&
 			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
-
 			return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
 				ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
 				ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
 				ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
-				ele.Global.V1.External.Opensearch.Ssl.ServerName.Value)
+				ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value,
+				ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value,
+			)
 		}
 	}
 	return nil
 }
 
-func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, rootCert, domainName string) *ExternalOpensearchToml {
+func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, rootCert, domainName, accessKey, secretKey, roleArn string) *ExternalOpensearchToml {
 	nodeUrl, _ := url.Parse(instanceUrl)
 	return &ExternalOpensearchToml{
 		OpensearchInstanceURL:       nodeUrl.Host,
@@ -458,6 +464,11 @@ func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, roo
 		OpensearchSuperUserPassword: superPassword,
 		OpensearchRootCert:          rootCert,
 		OpensearchDomainName:        domainName,
+		AWS: ExternalAwsToml{
+			OsUserAccessKeyId:     accessKey,
+			OsUserAccessKeySecret: secretKey,
+			AwsOsSnapshotRoleArn:  roleArn,
+		},
 	}
 }
 
@@ -466,18 +477,28 @@ func getExternalPGDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalPo
 		if ele.Global.V1.External.Postgresql.Nodes != nil &&
 			ele.Global.V1.External.Postgresql.Auth.Password.Superuser != nil &&
 			ele.Global.V1.External.Postgresql.Auth.Password.Dbuser != nil {
-			return &ExternalPostgreSQLToml{
-				PostgreSQLInstanceURL:       ele.Global.V1.External.Postgresql.Nodes[0].Value,
-				PostgreSQLSuperUserName:     ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Username.Value,
-				PostgreSQLSuperUserPassword: ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value,
-				PostgreSQLDBUserName:        ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Username.Value,
-				PostgreSQLDBUserPassword:    ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value,
-				PostgreSQLRootCert:          ele.Global.V1.External.Postgresql.Ssl.RootCert.Value,
-			}
+			return setExternalPGDetails(
+				ele.Global.V1.External.Postgresql.Nodes[0].Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Username.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Username.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value,
+				ele.Global.V1.External.Postgresql.Ssl.RootCert.Value,
+			)
 		}
-
 	}
 	return nil
+}
+
+func setExternalPGDetails(instanceUrl, superUserName, superUserPassword, dBUserName, dBUserPassword, rootCerts string) *ExternalPostgreSQLToml {
+	return &ExternalPostgreSQLToml{
+		PostgreSQLInstanceURL:       instanceUrl,
+		PostgreSQLSuperUserName:     superUserName,
+		PostgreSQLSuperUserPassword: superUserPassword,
+		PostgreSQLDBUserName:        dBUserName,
+		PostgreSQLDBUserPassword:    dBUserPassword,
+		PostgreSQLRootCert:          rootCerts,
+	}
 }
 
 func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []CertByIP {
@@ -642,6 +663,9 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 			sharedConfigToml.Aws.Config.OpensearchCertificate = externalOsDetails.OpensearchRootCert
 			sharedConfigToml.Aws.Config.OpensearchUsername = externalOsDetails.OpensearchSuperUserName
 			sharedConfigToml.Aws.Config.OpensearchUserPassword = externalOsDetails.OpensearchSuperUserPassword
+			sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = externalOsDetails.AWS.AwsOsSnapshotRoleArn
+			sharedConfigToml.Aws.Config.OsUserAccessKeyId = externalOsDetails.AWS.OsUserAccessKeyId
+			sharedConfigToml.Aws.Config.OsUserAccessKeySecret = externalOsDetails.AWS.OsUserAccessKeySecret
 		}
 		externalPgDetails := getExternalPGDetails(a2ConfigMap)
 		if externalPgDetails != nil {
