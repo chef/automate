@@ -1,6 +1,7 @@
 package opensearchs3bucketaccesschecktrigger
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -54,15 +55,18 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.Ch
 		AWSRegion:  config.Backup.ObjectStorage.AWSRegion,
 		AWSRoleArn: config.ExternalOS.OSRoleArn,
 	}
+	fmt.Printf("s3OpensearchBackupRequest.Endpoint 1: %v\n", s3OpensearchBackupRequest.Endpoint)
 
 	if !strings.Contains(s3OpensearchBackupRequest.Endpoint, "https://") {
 		s3OpensearchBackupRequest.Endpoint = "https://" + s3OpensearchBackupRequest.Endpoint
 	}
 
+	fmt.Printf("s3OpensearchBackupRequest.Endpoint 2: %v\n", s3OpensearchBackupRequest.Endpoint)
+
 	endPoint := checkutils.PrepareEndPoint(osb.host, osb.port, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH)
 
 	response := triggerCheckForOpensearchS3Backup(endPoint, osb.log, http.MethodPost, s3OpensearchBackupRequest)
-
+	fmt.Printf("response: %v\n", response)
 	return setHostAsOpensearchInResponse(response, config.ExternalOS.OSDomainURL)
 
 }
@@ -74,10 +78,12 @@ func (ss *OpensearchS3BucketAccessCheck) GetPortsForMockServer() map[string]map[
 
 // setHostAsOpensearchInResponse sets the Host as external OS endpoint as this will help us in mapping the result correctly
 func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExternalUrl string) []models.CheckTriggerResponse {
+	fmt.Printf("osExternalUrl: %v\n", osExternalUrl)
 	for i := range response {
 		response[i].Host = osExternalUrl
 
 	}
+
 	return response
 }
 
@@ -87,13 +93,15 @@ func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, metho
 	log.Debugf("Triggering the api call for Opensearch for S3 backup")
 	outputCh := make(chan models.CheckTriggerResponse)
 
+	fmt.Printf("reqBody: %v\n", reqBody)
 	//There will be only one request which will check the connection
 	go trigger.TriggerCheckAPI(endPoint, reqBody.Endpoint, constants.OPENSEARCH, method, outputCh, reqBody)
 
 	//As we are triggering only one request for checking the connection for opensearch and s3 bucket
 	res := <-outputCh
+	fmt.Printf("res.Host: %v\n", res.Host)
 	result = append(result, res)
-
+	fmt.Printf("result: %+v\n", result)
 	return result
 
 }

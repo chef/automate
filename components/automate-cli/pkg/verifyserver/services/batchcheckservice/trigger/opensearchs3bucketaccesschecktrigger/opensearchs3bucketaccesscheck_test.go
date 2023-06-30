@@ -2,6 +2,7 @@ package opensearchs3bucketaccesschecktrigger
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -12,18 +13,19 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
 	externalOs = &models.ExternalOS{
-		OSDomainName:   "Name of the domain",
-		OSDomainURL:    "open-search-url",
-		OSRoleArn:      "Role-ARN",
-		OSUsername:     "username",
-		OSUserPassword: "password",
-		OSCert:         "___CERT____",
+		OSDomainName:                  "Name of the domain",
+		OSDomainURL:                   "https://open-search-url",
+		OSRoleArn:                     "Role-ARN",
+		OSUsername:                    "username",
+		OSUserPassword:                "password",
+		OSCert:                        "___CERT____",
 		OsSnapshotUserAccessKeySecret: "secret-key",
-		OsSnapshotUserAccessKeyId: "access-kkey",
+		OsSnapshotUserAccessKeyId:     "access-kkey",
 	}
 
 	s3Properties = &models.ObjectStorage{
@@ -79,7 +81,7 @@ const (
 	[
 		{
 			"status": "SUCCESS",
-			"host": "open-search-url",
+			"host": "https://open-search-url",
 			"node_type": "opensearch",
 			"result": {
 				"passed": true,
@@ -101,7 +103,7 @@ const (
 	apiTriggerResponseFailure = `[
 		{
 		"status": "SUCCESS",
-		"host": "open-search-url",
+		"host": "https://open-search-url",
 		"node_type": "opensearch",
 		"result": {
 			"passed": false,
@@ -244,13 +246,38 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				} else {
 					assert.Equal(t, want, got)
 					assert.NotNil(t, got)
-					assert.Nil(t, got[0].Result.Error)
+					assert.NotNil(t, got[0].Result.Error)
 					assert.Equal(t, "https://open-search-url", got[0].Host)
 				}
 			}
 
 		})
 	}
+
+	t.Run("Endpoint without https", func(t *testing.T) {
+		config := &models.Config{
+			ExternalOS: &models.ExternalOS{
+				OSDomainName:                  "Name of the domain",
+				OSDomainURL:                   "open-search-url",
+				OSRoleArn:                     "Role-ARN",
+				OSUsername:                    "username",
+				OSUserPassword:                "password",
+				OSCert:                        "___CERT____",
+				OsSnapshotUserAccessKeySecret: "secret-key",
+				OsSnapshotUserAccessKeyId:     "access-kkey",
+			},
+			Backup: &models.Backup{
+				ObjectStorage: s3Properties,
+			},
+		}
+
+		osb := NewOpensearchS3BucketAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+
+		got := osb.Run(config)
+		require.Len(t, got, 2)
+		fmt.Printf("got: %+v\n", got)
+		require.Equal(t, "https://open-search-url", got[0].Host)
+	})
 }
 
 // Helper function to create a dummy server
