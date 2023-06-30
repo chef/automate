@@ -89,7 +89,6 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 			aboutToExpireCerts += key + ", "
 			continue
 		}
-
 	}
 
 	if aboutToExpireCerts != "" {
