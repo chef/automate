@@ -16,12 +16,14 @@ import (
 
 var (
 	externalOs = &models.ExternalOS{
-		OSDomainName:   "Name of the domain",
-		OSDomainURL:    "open-search-url",
-		OSRoleArn:      "Role-ARN",
-		OSUsername:     "username",
-		OSUserPassword: "password",
-		OSCert:         "___CERT____",
+		OSDomainName:                  "Name of the domain",
+		OSDomainURL:                   "https://open-search-url",
+		OSRoleArn:                     "Role-ARN",
+		OSUsername:                    "username",
+		OSUserPassword:                "password",
+		OSCert:                        "___CERT____",
+		OsSnapshotUserAccessKeySecret: "secret-key",
+		OsSnapshotUserAccessKeyId:     "access-kkey",
 	}
 
 	s3Properties = &models.ObjectStorage{
@@ -77,7 +79,7 @@ const (
 	[
 		{
 			"status": "SUCCESS",
-			"host": "open-search-url",
+			"host": "https://open-search-url",
 			"node_type": "opensearch",
 			"result": {
 				"passed": true,
@@ -99,7 +101,7 @@ const (
 	apiTriggerResponseFailure = `[
 		{
 		"status": "SUCCESS",
-		"host": "open-search-url",
+		"host": "https://open-search-url",
 		"node_type": "opensearch",
 		"result": {
 			"passed": false,
@@ -221,7 +223,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				assert.NotNil(t, got[0].Result.Error.Error)
 				assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 				assert.Equal(t, tt.httpResponseCode, got[0].Result.Error.Code)
-				assert.Equal(t, "open-search-url", got[0].Host)
+				assert.Equal(t, "https://open-search-url", got[0].Host)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
 				if tt.name == "Nil OS and Object storage" {
@@ -242,8 +244,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				} else {
 					assert.Equal(t, want, got)
 					assert.NotNil(t, got)
-					assert.Nil(t, got[0].Result.Error)
-					assert.Equal(t, "open-search-url", got[0].Host)
+					assert.Equal(t, "https://open-search-url", got[0].Host)
 				}
 			}
 

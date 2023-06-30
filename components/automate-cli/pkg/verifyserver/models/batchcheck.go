@@ -405,6 +405,8 @@ func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
 
 	if haConfig.IsAwsExternalOsConfigured() {
 		c.ExternalOS.OSRoleArn = externalOsConfig.Aws.AwsOsSnapshotRoleArn
+		c.ExternalOS.OsSnapshotUserAccessKeyId = externalOsConfig.Aws.OsSnapshotUserAccessKeyID
+		c.ExternalOS.OsSnapshotUserAccessKeySecret= externalOsConfig.Aws.OsSnapshotUserAccessKeySecret
 	}
 }
 
