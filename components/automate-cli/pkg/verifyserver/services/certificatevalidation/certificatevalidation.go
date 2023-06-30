@@ -64,7 +64,6 @@ func decodeAndParseCertificate(certificate, key string) (*x509.Certificate, erro
 func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map[string]string, keys []string) models.Checks {
 	vc.log.Debug("Validating Certificates Expiry...")
 	expiredCerts := ""
-	aboutToExpireCerts := ""
 
 	for _, key := range keys {
 		cert := certificates[key]
@@ -86,14 +85,10 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		threshold := currentTime.AddDate(0, 0, 30)
 		if certificate.NotAfter.Before(threshold) {
 			vc.log.Debugf("%s certificate is will expire soon", key)
-			aboutToExpireCerts += key + ", "
+			fmt.Printf("The certificate will expire with 30 days\n")
 			continue
 		}
-	}
 
-	if aboutToExpireCerts != "" {
-		vc.log.Debug("These certificates will expire within 30 days: %v\n", aboutToExpireCerts)
-		return createCheck(constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS, true, constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS, "", constants.RENEW_CERTS)
 	}
 
 	if expiredCerts == "" {
