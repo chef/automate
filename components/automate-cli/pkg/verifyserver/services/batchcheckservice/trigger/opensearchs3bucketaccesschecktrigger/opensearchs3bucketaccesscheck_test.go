@@ -22,6 +22,8 @@ var (
 		OSUsername:     "username",
 		OSUserPassword: "password",
 		OSCert:         "___CERT____",
+		OsSnapshotUserAccessKeySecret: "secret-key",
+		OsSnapshotUserAccessKeyId: "access-kkey",
 	}
 
 	s3Properties = &models.ObjectStorage{
@@ -221,7 +223,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				assert.NotNil(t, got[0].Result.Error.Error)
 				assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 				assert.Equal(t, tt.httpResponseCode, got[0].Result.Error.Code)
-				assert.Equal(t, "open-search-url", got[0].Host)
+				assert.Equal(t, "https://open-search-url", got[0].Host)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
 				if tt.name == "Nil OS and Object storage" {
@@ -243,7 +245,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					assert.Equal(t, want, got)
 					assert.NotNil(t, got)
 					assert.Nil(t, got[0].Result.Error)
-					assert.Equal(t, "open-search-url", got[0].Host)
+					assert.Equal(t, "https://open-search-url", got[0].Host)
 				}
 			}
 
