@@ -84,9 +84,16 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 
 		// this is for checking that certificate is expired or not.
 		currentTime := time.Now()
-		if currentTime.Before(certificate.NotBefore) || currentTime.After(certificate.NotAfter) {
+		if currentTime.After(certificate.NotAfter) {
 			vc.log.Debugf("%s certificate is expired", key)
 			expiredCerts += key + ", "
+			continue
+		}
+
+		threshold := currentTime.AddDate(0, 0, 30)
+		if certificate.NotAfter.Before(threshold) {
+			vc.log.Debugf("%s certificate is will expire soon", key)
+			aboutToExpireCerts += key + ", "
 			continue
 		}
 
