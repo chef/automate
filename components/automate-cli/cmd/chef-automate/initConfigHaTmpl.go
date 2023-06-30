@@ -52,6 +52,9 @@ admin_password = ""
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
 
+# Add Automate Load Balancer root-ca
+# root_ca = """automate_lb_root_ca_contents"""
+
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
 
@@ -66,9 +69,6 @@ config_file = "configs/automate.toml"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 
-# Add Automate Load Balancer root-ca
-# root_ca = """root_ca_contents"""
-
 # Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
@@ -76,6 +76,12 @@ enable_custom_certs = false
 
 [chef_server.config]
 ## === INPUT NEEDED ===
+
+# Chefserver Load Balancer FQDN eg.: "chefserver.example.com"
+fqdn = ""
+
+# Add Chefserver Load Balancer root-ca
+# lb_root_ca = """chef_server_lb_root_ca_contents"""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -359,24 +365,22 @@ region = ""
 # Password for Automate UI for 'admin' user.
 admin_password = ""
 
-
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
+
+# Add Automate Load Balancer root-ca
+# root_ca = """automate_lb_root_ca_contents"""
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
 
 ## === ===
 
-
 # teams_port = ""
 config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-
-# Add Automate Load Balancer root-ca
-# root_ca = """root_ca_contents"""
 
 # Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
@@ -389,6 +393,12 @@ enable_custom_certs = false
 
 [chef_server.config]
 ## === INPUT NEEDED ===
+
+# Chefserver Load Balancer FQDN eg.: "chefserver.example.com"
+fqdn = ""
+
+# Add Chefserver Load Balancer root-ca
+# lb_root_ca = """chef_server_lb_root_ca_contents"""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""

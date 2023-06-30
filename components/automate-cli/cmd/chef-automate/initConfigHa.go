@@ -204,6 +204,8 @@ type ChefServerToml struct {
 
 type ChefServerConfigToml struct {
 	InstanceCount     string     `toml:"instance_count"`
+	Fqdn              string     `toml:"fqdn"`
+	RootCA            string     `toml:"lb_root_ca"`
 	EnableCustomCerts bool       `toml:"enable_custom_certs"`
 	PrivateKey        string     `toml:"private_key"`
 	PublicKey         string     `toml:"public_key"`

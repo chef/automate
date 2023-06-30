@@ -130,7 +130,7 @@
   [global.v1.external.automate.auth]
     token = "<%= overrides[:automate_dc_token] %>"
 
-  <% if overrides[:automate_custom_certs_enabled] == true && overrides[:automate_root_ca] -%>
+  <% if overrides[:automate_root_ca] -%>
     [cs_nginx.v1.sys.ngx.http]
       ssl_verify_depth = 6
     [global.v1.external.automate.ssl]
