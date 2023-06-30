@@ -277,41 +277,11 @@ Follow these steps if you want to use the AWS certificates in your network infra
 
     {{< figure src="/images/automate/ha_load_balancer.png" alt="AWS Certificate ARN Value">}}
 
-1. Copy the existing or generated ARN value from AWS console to the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the *a2ha.rb* file. Refer to the code below:
+1. Copy and paste the certificate ARN from AWS console to the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the `a2ha.rb` file. For example:
 
-    ```bash
-        # Provide vpcid and cider block
-        # E.g. aws_vpc_id = “vpc12318h”
-        # E.g. aws_cidr_block_addr = “172.31.64.0”
-        aws_vpc_id = “vac-c2011ba6”
-        aws_cidr_block_addr = “172.31.128.0”
-        # ssh key pair name in AWS to access instances
-        ssh_key_pair_name = “meetg-sydney”
-        ami_filter_name = “ “
-        ami_filter_virt_type = “ “
-        ami_filter_owner = “ “
-        ami_id = “ “
-        automate_server_instance_type = “t3.medium”
-        chef_server_instance_type = “t3.medium”
-        elasticsearch_server_instance_type = “m5.large”
-        postgresql_server_instance_type = “t3.medium”
-        automate_lb_certificate_arn = “areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9332-26a59a6ce4e”
-        chef_server_lb_certificate_arn = “areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9932-262a59a6ce4e”
-        automate_ebs_volume_iops = “100”
-        automate_ebs_volume_size = “50”
-        automate_ebs_volume_type = “gp2”
-        chef_ebs_volume_iops = “100”
-        chef_ebs_volume_size = “50”
-        chef_ebs_volume_type = “gp2”
-        elasticsearch_ebs_volume_iops = “100”
-        elasticsearch_ebs_volume_size = “50”
-        elasticsearch_ebs_volume_type = “gp2”
-        postgresql_ebs_volume_iops = “100”
-        postgresql_ebs_volume_size = “50”
-        postgresql_ebs_volume_type = “gp2”
-        X-Contact = “ “
-        X-Dept = “ “
-        X-Project = “ “
+    ```ruby
+    automate_lb_certificate_arn = "areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9332-26a59a6ce4e"
+    chef_server_lb_certificate_arn = "areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9932-262a59a6ce4e"
     ```
 
 1. Save and close the file.
