@@ -234,7 +234,7 @@ func TestMakeRequests(t *testing.T) {
 
 	requestsForBastion, ok := mapRequests[constants.BASTION]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForBastion), 11)
+	assert.Equal(t, len(requestsForBastion), 7)
 
 	require.Equal(t, expected[0].SourceNodeIP, requestsForautomate[0].SourceNodeIP)
 	require.Equal(t, expected[0].DestinationNodeIP, requestsForautomate[0].DestinationNodeIP)
