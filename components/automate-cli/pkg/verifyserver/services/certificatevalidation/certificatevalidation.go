@@ -37,18 +37,11 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 	}
 }
 
-func createErrorMessage(expiredCerts, aboutToExpireCerts string) string {
+func createErrorMessage(expiredCerts string) string {
 	errorMessage := ""
 	if expiredCerts != "" {
 		expiredCerts = strings.TrimSuffix(expiredCerts, ", ")
 		errorMessage = fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, expiredCerts)
-	}
-	if aboutToExpireCerts != "" {
-		aboutToExpireCerts = strings.TrimSuffix(aboutToExpireCerts, ", ")
-		if errorMessage != "" {
-			errorMessage += "; "
-		}
-		errorMessage += fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, aboutToExpireCerts)
 	}
 
 	return errorMessage
@@ -71,7 +64,6 @@ func decodeAndParseCertificate(certificate, key string) (*x509.Certificate, erro
 func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map[string]string, keys []string) models.Checks {
 	vc.log.Debug("Validating Certificates Expiry...")
 	expiredCerts := ""
-	aboutToExpireCerts := ""
 
 	for _, key := range keys {
 		cert := certificates[key]
@@ -90,28 +82,22 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 			continue
 		}
 
+		// Is the certificate expiring in within 30 days
 		threshold := currentTime.AddDate(0, 0, 30)
 		if certificate.NotAfter.Before(threshold) {
 			vc.log.Debugf("%s certificate is will expire soon", key)
-			aboutToExpireCerts += key + ", "
+			fmt.Printf("The certificate will expire with 30 days\n")
 			continue
 		}
 
-		// this is for checking that certificate is going to expire in next 365 days or not.
-		expirationDate := time.Now().AddDate(0, 0, 365)
-		if certificate.NotAfter.Before(expirationDate) {
-			vc.log.Debugf("%s certificate is going to expire in next 365 days", key)
-			aboutToExpireCerts += key + ", "
-			continue
-		}
 	}
 
-	if expiredCerts == "" && aboutToExpireCerts == "" {
+	if expiredCerts == "" {
 		vc.log.Debug("Certificates are not expired")
 		return createCheck(constants.CERTIFICATE_EXPIRY_TITLE, true, constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE, "", "")
 	}
 
-	errorMessage := createErrorMessage(expiredCerts, aboutToExpireCerts)
+	errorMessage := createErrorMessage(expiredCerts)
 	return createCheck(constants.CERTIFICATE_EXPIRY_TITLE, false, "", errorMessage, constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE)
 }
 
