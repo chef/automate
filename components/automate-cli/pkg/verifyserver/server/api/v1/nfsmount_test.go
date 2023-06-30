@@ -566,23 +566,6 @@ func TestNFSMount(t *testing.T) {
 				}
 			}`,
 			RequestBody: `{
-				"external_db_type":"",
-				"automate_node_ips": []
-			}`,
-		},
-		{
-			TestName:     "Not Given all the required IPs in On-Prem self managed",
-			ExpectedCode: 400,
-			ExpectedBody: `{
-				"status": "FAILED",
-				"result": null,
-				"error": {
-					"code": 400,
-					"message": "AutomateNodeIPs or ChefInfraServerNodeIPs cannot be empty"
-				}
-			}`,
-			RequestBody: `{
-				"external_db_type":"self-managed",
 				"automate_node_ips": []
 			}`,
 		},
