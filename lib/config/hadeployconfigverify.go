@@ -225,7 +225,7 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 func (c *HaDeployConfig) verifyChefServerSettings() error {
 	chefServerSettings := c.ChefServer.Config
 	errorList := list.New()
-	if err := validateFQDN(chefServerSettings.ChefServerFqdn, "chefserver fqdn"); err != nil {
+	if err := validateFQDN(chefServerSettings.ChefServerFqdn, "chef-infra-server fqdn"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateNumberField(chefServerSettings.InstanceCount, "chef server instance_count", true); err != nil {
