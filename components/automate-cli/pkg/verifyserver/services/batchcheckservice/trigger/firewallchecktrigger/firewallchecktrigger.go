@@ -298,7 +298,7 @@ func constructResponseFromOutput(result []models.CheckTriggerResponse) []models.
 			newChecks := value.Result.Checks
 			newChecks = append(newChecks, checkResponse.Result.Checks...)
 			//Adding the new checks to the result
-			value.Result.Passed = checkResponse.Result.Passed
+			value.Result.Passed = checkResponse.Result.Passed 
 			value.Result.Skipped = checkResponse.Result.Skipped
 			value.Result.Checks = newChecks
 			if checkResponse.Result.Error != nil {
