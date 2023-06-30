@@ -54,7 +54,7 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 		if nfsMountAPIResponse!= nil {
 			return constructErrorResult(config, nfsMountAPIResponse.Error.Message, nfsMountAPIResponse.Error.Code)
 		}
-		return constructErrorResult(config, err.Error(), 503)
+		return constructErrorResult(config, err.Error(), 500)
 
 	}
 	result := constructSuccessResult(*nfsMountAPIResponse)
@@ -79,7 +79,7 @@ func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMount
 	apiResp := &models.NFSMountCheckResponse{}
 	err = json.Unmarshal(respBody, apiResp)
 	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of NFS Mount response from batch Check API : ", err)
+		ss.log.Error("Error while reading unmarshalled response of NFS Mount response from batch Check API : ", err)
 		return nil, err
 	}
 	if apiResp.Error.Message != "" {

@@ -40,7 +40,7 @@ func (ss *HardwareResourceCountCheck) Run(config *models.Config) []models.CheckT
 	// for each and every IP to make the processing simple at the caller end
 
 	if err != nil {
-		statusCode := 503
+		statusCode := 500
 		errMessage := err.Error()
 		if resp != nil {
 			statusCode = resp.Error.Code
@@ -89,7 +89,7 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 	response := models.HardwareResourceCheckResponse{}
 	err = json.Unmarshal(respBody, &response)
 	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of Hardware resource count check from batch Check API : ", response.Error.Message)
+		ss.log.Error("Error while reading unmarshalled response of Hardware resource count check from batch Check API : ", err)
 		return nil, err
 	}
 	
