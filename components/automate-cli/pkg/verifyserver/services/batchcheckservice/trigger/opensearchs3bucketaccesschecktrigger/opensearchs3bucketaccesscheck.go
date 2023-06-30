@@ -2,6 +2,7 @@ package opensearchs3bucketaccesschecktrigger
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -20,7 +21,7 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 	return &OpensearchS3BucketAccessCheck{
 		log:  log,
 		port: port,
-		host: constants.LOCAL_HOST_URL,
+		host: constants.LOCALHOST,
 	}
 }
 
@@ -48,10 +49,14 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.Ch
 		Password:   config.ExternalOS.OSUserPassword,
 		S3Bucket:   config.Backup.ObjectStorage.BucketName,
 		S3BasePath: config.Backup.ObjectStorage.BasePath,
-		AccessKey:  config.Backup.ObjectStorage.AccessKey,
-		SecretKey:  config.Backup.ObjectStorage.SecretKey,
+		AccessKey:  config.ExternalOS.OsSnapshotUserAccessKeyId,
+		SecretKey:  config.ExternalOS.OsSnapshotUserAccessKeySecret,
 		AWSRegion:  config.Backup.ObjectStorage.AWSRegion,
 		AWSRoleArn: config.ExternalOS.OSRoleArn,
+	}
+
+	if !strings.Contains(s3OpensearchBackupRequest.Endpoint, "https://") {
+		s3OpensearchBackupRequest.Endpoint = "https://" + s3OpensearchBackupRequest.Endpoint
 	}
 
 	endPoint := checkutils.PrepareEndPoint(osb.host, osb.port, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH)
