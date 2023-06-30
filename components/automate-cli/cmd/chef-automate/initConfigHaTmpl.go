@@ -81,7 +81,7 @@ enable_custom_certs = false
 fqdn = ""
 
 # Add Chefserver Load Balancer root-ca
-root_ca = ""
+lb_root_ca = ""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -398,7 +398,7 @@ enable_custom_certs = false
 fqdn = ""
 
 # Add Chefserver Load Balancer root-ca
-root_ca = ""
+lb_root_ca = ""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
