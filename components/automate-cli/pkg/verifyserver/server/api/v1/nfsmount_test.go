@@ -566,7 +566,23 @@ func TestNFSMount(t *testing.T) {
 				}
 			}`,
 			RequestBody: `{
+				"external_db_type":"",
 				"automate_node_ips": []
+			}`,
+		},
+		{
+			TestName:     "The Deployment type is AWS or Self-Managed",
+			ExpectedCode: 400,
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "The NFS Backup and restore is not supported for your deployment type"
+				}
+			}`,
+			RequestBody: `{
+				"external_db_type":"aws"
 			}`,
 		},
 		{
@@ -581,6 +597,7 @@ func TestNFSMount(t *testing.T) {
 				}
 			}`,
 			RequestBody: `{
+				"external_db_type":"",
 				"automate_node_ips": [
 					"localhost",
 					"localhost"

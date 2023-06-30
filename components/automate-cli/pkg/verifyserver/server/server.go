@@ -43,6 +43,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/executil"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/sshutils"
@@ -109,7 +110,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
 			), l, port)).
-		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, systemresource.NewSystemResourceInfoImpl())).
+		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, httputils.NewClient(l),systemresource.NewSystemResourceInfoImpl())).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
 		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).

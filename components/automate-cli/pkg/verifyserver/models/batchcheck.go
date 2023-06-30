@@ -88,6 +88,7 @@ type Config struct {
 	Arch            string         `json:"arch"`
 	Backup          *Backup        `json:"backup"`
 	Hardware        *Hardware      `json:"hardware"`
+	ExternalDbType  string         `json:"external_db_type"`
 	Certificate     []*Certificate `json:"certificate"`
 	ExternalOS      *ExternalOS    `json:"external_opensearch"`
 	ExternalPG      *ExternalPG    `json:"external_postgresql"`
@@ -378,6 +379,7 @@ func addCertificatesInConfig(fqdn, rootCA, nodeType string) *Certificate {
 }
 
 func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
+	c.ExternalDbType = haConfig.External.Database.Type
 	externalPgConfig := haConfig.External.Database.PostgreSQL
 	if c.ExternalPG == nil {
 		c.ExternalPG = &ExternalPG{}

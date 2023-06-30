@@ -4,28 +4,29 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 )
 
 type HardwareResourceCountCheck struct {
-	host string
-	port string
-	log  logger.Logger
+	host              string
+	port              string
+	log               logger.Logger
+	httpRequestClient httputils.HTTPClient
 }
 
 func NewHardwareResourceCountCheck(log logger.Logger, port string) *HardwareResourceCountCheck {
 	return &HardwareResourceCountCheck{
-		log:  log,
-		host: constants.LOCAL_HOST_URL,
-		port: port,
+		log:               log,
+		host:              constants.LOCAL_HOST_URL,
+		port:              port,
+		httpRequestClient: httputils.NewClient(log),
 	}
 }
 
@@ -76,18 +77,13 @@ func (ss *HardwareResourceCountCheck) Run(config *models.Config) []models.CheckT
 func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body interface{}) (
 	*models.HardwareResourceCheckResponse, error) {
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.HARDWARE_RESOURCE_CHECK_API_PATH)
-	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
+	_, responseBody, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		ss.log.Error("Error while Performing Hardware resource count check from batch Check API : ", err)
 		return nil, err
 	}
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		ss.log.Error("Error while reading response of Hardware resource count check from batch Check API : ", err)
-		return nil, err
-	}
 	response := models.HardwareResourceCheckResponse{}
-	err = json.Unmarshal(respBody, &response)
+	err = json.Unmarshal(responseBody, &response)
 	if err != nil {
 		ss.log.Error("Error while reading unmarshalled response of Hardware resource count check from batch Check API : ", err)
 		return nil, err

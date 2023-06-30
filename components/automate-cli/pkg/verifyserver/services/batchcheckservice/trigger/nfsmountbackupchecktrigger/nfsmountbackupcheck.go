@@ -2,30 +2,31 @@ package nfsmountbackupchecktrigger
 
 import (
 	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
+	"errors"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 )
 
 type NfsBackupConfigCheck struct {
-	log  logger.Logger
-	port string
-	host string
+	log               logger.Logger
+	port              string
+	host              string
+	httpRequestClient httputils.HTTPClient
 }
 
 func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigCheck {
 	return &NfsBackupConfigCheck{
-		log:  log,
-		port: port,
-		host: constants.LOCALHOST,
+		log:               log,
+		port:              port,
+		host:              constants.LOCALHOST,
+		httpRequestClient: httputils.NewClient(log),
 	}
 }
 
@@ -41,6 +42,7 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	}
 
 	nfsMountReq := models.NFSMountRequest{
+		ExternalDbType:         config.ExternalDbType,
 		AutomateNodeIPs:        config.Hardware.AutomateNodeIps,
 		ChefInfraServerNodeIPs: config.Hardware.ChefInfraServerNodeIps,
 		PostgresqlNodeIPs:      config.Hardware.PostgresqlNodeIps,
@@ -66,18 +68,14 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 // triggerCheckForMountService - Call the Hardware resource API and format response
 func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
 	url := checkutils.PrepareEndPoint(ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
-	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
+	_, resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		ss.log.Error("Error while triggering NFS Mount API from Batch Check API: ", err)
 		return nil, err
 	}
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		ss.log.Error("error while connecting to the endpoint:%s", err)
-		return nil, err
-	}
+	ss.log.Debug("the value of response from the trigger = ", string(resp))
 	apiResp := &models.NFSMountCheckResponse{}
-	err = json.Unmarshal(respBody, apiResp)
+	err = json.Unmarshal(resp, &apiResp)
 	if err != nil {
 		ss.log.Error("Error while reading unmarshalled response of NFS Mount response from batch Check API : ", err)
 		return nil, err

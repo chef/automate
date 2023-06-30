@@ -83,10 +83,5 @@ func (c *Client) MakeRequest(requestMethod, url string, body interface{}) (*http
 	}
 
 	c.Logger.Debugf("Response body for MakeRequest: \n%s\n", string(responseBody))
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return resp, responseBody, fmt.Errorf("unexpected response status: %s", resp.Status)
-	}
-
 	return resp, responseBody, nil
 }
