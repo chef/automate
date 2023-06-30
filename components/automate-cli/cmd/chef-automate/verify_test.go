@@ -6,12 +6,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	"github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/chef/automate/lib/reporting"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/version"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -602,4 +605,120 @@ func newMockVerifyCmdFlow(mockHttputils *httputils.MockHTTPClient, cw *majorupgr
 		cw.CliWriter,
 		mockVerifyCmdDeps,
 	)
+}
+
+func TestBuildReports(t *testing.T) {
+	type args struct {
+		batchCheckResults []models.BatchCheckResult
+	}
+	tests := []struct {
+		name string
+		args args
+		want []reporting.VerificationReport
+	}{
+		{
+			name: "If Report is successfully created",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip:       "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed:  true,
+								Message: "SSH User Access Check",
+								Check:   "ssh-user",
+								Checks: []models.Checks{
+									{
+										Title:         "SSH user accessible",
+										Passed:        true,
+										SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+										ErrorMsg:      "",
+										ResolutionMsg: "",
+									},
+									{
+										Title:         "Sudo password valid",
+										Passed:        true,
+										SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
+										ErrorMsg:      "",
+										ResolutionMsg: "",
+									},
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: "ssh-user",
+						Status:    "Success",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "SSH User Access Check - Success",
+							SubMessage:  nil,
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 2,
+							FailedCount:     0,
+							ToResolve:       nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Error was there form the handler or Trigger response",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip: "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed: false,
+								Message: "SSH User Access Check",
+								Check: "ssh-user",
+								Checks: nil,
+								Error: &fiber.Error{
+									Code: 400,
+									Message: "Permissions on the ssh key file do not satisfy the requirement",
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: "ssh-user",
+						Status:    "Failed",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "SSH User Access Check - Failed",
+							SubMessage: nil,
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 0,
+							FailedCount: 1,
+							ToResolve: []string{"Permissions on the ssh key file do not satisfy the requirement"},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := buildReports(tt.args.batchCheckResults)
+			assert.Equal(t, got, tt.want)
+
+		})
+	}
 }

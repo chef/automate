@@ -2,6 +2,7 @@ package nfsmountbackupchecktrigger
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
@@ -51,8 +52,10 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	//Triggers only one API call for nfs mount API
 	nfsMountAPIResponse, err := nbc.triggerCheckForMountService(nfsMountReq)
 	if err != nil {
-		response := constructErrorResult(config, err)
-		return response
+		if nfsMountAPIResponse!= nil {
+			return constructErrorResult(config, nfsMountAPIResponse.Error.Message, nfsMountAPIResponse.Error.Code)
+		}
+		return constructErrorResult(config, err.Error(), 500)
 
 	}
 	result := constructSuccessResult(*nfsMountAPIResponse)
@@ -77,20 +80,23 @@ func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMount
 	apiResp := &models.NFSMountCheckResponse{}
 	err = json.Unmarshal(respBody, apiResp)
 	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of NFS Mount respons from batch Check API : ", err)
-		return apiResp, err
+		ss.log.Error("Error while reading unmarshalled response of NFS Mount response from batch Check API : ", err)
+		return nil, err
+	}
+	if apiResp.Error.Message != "" {
+		return apiResp, errors.New(apiResp.Error.Message)
 	}
 	return apiResp, nil
 }
 
 // constructErrorResult constructs the error response when recived from the API
-func constructErrorResult(config *models.Config, err error) []models.CheckTriggerResponse {
+func constructErrorResult(config *models.Config, errMessage string, statusCode int) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
-			result = append(result, checkutils.PrepareTriggerResponse(nil, ip, types[i], err.Error(), "", "", true))
+			result = append(result, checkutils.PrepareTriggerResponse(nil, ip, types[i], errMessage, "", "", true, statusCode))
 		}
 	}
 

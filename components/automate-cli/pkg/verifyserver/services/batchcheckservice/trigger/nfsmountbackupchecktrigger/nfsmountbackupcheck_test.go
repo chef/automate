@@ -686,7 +686,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response:       "Error while triggering NFS Mount API from Batch Check API: 500 Internal Server Error",
+			response:       "unexpected end of JSON input",
 			isPassed:       false,
 			httpStatusCode: http.StatusInternalServerError,
 			isError:        true,
@@ -766,7 +766,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 				assert.Len(t, got, 4)
 				assert.NotNil(t, got[0].Result.Error)
 				assert.NotNil(t, got[0].Host)
-				assert.Contains(t, tt.response, got[0].Result.Error.Error())
+				assert.Contains(t, tt.response, got[0].Result.Error.Message)
 
 			} else {
 				var want []models.CheckTriggerResponse

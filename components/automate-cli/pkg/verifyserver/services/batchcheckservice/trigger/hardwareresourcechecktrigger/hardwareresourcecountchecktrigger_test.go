@@ -264,11 +264,10 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 			}
 		}
 	})
-
 	t.Run("Returns error", func(t *testing.T) {
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`invalid JSON`))
+			w.Write([]byte(`{"status":"failure", "result":[], "error":{"code":400, "message":"Invalid JSON"}}`))
 		}))
 		err := startMockServerOnCustomPort(mockServer, "1134")
 		assert.NoError(t, err)

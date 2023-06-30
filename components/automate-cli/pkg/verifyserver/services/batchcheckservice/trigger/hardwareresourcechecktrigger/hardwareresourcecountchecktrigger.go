@@ -2,6 +2,7 @@ package hardwareresourcechecktrigger
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,10 +40,16 @@ func (ss *HardwareResourceCountCheck) Run(config *models.Config) []models.CheckT
 	// for each and every IP to make the processing simple at the caller end
 
 	if err != nil {
+		statusCode := 500
+		errMessage := err.Error()
+		if resp != nil {
+			statusCode = resp.Error.Code
+			errMessage = resp.Error.Message
+		}
 		hostMap := configutils.GetNodeTypeMap(config.Hardware)
 		for ip, types := range hostMap {
 			for i := 0; i < len(types); i++ {
-				finalResult = append(finalResult, checkutils.PrepareTriggerResponse(nil, ip, types[i], err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
+				finalResult = append(finalResult, checkutils.PrepareTriggerResponse(nil, ip, types[i], errMessage, constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true, statusCode))
 			}
 		}
 		return finalResult
@@ -82,8 +89,13 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 	response := models.HardwareResourceCheckResponse{}
 	err = json.Unmarshal(respBody, &response)
 	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of Hardware resource count check from batch Check API : ", err)
+		ss.log.Error("Error while reading unmarshalled response of Hardware resource count check from batch Check API : ", err)
 		return nil, err
+	}
+	
+	if response.Error.Message != "" {
+		ss.log.Error("Error while calling the Hardware Resource Count: ", response.Error.Message)
+		return &response, errors.New(response.Error.Message) 
 	}
 	return &response, nil
 }
