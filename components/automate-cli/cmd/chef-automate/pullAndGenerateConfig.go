@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -438,8 +439,9 @@ func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *Ex
 		if ele.Global.V1.External.Opensearch != nil &&
 			ele.Global.V1.External.Opensearch.Auth != nil &&
 			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
+			nodeUrl, _ := url.Parse(ele.Global.V1.External.Opensearch.Nodes[0].Value)
 			return &ExternalOpensearchToml{
-				OpensearchInstanceURL:       ele.Global.V1.External.Opensearch.Nodes[0].Value,
+				OpensearchInstanceURL:       nodeUrl.Host,
 				OpensearchSuperUserName:     ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
 				OpensearchSuperUserPassword: ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
 				OpensearchRootCert:          ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
@@ -623,6 +625,24 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 			sharedConfigToml.Postgresql.Config.PublicKey = pgPubKey
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	} else {
+		externalOsDetails := getExternalOpensearchDetails(a2ConfigMap)
+		if externalOsDetails != nil {
+			sharedConfigToml.Aws.Config.OpensearchDomainName = externalOsDetails.OpensearchDomainName
+			sharedConfigToml.Aws.Config.OpensearchDomainUrl = externalOsDetails.OpensearchInstanceURL
+			sharedConfigToml.Aws.Config.OpensearchCertificate = externalOsDetails.OpensearchRootCert
+			sharedConfigToml.Aws.Config.OpensearchUsername = externalOsDetails.OpensearchSuperUserName
+			sharedConfigToml.Aws.Config.OpensearchUserPassword = externalOsDetails.OpensearchSuperUserPassword
+		}
+		externalPgDetails := getExternalPGDetails(a2ConfigMap)
+		if externalPgDetails != nil {
+			sharedConfigToml.Aws.Config.RDSDBUserName = externalPgDetails.PostgreSQLDBUserName
+			sharedConfigToml.Aws.Config.RDSDBUserPassword = externalPgDetails.PostgreSQLDBUserPassword
+			sharedConfigToml.Aws.Config.RDSInstanceUrl = externalPgDetails.PostgreSQLInstanceURL
+			sharedConfigToml.Aws.Config.RDSCertificate = externalPgDetails.PostgreSQLRootCert
+			sharedConfigToml.Aws.Config.RDSSuperUserName = externalPgDetails.PostgreSQLSuperUserName
+			sharedConfigToml.Aws.Config.RDSSuperUserPassword = externalPgDetails.PostgreSQLSuperUserPassword
+		}
 	}
 
 	// Build CertsByIP for Automate
