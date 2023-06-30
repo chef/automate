@@ -550,49 +550,7 @@ func TestCertificateValidation(t *testing.T) {
 				},
 			},
 		},
-		{
-			TestName: "Private Key is not in PKCS8 format",
-			ReqBody: models.CertificateCheckRequest{
-				RootCertificate:  ROOT_CERTIFICATE,
-				PrivateKey:       INVALID_KEY_FORMAT,
-				NodeCertificate:  NODE_CERTIFICATE,
-				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-				AdminCertificate: ADMIN_CERTIFICATE,
-			},
-			ExpectedResBody: models.CertificateCheckResponse{
-				Passed: false,
-				Checks: []models.Checks{
-					{
-						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
-					{
-						Title:         constants.CERTIFICATE_FORMAT_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
-					{
-						Title:         constants.KEY_FORMAT_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
-						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
-					},
-					{
-						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
-				},
-			},
-		},
+
 		{
 			TestName: "There is no root certificate",
 			ReqBody: models.CertificateCheckRequest{

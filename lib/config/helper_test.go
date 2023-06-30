@@ -10,6 +10,8 @@ import (
 	"math/big"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateStringBasedBoolean(t *testing.T) {
@@ -425,4 +427,555 @@ func generateExpiredCert() []byte {
 
 	derBytes, _ := x509.CreateCertificate(rand.Reader, template, template, &publicKey, privateKey)
 	return derBytes
+}
+
+const (
+	PublicKey  = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
+	PrivateKey = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
+	RootCa     = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
+	AdminCert  = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
+	AdminKey   = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
+
+	DummyPublicKey  = "DummyPublicKey"
+	DummyPrivateKey = "DummyPrivateKey"
+)
+
+func Test_validateAutomateCerts(t *testing.T) {
+	t.Run("NIL CERTByIP", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Automate: &AutomateSettings{
+				Config: &ConfigAutomateSettings{
+					CertsByIP: nil,
+				},
+			},
+		}
+
+		expectedErr := "automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
+		err := validateAutomateCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("Invalid common Certs", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Automate: &AutomateSettings{
+				Config: &ConfigAutomateSettings{
+					CertsByIP:  nil,
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode private_key for automate\ninvalid format. Failed to decode public_key for automate"
+		err := validateAutomateCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Automate: &AutomateSettings{
+				Config: &ConfigAutomateSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP: "10.10.10.10",
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "cannot find private key for ip 10.10.10.10"
+		err := validateAutomateCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Automate: &AutomateSettings{
+				Config: &ConfigAutomateSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: DummyPrivateKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "cannot find public key for ip 10.10.10.11"
+		err := validateAutomateCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No CertByIP validate", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Automate: &AutomateSettings{
+				Config: &ConfigAutomateSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: DummyPrivateKey,
+							PublicKey:  DummyPublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode private_key for automate\ninvalid format. Failed to decode public_key for automate"
+		err := validateAutomateCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("NO Error", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Automate: &AutomateSettings{
+				Config: &ConfigAutomateSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: PrivateKey,
+							PublicKey:  PublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		err := validateAutomateCerts(depConfig)
+		assert.NoError(t, err)
+	})
+}
+
+func Test_validateChefServerCerts(t *testing.T) {
+	t.Run("NIL CERTByIP", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			ChefServer: &ChefServerSettings{
+				Config: &ConfigSettings{
+					CertsByIP: nil,
+				},
+			},
+		}
+
+		expectedErr := "chefServer public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
+		err := validateChefServerCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("Invalid common Certs", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			ChefServer: &ChefServerSettings{
+				Config: &ConfigSettings{
+					CertsByIP:  nil,
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode private_key for chef-infra-server\ninvalid format. Failed to decode public_key for chef-infra-server"
+		err := validateChefServerCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			ChefServer: &ChefServerSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP: "10.10.10.10",
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "cannot find private key for ip 10.10.10.10"
+		err := validateChefServerCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			ChefServer: &ChefServerSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: "-----PK-----",
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "cannot find public key for ip 10.10.10.11"
+		err := validateChefServerCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No CertByIP validate", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			ChefServer: &ChefServerSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: DummyPrivateKey,
+							PublicKey:  DummyPublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode private_key for chef-infra-server\ninvalid format. Failed to decode public_key for chef-infra-server"
+		err := validateChefServerCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("NO Error", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			ChefServer: &ChefServerSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: PrivateKey,
+							PublicKey:  PublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+				},
+			},
+		}
+
+		err := validateChefServerCerts(depConfig)
+		assert.NoError(t, err)
+	})
+}
+
+func Test_validatePostgresqlCerts(t *testing.T) {
+	t.Run("NIL CERTByIP", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{},
+			},
+		}
+
+		expectedErr := "postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
+		err := validatePostgresqlCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("Invalid common Certs", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{
+					CertsByIP:  nil,
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+					RootCA:     "dummy_root_cert",
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode root_ca for postgresql\ninvalid format. Failed to decode private_key for postgresql\ninvalid format. Failed to decode public_key for postgresql"
+		err := validatePostgresqlCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP: "10.10.10.10",
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+					RootCA:     "-----ROOTCA KEY-----",
+				},
+			},
+		}
+
+		expectedErr := "cannot find private key for ip 10.10.10.10"
+		err := validatePostgresqlCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: DummyPrivateKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+					RootCA:     "-----ROOTCA KEY-----",
+				},
+			},
+		}
+
+		expectedErr := "cannot find public key for ip 10.10.10.11"
+		err := validatePostgresqlCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No CertByIP validate", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: DummyPrivateKey,
+							PublicKey:  DummyPublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+					RootCA:     "-----ROOTCA KEY-----",
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode root_ca for postgresql\ninvalid format. Failed to decode private_key for postgresql\ninvalid format. Failed to decode public_key for postgresql"
+		err := validatePostgresqlCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("NO Error", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: PrivateKey,
+							PublicKey:  PublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+					RootCA:     RootCa,
+				},
+			},
+		}
+
+		err := validatePostgresqlCerts(depConfig)
+		assert.NoError(t, err)
+	})
+
+	t.Run("RootCert Error", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Postgresql: &PostgresqlSettings{
+				Config: &ConfigSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: PrivateKey,
+							PublicKey:  PublicKey,
+						},
+					},
+					PrivateKey: DummyPrivateKey,
+					PublicKey:  DummyPublicKey,
+					RootCA:     "",
+				},
+			},
+		}
+
+		expectedErr := "cannot find root_ca for ip for PostgresSQL"
+		err := validatePostgresqlCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+}
+
+func Test_validateOpensearchCerts(t *testing.T) {
+	t.Run("NIL CERTByIP", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{},
+			},
+		}
+
+		expectedErr := "opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
+		err := validateOpensearchCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("Invalid common Certs", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{
+					CertsByIP:  nil,
+					PrivateKey: "-----PRIVATE KEY-----",
+					PublicKey:  "-----PUBLIC KEY-----",
+					RootCA:     "dummy_root_cert",
+					AdminCert:  "admin key",
+					AdminKey:   "admin key",
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode root_ca for opensearch\ninvalid format. Failed to decode admin_key for opensearch\ninvalid format. Failed to decode admin_cert for opensearch\ninvalid format. Failed to decode private_key for opensearch\ninvalid format. Failed to decode public_key for opensearch"
+		err := validateOpensearchCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No CertByIP validate", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: "-----PRIVATE2 KEY-----",
+							PublicKey:  "-----PRIVATE2sdsf KEY-----",
+						},
+					},
+					PrivateKey: "-----PRIVATE1 KEY-----",
+					PublicKey:  "-----PUBLIC1 KEY-----",
+					RootCA:     "-----ROOTCA KEY-----",
+					AdminCert:  "admin cer",
+					AdminKey:   "admin key",
+				},
+			},
+		}
+
+		expectedErr := "invalid format. Failed to decode root_ca for opensearch\ninvalid format. Failed to decode admin_key for opensearch\ninvalid format. Failed to decode root_ca for opensearch\ninvalid format. Failed to decode private_key for opensearch\ninvalid format. Failed to decode public_key for opensearch"
+		err := validateOpensearchCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("NO Error", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: PrivateKey,
+							PublicKey:  PublicKey,
+						},
+					},
+					PrivateKey: "-----PRIVATE1 KEY-----",
+					PublicKey:  "-----PUBLIC1 KEY-----",
+					RootCA:     RootCa,
+					AdminCert:  AdminCert,
+					AdminKey:   AdminKey,
+				},
+			},
+		}
+
+		err := validateOpensearchCerts(depConfig)
+		assert.NoError(t, err)
+	})
+
+	t.Run("RootCert Error", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.11",
+							PrivateKey: PrivateKey,
+							PublicKey:  PublicKey,
+						},
+					},
+					PrivateKey: "-----PRIVATE1 KEY-----",
+					PublicKey:  "-----PUBLIC1 KEY-----",
+					RootCA:     "",
+				},
+			},
+		}
+
+		expectedErr := "opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
+		err := validateOpensearchCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+
+	t.Run("No private key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP: "10.10.10.10",
+						},
+					},
+					RootCA:    "root ca",
+					AdminCert: "admin cert",
+					AdminKey:  "admin  key",
+				},
+			},
+		}
+
+		expectedErr := "cannot find private key for ip 10.10.10.10"
+		err := validateOpensearchCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
+	t.Run("No Public key", func(t *testing.T) {
+		depConfig := &HaDeployConfig{
+			Opensearch: &OpensearchSettings{
+				Config: &ConfigOpensearchSettings{
+					CertsByIP: &[]CertByIP{
+						{
+							IP:         "10.10.10.10",
+							PrivateKey: "private key",
+						},
+					},
+					RootCA:    "root ca",
+					AdminCert: "admin cert",
+					AdminKey:  "admin  key",
+				},
+			},
+		}
+
+		expectedErr := "cannot find public key for ip 10.10.10.10"
+		err := validateOpensearchCerts(depConfig)
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedErr)
+	})
 }
