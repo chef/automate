@@ -591,3 +591,74 @@ func TestGetOsCertsByIp(t *testing.T) {
 		})
 	}
 }
+
+func TestGetOpensearchDetails(t *testing.T) {
+	type testCaseInfo struct {
+		testCaseDescreption    string
+		InstanceURL            string
+		Username               string
+		password               string
+		rootCert               string
+		serverName             string
+		ExpectedOpensearchToml *ExternalOpensearchToml
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescreption: "With Http URL",
+			InstanceURL:         "http://testopensearch:9200/",
+			Username:            "admin",
+			password:            "pass",
+			rootCert:            "----certs----",
+			serverName:          "test server",
+			ExpectedOpensearchToml: &ExternalOpensearchToml{
+				OpensearchInstanceURL:       "testopensearch:9200",
+				OpensearchSuperUserName:     "admin",
+				OpensearchSuperUserPassword: "pass",
+				OpensearchRootCert:          "----certs----",
+				OpensearchDomainName:        "test server",
+			},
+		},
+		{
+			testCaseDescreption: "With Https URL",
+			InstanceURL:         "https://testopensearch:9200/",
+			Username:            "admin",
+			password:            "pass",
+			rootCert:            "----certs----",
+			serverName:          "test server",
+			ExpectedOpensearchToml: &ExternalOpensearchToml{
+				OpensearchInstanceURL:       "testopensearch:9200",
+				OpensearchSuperUserName:     "admin",
+				OpensearchSuperUserPassword: "pass",
+				OpensearchRootCert:          "----certs----",
+				OpensearchDomainName:        "test server",
+			},
+		},
+		{
+			testCaseDescreption: "With cert blank",
+			InstanceURL:         "https://testopensearch:9200/",
+			Username:            "admin",
+			password:            "pass",
+			rootCert:            "",
+			serverName:          "test server",
+			ExpectedOpensearchToml: &ExternalOpensearchToml{
+				OpensearchInstanceURL:       "testopensearch:9200",
+				OpensearchSuperUserName:     "admin",
+				OpensearchSuperUserPassword: "pass",
+				OpensearchRootCert:          "",
+				OpensearchDomainName:        "test server",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
+			externalOsConfig := setExternalOpensearchDetails(testCase.InstanceURL, testCase.Username, testCase.password, testCase.rootCert, testCase.serverName)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchInstanceURL, externalOsConfig.OpensearchInstanceURL)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchDomainName, externalOsConfig.OpensearchDomainName)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchSuperUserName, externalOsConfig.OpensearchSuperUserName)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchSuperUserPassword, externalOsConfig.OpensearchSuperUserPassword)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchRootCert, externalOsConfig.OpensearchRootCert)
+		})
+	}
+}

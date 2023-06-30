@@ -439,17 +439,26 @@ func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *Ex
 		if ele.Global.V1.External.Opensearch != nil &&
 			ele.Global.V1.External.Opensearch.Auth != nil &&
 			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
-			nodeUrl, _ := url.Parse(ele.Global.V1.External.Opensearch.Nodes[0].Value)
-			return &ExternalOpensearchToml{
-				OpensearchInstanceURL:       nodeUrl.Host,
-				OpensearchSuperUserName:     ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
-				OpensearchSuperUserPassword: ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
-				OpensearchRootCert:          ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
-				OpensearchDomainName:        ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
-			}
+
+			return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
+				ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+				ele.Global.V1.External.Opensearch.Ssl.ServerName.Value)
 		}
 	}
 	return nil
+}
+
+func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, rootCert, domainName string) *ExternalOpensearchToml {
+	nodeUrl, _ := url.Parse(instanceUrl)
+	return &ExternalOpensearchToml{
+		OpensearchInstanceURL:       nodeUrl.Host,
+		OpensearchSuperUserName:     superUserName,
+		OpensearchSuperUserPassword: superPassword,
+		OpensearchRootCert:          rootCert,
+		OpensearchDomainName:        domainName,
+	}
 }
 
 func getExternalPGDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalPostgreSQLToml {
