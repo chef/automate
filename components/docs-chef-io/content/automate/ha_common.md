@@ -334,7 +334,7 @@ Follow any of the step to destroy terraform or infrastructure created while depl
 
     `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy;cd $i;done`
 
-    {{< note >}}
+    {{< note spaces=4 >}}
 
     The deployment destroy does not remove any remote server configuration made, however it taints the terraform and thus you need to redo the configurations.
 
