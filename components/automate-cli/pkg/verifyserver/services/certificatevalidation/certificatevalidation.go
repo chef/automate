@@ -91,13 +91,17 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		threshold := currentTime.AddDate(0, 0, 30)
 		if certificate.NotAfter.Before(threshold) {
 			vc.log.Debugf("%s certificate is will expire soon", key)
-			fmt.Printf("The certificate will expire with 30 days\n")
+			aboutToExpireCerts += key + ", "
 			continue
 		}
 
 	if aboutToExpireCerts != "" {
 		vc.log.Debug("These certificates will expire within 30 days: %v\n", aboutToExpireCerts)
 		return createCheck(fmt.Sprintf(constants.CERTIFICATE_WILL_EXPIRE_IN_N_DAYS, remainingDays), true, constants.CERTIFICATE_EXPIRY_TITLE, fmt.Sprintf(constants.CERTIFICATE_WILL_EXPIRE_IN_N_DAYS, remainingDays), fmt.Sprintf(constants.RENEW_CERTS, remainingDays))
+	}
+
+	if aboutToExpireCerts != "" {
+		fmt.Printf("These certificates will expire with 30 days: %v\n", aboutToExpireCerts)
 	}
 
 	if expiredCerts == "" {
