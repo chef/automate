@@ -86,7 +86,7 @@ Execute the following command from the bastion host from any location:
 
 ### Issue: Unable to Determine the Bucket Region
 
-When Chef Automate instances cannot locate the S3 bucket, the following error is displayed, *Unable to restore the backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"*
+When Chef Automate instances cannot locate the S3 bucket, the following error is displayed:
 
 ```bash
 BackupRestoreError: Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get “https://s3.amazonaws.com/a2backup?delimiter=%2F&list-type=2&prefix=elasticsearch%2F” : di
