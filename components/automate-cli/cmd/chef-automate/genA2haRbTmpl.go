@@ -1,6 +1,7 @@
 package main
 
 const existingNodesA2harbTemplate = `
+state "{{ .State }}"
 secrets_key_file "{{ .Architecture.ConfigInitials.SecretsKeyFile }}"
 secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
 architecture "{{ .Architecture.ConfigInitials.Architecture }}"
