@@ -2,6 +2,7 @@ package constants
 
 const (
 	CERTIFICATE_EXPIRY_TITLE                 = "Certificates have valid expiry date"
+	CERTIFICATE_VALID                        = "Certificates are valid"
 	CERTIFICATE_EXPIRY_SUCCESS_MESSAGE       = "All certificates expiry date is later than 30 days"
 	CERTIFICATE_EXPIRY_ERROR_MESSAGE         = "The %v certificates have expired"
 	CERTIFICATE_INVALID_EXPIRY_MESSAGE       = "The %v certificates expiry date is earlier than 30 days"

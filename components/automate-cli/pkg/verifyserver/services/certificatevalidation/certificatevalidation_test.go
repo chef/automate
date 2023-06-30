@@ -1,12 +1,18 @@
-package certificatevalidation_test
+package certificatevalidation
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
 	"fmt"
+	"math/big"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/certificatevalidation"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -239,12 +245,12 @@ HAqVePERhISfN6cwZt5p8B3/JUwSR8el66DF7Jm57BM=
 )
 
 func TestValidateCertificateService(t *testing.T) {
-	vc := certificatevalidation.NewValidateCertificateService(logger.NewTestLogger())
+	vc := NewValidateCertificateService(logger.NewTestLogger())
 	assert.NotNil(t, vc)
 }
 
 func TestCertificateValidation(t *testing.T) {
-	vc := certificatevalidation.NewValidateCertificateService(logger.NewTestLogger())
+	vc := NewValidateCertificateService(logger.NewTestLogger())
 	assert.NotNil(t, vc)
 	tests := []struct {
 		TestName        string
@@ -602,4 +608,76 @@ func TestCertificateValidation(t *testing.T) {
 			assert.Equal(t, e.ExpectedResBody, res)
 		})
 	}
+}
+
+func Test_validateCertificateExpiry(t *testing.T) {
+	t.Run("Certificates will expire within 30 days", func(t *testing.T) {
+		cert, _ := GenerateCert(15, t)
+		certMap := map[string]string{
+			constants.ROOT: cert,
+		}
+		vcs := NewValidateCertificateService(logger.NewLogrusStandardLogger())
+		checks := vcs.validateCertificateExpiry(certMap, []string{constants.ROOT})
+
+		assert.True(t, checks.Passed)
+		assert.Equal(t, constants.CERTIFICATE_VALID, checks.SuccessMsg)
+		assert.Empty(t, checks.ErrorMsg)
+		assert.Empty(t, checks.ResolutionMsg)
+	})
+
+	t.Run("Certificates are expired", func(t *testing.T) {
+		cert, _ := GenerateCert(-1, t)
+		certMap := map[string]string{
+			constants.ROOT: cert,
+		}
+		vcs := NewValidateCertificateService(logger.NewLogrusStandardLogger())
+		checks := vcs.validateCertificateExpiry(certMap, []string{constants.ROOT})
+		fmt.Printf("checks: %+v\n", checks)
+		assert.False(t, checks.Passed)
+		assert.Empty(t, checks.SuccessMsg)
+		assert.Equal(t, "The Root certificates have expired", checks.ErrorMsg)
+		assert.Equal(t, "Generate and provide certificates with expiry date later than 30 days", checks.ResolutionMsg)
+	})
+}
+
+func GenerateCert(date int, t *testing.T) (string, string) {
+	// Generate a new RSA private key
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	assert.NoError(t, err)
+
+	// Create the certificate template
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			CommonName:   "Your Common Name",
+			Organization: []string{"Your Organization"},
+		},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().AddDate(0, 0, date), // Expires in 15 days
+	}
+
+	// Generate the certificate
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	assert.NoError(t, err)
+
+	// Parse the certificate
+	certificate, err := x509.ParseCertificate(derBytes)
+	assert.NoError(t, err)
+
+	// Encode the certificate to PEM format
+	certificatePEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+
+	// Encode the private key to PEM format
+	privateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)})
+
+	// Print the certificate and private key
+	fmt.Println("Certificate:")
+	fmt.Println(string(certificatePEM))
+	fmt.Println("Private Key:")
+	fmt.Println(string(privateKeyPEM))
+
+	// Print the expiry date
+	fmt.Println("Certificate Expiry Date:", certificate.NotAfter)
+	return string(certificatePEM), string(privateKeyPEM)
+
 }
