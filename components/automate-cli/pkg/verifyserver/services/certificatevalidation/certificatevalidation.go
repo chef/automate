@@ -82,7 +82,6 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 			expiredCerts += key + ", "
 			continue
 		}
-
 		// Is the certificate expiring in within 30 days
 		threshold := currentTime.AddDate(0, 0, 30)
 		if certificate.NotAfter.Before(threshold) {
@@ -90,7 +89,6 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 			aboutToExpireCerts += key + ", "
 			continue
 		}
-
 	}
 
 	if aboutToExpireCerts != "" {
