@@ -357,6 +357,24 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 			sharedConfigToml.Postgresql.Config.RootCA = pgRootCA
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	} else {
+		externalOsDetails := getExternalOpensearchDetails(a2ConfigMap)
+		if externalOsDetails != nil {
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = externalOsDetails.OpensearchDomainName
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = externalOsDetails.OpensearchInstanceURL
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = externalOsDetails.OpensearchRootCert
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = externalOsDetails.OpensearchSuperUserName
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = externalOsDetails.OpensearchSuperUserPassword
+		}
+		externalPgDetails := getExternalPGDetails(a2ConfigMap)
+		if externalPgDetails != nil {
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = externalPgDetails.PostgreSQLDBUserName
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = externalPgDetails.PostgreSQLDBUserPassword
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = externalPgDetails.PostgreSQLInstanceURL
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert = externalPgDetails.PostgreSQLRootCert
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName = externalPgDetails.PostgreSQLSuperUserName
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = externalPgDetails.PostgreSQLSuperUserPassword
+		}
 	}
 
 	// Build CertsByIP for Automate
@@ -413,6 +431,42 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	return sharedConfigToml, nil
+}
+
+func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalOpensearchToml {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Opensearch != nil &&
+			ele.Global.V1.External.Opensearch.Auth != nil &&
+			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
+			return &ExternalOpensearchToml{
+				OpensearchInstanceURL:       ele.Global.V1.External.Opensearch.Nodes[0].Value,
+				OpensearchSuperUserName:     ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
+				OpensearchSuperUserPassword: ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
+				OpensearchRootCert:          ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+				OpensearchDomainName:        ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+			}
+		}
+	}
+	return nil
+}
+
+func getExternalPGDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalPostgreSQLToml {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Postgresql.Nodes != nil &&
+			ele.Global.V1.External.Postgresql.Auth.Password.Superuser != nil &&
+			ele.Global.V1.External.Postgresql.Auth.Password.Dbuser != nil {
+			return &ExternalPostgreSQLToml{
+				PostgreSQLInstanceURL:       ele.Global.V1.External.Postgresql.Nodes[0].Value,
+				PostgreSQLSuperUserName:     ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Username.Value,
+				PostgreSQLSuperUserPassword: ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value,
+				PostgreSQLDBUserName:        ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Username.Value,
+				PostgreSQLDBUserPassword:    ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value,
+				PostgreSQLRootCert:          ele.Global.V1.External.Postgresql.Ssl.RootCert.Value,
+			}
+		}
+
+	}
+	return nil
 }
 
 func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []CertByIP {

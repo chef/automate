@@ -387,7 +387,12 @@ func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
 	c.ExternalPG.PGDbUserName = externalPgConfig.DbuserUsername
 	c.ExternalPG.PGDbUserPassword = externalPgConfig.DbuserPassword
 	c.ExternalPG.PGInstanceURL = externalPgConfig.InstanceURL
-	c.ExternalPG.PGRootCert = externalPgConfig.PostgresqlRootCert
+	if len(externalPgConfig.PostgresqlRootCert) < 1 && haConfig.External.Database.Type == "aws" {
+		c.ExternalPG.PGRootCert = EXTERNAL_PG_ROOT_CERT
+	} else {
+		c.ExternalPG.PGRootCert = externalPgConfig.PostgresqlRootCert
+	}
+
 	c.ExternalPG.PGSuperuserName = externalPgConfig.SuperuserUsername
 	c.ExternalPG.PGSuperuserPassword = externalPgConfig.SuperuserPassword
 
@@ -399,7 +404,13 @@ func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
 
 	c.ExternalOS.OSDomainName = externalOsConfig.OpensearchDomainName
 	c.ExternalOS.OSDomainURL = externalOsConfig.OpensearchDomainURL
-	c.ExternalOS.OSCert = externalOsConfig.OpensearchRootCert
+
+	// os root-ca might be nil in pre deploy state
+	if len(externalOsConfig.OpensearchRootCert) < 1 && haConfig.External.Database.Type == "aws" {
+		c.ExternalOS.OSCert = EXTERNAL_OPENSEARCH_ROOT_CERT
+	} else {
+		c.ExternalOS.OSCert = externalOsConfig.OpensearchRootCert
+	}
 	c.ExternalOS.OSUserPassword = externalOsConfig.OpensearchUserPassword
 	c.ExternalOS.OSUsername = externalOsConfig.OpensearchUsername
 
