@@ -272,7 +272,7 @@ func TestCertificateValidation(t *testing.T) {
 					{
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.CERTIFICATE_VALID,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -316,7 +316,7 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprint(fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.NODE) + "; " + fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ROOT)),
+						ErrorMsg:      fmt.Sprint(fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.NODE)),
 						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
 					},
 					{
@@ -355,10 +355,10 @@ func TestCertificateValidation(t *testing.T) {
 				Checks: []models.Checks{
 					{
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.NODE),
-						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_VALID,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
 					},
 					{
 						Title:         constants.CERTIFICATE_FORMAT_TITLE,
@@ -398,10 +398,10 @@ func TestCertificateValidation(t *testing.T) {
 				Checks: []models.Checks{
 					{
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ADMIN),
-						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_VALID,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
 					},
 					{
 						Title:         constants.CERTIFICATE_FORMAT_TITLE,
@@ -528,7 +528,7 @@ func TestCertificateValidation(t *testing.T) {
 					{
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.CERTIFICATE_VALID,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -572,7 +572,7 @@ func TestCertificateValidation(t *testing.T) {
 					{
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.CERTIFICATE_VALID,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
