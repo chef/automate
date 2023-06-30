@@ -100,7 +100,7 @@ chef-automate backup restore </path/to/backups/>BACKUP_ID --patch-config </path/
 ```
 
 Restores from a filesystem backup may fail with incorrect directory permissions.
-Run the [`fix-repo-permissions` command]({{< ref "cli_chef_automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
+Run the [`fix-repo-permissions` command]({{< relref "cli/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
 ```shell
 sudo chef-automate backup fix-repo-permissions <path>
@@ -139,7 +139,7 @@ chef-automate backup restore --airgap-bundle </path/to/bundle> gs://bucket_name/
 Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host.
 
 Restores from a filesystem backup may fail with incorrect directory permissions.
-Run the [`fix-repo-permissions` command]({{< ref "cli_chef_automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
+Run the [`fix-repo-permissions` command]({{< relref "cli/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
 ```shell
 sudo chef-automate backup fix-repo-permissions <path>
@@ -215,4 +215,4 @@ chef-automate debug set-log-level deployment-service debug
 
 ## References
 
-See the [`chef-automate backup restore` command reference]({{< ref "cli_chef_automate/#chef-automate-backup-restore" >}}).
+See the [`chef-automate backup restore` command reference]({{< relref "cli/#chef-automate-backup-restore" >}}).
