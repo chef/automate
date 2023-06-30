@@ -65,7 +65,7 @@ grpc .time_ms=1229.028 span .kind =server system=grpc
 
 #### Solution
 
-Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-4.x.y.aib*.
+Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, `frontend-4.x.y.aib`.
 
 ##### Command Example
 
