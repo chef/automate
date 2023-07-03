@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	"github.com/chef/automate/lib/config"
@@ -708,6 +709,60 @@ func TestBuildReports(t *testing.T) {
 							SuccessfulCount: 0,
 							FailedCount:     1,
 							ToResolve:       []string{"Permissions on the ssh key file do not satisfy the requirement"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "If Report is successfully created with warning message",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip:       "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed:  true,
+								Message: constants.CERTIFICATE_MSG,
+								Check:   constants.CERTIFICATE,
+								Checks: []models.Checks{
+									{
+										Title:         "Certificate check",
+										Passed:        true,
+										SuccessMsg:    "Certificate will expire in 15 days",
+										ErrorMsg:      "Certs are expiring soon",
+										ResolutionMsg: "Certificates will expire in 15 days. Please update the certificates!",
+									},
+									{
+										Title:         "Certificate check",
+										Passed:        true,
+										SuccessMsg:    "Certificate will expire in 15 days",
+										ErrorMsg:      "Certs are expiring soon",
+										ResolutionMsg: "Certificates will expire in 15 days. Please update the certificates!",
+									},
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: constants.CERTIFICATE,
+						Status:    "Success",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "Certificate Check - Success",
+							SubMessage:  []string{"Certs are expiring soon", "Certs are expiring soon"},
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 2,
+							FailedCount:     0,
+							ToResolve:       []string{"Certificates will expire in 15 days. Please update the certificates!", "Certificates will expire in 15 days. Please update the certificates!"},
 						},
 					},
 				},
