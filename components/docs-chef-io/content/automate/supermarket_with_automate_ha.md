@@ -1,7 +1,9 @@
 +++
 title = "Supermarket with Automate HA"
+
 draft = false
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Supermarket with Automate HA"
@@ -9,14 +11,15 @@ gh_repo = "automate"
     identifier = "automate/deploy_high_availability/supermarket_with_automate_ha.md Supermarket with Automate HA"
     weight = 75
 +++
-Chef Supermarket is the site for community cookbooks. It provides a searchable cookbook repository and a friendly web UI. This page will discuss the integration of Supermarket with Automate HA setup using On-Premises along with AWS Managed Services, OpenSearch, and PostgreSQL.
+
+Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI. This page will discuss the integration of Supermarket with Automate HA setup. The setup will be done using On-Premises along with AWS Managed Services, OpenSearch, and PostgreSQL.
 Before integrating the supermarket, let's see how to register a new Oauth application with OC-ID under Automate.
 
 ## Register a New Oauth Application with OC-ID
 
 When you install Chef Automate, it bundles the OC-ID component as an Oauth provider. The Oauth provider uses the Chef-Server credentials to log in to another application—for example, Supermarket. Follow the steps below to register the applications to use OC-ID as a medium to log in to the respective applications. Once you finish the registration, you will be authorized to use the application if the Che-Server login credentials are correct.
 
-1. Create a file to list down the details of the application you want to register with OC-ID. In the file, mention the **name** and the **redirect_uri** for the file. The content of the created file looks like as shown below:
+1. Create a file to list down the details of the application you  want to register with OC-ID. In the file, mention the **name** and the **redirect_uri** for the file. The content of the created file looks like as shown below:
 
     ```cd
     [ocid.v1.sys.ocid.oauth_application_config]
@@ -40,6 +43,7 @@ When you install Chef Automate, it bundles the OC-ID component as an Oauth provi
     Using the above snippet, you can register two applications to the OC-ID.
 
 1. Save the file in `.toml` format. For example: `register_oauth_application.toml`.
+
 1. Now, patch the above file by running the below command from your habitat studio `/src` directory or your bastion system:
 
     ```bash
@@ -98,3 +102,72 @@ When you install Chef Automate, it bundles the OC-ID component as an Oauth provi
     ```
 
 1. Now, configure your application with the generated `uid` and `secret` to be authorized to use **OC-ID** as an oauth chef-server provider and use the chef-server credential to log in to the app.
+
+## Integrate Supermarket with Automate HA Topology
+
+In this section we will discuss how to integrate supermarket with Automate HA. The Automate HA is setup ON-Premises along with AWS Managed Services, i.e., Open Search and PostgreSQL. You can manage the Open Search in AWS and can setup the PostgreSQL using RDS which is managed by AWS. In the below steps let's see the interaction process between Automate and Supermarket.
+
+1. In Automate the integrations is done using Chef Server Oauth provider, i.e., OC-ID we registered in above steps. The OC-ID is running as a part of Chef Server component inside Automate. This OC-ID will be used to integrate supermarket.
+
+    To check the registered nodes of the Automate HA cluster, run the following command:
+
+    ```bash
+    chef-automate status
+    ```
+
+    The output looks similar to the image shown below:
+
+    IMAGE
+
+    The above output shows that the automate and chef_server are hosted in one instaces individually to the created Automate HA cluster. The Open Search and PostgreSQL are hosted in AWS infrastructure.
+
+1. Now, let's see the Automate HA Topology. Before that let's check the configuration of Automate HA in `.toml` file. In the `.toml` file configure the following endpoints:
+
+    * **FQDN** endpoint for Automate Load Balancer:
+
+    ```cd
+    # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+    fqdn = "a2ha-xyz-xyz-aws-managed-automate.eng.chefdemo.net"
+    ```
+
+    The above value of the **fqdn** is the endpoint of the Automate website as login page.
+
+    * **RDS** endpoint for database configuration of PostgreSQL:
+
+    ```cd
+    [external.database.postgre_sql]
+
+    # eg: instance_url = "anaged-rds-db.c5gkx.ap-southeast-1.rds.amazonaws.com:5432"
+    instance_url = "a2ha-xyz-pg-1.ckhuz29gmswx.ap-southeast-1.rds.amazonaws.com:5432"
+    ```
+
+    The above value of the **instance_url** is the RDS endpoint followed by the port, i.e., **5432**.
+
+    * In the `.toml` file, the above code is followed by the credentials to log in to the PostgreSQL database.
+
+    ```cd
+    # username = "postgres"
+    superuser_username = "postgres"
+
+    # eg: password = "Progress123"
+    superuser_password = "postgres"
+
+    # eg: dbuser_username = "progres"
+    dbuser_username = "progres"
+
+    # eg: dbuser_password = "Progress123"
+    dbuser_password = "postgres"
+    ```
+
+    * For OpenSearch, add the similar things as PostgreSQL, i.e., the domain name, a2ha endpoint, and the credentials to log in to the end poit:
+
+
+
+
+
+
+
+
+
+
+
