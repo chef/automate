@@ -104,10 +104,10 @@ func TestValidateCertificate(t *testing.T) {
 						{
 							"title": "Certificates have valid expiry date",
 							"passed": true,
-							"success_msg": "All certificates expiry date is later than 365 days",
+							"success_msg": "All certificates expiry date is later than 30 days",
 							"error_msg": "",
 							"resolution_msg": "",
-							"skipped":false
+							"skipped": false
 						},
 						{
 							"title": "Certificates are of X509 V3 format",
@@ -115,7 +115,7 @@ func TestValidateCertificate(t *testing.T) {
 							"success_msg": "All certificates are of X509 V3 format",
 							"error_msg": "",
 							"resolution_msg": "",
-							"skipped":false
+							"skipped": false
 						},
 						{
 							"title": "Private Keys are of PKCS8 format",
@@ -123,7 +123,7 @@ func TestValidateCertificate(t *testing.T) {
 							"success_msg": "The private keys are of PKCS8 format",
 							"error_msg": "",
 							"resolution_msg": "",
-							"skipped":false
+							"skipped": false
 						},
 						{
 							"title": "Certificates are hashed using either of PBE-SHA1-3DES, RSA (2048), SHA-256 algorithms",
@@ -131,7 +131,7 @@ func TestValidateCertificate(t *testing.T) {
 							"success_msg": "All certificates are hashed using either of PBE-SHA1-3DES, RSA (2048), SHA-256 algorithms",
 							"error_msg": "",
 							"resolution_msg": "",
-							"skipped":false
+							"skipped": false
 						}
 					]
 				}

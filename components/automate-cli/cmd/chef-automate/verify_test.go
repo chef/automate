@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	"github.com/chef/automate/lib/config"
@@ -676,15 +677,15 @@ func TestBuildReports(t *testing.T) {
 				batchCheckResults: []models.BatchCheckResult{
 					{
 						NodeType: "automate",
-						Ip: "1.1.1.1",
+						Ip:       "1.1.1.1",
 						Tests: []models.ApiResult{
 							{
-								Passed: false,
+								Passed:  false,
 								Message: "SSH User Access Check",
-								Check: "ssh-user",
-								Checks: nil,
+								Check:   "ssh-user",
+								Checks:  nil,
 								Error: &fiber.Error{
-									Code: 400,
+									Code:    400,
 									Message: "Permissions on the ssh key file do not satisfy the requirement",
 								},
 								Skipped: false,
@@ -702,12 +703,67 @@ func TestBuildReports(t *testing.T) {
 						Status:    "Failed",
 						StatusMessage: &reporting.StatusMessage{
 							MainMessage: "SSH User Access Check - Failed",
-							SubMessage: nil,
+							SubMessage:  nil,
 						},
 						SummaryInfo: &reporting.SummaryInfo{
 							SuccessfulCount: 0,
-							FailedCount: 1,
-							ToResolve: []string{"Permissions on the ssh key file do not satisfy the requirement"},
+							FailedCount:     1,
+							ToResolve:       []string{"Permissions on the ssh key file do not satisfy the requirement"},
+						},
+					},
+				},
+			},
+		},
+		// New check added!
+		{
+			name: "If Report is successfully created with warning message",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip:       "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed:  true,
+								Message: constants.CERTIFICATE_MSG,
+								Check:   constants.CERTIFICATE,
+								Checks: []models.Checks{
+									{
+										Title:         "Certificate check",
+										Passed:        true,
+										SuccessMsg:    constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS,
+										ErrorMsg:      "",
+										ResolutionMsg: constants.RENEW_CERTS,
+									},
+									{
+										Title:         "Certificate check",
+										Passed:        true,
+										SuccessMsg:    constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS,
+										ErrorMsg:      "",
+										ResolutionMsg: constants.RENEW_CERTS,
+									},
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: constants.CERTIFICATE,
+						Status:    "Success",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "Certificate Check - Success",
+							SubMessage:  []string{constants.RENEW_CERTS, constants.RENEW_CERTS},
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 2,
+							FailedCount:     0,
+							ToResolve:       nil,
 						},
 					},
 				},

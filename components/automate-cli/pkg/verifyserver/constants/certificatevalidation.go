@@ -2,10 +2,10 @@ package constants
 
 const (
 	CERTIFICATE_EXPIRY_TITLE                 = "Certificates have valid expiry date"
-	CERTIFICATE_EXPIRY_SUCCESS_MESSAGE       = "All certificates expiry date is later than 365 days"
+	CERTIFICATE_VALID                        = "Certificates are valid"
+	CERTIFICATE_EXPIRY_SUCCESS_MESSAGE       = "All certificates expiry date is later than 30 days"
 	CERTIFICATE_EXPIRY_ERROR_MESSAGE         = "The %v certificates have expired"
-	CERTIFICATE_INVALID_EXPIRY_MESSAGE       = "The %v certificates expiry date is earlier than 365 days"
-	CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE    = "Generate and provide certificates with expiry date later than 365 days"
+	CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE    = "Generate and provide certificates with expiry date later than 30 days"
 	CERTIFICATE_FORMAT_TITLE                 = "Certificates are of X509 V3 format"
 	CERTIFICATE_FORMAT_SUCCESS_MESSAGE       = "All certificates are of X509 V3 format"
 	CERTIFICATE_FORMAT_ERROR_MESSAGE         = "The %v certificates are not of X509 V3 format"
@@ -25,4 +25,6 @@ const (
 	ADMIN                                    = "Admin"
 	NODE_KEY                                 = "Node-Key"
 	ADMIN_KEY                                = "Admin-Key"
+	CERTIFICATE_WILL_EXPIRE_IN_30_DAYS       = "Certificate will expire within 30 days"
+	RENEW_CERTS                              = "Certificates will expire withing 30 days, renew it please!"
 )
