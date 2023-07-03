@@ -620,9 +620,10 @@ func Test_validateCertificateExpiry(t *testing.T) {
 		checks := vcs.validateCertificateExpiry(certMap, []string{constants.ROOT})
 
 		assert.True(t, checks.Passed)
-		assert.Equal(t, constants.CERTIFICATE_VALID, checks.SuccessMsg)
-		assert.Empty(t, checks.ErrorMsg)
-		assert.Empty(t, checks.ResolutionMsg)
+		assert.Equal(t, constants.CERTIFICATE_WILL_EXPIRE_IN_30_Days, checks.Title)
+		assert.Equal(t, "", checks.SuccessMsg)
+		assert.NotNil(t, checks.ErrorMsg)
+		assert.Equal(t, "Renew certificate", checks.ResolutionMsg)
 	})
 
 	t.Run("Certificates are expired", func(t *testing.T) {

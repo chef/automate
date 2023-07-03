@@ -25,4 +25,5 @@ const (
 	ADMIN                                    = "Admin"
 	NODE_KEY                                 = "Node-Key"
 	ADMIN_KEY                                = "Admin-Key"
+	CERTIFICATE_WILL_EXPIRE_IN_30_Days       = "Certificate will expire within 30 days"
 )
