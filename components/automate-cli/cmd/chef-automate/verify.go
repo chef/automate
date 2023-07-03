@@ -676,9 +676,10 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 			}
 
 			for _, check := range test.Checks {
-				if check.Passed && check.ResolutionMsg != "" {
+				if check.Passed && check.ErrorMsg != "" {
 					successfulCount++
-					errorMsgs = append(errorMsgs, check.ResolutionMsg)
+					errorMsgs = append(errorMsgs, check.ErrorMsg)
+					resolutionMsgs = append(resolutionMsgs, check.ResolutionMsg)
 				} else if check.Passed {
 					successfulCount++
 				} else {
