@@ -67,7 +67,6 @@ func makeRequests(config *models.Config, reqMap map[string][]models.FirewallRequ
 	reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
 	reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
 	reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
-	reqMap[constants.BASTION] = getRequestAsBastionSource(config)
 }
 
 // getRequestsForAutomateAsSource gives the requests for all the ports and types automate as source
@@ -198,61 +197,6 @@ func getRequestsForOpensearchAsSource(config *models.Config) []models.FirewallRe
 
 			}
 
-		}
-	}
-
-	return reqBodies
-}
-
-func getRequestAsBastionSource(config *models.Config) []models.FirewallRequest {
-	var reqBodies []models.FirewallRequest
-
-	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
-		//Dest Chef Infra server
-		for _, port := range a2CsTCPPorts {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCALHOST,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     port,
-				DestinationServiceProtocol: "tcp",
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-	}
-	// Dest Chef Infra
-	for _, destNodeIP := range config.Hardware.ChefInfraServerNodeIps {
-		for _, port := range a2CsTCPPorts {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCALHOST,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     port,
-				DestinationServiceProtocol: "tcp",
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-	}
-	// Dest Postgres
-	for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-		for _, port := range postgresBastionPorts {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCALHOST,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     port,
-				DestinationServiceProtocol: "tcp",
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-	}
-	// Dest Opensearch
-	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-		for _, port := range ossBastionPorts {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCALHOST,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     port,
-				DestinationServiceProtocol: "tcp",
-			}
-			reqBodies = append(reqBodies, reqBody)
 		}
 	}
 

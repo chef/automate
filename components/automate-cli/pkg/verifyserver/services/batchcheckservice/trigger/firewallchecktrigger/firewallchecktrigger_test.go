@@ -77,42 +77,32 @@ const (
 			"status": "SUCCESS",
 			"host": "10.0.0.1",
 			"node_type": "automate",
+			"check_type": "",
 			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
+			  "passed": true,
+			  "msg": "",
+			  "check": "",
+			  "checks": [
+				{
+					"title": "Check for reachability of service at destination port from the source node",
+					"passed": true,
+					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
+					"error_msg": "",
+					"resolution_msg": "",
+				  	"skipped": false
+				},
+				{
+					"title": "Check for reachability of service at destination port from the source node",
+					"passed": true,
+					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
+					"error_msg": "",
+					"resolution_msg": "",
+				  	"skipped": false
+				}
+			  ],
+			  "skipped": false
 			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					},{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		}		
+		  }
 	]
 	 `
 
@@ -121,40 +111,30 @@ const (
 			"status": "SUCCESS",
 			"host": "10.0.0.1",
 			"node_type": "automate",
+			"check_type": "",
 			"result": {
 				"passed": false,
+				"msg": "",
+				"check": "",
 				"checks": [
 					{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>",
+						"skipped": false
+					},
 					{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					},{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>",
+						"skipped": false
 					}
-				]
+				],
+				"skipped": false
 			}
 		}
 	]`
@@ -232,10 +212,6 @@ func TestMakeRequests(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, len(requestsForOpensearch), 8)
 
-	requestsForBastion, ok := mapRequests[constants.BASTION]
-	assert.True(t, ok)
-	assert.Equal(t, len(requestsForBastion), 7)
-
 	require.Equal(t, expected[0].SourceNodeIP, requestsForautomate[0].SourceNodeIP)
 	require.Equal(t, expected[0].DestinationNodeIP, requestsForautomate[0].DestinationNodeIP)
 }
@@ -312,6 +288,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
 					Certificate: certificatelist,
 				},
@@ -326,6 +303,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
 					Certificate: certificatelist,
 				},
@@ -341,6 +319,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
 					Certificate: certificatelist,
 				},
@@ -357,6 +336,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
 					Certificate: certificatelist,
 				},
@@ -372,6 +352,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
 					Certificate: certificatelist,
 				},
@@ -427,9 +408,6 @@ func TestFirewallCheck_Run(t *testing.T) {
 				} else if tt.name == "Hardware Nil" {
 					assert.Len(t, got, 5)
 					for _, v := range got {
-						if v.CheckType == constants.BASTION {
-							assert.Equal(t, constants.LOCALHOST, v.Host)
-						}
 						assert.Equal(t, constants.FIREWALL, v.CheckType)
 						assert.Equal(t, constants.FIREWALL, v.Result.Check)
 						assert.True(t, v.Result.Skipped)
