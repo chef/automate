@@ -47,7 +47,7 @@ func TestDeletenodeAWSValidateIsManagedServicesOnError(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -99,7 +99,7 @@ func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -152,7 +152,7 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -202,7 +202,7 @@ func TestDeletenodeAWSModifyA2(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -255,7 +255,7 @@ func TestDeletenodeAWSModifyCS(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -309,7 +309,7 @@ func TestDeletenodeAWSModifyPG(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -362,7 +362,7 @@ func TestDeletenodeAWSModifyOS(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -415,7 +415,7 @@ func TestDeleteAwsnodePrompt(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				return nil
 			},
 			getModeFromConfigFunc: func(path string) (string, error) {
@@ -474,7 +474,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				filewritten = true
 				return nil
 			},
@@ -594,7 +594,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 				return nil
 			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 				filewritten = true
 				return errors.New("random")
 			},
@@ -678,7 +678,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -827,7 +827,7 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {

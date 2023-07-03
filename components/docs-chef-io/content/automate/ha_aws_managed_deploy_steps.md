@@ -141,6 +141,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
     {{% automate/char-warn %}}
     {{< /warning >}}
 
+   {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
+
 1. Continue with the deployment after updating config:
 
    ```bash

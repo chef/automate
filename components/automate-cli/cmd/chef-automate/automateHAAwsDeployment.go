@@ -5,20 +5,28 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/local-user-service/password"
+	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
+)
+
+const (
+	DEPLOY    = "deploy"
+	PROVISION = "provision"
 )
 
 type awsDeployment struct {
 	config     AwsConfigToml
 	configPath string
+	AWSConfigIp
 }
 
 func newAwsDeployemnt(configPath string) *awsDeployment {
@@ -29,7 +37,11 @@ func newAwsDeployemnt(configPath string) *awsDeployment {
 
 func (a *awsDeployment) doDeployWork(args []string) error {
 	if isA2HARBFileExist() {
-		err := executeDeployment(args)
+		err := a.generateConfig(DEPLOY)
+		if err != nil {
+			return status.Annotate(err, status.DeployError)
+		}
+		err = executeDeployment(args)
 		if err != nil {
 			return err
 		}
@@ -37,7 +49,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 		}
-		archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
+		archBytes, err := os.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 		if err != nil {
 			writer.Errorf("%s", err.Error())
 			return err
@@ -48,7 +60,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 		}
-		err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
+		err = os.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 		}
@@ -60,7 +72,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 
 func (a *awsDeployment) doProvisionJob(args []string) error {
 	writer.Print("AWS Provision")
-	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas)
+	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas, PROVISION)
 	if err != nil {
 		return err
 	}
@@ -77,8 +89,8 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
 
-func (a *awsDeployment) generateConfig() error {
-	templateBytes, err := ioutil.ReadFile(a.getConfigPath())
+func (a *awsDeployment) generateConfig(state string) error {
+	templateBytes, err := os.ReadFile(a.getConfigPath())
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
@@ -86,6 +98,19 @@ func (a *awsDeployment) generateConfig() error {
 	err = ptoml.Unmarshal(templateBytes, &a.config)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) {
+		archBytes, err := os.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
+		if err != nil {
+			writer.Errorf("%s", err.Error())
+			return err
+		}
+		var arch = strings.Trim(string(archBytes), "\n")
+		a.config.Architecture.ConfigInitials.Architecture = arch
+		err = a.getAwsHAIp()
+		if err != nil {
+			return status.Wrap(err, status.IpAccessError, "Error in fetching node IPs in aws mode")
+		}
 	}
 	errList := a.validateConfigFields()
 	if errList != nil && errList.Len() > 0 {
@@ -103,7 +128,7 @@ func (a *awsDeployment) generateConfig() error {
 		}
 		a.config.Opensearch.Config.NodesDn = nodes_dn
 	}
-	return writeHAConfigFiles(awsA2harbTemplate, a.config)
+	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }
 
 func (a *awsDeployment) getDistinguishedNameFromKey(publicKey string) (string, error) {
@@ -267,53 +292,155 @@ func (a *awsDeployment) validateCerts() *list.List {
 		}))
 	}
 	if a.config.Automate.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(a.config.Automate.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(a.config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
-		}
+		if len(a.config.Automate.Config.CertsByIP) > 0 {
 
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: a.config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
-			{key: a.config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
-		}))
+			if !stringutils.SubSlice(a.configAutomateIpList, extractIPsFromCertsByIP(a.config.Automate.Config.CertsByIP)) {
+				errorList.PushBack("Missing certificates for some automate private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(a.configAutomateIpList, ", "))
+			}
+			// check if all the certs are valid for given IPs
+			for _, node := range a.config.Automate.Config.CertsByIP {
+				if len(strings.TrimSpace(node.IP)) < 1 ||
+					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(node.PublicKey)) < 1 {
+					errorList.PushBack("Field certs_by_ip for Automate requires ip, private_key and public_key. Some of them are missing.")
+				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "automate cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "automate cert_by_ip for ip " + node.IP},
+				}))
+			}
+		} else {
+			if len(strings.TrimSpace(a.config.Automate.Config.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(a.config.Automate.Config.PublicKey)) < 1 {
+				errorList.PushBack("Automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+			}
+
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
+				{key: a.config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
+			}))
+		}
 	}
+
 	if a.config.ChefServer.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(a.config.ChefServer.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(a.config.ChefServer.Config.PublicKey)) < 1 {
-			errorList.PushBack("ChefServer root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		if len(a.config.ChefServer.Config.CertsByIP) > 0 {
+			if !stringutils.SubSlice(a.configChefServerIpList, extractIPsFromCertsByIP(a.config.ChefServer.Config.CertsByIP)) {
+				errorList.PushBack("Missing certificates for some ChefServer private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(a.configChefServerIpList, ", "))
+			}
+			// check if all the certs are valid for given IPs
+			for _, node := range a.config.ChefServer.Config.CertsByIP {
+				if len(strings.TrimSpace(node.IP)) < 1 ||
+					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(node.PublicKey)) < 1 {
+					errorList.PushBack("Field certs_by_ip for chef_server requires ip, private_key and public_key. Some of them are missing.")
+				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "chef-server cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "chef-server cert_by_ip for ip " + node.IP},
+				}))
+			}
+		} else {
+			if len(strings.TrimSpace(a.config.ChefServer.Config.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(a.config.ChefServer.Config.PublicKey)) < 1 {
+				errorList.PushBack("ChefServer root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
+				{key: a.config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
+			}))
 		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: a.config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
-			{key: a.config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
-		}))
 	}
+
 	if a.config.Postgresql.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(a.config.Postgresql.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(a.config.Postgresql.Config.PublicKey)) < 1 {
-			errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		if len(a.config.Postgresql.Config.CertsByIP) > 0 {
+			if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 {
+				errorList.PushBack("Postgresql root_ca is missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+			}))
+			if !stringutils.SubSlice(a.configPostgresqlIpList, extractIPsFromCertsByIP(a.config.Postgresql.Config.CertsByIP)) {
+				errorList.PushBack("Missing certificates for some Postgresql private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(a.configPostgresqlIpList, ", "))
+			}
+			// check if all the certs are valid for given IPs
+			for _, node := range a.config.Postgresql.Config.CertsByIP {
+				if len(strings.TrimSpace(node.IP)) < 1 ||
+					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(node.PublicKey)) < 1 {
+					errorList.PushBack("Field certs_by_ip for postgresql requires ip, private_key and public_key. Some of them are missing.")
+				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "postgresql cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "postgresql cert_by_ip for ip " + node.IP},
+				}))
+			}
+		} else {
+			if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 ||
+				len(strings.TrimSpace(a.config.Postgresql.Config.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(a.config.Postgresql.Config.PublicKey)) < 1 {
+				errorList.PushBack("PostgreSQL root_ca, public_key and private_key are mandatory fields, check if any of them are missing. Otherwise set enable_custom_certs to false.")
+			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+				{key: a.config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
+				{key: a.config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+			}))
 		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: a.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
-			{key: a.config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
-			{key: a.config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
-		}))
 	}
+
 	if a.config.Opensearch.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(a.config.Opensearch.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(a.config.Opensearch.Config.AdminKey)) < 1 ||
-			len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) < 1 ||
-			len(strings.TrimSpace(a.config.Opensearch.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) < 1 {
-			errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		if len(a.config.Opensearch.Config.CertsByIP) > 0 {
+			if len(strings.TrimSpace(a.config.Opensearch.Config.RootCA)) < 1 ||
+				len(strings.TrimSpace(a.config.Opensearch.Config.AdminKey)) < 1 ||
+				len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) < 1 {
+				errorList.PushBack("Opensearch root_ca, admin_key or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+				{key: a.config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+				{key: a.config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+			}))
+			if !stringutils.SubSlice(a.configOpensearchIpList, extractIPsFromCertsByIP(a.config.Opensearch.Config.CertsByIP)) {
+				errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(a.configOpensearchIpList, ", "))
+			}
+			// check if all the certs are valid for given IPs
+			for _, node := range a.config.Opensearch.Config.CertsByIP {
+				if len(strings.TrimSpace(node.IP)) < 1 ||
+					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(node.PublicKey)) < 1 {
+					errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
+				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "opensearch cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "opensearch cert_by_ip for ip " + node.IP},
+				}))
+			}
+		} else {
+			if len(strings.TrimSpace(a.config.Opensearch.Config.RootCA)) < 1 ||
+				len(strings.TrimSpace(a.config.Opensearch.Config.AdminKey)) < 1 ||
+				len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) < 1 ||
+				len(strings.TrimSpace(a.config.Opensearch.Config.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) < 1 {
+				errorList.PushBack("Opensearch root_ca, admin_key, admin_cert, public_key and private_key are mandatory fields, check if any of them are missing. Otherwise set enable_custom_certs to false.")
+			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+				{key: a.config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+				{key: a.config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+				{key: a.config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
+				{key: a.config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+			}))
 		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: a.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-			{key: a.config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-			{key: a.config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
-			{key: a.config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
-			{key: a.config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
-		}))
 	}
 	return errorList
+}
+
+func (a *awsDeployment) getAwsHAIp() error {
+	nodeUtils := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer)
+	ConfigIp, err := nodeUtils.getAWSConfigIp()
+	if err != nil {
+		return err
+	}
+	a.AWSConfigIp = *ConfigIp
+	return nil
 }

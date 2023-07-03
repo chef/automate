@@ -3,7 +3,7 @@ package main
 type deployManager interface {
 	doDeployWork(args []string) error
 	doProvisionJob(args []string) error
-	generateConfig() error
+	generateConfig(state string) error
 }
 
 func getDeployer(configPath string) (deployManager, error) {

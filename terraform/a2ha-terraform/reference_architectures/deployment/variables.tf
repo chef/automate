@@ -10,6 +10,11 @@ variable "ami_filter_virt_type" {
   default = "hvm"
 }
 
+variable "automate_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "automate_ebs_volume_iops" {
   default = 100
 }
@@ -78,6 +83,11 @@ variable "backup_config_s3" {
 }
 
 variable "bucket_name" {
+}
+
+variable "chef_server_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "chef_ebs_volume_iops" {
@@ -152,6 +162,11 @@ variable "managed_rds_superuser_username" {
   default = ""
 }
 
+variable "opensearch_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "opensearch_ebs_volume_iops" {
   default = 300
 }
@@ -182,6 +197,11 @@ variable "os_snapshot_user_access_key_id" {
 
 variable "os_snapshot_user_access_key_secret" {
   default = ""
+}
+
+variable "postgresql_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "postgresql_ebs_volume_iops" {

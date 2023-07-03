@@ -3,7 +3,7 @@ package main
 type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc    func(command string, args []string, helpDocs string) error
 	getHaInfraDetailsfunc                        func() (*AutomateHAInfraDetails, *SSHConfig, error)
-	writeHAConfigFilesFunc                       func(templateName string, data interface{}) error
+	writeHAConfigFilesFunc                       func(templateName string, data interface{}, state string) error
 	taintTerraformFunc                           func(path string) error
 	isA2HARBFileExistFunc                        func() bool
 	getModeFromConfigFunc                        func(path string) (string, error)
@@ -39,8 +39,8 @@ func (mnu *MockNodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()
 }
-func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
-	return mnu.writeHAConfigFilesFunc(templateName, data)
+func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}, state string) error {
+	return mnu.writeHAConfigFilesFunc(templateName, data, state)
 }
 func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
 	return mnu.taintTerraformFunc(path)

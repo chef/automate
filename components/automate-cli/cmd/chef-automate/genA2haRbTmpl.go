@@ -1,6 +1,7 @@
 package main
 
 const existingNodesA2harbTemplate = `
+state "{{ .State }}"
 secrets_key_file "{{ .Architecture.ConfigInitials.SecretsKeyFile }}"
 secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
 architecture "{{ .Architecture.ConfigInitials.Architecture }}"
@@ -125,6 +126,7 @@ end
 `
 
 const awsA2harbTemplate = `
+state "{{ .State }}"
 secrets_key_file "{{ .Architecture.ConfigInitials.SecretsKeyFile }}"
 secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
 architecture "{{ .Architecture.ConfigInitials.Architecture }}"
@@ -164,6 +166,7 @@ automate do
   {{ if .Automate.Config.RootCA }} root_ca "{{ .Automate.Config.RootCA }}" {{ else }} # root_ca "{{ .Automate.Config.RootCA }}" {{ end }}
   {{ if .Automate.Config.PrivateKey }} private_key "{{ .Automate.Config.PrivateKey }}" {{ else }} # private_key "{{ .Automate.Config.PrivateKey }}" {{ end }}
   {{ if .Automate.Config.PublicKey }} public_key "{{ .Automate.Config.PublicKey }}" {{ else }} # public_key "{{ .Automate.Config.PublicKey }}" {{ end }}
+  {{ if .Automate.Config.CertsByIP }} certs_by_ip  "{ {{ range $index, $element := .Automate.Config.CertsByIP}}{{if $index}} \n       {{end}} \"{{$element.IP}}\" = { private_key = <<-EOT\n{{$element.PrivateKey}}\nEOT\n\n public_key = <<-EOT\n{{$element.PublicKey}}\nEOT\n } {{end}} }" {{end}}
 end
 
 ###############################################################
@@ -174,6 +177,7 @@ chef_server do
   enable_custom_certs "{{ .ChefServer.Config.EnableCustomCerts }}"
   {{ if .ChefServer.Config.PrivateKey }} private_key "{{ .ChefServer.Config.PrivateKey }}" {{ else }} # private_key "{{ .ChefServer.Config.PrivateKey }}" {{ end }}
   {{ if .ChefServer.Config.PublicKey }} public_key "{{ .ChefServer.Config.PublicKey }}" {{ else }} # public_key "{{ .ChefServer.Config.PublicKey }}" {{ end }}
+  {{ if .ChefServer.Config.CertsByIP }} certs_by_ip  "{ {{ range $index, $element := .ChefServer.Config.CertsByIP}}{{if $index}} \n {{end}} \"{{$element.IP}}\" = { private_key = <<-EOT\n{{$element.PrivateKey}}\nEOT\n\n public_key = <<-EOT\n{{$element.PublicKey}}\nEOT\n } {{end}} }" {{end}}
 end
 
 ###############################################################
@@ -189,6 +193,7 @@ opensearch do
   {{ if .Opensearch.Config.PublicKey }} public_key "{{ .Opensearch.Config.PublicKey }}" {{ else }} # public_key "{{ .Opensearch.Config.PublicKey }}" {{ end }}
   admin_dn "{{ .Opensearch.Config.AdminDn }}"
   nodes_dn "{{ .Opensearch.Config.NodesDn }}"
+  {{ if .Opensearch.Config.CertsByIP }} certs_by_ip  "{ {{ range $index, $element := .Opensearch.Config.CertsByIP}}{{if $index}} \n {{end}} \"{{$element.IP}}\" = { private_key = <<-EOT\n{{$element.PrivateKey}}\nEOT\n\n public_key = <<-EOT\n{{$element.PublicKey}}\nEOT\n\n nodes_dn = <<-EOT\n{{$element.NodesDn}}\nEOT\n } {{end}} }" {{end}}
 end
 
 ###############################################################
@@ -200,6 +205,7 @@ postgresql do
   {{ if .Postgresql.Config.RootCA }} root_ca "{{ .Postgresql.Config.RootCA }}" {{ else }} # root_ca "{{ .Postgresql.Config.RootCA }}" {{ end }}
   {{ if .Postgresql.Config.PrivateKey }} private_key "{{ .Postgresql.Config.PrivateKey }}" {{ else }} # private_key "{{ .Postgresql.Config.PrivateKey }}" {{ end }}
   {{ if .Postgresql.Config.PublicKey }} public_key "{{ .Postgresql.Config.PublicKey }}" {{ else }} # public_key "{{ .Postgresql.Config.PublicKey }}" {{ end }}
+  {{ if .Postgresql.Config.CertsByIP }} certs_by_ip  "{ {{ range $index, $element := .Postgresql.Config.CertsByIP}}{{if $index}} \n {{end}} \"{{$element.IP}}\" = { private_key = <<-EOT\n{{$element.PrivateKey}}\nEOT\n\n public_key = <<-EOT\n{{$element.PublicKey}}\nEOT\n } {{end}} }" {{end}}
 end
 
 ###############################################################

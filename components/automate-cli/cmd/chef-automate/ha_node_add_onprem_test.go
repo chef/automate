@@ -385,7 +385,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -447,7 +447,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return errors.New("random")
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -506,7 +506,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -584,7 +584,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -706,7 +706,7 @@ func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {

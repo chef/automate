@@ -237,7 +237,7 @@ func TestSaveConfigToBastion(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return nil
 		},
 		isA2HARBFileExistFunc: func() bool {

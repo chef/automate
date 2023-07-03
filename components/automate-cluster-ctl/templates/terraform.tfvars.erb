@@ -184,8 +184,12 @@ EOT
 
 <% end %>
 
-# Common
+# Fields needed for all deployment types
 ################################################################################
+
+ssh_user = "<%= config.ssh_user %>"
+ssh_port = "<%= config.ssh_port %>"
+ssh_key_file = "<%= config.ssh_key_file %>"
 <% unless config.automate.admin_password.empty? %>
 automate_admin_password = "<%= config.automate.admin_password %>"
 <% end %>
@@ -196,6 +200,36 @@ automate_fqdn = "<%= config.automate.fqdn %>" # leave commented out for AWS, oth
 automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
 opensearch_instance_count = <%= config.opensearch.instance_count %>
+
+nfs_mount_path = "<%= config.backup_mount %>"
+postgresql_instance_count = <%= config.postgresql.instance_count %>
+postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
+
+habitat_uid_gid = "<%= config.habitat_uid_gid %>"
+ssh_group_name = "<%= config.ssh_group_name %>"
+
+
+<% if config.automate.teams_port %>
+teams_port = <%= config.automate.teams_port.to_i %>
+<% end %>
+
+<% if config.architecture == 'existing_nodes' and config.backup_config == 'object_storage' %>
+# ObjectStorage
+################################################################################
+bucket_name = "<%= config.object_storage.bucket_name %>"
+access_key = "<%= config.object_storage.access_key %>"
+secret_key = "<%= config.object_storage.secret_key %>"
+s3_endpoint = "<%= config.object_storage.endpoint %>"
+region = "<%= config.object_storage.region %>"
+<% end %>
+
+
+
+
+
+<% if config.state == 'deploy' %>
+# Certs
+################################################################################
 
 automate_root_ca = <<-EOT
 <%= config.automate.root_ca %>
@@ -269,33 +303,9 @@ opensearch_custom_certs_enabled = <%= config.opensearch.enable_custom_certs %>
 
 opensearch_admin_dn = "<%= config.opensearch.admin_dn %>"
 opensearch_nodes_dn = "<%= config.opensearch.nodes_dn %>"
-<% if config.architecture == 'existing_nodes' %>
 automate_certs_by_ip = <%= config.automate.certs_by_ip %>
 chef_server_certs_by_ip = <%= config.chef_server.certs_by_ip %>
 postgresql_certs_by_ip = <%= config.postgresql.certs_by_ip %>
 opensearch_certs_by_ip = <%= config.opensearch.certs_by_ip %>
-<% end %>
-nfs_mount_path = "<%= config.backup_mount %>"
-postgresql_instance_count = <%= config.postgresql.instance_count %>
-postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
 
-habitat_uid_gid = "<%= config.habitat_uid_gid %>"
-ssh_user = "<%= config.ssh_user %>"
-ssh_group_name = "<%= config.ssh_group_name %>"
-ssh_port = "<%= config.ssh_port %>"
-ssh_key_file = "<%= config.ssh_key_file %>"
-
-
-<% if config.automate.teams_port %>
-teams_port = <%= config.automate.teams_port.to_i %>
-<% end %>
-
-<% if config.architecture == 'existing_nodes' and config.backup_config == 'object_storage' %>
-# ObjectStorage
-################################################################################
-bucket_name = "<%= config.object_storage.bucket_name %>"
-access_key = "<%= config.object_storage.access_key %>"
-secret_key = "<%= config.object_storage.secret_key %>"
-s3_endpoint = "<%= config.object_storage.endpoint %>"
-region = "<%= config.object_storage.region %>"
 <% end %>

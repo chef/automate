@@ -241,7 +241,7 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {
-	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config)
+	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config, DEPLOY)
 	if err != nil {
 		return err
 	}

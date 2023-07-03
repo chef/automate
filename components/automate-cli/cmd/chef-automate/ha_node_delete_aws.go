@@ -212,13 +212,18 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config)
+	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config, PROVISION)
 	if err != nil {
 		return err
 	}
 
 	argsdeploy := []string{"-y"}
 	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
+	if err != nil {
+		return err
+	}
+	dna.config.Architecture.ConfigInitials.Architecture = "deployment"
+	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config, DEPLOY)
 	if err != nil {
 		return err
 	}

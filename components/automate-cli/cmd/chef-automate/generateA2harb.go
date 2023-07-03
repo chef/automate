@@ -28,7 +28,9 @@ func writeToA2HARBFile(template string, path string) {
 	writer.Printf("Config written to %s\n", path)
 }
 
-func renderSettingsToA2HARBFile(templateName string, data interface{}) string {
+func renderSettingsToA2HARBFile(templateName string, data map[string]interface{}, state string) string {
+	data["State"] = state
+
 	temp := template.Must(template.New("init").
 		Funcs(template.FuncMap{"StringsJoin": strings.Join}).
 		Parse(templateName))

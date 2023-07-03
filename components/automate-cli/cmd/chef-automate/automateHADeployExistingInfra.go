@@ -30,7 +30,7 @@ func newExistingInfa(configPath string) *existingInfra {
 }
 
 func (e *existingInfra) doDeployWork(args []string) error {
-	var err = bootstrapEnv(e, deployCmdFlags.airgap, false)
+	var err = bootstrapEnv(e, deployCmdFlags.airgap, false, DEPLOY)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (e *existingInfra) doProvisionJob(args []string) error {
 	return nil
 }
 
-func (e *existingInfra) generateConfig() error {
+func (e *existingInfra) generateConfig(state string) error {
 	templateBytes, err := ioutil.ReadFile(e.getConfigPath())
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
@@ -63,7 +63,7 @@ func (e *existingInfra) generateConfig() error {
 	if err != nil {
 		return err
 	}
-	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config)
+	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config, state)
 }
 
 func (e *existingInfra) addDNTocertConfig() error {

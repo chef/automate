@@ -289,6 +289,7 @@ module "opensearch" {
   opensearch_admin_dn             = var.opensearch_admin_dn
   opensearch_nodes_dn             = var.opensearch_nodes_dn
   opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
+  opensearch_certs_by_ip          = var.opensearch_certs_by_ip
   depends_on = [
     module.habitat-opensearch
   ]
@@ -330,6 +331,7 @@ module "postgresql" {
   postgresql_private_key          = var.postgresql_private_key
   postgresql_public_key           = var.postgresql_public_key
   postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
+  postgresql_certs_by_ip          = var.postgresql_certs_by_ip
   depends_on = [
     module.habitat-postgresql
   ]
@@ -354,6 +356,7 @@ module "bootstrap_automate" {
   chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
   postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+  automate_certs_by_ip               = var.automate_certs_by_ip
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_lb_fqdn                   = var.automate_lb_fqdn
@@ -424,6 +427,7 @@ module "automate" {
   chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
   postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+  automate_certs_by_ip               = var.automate_certs_by_ip
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_lb_fqdn                   = var.automate_lb_fqdn
@@ -498,6 +502,7 @@ module "chef_server" {
   chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
   postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+  chef_server_certs_by_ip            = var.chef_server_certs_by_ip
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_lb_fqdn                   = var.automate_lb_fqdn
