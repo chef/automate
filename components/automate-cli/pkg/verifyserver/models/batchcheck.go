@@ -299,7 +299,7 @@ func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 	c.Certificate = append(c.Certificate, cert)
 	chefserverConfig := haConfig.ChefServer.Config
 	//We can populate this later as well in config
-	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
+	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.FqdnRootCA, config.CHEFSERVER)
 	if chefserverConfig.EnableCustomCerts {
 		cert.Nodes = appendCertsByIpToNodeCerts(nil, c.Hardware.ChefInfraServerNodeIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
 	}
@@ -361,7 +361,7 @@ func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConf
 
 	//Adding Certificates for chef server FQDN and nodes certificates
 	chefserverConfig := haConfig.ChefServer.Config
-	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
+	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.FqdnRootCA, config.CHEFSERVER)
 	if chefserverConfig.EnableCustomCerts {
 		cert.Nodes = appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
 	}
@@ -406,7 +406,7 @@ func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
 	if haConfig.IsAwsExternalOsConfigured() {
 		c.ExternalOS.OSRoleArn = externalOsConfig.Aws.AwsOsSnapshotRoleArn
 		c.ExternalOS.OsSnapshotUserAccessKeyId = externalOsConfig.Aws.OsSnapshotUserAccessKeyID
-		c.ExternalOS.OsSnapshotUserAccessKeySecret= externalOsConfig.Aws.OsSnapshotUserAccessKeySecret
+		c.ExternalOS.OsSnapshotUserAccessKeySecret = externalOsConfig.Aws.OsSnapshotUserAccessKeySecret
 	}
 }
 

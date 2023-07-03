@@ -231,7 +231,7 @@ func (c *HaDeployConfig) verifyChefServerSettings() error {
 	if err := validateNumberField(chefServerSettings.InstanceCount, "chef server instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateFqdnRootCA(chefServerSettings.RootCA, CHEFSERVER); err != nil {
+	if err := validateFqdnRootCA(chefServerSettings.FqdnRootCA, CHEFSERVER); err != nil {
 		errorList.PushBack(err)
 	}
 	if chefServerSettings.EnableCustomCerts {

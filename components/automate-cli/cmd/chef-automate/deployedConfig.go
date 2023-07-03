@@ -98,7 +98,7 @@ func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml) *config.HaD
 			},
 		},
 		ChefServer: &config.ChefServerSettings{
-			Config: &config.ConfigSettings{
+			Config: &config.ConfigChefServerSettings{
 				EnableCustomCerts: existingInfraChefServerSettings.EnableCustomCerts,
 				InstanceCount:     existingInfraChefServerSettings.InstanceCount,
 				PrivateKey:        existingInfraChefServerSettings.PrivateKey,
@@ -226,7 +226,7 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 			},
 		},
 		ChefServer: &config.ChefServerSettings{
-			Config: &config.ConfigSettings{
+			Config: &config.ConfigChefServerSettings{
 				EnableCustomCerts: awsConfigChefServerSettings.EnableCustomCerts,
 				InstanceCount:     awsConfigChefServerSettings.InstanceCount,
 				PrivateKey:        awsConfigChefServerSettings.PrivateKey,

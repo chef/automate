@@ -78,7 +78,7 @@ type ConfigAutomateSettings struct {
 }
 
 type ChefServerSettings struct {
-	Config *ConfigSettings `toml:"config,omitempty"`
+	Config *ConfigChefServerSettings `toml:"config,omitempty"`
 }
 
 type PostgresqlSettings struct {
@@ -87,6 +87,16 @@ type PostgresqlSettings struct {
 
 type OpensearchSettings struct {
 	Config *ConfigOpensearchSettings `toml:"config,omitempty"`
+}
+
+type ConfigChefServerSettings struct {
+	ChefServerFqdn    string      `toml:"fqdn,omitempty"`
+	FqdnRootCA        string      `toml:"lb_root_ca,omitempty"`
+	InstanceCount     string      `toml:"instance_count,omitempty"`
+	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
+	PrivateKey        string      `toml:"private_key,omitempty"`
+	PublicKey         string      `toml:"public_key,omitempty"`
+	CertsByIP         *[]CertByIP `toml:"certs_by_ip,omitempty"`
 }
 type ConfigOpensearchSettings struct {
 	AdminCert         string      `toml:"admin_cert,omitempty"`
@@ -102,7 +112,6 @@ type ConfigOpensearchSettings struct {
 }
 
 type ConfigSettings struct {
-	ChefServerFqdn    string      `toml:"fqdn,omitempty"`
 	RootCA            string      `toml:"root_ca,omitempty"`
 	InstanceCount     string      `toml:"instance_count,omitempty"`
 	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`

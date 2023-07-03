@@ -450,7 +450,7 @@ func Test_validateAutomateCerts(t *testing.T) {
 			},
 		}
 
-		expectedErr := "automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
+		expectedErr := "automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"
 		err := validateAutomateCerts(depConfig)
 		assert.Error(t, err)
 		assert.EqualError(t, err, expectedErr)
@@ -564,7 +564,7 @@ func Test_validateChefServerCerts(t *testing.T) {
 	t.Run("NIL CERTByIP", func(t *testing.T) {
 		depConfig := &HaDeployConfig{
 			ChefServer: &ChefServerSettings{
-				Config: &ConfigSettings{
+				Config: &ConfigChefServerSettings{
 					CertsByIP: nil,
 				},
 			},
@@ -579,7 +579,7 @@ func Test_validateChefServerCerts(t *testing.T) {
 	t.Run("Invalid common Certs", func(t *testing.T) {
 		depConfig := &HaDeployConfig{
 			ChefServer: &ChefServerSettings{
-				Config: &ConfigSettings{
+				Config: &ConfigChefServerSettings{
 					CertsByIP:  nil,
 					PrivateKey: DummyPrivateKey,
 					PublicKey:  DummyPublicKey,
@@ -595,7 +595,7 @@ func Test_validateChefServerCerts(t *testing.T) {
 	t.Run("No private key", func(t *testing.T) {
 		depConfig := &HaDeployConfig{
 			ChefServer: &ChefServerSettings{
-				Config: &ConfigSettings{
+				Config: &ConfigChefServerSettings{
 					CertsByIP: &[]CertByIP{
 						{
 							IP: "10.10.10.10",
@@ -616,7 +616,7 @@ func Test_validateChefServerCerts(t *testing.T) {
 	t.Run("No private key", func(t *testing.T) {
 		depConfig := &HaDeployConfig{
 			ChefServer: &ChefServerSettings{
-				Config: &ConfigSettings{
+				Config: &ConfigChefServerSettings{
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
@@ -638,7 +638,7 @@ func Test_validateChefServerCerts(t *testing.T) {
 	t.Run("No CertByIP validate", func(t *testing.T) {
 		depConfig := &HaDeployConfig{
 			ChefServer: &ChefServerSettings{
-				Config: &ConfigSettings{
+				Config: &ConfigChefServerSettings{
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
@@ -661,7 +661,7 @@ func Test_validateChefServerCerts(t *testing.T) {
 	t.Run("NO Error", func(t *testing.T) {
 		depConfig := &HaDeployConfig{
 			ChefServer: &ChefServerSettings{
-				Config: &ConfigSettings{
+				Config: &ConfigChefServerSettings{
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",

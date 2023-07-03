@@ -201,7 +201,7 @@ func validateAutomateCerts(depConfig *HaDeployConfig) error {
 	if depConfig.Automate.Config.CertsByIP == nil || len(*depConfig.Automate.Config.CertsByIP) == 0 {
 		if len(strings.TrimSpace(depConfig.Automate.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(depConfig.Automate.Config.PublicKey)) < 1 {
-			return fmt.Errorf("automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
+			return fmt.Errorf("automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 		}
 
 		return checkCertValid([]keydetails{
@@ -210,11 +210,33 @@ func validateAutomateCerts(depConfig *HaDeployConfig) error {
 		})
 	}
 
-func validateChefServerCerts(chefServerSettings *ConfigSettings) error {
-	if len(strings.TrimSpace(chefServerSettings.PrivateKey)) < 1 ||
-		len(strings.TrimSpace(chefServerSettings.PublicKey)) < 1 {
-		return fmt.Errorf("chefServer public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
+	// If CertByIp available then check it's availabe for all the nodes
+	for _, v := range *depConfig.Automate.Config.CertsByIP {
+		if v.PrivateKey == "" {
+			return fmt.Errorf(returnErrorPrivetKeyMsg, v.IP)
+		}
+		if v.PublicKey == "" {
+			return fmt.Errorf(returnErrorPublicKeyMsg, v.IP)
+		}
+
+		if err := checkCertValid([]keydetails{
+			{key: v.PrivateKey, certtype: PRIVATE_KEY, svc: AUTOMATE},
+			{key: v.PublicKey, certtype: PUBLIC_KEY, svc: AUTOMATE},
+		}); err != nil {
+			return err
+		}
 	}
+
+	return nil
+}
+
+func validateChefServerCerts(depConfig *HaDeployConfig) error {
+	// If CertByIp is available validate it is available for all the nodes.
+	if depConfig.ChefServer.Config.CertsByIP == nil || len(*depConfig.ChefServer.Config.CertsByIP) == 0 {
+		if len(strings.TrimSpace(depConfig.ChefServer.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(depConfig.ChefServer.Config.PublicKey)) < 1 {
+			return fmt.Errorf("chefServer public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
+		}
 
 		return checkCertValid([]keydetails{
 			{key: depConfig.ChefServer.Config.PrivateKey, certtype: PRIVATE_KEY, svc: CHEFSERVER},

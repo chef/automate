@@ -151,7 +151,7 @@ fqdn = "chefautomate.example.com"
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = "2"
 
-root_ca = """-----BEGIN CERTIFICATE-----
+lb_root_ca = """-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
 U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
