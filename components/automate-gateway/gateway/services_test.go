@@ -25,7 +25,6 @@ func TestIsFileNameValid(t *testing.T) {
 		{"file&name.txt", false},
 		{"file%name.txt", false},
 		{"file#@name.txt", false},
-		{"file+=name.txt", false},
 		{"file[invalid]name.txt", true},
 		{"file{invalid}name.txt", true},
 		{"file(invalid)name.txt", true},

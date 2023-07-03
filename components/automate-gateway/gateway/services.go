@@ -1159,7 +1159,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 func IsFileNameValid(fileName string) bool {
 	// Define the regular expression pattern for prohibited characters
-	regexPattern := "[<>:\"/\\|?*\x00-\x1F!&%#@+=]"
+	regexPattern := "[<>:\"/\\|?*\x00-\x1F!&%#@=]"
 
 	regex, err := regexp.Compile(regexPattern)
 	if err != nil {
