@@ -159,9 +159,16 @@ In this section we will discuss how to integrate supermarket with Automate HA. T
     dbuser_password = "postgres"
     ```
 
-    * For OpenSearch, add the similar things as PostgreSQL, i.e., the domain name, a2ha endpoint, and the credentials to log in to the end poit:
+    * For OpenSearch, add the similar things as PostgreSQL, i.e., the domain name, a2ha endpoint, and the credentials to log in to the end point:
 
+    ```cd
+    [external.database.open_search]
 
+    # eg: managed_opensearch_domain_name = "managed-services-os"
+    opensearch_domain_name = "a2ha-xyz-opensearch-2"
+
+    # eg opensearch_domain_url = "search-managed-services-os.us-east-1.es.amazonaws.com"
+    opensearch_domain_url = 
 
 
 
