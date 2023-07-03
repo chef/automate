@@ -26,5 +26,5 @@ const (
 	NODE_KEY                                 = "Node-Key"
 	ADMIN_KEY                                = "Admin-Key"
 	CERTIFICATE_WILL_EXPIRE_IN_30_DAYS       = "Certificate will expire within 30 days"
-	RENEW_CERTS                              = "Renew certificates"
+	RENEW_CERTS                              = "Certificates will expire withing 30 days, renew it please!"
 )
