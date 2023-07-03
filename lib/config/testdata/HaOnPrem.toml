@@ -63,11 +63,10 @@ instance_count = ""
 
 # teams_port = ""
 config_file = "automate.toml"
-
+root_ca = "a2_cert"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = true
 # Add Automate load balancer root-ca and keys
-root_ca = "a2_cert"
 private_key = "a2_pvt_key"
 public_key = "a2_public_key"
 [[automate.config.certs_by_ip]]

@@ -201,7 +201,7 @@ func validateAutomateCerts(depConfig *HaDeployConfig) error {
 	if depConfig.Automate.Config.CertsByIP == nil || len(*depConfig.Automate.Config.CertsByIP) == 0 {
 		if len(strings.TrimSpace(depConfig.Automate.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(depConfig.Automate.Config.PublicKey)) < 1 {
-			return fmt.Errorf("automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
+			return fmt.Errorf("automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 		}
 
 		return checkCertValid([]keydetails{
@@ -473,4 +473,15 @@ func validateS3Endpoint(endpoint string) error {
 		return errors.New("invalid or empty: endpoint")
 	}
 	return nil
+}
+
+func validateFqdnRootCA(RootCA string, value string) error {
+
+	if len(strings.TrimSpace(RootCA)) < 1 {
+		return fmt.Errorf("%s root_ca is missing", value)
+	}
+
+	return checkCertValid([]keydetails{
+		{key: RootCA, certtype: ROOT_CA, svc: value},
+	})
 }
