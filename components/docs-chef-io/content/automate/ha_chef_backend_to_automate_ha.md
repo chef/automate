@@ -309,4 +309,4 @@ Bootstrap the nodes to update the `chef_server_url` using the following steps:
 
 ## Use Automate HA for Chef-Backend User
 
-Download and Install the [Chef Workstation](https://www.chef.io/downloads/tools/workstation) from the Bastion machine or local machine install chef-workstation. You can refer to the [Workstation page](https://docs.chef.io/workstation/getting_started/#set-up-your-chef-repo) to set up your Workstation.
+From the bastion host or a local machine, download and install [Chef Workstation](https://www.chef.io/downloads). See the [Chef Workstation documentation](/workstation/getting_started/#set-up-your-chef-repo) for information on setting up Workstation.
