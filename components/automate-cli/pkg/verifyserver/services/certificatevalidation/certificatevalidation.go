@@ -93,7 +93,7 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 
 	if aboutToExpireCerts != "" {
 		vc.log.Debug("These certificates will expire within 30 days: %v\n", aboutToExpireCerts)
-		return createCheck(constants.CERTIFICATE_WILL_EXPIRE_IN_30_Days, true, "", constants.CERTIFICATE_WILL_EXPIRE_IN_30_Days, "Renew certificate")
+		return createCheck(constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS, true, constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS, "", constants.RENEW_CERTS)
 	}
 
 	if expiredCerts == "" {
