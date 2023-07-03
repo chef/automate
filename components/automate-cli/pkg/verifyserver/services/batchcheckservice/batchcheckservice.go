@@ -11,9 +11,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/arrayutils"
 	"github.com/chef/automate/lib/certgenerateutils"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
@@ -27,7 +27,7 @@ type BatchCheckService struct {
 	checkTrigger      trigger.CheckTrigger
 	port              string
 	log               logger.Logger
-	httpRequestClient httputils.IHttpRequestClient
+	httpRequestClient httputils.HTTPClient
 	fileUtils         fileutils.FileUtils
 }
 
@@ -36,7 +36,7 @@ func NewBatchCheckService(trigger trigger.CheckTrigger, log logger.Logger, port 
 		checkTrigger:      trigger,
 		port:              port,
 		log:               log,
-		httpRequestClient: httputils.NewHttpRequestClient(),
+		httpRequestClient: httputils.NewClient(log),
 		fileUtils:         fileutils.NewFileSystemUtils(),
 	}
 }
@@ -364,14 +364,14 @@ func (ss *BatchCheckService) getDeploymentState(config *models.Config) (string, 
 
 func (ss *BatchCheckService) getStatusFromNode(ip string) (string, error) {
 	url := fmt.Sprintf("http://%s:%s%s", ip, ss.port, constants.STATUS_API_PATH)
-	resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
+	_, resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
 	if err != nil {
 		ss.log.Error("Error while calling status API from batch check service:", err)
 		return "", err
 	}
 
 	var statusApiResponse models.StatusApiResponse
-	err = json.NewDecoder(resp.Body).Decode(&statusApiResponse)
+	err = json.Unmarshal(resp, &statusApiResponse)
 	if err != nil {
 		ss.log.Error("Error while unmarshalling response of status API from batch check service:", err)
 		return "", err
@@ -386,7 +386,7 @@ func (ss *BatchCheckService) getStatusFromNode(ip string) (string, error) {
 
 func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, startMockServerRequestBody models.StartMockServerRequestBody, respChan chan models.MockServerFromBatchServiceResponse) {
 	url := fmt.Sprintf("%s%s:%s%s", "http://", host, port, constants.START_MOCK_SERVER)
-	resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, startMockServerRequestBody)
+	resp, _, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, startMockServerRequestBody)
 	if err != nil && resp == nil {
 		ss.log.Error("Error occurred while making request to start mock server", err.Error())
 		respChan <- models.MockServerFromBatchServiceResponse{
@@ -417,7 +417,7 @@ func (ss *BatchCheckService) stopMockServerOnHostAndPort(host, protocol string, 
 		Protocol: protocol,
 	}
 	url := fmt.Sprintf("%s%s:%s%s", "http://", host, ss.port, constants.STOP_MOCK_SERVER)
-	resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, stopMockServerRequestBody)
+	resp, _, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, stopMockServerRequestBody)
 	if err != nil && resp == nil {
 		ss.log.Error("Error occurred while making request to stop mock server: ", err.Error())
 		chanResponse := models.MockServerFromBatchServiceResponse{

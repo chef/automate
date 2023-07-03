@@ -15,15 +15,15 @@ func (h *Handler) NFSMount(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
 
-	if reqBody.ExternalDbType == "self-managed" {
-		if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 {
-			return fiber.NewError(http.StatusBadRequest, "AutomateNodeIPs or ChefInfraServerNodeIPs cannot be empty")
-		}
+	if reqBody.ExternalDbType == "aws" || reqBody.ExternalDbType == "self-managed" {
+		h.Logger.Debug("Inisde the service if checks")
+		return fiber.NewError(http.StatusBadRequest, "The NFS Backup and restore is not supported for your deployment type")
 	} else {
 		if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 || len(reqBody.PostgresqlNodeIPs) == 0 || len(reqBody.OpensearchNodeIPs) == 0 {
 			return fiber.NewError(http.StatusBadRequest, "AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty")
 		}
 	}
+
 	if reqBody.MountLocation == "" {
 		return fiber.NewError(http.StatusBadRequest, "Mount Location cannot be empty")
 	}

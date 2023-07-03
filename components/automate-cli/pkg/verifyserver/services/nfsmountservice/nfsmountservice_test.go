@@ -1,16 +1,15 @@
 package nfsmountservice
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/systemresource"
 	"github.com/shirou/gopsutil/disk"
@@ -91,7 +90,7 @@ var (
 
 func TestNFSMountService(t *testing.T) {
 	testPort := "1234"
-	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{})
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &httputils.MockHTTPClient{},&systemresource.MockSystemResourceInfoImpl{})
 	assert.NotNil(t, nm)
 	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{})
 	assert.Equal(t, new([]models.NFSMountResponse), nmDetails)
@@ -182,31 +181,31 @@ func TestCheckShare(t *testing.T) {
 func TestGetResultStructFromRespBody(t *testing.T) {
 	tests := []struct {
 		TestName     string
-		Body         io.Reader
+		Body         []byte
 		ExpectedResp *models.NFSMountLocResponse
 		ExpectedErr  error
 	}{
 		{
 			TestName:     "Success Response Body",
-			Body:         bytes.NewBufferString(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT),
+			Body:         []byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT),
 			ExpectedResp: &SUCCESS_NFS_MOUNT_LOC_RESULT_STRUCT,
 			ExpectedErr:  nil,
 		},
 		{
 			TestName:     "Failure Response Body",
-			Body:         bytes.NewBufferString(FAILED_NFS_MOUNT_LOC_RESPONSE_BODY),
+			Body:         []byte(FAILED_NFS_MOUNT_LOC_RESPONSE_BODY),
 			ExpectedResp: nil,
 			ExpectedErr:  errors.New(""),
 		},
 		{
 			TestName:     "Success Response Body (Response Returning string instead of SuccessResponse Object)",
-			Body:         bytes.NewBufferString(""),
+			Body:         []byte(""),
 			ExpectedResp: nil,
 			ExpectedErr:  errors.New(""),
 		},
 		{
-			TestName:     "Success Response Body (Doesn’t Contain Result Struct. Instead some other string)",
-			Body:         bytes.NewBufferString(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITHOUT_RESULT_STRUCT),
+			TestName:     "Success Response Body (Doesn't Contain Result Struct. Instead some other string)",
+			Body:         []byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITHOUT_RESULT_STRUCT),
 			ExpectedResp: nil,
 			ExpectedErr:  errors.New(""),
 		},
@@ -214,7 +213,7 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			res, err := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{}).getResultStructFromRespBody(e.Body)
+			res, err := NewNFSMountService(logger.NewTestLogger(), testPort, &httputils.MockHTTPClient{},&systemresource.MockSystemResourceInfoImpl{}).getResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
 			} else {
@@ -274,7 +273,7 @@ func TestDoAPICall(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			nm := NewNFSMountService(logger.NewTestLogger(), e.Port, &systemresource.MockSystemResourceInfoImpl{})
+			nm := NewNFSMountService(logger.NewTestLogger(), e.Port, &httputils.MockHTTPClient{}, &systemresource.MockSystemResourceInfoImpl{})
 			resp, err := nm.doAPICall(e.URL, "/mount-location")
 			if e.ExpectedError != nil {
 				assert.Error(t, err)
@@ -376,7 +375,7 @@ func TestGetNFSMountDetails(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			nm := NewNFSMountService(logger.NewTestLogger(), Testport, &systemresource.MockSystemResourceInfoImpl{})
+			nm := NewNFSMountService(logger.NewTestLogger(), Testport, &httputils.MockHTTPClient{}, &systemresource.MockSystemResourceInfoImpl{})
 			resp := nm.GetNFSMountDetails(e.ReqBody)
 			for index, te := range *resp {
 				if e.Response[index].Error != nil {
@@ -515,7 +514,7 @@ func TestGetNFSMountLoc(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort, &httputils.MockHTTPClient{}, &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 					return disk.UsageStat{
 						Total: 1,
@@ -537,7 +536,7 @@ func TestGetNFSMountLoc(t *testing.T) {
 
 func TestGetNFSMountLocGetDiskSpaceInfoError(t *testing.T) {
 	testPort := "1234"
-	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &httputils.MockHTTPClient{}, &systemresource.MockSystemResourceInfoImpl{
 		GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 			return disk.UsageStat{
 				Total: 1,
@@ -565,7 +564,7 @@ func TestGetNFSMountLocGetDiskSpaceInfoError(t *testing.T) {
 
 func TestGetNFSMountLocGetDiskPartitionsError(t *testing.T) {
 	testPort := "1234"
-	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &httputils.MockHTTPClient{}, &systemresource.MockSystemResourceInfoImpl{
 		GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 			return disk.UsageStat{
 				Total: 1,

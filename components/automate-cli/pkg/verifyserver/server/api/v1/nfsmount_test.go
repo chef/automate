@@ -571,19 +571,18 @@ func TestNFSMount(t *testing.T) {
 			}`,
 		},
 		{
-			TestName:     "Not Given all the required IPs in On-Prem self managed",
+			TestName:     "The Deployment type is AWS or Self-Managed",
 			ExpectedCode: 400,
 			ExpectedBody: `{
 				"status": "FAILED",
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "AutomateNodeIPs or ChefInfraServerNodeIPs cannot be empty"
+					"message": "The NFS Backup and restore is not supported for your deployment type"
 				}
 			}`,
 			RequestBody: `{
-				"external_db_type":"self-managed",
-				"automate_node_ips": []
+				"external_db_type":"aws"
 			}`,
 		},
 		{
@@ -598,6 +597,7 @@ func TestNFSMount(t *testing.T) {
 				}
 			}`,
 			RequestBody: `{
+				"external_db_type":"",
 				"automate_node_ips": [
 					"localhost",
 					"localhost"

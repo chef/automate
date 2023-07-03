@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 
@@ -21,19 +21,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockHttpRequestClient(responseJson string, err error, shouldStartMockServerOnSomeNodesOnly bool) httputils.IHttpRequestClient {
+func SetupMockHttpRequestClient(responseJson string, err error, shouldStartMockServerOnSomeNodesOnly bool) httputils.HTTPClient {
 	r := io.NopCloser(bytes.NewReader([]byte(responseJson)))
-	return &httputils.MockHttpRequestClient{
-		MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+	return &httputils.MockHTTPClient{
+		MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 			if shouldStartMockServerOnSomeNodesOnly && url == "http://1.2.3.4:1234/api/v1/start/mock-server" {
 				return &http.Response{
 					StatusCode: 500,
-				}, errors.New("Error occurred")
+				}, []byte(responseJson), errors.New("Error occurred")
 			}
 			return &http.Response{
 				StatusCode: 200,
 				Body:       r,
-			}, err
+			}, []byte(responseJson), err
 		},
 	}
 }

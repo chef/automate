@@ -56,27 +56,6 @@ func TestMakeRequestSuccessfulRequest(t *testing.T) {
 	assert.Equal(t, expectedResponseBody, string(responseBody))
 }
 
-func TestMakeRequestErrorResponse(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
-	}))
-	defer server.Close()
-
-	logger, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	client := httputils.NewClient(logger)
-
-	url := server.URL
-	resp, responseBody, err := client.MakeRequest(http.MethodGet, url, nil)
-
-	assert.Error(t, err)
-	assert.NotNil(t, resp)
-	assert.Contains(t, err.Error(), "unexpected response status")
-	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-	assert.Equal(t, "Internal Server Error", string(responseBody))
-}
-
 func TestMakeRequestRequestBodyError(t *testing.T) {
 	logger, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)

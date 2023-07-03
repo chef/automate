@@ -87,8 +87,8 @@ type Config struct {
 	SSHUser         *SSHUser       `json:"ssh_user"`
 	Arch            string         `json:"arch"`
 	Backup          *Backup        `json:"backup"`
-	ExternalDbType  string         `json:"external_db_type"`
 	Hardware        *Hardware      `json:"hardware"`
+	ExternalDbType  string         `json:"external_db_type"`
 	Certificate     []*Certificate `json:"certificate"`
 	ExternalOS      *ExternalOS    `json:"external_opensearch"`
 	ExternalPG      *ExternalPG    `json:"external_postgresql"`

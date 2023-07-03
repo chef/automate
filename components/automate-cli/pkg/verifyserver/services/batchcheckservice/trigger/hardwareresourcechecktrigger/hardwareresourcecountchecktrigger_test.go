@@ -2,12 +2,14 @@ package hardwareresourcechecktrigger
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/require"
 
@@ -292,7 +294,11 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing.T) {
 	t.Run("cannot reach", func(t *testing.T) {
 		// create the CheckTrigger instance to be tested
-		hrc := HardwareResourceCountCheck{log: logger.NewTestLogger(), host: "invalid-url"}
+		hrc := HardwareResourceCountCheck{log: logger.NewTestLogger(), httpRequestClient: &httputils.MockHTTPClient{
+			func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+				return nil, []byte(""), errors.New("")
+			},
+		},host: "invalid-url"}
 
 		// make the HTTP request to an invalid URL
 		resp, err := hrc.TriggerHardwareResourceCountCheck(GetRequestJson())
