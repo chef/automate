@@ -278,13 +278,6 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 func (a *awsDeployment) validateCerts() *list.List {
 	errorList := list.New()
 
-	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) {
-		err := a.getAwsHAIp()
-		if err != nil {
-			errorList.PushBack("Error in fetching node IPs in aws mode")
-			return errorList
-		}
-	}
 	// If automate root_ca is provided, check that it is valid
 	if len(strings.TrimSpace(a.config.Automate.Config.RootCA)) > 0 {
 		errorList.PushBackList(checkCertValid([]keydetails{
