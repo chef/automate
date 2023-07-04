@@ -173,10 +173,11 @@ To configure the supermarket in Chef Automate, follow the steps given below:
 
 1. Authorize the supermarket to use your Chef account. Refer to the image below:
 
-    {{< figure src="/images/automate/standalone_supermarket_credentials_signin.png" alt="Supermarket Authorization Page">}}
+    {{< figure src="/images/automate/standalone_supermaket_authorization.png" alt="Supermarket Authorization Page">}}
 
 1. Once the supermarket application is successfully authorized, the screen looks like as shown in the below image:
 
     {{< figure src="/images/automate/standalone_supermarket_app_board.png" alt="Supermarket Board">}}
 
 You have successfully logged in to the supermarket using the credentials of `chef-server` through the **Chef Identity** service running as part of Airgapped Automate.
+
