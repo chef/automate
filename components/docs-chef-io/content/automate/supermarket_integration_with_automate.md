@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 70
 +++
 
-Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI. This page will discuss the integration of Supermarket with Automate HA setup. The setup will be done using On-Premises, AWS Managed Services, OpenSearch, and PostgreSQL.
+Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI.
 
 ## Pre-requisites
 
@@ -158,7 +158,7 @@ To configure the supermarket in Chef Automate, follow the steps given below:
 1. Now, run the following `reconfigure` command to reflect the above changes in the running supermarket application:
 
     ```bash
-    appsupermarket-ctl reconfigure
+    supermarket-ctl reconfigure
     ```
 
 1. Once reconfiguring is completed, visit the supermarket website on the browser. Refer to the image below:

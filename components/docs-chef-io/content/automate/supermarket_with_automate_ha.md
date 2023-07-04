@@ -11,7 +11,7 @@ gh_repo = "automate"
     weight = 75
 +++
 
-This guide will show you how to register a supermarket with OC-ID embedded in Automate HA in a [on-premise setup](/automate/ha_onprim_deployment_procedure/). Before starting this page, refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/) page with Automate for basic understanding.
+This page will discuss the integration of Supermarket with Automate HA setup. The setup will be done using On-Premises along with AWS Managed Services, OpenSearch, and PostgreSQL. The guide will show you how to register a supermarket with OC-ID embedded in Automate HA in a [on-premise setup](/automate/ha_onprim_deployment_procedure/). Before starting this page, refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/) page with Automate for basic understanding.
 
 ## Register Supermarket with Automate HA Embedded OC-ID
 
@@ -64,7 +64,7 @@ The steps to register a supermarket with Automate HA embedded OC-ID is as follow
     The above command will fetch the details of all the registered OC-ID applications from all the Automate nodes. To know about the different flags to be used with this command, run the following command(help command):
 
     ```bash
-    chef-automate config oc-id-show-app -h.
+    chef-automate config oc-id-show-app -h
     ```
 
     The output of the above command looks like as shown below:
