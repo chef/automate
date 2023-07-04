@@ -1,11 +1,10 @@
 +++
 title = "Supermarket Integration"
-
 date = 2020-02-11T14:24:00-08:00
 weight = 20
 draft = false
-
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Supermarket Integration"
@@ -14,11 +13,11 @@ gh_repo = "automate"
     weight = 70
 +++
 
-Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI. This page will discuss the integration of Supermarket with Automate HA setup. The setup will be done using On-Premises along with AWS Managed Services, OpenSearch, and PostgreSQL.
+Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI. This page will discuss the integration of Supermarket with Automate HA setup. The setup will be done using On-Premises, AWS Managed Services, OpenSearch, and PostgreSQL.
 
 ## Pre-requisites
 
-1. To start with the supermarket integration, firstly use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** on an internet connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirement. You can also refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the validation of airgapped installation.
+1. To start with the supermarket integration, firstly, use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** on an internet-connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirements. You can also refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the validation of airgapped installation.
 
 1. SSH into to your ec2 instance as the root user and download the Chef Automate command-line tool from the current release channel.
 
@@ -26,7 +25,7 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
     curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
-1. Download the airgapped installation bundle of the latest automate version to an internet connected machine using the following command:
+1. Download the airgapped installation bundle of the latest automate version to an internet-connected machine using the following command:
 
     ```bash
     curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o </path/to/airgap-install-bundle>
@@ -36,6 +35,7 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
 
     ```bash
     curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
+
     ```
 
 1. Deploy the Airgap Installation Bundle using the following command:
@@ -64,9 +64,9 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
 
 ## Register Supermarket with Automate Embedded Chef Identity
 
-When you install Chef Automate, it bundles the Chef-Server OC-ID component as an Oauth provider. Using the Oauth provider users can login to another application (e.g. Supermarket) using their Chef-Server credentials. Follow the steps below to register the applications to use OC-ID as a medium to log in to the respective applications. Once you finish the registration, you will be authorized to use the application if the Che-Server login credentials are correct.
+When you install Chef Automate, it bundles the Chef-Server OC-ID component as an Oauth provider. Users can use the Oauth provider to log in to another application (e.g. Supermarket) using their Chef-Server credentials. Follow the steps below to register the applications to use OC-ID as a medium to log in to the respective applications. Once you finish the registration, you will be authorized to use the application if the Che-Server login credentials are correct.
 
-1. Create a file to list down the details of the application you  want to register with OC-ID. In the file named `ocid-apps.toml`, mention the **name** and the **redirect_uri** for the application. The content of the created file looks like as shown below:
+1. Create a file to list down the details of the application you want to register with OC-ID. In the file `ocid-apps.toml`, mention the application's **name** and the **redirect_uri**. The content of the created file looks like as shown below:
 
     ```cd
     [ocid.v1.sys.ocid.oauth_application_config]
@@ -104,7 +104,7 @@ When you install Chef Automate, it bundles the Chef-Server OC-ID component as an
     chef-automate config patch ocid-apps.toml
     ```
 
-Once the patch is successfully applied the new application would get registered with Chef Identity.
+Once the patch is successfully applied, the new application will get registered with Chef Identity.
 
 1. Verify whether the new configuration has been applied or not by running the following command:
 
@@ -114,7 +114,7 @@ Once the patch is successfully applied the new application would get registered 
 
     The output of the above command will contain the values from the file you patched.
 
-1. Run the following `ctl` command to get the details of the applications which are registered with OC-ID.
+1. Run the following `ctl` command to get the details of the applications registered with OC-ID.
 
     ```cd
     chef-automate config oc-id-show-app
@@ -135,14 +135,14 @@ Once the patch is successfully applied the new application would get registered 
 
 To configure the supermarket in Chef Automate, follow the steps given below:
 
-1. SSH into the ec2 instance where supermarket is installed. Then run the following commands:
+1. SSH into the ec2 instance where the supermarket is installed. Then run the following commands:
 
     ```bash
     sudo su
     cd /etc/supermarket
     ```
 
-1. Update the `supermarket.rb` file in `/etc/supermarket` directory with the application details retrieved from the automate instance after registering supermarket as an oauth application with OC-ID:
+1. Update the `supermarket.rb` file in the `/etc/supermarket` directory with the application details retrieved from the automate instance after registering supermarket as an oauth application with OC-ID:
 
     ```cd
     default['supermarket']['chef_oauth2_app_id'] = "<uid>"
@@ -151,7 +151,7 @@ To configure the supermarket in Chef Automate, follow the steps given below:
     default['supermarket']['chef_oauth2_verify_ssl'] = false
     ```
 
-    The value of the flag `chef_oauth2_verify_ssl` is boolean and should be based on whether you have a valid certificate(non self-signed certificate) for automate. If you have a valid certificate set it as `true`, or else set it as `false`.
+    The flag `chef_oauth2_verify_ssl` value is boolean and should be based on whether you have a valid(non self-signed certificate) certificate for automate. If you have a valid certificate, set it as `true`, or else set it as `false`.
 
 1. Now, run the following `reconfigure` command to reflect the above changes in the running supermarket application:
 
@@ -159,7 +159,7 @@ To configure the supermarket in Chef Automate, follow the steps given below:
     appsupermarket-ctl reconfigure
     ```
 
-1. Once reconfigure is completed visit the supermarket website on the browser. Refer to the image given below:
+1. Once reconfiguring is completed, visit the supermarket website on the browser. Refer to the image given below:
 
     {{< figure src="/images/automate/standalone_supemarket_landing_page.png" alt="Supermarket Landing Page">}}
 
@@ -171,12 +171,12 @@ To configure the supermarket in Chef Automate, follow the steps given below:
 
     {{< figure src="/images/automate/standalone_supermarket_credentials_signin.png" alt="Supermarket Credentials">}}
 
-1. Authorize supermarket to use your Chef account. Refer to the image below:
+1. Authorize the supermarket to use your Chef account. Refer to the image below:
 
     {{< figure src="/images/automate/standalone_supermarket_credentials_signin.png" alt="Supermarket Authorization Page">}}
 
-1. Once the supermarket application is successfully authorized the screen looks like as shown in the below image:
+1. Once the supermarket application is successfully authorized, the screen looks like as shown in the below image:
 
     {{< figure src="/images/automate/standalone_supermarket_app_board.png" alt="Supermarket Board">}}
 
-You have successfully logged in to supermarket using the credentials of `chef-server` through **Chef Identity** service running as part of Airgapped Automate.
+You have successfully logged in to the supermarket using the credentials of `chef-server` through the **Chef Identity** service running as part of Airgapped Automate.
