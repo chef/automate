@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 75
 +++
 
-This guide will show you how to register supermarket with Automate HA embedded OC-ID. Before we start with this page, refer to the [Integration Supermarket](/automate/supermarket_integration_with_automate/) page with Automate.
+This guide will show you how to register supermarket with OC-ID embedded in Automate HA in a [on-premise setup](/automate/ha_onprim_deployment_procedure/). Before we start with this page, you can refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/) page with Automate for basic understanding.
 
 ## Register Supermarket with Automate HA Embedded OC-ID
 
@@ -24,7 +24,7 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
     sudo su
     ```
 
-1. Create file named `ocid-apps.toml`, mention the **name** and the **redirect_uri** for the file. The content of the created file looks like as shown below:
+1. Create a file named `ocid-apps.toml`, mention the **name** and the **redirect_uri** for the application e.g. *Supermarket*. The content of the created file should be in the following format:
 
     ```cd
     [ocid.v1.sys.ocid.oauth_application_config]
@@ -39,22 +39,22 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
     [ocid.v1.sys.ocid.oauth_application_config]
         [[ocid.v1.sys.ocid.oauth_application_config.oauth_applications]]
             name = "supermarket"
-            redirect_uri = "https://ec2-3-135-208-2.us-east-2.compute.amazonaws.com/auth/chef_oauth2/callback"
+            redirect_uri = "https://example-supermarket.com/auth/chef_oauth2/callback"
     ```
 
-1. Now, run run `config patch` on all the automate and chef-server nodes from the bastion node. The commands to patch are as follows:
+1. Now, run the command: `config patch` with the `.toml` file you created in previous step on all the automate and chef-server nodes from the bastion node. The commands to patch are as follows:
 
     ```bash
-    # automate patch
+    # Run patch on Automate nodes
     chef-automate config patch ocid-apps.toml -a
     ```
 
     ```bash
-    # chef-server patch
+    # Run patch on Chef Server nodes
     chef-automate config patch ocid-apps.toml -c
     ```
 
-    Once the patch is successfully completed the new app should be registered on OCID.
+    Once the patch is successfully completed the new app should be registered with OC-ID running as part of Automate embedded chef-server.
 
 1. Get the details of the registered applications from the bastion node, run the following command:
 
@@ -62,7 +62,7 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
     chef-automate config oc-id-show-app -a
     ```
 
-    The above command will fetch the details of all the registered OC-ID applications from all the Automate nodes. To know the flag usage for this command, run the following command: 
+    The above command will fetch the details of all the registered OC-ID applications from all the Automate nodes. To know about the different flags to be used with this command, run the following command(help command):
 
     ```bash
     chef-automate config oc-id-show-app -h.
@@ -72,14 +72,16 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
 
     IMAGE
 
-1. Now, SSH into the supermarket instance using the following command:
+## Configuration of Supermarket
+
+1. Now, SSH into the supermarket instance and run the following command in sequence:
 
     ```bash
     sudo su
     cd /etc/supermaket
     ```
 
-1. Once you are in the path `/etc/supermarket`, edit the file `supermarket.rb` to update the details of the **UID**, **secret**, **chef-server-endpoint** and **ssl-verify-mode** as per the details of the registered OC-ID apps found in the steps above. Refer to the snippet below:
+1. Once you are in the path `/etc/supermarket`, edit the file `supermarket.rb` to update the details of the **UID**, **secret**, **chef-server-endpoint** and **ssl-verify-mode** as per the details of the registered OC-ID apps found in the steps above where you have registered the supermarket application. Refer to the snippet below:
 
     ```bash
     default['supermarket']['chef_oauth2_app_id'] = "<UID>"
@@ -87,6 +89,8 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
     default['supermarket']['chef_oauth2_url'] = "<Automate HA load balancer FQDN>"
     default['supermarket']['chef_oauth2_verify_ssl'] = false
     ```
+
+    The datatype of the attribute: `chef_oauth2_verify_ssl` is a boolean. The value will depend on where your automate is running with a valid SSL certificate or not. If automate is running with a valid SSL certificate then this should be set as `true` otherwise set is as `false`.
 
 1. Now run `reconfigure` command to reflect the above changes in the running supermarket application configuration:
 
@@ -98,7 +102,7 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
 
     IMAGE
 
-1. Select Sign In. If configured properly you should see the OC-ID login page from the Automate HA website. Refer to the image below:
+1. Select Sign In. If the configuration is done properly you should see the OC-ID login page from the Automate HA website. Refer to the image below:
 
     IMAGE
 
@@ -110,4 +114,4 @@ The steps to register supermarket with Automate HA embedded OC-ID is as follows:
 
     IMAGE
 
-You have successfully logged in to supermarket using the credentials of `chef-server` through the **OC-ID** service running as part of Automate HA.
+You have now successfully logged in to supermarket using the credentials of `chef-server` through the **OC-ID** service running as part of Automate HA.
