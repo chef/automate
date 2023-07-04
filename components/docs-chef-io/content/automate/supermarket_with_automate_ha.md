@@ -73,7 +73,7 @@ The steps to register a supermarket with Automate HA embedded OC-ID is as follow
 
 ## Configuration of Supermarket
 
-1. Now, SSH into the supermarket instance and run the following command in sequence:
+1. Now, SSH into the supermarket instance and run the following commands in sequence:
 
     ```bash
     sudo su
