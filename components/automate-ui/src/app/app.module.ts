@@ -219,6 +219,7 @@ import {
 } from './page-components/data-feed-table/data-feed-table.component';
 import { SigninService } from './services/signin/signin.service';
 import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-banner/manual-upgrade-banner.component';
+import { MfeSessionService } from './services/mfe-session/mfe-session.service';
 
 
 @NgModule({
@@ -365,6 +366,7 @@ import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-b
     LocalStorageService,
     ManagerRequests,
     MetadataService,
+    MfeSessionService,
     NodesRequests,
     NodeRunlistRequests,
     NotificationRuleRequests,
