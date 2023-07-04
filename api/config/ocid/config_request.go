@@ -3,7 +3,11 @@ package ocid
 import (
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"fmt"
+	"regexp"
 )
+
+const regexValidURI = `^(http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$`
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
 func NewConfigRequest() *ConfigRequest {
@@ -46,7 +50,29 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	return nil
+	cfgErr := ac.NewInvalidConfigError()
+	oauthApplications := c.GetV1().GetSys().GetOcid().GetOauthApplicationConfig().GetOauthApplications()
+	oauthApplicationsCount := len(oauthApplications)
+
+	if(oauthApplicationsCount < 1){
+		return nil
+	}else{
+		for i := 0; i < oauthApplicationsCount; i++ {
+			redirectURI := oauthApplications[i].GetRedirectUri().GetValue()
+			appName := oauthApplications[i].GetName().GetValue()
+
+			validUrl, _ := regexp.MatchString(regexValidURI, redirectURI)
+
+			if !validUrl {
+				keyName := fmt.Sprintf("Redirect URI for App: %v", appName)
+				cfgErr.AddInvalidValue(keyName, redirectURI)
+			}
+		}
+		if cfgErr.IsEmpty() {
+			return nil
+		}
+		return cfgErr
+	}
 }
 
 func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
