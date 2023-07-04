@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
+	cfg "github.com/chef/automate/lib/config"
 )
 
 type OpensearchS3BucketAccessCheck struct {
@@ -31,7 +32,11 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.Ch
 			trigger.SkippedTriggerCheckResp("-", constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
 		}
 	}
-
+	if config.ExternalDbType == cfg.SELF_MANAGED {
+		return []models.CheckTriggerResponse{
+			trigger.SkippedTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
+		}
+	}
 	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {
 		return []models.CheckTriggerResponse{
 			trigger.ErrTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.OBJECT_STORAGE_MISSING),

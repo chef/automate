@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	cfg "github.com/chef/automate/lib/config"
 )
 
 var (
@@ -165,6 +166,19 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			isError:          false,
 		},
 		{
+			name: "Skipped Response for onPrem self-managed",
+			args: args{
+				config: &models.Config{
+					ExternalOS: externalOs,
+					Backup: &models.Backup{
+						ObjectStorage: s3Properties,
+					},
+					ExternalDbType: cfg.SELF_MANAGED,
+				},
+			},
+			isError: false,
+		},
+		{
 			name: "Internal Server Error",
 			args: args{
 				config: &models.Config{
@@ -241,6 +255,12 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
 					assert.Equal(t, constants.OBJECT_STORAGE_MISSING, got[0].Result.Error.Message)
 					assert.False(t, got[0].Result.Skipped)
+				} else if tt.name == "Skipped Response for onPrem self-managed" {
+					assert.Len(t, got, 1)
+					assert.Equal(t, "https://open-search-url", got[0].Host)
+					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
+					assert.True(t, got[0].Result.Skipped)
 				} else {
 					assert.Equal(t, want, got)
 					assert.NotNil(t, got)
