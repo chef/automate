@@ -34,7 +34,7 @@ The steps to register a supermarket with Automate HA embedded OC-ID is as follow
 
     Update the URL of the supermarket website in the `redirect_uri` as per the actual supermarket URL. Refer to the code below:
 
-    ```cd
+    ```toml
     [ocid.v1.sys.ocid.oauth_application_config]
         [[ocid.v1.sys.ocid.oauth_application_config.oauth_applications]]
             name = "supermarket"
