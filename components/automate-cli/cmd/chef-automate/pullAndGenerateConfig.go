@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -357,6 +358,27 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 			sharedConfigToml.Postgresql.Config.RootCA = pgRootCA
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	} else {
+		externalOsDetails := getExternalOpensearchDetails(a2ConfigMap)
+		if externalOsDetails != nil {
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = externalOsDetails.OpensearchDomainName
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = externalOsDetails.OpensearchInstanceURL
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = externalOsDetails.OpensearchRootCert
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = externalOsDetails.OpensearchSuperUserName
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = externalOsDetails.OpensearchSuperUserPassword
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = externalOsDetails.AWS.AwsOsSnapshotRoleArn
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = externalOsDetails.AWS.OsUserAccessKeyId
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = externalOsDetails.AWS.OsUserAccessKeySecret
+		}
+		externalPgDetails := getExternalPGDetails(a2ConfigMap)
+		if externalPgDetails != nil {
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = externalPgDetails.PostgreSQLDBUserName
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = externalPgDetails.PostgreSQLDBUserPassword
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = externalPgDetails.PostgreSQLInstanceURL
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert = externalPgDetails.PostgreSQLRootCert
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName = externalPgDetails.PostgreSQLSuperUserName
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = externalPgDetails.PostgreSQLSuperUserPassword
+		}
 	}
 
 	// Build CertsByIP for Automate
@@ -413,6 +435,70 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	return sharedConfigToml, nil
+}
+
+func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalOpensearchToml {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Opensearch != nil &&
+			ele.Global.V1.External.Opensearch.Auth != nil &&
+			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
+			return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
+				ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+				ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value,
+				ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value,
+				ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value,
+			)
+		}
+	}
+	return nil
+}
+
+func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, rootCert, domainName, accessKey, secretKey, roleArn string) *ExternalOpensearchToml {
+	nodeUrl, _ := url.Parse(instanceUrl)
+	return &ExternalOpensearchToml{
+		OpensearchInstanceURL:       nodeUrl.Host,
+		OpensearchSuperUserName:     superUserName,
+		OpensearchSuperUserPassword: superPassword,
+		OpensearchRootCert:          rootCert,
+		OpensearchDomainName:        domainName,
+		AWS: ExternalAwsToml{
+			OsUserAccessKeyId:     accessKey,
+			OsUserAccessKeySecret: secretKey,
+			AwsOsSnapshotRoleArn:  roleArn,
+		},
+	}
+}
+
+func getExternalPGDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalPostgreSQLToml {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Postgresql.Nodes != nil &&
+			ele.Global.V1.External.Postgresql.Auth.Password.Superuser != nil &&
+			ele.Global.V1.External.Postgresql.Auth.Password.Dbuser != nil {
+			return setExternalPGDetails(
+				ele.Global.V1.External.Postgresql.Nodes[0].Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Username.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Username.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value,
+				ele.Global.V1.External.Postgresql.Ssl.RootCert.Value,
+			)
+		}
+	}
+	return nil
+}
+
+func setExternalPGDetails(instanceUrl, superUserName, superUserPassword, dBUserName, dBUserPassword, rootCerts string) *ExternalPostgreSQLToml {
+	return &ExternalPostgreSQLToml{
+		PostgreSQLInstanceURL:       instanceUrl,
+		PostgreSQLSuperUserName:     superUserName,
+		PostgreSQLSuperUserPassword: superUserPassword,
+		PostgreSQLDBUserName:        dBUserName,
+		PostgreSQLDBUserPassword:    dBUserPassword,
+		PostgreSQLRootCert:          rootCerts,
+	}
 }
 
 func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []CertByIP {
@@ -569,6 +655,27 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 			sharedConfigToml.Postgresql.Config.PublicKey = pgPubKey
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	} else {
+		externalOsDetails := getExternalOpensearchDetails(a2ConfigMap)
+		if externalOsDetails != nil {
+			sharedConfigToml.Aws.Config.OpensearchDomainName = externalOsDetails.OpensearchDomainName
+			sharedConfigToml.Aws.Config.OpensearchDomainUrl = externalOsDetails.OpensearchInstanceURL
+			sharedConfigToml.Aws.Config.OpensearchCertificate = externalOsDetails.OpensearchRootCert
+			sharedConfigToml.Aws.Config.OpensearchUsername = externalOsDetails.OpensearchSuperUserName
+			sharedConfigToml.Aws.Config.OpensearchUserPassword = externalOsDetails.OpensearchSuperUserPassword
+			sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = externalOsDetails.AWS.AwsOsSnapshotRoleArn
+			sharedConfigToml.Aws.Config.OsUserAccessKeyId = externalOsDetails.AWS.OsUserAccessKeyId
+			sharedConfigToml.Aws.Config.OsUserAccessKeySecret = externalOsDetails.AWS.OsUserAccessKeySecret
+		}
+		externalPgDetails := getExternalPGDetails(a2ConfigMap)
+		if externalPgDetails != nil {
+			sharedConfigToml.Aws.Config.RDSDBUserName = externalPgDetails.PostgreSQLDBUserName
+			sharedConfigToml.Aws.Config.RDSDBUserPassword = externalPgDetails.PostgreSQLDBUserPassword
+			sharedConfigToml.Aws.Config.RDSInstanceUrl = externalPgDetails.PostgreSQLInstanceURL
+			sharedConfigToml.Aws.Config.RDSCertificate = externalPgDetails.PostgreSQLRootCert
+			sharedConfigToml.Aws.Config.RDSSuperUserName = externalPgDetails.PostgreSQLSuperUserName
+			sharedConfigToml.Aws.Config.RDSSuperUserPassword = externalPgDetails.PostgreSQLSuperUserPassword
+		}
 	}
 
 	// Build CertsByIP for Automate
