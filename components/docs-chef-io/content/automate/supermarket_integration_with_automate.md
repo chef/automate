@@ -112,7 +112,7 @@ Once the patch is successfully applied, the new application will get registered 
     chef-automate config show
     ```
 
-    The output of the above command will contain the values from the file you patched.
+    The output of the above command should contain the values from the file you patched.
 
 1. Run the following `ctl` command to get the details of the applications registered with OC-ID.
 
