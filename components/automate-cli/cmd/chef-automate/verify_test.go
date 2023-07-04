@@ -714,7 +714,6 @@ func TestBuildReports(t *testing.T) {
 				},
 			},
 		},
-		// New check added!
 		{
 			name: "If Report is successfully created with warning message",
 			args: args{
@@ -731,16 +730,16 @@ func TestBuildReports(t *testing.T) {
 									{
 										Title:         "Certificate check",
 										Passed:        true,
-										SuccessMsg:    constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS,
-										ErrorMsg:      "",
-										ResolutionMsg: constants.RENEW_CERTS,
+										SuccessMsg:    "Certificate will expire in 15 days",
+										ErrorMsg:      "Certs are expiring soon",
+										ResolutionMsg: "Certificates will expire in 15 days. Please update the certificates!",
 									},
 									{
 										Title:         "Certificate check",
 										Passed:        true,
-										SuccessMsg:    constants.CERTIFICATE_WILL_EXPIRE_IN_30_DAYS,
-										ErrorMsg:      "",
-										ResolutionMsg: constants.RENEW_CERTS,
+										SuccessMsg:    "Certificate will expire in 15 days",
+										ErrorMsg:      "Certs are expiring soon",
+										ResolutionMsg: "Certificates will expire in 15 days. Please update the certificates!",
 									},
 								},
 								Skipped: false,
@@ -758,12 +757,12 @@ func TestBuildReports(t *testing.T) {
 						Status:    "Success",
 						StatusMessage: &reporting.StatusMessage{
 							MainMessage: "Certificate Check - Success",
-							SubMessage:  []string{constants.RENEW_CERTS, constants.RENEW_CERTS},
+							SubMessage:  []string{"Certs are expiring soon", "Certs are expiring soon"},
 						},
 						SummaryInfo: &reporting.SummaryInfo{
 							SuccessfulCount: 2,
 							FailedCount:     0,
-							ToResolve:       nil,
+							ToResolve:       []string{"Certificates will expire in 15 days. Please update the certificates!", "Certificates will expire in 15 days. Please update the certificates!"},
 						},
 					},
 				},

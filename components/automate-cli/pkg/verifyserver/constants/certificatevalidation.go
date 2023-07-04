@@ -25,6 +25,7 @@ const (
 	ADMIN                                    = "Admin"
 	NODE_KEY                                 = "Node-Key"
 	ADMIN_KEY                                = "Admin-Key"
-	CERTIFICATE_WILL_EXPIRE_IN_30_DAYS       = "Certificate will expire within 30 days"
-	RENEW_CERTS                              = "Certificates will expire withing 30 days, renew it please!"
+	CERTIFICATE_WILL_EXPIRE_IN_N_DAYS        = "Certificate will expire in %v days"
+	RENEW_CERTS                              = "Certificates will expire in %v days. Update the certificate, please ensure that the certificate has a validity period more than 30 days."
+	CERTS_EXPIRING_SOON                      = "Please update the certificates"
 )
