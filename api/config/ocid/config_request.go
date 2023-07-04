@@ -56,23 +56,39 @@ func (c *ConfigRequest) Validate() error {
 
 	if(oauthApplicationsCount < 1){
 		return nil
-	}else{
-		for i := 0; i < oauthApplicationsCount; i++ {
-			redirectURI := oauthApplications[i].GetRedirectUri().GetValue()
-			appName := oauthApplications[i].GetName().GetValue()
+	}
 
+	for i := 0; i < oauthApplicationsCount; i++ {
+		appName := oauthApplications[i].GetName().GetValue()
+		redirectURI := oauthApplications[i].GetRedirectUri().GetValue()
+
+		// We need this condition to skip empty objects
+		if (appName == "" && redirectURI == ""){
+			continue
+		}
+
+		// Validating App Name
+		if (appName == ""){
+			cfgErr.AddMissingKey("Oauth Application Name")
+		}
+
+		// Validating App Redirect URI
+		if (redirectURI == "" ){
+			cfgErr.AddMissingKey("Oauth Application Redirect URI")
+		}else{
+			// Validating Redirect URI format
 			validUrl, _ := regexp.MatchString(regexValidURI, redirectURI)
-
 			if !validUrl {
 				keyName := fmt.Sprintf("Redirect URI for App: %v", appName)
 				cfgErr.AddInvalidValue(keyName, redirectURI)
 			}
 		}
-		if cfgErr.IsEmpty() {
-			return nil
-		}
-		return cfgErr
 	}
+
+	if cfgErr.IsEmpty() {
+		return nil
+	}
+	return cfgErr
 }
 
 func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
