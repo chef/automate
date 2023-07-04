@@ -98,7 +98,7 @@ When you install Chef Automate, it bundles the Chef-Server OC-ID component as an
 
     Using the above snippet, you can register two applications to the OC-ID.
 
-1. Now, patch the above file by running the below command from your habitat studio `/src` directory or your bastion system:
+1. Now, patch the above configuration by running the below command:
 
     ```bash
     chef-automate config patch ocid-apps.toml
