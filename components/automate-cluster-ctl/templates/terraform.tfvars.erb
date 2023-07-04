@@ -228,6 +228,30 @@ region = "<%= config.object_storage.region %>"
 
 
 <% if config.state == 'deploy' %>
+
+# AWS deployment config
+################################################################################
+
+<% if config.architecture == 'deployment' %>
+<% if config.s3_bucketName %>
+bucket_name_deployment = "<%= config.s3_bucketName %>"
+<% end %>
+managed_opensearch_domain_url_deployment = "<%= config.aws.managed_opensearch_domain_url %>"
+managed_opensearch_username_deployment = "<%= config.aws.managed_opensearch_username %>"
+# left : ensure that pullandgenerate gets all these fields its very imp
+managed_opensearch_user_password_deployment = "<%= config.aws.managed_opensearch_user_password %>"
+managed_opensearch_certificate_deployment = "<%= config.aws.managed_opensearch_certificate %>"
+aws_os_snapshot_role_arn_deployment = "<%= config.aws.aws_os_snapshot_role_arn %>"
+os_snapshot_user_access_key_id_deployment = "<%= config.aws.os_snapshot_user_access_key_id %>"
+os_snapshot_user_access_key_secret_deployment = "<%= config.aws.os_snapshot_user_access_key_secret %>"
+managed_rds_instance_url_deployment = "<%= config.aws.managed_rds_instance_url %>"
+managed_rds_superuser_username_deployment = "<%= config.aws.managed_rds_superuser_username %>"
+managed_rds_superuser_password_deployment = "<%= config.aws.managed_rds_superuser_password %>"
+managed_rds_dbuser_username_deployment = "<%= config.aws.managed_rds_dbuser_username %>"
+managed_rds_dbuser_password_deployment = "<%= config.aws.managed_rds_dbuser_password %>"
+managed_rds_certificate_deployment = "<%= config.aws.managed_rds_certificate %>"
+<% end %>
+
 # Certs
 ################################################################################
 

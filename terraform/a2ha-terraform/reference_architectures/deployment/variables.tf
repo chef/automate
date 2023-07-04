@@ -51,7 +51,15 @@ variable "aws_s3_bucketName" {
   default = "chef-automate-ha"
 }
 
+variable "bucket_name_deployment" {
+  default = "chef-automate-ha"
+}
+
 variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
+variable "aws_os_snapshot_role_arn_deployment" {
   default = ""
 }
 
@@ -122,11 +130,19 @@ variable "managed_opensearch_certificate" {
   default = ""
 }
 
+variable "managed_opensearch_certificate_deployment" {
+  default = ""
+}
+
 variable "managed_opensearch_domain_name" {
   default = ""
 }
 
 variable "managed_opensearch_domain_url" {
+  default = ""
+}
+
+variable "managed_opensearch_domain_url_deployment" {
   default = ""
 }
 
@@ -138,7 +154,11 @@ variable "managed_opensearch_username" {
   default = ""
 }
 
-variable "managed_rds_certificate" {
+variable "managed_opensearch_username_deployment" {
+  default = ""
+}
+
+variable "managed_rds_certificate_deployment" {
   default = ""
 }
 
@@ -146,7 +166,15 @@ variable "managed_rds_dbuser_password" {
   default = ""
 }
 
+variable "managed_rds_dbuser_password_deployment" {
+  default = ""
+}
+
 variable "managed_rds_dbuser_username" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_username_deployment" {
   default = ""
 }
 
@@ -154,11 +182,23 @@ variable "managed_rds_instance_url" {
   default = ""
 }
 
+variable "managed_rds_instance_url_deployment" {
+  default = ""
+}
+
 variable "managed_rds_superuser_password" {
   default = ""
 }
 
+variable "managed_rds_superuser_password_deployment" {
+  default = ""
+}
+
 variable "managed_rds_superuser_username" {
+  default = ""
+}
+
+variable "managed_rds_superuser_username_deployment" {
   default = ""
 }
 
@@ -195,7 +235,15 @@ variable "os_snapshot_user_access_key_id" {
   default = ""
 }
 
+variable "os_snapshot_user_access_key_id_deployment" {
+  default = ""
+}
+
 variable "os_snapshot_user_access_key_secret" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret_deployment" {
   default = ""
 }
 
