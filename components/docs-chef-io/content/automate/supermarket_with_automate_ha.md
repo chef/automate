@@ -25,7 +25,7 @@ The steps to register a supermarket with Automate HA embedded OC-ID is as follow
 
 1. Create a file named `ocid-apps.toml`, and mention the **name** and the **redirect_uri** for the application, e.g., *Supermarket*. The content of the created file should be in the following format:
 
-    ```cd
+    ```toml
     [ocid.v1.sys.ocid.oauth_application_config]
         [[ocid.v1.sys.ocid.oauth_application_config.oauth_applications]]
             name = ""
