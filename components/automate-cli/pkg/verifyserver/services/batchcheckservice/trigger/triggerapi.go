@@ -15,6 +15,12 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
+type ErrorResponse struct {
+	Status  string          `json:"string"`
+	Results []models.Checks `json:"checks"`
+	Error   fiber.Error     `json:"error"`
+}
+
 func RunCheck(config *models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
@@ -136,14 +142,45 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		responseBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			output <- models.CheckTriggerResponse{
+				Host:     host,
+				NodeType: nodeType,
+				Result: models.ApiResult{
+					Passed: false,
+					Error: &fiber.Error{
+						Code:    http.StatusInternalServerError,
+						Message: fmt.Sprintf("error while reading checks response Body: %s", err.Error()),
+					},
+				},
+			}
+			return
+		}
+		errResponse := ErrorResponse{}
+		err = json.Unmarshal(responseBody, &errResponse)
+		if err != nil {
+			output <- models.CheckTriggerResponse{
+				Host:     host,
+				NodeType: nodeType,
+				Result: models.ApiResult{
+					Passed: false,
+					Error: &fiber.Error{
+						Code:    http.StatusInternalServerError,
+						Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
+					},
+				},
+			}
+			return
+		}
 		output <- models.CheckTriggerResponse{
 			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
 				Passed: false,
 				Error: &fiber.Error{
-					Code:    resp.StatusCode,
-					Message: "error while connecting to the endpoint, received invalid status code",
+					Code:    errResponse.Error.Code,
+					Message: errResponse.Error.Message,
 				},
 			},
 		}

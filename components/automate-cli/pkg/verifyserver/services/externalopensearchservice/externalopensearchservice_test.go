@@ -7,8 +7,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
+	"strconv"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	LOCALHOST  = "localhost"
+	LOCALHOST  = "localhost:3073"
 	SERVER_CRT = `-----BEGIN CERTIFICATE-----
 MIIGrzCCBJegAwIBAgIJAMgNHiWQ140JMA0GCSqGSIb3DQEBCwUAMGwxCzAJBgNV
 BAYTAklOMRIwEAYDVQQIDAlLYXJuYXRha2ExEjAQBgNVBAcMCUJlbmdhbHVydTEW
@@ -209,7 +209,7 @@ func startHTTPSMockServerOnCustomPort(mockServer *httptest.Server, port string) 
 }
 
 func TestGetExternalOpensearchDetails(t *testing.T) {
-	httpsTestPort := 3073
+	httpsport := 3073
 	httpsMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
 		if !ok || user != "admin" || pass != "admin" {
@@ -221,7 +221,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	}))
-	err := startHTTPSMockServerOnCustomPort(httpsMockServer, strconv.Itoa(httpsTestPort))
+	err := startHTTPSMockServerOnCustomPort(httpsMockServer, strconv.Itoa(httpsport))
 	assert.NoError(t, err)
 	defer httpsMockServer.Close()
 
@@ -231,7 +231,6 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 		TestName     string
 		ReqBody      models.ExternalOSRequest
 		ResponseBody models.ExternalOpensearchResponse
-		Port         int
 	}{
 		{
 			TestName: "Correct url, username, password and root_ca",
@@ -256,7 +255,6 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 					},
 				},
 			},
-			Port: httpsTestPort,
 		},
 		{
 			TestName: "Correct url, username and password but wrong root_ca",
@@ -281,7 +279,6 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 					},
 				},
 			},
-			Port: httpsTestPort,
 		},
 		{
 			TestName: "Correct url, username and password but different server root_ca",
@@ -306,7 +303,6 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 					},
 				},
 			},
-			Port: httpsTestPort,
 		},
 		{
 			TestName: "Correct root_ca and url but wrong username and password",
@@ -331,7 +327,6 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 					},
 				},
 			},
-			Port: httpsTestPort,
 		},
 
 		{
@@ -357,12 +352,11 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 					},
 				},
 			},
-			Port: httpsTestPort,
 		},
 	}
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			resp := eos.GetExternalOpensearchDetails(e.ReqBody, e.Port)
+			resp := eos.GetExternalOpensearchDetails(e.ReqBody)
 			assert.Equal(t, e.ResponseBody.Passed, resp.Passed)
 			assert.NotNil(t, resp.Checks)
 			for index, check := range resp.Checks {
