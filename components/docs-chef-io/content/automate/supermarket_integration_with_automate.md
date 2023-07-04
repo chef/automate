@@ -62,6 +62,8 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
     chef-server-ctl command
     ```
 
+    N.B. For more help on how to create user using the `chef-server-ctl` utility, refer this [documentation](https://docs.chef.io/server/ctl_chef_server/#user-create)
+
 ## Register Supermarket with Automate Embedded Chef Identity
 
 When you install Chef Automate, it bundles the Chef-Server OC-ID component as an Oauth provider. Users can use the Oauth provider to log in to another application (e.g. Supermarket) using their Chef-Server credentials. Follow the steps below to register the applications to use OC-ID as a medium to log in to the respective applications. Once you finish the registration, you will be authorized to use the application if the Che-Server login credentials are correct.
