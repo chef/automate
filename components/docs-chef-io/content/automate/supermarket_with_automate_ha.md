@@ -17,7 +17,7 @@ This guide will show you how to register a supermarket with OC-ID embedded in Au
 
 The steps to register a supermarket with Automate HA embedded OC-ID is as follows:
 
-1. SSH into the Bastion node of Automate HA On-Premises setup.
+1. SSH into the Bastion node of Automate HA On-Premises setup. Then switch to root user using below command:
 
     ```bash
     sudo su
