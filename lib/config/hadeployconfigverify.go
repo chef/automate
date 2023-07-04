@@ -225,15 +225,23 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 func (c *HaDeployConfig) verifyChefServerSettings() error {
 	chefServerSettings := c.ChefServer.Config
 	errorList := list.New()
-	if err := validateFQDN(chefServerSettings.ChefServerFqdn, "chef-infra-server fqdn"); err != nil {
-		errorList.PushBack(err)
+
+	if chefServerSettings.ChefServerFqdn != "" {
+		if err := validateFQDN(chefServerSettings.ChefServerFqdn, "chef-infra-server fqdn"); err != nil {
+			errorList.PushBack(err)
+		}
 	}
+
+	if chefServerSettings.FqdnRootCA != "" {
+		if err := validateFqdnRootCA(chefServerSettings.FqdnRootCA, CHEFSERVER); err != nil {
+			errorList.PushBack(err)
+		}
+	}
+
 	if err := validateNumberField(chefServerSettings.InstanceCount, "chef server instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateFqdnRootCA(chefServerSettings.FqdnRootCA, CHEFSERVER); err != nil {
-		errorList.PushBack(err)
-	}
+
 	if chefServerSettings.EnableCustomCerts {
 		if err := validateChefServerCerts(c); err != nil {
 			errorList.PushBack(err)
