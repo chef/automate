@@ -1,6 +1,6 @@
 # Authentication & Authorization
 
-Our work on Authentication and Authorization is based on industry best-practices.
+Our work  on Authentication and Authorization is based on industry best-practices.
 
 - [OpenID Connect](http://openid.net/connect/)
 - [AWS IAM Policies](http://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html)
