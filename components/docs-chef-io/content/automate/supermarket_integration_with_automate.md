@@ -159,7 +159,7 @@ To configure the supermarket in Chef Automate, follow the steps given below:
     appsupermarket-ctl reconfigure
     ```
 
-1. Once reconfiguring is completed, visit the supermarket website on the browser. Refer to the image given below:
+1. Once reconfiguring is completed, visit the supermarket website on the browser. Refer to the image below:
 
     {{< figure src="/images/automate/standalone_supemarket_landing_page.png" alt="Supermarket Landing Page">}}
 
