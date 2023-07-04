@@ -600,6 +600,9 @@ func TestGetOpensearchDetails(t *testing.T) {
 		password               string
 		rootCert               string
 		serverName             string
+		accessKey              string
+		secretKey              string
+		roleArn                string
 		ExpectedOpensearchToml *ExternalOpensearchToml
 	}
 
@@ -611,12 +614,20 @@ func TestGetOpensearchDetails(t *testing.T) {
 			password:            "pass",
 			rootCert:            "----certs----",
 			serverName:          "test server",
+			accessKey:           "test-access",
+			secretKey:           "test-secret",
+			roleArn:             "test-role-arn",
 			ExpectedOpensearchToml: &ExternalOpensearchToml{
 				OpensearchInstanceURL:       "testopensearch:9200",
 				OpensearchSuperUserName:     "admin",
 				OpensearchSuperUserPassword: "pass",
 				OpensearchRootCert:          "----certs----",
 				OpensearchDomainName:        "test server",
+				AWS: ExternalAwsToml{
+					AwsOsSnapshotRoleArn:  "test-role-arn",
+					OsUserAccessKeyId:     "test-access",
+					OsUserAccessKeySecret: "test-secret",
+				},
 			},
 		},
 		{
@@ -626,12 +637,20 @@ func TestGetOpensearchDetails(t *testing.T) {
 			password:            "pass",
 			rootCert:            "----certs----",
 			serverName:          "test server",
+			accessKey:           "test-access",
+			secretKey:           "test-secret",
+			roleArn:             "test-role-arn",
 			ExpectedOpensearchToml: &ExternalOpensearchToml{
 				OpensearchInstanceURL:       "testopensearch:9200",
 				OpensearchSuperUserName:     "admin",
 				OpensearchSuperUserPassword: "pass",
 				OpensearchRootCert:          "----certs----",
 				OpensearchDomainName:        "test server",
+				AWS: ExternalAwsToml{
+					AwsOsSnapshotRoleArn:  "test-role-arn",
+					OsUserAccessKeyId:     "test-access",
+					OsUserAccessKeySecret: "test-secret",
+				},
 			},
 		},
 		{
@@ -641,24 +660,35 @@ func TestGetOpensearchDetails(t *testing.T) {
 			password:            "pass",
 			rootCert:            "",
 			serverName:          "test server",
+			accessKey:           "test-access",
+			secretKey:           "test-secret",
+			roleArn:             "test-role-arn",
 			ExpectedOpensearchToml: &ExternalOpensearchToml{
 				OpensearchInstanceURL:       "testopensearch:9200",
 				OpensearchSuperUserName:     "admin",
 				OpensearchSuperUserPassword: "pass",
 				OpensearchRootCert:          "",
 				OpensearchDomainName:        "test server",
+				AWS: ExternalAwsToml{
+					AwsOsSnapshotRoleArn:  "test-role-arn",
+					OsUserAccessKeyId:     "test-access",
+					OsUserAccessKeySecret: "test-secret",
+				},
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
-			externalOsConfig := setExternalOpensearchDetails(testCase.InstanceURL, testCase.Username, testCase.password, testCase.rootCert, testCase.serverName)
+			externalOsConfig := setExternalOpensearchDetails(testCase.InstanceURL, testCase.Username, testCase.password, testCase.rootCert, testCase.serverName, testCase.accessKey, testCase.secretKey, testCase.roleArn)
 			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchInstanceURL, externalOsConfig.OpensearchInstanceURL)
 			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchDomainName, externalOsConfig.OpensearchDomainName)
 			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchSuperUserName, externalOsConfig.OpensearchSuperUserName)
 			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchSuperUserPassword, externalOsConfig.OpensearchSuperUserPassword)
 			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchRootCert, externalOsConfig.OpensearchRootCert)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.AWS.AwsOsSnapshotRoleArn, externalOsConfig.AWS.AwsOsSnapshotRoleArn)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.AWS.OsUserAccessKeyId, externalOsConfig.AWS.OsUserAccessKeyId)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.AWS.OsUserAccessKeySecret, externalOsConfig.AWS.OsUserAccessKeySecret)
 		})
 	}
 }
