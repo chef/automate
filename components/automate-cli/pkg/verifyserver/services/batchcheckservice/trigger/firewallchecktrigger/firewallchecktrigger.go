@@ -142,13 +142,15 @@ func getRequestsForPostgresAsSource(config *models.Config) []models.FirewallRequ
 				continue
 			}
 			//for Upd
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9638",
-				DestinationServiceProtocol: "udp",
+			if config.DeploymentState != "post-deploy" {
+				reqBody := models.FirewallRequest{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     "9638",
+					DestinationServiceProtocol: "udp",
+				}
+				reqBodies = append(reqBodies, reqBody)
 			}
-			reqBodies = append(reqBodies, reqBody)
 
 			//for tcp
 			for _, port := range postgresqlTCPPorts {
@@ -177,13 +179,15 @@ func getRequestsForOpensearchAsSource(config *models.Config) []models.FirewallRe
 				continue
 			}
 			//for upd
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9638",
-				DestinationServiceProtocol: "udp",
+			if config.DeploymentState != "post-deploy" {
+				reqBody := models.FirewallRequest{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     "9638",
+					DestinationServiceProtocol: "udp",
+				}
+				reqBodies = append(reqBodies, reqBody)
 			}
-			reqBodies = append(reqBodies, reqBody)
 
 			//for tcp
 			for _, port := range opensearchTCPPorts {
