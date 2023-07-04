@@ -16,6 +16,10 @@ type FirewallCheck struct {
 	log  logger.Logger
 }
 
+const (
+	POST_DEPLOY_STATE = "post-deploy"
+)
+
 func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 	return &FirewallCheck{
 		log:  log,
@@ -141,8 +145,8 @@ func getRequestsForPostgresAsSource(config *models.Config) []models.FirewallRequ
 			if sourceNodeIP == destNodeIP {
 				continue
 			}
-			//for Upd
-			if config.DeploymentState != "post-deploy" {
+			//for udp
+			if config.DeploymentState != POST_DEPLOY_STATE {
 				reqBody := models.FirewallRequest{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
@@ -178,8 +182,8 @@ func getRequestsForOpensearchAsSource(config *models.Config) []models.FirewallRe
 			if sourceNodeIP == destNodeIP {
 				continue
 			}
-			//for upd
-			if config.DeploymentState != "post-deploy" {
+			//for udp
+			if config.DeploymentState != POST_DEPLOY_STATE {
 				reqBody := models.FirewallRequest{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
