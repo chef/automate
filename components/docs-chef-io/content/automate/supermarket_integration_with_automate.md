@@ -19,7 +19,7 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
 
 1. To start with the supermarket integration, firstly, use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** on an internet-connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirements. You can also refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the validation of airgapped installation.
 
-1. SSH into to your ec2 instance as the root user and download the Chef Automate command-line tool from the current release channel.
+1. SSH into to your ec2 instance and download the Chef Automate command-line tool from the current release channel.
 
     ```cd
     curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
