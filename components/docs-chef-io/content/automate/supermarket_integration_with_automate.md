@@ -17,7 +17,7 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
 
 ## Pre-requisites
 
-1. To start with the supermarket integration, firstly, use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** on an internet-connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirements. You can also refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the validation of airgapped installation.
+1. To start with the supermarket integration, firstly, use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** for Automate on an internet-connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirements. You can also refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the validation of airgapped installation.
 
 1. SSH into to your ec2 instance and download the Chef Automate command-line tool from the current release channel.
 
@@ -66,9 +66,9 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
 
 ## Register Supermarket with Automate Embedded Chef Identity
 
-When you install Chef Automate, it bundles the Chef-Server OC-ID component as an Oauth provider. Users can use the Oauth provider to log in to another application (e.g. Supermarket) using their Chef-Server credentials. Follow the steps below to register the applications to use OC-ID as a medium to log in to the respective applications. Once you finish the registration, you will be authorized to use the application if the Che-Server login credentials are correct.
+When you install Chef Automate, it bundles the Chef-Server OC-ID component as an Oauth provider. Users can use the Oauth provider to log in to another application (e.g. Supermarket) using their Chef-Server credentials. Follow the steps below to register the applications to use OC-ID as a medium to log in to the respective applications. Once you finish the registration, you will be authorized to use Chef-Server login credentials to login to the application.
 
-1. Create a file to list down the details of the application you want to register with OC-ID. In the file `ocid-apps.toml`, mention the application's **name** and the **redirect_uri**. The content of the created file looks like as shown below:
+1. Create a file to list down the details of the application you want to register with OC-ID. In the file `ocid-apps.toml`, mention the application's **name** and the **redirect_uri**. The content of the created file should be in the following format:
 
     ```cd
     [ocid.v1.sys.ocid.oauth_application_config]
