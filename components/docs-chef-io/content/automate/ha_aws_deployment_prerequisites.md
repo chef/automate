@@ -52,7 +52,7 @@ The operating system and the supported version for different nodes in AWS deploy
 | Amazon Linux 2 (64 Bit OS)           | 2 (kernel 5.10)                                                                                                                                                                                                                                           |
 | SUSE Linux Enterprise Server         | 12.5                                                                                                                                                                                                                                                      |
 
-#### Minimum Hardware Requirement
+### Minimum Hardware Requirement
 
 | Instance          | Count | vCPU | RAM | Storage Size(/hab) | Recommended EBS volume | AWS Machine Type | Additional Space  |
 | ----------------- | ----- | ---- | --- | ------------------ | ---------------------- | ---------------- | ----------------- |
