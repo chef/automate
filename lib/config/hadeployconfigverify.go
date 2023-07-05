@@ -127,6 +127,10 @@ func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials) er
 func (c *HaDeployConfig) validateExistingInfraBackupConfig() error {
 	// validate existing infra backup config
 	backupConfig := c.Architecture.ExistingInfra.BackupConfig
+	// backup config is optional
+	if backupConfig == "" {
+		return nil
+	}
 
 	if err := validateRequiredString(backupConfig, "backup_config", "object_storage", "file_system"); err != nil {
 		return err
@@ -148,6 +152,10 @@ func (c *HaDeployConfig) validateExistingInfraBackupConfig() error {
 }
 
 func (c *HaDeployConfig) validateAwsBackupConfig() error {
+	// backup config is optional
+	if c.Architecture.Aws.BackupConfig == "" {
+		return nil
+	}
 	// validate aws backup config
 	if err := checkForValidS3Bucket(c); err != nil {
 		return err
