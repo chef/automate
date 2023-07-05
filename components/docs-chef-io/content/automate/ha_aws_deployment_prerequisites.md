@@ -52,6 +52,16 @@ The operating system and the supported version for different nodes in AWS deploy
 | Amazon Linux 2 (64 Bit OS)           | 2 (kernel 5.10)                                                                                                                                                                                                                                           |
 | SUSE Linux Enterprise Server         | 12.5                                                                                                                                                                                                                                                      |
 
+#### Minimum Hardware Requirement
+
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | Recommended EBS volume | AWS Machine Type | Additional Space  |
+| ----------------- | ----- | ---- | --- | ------------------ | ---------------------- | ---------------- | ----------------- |
+| Chef Automate     | 2     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
+| Postgresql DB     | 3     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
+
 ### Minimum Supported Chef Tool Versions
 
 Current Automate HA supports integration with the following Chef tools:
@@ -84,8 +94,9 @@ Current Automate HA integrates with the following non-Chef tools:
 {{< note >}}
 
 -   Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case.
--   Make sure the hardwar requirement in not lesser than the recommended [Minimum Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-requirement/)
-    {{< /note >}}
+-   Make sure the hardware requirement in not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement/)
+
+{{< /note >}}
 
 We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below shows the tested **assumptions** and should not be used as exact recommendations.
 
@@ -114,16 +125,6 @@ The machine requirements based on the above assumptions are listed below:
 | Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         | /tmp=5% /root=20% |
 
 {{< note >}} For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. {{< /note >}}
-
-#### Minimum Requirement
-
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | Recommended EBS volume | AWS Machine Type | Additional Space  |
-| ----------------- | ----- | ---- | --- | ------------------ | ---------------------- | ---------------- | ----------------- |
-| Chef Automate     | 2     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| Postgresql DB     | 3     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
 
 ### Load Balancer
 
