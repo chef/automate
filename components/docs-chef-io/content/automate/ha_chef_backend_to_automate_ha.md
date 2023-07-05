@@ -16,9 +16,9 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance.
+- Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** with Chef Backend should not migrate with this.
+
 - Also, for the customers using a standalone Chef Infra Server, cookbooks should be in the database or S3 but not in the file system.
-- Automate HA does not support supermarket authentication with chef-server user credentials. Post migration to Automate HA those customer users will not be able to log in with chef-server user credentials to their Supermarket.
 
 {{< /warning >}}
 
@@ -313,4 +313,4 @@ Download and Install the [Chef Workstation](https://www.chef.io/downloads/tools/
 
 ## Use Existing Private Supermarket with Automate HA
 
-You can register a Supermarket with OC-ID embedded in Automate HA in an on-premises setup. You can refer to the integration page of [Supermarket with Automate HA](/automate/supermarket_with_automate_ha/).
+You can register a Supermarket with Automate HA in an on-premises setup. You can refer to the integration page of [Supermarket with Automate HA](/automate/supermarket_with_automate_ha/).

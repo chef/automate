@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 70
 +++
 
-Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI.
+Chef Supermarket is the site for cookbooks. It provides a searchable cookbook repository and a friendly web UI. In this article, we will configure and integrate an existing private Supermarket with an Airgapped installation of Chef Automate.
 
 ## Pre-requisites
 
