@@ -454,7 +454,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 	}
 
 	if len(hostIPsToCopyLatestCLI) > 0 {
-		v.Writer.Printf("Copying CLI to the follwoing IPs: %v", hostIPsToCopyLatestCLI)
+		v.Writer.Printf("Copying CLI to the follwoing IPs: %v\n", hostIPsToCopyLatestCLI)
 		// Copying Latest CLI binary to remote nodes
 		err = v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPsToCopyLatestCLI)
 		if err != nil {
