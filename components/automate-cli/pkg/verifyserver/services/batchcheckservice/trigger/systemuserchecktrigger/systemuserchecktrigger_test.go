@@ -89,7 +89,7 @@ func TestSystemUserCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 1)
 		require.NotNil(t, ctr[0].Result.Error)
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
+		assert.Equal(t, "error while parsing the response data:unexpected end of JSON input", ctr[0].Result.Error.Error())
 	})
 
 	t.Run("Nil Hardware", func(t *testing.T) {

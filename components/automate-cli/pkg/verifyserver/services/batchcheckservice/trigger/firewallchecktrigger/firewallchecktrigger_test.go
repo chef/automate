@@ -217,7 +217,7 @@ func TestMakeRequests(t *testing.T) {
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseResponse bool, isFailed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseResponse bool, isFailed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == constants.FIREWALL_API_PATH {
@@ -256,6 +256,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL
@@ -273,13 +274,14 @@ func TestFirewallCheck_Run(t *testing.T) {
 		config *models.Config
 	}
 	tests := []struct {
-		name                 string
-		args                 args
-		response             string
-		httpStatusCode       int
-		isError              bool
-		invalidParseResponse bool
-		isFailed             bool
+		name                   string
+		args                   args
+		response               string
+		httpStatusCode         int
+		isError                bool
+		invalidParseResponse   bool
+		isFailed               bool
+		requiredStatusResponse string
 	}{
 		{
 			name: "Automate Pg Passed",
@@ -324,10 +326,11 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Certificate: certificatelist,
 				},
 			},
-			response:             "error while connecting to the endpoint, received invalid status code",
+			response:             "Internal Server Error",
 			httpStatusCode:       http.StatusInternalServerError,
 			isError:              true,
 			invalidParseResponse: false,
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name: "Error in parsing the response",
@@ -357,10 +360,11 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Certificate: certificatelist,
 				},
 			},
-			response:             "error while connecting to the endpoint, received invalid status code",
+			response:             "source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty",
 			httpStatusCode:       http.StatusBadRequest,
 			isError:              true,
 			invalidParseResponse: true,
+			requiredStatusResponse: `{"error":{"code":400,"message":"source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty"}}`,
 		},
 		{
 			name: "Hardware Nil",
@@ -385,7 +389,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 
 				// Create a dummy server
-				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed)
+				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed, tt.requiredStatusResponse)
 				defer server.Close()
 
 				fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), port)

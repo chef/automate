@@ -233,12 +233,13 @@ func TestOpensearchCheck_Run(t *testing.T) {
 	}
 
 	tests := []struct {
-		name           string
-		isPassed       bool
-		args           args
-		response       string
-		httpStatusCode int
-		isError        bool
+		name               string
+		isPassed           bool
+		args               args
+		response           string
+		httpStatusCode     int
+		isError            bool
+		httpStatusResponse string
 	}{
 		{
 			name:           "Opensearch Checks are passed",
@@ -288,10 +289,10 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			response: externalOpensearchResponseFailureAutomateExpected,
 		},
 		{
-			name:           "Internal Server Error",
+			name:           "400 Bad Request",
 			isPassed:       false,
 			isError:        true,
-			httpStatusCode: http.StatusInternalServerError,
+			httpStatusCode: http.StatusBadRequest,
 			args: args{
 				config: &models.Config{
 					Hardware: &models.Hardware{
@@ -308,7 +309,8 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			httpStatusResponse: `{"error":{"code":400, "message":"opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty"}}`,
+			response: "opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty",
 		},
 		{
 			name:           "Gateway Timeout",
@@ -331,7 +333,8 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			httpStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
+			response: "context deadline exceeded",
 		},
 		{
 			name:     "Empty OS",
@@ -377,7 +380,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var want []models.CheckTriggerResponse
-			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed)
+			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed, tt.httpStatusResponse)
 			defer server.Close()
 
 			svc := NewExternalOpensearchCheck(
@@ -447,7 +450,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 			},
 		}
 		isError := false
-		server, host, port := createDummyServer(t, http.StatusOK, true)
+		server, host, port := createDummyServer(t, http.StatusOK, true,"")
 		defer server.Close()
 		svc := NewExternalOpensearchCheck(
 			logger.NewLogrusStandardLogger(),
@@ -491,7 +494,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 			},
 		}
 		isError := false
-		server, host, port := createDummyServer(t, http.StatusOK, false)
+		server, host, port := createDummyServer(t, http.StatusOK, false,"")
 		defer server.Close()
 		svc := NewExternalOpensearchCheck(
 			logger.NewLogrusStandardLogger(),
@@ -521,7 +524,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var got models.ExternalOSRequest
@@ -555,6 +558,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL

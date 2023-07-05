@@ -212,13 +212,20 @@ func TestTriggerCheckAPI(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Return a non-OK status code
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{"error":{"code":400, "message":"Request Parameters that is 'ip', 'user_name', 'ssh_port' and 'private_key' cannot be empty"}}`))
 		}))
 		defer server.Close()
-
+		requestBody := models.SshUserChecksRequest{
+			Ip: "1.1.1.1",
+			UserName: "admin",
+			Port: "22",
+			PrivateKey: "",
+			SudoPassword: "",
+		}
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go TriggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
+		go TriggerCheckAPI(server.URL+constants.SSH_USER_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodPost, output, requestBody)
 
 		// Wait for the response
 		response := <-output
@@ -226,7 +233,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
 		assert.Equal(t, http.StatusBadRequest, response.Result.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Result.Error.Message)
+		assert.Equal(t, "Request Parameters that is 'ip', 'user_name', 'ssh_port' and 'private_key' cannot be empty", response.Result.Error.Message)
 	})
 
 	t.Run("Error decoding response JSON", func(t *testing.T) {
@@ -262,10 +269,11 @@ func TestTriggerCheckAPI(t *testing.T) {
 
 		// Wait for the response
 		response := <-output
+
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
-		require.Equal(t, http.StatusNotFound, response.Result.Error.Code)
-		assert.Contains(t, response.Result.Error.Message, "error while connecting to the endpoint")
+		require.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
+		assert.Contains(t, response.Result.Error.Message, "error while parsing the response data:invalid character '<' looking for beginning of value")
 	})
 	t.Run("Invalid Request Body", func(t *testing.T) {
 		endPoint := "http://example.com/api/v1/checks/software-versions"

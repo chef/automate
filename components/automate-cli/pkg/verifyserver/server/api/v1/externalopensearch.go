@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/gofiber/fiber/v2"
@@ -26,6 +25,6 @@ func (h *Handler) ExternalOpensearch(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty")
 	}
 
-	externalOpensearchResult := h.ExternalOpensearchService.GetExternalOpensearchDetails(reqBody, constants.HTTPS_PORT)
+	externalOpensearchResult := h.ExternalOpensearchService.GetExternalOpensearchDetails(reqBody)
 	return c.JSON(response.BuildSuccessResponse(externalOpensearchResult))
 }

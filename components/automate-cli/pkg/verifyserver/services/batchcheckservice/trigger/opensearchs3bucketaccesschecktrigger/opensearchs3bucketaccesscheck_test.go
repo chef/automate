@@ -179,7 +179,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			isError: false,
 		},
 		{
-			name: "Internal Server Error",
+			name: "Entered Incorrect Request Body",
 			args: args{
 				config: &models.Config{
 					ExternalOS: externalOs,
@@ -188,9 +188,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			httpResponseCode: http.StatusInternalServerError,
+			httpResponseCode: http.StatusBadRequest,
 			isPassed:         false,
-			response:         "error while connecting to the endpoint, received invalid status code",
+			response:         "Invalid request body for S3 backup check",
 			isError:          true,
 		},
 		{
@@ -305,6 +305,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(`{"error":{"code":400, "message":"Invalid request body for S3 backup check"}}`))
 	}))
 
 	// Extract IP and port from the server's URL
