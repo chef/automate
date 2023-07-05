@@ -82,7 +82,7 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		remainingDays = int(certificate.NotAfter.Sub(currentTime).Hours() / 24)
 
 		if currentTime.After(certificate.NotAfter) {
-			vc.log.Debugf("%s certificate will expire in %d days", key, remainingDays)
+			vc.log.Debugf("%s certificate has expired already", key)
 			expiredCerts += key + ", "
 			continue
 		}
@@ -94,6 +94,7 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 			aboutToExpireCerts += key + ", "
 			continue
 		}
+
 	}
 
 	if aboutToExpireCerts != "" {
@@ -105,7 +106,6 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		vc.log.Debug("Certificates are not expired")
 		return createCheck(constants.CERTIFICATE_EXPIRY_TITLE, true, constants.CERTIFICATE_VALID, "", "")
 	}
-
 	errorMessage := createErrorMessage(expiredCerts)
 	return createCheck(constants.CERTIFICATE_EXPIRY_TITLE, false, "", errorMessage, constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE)
 }
