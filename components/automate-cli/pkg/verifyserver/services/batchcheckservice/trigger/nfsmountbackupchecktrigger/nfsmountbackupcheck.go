@@ -34,7 +34,6 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	if config.Hardware == nil {
 		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, true, true, false)
 	}
-
 	if config.Backup == nil || config.Backup.FileSystem == nil {
 		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG)
 	}
