@@ -187,12 +187,13 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 	}
 
 	tests := []struct {
-		name           string
-		isPassed       bool
-		args           args
-		response       string
-		httpStatusCode int
-		isError        bool
+		name                   string
+		isPassed               bool
+		args                   args
+		response               string
+		httpStatusCode         int
+		isError                bool
+		requiredStatusResponse string
 	}{
 		{
 			name:           "All the s3 checks passed",
@@ -254,7 +255,6 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
 							AccessKey:  accessKey,
@@ -264,7 +264,8 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			response: "Internal Server Error",
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name:           "Gateway Timeout",
@@ -289,13 +290,14 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
+			response: "context deadline exceeded",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var want []models.CheckTriggerResponse
-			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed)
+			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed, tt.requiredStatusResponse)
 			defer server.Close()
 
 			svc := NewS3BackupConfigCheck(
@@ -374,7 +376,7 @@ func TestRunS3BackupCheck(t *testing.T) {
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var got models.S3ConfigRequest
@@ -408,6 +410,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL

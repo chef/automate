@@ -235,12 +235,13 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 	}
 
 	tests := []struct {
-		name           string
-		isPassed       bool
-		args           args
-		response       string
-		httpStatusCode int
-		isError        bool
+		name                   string
+		isPassed               bool
+		args                   args
+		response               string
+		httpStatusCode         int
+		isError                bool
+		requiredStatusResponse string
 	}{
 		{
 			name:           "Postgres Checks are passed",
@@ -310,7 +311,8 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			response: "Internal Server Error",
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name:           "Gateway Timeout",
@@ -333,7 +335,8 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			response: "context deadline exceeded",
+			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
 		},
 		{
 			name:           "Empty PG",
@@ -373,7 +376,7 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var want []models.CheckTriggerResponse
-			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed)
+			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed, tt.requiredStatusResponse)
 			defer server.Close()
 
 			svc := NewExternalPostgresCheck(
@@ -446,7 +449,7 @@ func TestForChefserverPostgres(t *testing.T) {
 			},
 		}
 		isError := false
-		server, host, port := createDummyServer(t, http.StatusOK, true)
+		server, host, port := createDummyServer(t, http.StatusOK, true, "")
 		defer server.Close()
 		svc := NewExternalPostgresCheck(
 			logger.NewLogrusStandardLogger(),
@@ -491,7 +494,7 @@ func TestForChefserverPostgres(t *testing.T) {
 			},
 		}
 		isError := false
-		server, host, port := createDummyServer(t, http.StatusOK, false)
+		server, host, port := createDummyServer(t, http.StatusOK, false, "")
 		defer server.Close()
 		svc := NewExternalPostgresCheck(
 			logger.NewLogrusStandardLogger(),
@@ -522,7 +525,7 @@ func TestForChefserverPostgres(t *testing.T) {
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var got models.ExternalPgRequest
@@ -556,6 +559,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL

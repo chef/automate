@@ -269,10 +269,11 @@ func TestTriggerCheckAPI(t *testing.T) {
 
 		// Wait for the response
 		response := <-output
+
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
-		require.Equal(t, http.StatusNotFound, response.Result.Error.Code)
-		assert.Contains(t, response.Result.Error.Message, "error while connecting to the endpoint")
+		require.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
+		assert.Contains(t, response.Result.Error.Message, "error while parsing the response data:invalid character '<' looking for beginning of value")
 	})
 	t.Run("Invalid Request Body", func(t *testing.T) {
 		endPoint := "http://example.com/api/v1/checks/software-versions"

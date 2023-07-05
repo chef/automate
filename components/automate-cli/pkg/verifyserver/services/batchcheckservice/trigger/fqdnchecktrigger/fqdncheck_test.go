@@ -305,12 +305,13 @@ func TestFqdnCheck_Run(t *testing.T) {
 		config *models.Config
 	}
 	tests := []struct {
-		name       string
-		args       args
-		isPassed   bool
-		response   string
-		httpStatus int
-		isError    bool
+		name                   string
+		args                   args
+		isPassed               bool
+		response               string
+		httpStatus             int
+		isError                bool
+		requiredStatusResponse string
 	}{
 		{
 			name: "Passed Automate Node Check",
@@ -410,9 +411,10 @@ func TestFqdnCheck_Run(t *testing.T) {
 				},
 			},
 			isPassed:   false,
-			response:   "error while connecting to the endpoint, received invalid status code",
+			response:   "Internal Server Error",
 			httpStatus: http.StatusInternalServerError,
 			isError:    true,
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name: "400 Bad Reqest",
@@ -427,9 +429,10 @@ func TestFqdnCheck_Run(t *testing.T) {
 				},
 			},
 			isPassed:   false,
-			response:   "error while connecting to the endpoint, received invalid status code",
+			response:   "fqdn, root_cert and nodes can't be empty, Please provide all the required fields.",
 			httpStatus: http.StatusBadRequest,
 			isError:    true,
+			requiredStatusResponse: `{"error":{"code":400,"message":"fqdn, root_cert and nodes can't be empty, Please provide all the required fields."}}`,
 		},
 		{
 			name: "Passed Automate Node Check Post Deployment",
@@ -455,7 +458,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 			var want []models.CheckTriggerResponse
 			json.Unmarshal([]byte(tt.response), &want)
 
-			server, host, port := createDummyServer(t, tt.httpStatus, tt.isPassed)
+			server, host, port := createDummyServer(t, tt.httpStatus, tt.isPassed, tt.requiredStatusResponse)
 			defer server.Close()
 
 			fqc := NewFqdnCheck(
@@ -482,7 +485,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 	}
 }
 
-func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var got models.FqdnRequest
@@ -519,6 +522,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL
