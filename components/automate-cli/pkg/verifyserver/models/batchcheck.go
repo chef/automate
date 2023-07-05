@@ -167,7 +167,7 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 		c.populateConfigInitials(haConfig)
 	}
 
-	if haConfig.GetConfigInitials().BackupConfig == "file_system" && c.Backup == nil {
+	if (haConfig.GetConfigInitials().BackupConfig == "file_system" && c.Backup == nil) || (haConfig.GetConfigInitials().BackupConfig == "efs" && c.Backup == nil) {
 		c.Backup = &Backup{
 			FileSystem: &FileSystem{
 				MountLocation: haConfig.GetConfigInitials().BackupMount,
