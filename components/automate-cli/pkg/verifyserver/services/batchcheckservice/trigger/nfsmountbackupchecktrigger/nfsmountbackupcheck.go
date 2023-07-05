@@ -2,8 +2,8 @@ package nfsmountbackupchecktrigger
 
 import (
 	"encoding/json"
-	"net/http"
 	"errors"
+	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -34,7 +34,8 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	if config.Hardware == nil {
 		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, true, true, false)
 	}
-	if config.Backup.FileSystem == nil {
+
+	if config.Backup == nil || config.Backup.FileSystem == nil {
 		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG)
 	}
 	if isMountLocationEmpty(config.Backup) {
@@ -53,7 +54,7 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	//Triggers only one API call for nfs mount API
 	nfsMountAPIResponse, err := nbc.triggerCheckForMountService(nfsMountReq)
 	if err != nil {
-		if nfsMountAPIResponse!= nil {
+		if nfsMountAPIResponse != nil {
 			return constructErrorResult(config, nfsMountAPIResponse.Error.Message, nfsMountAPIResponse.Error.Code)
 		}
 		return constructErrorResult(config, err.Error(), 500)

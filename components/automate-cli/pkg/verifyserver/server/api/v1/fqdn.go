@@ -18,9 +18,9 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
 
-	if strings.TrimSpace(req.Fqdn) == "" || strings.TrimSpace(req.RootCert) == "" || len(req.Nodes) == 0 {
-		h.Logger.Error("fqdn, root_cert and nodes can't be empty.")
-		return fiber.NewError(http.StatusBadRequest, "fqdn, root_cert and nodes can't be empty, Please provide all the required fields.")
+	if strings.TrimSpace(req.Fqdn) == "" || len(req.Nodes) == 0 {
+		h.Logger.Error("fqdn, nodes can't be empty.")
+		return fiber.NewError(http.StatusBadRequest, "fqdn, nodes can't be empty, Please provide all the required fields.")
 	}
 
 	for _, ip := range req.Nodes {

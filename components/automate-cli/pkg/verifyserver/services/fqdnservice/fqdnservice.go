@@ -39,12 +39,23 @@ func (fq *FqdnService) createClient(rootCert string) *http.Client {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM([]byte(rootCert))
 
+	// If root-ca is passed then we are using it, otherwise we are making insecure call
+	var tlsConfig = new(tls.Config)
+	if rootCert == "" {
+		tlsConfig = &tls.Config{
+			InsecureSkipVerify: true,
+			MinVersion:         tls.VersionTLS12,
+		}
+	} else {
+		tlsConfig = &tls.Config{
+			RootCAs:    caCertPool,
+			MinVersion: tls.VersionTLS12,
+		}
+	}
+
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:    caCertPool,
-				MinVersion: tls.VersionTLS12,
-			},
+			TLSClientConfig: tlsConfig,
 		},
 		Timeout: fq.timeout * time.Second,
 	}
@@ -241,7 +252,7 @@ func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string
 	certificateValidityCheck := true
 	fqdnReachabilityCheck := true
 
-	if !req.IsAfterDeployment {
+	if !req.IsAfterDeployment && strings.TrimSpace(req.RootCert) != "" {
 		check := fq.validateCertificate(req.RootCert)
 		certificateValidityCheck = check.Passed
 		response.Checks = append(response.Checks, check)
