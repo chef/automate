@@ -27,7 +27,7 @@ func TestParseAndVerify(t *testing.T) {
 			name:    "Verify AWS Managed Config",
 			args:    args{configFile: "./testdata/HaAwsManaged.toml"},
 			wantErr: true,
-			err:     errors.New("invalid ssh_key_file: ~/.ssh/central.pem (stat ~/.ssh/central.pem: no such file or directory)\ninvalid or empty URL: automate fqdn"),
+			err:     errors.New("invalid ssh_key_file: ~/.ssh/central.pem no such file or directory\ninvalid or empty URL: automate fqdn"),
 		},
 		{
 			name:    "Verify OnPrem Config",

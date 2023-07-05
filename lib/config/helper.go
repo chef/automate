@@ -59,8 +59,13 @@ func validateRequiredPathField(value string, fieldName string) error {
 	if len(value) == 0 {
 		return fmt.Errorf(INVALID_EMPTY_VALUE, fieldName)
 	}
-	if _, err := os.Stat(value); err != nil {
-		return fmt.Errorf("invalid %s: %s (%v)", fieldName, value, err)
+	home := os.Getenv("HOME")
+	path := value
+	if strings.Index(path, "~") == 0 {
+		path = strings.Replace(path, "~", home, 1)
+	}
+	if _, err := os.Stat(path); err != nil {
+		return fmt.Errorf("invalid %s: %s no such file or directory", fieldName, value)
 	}
 	return nil
 }
