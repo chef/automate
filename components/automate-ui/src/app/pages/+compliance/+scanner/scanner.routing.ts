@@ -6,6 +6,7 @@ import { JobScansListComponent } from './containers/job-scans-list/job-scans-lis
 import { NodesListComponent } from './containers/nodes-list/nodes-list.component';
 import { NodesAddComponent } from './containers/nodes-add/nodes-add.component';
 import { NodesEditComponent } from './containers/nodes-edit/nodes-edit.component';
+import { MfeSessionService } from 'app/services/mfe-session/mfe-session.service';
 
 const routes: Routes = [
   {
@@ -19,7 +20,8 @@ const routes: Routes = [
       },
       {
         path: 'jobs',
-        component: JobsListComponent
+        component: JobsListComponent,
+        canActivate : [MfeSessionService],
       },
       {
         path: 'nodes',
