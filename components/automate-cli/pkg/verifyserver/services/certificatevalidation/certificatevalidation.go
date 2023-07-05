@@ -82,7 +82,7 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		remainingDays = int(certificate.NotAfter.Sub(currentTime).Hours() / 24)
 
 		if currentTime.After(certificate.NotAfter) {
-			vc.log.Debugf("%s certificate will expire in %d days", key, remainingDays)
+			vc.log.Debugf("%s certificate has expired already", key)
 			expiredCerts += key + ", "
 			continue
 		}
