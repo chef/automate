@@ -141,7 +141,7 @@ func TestCheckFqdn(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "fqdn, root_cert and nodes can't be empty, Please provide all the required fields."
+					"message": "fqdn, nodes can't be empty, Please provide all the required fields."
 				}
 			}`,
 		},

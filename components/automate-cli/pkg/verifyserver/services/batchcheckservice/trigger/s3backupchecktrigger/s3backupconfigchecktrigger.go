@@ -29,7 +29,7 @@ func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTrigger
 		}
 	}
 
-	if config.Backup.ObjectStorage == nil {
+	if config.Backup == nil || config.Backup.ObjectStorage == nil {
 		return s3ConfigSkippedResponse(config, constants.S3_BACKUP_CONFIG)
 	}
 
