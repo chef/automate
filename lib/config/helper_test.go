@@ -87,7 +87,9 @@ func TestValidateRequiredPathField(t *testing.T) {
 		{value: "./testdata/A2HA.pem", fieldName: "file", expected: nil},
 		{value: "./testdata", fieldName: "directory", expected: nil},
 		{value: "", fieldName: "empty", expected: fmt.Errorf(INVALID_EMPTY_VALUE, "empty")},
-		{value: "/nonexistent/file.txt", fieldName: "nonexistent", expected: fmt.Errorf("invalid nonexistent: /nonexistent/file.txt (stat /nonexistent/file.txt: no such file or directory)")},
+		{value: "/nonexistent/file.txt", fieldName: "nonexistent", expected: fmt.Errorf("invalid nonexistent: /nonexistent/file.txt no such file or directory")},
+		{value: "./testdata/.ssh/A2HA.pem", fieldName: "file", expected: nil},
+		{value: "~", fieldName: "directory", expected: nil},
 	}
 
 	for _, test := range tests {

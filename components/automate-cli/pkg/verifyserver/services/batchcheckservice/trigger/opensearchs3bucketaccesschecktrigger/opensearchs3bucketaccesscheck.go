@@ -8,8 +8,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
-	"github.com/chef/automate/lib/logger"
 	cfg "github.com/chef/automate/lib/config"
+	"github.com/chef/automate/lib/logger"
 )
 
 type OpensearchS3BucketAccessCheck struct {
@@ -27,7 +27,7 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 }
 
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	if config.ExternalOS == nil || config.Backup.ObjectStorage == nil {
+	if config.ExternalOS == nil || config.Backup == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
 			trigger.SkippedTriggerCheckResp("-", constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
 		}

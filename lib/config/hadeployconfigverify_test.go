@@ -27,7 +27,7 @@ func TestParseAndVerify(t *testing.T) {
 			name:    "Verify AWS Managed Config",
 			args:    args{configFile: "./testdata/HaAwsManaged.toml"},
 			wantErr: true,
-			err:     errors.New("invalid ssh_key_file: ~/.ssh/central.pem (stat ~/.ssh/central.pem: no such file or directory)\ninvalid or empty URL: automate fqdn"),
+			err:     errors.New("invalid ssh_key_file: ~/.ssh/central.pem no such file or directory\ninvalid or empty URL: automate fqdn"),
 		},
 		{
 			name:    "Verify OnPrem Config",
@@ -39,7 +39,7 @@ func TestParseAndVerify(t *testing.T) {
 			name:    "Verify OnPrem Db Self-Managed Config",
 			args:    args{configFile: "./testdata/HaOnPremDbSelfManaged.toml"},
 			wantErr: true,
-			err:     errors.New("invalid ssh_key_file: ~/.ssh/A2HA.pem (stat ~/.ssh/A2HA.pem: no such file or directory)\ninvalid or empty: dbuser_username\ninvalid or empty: dbuser_password\ninvalid or empty URL: instance_url\ninvalid or empty: postgresql_root_cert\ninvalid or empty: superuser_password\ninvalid or empty: superuser_username\ninvalid or empty: opensearch_domain_name\ninvalid or empty URL: opensearch_domain_url\ninvalid or empty: opensearch_root_cert\ninvalid or empty: opensearch_user_password\ninvalid or empty: opensearch_username"),
+			err:     errors.New("invalid ssh_key_file: ~/.ssh/A2HA.pem no such file or directory\ninvalid or empty: dbuser_username\ninvalid or empty: dbuser_password\ninvalid or empty URL: instance_url\ninvalid or empty: postgresql_root_cert\ninvalid or empty: superuser_password\ninvalid or empty: superuser_username\ninvalid or empty: opensearch_domain_name\ninvalid or empty URL: opensearch_domain_url\ninvalid or empty: opensearch_root_cert\ninvalid or empty: opensearch_user_password\ninvalid or empty: opensearch_username"),
 		},
 		{
 			name:    "Verify OnPrem Db Aws Managed Config",
