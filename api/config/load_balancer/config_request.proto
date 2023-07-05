@@ -102,6 +102,9 @@ message ConfigRequest {
 
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;
+
+					// ssl 
+					google.protobuf.StringValue ssl_dhparam = 30;
 				}
 
 				message Mail {
