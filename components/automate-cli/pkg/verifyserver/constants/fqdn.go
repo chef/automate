@@ -3,7 +3,7 @@ package constants
 const (
 	FQDN_TITLE                     = "FQDN is reachable"
 	FQDN_ERROR_MESSAGE             = "FQDN is not reachable"
-	FQDN_RESOLUTION_MESSAGE        = "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+	FQDN_RESOLUTION_MESSAGE        = "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 	NODE_TITLE                     = "Nodes are reachable"
 	NODE_SUCCESS_MESSAGE           = "All nodes are reachable"
 	NODE_ERROR_MESSAGE             = "%v is not reachable"
