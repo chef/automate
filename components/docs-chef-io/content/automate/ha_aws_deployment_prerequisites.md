@@ -52,16 +52,6 @@ The operating system and the supported version for different nodes in AWS deploy
 | Amazon Linux 2 (64 Bit OS)           | 2 (kernel 5.10)                                                                                                                                                                                                                                           |
 | SUSE Linux Enterprise Server         | 12.5                                                                                                                                                                                                                                                      |
 
-### Minimum Hardware Requirement
-
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | Recommended EBS volume | AWS Machine Type | Additional Space  |
-| ----------------- | ----- | ---- | --- | ------------------ | ---------------------- | ---------------- | ----------------- |
-| Chef Automate     | 2     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| Postgresql DB     | 3     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 150 GB             | 200 GB                 | m5.large         | /tmp=5% /root=20% |
-
 ### Minimum Supported Chef Tool Versions
 
 Current Automate HA supports integration with the following Chef tools:
@@ -98,31 +88,15 @@ Current Automate HA integrates with the following non-Chef tools:
 
 {{< /note >}}
 
-We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below shows the tested **assumptions** and should not be used as exact recommendations.
-
-You can use the below assumptions in the calculator to drive into your hardware requirement:
-
-| Assumption                            | Value | Unit     |
-| ------------------------------------- | ----- | -------- |
-| Number of Nodes sending data          | 5000  |          |
-| Frequency of Compliance Scan          | 1     | Per Hour |
-| Frequency of Client runs (Infra runs) | 1     | Per Hour |
-| Frequency of Event Feed               | 1     | Per Hour |
-| Data Retention policy                 | 1     | Days     |
-| Compliance scan report size           | 400   | KB       |
-| Client Run (Infra run) size           | 300   | KB       |
-| Event Feed update size                | 2     | KB       |
-| No. of Shards in OpenSearch Index     | 2     |
-
-The machine requirements based on the above assumptions are listed below:
+### Minimum Hardware Requirement
 
 | Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space  |
 | ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
-| Chef Automate     | 2     | 2    | 8   | 80 GB              | m5.large         | /tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 80 GB              | m5.large         | /tmp=5% /root=20% |
-| Postgresql DB     | 3     | 2    | 8   | 150 GB             | m5.large         | /tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         | /tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         | /tmp=5% /root=20% |
+| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| Postgresql DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
 
 {{< note >}} For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. {{< /note >}}
 
