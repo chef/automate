@@ -170,6 +170,14 @@ var awsConfig = &AwsConfigToml{
 			PublicKey:         "/aws/public/key",
 			RootCA:            "/aws/root/ca",
 			TeamsPort:         "9090",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/aws/cert1/private/key",
+					PublicKey:  "/aws/cert1/public/key",
+					NodesDn:    "/aws/cert1/nodes/dn",
+				},
+			},
 		},
 	},
 	ChefServer: ChefServerToml{
@@ -178,6 +186,14 @@ var awsConfig = &AwsConfigToml{
 			InstanceCount:     "3",
 			PrivateKey:        "/existing/private/key",
 			PublicKey:         "/existing/public/key",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/aws/cert1/private/key",
+					PublicKey:  "/aws/cert1/public/key",
+					NodesDn:    "/aws/cert1/nodes/dn",
+				},
+			},
 		},
 	},
 	Postgresql: PostgresqlToml{
@@ -187,6 +203,14 @@ var awsConfig = &AwsConfigToml{
 			PrivateKey:        "/existing/private/key",
 			PublicKey:         "/existing/public/key",
 			RootCA:            "/existing/root/ca",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/aws/cert1/private/key",
+					PublicKey:  "/aws/cert1/public/key",
+					NodesDn:    "/aws/cert1/nodes/dn",
+				},
+			},
 		},
 	},
 	Opensearch: OpensearchToml{
@@ -200,6 +224,14 @@ var awsConfig = &AwsConfigToml{
 			PrivateKey:        "/existing/private/key",
 			PublicKey:         "/existing/public/key",
 			RootCA:            "/existing/root/ca",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/aws/cert1/private/key",
+					PublicKey:  "/aws/cert1/public/key",
+					NodesDn:    "/aws/cert1/nodes/dn",
+				},
+			},
 		},
 	},
 	Aws: AwsToml{
@@ -573,12 +605,20 @@ func TestCopyAws(t *testing.T) {
 	assert.Equal(t, "/aws/public/key", automate.PublicKey)
 	assert.Equal(t, "/aws/root/ca", automate.FqdnRootCA)
 	assert.Equal(t, "9090", automate.TeamsPort)
+	assert.Equal(t, "10.0.0.1", (*automate.CertsByIP)[0].IP)
+	assert.Equal(t, "/aws/cert1/private/key", (*automate.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/aws/cert1/public/key", (*automate.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/aws/cert1/nodes/dn", (*automate.CertsByIP)[0].NodesDn)
 
 	chefServer := haDeployConfig.ChefServer.Config
 	assert.Equal(t, true, chefServer.EnableCustomCerts)
 	assert.Equal(t, "3", chefServer.InstanceCount)
 	assert.Equal(t, "/existing/private/key", chefServer.PrivateKey)
 	assert.Equal(t, "/existing/public/key", chefServer.PublicKey)
+	assert.Equal(t, "10.0.0.1", (*chefServer.CertsByIP)[0].IP)
+	assert.Equal(t, "/aws/cert1/private/key", (*chefServer.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/aws/cert1/public/key", (*chefServer.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/aws/cert1/nodes/dn", (*chefServer.CertsByIP)[0].NodesDn)
 
 	postgresql := haDeployConfig.Postgresql.Config
 	assert.Equal(t, true, postgresql.EnableCustomCerts)
@@ -586,6 +626,10 @@ func TestCopyAws(t *testing.T) {
 	assert.Equal(t, "/existing/private/key", postgresql.PrivateKey)
 	assert.Equal(t, "/existing/public/key", postgresql.PublicKey)
 	assert.Equal(t, "/existing/root/ca", postgresql.RootCA)
+	assert.Equal(t, "10.0.0.1", (*postgresql.CertsByIP)[0].IP)
+	assert.Equal(t, "/aws/cert1/private/key", (*postgresql.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/aws/cert1/public/key", (*postgresql.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/aws/cert1/nodes/dn", (*postgresql.CertsByIP)[0].NodesDn)
 
 	opensearch := haDeployConfig.Opensearch.Config
 	assert.Equal(t, "/existing/admin/cert", opensearch.AdminCert)
@@ -597,6 +641,10 @@ func TestCopyAws(t *testing.T) {
 	assert.Equal(t, "/existing/private/key", opensearch.PrivateKey)
 	assert.Equal(t, "/existing/public/key", opensearch.PublicKey)
 	assert.Equal(t, "/existing/root/ca", opensearch.RootCA)
+	assert.Equal(t, "10.0.0.1", (*opensearch.CertsByIP)[0].IP)
+	assert.Equal(t, "/aws/cert1/private/key", (*opensearch.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/aws/cert1/public/key", (*opensearch.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/aws/cert1/nodes/dn", (*opensearch.CertsByIP)[0].NodesDn)
 
 	aws := haDeployConfig.Aws.Config
 	assert.Equal(t, "my-profile", aws.Profile)
