@@ -77,7 +77,7 @@ const (
 			  "passed": false,
 			  "success_msg": "",
 			  "error_msg": "FQDN is not reachable",
-			  "resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+			  "resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 			},
 			{
 			  "title": "Nodes are reachable",
@@ -179,7 +179,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -212,7 +212,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -246,7 +246,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -277,7 +277,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -410,10 +410,10 @@ func TestFqdnCheck_Run(t *testing.T) {
 					APIToken:    token,
 				},
 			},
-			isPassed:   false,
-			response:   "Internal Server Error",
-			httpStatus: http.StatusInternalServerError,
-			isError:    true,
+			isPassed:               false,
+			response:               "Internal Server Error",
+			httpStatus:             http.StatusInternalServerError,
+			isError:                true,
 			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
@@ -428,10 +428,10 @@ func TestFqdnCheck_Run(t *testing.T) {
 					APIToken:    token,
 				},
 			},
-			isPassed:   false,
-			response:   "fqdn, root_cert and nodes can't be empty, Please provide all the required fields.",
-			httpStatus: http.StatusBadRequest,
-			isError:    true,
+			isPassed:               false,
+			response:               "fqdn, root_cert and nodes can't be empty, Please provide all the required fields.",
+			httpStatus:             http.StatusBadRequest,
+			isError:                true,
 			requiredStatusResponse: `{"error":{"code":400,"message":"fqdn, root_cert and nodes can't be empty, Please provide all the required fields."}}`,
 		},
 		{
