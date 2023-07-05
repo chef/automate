@@ -44,6 +44,7 @@ func (fq *FqdnService) createClient(rootCert string) *http.Client {
 	if rootCert == "" {
 		tlsConfig = &tls.Config{
 			InsecureSkipVerify: true,
+			MinVersion:         tls.VersionTLS12,
 		}
 	} else {
 		tlsConfig = &tls.Config{
