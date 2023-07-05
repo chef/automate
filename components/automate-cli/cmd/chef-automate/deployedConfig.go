@@ -225,6 +225,7 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 				PublicKey:         awsConfigAutomateSettings.PublicKey,
 				FqdnRootCA:        awsConfigAutomateSettings.RootCA,
 				TeamsPort:         awsConfigAutomateSettings.TeamsPort,
+				CertsByIP:         &[]config.CertByIP{},
 			},
 		},
 		ChefServer: &config.ChefServerSettings{
@@ -235,6 +236,7 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 				InstanceCount:     awsConfigChefServerSettings.InstanceCount,
 				PrivateKey:        awsConfigChefServerSettings.PrivateKey,
 				PublicKey:         awsConfigChefServerSettings.PublicKey,
+				CertsByIP:         &[]config.CertByIP{},
 			},
 		},
 		Postgresql: &config.PostgresqlSettings{
@@ -244,6 +246,7 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 				PrivateKey:        awsConfigPostgresqlSettings.PrivateKey,
 				PublicKey:         awsConfigPostgresqlSettings.PublicKey,
 				RootCA:            awsConfigPostgresqlSettings.RootCA,
+				CertsByIP:         &[]config.CertByIP{},
 			},
 		},
 		Opensearch: &config.OpensearchSettings{
@@ -257,6 +260,7 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 				PrivateKey:        awsConfigOpensearchSettings.PrivateKey,
 				PublicKey:         awsConfigOpensearchSettings.PublicKey,
 				RootCA:            awsConfigOpensearchSettings.RootCA,
+				CertsByIP:         &[]config.CertByIP{},
 			},
 		},
 		Aws: &config.AwsSettings{
@@ -306,6 +310,22 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 				LbAccessLogs:                  awsConfigSetting.LBAccessLogs,
 			},
 		},
+	}
+
+	if awsConfigAutomateSettings.CertsByIP != nil {
+		CopyCertsByIP(haDeployConfig.Automate.Config.CertsByIP, awsConfigAutomateSettings.CertsByIP)
+	}
+
+	if awsConfigChefServerSettings.CertsByIP != nil {
+		CopyCertsByIP(haDeployConfig.ChefServer.Config.CertsByIP, awsConfigChefServerSettings.CertsByIP)
+	}
+
+	if awsConfigPostgresqlSettings.CertsByIP != nil {
+		CopyCertsByIP(haDeployConfig.Postgresql.Config.CertsByIP, awsConfigPostgresqlSettings.CertsByIP)
+	}
+
+	if awsConfigOpensearchSettings.CertsByIP != nil {
+		CopyCertsByIP(haDeployConfig.Opensearch.Config.CertsByIP, awsConfigOpensearchSettings.CertsByIP)
 	}
 
 	return haDeployConfig
