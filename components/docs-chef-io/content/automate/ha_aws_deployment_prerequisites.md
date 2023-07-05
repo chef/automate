@@ -94,7 +94,7 @@ Current Automate HA integrates with the following non-Chef tools:
 {{< note >}}
 
 -   Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case.
--   Make sure the hardware requirement in not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement/)
+-   Make sure the hardware requirement in not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement)
 
 {{< /note >}}
 
