@@ -4,7 +4,6 @@ import { ComplianceComponent } from './compliance.component';
 import {
   ComplianceLandingComponent
 } from 'app/pages/compliance-landing/compliance-landing.component';
-import { MfeSessionService } from 'app/services/mfe-session/mfe-session.service';
 
 const routes: Routes = [
   {
@@ -23,7 +22,6 @@ const routes: Routes = [
       {
         path: 'reports',
         loadChildren: () => import('./+reporting/reporting.module').then(m => m.ReportingModule),
-        canActivate : [MfeSessionService],
       },
       {
         path: 'scanner',
@@ -32,12 +30,10 @@ const routes: Routes = [
       {
         path: 'scan-jobs',
         loadChildren: () => import('./+scanner/scanner.module').then(m => m.ScannerModule),
-        canActivate : [MfeSessionService],
       },
       {
         path: 'compliance-profiles',
         loadChildren: () => import('./+profile/profile.module').then(m => m.ProfileModule),
-        canActivate : [MfeSessionService],
       }
     ]
   }

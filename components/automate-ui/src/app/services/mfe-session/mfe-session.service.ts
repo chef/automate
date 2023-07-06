@@ -3,14 +3,18 @@ import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angul
 export class MfeSessionService implements CanActivate {
   canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     let urls : any = localStorage.getItem('mfe_urls');
-    if(urls){
+    let map_url = localStorage.getItem('url_mapping');
+
+    if(urls && map_url){
       urls = JSON.parse(urls);
-      for (let index = 0; index < urls.length; index++) {
-        const element = urls[index];
+      urls.forEach(url => {
+        const element = url;
         if(element === state.url) {
+          map_url = JSON.parse(map_url);
+          window.location.href = map_url[element];
           return false;
         }
-      }
+      });
       return true;
     }
     return false;
