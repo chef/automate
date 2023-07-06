@@ -452,6 +452,32 @@ func TestFqdnCheck_Run(t *testing.T) {
 			httpStatus: http.StatusOK,
 			isError:    false,
 		},
+		{
+			name: "Hardware nil",
+			args: args{
+				config: &models.Config{
+					Hardware: nil,
+				},
+			},
+
+			isError: false,
+		},
+		{
+			name: "Nil Certificate",
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount:        1,
+						AutomateNodeIps:          []string{"127.0.0.1"},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"127.0.0.1"},
+					},
+					Certificate: nil,
+				},
+			},
+
+			isError: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -470,15 +496,29 @@ func TestFqdnCheck_Run(t *testing.T) {
 			got := fqc.Run(tt.args.config)
 
 			if tt.isError {
-				assert.Len(t, got, tt.args.config.Hardware.ChefInfraServerNodeCount)
-				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, "chef-infra-server", got[0].NodeType)
-				assert.Equal(t, got[0].Result.Error.Code, tt.httpStatus)
-				assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				if tt.name == "Nil Certificate" {
+					assert.NotNil(t, got)
+					assert.Len(t, got, 2)
+					assert.True(t, got[0].Result.Skipped)
+					assert.True(t, got[1].Result.Skipped)
+				} else {
+					assert.Len(t, got, tt.args.config.Hardware.ChefInfraServerNodeCount)
+					assert.NotNil(t, got[0].Result.Error)
+					assert.Equal(t, "chef-infra-server", got[0].NodeType)
+					assert.Equal(t, got[0].Result.Error.Code, tt.httpStatus)
+					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				}
 			} else {
-				assert.Equal(t, got, want)
-				assert.NotNil(t, got)
-				assert.Nil(t, got[0].Result.Error)
+				if tt.name == "Hardware nil" {
+					assert.NotNil(t, got)
+					assert.Len(t, got, 2)
+					assert.True(t, got[0].Result.Skipped)
+					assert.True(t, got[1].Result.Skipped)
+				} else {
+					assert.Equal(t, got, want)
+					assert.NotNil(t, got)
+					assert.Nil(t, got[0].Result.Error)
+				}
 			}
 
 		})

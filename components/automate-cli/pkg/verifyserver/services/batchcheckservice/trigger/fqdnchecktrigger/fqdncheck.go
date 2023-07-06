@@ -29,6 +29,14 @@ func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 
 	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.FQDN, false, false, false)
+	}
+
+	if config.Certificate == nil {
+		return constructNilResp(config, constants.FQDN)
+	}
+
 	return triggerFqdnCheck(config, endPoint, fqc.log)
 
 }
@@ -104,4 +112,16 @@ func (ss *FqdnCheck) GetPortsForMockServer() map[string]map[string][]int {
 		},
 	}
 	return nodeTypePortMap
+}
+
+func constructNilResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+
+	return resps
 }
