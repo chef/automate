@@ -228,11 +228,11 @@ region = "<%= config.object_storage.region %>"
 
 
 <% if config.state == 'deploy' %>
+<% if config.architecture == 'deployment' %>
 
 # AWS deployment config
 ################################################################################
 
-<% if config.architecture == 'deployment' %>
 <% if config.s3_bucketName %>
 bucket_name_deployment = "<%= config.s3_bucketName %>"
 <% end %>
