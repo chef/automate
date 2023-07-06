@@ -19,6 +19,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const GET_OS_PASSWORD = "sudo HAB_LICENSE=accept-no-persist hab pkg exec chef/automate-platform-tools secrets-helper show userconfig.os_password"
+
 type ConfigKeys struct {
 	rootCA     string
 	privateKey string
@@ -359,7 +361,10 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	} else {
-		externalOsDetails := getExternalOpensearchDetails(a2ConfigMap)
+		externalOsDetails, err := p.getExternalOpensearchDetails(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
+		if err != nil {
+			return nil, err
+		}
 		if externalOsDetails != nil {
 			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = externalOsDetails.OpensearchDomainName
 			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = externalOsDetails.OpensearchInstanceURL
@@ -443,30 +448,70 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	return sharedConfigToml, nil
 }
 
-func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalOpensearchToml {
-	var roleArn string
+func (p *PullConfigsImpl) getOSpassword() (string, error) {
+	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
+		p.sshUtil.getSSHConfig().hostIP = ip
+		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_OS_PASSWORD, true)
+		if err != nil {
+			return "", err
+		}
+		return strings.TrimSpace(rawOutput), nil
+	}
+	return "", nil
+
+}
+
+func (p *PullConfigsImpl) getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig, dbType string) (*ExternalOpensearchToml, error) {
 	for _, ele := range a2ConfigMap {
+		roleArn := ""
 		if ele.Global.V1.External.Opensearch.Backup != nil &&
 			ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
 			ele.Global.V1.External.Opensearch.Backup.S3.Settings != nil &&
 			ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn != nil {
 			roleArn = ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value
 		}
-		if ele.Global.V1.External.Opensearch != nil &&
-			ele.Global.V1.External.Opensearch.Auth != nil &&
-			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
-			return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
-				ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
-				ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
-				ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
-				ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
-				ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value,
-				ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value,
-				roleArn,
-			)
+
+		if dbType == TYPE_AWS {
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Auth != nil &&
+				ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
+				return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
+					ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+					ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value,
+					roleArn,
+				), nil
+			}
+		} else if dbType == TYPE_SELF_MANAGED {
+			osPass, err := p.getOSpassword()
+			if err != nil {
+				return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch password")
+			}
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Auth != nil &&
+				ele.Global.V1.External.Opensearch.Auth.BasicAuth != nil {
+				return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
+					ele.Global.V1.External.Opensearch.Auth.BasicAuth.Username.Value,
+					osPass,
+					ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+					ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+					"",
+					"",
+					roleArn,
+				), nil
+			}
+		} else {
+			return nil, status.New(status.ConfigError, fmt.Sprintf("Database type %s is invalid", dbType))
 		}
 	}
-	return nil
+
+	return nil, nil
 }
 
 func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, rootCert, domainName, accessKey, secretKey, roleArn string) *ExternalOpensearchToml {
@@ -686,7 +731,10 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	} else {
-		externalOsDetails := getExternalOpensearchDetails(a2ConfigMap)
+		externalOsDetails, err := p.getExternalOpensearchDetails(a2ConfigMap, TYPE_AWS)
+		if err != nil {
+			return nil, err
+		}
 		if externalOsDetails != nil {
 			sharedConfigToml.Aws.Config.OpensearchDomainName = externalOsDetails.OpensearchDomainName
 			sharedConfigToml.Aws.Config.OpensearchDomainUrl = externalOsDetails.OpensearchInstanceURL
