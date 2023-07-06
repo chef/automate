@@ -21,7 +21,7 @@ const routes: Routes = [
       },
       {
         path: 'reports',
-        loadChildren: () => import('./+reporting/reporting.module').then(m => m.ReportingModule),
+        loadChildren: () => import('./+reporting/reporting.module').then(m => m.ReportingModule)
       },
       {
         path: 'scanner',
@@ -29,11 +29,11 @@ const routes: Routes = [
       },
       {
         path: 'scan-jobs',
-        loadChildren: () => import('./+scanner/scanner.module').then(m => m.ScannerModule),
+        loadChildren: () => import('./+scanner/scanner.module').then(m => m.ScannerModule)
       },
       {
         path: 'compliance-profiles',
-        loadChildren: () => import('./+profile/profile.module').then(m => m.ProfileModule),
+        loadChildren: () => import('./+profile/profile.module').then(m => m.ProfileModule)
       }
     ]
   }
