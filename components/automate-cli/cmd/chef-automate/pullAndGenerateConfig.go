@@ -444,7 +444,14 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 }
 
 func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalOpensearchToml {
+	var roleArn string
 	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Opensearch.Backup != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3.Settings != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn != nil {
+			roleArn = ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value
+		}
 		if ele.Global.V1.External.Opensearch != nil &&
 			ele.Global.V1.External.Opensearch.Auth != nil &&
 			ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
@@ -455,7 +462,7 @@ func getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig) *Ex
 				ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
 				ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value,
 				ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value,
-				ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value,
+				roleArn,
 			)
 		}
 	}
