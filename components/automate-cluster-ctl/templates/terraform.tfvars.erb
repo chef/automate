@@ -236,11 +236,19 @@ region = "<%= config.object_storage.region %>"
 <% if config.s3_bucketName %>
 bucket_name_deployment = "<%= config.s3_bucketName %>"
 <% end %>
+<% if config.backup_config == 'efs' %>
+ backup_config_efs_deployment = "true"
+<% end %>
+<% if config.backup_config == 's3' %>
+ backup_config_s3_deployment = "true"
+<% end %>
 managed_opensearch_domain_url_deployment = "<%= config.aws.managed_opensearch_domain_url %>"
 managed_opensearch_username_deployment = "<%= config.aws.managed_opensearch_username %>"
-# left : ensure that pullandgenerate gets all these fields its very imp
 managed_opensearch_user_password_deployment = "<%= config.aws.managed_opensearch_user_password %>"
-managed_opensearch_certificate_deployment = "<%= config.aws.managed_opensearch_certificate %>"
+managed_opensearch_certificate_deployment = <<-EOT
+<%= config.aws.managed_opensearch_certificate %>
+
+EOT
 aws_os_snapshot_role_arn_deployment = "<%= config.aws.aws_os_snapshot_role_arn %>"
 os_snapshot_user_access_key_id_deployment = "<%= config.aws.os_snapshot_user_access_key_id %>"
 os_snapshot_user_access_key_secret_deployment = "<%= config.aws.os_snapshot_user_access_key_secret %>"
@@ -249,7 +257,10 @@ managed_rds_superuser_username_deployment = "<%= config.aws.managed_rds_superuse
 managed_rds_superuser_password_deployment = "<%= config.aws.managed_rds_superuser_password %>"
 managed_rds_dbuser_username_deployment = "<%= config.aws.managed_rds_dbuser_username %>"
 managed_rds_dbuser_password_deployment = "<%= config.aws.managed_rds_dbuser_password %>"
-managed_rds_certificate_deployment = "<%= config.aws.managed_rds_certificate %>"
+managed_rds_certificate_deployment = <<-EOT
+<%= config.aws.managed_rds_certificate %>
+
+EOT
 <% end %>
 
 # Certs

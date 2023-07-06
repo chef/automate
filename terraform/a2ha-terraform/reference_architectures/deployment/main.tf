@@ -279,7 +279,7 @@ module "opensearch" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
-  backup_config_efs               = var.backup_config_efs
+  backup_config_efs               = var.backup_config_efs_deployment
   nfs_mount_path                  = var.nfs_mount_path
   opensearch_root_ca              = var.opensearch_root_ca
   opensearch_private_key          = var.opensearch_private_key
@@ -373,7 +373,7 @@ module "bootstrap_automate" {
   opensearch_private_ips             = var.opensearch_private_ips
   managed_opensearch_certificate     = var.managed_opensearch_certificate_deployment
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url_deployment
-  managed_opensearch_user_password   = var.managed_opensearch_user_password
+  managed_opensearch_user_password   = var.managed_opensearch_user_password_deployment
   managed_opensearch_username        = var.managed_opensearch_username_deployment
   aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn_deployment
   os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id_deployment
@@ -397,8 +397,8 @@ module "bootstrap_automate" {
   ssh_user_sudo_password             = local.fe_sudo_password
   sudo_cmd                           = var.sudo_cmd
   teams_port                         = var.teams_port
-  backup_config_s3                   = var.backup_config_s3
-  backup_config_efs                  = var.backup_config_efs
+  backup_config_s3                   = var.backup_config_s3_deployment
+  backup_config_efs                  = var.backup_config_efs_deployment
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name_deployment
   nfs_mount_path                     = var.nfs_mount_path
@@ -444,7 +444,7 @@ module "automate" {
   opensearch_private_ips             = var.opensearch_private_ips
   managed_opensearch_certificate     = var.managed_opensearch_certificate_deployment
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url_deployment
-  managed_opensearch_user_password   = var.managed_opensearch_user_password
+  managed_opensearch_user_password   = var.managed_opensearch_user_password_deployment
   managed_opensearch_username        = var.managed_opensearch_username_deployment
   aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn_deployment
   os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id_deployment
@@ -472,8 +472,8 @@ module "automate" {
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
-  backup_config_s3       = var.backup_config_s3
-  backup_config_efs      = var.backup_config_efs
+  backup_config_s3       = var.backup_config_s3_deployment
+  backup_config_efs      = var.backup_config_efs_deployment
   s3_endpoint            = var.s3_endpoint
   bucket_name            = var.bucket_name_deployment
   nfs_mount_path         = var.nfs_mount_path
@@ -519,7 +519,7 @@ module "chef_server" {
   opensearch_private_ips             = var.opensearch_private_ips
   managed_opensearch_certificate     = var.managed_opensearch_certificate_deployment
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url_deployment
-  managed_opensearch_user_password   = var.managed_opensearch_user_password
+  managed_opensearch_user_password   = var.managed_opensearch_user_password_deployment
   managed_opensearch_username        = var.managed_opensearch_username_deployment
   aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn_deployment
   os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id_deployment
@@ -543,8 +543,8 @@ module "chef_server" {
   ssh_user_sudo_password             = local.fe_sudo_password
   sudo_cmd                           = var.sudo_cmd
   teams_port                         = var.teams_port
-  backup_config_s3                   = var.backup_config_s3
-  backup_config_efs                  = var.backup_config_efs
+  backup_config_s3                   = var.backup_config_s3_deployment
+  backup_config_efs                  = var.backup_config_efs_deployment
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name_deployment
   nfs_mount_path                     = var.nfs_mount_path

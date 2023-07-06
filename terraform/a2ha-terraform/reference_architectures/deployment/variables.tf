@@ -86,7 +86,15 @@ variable "backup_config_efs" {
   default = "false"
 }
 
+variable "backup_config_efs_deployment" {
+  default = "false"
+}
+
 variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "backup_config_s3_deployment" {
   default = "false"
 }
 
@@ -147,6 +155,10 @@ variable "managed_opensearch_domain_url_deployment" {
 }
 
 variable "managed_opensearch_user_password" {
+  default = ""
+}
+
+variable "managed_opensearch_user_password_deployment" {
   default = ""
 }
 

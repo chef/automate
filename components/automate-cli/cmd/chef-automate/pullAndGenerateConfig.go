@@ -313,6 +313,56 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 	return ipConfigMap, nil
 }
 
+func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s3, fs string) (string, error) {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Opensearch != nil {
+			osBkpLocation := ""
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Location != nil {
+				osBkpLocation = ele.Global.V1.External.Opensearch.Backup.Location.Value
+			}
+			if ele.Global.V1.Backups == nil && ele.Global.V1.External.Opensearch.Backup == nil {
+				return "", nil
+			} else if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Location != nil &&
+				ele.Global.V1.Backups.Location.Value == "s3" &&
+				osBkpLocation == "s3" {
+				return s3, nil
+			} else if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Filesystem != nil &&
+				ele.Global.V1.Backups.Filesystem.Path != nil &&
+				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 &&
+				osBkpLocation == "fs" {
+				return fs, nil
+			} else {
+				return "", status.New(status.ConfigError, "Automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
+			}
+		} else {
+			return "", status.New(status.ConfigError, "Automate config Global.V1.External.Opensearch missing")
+		}
+	}
+	return currConfig, nil
+}
+
+func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (string, error) {
+	if dbtype == TYPE_AWS || dbtype == TYPE_SELF_MANAGED {
+		for _, ele := range a2ConfigMap {
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Auth != nil &&
+				ele.Global.V1.External.Opensearch.Auth.Scheme != nil {
+				if ele.Global.V1.External.Opensearch.Auth.Scheme.Value == "basic_auth" {
+					return TYPE_SELF_MANAGED, nil
+				} else if ele.Global.V1.External.Opensearch.Auth.Scheme.Value == "aws_os" {
+					return TYPE_AWS, nil
+				} else {
+					return "", status.New(status.ConfigError, "Automate config Value in Global.V1.External.Opensearch.Auth.Scheme can be either basic_auth or aws_os")
+				}
+			}
+		}
+	}
+	return dbtype, nil
+}
+
 func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := getExistingHAConfig()
 	if err != nil {
@@ -326,6 +376,23 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
+
+	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
+	if err != nil {
+		return nil, err
+	}
+	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
+
+	fmt.Println(":::::Determined BackupConfig", sharedConfigToml.Architecture.ConfigInitials.BackupConfig)
+
+	dbtype, err := determineDBType(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
+	if err != nil {
+		return nil, err
+	}
+	sharedConfigToml.ExternalDB.Database.Type = dbtype
+
+	fmt.Println(":::::Determined dbtype", sharedConfigToml.ExternalDB.Database.Type)
+
 	// checking onprem with managed or self managed services
 	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
 	if len(strings.TrimSpace(sharedConfigToml.ExternalDB.Database.Type)) < 1 {
@@ -676,6 +743,15 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
+
+	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "s3", "efs")
+	if err != nil {
+		return nil, err
+	}
+	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
+
+	fmt.Println("::::::Determined backupConfig", sharedConfigToml.Architecture.ConfigInitials.BackupConfig)
+
 	// checking AWS with managed services or Non managed services
 	logrus.Debug(sharedConfigToml.Aws.Config.SetupManagedServices)
 	if !isManagedServicesOn() {
