@@ -244,16 +244,16 @@ ami_id = ""
 # eg: delete_on_termination = true or false
 delete_on_termination = true
 
-# eg: automate_server_instance_type = "t3.medium"
+# eg: automate_server_instance_type = "m5.large"
 automate_server_instance_type = ""
 
-# eg: chef_server_instance_type = "t3.medium"
+# eg: chef_server_instance_type = "m5.large"
 chef_server_instance_type = ""
 
 # eg: opensearch_server_instance_type = "m5.large"
 opensearch_server_instance_type = ""
 
-# eg: postgresql_server_instance_type = "t3.medium"
+# eg: postgresql_server_instance_type = "m5.large"
 postgresql_server_instance_type = ""
 
 # eg: automate_lb_certificate_arn = "arn:aws:acm...."
@@ -265,7 +265,7 @@ chef_server_lb_certificate_arn = ""
 # eg: automate_ebs_volume_iops = "100"
 automate_ebs_volume_iops = ""
 
-# eg: automate_ebs_volume_size = "50"
+# eg: automate_ebs_volume_size = "200"
 automate_ebs_volume_size = ""
 
 # eg: automate_ebs_volume_type = "gp3"
@@ -274,7 +274,7 @@ automate_ebs_volume_type = ""
 # eg: chef_ebs_volume_iops = "100"
 chef_ebs_volume_iops = ""
 
-# eg: chef_ebs_volume_size = "50"
+# eg: chef_ebs_volume_size = "200"
 chef_ebs_volume_size = ""
 
 # eg: chef_ebs_volume_type = "gp3"
@@ -283,7 +283,7 @@ chef_ebs_volume_type = ""
 # eg: opensearch_ebs_volume_iops = "100"
 opensearch_ebs_volume_iops = ""
 
-# eg: opensearch_ebs_volume_size = "50"
+# eg: opensearch_ebs_volume_size = "200"
 opensearch_ebs_volume_size = ""
 
 # eg: opensearch_ebs_volume_type = "gp3"
@@ -292,7 +292,7 @@ opensearch_ebs_volume_type = ""
 # eg: postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_iops = ""
 
-# eg: postgresql_ebs_volume_size = "50"
+# eg: postgresql_ebs_volume_size = "200"
 postgresql_ebs_volume_size = ""
 
 # eg: postgresql_ebs_volume_type = "gp3"
