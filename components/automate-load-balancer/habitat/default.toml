@@ -46,3 +46,4 @@ ssl_protocols = "TLSv1.2 TLSv1.3"
 tcp_nopush = "on"
 tcp_nodelay = "on"
 enable_csp_header = false
+enable_param = false
