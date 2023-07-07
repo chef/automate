@@ -7,7 +7,7 @@ export class MfeSessionService implements CanActivate {
 
     map_url = JSON.parse(map_url);
     
-    if(map_url[state.url]){
+    if(map_url && map_url[state.url]){
       window.location.href = map_url[state.url];
       flag = false;
     }
