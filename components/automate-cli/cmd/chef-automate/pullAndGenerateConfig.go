@@ -318,6 +318,7 @@ func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s
 		if ele.Global.V1.External.Opensearch != nil {
 			osBkpLocation := ""
 			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
 				ele.Global.V1.External.Opensearch.Backup.Location != nil {
 				osBkpLocation = ele.Global.V1.External.Opensearch.Backup.Location.Value
 			}
@@ -335,10 +336,10 @@ func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s
 				osBkpLocation == "fs" {
 				return fs, nil
 			} else {
-				return "", status.New(status.ConfigError, "Automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
+				return "", errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
 			}
 		} else {
-			return "", status.New(status.ConfigError, "Automate config Global.V1.External.Opensearch missing")
+			return "", errors.New("automate config Global.V1.External.Opensearch missing")
 		}
 	}
 	return currConfig, nil
@@ -355,10 +356,14 @@ func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (
 				} else if ele.Global.V1.External.Opensearch.Auth.Scheme.Value == "aws_os" {
 					return TYPE_AWS, nil
 				} else {
-					return "", status.New(status.ConfigError, "Automate config Value in Global.V1.External.Opensearch.Auth.Scheme can be either basic_auth or aws_os")
+					return "", errors.New("automate config Value in Global.V1.External.Opensearch.Auth.Scheme can be either basic_auth or aws_os")
 				}
+			} else {
+				return "", errors.New("automate config error found")
 			}
 		}
+	} else {
+		return "", errors.New("db type neither aws nor self-managed")
 	}
 	return dbtype, nil
 }
@@ -379,19 +384,15 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 
 	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
 	if err != nil {
-		return nil, err
+		return nil, status.New(status.ConfigError, err.Error())
 	}
 	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
 
-	fmt.Println(":::::Determined BackupConfig", sharedConfigToml.Architecture.ConfigInitials.BackupConfig)
-
 	dbtype, err := determineDBType(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
 	if err != nil {
-		return nil, err
+		return nil, status.New(status.ConfigError, err.Error())
 	}
 	sharedConfigToml.ExternalDB.Database.Type = dbtype
-
-	fmt.Println(":::::Determined dbtype", sharedConfigToml.ExternalDB.Database.Type)
 
 	// checking onprem with managed or self managed services
 	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
@@ -749,8 +750,6 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		return nil, err
 	}
 	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
-
-	fmt.Println("::::::Determined backupConfig", sharedConfigToml.Architecture.ConfigInitials.BackupConfig)
 
 	// checking AWS with managed services or Non managed services
 	logrus.Debug(sharedConfigToml.Aws.Config.SetupManagedServices)

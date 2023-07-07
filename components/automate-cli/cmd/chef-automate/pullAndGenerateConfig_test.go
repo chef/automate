@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"errors"
+
 	dc "github.com/chef/automate/api/config/deployment"
 	shared "github.com/chef/automate/api/config/shared"
 	"github.com/stretchr/testify/assert"
@@ -751,6 +753,286 @@ func TestGetPGDetails(t *testing.T) {
 			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLDBUserName, externalPGConfig.PostgreSQLDBUserName)
 			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLDBUserPassword, externalPGConfig.PostgreSQLDBUserPassword)
 			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLRootCert, externalPGConfig.PostgreSQLRootCert)
+		})
+	}
+}
+
+func TestDetermineDBType(t *testing.T) {
+	testCases := []struct {
+		name         string
+		a2ConfigMap  map[string]*dc.AutomateConfig
+		dbtype       string
+		expectedType string
+		expectedErr  error
+	}{
+		{
+			name: "When db type is self managed but customer had patched aws",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_SELF_MANAGED,
+			expectedType: TYPE_AWS,
+			expectedErr:  nil,
+		},
+		{
+			name: "When db type is aws but customer had patched self managed",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "basic_auth",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_AWS,
+			expectedType: TYPE_SELF_MANAGED,
+			expectedErr:  nil,
+		},
+		{
+			name: "When global.external.opensearch not present",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_AWS,
+			expectedType: "",
+			expectedErr:  errors.New("automate config error found"),
+		},
+		{
+			name: "When invalid type comes in db type",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       "old_type",
+			expectedType: "old_type",
+			expectedErr:  errors.New("db type neither aws nor self-managed"),
+		},
+		{
+			name: "When scheme is invalid",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os_invalid",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_AWS,
+			expectedType: "",
+			expectedErr:  errors.New("automate config Value in Global.V1.External.Opensearch.Auth.Scheme can be either basic_auth or aws_os"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dbType, err := determineDBType(tc.a2ConfigMap, tc.dbtype)
+			if tc.expectedErr != nil {
+				assert.Equal(t, tc.expectedErr, err)
+			} else {
+				assert.Equal(t, tc.expectedType, dbType)
+			}
+		})
+	}
+}
+
+func TestDetermineBkpConfig(t *testing.T) {
+	tests := []struct {
+		name           string
+		a2ConfigMap    map[string]*dc.AutomateConfig
+		currConfig     string
+		s3             string
+		fs             string
+		expectedResult string
+		expectedErr    error
+	}{
+		{
+			name: "When backup has s3 and os has s3",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "s3",
+										},
+									},
+								},
+							},
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "s3",
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "s3_backup",
+			expectedErr:    nil,
+		},
+		{
+			name: "When missing OS config",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: nil,
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "",
+			expectedErr:    errors.New("automate config Global.V1.External.Opensearch missing"),
+		},
+		{
+			name: "When missing location value in opensearch",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{},
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "",
+			expectedErr:    errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup"),
+		},
+		{
+			name: "When setting present on backup and os",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "fs",
+										},
+									},
+								},
+							},
+							Backups: &shared.Backups{
+								Filesystem: &shared.Backups_Filesystem{
+									Path: &wrapperspb.StringValue{
+										Value: "/var/opt/backups",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "fs_backup",
+			expectedErr:    nil,
+		},
+		{
+			name: "When missing the backup value",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "s3",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "",
+			expectedErr:    errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup"),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := determineBkpConfig(tc.a2ConfigMap, tc.currConfig, tc.s3, tc.fs)
+			if tc.expectedErr != nil {
+				assert.Equal(t, tc.expectedErr, err)
+			} else {
+				assert.Equal(t, tc.expectedResult, result)
+			}
 		})
 	}
 }
