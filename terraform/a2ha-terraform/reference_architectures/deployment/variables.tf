@@ -51,10 +51,6 @@ variable "aws_s3_bucketName" {
   default = "chef-automate-ha"
 }
 
-variable "bucket_name_deployment" {
-  default = "chef-automate-ha"
-}
-
 variable "aws_os_snapshot_role_arn" {
   default = ""
 }
@@ -104,6 +100,10 @@ variable "bucket_name" {
 variable "chef_server_certs_by_ip" {
   type = map(map(string))
   default = {}
+}
+
+variable "bucket_name_deployment" {
+  default = "chef-automate-ha"
 }
 
 variable "chef_ebs_volume_iops" {
