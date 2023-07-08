@@ -85,7 +85,7 @@ func (ss *SshUserAccessCheck) getSShUserAPIRequest(ip string, sshUser *models.SS
 		return models.SShUserRequest{}, err
 	}
 	if permisssion > 400 {
-		return models.SShUserRequest{}, errors.New("Permissions on the ssh key file do not satisfy the requirement")
+		return models.SShUserRequest{}, errors.New("Provide permission on the SSH key file as 400 (Read Only by Owner).")
 	}
 	ct, err := ss.fileUtils.ReadFile(sshUser.PrivateKey)
 	if err != nil {
