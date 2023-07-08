@@ -144,15 +144,15 @@ func (fw *FirewallService) getResultStructFromRespBody(respBody io.Reader) (mode
 }
 
 func GetFirewallSuccessMsg(service, destinationIP, destinationPort, sourceIP string) string {
-	return fmt.Sprintf("The %s service running at %s:%s is reachable from %s", service, destinationIP, destinationPort, sourceIP)
+	return fmt.Sprintf("The %s service running on %s:%s is reachable from %s", service, destinationIP, destinationPort, sourceIP)
 }
 
 func GetFirewallErrorMsg(service, destinationIP, destinationPort, sourceIP string) string {
-	return fmt.Sprintf("The %s service running at %s:%s is not reachable from %s", service, destinationIP, destinationPort, sourceIP)
+	return fmt.Sprintf("The %s service running on %s:%s is not reachable from %s", service, destinationIP, destinationPort, sourceIP)
 }
 
 func GetFirewallResolutionMsg(destinationIP, destinationPort, sourceIP string) string {
-	return fmt.Sprintf("Check your firewall settings to provide access to %s port at %s from %s", destinationPort, destinationIP, sourceIP)
+	return fmt.Sprintf("Check your firewall settings to provide access on %s port at %s from %s", destinationPort, destinationIP, sourceIP)
 }
 
 func createFirewallCheck(passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
