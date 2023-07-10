@@ -774,12 +774,12 @@ func getPort() string {
 	return port
 }
 
-func isConfigValid(externalMangedDbs bool, automateIPs, chefServerIPs, postgresqlIPs, opensearchIPs []string) bool {
+func isConfigValid(isExternalMangedDbs bool, automateIPs, chefServerIPs, postgresqlIPs, opensearchIPs []string) bool {
 	if len(automateIPs) == 0 || len(chefServerIPs) == 0 {
 		return false
 	}
 
-	if externalMangedDbs {
+	if !isExternalMangedDbs {
 		if len(postgresqlIPs) == 0 || len(opensearchIPs) == 0 {
 			return false
 		}
