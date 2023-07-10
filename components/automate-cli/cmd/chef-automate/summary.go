@@ -352,7 +352,6 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 	}
 
 	for ip, res := range beOutput {
-		// fmt.Printf("ip: %s :: \nres: %v\n", ip, res)
 		status := ss.getBEStatus(res, ip, authToken, serviceName)
 		ss.beStatus = append(ss.beStatus, status)
 	}
@@ -437,8 +436,6 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 	}
 
 	for _, output := range outputs {
-		// fmt.Printf("\nCmd Output: %+v\n", *output)
-		fmt.Printf("\nScript Name: %v\n", output.ScriptName)
 		cmdResMap[output.ScriptName] = output
 	}
 
@@ -460,9 +457,6 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 	if err != nil {
 		lag = "Error"
 	}
-	fmt.Printf("\n Lag output: %v", lag)
-
-	// fmt.Printf("cmd map: %v", cmdResMap)
 
 	return BeStatusValue{
 		serviceName: serviceName,
@@ -537,8 +531,6 @@ func (ss *Summary) getFollowerLag(output string, service string, memberId string
 		return lag, err
 	}
 
-	fmt.Println("Service: ", service, " pg: ", postgresql)
-
 	if service == postgresql {
 		if role == "Follower" {
 			// Define the regular expression pattern to match the desired substring
@@ -551,7 +543,6 @@ func (ss *Summary) getFollowerLag(output string, service string, memberId string
 			lag = regExp.FindString(outputMap["stdout"].(string))
 
 			// Print the matched substring
-			fmt.Printf("\n match: %+v", lag)
 			return lag, nil
 		}
 	}
