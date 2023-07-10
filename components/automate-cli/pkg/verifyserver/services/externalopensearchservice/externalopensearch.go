@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -49,7 +48,8 @@ func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalO
 	err := eos.triggerRequest(reqBody, client)
 	if err != nil {
 		eos.log.Error(err)
-		return createExternalOpensearchCheck(false, constants.EXTERNAL_OPENSEARCH_FAILED_TITLE, constants.STATUS_FAIL, "", constants.EXTERNAL_OPENSEARCH_ERROR_MSG, constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG, err.Error())
+		errorMsg := constants.EXTERNAL_OPENSEARCH_ERROR_MSG + "\n " + err.Error()
+		return createExternalOpensearchCheck(false, constants.EXTERNAL_OPENSEARCH_FAILED_TITLE, constants.STATUS_FAIL, "", errorMsg, constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG, err.Error())
 	}
 
 	eos.log.Debug("External Opensearch is reachable")
@@ -108,10 +108,6 @@ func (eos *ExternalOpensearchService) GetExternalOpensearchDetails(reqBody model
 }
 
 func createExternalOpensearchCheck(passed bool, title, status, successMsg, errorMsg, resolutionMsg, debugMsg string) models.ExternalOpensearchCheck {
-
-	if strings.Contains(debugMsg, "x509:") {
-		errorMsg = errorMsg + "\n " + debugMsg
-	}
 
 	return models.ExternalOpensearchCheck{
 		Title:         title,

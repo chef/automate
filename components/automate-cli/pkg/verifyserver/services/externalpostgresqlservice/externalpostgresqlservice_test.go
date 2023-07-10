@@ -91,7 +91,7 @@ func TestExternalPostgresqlServiceFailure(t *testing.T) {
 				Title:         constants.EXTERNAL_PG_FAIL_CONNECTION_TITLE,
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      constants.EXTERNAL_PG_CONNECTION_ERROR_MSG,
+				ErrorMsg:      constants.EXTERNAL_PG_CONNECTION_ERROR_MSG + "\n ",
 				ResolutionMsg: constants.EXTERNAL_PG_CONNECTION_RESOLUTION_MSG,
 			},
 		},

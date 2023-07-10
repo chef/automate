@@ -180,6 +180,8 @@ abcd
 )
 
 var certErrorMessage = "Machine is unable to connect with External Managed OpenSearch\n Failed to connect to OpenSearch: Get \"https://localhost:3073/_cat/indices\": x509: certificate signed by unknown authority"
+var incorrectUrlError = "Machine is unable to connect with External Managed OpenSearch\n Failed to create request: parse \"https://\\t/_cat/indices\": net/url: invalid control character in URL"
+var osUnreachableError = "Machine is unable to connect with External Managed OpenSearch\n external opensearch is not reachable"
 
 func TestPortReachableDetails(t *testing.T) {
 	eos := externalopensearchservice.NewExternalOpensearchService(logger.NewTestLogger(), time.Duration(TIMEOUT))
@@ -323,7 +325,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 						Passed:        false,
 						Status:        constants.STATUS_FAIL,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.EXTERNAL_OPENSEARCH_ERROR_MSG,
+						ErrorMsg:      osUnreachableError,
 						ResolutionMsg: constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG,
 						DebugMsg:      "external opensearch is not reachable",
 					},
@@ -348,7 +350,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 						Passed:        false,
 						Status:        constants.STATUS_FAIL,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.EXTERNAL_OPENSEARCH_ERROR_MSG,
+						ErrorMsg:      incorrectUrlError,
 						ResolutionMsg: constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG,
 						DebugMsg:      "Failed to create request",
 					},
