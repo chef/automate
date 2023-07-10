@@ -293,13 +293,23 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// Get config required for batch-check API call
 	batchCheckConfig := models.NewConfig()
 	if v.Config.IsExistingInfra() {
+		isManagedDbs := false
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
 
 		v.automateIPs = v.Config.ExistingInfra.Config.AutomatePrivateIps
 		v.chefServerIPs = v.Config.ExistingInfra.Config.ChefServerPrivateIps
 		v.postgresqlIPs = v.Config.ExistingInfra.Config.PostgresqlPrivateIps
 		v.opensearchIPs = v.Config.ExistingInfra.Config.OpensearchPrivateIps
+
+		if v.Config.IsExternalDb() {
+			isManagedDbs = true
+		}
+
+		if !isConfigValid(isManagedDbs, v.automateIPs, v.chefServerIPs, v.postgresqlIPs, v.opensearchIPs) {
+			return status.New(status.ConfigVerifyError, "Invalid config: missing Ip's")
+		}
 	} else if v.Config.IsAws() {
+		isManagedDbs := false
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.Aws)
 		configDetails, err := fetchAwsConfigFromTerraform()
 		if err != nil {
@@ -312,12 +322,18 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		v.opensearchIPs = configDetails.OpensearchIps
 
 		if v.Config.Aws.Config.SetupManagedServices {
+			isManagedDbs = true
 			batchCheckConfig.ExternalOS = &models.ExternalOS{
 				OSRoleArn:                     configDetails.OsSnapshotRoleArn,
 				OsSnapshotUserAccessKeyId:     configDetails.OsSnapshotUserID,
 				OsSnapshotUserAccessKeySecret: configDetails.OsSnapshotUserSecret,
 			}
 		}
+
+		if !isConfigValid(isManagedDbs, v.automateIPs, v.chefServerIPs, v.postgresqlIPs, v.opensearchIPs) {
+			return status.New(status.ConfigVerifyError, "Invalid config: missing Ip's")
+		}
+
 		// assign ip's to models.Hardware
 		batchCheckHardware := batchCheckConfig.Hardware
 		batchCheckHardware.AutomateNodeIps = configDetails.AutomateIps
@@ -756,4 +772,27 @@ func getPort() string {
 		}
 	}
 	return port
+}
+
+func isConfigValid(externalMangedDbs bool, automateIPs, chefServerIPs, postgresqlIPs, opensearchIPs []string) bool {
+	if isSliceEmpty(automateIPs) || isSliceEmpty(chefServerIPs) {
+		return false
+	}
+
+	if externalMangedDbs {
+		if isSliceEmpty(postgresqlIPs) || isSliceEmpty(opensearchIPs) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func isSliceEmpty(slice []string) bool {
+	for _, element := range slice {
+		if strings.TrimSpace(element) == "" {
+			return true
+		}
+	}
+	return false
 }
