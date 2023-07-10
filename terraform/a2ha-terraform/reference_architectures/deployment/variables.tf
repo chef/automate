@@ -169,14 +169,14 @@ variable "managed_opensearch_username_deployment" {
   default = ""
 }
 
-variable "managed_rds_certificate_deployment" {
-  default = ""
-}
-
 variable "managed_rds_certificate" {
 }
 
 variable "managed_rds_dbuser_password" {
+  default = ""
+}
+
+variable "managed_rds_certificate_deployment" {
   default = ""
 }
 
