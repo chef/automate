@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -107,6 +108,11 @@ func (eos *ExternalOpensearchService) GetExternalOpensearchDetails(reqBody model
 }
 
 func createExternalOpensearchCheck(passed bool, title, status, successMsg, errorMsg, resolutionMsg, debugMsg string) models.ExternalOpensearchCheck {
+
+	if strings.Contains(debugMsg, "x509:") {
+		errorMsg = errorMsg + "\n " + debugMsg
+	}
+
 	return models.ExternalOpensearchCheck{
 		Title:         title,
 		Passed:        passed,
