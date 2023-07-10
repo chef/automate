@@ -262,28 +262,36 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// TODO : config flag is optional for now. Need to handle the default config path
 	if len(strings.TrimSpace(config)) > 0 {
 		configPath = config
-	}
+		err := v.Config.ParseAndVerify(configPath)
+		if err != nil {
+			return err
+		}
+	} else {
+		infra, err := v.deps.getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
 
-	err := v.Config.ParseAndVerify(configPath)
-	if err != nil {
-		return err
+		config, err := v.deps.PopulateHaCommonConfig(configPuller)
+		if err != nil {
+			return err
+		}
+		v.Config = config
+		err = v.Config.Verify()
+		if err != nil {
+			return err
+		}
 	}
 
 	// Get config required for batch-check API call
-	batchCheckConfig := &models.Config{
-		Hardware: &models.Hardware{},
-		SSHUser:  &models.SSHUser{},
-		Backup: &models.Backup{
-			FileSystem:    &models.FileSystem{},
-			ObjectStorage: &models.ObjectStorage{},
-		},
-	}
-
-	err = batchCheckConfig.PopulateWith(v.Config)
-	if err != nil {
-		return err
-	}
-
+	batchCheckConfig := models.NewConfig()
 	if v.Config.IsExistingInfra() {
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
 
