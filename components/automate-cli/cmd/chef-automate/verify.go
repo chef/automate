@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/jedib0t/go-pretty/v5/table"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -305,9 +306,11 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 			isManagedDbs = true
 		}
 
-		if !isConfigValid(isManagedDbs, v.automateIPs, v.chefServerIPs, v.postgresqlIPs, v.opensearchIPs) {
-			return status.New(status.ConfigVerifyError, "Invalid config: missing Ip's")
+		err := isConfigValid(isManagedDbs, v.automateIPs, v.chefServerIPs, v.postgresqlIPs, v.opensearchIPs)
+		if err != nil {
+			return status.New(status.ConfigVerifyError, err.Error())
 		}
+
 	} else if v.Config.IsAws() {
 		isManagedDbs := false
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.Aws)
@@ -330,8 +333,9 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 			}
 		}
 
-		if !isConfigValid(isManagedDbs, v.automateIPs, v.chefServerIPs, v.postgresqlIPs, v.opensearchIPs) {
-			return status.New(status.ConfigVerifyError, "Invalid config: missing Ip's")
+		err = isConfigValid(isManagedDbs, v.automateIPs, v.chefServerIPs, v.postgresqlIPs, v.opensearchIPs)
+		if err != nil {
+			return status.New(status.ConfigVerifyError, err.Error())
 		}
 
 		// assign ip's to models.Hardware
@@ -774,16 +778,15 @@ func getPort() string {
 	return port
 }
 
-func isConfigValid(isExternalMangedDbs bool, automateIPs, chefServerIPs, postgresqlIPs, opensearchIPs []string) bool {
+func isConfigValid(isExternalMangedDbs bool, automateIPs, chefServerIPs, postgresqlIPs, opensearchIPs []string) error {
 	if len(automateIPs) == 0 || len(chefServerIPs) == 0 {
-		return false
+		return errors.New("automate or chef server ip's can't be empty")
 	}
 
 	if !isExternalMangedDbs {
 		if len(postgresqlIPs) == 0 || len(opensearchIPs) == 0 {
-			return false
+			return errors.New("postgres or opensearch ip's can't be empty in case of non external managed db's")
 		}
 	}
-
-	return true
+	return nil
 }
