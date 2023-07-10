@@ -515,7 +515,8 @@ dbuser_username = ""
 dbuser_password = ""
 
 # In case of AWS managed RDS leave it blank
-postgresql_root_cert = """<cert_content>"""
+# eg: postgresql_root_cert = """<cert content>"""
+postgresql_root_cert = """"""
 
 [external.database.open_search]
 
@@ -532,7 +533,8 @@ opensearch_username = ""
 opensearch_user_password = ""
 
 # In case of AWS managed opensearch leave it blank
-opensearch_root_cert = """<cert_content>"""
+# eg: opensearch_root_cert = """<cert content>"""
+opensearch_root_cert = """"""
 
 [external.database.open_search.aws]
 
