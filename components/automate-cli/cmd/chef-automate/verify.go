@@ -775,24 +775,15 @@ func getPort() string {
 }
 
 func isConfigValid(externalMangedDbs bool, automateIPs, chefServerIPs, postgresqlIPs, opensearchIPs []string) bool {
-	if isSliceEmpty(automateIPs) || isSliceEmpty(chefServerIPs) {
+	if len(automateIPs) == 0 || len(chefServerIPs) == 0 {
 		return false
 	}
 
 	if externalMangedDbs {
-		if isSliceEmpty(postgresqlIPs) || isSliceEmpty(opensearchIPs) {
+		if len(postgresqlIPs) == 0 || len(opensearchIPs) == 0 {
 			return false
 		}
 	}
 
 	return true
-}
-
-func isSliceEmpty(slice []string) bool {
-	for _, element := range slice {
-		if strings.TrimSpace(element) == "" {
-			return true
-		}
-	}
-	return false
 }
