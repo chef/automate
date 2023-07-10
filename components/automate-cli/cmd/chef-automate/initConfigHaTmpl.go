@@ -200,7 +200,7 @@ managed_opensearch_username = ""
 managed_opensearch_user_password = ""
 
 # eg: managed_opensearch_certificate = """<cert content>"""
-managed_opensearch_certificate = """ """
+managed_opensearch_certificate = """"""
 
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
 aws_os_snapshot_role_arn = ""
@@ -227,7 +227,7 @@ managed_rds_dbuser_username = ""
 managed_rds_dbuser_password = ""
 
 # eg: managed_rds_certificate = """<cert content>"""
-managed_rds_certificate = """ """
+managed_rds_certificate = """"""
 
 ## === ===
 
