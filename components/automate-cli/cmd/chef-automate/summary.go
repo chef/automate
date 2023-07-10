@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -196,6 +197,7 @@ func (ss *Summary) automateNodeMap(automateIps []string) *NodeTypeAndCmd {
 	return automateNodeMap
 }
 
+// returns automateIps, chefServerIps, opensearchIps, postgresqlIps, errList
 func (ss *Summary) getIPAddressesFromFlagOrInfra() ([]string, []string, []string, []string, *list.List) {
 	errorList := list.New()
 	if ss.statusSummaryCmdFlags.node != "" {
@@ -350,6 +352,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 	}
 
 	for ip, res := range beOutput {
+		// fmt.Printf("ip: %s :: \nres: %v\n", ip, res)
 		status := ss.getBEStatus(res, ip, authToken, serviceName)
 		ss.beStatus = append(ss.beStatus, status)
 	}
@@ -434,6 +437,8 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 	}
 
 	for _, output := range outputs {
+		// fmt.Printf("\nCmd Output: %+v\n", *output)
+		fmt.Printf("\nScript Name: %v\n", output.ScriptName)
 		cmdResMap[output.ScriptName] = output
 	}
 
@@ -451,6 +456,14 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		return defaultBeStatusValue
 	}
 
+	lag, err := ss.getFollowerLag(cmdResMap[defaultServiceHealthDetails].Output, serviceName, memeberId, role)
+	if err != nil {
+		lag = "Error"
+	}
+	fmt.Printf("\n Lag output: %v", lag)
+
+	// fmt.Printf("cmd map: %v", cmdResMap)
+
 	return BeStatusValue{
 		serviceName: serviceName,
 		ipAddress:   ip,
@@ -458,6 +471,7 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
 		upTime:      formattedDuration,
 		role:        role,
+		Lag:         lag,
 	}
 }
 
@@ -514,6 +528,34 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 		}
 	}
 	return role, nil
+}
+
+func (ss *Summary) getFollowerLag(output string, service string, memberId string, role string) (string, error) {
+	lag := "NA"
+	outputMap, err := parseStringInToMapStringInterface(output)
+	if err != nil {
+		return lag, err
+	}
+
+	fmt.Println("Service: ", service, " pg: ", postgresql)
+
+	if service == postgresql {
+		if role == "Follower" {
+			// Define the regular expression pattern to match the desired substring
+			pattern := `(\d+ bytes and \d+ seconds)`
+
+			// Compile the regular expression pattern
+			regExp := regexp.MustCompile(pattern)
+
+			// Find the first lag of the pattern in the input string
+			lag = regExp.FindString(outputMap["stdout"].(string))
+
+			// Print the matched substring
+			fmt.Printf("\n match: %+v", lag)
+			return lag, nil
+		}
+	}
+	return lag, nil
 }
 
 func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
@@ -630,9 +672,9 @@ func (ss *Summary) ShowBEStatus() string {
 		tTemp := table.Table{}
 		tTemp.Render()
 		for _, status := range ss.beStatus {
-			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.upTime, status.role})
+			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.Lag, status.upTime, status.role})
 		}
-		t.AppendHeader(table.Row{"Name", "IP Address", "Health", "Process", "Uptime", "Role"})
+		t.AppendHeader(table.Row{"Name", "IP Address", "Health", "Process", "Lag", "Uptime", "Role"})
 		return t.Render()
 	}
 	return ""

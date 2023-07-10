@@ -56,6 +56,7 @@ type BeStatusValue struct {
 	process     string
 	upTime      string
 	role        string
+	Lag         string
 }
 
 type FeStatus []FeStatusValue
