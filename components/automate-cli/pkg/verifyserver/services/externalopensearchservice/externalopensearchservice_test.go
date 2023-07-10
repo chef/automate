@@ -7,8 +7,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"strconv"
+	"testing"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -179,6 +179,8 @@ abcd
 	TIMEOUT = 1
 )
 
+var certErrorMessage = "Machine is unable to connect with External Managed OpenSearch\n Failed to connect to OpenSearch: Get \"https://localhost:3073/_cat/indices\": x509: certificate signed by unknown authority"
+
 func TestPortReachableDetails(t *testing.T) {
 	eos := externalopensearchservice.NewExternalOpensearchService(logger.NewTestLogger(), time.Duration(TIMEOUT))
 	assert.NotNil(t, eos)
@@ -273,7 +275,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 						Passed:        false,
 						Status:        constants.STATUS_FAIL,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.EXTERNAL_OPENSEARCH_ERROR_MSG,
+						ErrorMsg:      certErrorMessage,
 						ResolutionMsg: constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG,
 						DebugMsg:      "Failed to connect to OpenSearch",
 					},
@@ -297,7 +299,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 						Passed:        false,
 						Status:        constants.STATUS_FAIL,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.EXTERNAL_OPENSEARCH_ERROR_MSG,
+						ErrorMsg:      certErrorMessage,
 						ResolutionMsg: constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG,
 						DebugMsg:      "Failed to connect to OpenSearch",
 					},
