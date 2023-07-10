@@ -181,33 +181,53 @@ func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Har
 
 	setAutomate, setChefServer, setPostgresql, setOpensearch, setFrontend, setBackend := hrc.createNodeSet(req)
 
-	for index, ip := range req.AutomateNodeIps {
-		key := constants.AUTOMATE + ip + strconv.Itoa(index)
-		hrc.log.Debug("Call Initiated for Automate node having IP: ", ip)
-		go runHardwareResourceCountCheck(req.AutomateNodeCount, len(req.AutomateNodeIps), constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
-		hardwareResultOrderList = append(hardwareResultOrderList, key)
+	if req.AutomateNodeCount > 0 && len(req.AutomateNodeIps) == 0 {
+		go runHardwareResourceCountCheck(req.AutomateNodeCount, len(req.AutomateNodeIps), constants.AUTOMATE, "", setAutomate, setBackend, ch, "temp_automate")
+		hardwareResultOrderList = append(hardwareResultOrderList, "temp_automate")
+	} else {
+		for index, ip := range req.AutomateNodeIps {
+			key := constants.AUTOMATE + ip + strconv.Itoa(index)
+			hrc.log.Debug("Call Initiated for Automate node having IP: ", ip)
+			go runHardwareResourceCountCheck(req.AutomateNodeCount, len(req.AutomateNodeIps), constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
+			hardwareResultOrderList = append(hardwareResultOrderList, key)
+		}
 	}
 
-	for index, ip := range req.ChefInfraServerNodeIps {
-		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
-		hrc.log.Debug("Call Initiated for Chefserver node having IP: ", ip)
-		go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, len(req.ChefInfraServerNodeIps), constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
-		hardwareResultOrderList = append(hardwareResultOrderList, key)
+	if req.ChefInfraServerNodeCount > 0 && len(req.ChefInfraServerNodeIps) == 0 {
+		go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, len(req.ChefInfraServerNodeIps), constants.CHEF_INFRA_SERVER, "", setChefServer, setBackend, ch, "temp_server")
+		hardwareResultOrderList = append(hardwareResultOrderList, "temp_server")
+	} else {
+		for index, ip := range req.ChefInfraServerNodeIps {
+			key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
+			hrc.log.Debug("Call Initiated for Chefserver node having IP: ", ip)
+			go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, len(req.ChefInfraServerNodeIps), constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
+			hardwareResultOrderList = append(hardwareResultOrderList, key)
+		}
 	}
 
 	if !isManagedServices {
-		for index, ip := range req.PostgresqlNodeIps {
-			key := constants.POSTGRESQL + ip + strconv.Itoa(index)
-			hrc.log.Debug("Call Initiated for Postgresql node having IP: ", ip)
-			go runHardwareResourceCountCheck(req.PostgresqlNodeCount, len(req.PostgresqlNodeIps), constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
-			hardwareResultOrderList = append(hardwareResultOrderList, key)
+		if req.PostgresqlNodeCount > 0 && len(req.PostgresqlNodeIps) == 0 {
+			go runHardwareResourceCountCheck(req.PostgresqlNodeCount, len(req.PostgresqlNodeIps), constants.POSTGRESQL, "", setPostgresql, setFrontend, ch, "temp_pg")
+			hardwareResultOrderList = append(hardwareResultOrderList, "temp_pg")
+		} else {
+			for index, ip := range req.PostgresqlNodeIps {
+				key := constants.POSTGRESQL + ip + strconv.Itoa(index)
+				hrc.log.Debug("Call Initiated for Postgresql node having IP: ", ip)
+				go runHardwareResourceCountCheck(req.PostgresqlNodeCount, len(req.PostgresqlNodeIps), constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
+				hardwareResultOrderList = append(hardwareResultOrderList, key)
+			}
 		}
 
-		for index, ip := range req.OpenSearchNodeIps {
-			key := constants.OPENSEARCH + ip + strconv.Itoa(index)
-			hrc.log.Debug("Call Initiated for Opensearch node having IP: ", ip)
-			go runHardwareResourceCountCheck(req.OpenSearchNodeCount, len(req.OpenSearchNodeIps), constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
-			hardwareResultOrderList = append(hardwareResultOrderList, key)
+		if req.OpenSearchNodeCount > 0 && len(req.OpenSearchNodeIps) == 0 {
+			go runHardwareResourceCountCheck(req.OpenSearchNodeCount, len(req.OpenSearchNodeIps), constants.OPENSEARCH, "", setOpensearch, setFrontend, ch, "temp_os")
+			hardwareResultOrderList = append(hardwareResultOrderList, "temp_os")
+		} else {
+			for index, ip := range req.OpenSearchNodeIps {
+				key := constants.OPENSEARCH + ip + strconv.Itoa(index)
+				hrc.log.Debug("Call Initiated for Opensearch node having IP: ", ip)
+				go runHardwareResourceCountCheck(req.OpenSearchNodeCount, len(req.OpenSearchNodeIps), constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
+				hardwareResultOrderList = append(hardwareResultOrderList, key)
+			}
 		}
 	}
 
