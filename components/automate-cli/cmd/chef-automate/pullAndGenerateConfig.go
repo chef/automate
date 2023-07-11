@@ -363,7 +363,7 @@ func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (
 			}
 		}
 	} else if dbtype != "" {
-		return "", errors.New(`unsupported db type. It should be either "aws", "self-managed" or ""`)
+		return "", errors.New(`unsupported db type. It should be either "aws" or "self-managed" or ""`)
 	}
 	return dbtype, nil
 }
