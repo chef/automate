@@ -362,8 +362,8 @@ func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (
 				return "", errors.New("automate config error found")
 			}
 		}
-	} else {
-		return "", errors.New("db type neither aws nor self-managed")
+	} else if dbtype != "" {
+		return "", errors.New(`db type neither aws nor self-managed nor ""`)
 	}
 	return dbtype, nil
 }

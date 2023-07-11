@@ -847,7 +847,30 @@ func TestDetermineDBType(t *testing.T) {
 			},
 			dbtype:       "old_type",
 			expectedType: "old_type",
-			expectedErr:  errors.New("db type neither aws nor self-managed"),
+			expectedErr:  errors.New(`db type neither aws nor self-managed nor ""`),
+		},
+		{
+			name: "When invalid type comes in db type",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       "",
+			expectedType: "",
+			expectedErr:  nil,
 		},
 		{
 			name: "When scheme is invalid",
