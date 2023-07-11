@@ -22,13 +22,7 @@ The steps to register a supermarket with Automate HA is same as that of [Standal
 Here you have to run the `config patch` command with the `.toml` file you created in the previous step on all the automate and chef-server nodes from the bastion node. The commands to patch in Automate HA are as follows:
 
 ```bash
-# Run patch on Automate nodes
-chef-automate config patch ocid-apps.toml -a
-```
-
-```bash
-# Run patch on Chef Server nodes
-chef-automate config patch ocid-apps.toml -c
+chef-automate config patch ocid-apps.toml -f
 ```
 
 Once the patch is completed, the new app should be registered with OC-ID as part of Automate embedded chef-server.
@@ -36,17 +30,11 @@ Once the patch is completed, the new app should be registered with OC-ID as part
 You can get the details of the registered applications from the bastion node, and run the following command:
 
 ```bash
-# Get details from Automate Nodes
-chef-automate config oc-id-show-app -a
-```
-
-The above command will fetch the details of all the registered OC-ID applications from all the Automate nodes. To know about the different flags to be used with this command, run the following command(help command):
-
-```bash
-# Get Help Page
-chef-automate config oc-id-show-app -h
+chef-automate config oc-id-show-app
 ```
 
 The output of the above command looks like as shown below:
 
 {{< figure src="/images/automate/ha_output_ocid_app.png" alt="OC-ID Application Output">}}
+
+Refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/#supermarket-configuration) page to view the Supermarket configuration steps.
