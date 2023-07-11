@@ -31,6 +31,7 @@ const (
 	initialHealth               = "ERROR"
 	initialFormattedDuration    = "0d 0h 0m 0s"
 	initialRole                 = "Unknown"
+	initialLag                  = "NA"
 	defaultServiceDetails       = "DefaultServiceDetails"
 	defaultServiceHealthDetails = "DefaultServiceHealthDetails"
 	censusDetails               = "CensusDetails"
@@ -433,6 +434,7 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		process:     fmt.Sprintf("%s (pid: %s)", initialServiceState, initialServicePid),
 		upTime:      initialFormattedDuration,
 		role:        initialRole,
+		lag:         initialLag,
 	}
 
 	for _, output := range outputs {
@@ -465,7 +467,7 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
 		upTime:      formattedDuration,
 		role:        role,
-		Lag:         lag,
+		lag:         lag,
 	}
 }
 
@@ -525,7 +527,7 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 }
 
 func (ss *Summary) getFollowerLag(output string, service string, memberId string, role string) (string, error) {
-	lag := "NA"
+	lag := initialLag
 	outputMap, err := parseStringInToMapStringInterface(output)
 	if err != nil {
 		return lag, err
@@ -663,7 +665,7 @@ func (ss *Summary) ShowBEStatus() string {
 		tTemp := table.Table{}
 		tTemp.Render()
 		for _, status := range ss.beStatus {
-			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.Lag, status.upTime, status.role})
+			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.lag, status.upTime, status.role})
 		}
 		t.AppendHeader(table.Row{"Name", "IP Address", "Health", "Process", "Lag", "Uptime", "Role"})
 		return t.Render()

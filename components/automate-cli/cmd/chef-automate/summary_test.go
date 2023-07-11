@@ -27,11 +27,11 @@ Incorrect postgresql IP, 127.0.0 IP address validation failed
 Incorrect postgresql IP, 127.0.1 IP address validation failed
 Incorrect postgresql IP, 127.0.2 IP address validation failed
 Incorrect postgresql IP, 127.0.3 IP address validation failed`
-	displayBE = `+------------+--------------+--------+--------------+-------------+---------+
-| NAME       | IP ADDRESS   | HEALTH | PROCESS      | UPTIME      | ROLE    |
-+------------+--------------+--------+--------------+-------------+---------+
-| postgresql | 198.51.100.7 | ERROR  | down (pid: ) | 0d 0h 0m 0s | Unknown |
-+------------+--------------+--------+--------------+-------------+---------+`
+	displayBE = `+------------+--------------+--------+--------------+-----+-------------+---------+
+| NAME       | IP ADDRESS   | HEALTH | PROCESS      | LAG | UPTIME      | ROLE    |
++------------+--------------+--------+--------------+-----+-------------+---------+
+| postgresql | 198.51.100.7 | ERROR  | down (pid: ) | NA  | 0d 0h 0m 0s | Unknown |
++------------+--------------+--------+--------------+-----+-------------+---------+`
 	displayFEAutomate         = `| automate    | 198.51.100.1 | ERROR  | Unknown    |`
 	displayFECS               = `| chef-server | 198.51.100.2 | ERROR  | Unknown    |`
 	mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
