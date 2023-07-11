@@ -6,6 +6,7 @@ export A2_SVC_DB_USER="dex"
 
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
+
 chmod 0600 {{pkg.svc_config_path}}/service.crt
 chmod 0600 {{pkg.svc_config_path}}/service.key
 chmod 0600 {{pkg.svc_config_path}}/root_ca.crt
