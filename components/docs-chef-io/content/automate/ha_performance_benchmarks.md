@@ -51,7 +51,7 @@ The following configs can be used to improve the performance of the Automate HA 
 
 ### Cookbook Version Cache
 
-If you frequently see very long response times from cookbook_versions when under load, this is worth enabling. Enabling this can significantly improve performance of the cluster if there are a large number of cookbooks with old versions.
+If you frequently see very long response times from `cookbook_versions` when under load, this is worth enabling. Enabling this can significantly improve performance of the cluster if there are a large number of cookbooks with old versions.
 
 ```toml
 [erchef.v1.sys.api] 
