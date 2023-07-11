@@ -991,7 +991,7 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAIn
 	//Getting Existing config from server
 	var existingConfig PostgresqlConfig
 	var reqConfig PostgresqlConfig
-	var dummyConfig PostgresqlConfig
+	var emptyConfig PostgresqlConfig
 	srcInputString, err := getConfigFromRemoteServer(infra, postgresql, config, sshUtil)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
@@ -1008,7 +1008,7 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAIn
 		return existingConfig, reqConfig, err
 	}
 	reqConfig = reqConfigInterface.(PostgresqlConfig)
-	if !isConfigChanged(dummyConfig, reqConfig) {
+	if !isConfigChanged(emptyConfig, reqConfig) {
 		return existingConfig, reqConfig, status.Annotate(errors.New("Incorrect Config"), status.ConfigError)
 	}
 	mergo.Merge(&reqConfig, existingConfig)
@@ -1020,7 +1020,7 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomateHA
 	//Getting Existing config from server
 	var existingConfig OpensearchConfig
 	var reqConfig OpensearchConfig
-	var dummyConfig OpensearchConfig
+	var emptyConfig OpensearchConfig
 	srcInputString, err := getConfigFromRemoteServer(infra, opensearch_const, config, sshUtil)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
@@ -1037,7 +1037,7 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomateHA
 		return existingConfig, reqConfig, err
 	}
 	reqConfig = reqConfigInterface.(OpensearchConfig)
-	if !isConfigChanged(dummyConfig, reqConfig) {
+	if !isConfigChanged(emptyConfig, reqConfig) {
 		return existingConfig, reqConfig, status.Annotate(errors.New("Incorrect Config"), status.ConfigError)
 	}
 	mergo.Merge(&reqConfig, existingConfig)
