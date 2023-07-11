@@ -35,7 +35,7 @@ func (c *HaDeployConfig) Verify() error {
 	}
 
 	// no need to verify os ans pg config for aws managed services
-	if c.IsAws() && c.Aws.Config.SetupManagedServices {
+	if (c.IsAws() && c.Aws.Config.SetupManagedServices) || (c.IsExistingInfra() && c.IsExternalDb()) {
 		return getSingleErrorFromList(errorList)
 	}
 
