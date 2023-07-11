@@ -362,10 +362,10 @@ func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (
 				return "", errors.New("automate config error found")
 			}
 		}
-	} else if dbtype != "" {
-		return "", errors.New(`unsupported db type. It should be either "aws" or "self-managed" or ""`)
+	} else if dbtype == "" {
+		return dbtype, nil
 	}
-	return dbtype, nil
+	return "", errors.New(`unsupported db type. It should be either "aws" or "self-managed" or ""`)
 }
 
 func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
