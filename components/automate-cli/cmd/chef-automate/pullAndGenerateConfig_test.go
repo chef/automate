@@ -847,7 +847,7 @@ func TestDetermineDBType(t *testing.T) {
 			},
 			dbtype:       "old_type",
 			expectedType: "old_type",
-			expectedErr:  errors.New(`db type neither aws nor self-managed nor ""`),
+			expectedErr:  errors.New(`unsupported db type. It should be either "aws", "self-managed" or ""`),
 		},
 		{
 			name: "When invalid type comes in db type",
