@@ -132,3 +132,9 @@ errors:
 - name: InsufficientSpaceError
   description: Insufficient disk space
   code: "122"
+- name: ConfigVerifyError
+  description: Config Verification failed
+  code: "124"
+- name: VerifyChecksError
+  description: Verify Checks failed
+  code: "125"
