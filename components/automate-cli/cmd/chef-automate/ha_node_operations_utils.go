@@ -23,7 +23,12 @@ import (
 )
 
 const (
-	TAINT_TERRAFORM        = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
+	TAINT_TERRAFORM = `for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done`
+
+	TAINT_EFS = `
+    terraform init;
+	for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate | grep "module.efs\[0\].null_resource.mount_efs");do terraform taint $x; done`
+
 	REMOVE_TERRAFORM_STATE = `S3_STATE=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate | grep ".aws_s3_bucket.createS3bucket");
 if [ "$S3_STATE" == "module.s3[0].aws_s3_bucket.createS3bucket" ]; then
 terraform state rm $S3_STATE
@@ -166,6 +171,11 @@ func (nu *NodeUtilsImpl) taintTerraform(path string) error {
 		if err := executeShellCommand("/bin/bash", []string{"-c", REMOVE_TERRAFORM_STATE}, filepath.Join(path, "destroy", "aws")); err != nil {
 			return err
 		}
+
+		if err := executeShellCommand("/bin/bash", []string{"-c", TAINT_EFS}, filepath.Join(path, "destroy", "aws")); err != nil {
+			return err
+		}
+
 	}
 	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, path)
 }
