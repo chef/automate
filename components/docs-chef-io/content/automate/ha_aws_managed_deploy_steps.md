@@ -110,7 +110,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Set `backup_config` to `"s3"` or `efs`.
    - If `backup_config` is `s3`, uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
-   - Don't set `fqdn` for the AWS deployment.
+   - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *Postgresql*, *OpenSearch*.
    - Set AWS Config Details:
       - Set `profile`. The default value of `profile` is `"default"`.
