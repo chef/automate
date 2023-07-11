@@ -66,7 +66,7 @@ const (
 				  "passed": false,
 				  "success_msg": "",
 				  "error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-				  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+				  "resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>"
 				}
 			  ]
 			}
@@ -122,7 +122,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>",
+						"resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>",
 						"skipped": false
 					},
 					{
@@ -130,7 +130,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>",
+						"resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>",
 						"skipped": false
 					}
 				],
@@ -326,10 +326,10 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Certificate: certificatelist,
 				},
 			},
-			response:             "Internal Server Error",
-			httpStatusCode:       http.StatusInternalServerError,
-			isError:              true,
-			invalidParseResponse: false,
+			response:               "Internal Server Error",
+			httpStatusCode:         http.StatusInternalServerError,
+			isError:                true,
+			invalidParseResponse:   false,
 			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
@@ -360,10 +360,10 @@ func TestFirewallCheck_Run(t *testing.T) {
 					Certificate: certificatelist,
 				},
 			},
-			response:             "source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty",
-			httpStatusCode:       http.StatusBadRequest,
-			isError:              true,
-			invalidParseResponse: true,
+			response:               "source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty",
+			httpStatusCode:         http.StatusBadRequest,
+			isError:                true,
+			invalidParseResponse:   true,
 			requiredStatusResponse: `{"error":{"code":400,"message":"source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty"}}`,
 		},
 		{

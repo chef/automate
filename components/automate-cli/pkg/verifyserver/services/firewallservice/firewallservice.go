@@ -152,7 +152,7 @@ func GetFirewallErrorMsg(service, destinationIP, destinationPort, sourceIP strin
 }
 
 func GetFirewallResolutionMsg(destinationIP, destinationPort, sourceIP string) string {
-	return fmt.Sprintf("Check your firewall settings to provide access on %s port at %s from %s", destinationPort, destinationIP, sourceIP)
+	return fmt.Sprintf("Check your firewall settings and provide access to port %s on %s from %s", destinationPort, destinationIP, sourceIP)
 }
 
 func createFirewallCheck(passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
