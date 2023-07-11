@@ -153,6 +153,13 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
    #Run provision command to deploy `automate.aib` with set `config.toml`
    chef-automate provision-infra config.toml --airgap-bundle automate.aib
+    "
+    ```
+
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
+
+    ```bash
+    sudo -- sh -c "
 
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
@@ -166,7 +173,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
-  If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
 - Create a file `a2.fqdn.toml`
 
