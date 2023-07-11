@@ -42,7 +42,7 @@ const (
         "passed": false,
         "success_msg": "",
         "error_msg": "The tcp service running at ANY_IP:7433 is not reachable",
-        "resolution_msg": "Check your firewall settings to provide access to 7433 port at 13.39.148.115"
+        "resolution_msg": "Check your firewall settings and provide access to port 7433 on 13.39.148.115"
     }
 }
 `

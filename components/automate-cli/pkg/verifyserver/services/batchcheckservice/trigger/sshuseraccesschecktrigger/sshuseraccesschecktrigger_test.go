@@ -356,7 +356,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 				return []byte("test_key"), nil
 			},
 			GetFilePermissionFunc: func(filePath string) (int64, error) {
-				return 400 , nil
+				return 400, nil
 			},
 		}, "8080")
 		got := newOS.Run(config)
@@ -447,7 +447,7 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 			},
 		}, "1234")
 		ip := "1.2.3.4"
-		expected, err := models.SShUserRequest{}, errors.New("Permissions on the ssh key file do not satisfy the requirement")
+		expected, err := models.SShUserRequest{}, errors.New("Provide permission on the SSH key file as 400 (Read Only by Owner).")
 		actual, actualerr := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
 		assert.Equal(t, expected, actual)
 		assert.Equal(t, err.Error(), actualerr.Error())

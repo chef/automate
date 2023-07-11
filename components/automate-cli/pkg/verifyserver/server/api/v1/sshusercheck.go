@@ -17,7 +17,7 @@ func (h *Handler) CheckSshUser(c *fiber.Ctx) error {
 		len(req.UserName) == 0 ||
 		len(req.PrivateKey) == 0 ||
 		len(req.Port) == 0 {
-		return fiber.NewError(fiber.StatusBadRequest, `Request Parameters that is 'ip', 'user_name', 'ssh_port' and 'private_key' cannot be empty`)
+		return fiber.NewError(fiber.StatusBadRequest, `Instance IPs, 'ssh_user', 'ssh_port', and 'ssh_key_file' cannot be empty in the config`)
 	}
 
 	service, err := h.SshUserCheckService.CheckSshUserDetails(req)

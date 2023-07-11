@@ -114,7 +114,8 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 func (fq *FqdnService) MakeConcurrentCalls(url string, client *http.Client, setNodes map[string]int) error {
 	fq.log.Debug("Making Concurrent Calls...")
 	fqdnResultChan := make(chan string)
-	for i := 0; i < constants.MIN_NUMBER_OF_CALLS; i++ {
+	minNumberOfCalls := 5 * len(setNodes)
+	for i := 0; i < minNumberOfCalls; i++ {
 		go func(fqdnResultChan chan string) {
 			res, err := client.Get(url)
 			if err != nil {
@@ -127,7 +128,7 @@ func (fq *FqdnService) MakeConcurrentCalls(url string, client *http.Client, setN
 		}(fqdnResultChan)
 	}
 
-	for i := 0; i < constants.MIN_NUMBER_OF_CALLS; i++ {
+	for i := 0; i < minNumberOfCalls; i++ {
 		chanResult := <-fqdnResultChan
 		if chanResult == constants.CHAN_RESULT_ERROR_MESSAGE {
 			continue

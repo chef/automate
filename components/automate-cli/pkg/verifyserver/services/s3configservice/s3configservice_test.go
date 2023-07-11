@@ -27,7 +27,7 @@ var (
 	s3ConnectionSuccessMsg      = "Machine is able to connect with S3 using the provided access key and secret key"
 	s3BucketAccessTitle         = "S3 bucket access test"
 	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key: "
-	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
+	s3BucketAccessResolutionMsg = "Please check if the provided S3 bucket exists or not. If it exists then provide the bucket access to the snapshot user."
 	s3BucketAccessSuccessMsg    = "Machine is able to access the S3 bucket using the provided access key and secret key"
 	req                         = models.S3ConfigRequest{
 		Endpoint:   "s3://example-s3.aws.region.com",
@@ -132,7 +132,6 @@ func TestGetBucketAccessAwsConnection(t *testing.T) {
 		ResolutionMsg: s3BucketAccessResolutionMsg,
 	}, services)
 }
-
 
 func TestGetS3ConnectionListBucketsFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
