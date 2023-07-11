@@ -5,6 +5,8 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -205,7 +207,10 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 func (a *awsDeployment) validateEnvFields() *list.List {
 	errorList := list.New()
 	if len(a.config.Aws.Config.Profile) < 1 {
-		errorList.PushBack("Invalid or empty aws profile name")
+		check, _ := a.getBastionIamRole()
+		if !check {
+			errorList.PushBack("Invalid Profile name or Bastion IAM Role, Please Check your Profile name or Bastion IAM Role provided")
+		}
 	}
 	if len(a.config.Aws.Config.Region) < 1 {
 		errorList.PushBack("Invalid or empty aws region")
@@ -443,4 +448,43 @@ func (a *awsDeployment) getAwsHAIp() error {
 	}
 	a.AWSConfigIp = *ConfigIp
 	return nil
+}
+
+func (a *awsDeployment) getBastionIamRole() (bool, error) {
+	tokenurl := "http://169.254.169.254/latest/api/token"
+	tokenreq, err := http.NewRequest("PUT", tokenurl, nil)
+	if err != nil {
+		fmt.Errorf("Error in creating the Token fetching request =%v",err)
+		return false, err
+	}
+	tokenreq.Header.Set("X-aws-ec2-metadata-token-ttl-seconds", "21600")
+	tokenresp, err := http.DefaultClient.Do(tokenreq)
+	if err != nil {
+		fmt.Errorf("Error in creating the Token client request =%v",err)
+		return false, err
+	}
+	defer tokenresp.Body.Close()
+
+	responseBody, err := io.ReadAll(tokenresp.Body)
+	if err != nil {
+		fmt.Errorf("Error in reading the Token response Body =%v",err)
+		return false, err
+	}
+	token := string(responseBody)
+	url := "http://169.254.169.254/latest/meta-data/iam/info"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Errorf("Error in creating the request for fetch IAM role from Bastion = %v", err)
+		return false, err
+	}
+	req.Header.Set("X-aws-ec2-metadata-token", token)
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Errorf("Error in getting in response from Bastion IAM role request= %v", err)
+		return false, err
+	}
+	if response.StatusCode != 200 {
+		return false, errors.New("Please check if Bastion has attached IAM Role onto it")
+	}
+	return true, nil
 }

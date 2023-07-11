@@ -595,11 +595,7 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 
 func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	errorList := list.New()
-
-	if err := validateRequiredString(aws.Profile, "aws profile name"); err != nil {
-		errorList.PushBack(err)
-	}
-
+	
 	if err := validateRequiredString(aws.Region, "aws region"); err != nil {
 		errorList.PushBack(err)
 	}

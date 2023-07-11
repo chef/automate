@@ -51,7 +51,6 @@ variable "aws_os_snapshot_role_arn" {
 }
 
 variable "aws_profile" {
-  default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
 }
 
