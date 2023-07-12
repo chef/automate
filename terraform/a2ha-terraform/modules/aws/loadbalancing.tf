@@ -1,12 +1,11 @@
-
 /////////////////////////
 // Automate Load Balancing
 resource "aws_alb" "automate_lb" {
   name               = "${var.tag_name}-${random_id.random.hex}-automate-lb"
-  internal           = false
+  internal           = length(var.public_custom_subnets) > 0 ? false : true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer.id]
-  subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
+  subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : data.aws_subnet.default.*.id
   tags               = var.tags
 }
 
@@ -58,10 +57,10 @@ resource "aws_alb_listener" "automate_lb_listener_80" {
 // Chef Server
 resource "aws_alb" "chef_server_lb" {
   name               = "${var.tag_name}-${random_id.random.hex}-chef-server-lb"
-  internal           = false
+  internal           = length(var.public_custom_subnets) > 0 ? false : true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer.id]
-  subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
+  subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : data.aws_subnet.default.*.id
   tags               = var.tags
 }
 
