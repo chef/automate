@@ -146,6 +146,12 @@ type patchFnParameters struct {
 	skipIpsList   []string
 }
 
+type configPatchResponse struct {
+	hostIp       string
+	outputString string
+	err          error
+}
+
 func init() {
 	flagsObj := certRotateFlags{}
 
@@ -214,7 +220,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
 
 		if err != nil {
-			return errors.New("Error occured while fetching current certs.")
+			return errors.Wrap(err, "Error occured while fetching current certs")
 		}
 
 		if flagsObj.timeout < DEFAULT_TIMEOUT {
@@ -545,33 +551,87 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 
 	var err error
 	var tomlFilePath string
+	responseChan := make(chan configPatchResponse, len(ips))
+	defer close(responseChan)
 	for i := 0; i < len(ips); i++ {
-		sshUtil.getSSHConfig().hostIP = ips[i]
-		if (flagsObj.postgres || flagsObj.opensearch) && remoteService != "frontend" {
-			tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUtil)
-			if err != nil {
-				return err
-			}
-			// Copying the new toml file which includes both old and new configurations (for backend nodes).
-			err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
-		} else {
-			// Copying the new toml file which includes new configurations (for frontend nodes).
-			err = sshUtil.copyFileToRemote(fileName, remoteService+timestamp, false)
-		}
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
-			writer.Errorf("%v", err)
 			return err
+		}
+		SSHConfig := c.getSshDetails(infra)
+		sshUtil1 := NewSSHUtil(SSHConfig)
+		SSHConfig.timeout = flagsObj.timeout
+		sshUtil1.setSSHConfig(SSHConfig)
+		go func(hostIP string, responseChan chan configPatchResponse) {
+			rc := configPatchResponse{hostIP, "", nil}
+			sshUtil1.getSSHConfig().hostIP = hostIP
+			if (flagsObj.postgres || flagsObj.opensearch) && remoteService != "frontend" {
+				tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUtil1)
+				if err != nil {
+					rc.err = err
+					responseChan <- rc
+					return
+				}
+				// Copying the new toml file which includes both old and new configurations (for backend nodes).
+				err = sshUtil1.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
+			} else {
+				// Copying the new toml file which includes new configurations (for frontend nodes).
+				err = sshUtil1.copyFileToRemote(fileName, remoteService+timestamp, false)
+			}
+			if err != nil {
+				writer.Errorf("%v", err)
+				rc.err = err
+				responseChan <- rc
+			}
+
+			fmt.Printf("\nStarted Applying the Configurations in %s node: %s \n", remoteService, hostIP)
+
+			output, err := sshUtil1.connectAndExecuteCommandOnRemote(scriptCommands, true)
+			if err != nil {
+				writer.Errorf("%v", err)
+				rc.err = err
+				responseChan <- rc
+				return
+			}
+			//writer.Printf(output + "\n")
+			rc.outputString = output
+			responseChan <- rc
+
+		}(ips[i], responseChan)
+	}
+	var combinedErr error
+
+	for i := 0; i < len(ips); i++ {
+		result := <-responseChan
+		if result.err != nil {
+			writer.Errorf("%v", err)
+			if combinedErr == nil {
+				combinedErr = result.err
+				writer.Printf("\nCommand result for ip: ", combinedErr)
+			} else {
+				combinedErr = errors.Wrap(combinedErr, result.err.Error())
+				writer.Printf("\nCommand result for ip: ", combinedErr)
+			}
+		} else {
+			writer.Printf("\nOutput result for ip: %s", result.outputString+"\n")
+			writer.Successf("Successfully rotated for ip: %s", result.hostIp+"\n")
 		}
 
-		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-		if err != nil {
-			writer.Errorf("%v", err)
-			return err
-		}
-		writer.Printf(output + "\n")
 	}
-	return nil
+	return combinedErr
+
+	// var errorStrings error = nil
+	// for i := 0; i < len(ips); i++ {
+	// 	response := <-responseChan
+	// 	if response.err != nil {
+	// 		if errorStrings != nil {
+	// 			errors.Wrap(response.err, errorStrings.Error())
+	// 		} else {
+	// 			errorStrings = response.err
+	// 		}
+	// 	}
+	// }
+	//return nil
 }
 
 // validateEachIp validate given ip with the remoteService cluster.
