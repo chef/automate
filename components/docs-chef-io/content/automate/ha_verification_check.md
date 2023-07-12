@@ -1,5 +1,5 @@
 +++
-title = "Verification Check in Automate HA"
+title = "Config Verify"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Verification Check in Automate HA"
-    identifier = "automate/deploy_high_availability/ha_verification_check.md Verification Check in Automate HA"
-    parent = "automate/deploy_high_availability"
-    weight = 55
+    title = "Config Verify"
+    identifier = "automate/deploy_high_availability/reference/ha_verification_check.md Config Verify"
+    parent = "automate/deploy_high_availability/reference"
+    weight = 250
 +++
 
 {{< warning >}}
@@ -31,5 +31,18 @@ Failures occuring during the deployment of Automate HA might result to clear up 
 chef-automate verify --config config.toml
 ```
 
-The above command will run the `config.toml` file which contains .....
+The above command will trigger the `config.toml` file with config, the one you want to deploy. Once the verify command is triggered, following checks will be triggered:
 
+- System Resources (All Nodes)
+- Software Version (All Nodes)
+- System User (All Nodes)
+- External OpenSearch Database
+- External PostgreSQL Database
+- S3/Minio Backup Config (If Required)
+- NFS Backup Config (If Required)
+- FQDN with Load Balancer Reachability
+- Firewall Ports
+
+If all the above checks passes, you get a report. If all the pointers in the report shows pass, it means everything is fine and you can move ahead with the Automate HA deployment.
+
+## Reports
