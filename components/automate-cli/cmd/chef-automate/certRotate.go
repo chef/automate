@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
@@ -146,10 +147,12 @@ type patchFnParameters struct {
 	skipIpsList   []string
 }
 
-type configPatchResponse struct {
+type CertRoateCmdResult struct {
 	hostIp       string
 	outputString string
 	err          error
+	writer       *cli.Writer
+	nodeType     string
 }
 
 func init() {
@@ -428,23 +431,34 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	}
 
-	//fetching server_name from automate
-	plgcng := NewPullConfigs(infra, sshUtil)
-	automatesConfig, err := plgcng.pullAutomateConfigs()
+	//fetching current config from automate
+	pullAutomateCurrentConfig := NewPullConfigs(infra, sshUtil)
+	automateCurrentConfig, err := pullAutomateCurrentConfig.pullAutomateConfigs()
 
 	if err != nil {
 		return err
 	}
-
-	oldCn := getOldCn(automatesConfig)
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
-	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, oldCn, flagsObj.node, currentCertsInfo, infra)
+	skipIpsList = c.getFrontIpsToSkipRootCAandCNPatching(automateCurrentConfig, certs.rootCA, cn, flagsObj.node, infra)
+	fmt.Println("new rootca : ",certs.rootCA)	
+	fmt.Println("new CN",cn)	
+
+	//fetching current config from chefServer
+	pullChefServerCurrentConfig := NewPullConfigs(infra, sshUtil)
+	chefServerCurrentConfig, err := pullChefServerCurrentConfig.pullChefServerConfigs()
+
+	if err != nil {
+		return err
+	}
+	newskipIpsList := c.getFrontIpsToSkipRootCAandCNPatching(chefServerCurrentConfig, certs.rootCA, cn, flagsObj.node, infra)
+	skipIpsList = append(skipIpsList, newskipIpsList...)
 	skipMessage := ""
+
 	// Creating and patching the required configurations.
 	var configFe string
 	if flagsObj.node != "" {
@@ -489,17 +503,24 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	return nil
 }
 
-func getOldCn(automatesConfig map[string]*deployment.AutomateConfig) string {
+func (c *certRotateFlow) getFrontIpsToSkipRootCAandCNPatching(automatesConfig map[string]*deployment.AutomateConfig, newRootCA string, newCn string, node string, infra *AutomateHAInfraDetails) []string {
+	oldRootCA := ""
 	oldCn := ""
-	for _, config := range automatesConfig {
+	skipIpsList := []string{}
+	for ip, config := range automatesConfig {
 		if config.Global.V1.External.Opensearch != nil && config.Global.V1.External.Opensearch.Ssl != nil {
-			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
+			if config.Global.V1.External.Opensearch.Ssl.RootCert != nil {
+				oldRootCA = config.Global.V1.External.Opensearch.Ssl.RootCert.Value
 				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
-				break
+				if c.getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, oldRootCA, node, infra) == true {
+					skipIpsList = append(skipIpsList, ip)
+				}
+				fmt.Printf("%s old rootca : %s ",ip,oldRootCA+"\n")	
+				fmt.Printf("%s old CN : %s",ip,oldCn+"\n")
 			}
 		}
 	}
-	return oldCn
+	return skipIpsList
 }
 
 // patchConfig will patch the configurations to required nodes.
@@ -539,7 +560,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
-	err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
+	err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
 	if err != nil {
 		return err
 	}
@@ -547,11 +568,10 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 }
 
 // copyAndExecute will copy the toml file to each required node and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
-
-	var err error
+func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRoateCmdResult, string, *cli.Writer)) error {
+	//var err error
 	var tomlFilePath string
-	responseChan := make(chan configPatchResponse, len(ips))
+	responseChan := make(chan CertRoateCmdResult, len(ips))
 	defer close(responseChan)
 	for i := 0; i < len(ips); i++ {
 		infra, err := getAutomateHAInfraDetails()
@@ -559,24 +579,24 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 			return err
 		}
 		SSHConfig := c.getSshDetails(infra)
-		sshUtil1 := NewSSHUtil(SSHConfig)
+		SSHUtils := NewSSHUtil(SSHConfig)
 		SSHConfig.timeout = flagsObj.timeout
-		sshUtil1.setSSHConfig(SSHConfig)
-		go func(hostIP string, responseChan chan configPatchResponse) {
-			rc := configPatchResponse{hostIP, "", nil}
-			sshUtil1.getSSHConfig().hostIP = hostIP
+		SSHUtils.setSSHConfig(SSHConfig)
+		go func(hostIP string, responseChan chan CertRoateCmdResult) {
+			rc := CertRoateCmdResult{hostIP, "", nil, writer, remoteService}
+			SSHUtils.getSSHConfig().hostIP = hostIP
 			if (flagsObj.postgres || flagsObj.opensearch) && remoteService != "frontend" {
-				tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUtil1)
+				tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, SSHUtils)
 				if err != nil {
 					rc.err = err
 					responseChan <- rc
 					return
 				}
 				// Copying the new toml file which includes both old and new configurations (for backend nodes).
-				err = sshUtil1.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
+				err = SSHUtils.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
 			} else {
 				// Copying the new toml file which includes new configurations (for frontend nodes).
-				err = sshUtil1.copyFileToRemote(fileName, remoteService+timestamp, false)
+				err = SSHUtils.copyFileToRemote(fileName, remoteService+timestamp, false)
 			}
 			if err != nil {
 				writer.Errorf("%v", err)
@@ -586,52 +606,56 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 
 			fmt.Printf("\nStarted Applying the Configurations in %s node: %s \n", remoteService, hostIP)
 
-			output, err := sshUtil1.connectAndExecuteCommandOnRemote(scriptCommands, true)
+			output, err := SSHUtils.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				writer.Errorf("%v", err)
 				rc.err = err
 				responseChan <- rc
 				return
 			}
-			//writer.Printf(output + "\n")
 			rc.outputString = output
 			responseChan <- rc
 
 		}(ips[i], responseChan)
 	}
-	var combinedErr error
+	getCertChannelValue(ips, responseChan, printCertRotateOutput)
+	return nil
+}
 
+func getCertChannelValue(ips []string, certRotateCmdResults chan CertRoateCmdResult, printCertRotateOutput func(CertRoateCmdResult, string, *cli.Writer)) error {
 	for i := 0; i < len(ips); i++ {
-		result := <-responseChan
-		if result.err != nil {
-			writer.Errorf("%v", err)
-			if combinedErr == nil {
-				combinedErr = result.err
-				writer.Printf("\nCommand result for ip: ", combinedErr)
-			} else {
-				combinedErr = errors.Wrap(combinedErr, result.err.Error())
-				writer.Printf("\nCommand result for ip: ", combinedErr)
-			}
+		CertRoateCmdResult := <-certRotateCmdResults
+		if CertRoateCmdResult.err != nil {
+			return CertRoateCmdResult.err
 		} else {
-			writer.Printf("\nOutput result for ip: %s", result.outputString+"\n")
-			writer.Successf("Successfully rotated for ip: %s", result.hostIp+"\n")
+			if CertRoateCmdResult.writer != nil {
+				printCertRotateOutput(CertRoateCmdResult, CertRoateCmdResult.nodeType, CertRoateCmdResult.writer)
+			}
 		}
-
 	}
-	return combinedErr
+	return nil
+}
 
-	// var errorStrings error = nil
-	// for i := 0; i < len(ips); i++ {
-	// 	response := <-responseChan
-	// 	if response.err != nil {
-	// 		if errorStrings != nil {
-	// 			errors.Wrap(response.err, errorStrings.Error())
-	// 		} else {
-	// 			errorStrings = response.err
-	// 		}
-	// 	}
-	// }
-	//return nil
+func printCertRotateOutput(cmdResult CertRoateCmdResult, remoteService string, writer *cli.Writer) {
+	writer.Printf("\n=======================================================================\n")
+	if cmdResult.err != nil || strings.Contains(cmdResult.outputString, "DeploymentServiceCallError") {
+		printCertRotateErrorOutput(cmdResult, remoteService, writer)
+	} else {
+		writer.Printf("Output for Host IP %s : \n%s", cmdResult.hostIp, cmdResult.outputString+"\n")
+		writer.Success("Command is executed on node : " + cmdResult.hostIp + "\n")
+	}
+	writer.BufferWriter().Flush()
+}
+
+func printCertRotateErrorOutput(cmdResult CertRoateCmdResult, remoteService string, writer *cli.Writer) {
+	isOutputError := false
+	if strings.Contains(cmdResult.outputString, "DeploymentServiceCallError") {
+		isOutputError = true
+		writer.Failf(CMD_FAILED_MSG, remoteService, cmdResult.hostIp, cmdResult.outputString)
+	}
+	if !isOutputError {
+		writer.Failf(CMD_FAILED_MSG, remoteService, cmdResult.hostIp, cmdResult.err.Error())
+	}
 }
 
 // validateEachIp validate given ip with the remoteService cluster.
@@ -760,11 +784,17 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 
 	if remoteService == POSTGRESQL {
 		if strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newRootCA {
-			skipIpsList = append(skipIpsList, c.getIps("frontend", infra)...)
+			skipIpsList = append(skipIpsList, c.getIps(POSTGRESQL, infra)...)
 		}
 	}
 
 	if remoteService == AUTOMATE {
+		if strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newRootCA {
+			skipIpsList = append(skipIpsList, c.getIps(AUTOMATE, infra)...)
+		}
+	}
+
+	if remoteService == CHEF_SERVER {
 		if strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newRootCA {
 			skipIpsList = append(skipIpsList, c.getIps(CHEF_SERVER, infra)...)
 		}
@@ -774,10 +804,10 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 }
 
 // getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
-func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
+func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, oldRootCA, node string, infra *AutomateHAInfraDetails) bool {
 	isRootCaSame := false
 
-	if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
+	if strings.TrimSpace(oldRootCA) == newRootCA {
 		isRootCaSame = true
 	}
 
@@ -788,14 +818,14 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA,
 	}
 
 	if node == "" && isRootCaSame && isCnSame {
-		return c.getIps("frontend", infra)
+		return true
 	}
 
 	if node != "" && isCnSame {
-		return c.getIps("frontend", infra)
+		return true
 	}
 
-	return []string{}
+	return false
 }
 
 // skipMessagePrinter print the skip message
