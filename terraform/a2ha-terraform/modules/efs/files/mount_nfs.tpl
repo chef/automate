@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 if mountpoint -q "${mount_path}"; then
-
+    echo "Mountpoint exist"
 else
     if  which yum &> /dev/null; then
         echo "yum package manager found; install redhat style packages"
