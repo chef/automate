@@ -14,7 +14,7 @@
   # Use a descriptive name for your cluster:
   #
   name = "opensearch"
-  max_shards_per_node= "6000"
+  max_shards_per_node= "2000"
 
   [cluster.routing.allocation]
     #
