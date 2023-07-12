@@ -943,6 +943,12 @@ paths = [
   "components/automate-cs-oc-erchef/*"
 ]
 
+[automate-cs-ocid]
+plan_path = "components/automate-cs-ocid"
+paths = [
+  "components/automate-cs-ocid/*"
+]
+
 [automate-cs-nginx]
 plan_path = "components/automate-cs-nginx"
 paths = [
@@ -958,12 +964,6 @@ paths = [
   "lib/secrets/*",
   "lib/stringutils/*",
   "lib/user/*"
-]
-
-[automate-cs-ocid]
-plan_path = "components/automate-cs-ocid"
-paths = [
-  "components/automate-cs-ocid/*"
 ]
 
 [automate-workflow-nginx]
