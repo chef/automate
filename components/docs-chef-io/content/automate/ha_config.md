@@ -16,7 +16,7 @@ gh_repo = "automate"
 {{< note >}}
 
 - All the nodes will apply the Frontend patch/set wherever the Postgresql and OpenSearch changes will be used to only one cluster node.
-- After patching/setting, some services will restart. So the health status will take good amount of time based on your data to show healthy.
+- After applying/adjusting any configuration, certain services will restart. The time required for your services to regain stability may vary depending on the amount of data stored in your system.
 
 {{< /note >}}
 
@@ -208,7 +208,7 @@ chef-automate config set path/to/opensearch-config.toml --os
 ```
 
 ### How to patch max shards per node for opensearch
-To configure OpenSearch max shard per node, create a TOML file that contains the partial configuration below. change max_shards_per_node as needed, and then run [command]({{< relref "ha_config/#patch-configuration-for-opensearch-cluster" >}}) to apply change.
+To configure OpenSearch max shard per node, create a TOML file that contains the partial configuration below. Change max_shards_per_node as needed, and then run [command]({{< relref "ha_config/#patch-configuration-for-opensearch-cluster" >}}) to apply change.
 
 ```toml
 [cluster]
