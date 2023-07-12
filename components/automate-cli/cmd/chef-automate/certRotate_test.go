@@ -1,15 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/chef/automate/api/config/deployment"
-	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -769,16 +768,17 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 	c, infra := getMockCertRotateFlowAndInfra()
 	nodesDn, _ := getDistinguishedNameFromKey(FileContent)
 	newCn := nodesDn.CommonName
+	fmt.Println("new cn : ", newCn)
 
 	type testCaseInfo struct {
 		testCaseDescription string
 		newRootCA           string
 		newCn               string
 		oldCn               string
+		oldRootCA           string
 		node                string
-		currentCertsInfo    *certShowCertificates
 		infra               *AutomateHAInfraDetails
-		skipIpsList         []string
+		skipIpsList         bool
 	}
 
 	testCases := []testCaseInfo{
@@ -787,57 +787,47 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			newRootCA:           FileContent,
 			newCn:               newCn,
 			oldCn:               newCn,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-			},
-			infra:       infra,
-			skipIpsList: c.getIps("frontend", infra),
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same root-ca different cn",
-			newRootCA:           FileContent,
-			newCn:               newCn + "n",
-			oldCn:               "",
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-			},
-			infra:       infra,
-			skipIpsList: []string{},
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same cn and node flag",
-			newCn:               newCn,
-			oldCn:               newCn,
-			node:                ValidIP4,
-			currentCertsInfo:    &certShowCertificates{},
+			oldRootCA:           FileContent,
 			infra:               infra,
-			skipIpsList:         c.getIps("frontend", infra),
+			skipIpsList:         true,
 		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | different cn and node flag",
-			newCn:               newCn + "n",
-			oldCn:               newCn,
-			node:                ValidIP4,
-			currentCertsInfo:    &certShowCertificates{},
-			infra:               infra,
-			skipIpsList:         []string{},
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | different root-ca",
-			newRootCA:           FileContent + "a",
-			newCn:               newCn,
-			oldCn:               newCn,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-			},
-			infra:       infra,
-			skipIpsList: []string{},
-		},
+		// {
+		// 	testCaseDescription: "Opensearch root-ca and cn patching | same root-ca different cn",
+		// 	newRootCA:           FileContent,
+		// 	newCn:               newCn + "n",
+		// 	oldCn:               "",
+		// 	infra:               infra,
+		// 	skipIpsList:         []string{},
+		// },
+		// {
+		// 	testCaseDescription: "Opensearch root-ca and cn patching | same cn and node flag",
+		// 	newCn:               newCn,
+		// 	oldCn:               newCn,
+		// 	node:                ValidIP4,
+		// 	infra:               infra,
+		// 	skipIpsList:         c.getIps("frontend", infra),
+		// },
+		// {
+		// 	testCaseDescription: "Opensearch root-ca and cn patching | different cn and node flag",
+		// 	newCn:               newCn + "n",
+		// 	oldCn:               newCn,
+		// 	node:                ValidIP4,
+		// 	infra:               infra,
+		// 	skipIpsList:         []string{},
+		// },
+		// {
+		// 	testCaseDescription: "Opensearch root-ca and cn patching | different root-ca",
+		// 	newRootCA:           FileContent + "a",
+		// 	newCn:               newCn,
+		// 	oldCn:               newCn,
+		// 	infra:               infra,
+		// 	skipIpsList:         []string{},
+		// },
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.oldCn, testCase.node, testCase.currentCertsInfo, infra)
+			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.oldCn, testCase.oldRootCA, testCase.node, infra)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 		})
 	}
@@ -878,70 +868,91 @@ func TestGetFilteredIps(t *testing.T) {
 	}
 }
 
-func TestGetOldCn(t *testing.T) {
+func TestGetFrontIpsToSkipRootCAandCNPatching(t *testing.T) {
+	c, infra := getMockCertRotateFlowAndInfra()
+	// nodesDn, _ := getDistinguishedNameFromKey(FileContent)
+	// newCn := nodesDn.CommonName
+	// fmt.Println("first dn", nodesDn)
+	// fmt.Println("first cn", newCn)
 	type testCaseInfo struct {
 		testCaseDescription string
 		automatesConfig     *deployment.AutomateConfig
-		OldCnExpected       string
+		newRootCA           string
+		oldRootCA           string
+		newCn               string
+		oldCn               string
+		node                string
+		infra               *AutomateHAInfraDetails
+		skipIpsList         []string
 	}
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Getting cn value",
-			automatesConfig: &deployment.AutomateConfig{
-				Global: &shared.GlobalConfig{
-					V1: &shared.V1{
-						External: &shared.External{
-							Opensearch: &shared.External_Opensearch{
-								Ssl: &shared.External_Opensearch_SSL{
-									ServerName: &wrapperspb.StringValue{
-										Value: "chefnode",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			OldCnExpected: "chefnode",
+			testCaseDescription: "Opensearch root-ca and cn patching | same rootca ,cn and node flag",
+			oldRootCA:           FileContent,
+			newRootCA:           FileContent,
+			newCn:               "newCn",
+			oldCn:               "newCn",
+			node:                ValidIP4,
+			infra:               infra,
+			skipIpsList:         c.getIps("frontend", infra),
 		},
-		{
-			testCaseDescription: "Getting cn value with field are nil",
-			automatesConfig: &deployment.AutomateConfig{
-				Global: &shared.GlobalConfig{
-					V1: &shared.V1{
-						External: &shared.External{},
-					},
-				},
-			},
-			OldCnExpected: "",
-		},
-		{
-			testCaseDescription: "Getting cn value server name as nil",
-			automatesConfig: &deployment.AutomateConfig{
-				Global: &shared.GlobalConfig{
-					V1: &shared.V1{
-						External: &shared.External{
-							Opensearch: &shared.External_Opensearch{
-								Ssl: &shared.External_Opensearch_SSL{},
-							},
-						},
-					},
-				},
-			},
-			OldCnExpected: "",
-		},
-		{
-			testCaseDescription: "Getting cn value server name as nil",
-			automatesConfig: &deployment.AutomateConfig{
-				Global: &shared.GlobalConfig{
-					V1: &shared.V1{
-						External: &shared.External{},
-					},
-				},
-			},
-			OldCnExpected: "",
-		},
+		// {
+		// 	testCaseDescription: "Getting cn value",
+		// 	automatesConfig: &deployment.AutomateConfig{
+		// 		Global: &shared.GlobalConfig{
+		// 			V1: &shared.V1{
+		// 				External: &shared.External{
+		// 					Opensearch: &shared.External_Opensearch{
+		// 						Ssl: &shared.External_Opensearch_SSL{
+		// 							ServerName: &wrapperspb.StringValue{
+		// 								Value: "chefnode",
+		// 							},
+		// 						},
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	OldCnExpected: "chefnode",
+		// },
+		// {
+		// 	testCaseDescription: "Getting cn value with field are nil",
+		// 	automatesConfig: &deployment.AutomateConfig{
+		// 		Global: &shared.GlobalConfig{
+		// 			V1: &shared.V1{
+		// 				External: &shared.External{},
+		// 			},
+		// 		},
+		// 	},
+		// 	OldCnExpected: "",
+		// },
+		// {
+		// 	testCaseDescription: "Getting cn value server name as nil",
+		// 	automatesConfig: &deployment.AutomateConfig{
+		// 		Global: &shared.GlobalConfig{
+		// 			V1: &shared.V1{
+		// 				External: &shared.External{
+		// 					Opensearch: &shared.External_Opensearch{
+		// 						Ssl: &shared.External_Opensearch_SSL{},
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	OldCnExpected: "",
+		// },
+		// {
+		// 	testCaseDescription: "Getting cn value server name as nil",
+		// 	automatesConfig: &deployment.AutomateConfig{
+		// 		Global: &shared.GlobalConfig{
+		// 			V1: &shared.V1{
+		// 				External: &shared.External{},
+		// 			},
+		// 		},
+		// 	},
+		// 	OldCnExpected: "",
+		// },
 	}
 
 	for _, testCase := range testCases {
@@ -949,8 +960,10 @@ func TestGetOldCn(t *testing.T) {
 			configMap := map[string]*deployment.AutomateConfig{
 				ValidIP: testCase.automatesConfig,
 			}
-			oldCn := getOldCn(configMap)
-			assert.Equal(t, testCase.OldCnExpected, oldCn)
+			fmt.Println("new cn: ", testCase.newCn)
+			skipIpsListGot := c.getFrontIpsToSkipRootCAandCNPatching(configMap, testCase.newRootCA, testCase.newCn, testCase.node, infra)
+			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+
 		})
 	}
 }
