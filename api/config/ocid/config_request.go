@@ -28,7 +28,7 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
-	c.V1.Sys.Network.Port = w.Int32(9090)
+	c.V1.Sys.Network.Port = w.Int32(10114)
 	c.V1.Sys.Network.ListenIp = w.String("127.0.0.1")
 
 	c.V1.Sys.Log.Level = w.String("info")
