@@ -1,9 +1,9 @@
 package ocid
 
 import (
+	"fmt"
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
-	"fmt"
 	"regexp"
 )
 
@@ -14,10 +14,10 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Log:       &ConfigRequest_V1_System_Log{},
-				Network:   &ConfigRequest_V1_System_Network{},
-				Sql:       &ConfigRequest_V1_System_Sql{},
-				Ocid: &ConfigRequest_V1_System_Ocid{},
+				Log:     &ConfigRequest_V1_System_Log{},
+				Network: &ConfigRequest_V1_System_Network{},
+				Sql:     &ConfigRequest_V1_System_Sql{},
+				Ocid:    &ConfigRequest_V1_System_Ocid{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -54,7 +54,7 @@ func (c *ConfigRequest) Validate() error {
 	oauthApplications := c.GetV1().GetSys().GetOcid().GetOauthApplicationConfig().GetOauthApplications()
 	oauthApplicationsCount := len(oauthApplications)
 
-	if(oauthApplicationsCount < 1){
+	if oauthApplicationsCount < 1 {
 		return nil
 	}
 
@@ -63,19 +63,19 @@ func (c *ConfigRequest) Validate() error {
 		redirectURI := oauthApplications[i].GetRedirectUri().GetValue()
 
 		// We need this condition to skip empty objects
-		if (appName == "" && redirectURI == ""){
+		if appName == "" && redirectURI == "" {
 			continue
 		}
 
 		// Validating App Name
-		if (appName == ""){
+		if appName == "" {
 			cfgErr.AddMissingKey("Oauth Application Name")
 		}
 
 		// Validating App Redirect URI
-		if (redirectURI == "" ){
+		if redirectURI == "" {
 			cfgErr.AddMissingKey("Oauth Application Redirect URI")
-		}else{
+		} else {
 			// Validating Redirect URI format
 			validUrl, _ := regexp.MatchString(regexValidURI, redirectURI)
 			if !validUrl {
