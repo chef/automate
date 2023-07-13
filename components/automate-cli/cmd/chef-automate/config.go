@@ -133,21 +133,8 @@ func init() {
 	setConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	//config oc-id-show-app flags
-	ocIdShowAppCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Shows registered OCID app details from all frontend nodes")
-	ocIdShowAppCmd.PersistentFlags().SetAnnotation("frontend", docs.Compatibility, []string{docs.CompatiblewithHA})
-	ocIdShowAppCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Shows registered OCID app details from all frontend nodes[DUPLICATE]")
-	ocIdShowAppCmd.PersistentFlags().SetAnnotation("fe", docs.Compatibility, []string{docs.CompatiblewithHA})
-	ocIdShowAppCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Shows registered OCID app details from Automate node(HA)")
-	ocIdShowAppCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
-	ocIdShowAppCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Shows registered OCID app details from Chef-server node(HA)")
-	ocIdShowAppCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
-	ocIdShowAppCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Shows registered OCID app details from Automate node(HA)[DUPLICATE]")
-	ocIdShowAppCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
-	ocIdShowAppCmd.PersistentFlags().BoolVar(&configCmdFlags.chef_server, "cs", false, "Shows registered OCID app details from Chef-server node(HA)[DUPLICATE]")
-	ocIdShowAppCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
 	ocIdShowAppCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, waitTimeout, DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config oc-id-show-app process")
 	ocIdShowAppCmd.PersistentFlags().SetAnnotation(waitTimeout, docs.Compatibility, []string{docs.CompatiblewithHA})
-
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -752,64 +739,35 @@ func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
-		  return err
+			return err
 		}
 		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
-		  return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+			return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
 		}
 
 		frontendCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
 		frontend := &Cmd{
-		  CmdInputs: &CmdInputs{
-		    Cmd:                      frontendCmd,
-		    WaitTimeout:              configCmdFlags.waitTimeout,
-		    Single:                   false,
-		    Args:                     args,
-		    ErrorCheckEnableInOutput: true,
-		    NodeType:                 configCmdFlags.frontend,
-		  },
-		}
-		automateCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
-		automate := &Cmd{
-		  CmdInputs: &CmdInputs{
-		    Cmd:                      automateCmd,
-		    WaitTimeout:              configCmdFlags.waitTimeout,
-		    Single:                   false,
-		    Args:                     args,
-		    ErrorCheckEnableInOutput: true,
-		    NodeType:                 configCmdFlags.automate,
-		  },
-		}
-
-		chefServerCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
-		chefServer := &Cmd{
-		  CmdInputs: &CmdInputs{
-		    Cmd:                      chefServerCmd,
-		    WaitTimeout:              configCmdFlags.waitTimeout,
-		    Single:                   false,
-		    Args:                     args,
-		    ErrorCheckEnableInOutput: true,
-		    NodeType:                 configCmdFlags.chef_server,
-		  },
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCmd,
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   true,
+				Args:                     args,
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 true,
+			},
 		}
 
 		nodeMap := &NodeTypeAndCmd{
-		  Frontend:   frontend,
-		  Automate:   automate,
-		  ChefServer: chefServer,
-		  Infra:      infra,
+			Frontend: frontend,
+			Infra:    infra,
 		}
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-		if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server {
-		  _, err := cmdUtil.Execute()
+		_, cmdExecErr := cmdUtil.Execute()
 
-		  if err != nil {
-		    return err
-		  }
-		} else {
-		  writer.Println(cmd.UsageString())
+		if cmdExecErr != nil {
+			return cmdExecErr
 		}
 	} else {
 		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
