@@ -8,11 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -428,4 +427,59 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))
+}
+
+func TestS3ConfigSkippedResponse(t *testing.T) {
+	type args struct {
+		config    *models.Config
+		checkType string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{
+		{
+			name: "Make the skip Response",
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 1,
+						AutomateNodeIps:   []string{constants.LOCALHOST},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{constants.LOCALHOST},
+					},
+				},
+				checkType: "s3-backup-config",
+			},
+			want: []models.CheckTriggerResponse{
+				{
+					NodeType: "automate",
+					CheckType: "s3-backup-config",
+					Result: models.ApiResult{
+						Passed: false,
+						Skipped: true,
+						Check: "s3-backup-config",
+					},
+					Host: constants.LOCALHOST,
+				},
+				{
+					NodeType: "chef-infra-server",
+					CheckType: "s3-backup-config",
+					Result: models.ApiResult{
+						Passed: false,
+						Skipped: true,
+						Check: "s3-backup-config",
+					},
+					Host: constants.LOCALHOST,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := s3ConfigSkippedResponse(tt.args.config, tt.args.checkType)
+			assert.Equal(t, tt.want, got)
+		})
+	}
 }
