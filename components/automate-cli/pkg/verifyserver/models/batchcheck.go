@@ -45,6 +45,7 @@ type FileSystem struct {
 	MountLocation string `json:"mount_location"`
 }
 type ObjectStorage struct {
+	Profile    string `json:"profile"`
 	Endpoint   string `json:"endpoint"`
 	BucketName string `json:"bucket_name"`
 	BasePath   string `json:"base_path"`
@@ -280,14 +281,19 @@ func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
 				BucketName: haConfig.Architecture.Aws.S3BucketName,
 			},
 		}
-		cred := credentials.NewSharedCredentials("", "")
-		creds, err := cred.Get()
-		if err != nil {
-			log.Println("populateAwsS3BucketName:", err)
-		}
-		c.Backup.ObjectStorage.AccessKey = creds.AccessKeyID
-		c.Backup.ObjectStorage.SecretKey = creds.SecretAccessKey
 		c.Backup.ObjectStorage.AWSRegion = haConfig.Aws.Config.Region
+
+		if haConfig.Aws.Config.Profile != "" {
+			cred := credentials.NewSharedCredentials("", "")
+			creds, err := cred.Get()
+			if err != nil {
+				log.Println("populateAwsS3BucketName:", err)
+			}
+
+			c.Backup.ObjectStorage.AccessKey = creds.AccessKeyID
+			c.Backup.ObjectStorage.SecretKey = creds.SecretAccessKey
+		}
+
 	}
 }
 

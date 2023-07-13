@@ -5,8 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,6 +12,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/local-user-service/password"
+	"github.com/chef/automate/lib/httputils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
@@ -21,19 +21,24 @@ import (
 )
 
 const (
-	DEPLOY    = "deploy"
-	PROVISION = "provision"
+	DEPLOY      = "deploy"
+	PROVISION   = "provision"
+	tokenurl    = "http://169.254.169.254/latest/api/token"
+	metaDataurl = "http://169.254.169.254/latest/meta-data/iam/info"
 )
 
 type awsDeployment struct {
 	config     AwsConfigToml
 	configPath string
 	AWSConfigIp
+	httpRequestClient httputils.HTTPClient
 }
 
 func newAwsDeployemnt(configPath string) *awsDeployment {
+	log := logger.NewLogrusStandardLogger()
 	return &awsDeployment{
-		configPath: configPath,
+		configPath:        configPath,
+		httpRequestClient: httputils.NewClient(log),
 	}
 }
 
@@ -209,7 +214,7 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.Profile) < 1 {
 		check, _ := a.getBastionIamRole()
 		if !check {
-			errorList.PushBack("Invalid Profile name or Bastion IAM Role, Please Check your Profile name or Bastion IAM Role provided")
+			errorList.PushBack("Invalid local AWS Profile name or Bastion IAM role, Please Check your local AWS Profile name or Bastion IAM Role is configured properly")
 		}
 	}
 	if len(a.config.Aws.Config.Region) < 1 {
@@ -451,39 +456,18 @@ func (a *awsDeployment) getAwsHAIp() error {
 }
 
 func (a *awsDeployment) getBastionIamRole() (bool, error) {
-	tokenurl := "http://169.254.169.254/latest/api/token"
-	tokenreq, err := http.NewRequest("PUT", tokenurl, nil)
+	_, tokenresponseBody, err := a.httpRequestClient.MakeRequestWithHeaders("PUT", tokenurl, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
 	if err != nil {
-		fmt.Errorf("Error in creating the Token fetching request =%v",err)
-		return false, err
+		return false, fmt.Errorf("error while getting the token value= %v", err)
 	}
-	tokenreq.Header.Set("X-aws-ec2-metadata-token-ttl-seconds", "21600")
-	tokenresp, err := http.DefaultClient.Do(tokenreq)
-	if err != nil {
-		fmt.Errorf("Error in creating the Token client request =%v",err)
-		return false, err
-	}
-	defer tokenresp.Body.Close()
 
-	responseBody, err := io.ReadAll(tokenresp.Body)
+	token := string(tokenresponseBody)
+
+	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders("GET", metaDataurl, nil, "X-aws-ec2-metadata-token", token)
 	if err != nil {
-		fmt.Errorf("Error in reading the Token response Body =%v",err)
-		return false, err
+		return false, fmt.Errorf("error while getting the response for  IAM role =%v", err)
 	}
-	token := string(responseBody)
-	url := "http://169.254.169.254/latest/meta-data/iam/info"
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Errorf("Error in creating the request for fetch IAM role from Bastion = %v", err)
-		return false, err
-	}
-	req.Header.Set("X-aws-ec2-metadata-token", token)
-	response, err := http.DefaultClient.Do(req)
-	if err != nil {
-		fmt.Errorf("Error in getting in response from Bastion IAM role request= %v", err)
-		return false, err
-	}
-	if response.StatusCode != 200 {
+	if resp.StatusCode != 200 {
 		return false, errors.New("Please check if Bastion has attached IAM Role onto it")
 	}
 	return true, nil

@@ -35,7 +35,9 @@ func (au *AwsUtilsImpl) NewSessionWithOptions(endpoint, accessKey, secretKey, re
 	}
 	config.Endpoint = &endpoint
 	config.Region = aws.String(region)
-	config.Credentials = credentials.NewStaticCredentials(accessKey, secretKey, "")
+	if accessKey != "" && secretKey != "" {
+		config.Credentials = credentials.NewStaticCredentials(accessKey, secretKey, "")
+	}
 	return session.NewSessionWithOptions(session.Options{
 		Config: config,
 	})

@@ -295,7 +295,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 	t.Run("cannot reach", func(t *testing.T) {
 		// create the CheckTrigger instance to be tested
 		hrc := HardwareResourceCountCheck{log: logger.NewTestLogger(), httpRequestClient: &httputils.MockHTTPClient{
-			func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+			MakeRequestFunc : func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 				return nil, []byte(""), errors.New("")
 			},
 		},host: "invalid-url"}

@@ -1,9 +1,6 @@
-module "bastion_IAM_role" {
-  source = "./modules/iam_role"
-}
 provider "aws" {
   region  = var.aws_region
-  profile = length(var.aws_profile) > 0 ? var.aws_profile : module.bastion_IAM_role.json_data
+  profile = length(var.aws_profile) > 0 ? var.aws_profile : ""
 }
 
 module "aws_metadata" {
