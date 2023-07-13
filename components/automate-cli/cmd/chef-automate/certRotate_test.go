@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
 	"github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -707,68 +708,10 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 	}
 }
 
-func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
-	c, infra := getMockCertRotateFlowAndInfra()
-	type testCaseInfo struct {
-		testCaseDescription string
-		remoteService       string
-		newRootCA           string
-		currentCertsInfo    *certShowCertificates
-		skipIpsList         []string
-	}
-
-	testCases := []testCaseInfo{
-		{
-			testCaseDescription: "Automate root-ca patching in chef-server | same root-ca",
-			remoteService:       AUTOMATE,
-			newRootCA:           FileContent,
-			currentCertsInfo: &certShowCertificates{
-				AutomateRootCert: FileContent,
-			},
-			skipIpsList: c.getIps(CHEF_SERVER, infra),
-		},
-		{
-			testCaseDescription: "Automate root-ca patching in chef-server | different root-ca",
-			remoteService:       AUTOMATE,
-			newRootCA:           FileContent + "a",
-			currentCertsInfo: &certShowCertificates{
-				AutomateRootCert: FileContent,
-			},
-			skipIpsList: []string{},
-		},
-		{
-			testCaseDescription: "Postgresql root-ca patching in frontend | same root-ca",
-			remoteService:       POSTGRESQL,
-			newRootCA:           FileContent,
-			currentCertsInfo: &certShowCertificates{
-				PostgresqlRootCert: FileContent,
-			},
-			skipIpsList: c.getIps("frontend", infra),
-		},
-		{
-			testCaseDescription: "Postgresql root-ca patching in frontEnd | different root-ca",
-			remoteService:       POSTGRESQL,
-			newRootCA:           FileContent + "a",
-			currentCertsInfo: &certShowCertificates{
-				PostgresqlRootCert: FileContent,
-			},
-			skipIpsList: []string{},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.getFrontEndIpsForSkippingRootCAPatching(testCase.remoteService, testCase.newRootCA, infra, testCase.currentCertsInfo)
-			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
-		})
-	}
-}
-
 func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 	c, infra := getMockCertRotateFlowAndInfra()
 	nodesDn, _ := getDistinguishedNameFromKey(FileContent)
 	newCn := nodesDn.CommonName
-	fmt.Println("new cn : ", newCn)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -778,57 +721,68 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 		oldRootCA           string
 		node                string
 		infra               *AutomateHAInfraDetails
-		skipIpsList         bool
+		skipIps             bool
 	}
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same cn and root-ca",
+			testCaseDescription: "Comparing old cn nd old rootCA | same cn and root-ca",
 			newRootCA:           FileContent,
+			oldRootCA:           FileContent,
 			newCn:               newCn,
 			oldCn:               newCn,
-			oldRootCA:           FileContent,
 			infra:               infra,
-			skipIpsList:         true,
+			skipIps:             true,
 		},
-		// {
-		// 	testCaseDescription: "Opensearch root-ca and cn patching | same root-ca different cn",
-		// 	newRootCA:           FileContent,
-		// 	newCn:               newCn + "n",
-		// 	oldCn:               "",
-		// 	infra:               infra,
-		// 	skipIpsList:         []string{},
-		// },
-		// {
-		// 	testCaseDescription: "Opensearch root-ca and cn patching | same cn and node flag",
-		// 	newCn:               newCn,
-		// 	oldCn:               newCn,
-		// 	node:                ValidIP4,
-		// 	infra:               infra,
-		// 	skipIpsList:         c.getIps("frontend", infra),
-		// },
-		// {
-		// 	testCaseDescription: "Opensearch root-ca and cn patching | different cn and node flag",
-		// 	newCn:               newCn + "n",
-		// 	oldCn:               newCn,
-		// 	node:                ValidIP4,
-		// 	infra:               infra,
-		// 	skipIpsList:         []string{},
-		// },
-		// {
-		// 	testCaseDescription: "Opensearch root-ca and cn patching | different root-ca",
-		// 	newRootCA:           FileContent + "a",
-		// 	newCn:               newCn,
-		// 	oldCn:               newCn,
-		// 	infra:               infra,
-		// 	skipIpsList:         []string{},
-		// },
+		{
+			testCaseDescription: "Comparing old cn nd old rootCA | same root-ca different cn",
+			newRootCA:           FileContent,
+			oldRootCA:           FileContent,
+			newCn:               newCn + "n",
+			oldCn:               "",
+			infra:               infra,
+			skipIps:             false,
+		},
+		{
+			testCaseDescription: "Comparing old cn nd old rootCA | different root-ca",
+			newRootCA:           FileContent + "a",
+			oldRootCA:           FileContent,
+			newCn:               newCn,
+			oldCn:               newCn,
+			infra:               infra,
+			skipIps:             false,
+		},
+		{
+			testCaseDescription: "Comparing old cn nd old rootCA | different root-ca same cn",
+			newRootCA:           FileContent + "a",
+			oldRootCA:           FileContent,
+			newCn:               newCn,
+			oldCn:               newCn,
+			infra:               infra,
+			skipIps:             false,
+		},
+		{
+			testCaseDescription: "Comparing old cn | different cn with node flag",
+			newCn:               newCn + "a",
+			oldCn:               newCn,
+			infra:               infra,
+			node:                ValidIP,
+			skipIps:             false,
+		},
+		{
+			testCaseDescription: "Comparing old cn | same cn with node flag",
+			newCn:               newCn ,
+			oldCn:               newCn,
+			infra:               infra,
+			node:                ValidIP,
+			skipIps:             true,
+		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.oldCn, testCase.oldRootCA, testCase.node, infra)
-			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+			skipIpsGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.oldCn, testCase.oldRootCA, testCase.node, infra)
+			assert.Equal(t, testCase.skipIps, skipIpsGot)
 		})
 	}
 }
@@ -868,12 +822,8 @@ func TestGetFilteredIps(t *testing.T) {
 	}
 }
 
-func TestGetFrontIpsToSkipRootCAandCNPatching(t *testing.T) {
+func TestGetFrontIpsToSkipRootCAandCNPatchingForOs(t *testing.T) {
 	c, infra := getMockCertRotateFlowAndInfra()
-	// nodesDn, _ := getDistinguishedNameFromKey(FileContent)
-	// newCn := nodesDn.CommonName
-	// fmt.Println("first dn", nodesDn)
-	// fmt.Println("first cn", newCn)
 	type testCaseInfo struct {
 		testCaseDescription string
 		automatesConfig     *deployment.AutomateConfig
@@ -888,80 +838,232 @@ func TestGetFrontIpsToSkipRootCAandCNPatching(t *testing.T) {
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same rootca ,cn and node flag",
-			oldRootCA:           FileContent,
-			newRootCA:           FileContent,
-			newCn:               "newCn",
-			oldCn:               "newCn",
-			node:                ValidIP4,
-			infra:               infra,
-			skipIpsList:         c.getIps("frontend", infra),
+			testCaseDescription: "Opensearch root-ca and cn patching | same rootca and CN ",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{
+							Opensearch: &shared.External_Opensearch{
+								Ssl: &shared.External_Opensearch_SSL{
+									ServerName: &wrapperspb.StringValue{
+										Value: "chefnode",
+									},
+									RootCert: &wrapperspb.StringValue{
+										Value: FileContent,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent,
+			newCn:       "chefnode",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{ValidIP},
 		},
-		// {
-		// 	testCaseDescription: "Getting cn value",
-		// 	automatesConfig: &deployment.AutomateConfig{
-		// 		Global: &shared.GlobalConfig{
-		// 			V1: &shared.V1{
-		// 				External: &shared.External{
-		// 					Opensearch: &shared.External_Opensearch{
-		// 						Ssl: &shared.External_Opensearch_SSL{
-		// 							ServerName: &wrapperspb.StringValue{
-		// 								Value: "chefnode",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	OldCnExpected: "chefnode",
-		// },
-		// {
-		// 	testCaseDescription: "Getting cn value with field are nil",
-		// 	automatesConfig: &deployment.AutomateConfig{
-		// 		Global: &shared.GlobalConfig{
-		// 			V1: &shared.V1{
-		// 				External: &shared.External{},
-		// 			},
-		// 		},
-		// 	},
-		// 	OldCnExpected: "",
-		// },
-		// {
-		// 	testCaseDescription: "Getting cn value server name as nil",
-		// 	automatesConfig: &deployment.AutomateConfig{
-		// 		Global: &shared.GlobalConfig{
-		// 			V1: &shared.V1{
-		// 				External: &shared.External{
-		// 					Opensearch: &shared.External_Opensearch{
-		// 						Ssl: &shared.External_Opensearch_SSL{},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	OldCnExpected: "",
-		// },
-		// {
-		// 	testCaseDescription: "Getting cn value server name as nil",
-		// 	automatesConfig: &deployment.AutomateConfig{
-		// 		Global: &shared.GlobalConfig{
-		// 			V1: &shared.V1{
-		// 				External: &shared.External{},
-		// 			},
-		// 		},
-		// 	},
-		// 	OldCnExpected: "",
-		// },
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | diff rootca and CN",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent + "a",
+			newCn:       "chefnode1",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | same rootca and diff CN",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent,
+			newCn:       "chefnode1",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | diff rootca and same CN",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent + "a",
+			newCn:       "chefnode",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | diff CN with node flag",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			newCn:       "chefnode1",
+			oldCn:       "chefnode",
+			node:        ValidIP,
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | same CN with node flag",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			newCn:       "chefnode",
+			oldCn:       "chefnode",
+			node:        ValidIP,
+			infra:       infra,
+			skipIpsList: []string{ValidIP},
+		},
 	}
 
 	for _, testCase := range testCases {
-		t.Run("GetOldCn", func(t *testing.T) {
+		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			configMap := map[string]*deployment.AutomateConfig{
 				ValidIP: testCase.automatesConfig,
 			}
-			fmt.Println("new cn: ", testCase.newCn)
-			skipIpsListGot := c.getFrontIpsToSkipRootCAandCNPatching(configMap, testCase.newRootCA, testCase.newCn, testCase.node, infra)
+			skipIpsListGot := c.getFrontIpsToSkipRootCAandCNPatchingForOs(configMap, testCase.newRootCA, testCase.newCn, testCase.node, infra)
+			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+
+		})
+	}
+}
+
+func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
+	c, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		testCaseDescription string
+		automatesConfig     *deployment.AutomateConfig
+		newRootCA           string
+		oldRootCA           string
+		infra               *AutomateHAInfraDetails
+		skipIpsList         []string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Postgresql root-ca comparing | same rootca ",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{
+							Postgresql: &shared.External_Postgresql{
+								Ssl: &shared.External_Postgresql_SSL{
+									RootCert: &wrapperspb.StringValue{
+										Value: FileContent,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent,
+			infra:       infra,
+			skipIpsList: []string{ValidIP},
+		},
+		{
+			testCaseDescription: "Postgresql root-ca comparing | diff rootca ",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{
+							Postgresql: &shared.External_Postgresql{
+							Ssl: &shared.External_Postgresql_SSL{
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent + "a",
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescription, func(t *testing.T) {
+			configMap := map[string]*deployment.AutomateConfig{
+				ValidIP: testCase.automatesConfig,
+			}
+			skipIpsListGot := c.getFrontIpsToSkipRootCAPatchingForPg(configMap, testCase.newRootCA, infra)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 
 		})
