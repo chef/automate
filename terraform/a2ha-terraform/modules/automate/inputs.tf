@@ -121,7 +121,6 @@ variable "infra" {
 }
 
 variable "managed_opensearch_certificate" {
-  default = ""
 }
 
 variable "managed_opensearch_domain_name" {
@@ -141,7 +140,6 @@ variable "managed_opensearch_username" {
 }
 
 variable "managed_rds_certificate" {
-  default = ""
 }
 
 variable "managed_rds_dbuser_password" {

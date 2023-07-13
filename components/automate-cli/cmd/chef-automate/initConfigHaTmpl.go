@@ -199,8 +199,8 @@ managed_opensearch_username = ""
 # eg: managed_opensearch_user_password = "Progress@123"
 managed_opensearch_user_password = ""
 
-# eg: managed_opensearch_certificate = "<cert content>"
-managed_opensearch_certificate = ""
+# eg: managed_opensearch_certificate = """<cert content>"""
+managed_opensearch_certificate = """"""
 
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
 aws_os_snapshot_role_arn = ""
@@ -226,8 +226,8 @@ managed_rds_dbuser_username = ""
 # eg: managed_rds_dbuser_password = "Progress123"
 managed_rds_dbuser_password = ""
 
-# eg: managed_rds_certificate = "<cert content>"
-managed_rds_certificate = ""
+# eg: managed_rds_certificate = """<cert content>"""
+managed_rds_certificate = """"""
 
 ## === ===
 
@@ -515,7 +515,8 @@ dbuser_username = ""
 dbuser_password = ""
 
 # In case of AWS managed RDS leave it blank
-postgresql_root_cert = "<cert_content>"
+# eg: postgresql_root_cert = """<cert content>"""
+postgresql_root_cert = """"""
 
 [external.database.open_search]
 
@@ -532,7 +533,8 @@ opensearch_username = ""
 opensearch_user_password = ""
 
 # In case of AWS managed opensearch leave it blank
-opensearch_root_cert = "<cert_content>"
+# eg: opensearch_root_cert = """<cert content>"""
+opensearch_root_cert = """"""
 
 [external.database.open_search.aws]
 

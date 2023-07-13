@@ -26,7 +26,9 @@ managed_opensearch_domain_name = " "
 managed_opensearch_domain_url = " "
 managed_opensearch_username = " "
 managed_opensearch_user_password = " "
-managed_opensearch_certificate = " "
+managed_opensearch_certificate = <<-EOT
+
+EOT
 aws_os_snapshot_role_arn = " "
 os_snapshot_user_access_key_id = " "
 os_snapshot_user_access_key_secret = " "
@@ -35,7 +37,9 @@ managed_rds_superuser_username = " "
 managed_rds_superuser_password = " "
 managed_rds_dbuser_username = " "
 managed_rds_dbuser_password = " "
-managed_rds_certificate = " "
+managed_rds_certificate = <<-EOT
+
+EOT
 aws_ami_id = "ami-061534684251"
 lb_access_logs = "false"
 automate_lb_certificate_arn = "arn:aws:acm:us-west-1:11275563:certificate/1a0995"
