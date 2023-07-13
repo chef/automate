@@ -1,6 +1,3 @@
-[cluster]
-  max_shards_per_node = "2000"
-
 [network]
   port = ${listen_port}
   host = "${private_ip}"
