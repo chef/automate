@@ -130,7 +130,6 @@ func init() {
 	ocIdShowAppCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, waitTimeout, DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config oc-id-show-app process")
 	ocIdShowAppCmd.PersistentFlags().SetAnnotation(waitTimeout, docs.Compatibility, []string{docs.CompatiblewithHA})
 
-
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
 	configCmd.PersistentFlags().SetAnnotation("timeout", docs.Compatibility, []string{docs.CompatiblewithStandalone})
@@ -659,41 +658,35 @@ func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
-		  return err
+			return err
 		}
 		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
-		  return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+			return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
 		}
-
-		configCmdFlags.frontend = true
 
 		frontendCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
 		frontend := &Cmd{
-		  CmdInputs: &CmdInputs{
-		    Cmd:                      frontendCmd,
-		    WaitTimeout:              configCmdFlags.waitTimeout,
-		    Single:                   true,
-		    Args:                     args,
-		    ErrorCheckEnableInOutput: true,
-		    NodeType:                 configCmdFlags.frontend,
-		  },
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCmd,
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   true,
+				Args:                     args,
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 true,
+			},
 		}
-		
+
 		nodeMap := &NodeTypeAndCmd{
-		  Frontend:   frontend,
-		  Infra:      infra,
+			Frontend: frontend,
+			Infra:    infra,
 		}
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-		if configCmdFlags.frontend {
-		  _, cmdExecErr := cmdUtil.Execute()
+		_, cmdExecErr := cmdUtil.Execute()
 
-		  if cmdExecErr != nil {
-		    return cmdExecErr
-		  }
-		} else {
-		  writer.Println(cmd.UsageString())
+		if cmdExecErr != nil {
+			return cmdExecErr
 		}
 	} else {
 		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
