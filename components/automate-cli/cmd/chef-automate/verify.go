@@ -712,6 +712,9 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 
 			statusMessage := &reporting.StatusMessage{}
 			statusMessage.MainMessage = fmt.Sprintf("%s - %s", test.Message, info.Status)
+			if test.Skipped {
+				statusMessage.MainMessage = fmt.Sprintf("%s\n- %s", statusMessage.MainMessage, test.SkipMessage)
+			}
 			statusMessage.SubMessage = errorMsgs
 			info.StatusMessage = statusMessage
 

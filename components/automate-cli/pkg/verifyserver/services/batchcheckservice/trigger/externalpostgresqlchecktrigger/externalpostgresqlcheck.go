@@ -29,7 +29,7 @@ func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTrigg
 		return trigger.HardwareNil(constants.EXTERNAL_POSTGRESQL, false, false, false)
 	}
 	if config.ExternalPG == nil {
-		return externalPGNillResp(config, constants.EXTERNAL_POSTGRESQL)
+		return externalPGNillResp(config, constants.EXTERNAL_POSTGRESQL, "Using Chef Managed PostgreSQL")
 	}
 	if isEmptyExternalPG(config.ExternalPG) {
 		return externalPGEmptyResp(config, constants.EXTERNAL_POSTGRESQL)
@@ -87,15 +87,15 @@ func getPostgresRequest(details *models.ExternalPG) models.ExternalPgRequest {
 	}
 }
 
-func externalPGNillResp(config *models.Config, checkType string) []models.CheckTriggerResponse {
+func externalPGNillResp(config *models.Config, checkType, message string) []models.CheckTriggerResponse {
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE, message))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, message))
 	}
 
 	return triggerResps

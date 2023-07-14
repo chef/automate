@@ -303,14 +303,15 @@ func ErrTriggerCheckResp(ip, checkType, nodeType, msg string) models.CheckTrigge
 	}
 }
 
-func SkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
+func SkippedTriggerCheckResp(ip, checktype, nodeType, message string) models.CheckTriggerResponse {
 	return models.CheckTriggerResponse{
 		NodeType:  nodeType,
 		CheckType: checktype,
 		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-			Check:   checktype,
+			Passed:      false,
+			Skipped:     true,
+			Check:       checktype,
+			SkipMessage: message,
 		},
 		Host: ip,
 	}
@@ -334,19 +335,19 @@ func ConstructEmptyResp(config *models.Config, checktype, msg string) []models.C
 	return resps
 }
 
-func ConstructNilResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+func ConstructNilResp(config *models.Config, checktype, message string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE, message))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, message))
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL, message))
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH, message))
 	}
 
 	return resps

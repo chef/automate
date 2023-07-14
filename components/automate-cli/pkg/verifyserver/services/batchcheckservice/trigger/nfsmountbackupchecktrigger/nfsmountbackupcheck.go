@@ -35,7 +35,7 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, true, true, false)
 	}
 	if config.Backup == nil || config.Backup.FileSystem == nil {
-		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG)
+		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG, "Backup settings not set")
 	}
 	if isMountLocationEmpty(config.Backup) {
 		return trigger.ConstructEmptyResp(config, constants.NFS_BACKUP_CONFIG, constants.MOUNT_LOCATION_MISSING)

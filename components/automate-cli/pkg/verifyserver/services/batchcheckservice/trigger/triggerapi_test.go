@@ -216,10 +216,10 @@ func TestTriggerCheckAPI(t *testing.T) {
 		}))
 		defer server.Close()
 		requestBody := models.SshUserChecksRequest{
-			Ip: "1.1.1.1",
-			UserName: "admin",
-			Port: "22",
-			PrivateKey: "",
+			Ip:           "1.1.1.1",
+			UserName:     "admin",
+			Port:         "22",
+			PrivateKey:   "",
 			SudoPassword: "",
 		}
 		output := make(chan models.CheckTriggerResponse)
@@ -603,14 +603,15 @@ func TestGetSkippedTriggerCheckResp(t *testing.T) {
 		NodeType:  nodeType,
 		CheckType: checkType,
 		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-			Check:   checkType,
+			Passed:      false,
+			Skipped:     true,
+			Check:       checkType,
+			SkipMessage: "test",
 		},
 		Host: ip,
 	}
 
-	result := SkippedTriggerCheckResp(ip, checkType, nodeType)
+	result := SkippedTriggerCheckResp(ip, checkType, nodeType, "test")
 
 	assert.Equal(t, expected, result)
 }
@@ -627,19 +628,20 @@ func TestGetNilResp(t *testing.T) {
 	}
 
 	checkType := "sampleCheckType"
+	exampleSkip := "skip test message"
 
 	expectedResponses := []models.CheckTriggerResponse{
-		SkippedTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE),
-		SkippedTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE),
-		SkippedTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER),
-		SkippedTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER),
-		SkippedTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL),
-		SkippedTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL),
-		SkippedTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH),
-		SkippedTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH),
+		SkippedTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE, exampleSkip),
+		SkippedTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE, exampleSkip),
+		SkippedTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER, exampleSkip),
+		SkippedTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER, exampleSkip),
+		SkippedTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL, exampleSkip),
+		SkippedTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL, exampleSkip),
+		SkippedTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH, exampleSkip),
+		SkippedTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH, exampleSkip),
 	}
 
-	responses := ConstructNilResp(config, checkType)
+	responses := ConstructNilResp(config, checkType, exampleSkip)
 
 	assert.Equal(t, expectedResponses, responses)
 }

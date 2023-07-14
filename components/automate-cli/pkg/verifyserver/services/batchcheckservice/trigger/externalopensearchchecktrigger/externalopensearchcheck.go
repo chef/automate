@@ -28,7 +28,7 @@ func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTri
 		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, false, false, false)
 	}
 	if config.ExternalOS == nil {
-		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH)
+		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH, "Using Chef Managed OpenSearch"))
 	}
 
 	if isEmptyExternalOS(config.ExternalOS) {
@@ -85,15 +85,15 @@ func getOpensearchRequest(details *models.ExternalOS) models.ExternalOSRequest {
 
 }
 
-func externalOSNillResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+func externalOSNillResp(config *models.Config, checktype, message string) []models.CheckTriggerResponse {
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE, message))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, message))
 	}
 
 	return triggerResps
