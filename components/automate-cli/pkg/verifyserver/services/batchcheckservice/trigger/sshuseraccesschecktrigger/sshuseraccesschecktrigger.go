@@ -38,7 +38,7 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 		return trigger.HardwareNil(constants.SSH_USER, true, true, false)
 	}
 	if config.SSHUser == nil {
-		return trigger.ConstructNilResp(config, constants.SSH_USER)
+		return trigger.ConstructNilResp(config, constants.SSH_USER, "SSH credentials missing")
 	}
 	if IsSSHUserEmpty(config.SSHUser) {
 		return trigger.ConstructEmptyResp(config, constants.SSH_USER, "SSH credentials is missing")

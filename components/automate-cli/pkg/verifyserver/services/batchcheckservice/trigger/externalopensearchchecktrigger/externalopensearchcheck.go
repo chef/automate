@@ -28,7 +28,7 @@ func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTri
 		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, false, false, false)
 	}
 	if config.ExternalOS == nil {
-		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH, "Using Chef Managed OpenSearch"))
+		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH, "Using Chef Managed OpenSearch")
 	}
 
 	if isEmptyExternalOS(config.ExternalOS) {

@@ -25,7 +25,7 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil {
 		return []models.CheckTriggerResponse{
-			trigger.SkippedTriggerCheckResp("-", constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
+			trigger.SkippedTriggerCheckResp("-", constants.S3_BACKUP_CONFIG, constants.AUTOMATE, "Missing instance counts and instance IPs"),
 		}
 	}
 
@@ -45,11 +45,11 @@ func s3ConfigSkippedResponse(config *models.Config, checkType string) []models.C
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE, "Backup settings not set"))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, "Backup settings not set"))
 	}
 
 	return triggerResps
