@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-if mountpoint -q "${mount_path}"; then
+if  grep -qs "${mount_path}" /proc/mounts; then
     echo "Mountpoint exist"
 else
     if  which yum &> /dev/null; then
