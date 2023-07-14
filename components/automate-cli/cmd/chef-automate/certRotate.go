@@ -287,7 +287,8 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 		skipIpsList:   skipIpsList,
 	}
 
-	err := c.patchConfig(patchFnParam, true)
+	nodeOpUtils := &NodeUtilsImpl{}
+	err := c.patchConfig(patchFnParam, true, nodeOpUtils)
 	if err != nil {
 		return err
 	}
@@ -326,8 +327,9 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 		skipIpsList:   skipIpsList,
 	}
 
+	nodeOpUtils := &NodeUtilsImpl{}
 	// patching on PG
-	err := c.patchConfig(patchFnParam, false)
+	err := c.patchConfig(patchFnParam, false, nodeOpUtils)
 	if err != nil {
 		return err
 	}
@@ -344,7 +346,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-	fmt.Printf("new root ca : %s ", certs.rootCA)
+
 	//get frontend ips to skip root-ca patch
 	skipIpsList = c.getFrontIpsToSkipRootCAPatchingForPg(automateCurrentConfig, certs.rootCA, infra)
 
@@ -370,7 +372,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	patchFnParam.remoteService = remoteService
 	patchFnParam.skipIpsList = skipIpsList
 
-	err = c.patchConfig(patchFnParam, true)
+	err = c.patchConfig(patchFnParam, true, nodeOpUtils)
 	if err != nil {
 		return err
 	}
@@ -432,7 +434,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		skipIpsList:   skipIpsList,
 	}
 
-	err = c.patchConfig(patchFnParam, false)
+	nodeOpUtils := &NodeUtilsImpl{}
+	err = c.patchConfig(patchFnParam, false, nodeOpUtils)
 	if err != nil {
 		return err
 	}
@@ -492,7 +495,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	patchFnParam.remoteService = remoteService
 	patchFnParam.skipIpsList = skipIpsList
 
-	err = c.patchConfig(patchFnParam, true)
+	err = c.patchConfig(patchFnParam, true, nodeOpUtils)
 	if err != nil {
 		return err
 	}
@@ -510,8 +513,8 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	patchFnParam.config = peerConfig
 	patchFnParam.timestamp = time.Now().Format("20060102150405")
 	patchFnParam.skipIpsList = []string{flagsObj.node}
-
-	err := c.patchConfig(patchFnParam, false)
+	nodeOpUtils := &NodeUtilsImpl{}
+	err := c.patchConfig(patchFnParam, false, nodeOpUtils)
 	if err != nil {
 		return err
 	}
@@ -526,14 +529,14 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAandCNPatchingForOs(automatesConf
 	skipIpsList := []string{}
 	for ip, config := range automatesConfig {
 		if config.Global.V1.External.Opensearch != nil && config.Global.V1.External.Opensearch.Ssl != nil {
-			if config.Global.V1.External.Opensearch.Ssl.RootCert != nil {
-				oldRootCA = config.Global.V1.External.Opensearch.Ssl.RootCert.Value
+			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
+				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
 				if c.getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, oldRootCA, node, infra) {
 					skipIpsList = append(skipIpsList, ip)
 				}
 			}
-			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
-				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
+			if config.Global.V1.External.Opensearch.Ssl.RootCert != nil {
+				oldRootCA = config.Global.V1.External.Opensearch.Ssl.RootCert.Value
 				if c.getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, oldRootCA, node, infra) {
 					skipIpsList = append(skipIpsList, ip)
 				}
@@ -561,7 +564,7 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAPatchingForPg(automatesConfig ma
 }
 
 // patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool) error {
+func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool, nodeOpUtils NodeOpUtils) error {
 
 	f, err := os.Create(param.fileName)
 	if err != nil {
@@ -603,7 +606,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool) 
 			return err
 		}
 	} else {
-		err = c.copyAndExecuteConCurrently(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
+		err = c.copyAndExecuteConcurrently(nodeOpUtils, filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
 		if err != nil {
 			return err
 		}
@@ -645,13 +648,13 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 }
 
 // copyAndExecute will copy the toml file to each required node and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecuteConCurrently(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
+func (c *certRotateFlow) copyAndExecuteConcurrently(nu NodeOpUtils, ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
 	//var err error
 	var tomlFilePath string
 	responseChan := make(chan CertRotateCmdResult, len(ips))
 	defer close(responseChan)
 	for i := 0; i < len(ips); i++ {
-		infra, err := getAutomateHAInfraDetails()
+		infra, _, err := nu.getHaInfraDetails()
 		if err != nil {
 			return err
 		}
@@ -685,7 +688,6 @@ func (c *certRotateFlow) copyAndExecuteConCurrently(ips []string, sshUtil SSHUti
 
 			output, err := SSHUtils.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
-				writer.Errorf("%v", err)
 				rc.err = err
 				responseChan <- rc
 				return
@@ -702,18 +704,13 @@ func (c *certRotateFlow) copyAndExecuteConCurrently(ips []string, sshUtil SSHUti
 func getCertChannelValue(ips []string, certRotateCmdResults chan CertRotateCmdResult, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) {
 	for i := 0; i < len(ips); i++ {
 		CertRotateCmdResult := <-certRotateCmdResults
-		if CertRotateCmdResult.err != nil {
-			writer.Printf("\nCommand result for ip: %s ", CertRotateCmdResult.err)
-		} else {
-			if CertRotateCmdResult.writer != nil {
-				printCertRotateOutput(CertRotateCmdResult, CertRotateCmdResult.nodeType, CertRotateCmdResult.writer)
-			}
-		}
+		printCertRotateOutput(CertRotateCmdResult, CertRotateCmdResult.nodeType, CertRotateCmdResult.writer)
 	}
 }
 
 func printCertRotateOutput(cmdResult CertRotateCmdResult, remoteService string, writer *cli.Writer) {
 	writer.Printf("\n=======================================================================\n")
+
 	if cmdResult.err != nil || strings.Contains(cmdResult.outputString, "DeploymentServiceCallError") {
 		printCertRotateErrorOutput(cmdResult, remoteService, writer)
 	} else {
