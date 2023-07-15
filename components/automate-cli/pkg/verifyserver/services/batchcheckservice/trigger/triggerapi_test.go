@@ -526,7 +526,7 @@ func TestNilResp(t *testing.T) {
 		},
 	}
 
-	result1 := HardwareNil(checkType, false, false, false)
+	result1 := HardwareNil(checkType, "ip and instance count empty", false, false, false)
 	assert.Equal(t, expected1, result1)
 
 	// Test case 2: Include OPENSEARCH
@@ -541,7 +541,7 @@ func TestNilResp(t *testing.T) {
 		Host: constants.UNKNOWN_HOST,
 	})
 
-	result2 := HardwareNil(checkType, true, false, false)
+	result2 := HardwareNil(checkType, "ip and instance count empty", true, false, false)
 	assert.Equal(t, expected2, result2)
 
 	// Test case 3: Include POSTGRESQL and BASTION
@@ -565,7 +565,7 @@ func TestNilResp(t *testing.T) {
 		Host: constants.LOCALHOST,
 	})
 
-	result3 := HardwareNil(checkType, true, true, true)
+	result3 := HardwareNil(checkType, "ip and instance count empty", true, true, true)
 	assert.Equal(t, expected3, result3)
 }
 

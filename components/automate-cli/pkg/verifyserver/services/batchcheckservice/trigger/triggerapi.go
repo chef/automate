@@ -221,15 +221,16 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 	return reader, nil
 }
 
-func HardwareNil(checkType string, includeOPENSEARCH bool, includePOSTGRESQL bool, includeBASTION bool) []models.CheckTriggerResponse {
+func HardwareNil(checkType, message string, includeOPENSEARCH bool, includePOSTGRESQL bool, includeBASTION bool) []models.CheckTriggerResponse {
 	responses := []models.CheckTriggerResponse{
 		{
 			NodeType:  constants.AUTOMATE,
 			CheckType: checkType,
 			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
 			},
 			Host: constants.UNKNOWN_HOST,
 		},
@@ -237,9 +238,10 @@ func HardwareNil(checkType string, includeOPENSEARCH bool, includePOSTGRESQL boo
 			NodeType:  constants.CHEF_INFRA_SERVER,
 			CheckType: checkType,
 			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
 			},
 			Host: constants.UNKNOWN_HOST,
 		},
@@ -250,9 +252,10 @@ func HardwareNil(checkType string, includeOPENSEARCH bool, includePOSTGRESQL boo
 			NodeType:  constants.OPENSEARCH,
 			CheckType: checkType,
 			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
 			},
 			Host: constants.UNKNOWN_HOST,
 		})
@@ -263,9 +266,10 @@ func HardwareNil(checkType string, includeOPENSEARCH bool, includePOSTGRESQL boo
 			NodeType:  constants.POSTGRESQL,
 			CheckType: checkType,
 			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
 			},
 			Host: constants.UNKNOWN_HOST,
 		})
@@ -278,6 +282,7 @@ func HardwareNil(checkType string, includeOPENSEARCH bool, includePOSTGRESQL boo
 			Result: models.ApiResult{
 				Passed:  false,
 				Skipped: true,
+				Message: message,
 				Check:   checkType,
 			},
 			Host: constants.LOCALHOST,

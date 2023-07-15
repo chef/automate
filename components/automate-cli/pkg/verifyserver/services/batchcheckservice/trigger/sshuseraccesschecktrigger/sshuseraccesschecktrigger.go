@@ -35,7 +35,7 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 
 	// Check if certificate is empty or nil
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.SSH_USER, true, true, false)
+		return trigger.HardwareNil(constants.SSH_USER, "ip and instance count empty", true, true, false)
 	}
 	if config.SSHUser == nil {
 		return trigger.ConstructNilResp(config, constants.SSH_USER, "SSH credentials missing")
