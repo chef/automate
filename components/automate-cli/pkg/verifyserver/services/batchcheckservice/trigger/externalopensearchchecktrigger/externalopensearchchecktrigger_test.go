@@ -420,7 +420,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					assert.Equal(t, "127.0.0.1", got[0].Host)
 					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 					assert.True(t, got[0].Result.Skipped)
-					assert.Equal(t, "Using Chef Managed OpenSearch", got[0].Result.SkipMessage)
+					assert.Equal(t, constants.SKIP_MANAGED_OS_TEST_MESSAGE, got[0].Result.SkipMessage)
 				} else {
 					assert.Nil(t, got[0].Result.Error)
 					assert.Equal(t, constants.LOCALHOST, got[0].Host)

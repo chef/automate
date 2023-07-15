@@ -852,7 +852,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
 			assert.True(t, v.Result.Skipped)
-			assert.Equal(t, "Missing instance counts and instance IPs", v.Result.SkipMessage)
+			assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, v.Result.SkipMessage)
 		}
 	})
 
@@ -884,7 +884,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
 			assert.True(t, v.Result.Skipped)
-			assert.Equal(t, "Backup settings not set", v.Result.SkipMessage)
+			assert.Equal(t, constants.SKIP_BACKUP_TEST_MESSAGE, v.Result.SkipMessage)
 		}
 	})
 	t.Run("Empty FileSystem", func(t *testing.T) {

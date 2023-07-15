@@ -29,12 +29,12 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.ExternalOS == nil || config.Backup == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
-			trigger.SkippedTriggerCheckResp("-", constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, "External OpenSearch configuration or Backup config not provided"),
+			trigger.SkippedTriggerCheckResp("-", constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.SKIP_OS_BUCKET_TEST_MESSAGE),
 		}
 	}
 	if config.ExternalDbType == cfg.SELF_MANAGED {
 		return []models.CheckTriggerResponse{
-			trigger.SkippedTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, "External OpenSearch is self managed"),
+			trigger.SkippedTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.SKIP_OS_BUCKET_TEST_SELF_MANAGED_MESSAGE),
 		}
 	}
 	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {

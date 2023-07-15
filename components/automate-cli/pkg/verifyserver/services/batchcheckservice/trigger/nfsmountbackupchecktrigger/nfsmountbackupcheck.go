@@ -32,10 +32,10 @@ func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigChe
 
 func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, "Missing instance counts and instance IPs", true, true, false)
+		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, true, false)
 	}
 	if config.Backup == nil || config.Backup.FileSystem == nil {
-		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG, "Backup settings not set")
+		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG, constants.SKIP_BACKUP_TEST_MESSAGE)
 	}
 	if isMountLocationEmpty(config.Backup) {
 		return trigger.ConstructEmptyResp(config, constants.NFS_BACKUP_CONFIG, constants.MOUNT_LOCATION_MISSING)

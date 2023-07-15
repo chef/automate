@@ -345,7 +345,7 @@ func TestRunS3BackupCheck(t *testing.T) {
 		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
 		assert.True(t, got[0].Result.Skipped)
-		assert.Equal(t, "Missing instance counts and instance IPs", got[0].Result.SkipMessage)
+		assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[0].Result.SkipMessage)
 
 	})
 

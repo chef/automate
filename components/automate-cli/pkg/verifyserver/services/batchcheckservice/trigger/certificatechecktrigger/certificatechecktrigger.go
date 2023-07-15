@@ -30,7 +30,7 @@ func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResp
 
 	// Check if certificate is empty or nil
 	if isCertificateNil(config.Certificate) {
-		return trigger.ConstructNilResp(config, constants.CERTIFICATE, "Using default certificates")
+		return trigger.ConstructNilResp(config, constants.CERTIFICATE, constants.SKIP_CERT_TEST_MESSAGE)
 	}
 	if isCertificateEmpty(config.Certificate) {
 		return trigger.ConstructEmptyResp(config, constants.CERTIFICATE, constants.MISSING_CERTIFICATE)
@@ -95,7 +95,7 @@ func skipCertificateForAutomateAndChefServerNodes(nodeType string, hardwareMap m
 	for ip, nodeTypes := range hardwareMap {
 		for _, nodeTypeMap := range nodeTypes {
 			if nodeTypeMap == nodeType {
-				result = append(result, trigger.SkippedTriggerCheckResp(ip, constants.CERTIFICATE, nodeTypeMap, "Using default certificates for nodes"))
+				result = append(result, trigger.SkippedTriggerCheckResp(ip, constants.CERTIFICATE, nodeTypeMap, constants.SKIP_NODE_CERT_TEST_MESSAGE))
 			}
 		}
 	}
