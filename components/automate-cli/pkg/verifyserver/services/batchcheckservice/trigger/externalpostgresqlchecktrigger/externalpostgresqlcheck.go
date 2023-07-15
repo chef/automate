@@ -26,7 +26,7 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for nil or empty req body
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.EXTERNAL_POSTGRESQL, "ip and instance count empty", false, false, false)
+		return trigger.HardwareNil(constants.EXTERNAL_POSTGRESQL, "Missing instance counts and instance IPs", false, false, false)
 	}
 	if config.ExternalPG == nil {
 		return externalPGNillResp(config, constants.EXTERNAL_POSTGRESQL, "Using Chef Managed PostgreSQL")

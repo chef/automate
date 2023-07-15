@@ -32,7 +32,7 @@ func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerRespons
 	fc.log.Info("Performing Firewall check from batch check ")
 
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.FIREWALL, "ip and instance count empty", true, true, true)
+		return trigger.HardwareNil(constants.FIREWALL, "Missing instance counts and instance IPs", true, true, true)
 	}
 
 	requestMap := make(map[string][]models.FirewallRequest)

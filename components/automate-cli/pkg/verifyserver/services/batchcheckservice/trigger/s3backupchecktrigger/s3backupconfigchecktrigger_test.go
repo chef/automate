@@ -264,7 +264,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "Internal Server Error",
+			response:               "Internal Server Error",
 			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
@@ -291,7 +291,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 				},
 			},
 			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
-			response: "context deadline exceeded",
+			response:               "context deadline exceeded",
 		},
 	}
 	for _, tt := range tests {
@@ -345,6 +345,7 @@ func TestRunS3BackupCheck(t *testing.T) {
 		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
 		assert.True(t, got[0].Result.Skipped)
+		assert.Equal(t, "Missing instance counts and instance IPs", got[0].Result.SkipMessage)
 
 	})
 

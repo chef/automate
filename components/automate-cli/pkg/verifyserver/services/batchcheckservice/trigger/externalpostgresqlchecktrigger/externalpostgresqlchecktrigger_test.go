@@ -311,7 +311,7 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "Internal Server Error",
+			response:               "Internal Server Error",
 			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
@@ -335,7 +335,7 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "context deadline exceeded",
+			response:               "context deadline exceeded",
 			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
 		},
 		{
@@ -418,6 +418,7 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 					assert.Equal(t, "127.0.0.1", got[0].Host)
 					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 					assert.True(t, got[0].Result.Skipped)
+					assert.Equal(t, "Using Chef Managed PostgreSQL", got[0].Result.SkipMessage)
 				} else {
 					assert.Nil(t, got[0].Result.Error)
 					assert.Equal(t, constants.LOCALHOST, got[0].Host)

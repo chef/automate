@@ -30,7 +30,7 @@ func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.FQDN, "ip and instance count empty", false, false, false)
+		return trigger.HardwareNil(constants.FQDN, "Missing instance counts and instance IPs", false, false, false)
 	}
 
 	if config.Certificate == nil {

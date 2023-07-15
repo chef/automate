@@ -25,7 +25,7 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for nil or empty req body
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, "ip and instance count empty", false, false, false)
+		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, "Missing instance counts and instance IPs", false, false, false)
 	}
 	if config.ExternalOS == nil {
 		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH, "Using Chef Managed OpenSearch")
