@@ -280,10 +280,10 @@ func HardwareNil(checkType, message string, includeOPENSEARCH bool, includePOSTG
 			NodeType:  constants.BASTION,
 			CheckType: checkType,
 			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Message: message,
-				Check:   checkType,
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
 			},
 			Host: constants.LOCALHOST,
 		})
