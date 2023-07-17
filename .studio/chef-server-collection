@@ -604,4 +604,3 @@ test_if_oauthapps_are_patched_correctly() {
     echo "OAuth App values are patched correctly"
   fi
 }
-
