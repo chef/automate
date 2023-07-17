@@ -6,7 +6,7 @@ rails_env="production"
 rack_env="production"
 
 [network]
-port=9090
+port=10114
 listen_ip="0.0.0.0"
 
 [tls]
