@@ -3,5 +3,5 @@ output "json_data" {
 }
 
 output "bastion_role" {
-  value = "${data.http.getBastionRole.status_code}/32"
+  value = "${data.http.getBastionRole.status_code}"
 }
