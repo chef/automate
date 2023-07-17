@@ -65,7 +65,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.Sendfile = w.String("on")
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(config.ExternalCipherSuite)
 	c.V1.Sys.Ngx.Http.EnableParam = w.Bool(false) //w.String("/etc/ssl/certs/dhparam.pem")
-	//c.V1.Sys.Ngx.Http.Enablessldhparams.SslDhparam = w.String("/etc/ssl/certs/dhparam.pem")
 	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	c.V1.Sys.Ngx.Http.TcpNodelay = w.String("on")
 	c.V1.Sys.Ngx.Http.TcpNopush = w.String("on")
