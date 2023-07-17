@@ -45,7 +45,6 @@ type FileSystem struct {
 	MountLocation string `json:"mount_location"`
 }
 type ObjectStorage struct {
-	Profile    string `json:"profile"`
 	Endpoint   string `json:"endpoint"`
 	BucketName string `json:"bucket_name"`
 	BasePath   string `json:"base_path"`
@@ -88,6 +87,7 @@ type ExternalPG struct {
 type Config struct {
 	SSHUser         *SSHUser       `json:"ssh_user"`
 	Arch            string         `json:"arch"`
+	Profile         string         `json:"profile"`
 	Backup          *Backup        `json:"backup"`
 	Hardware        *Hardware      `json:"hardware"`
 	ExternalDbType  string         `json:"external_db_type"`

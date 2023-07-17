@@ -33,7 +33,7 @@ func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTrigger
 		return s3ConfigSkippedResponse(config, constants.S3_BACKUP_CONFIG, constants.SKIP_BACKUP_TEST_MESSAGE_S3)
 	}
 
-	if !isObjectStorage(config.Backup) {
+	if !isObjectStorage(config ) {
 		return emptyResp(config, constants.S3_BACKUP_CONFIG)
 	}
 
@@ -102,10 +102,11 @@ func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
 	}
 }
 
-func isObjectStorage(backup *models.Backup) bool {
+func isObjectStorage(config *models.Config) bool {
+	backup := config.Backup
 	if backup.ObjectStorage.BucketName == "" {
 		return false
-	} else if backup.ObjectStorage.Profile != "" {
+	} else if config.Profile != "" {
 		if backup.ObjectStorage.AccessKey == "" ||
 			backup.ObjectStorage.SecretKey == "" {
 			return false

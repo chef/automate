@@ -213,8 +213,8 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 func (a *awsDeployment) validateEnvFields() *list.List {
 	errorList := list.New()
 	if len(a.config.Aws.Config.Profile) < 1 {
-		check, _ := a.isIamRolePresent()
-		if !check {
+		isIAMRole, _ := a.isIamRolePresent()
+		if !isIAMRole {
 			errorList.PushBack("Invalid local AWS Profile name or Bastion IAM role, Please Check your local AWS Profile name or Bastion IAM Role is configured properly")
 		}
 	}
