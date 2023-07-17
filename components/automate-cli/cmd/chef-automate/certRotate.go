@@ -606,7 +606,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool, 
 			return err
 		}
 	} else {
-		err = c.copyAndExecuteConcurrently(nodeOpUtils, filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
+		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(nodeOpUtils, filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
 		if err != nil {
 			return err
 		}
@@ -647,17 +647,16 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 	return nil
 }
 
-// copyAndExecute will copy the toml file to each required node and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecuteConcurrently(nu NodeOpUtils, ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
-	//var err error
-	var tomlFilePath string
+// copyAndExecuteConcurrently will copy the toml file to each required nodes concurrently and then execute the set of commands.
+func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(nu NodeOpUtils, ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
+
 	responseChan := make(chan CertRotateCmdResult, len(ips))
 	defer close(responseChan)
+	infra, _, err := nu.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
 	for i := 0; i < len(ips); i++ {
-		infra, _, err := nu.getHaInfraDetails()
-		if err != nil {
-			return err
-		}
 		SSHConfig := c.getSshDetails(infra)
 		SSHUtils := NewSSHUtil(SSHConfig)
 		SSHConfig.timeout = flagsObj.timeout
@@ -665,19 +664,8 @@ func (c *certRotateFlow) copyAndExecuteConcurrently(nu NodeOpUtils, ips []string
 		go func(hostIP string, responseChan chan CertRotateCmdResult) {
 			rc := CertRotateCmdResult{hostIP, "", nil, writer, remoteService}
 			SSHUtils.getSSHConfig().hostIP = hostIP
-			if (flagsObj.postgres || flagsObj.opensearch) && remoteService != "frontend" {
-				tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, SSHUtils)
-				if err != nil {
-					rc.err = err
-					responseChan <- rc
-					return
-				}
-				// Copying the new toml file which includes both old and new configurations (for backend nodes).
-				err = SSHUtils.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
-			} else {
-				// Copying the new toml file which includes new configurations (for frontend nodes).
-				err = SSHUtils.copyFileToRemote(fileName, remoteService+timestamp, false)
-			}
+			// Copying the new toml file which includes new configurations (for frontend nodes).
+			err = SSHUtils.copyFileToRemote(fileName, remoteService+timestamp, false)
 			if err != nil {
 				writer.Errorf("%v", err)
 				rc.err = err

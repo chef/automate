@@ -1201,7 +1201,7 @@ func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
 	}
 }
 
-func TestCopyAndExecuteConCurrently(t *testing.T) {
+func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 	c := certRotateFlow{FileUtils: mockFS()}
 	infra := &AutomateHAInfraDetails{}
 	fmt.Println(infra)
@@ -1247,7 +1247,7 @@ func TestCopyAndExecuteConCurrently(t *testing.T) {
 			fmt.Println("remote service : ", testCase.remoteService)
 			fmt.Println("commands : ", testCase.scriptCommands)
 			fmt.Println("flags: ", testCase.flagsObj)
-			err := c.copyAndExecuteConcurrently(testCase.mockPatchCmdHelper, testCase.ips, testCase.sshUtil, testCase.timestamp, testCase.remoteService, testCase.fileName, testCase.scriptCommands, testCase.flagsObj, printCertRotateOutput)
+			err := c.copyAndExecuteConcurrentlyToFrontEndNodes(testCase.mockPatchCmdHelper, testCase.ips, testCase.sshUtil, testCase.timestamp, testCase.remoteService, testCase.fileName, testCase.scriptCommands, testCase.flagsObj, printCertRotateOutput)
 			fmt.Println("msg: ", err)
 			if err != nil {
 				assert.EqualError(t, err, testCase.errorWant.Error())
