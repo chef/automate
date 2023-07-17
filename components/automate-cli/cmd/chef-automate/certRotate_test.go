@@ -950,7 +950,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 		oldRootCA           string
 		node                string
 		infra               *AutomateHAInfraDetails
-		isIpSkip             bool
+		isIpSkip            bool
 	}
 
 	testCases := []testCaseInfo{
@@ -961,7 +961,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			newCn:               newCn,
 			oldCn:               newCn,
 			infra:               infra,
-			isIpSkip:             true,
+			isIpSkip:            true,
 		},
 		{
 			testCaseDescription: "Comparing old cn nd old rootCA | same root-ca different cn",
@@ -970,7 +970,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			newCn:               newCn + "n",
 			oldCn:               "",
 			infra:               infra,
-			isIpSkip:             false,
+			isIpSkip:            false,
 		},
 		{
 			testCaseDescription: "Comparing old cn nd old rootCA | different root-ca",
@@ -979,7 +979,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			newCn:               newCn,
 			oldCn:               newCn,
 			infra:               infra,
-			isIpSkip:             false,
+			isIpSkip:            false,
 		},
 		{
 			testCaseDescription: "Comparing old cn nd old rootCA | different root-ca same cn",
@@ -988,7 +988,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			newCn:               newCn,
 			oldCn:               newCn,
 			infra:               infra,
-			isIpSkip:             false,
+			isIpSkip:            false,
 		},
 		{
 			testCaseDescription: "Comparing old cn | different cn with node flag",
@@ -996,7 +996,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			oldCn:               newCn,
 			infra:               infra,
 			node:                ValidIP,
-			isIpSkip:             false,
+			isIpSkip:            false,
 		},
 		{
 			testCaseDescription: "Comparing old cn | same cn with node flag",
@@ -1004,7 +1004,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			oldCn:               newCn,
 			infra:               infra,
 			node:                ValidIP,
-			isIpSkip:             true,
+			isIpSkip:            true,
 		},
 	}
 
@@ -1333,7 +1333,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 			flagsObj: &certRotateFlags{
 				automate: true,
 			},
-			isError: false,
+			isError:       false,
 			ExpectedError: "",
 		},
 		{
@@ -1352,7 +1352,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 			flagsObj: &certRotateFlags{
 				automate: true,
 			},
-			isError: true,
+			isError:       true,
 			ExpectedError: "Error occured while reading infra details",
 		},
 		{
@@ -1371,7 +1371,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 			flagsObj: &certRotateFlags{
 				automate: true,
 			},
-			isError: false,
+			isError:       false,
 			ExpectedError: "",
 		},
 		{
@@ -1390,7 +1390,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 			flagsObj: &certRotateFlags{
 				automate: true,
 			},
-			isError: false,
+			isError:       false,
 			ExpectedError: "",
 		},
 	}
@@ -1439,7 +1439,7 @@ func TestPatchConfig(t *testing.T) {
 					return infra, &SSHConfig{}, nil
 				},
 			},
-			isError: false,
+			isError:       false,
 			ExpectedError: "",
 		},
 		{
@@ -1462,7 +1462,7 @@ func TestPatchConfig(t *testing.T) {
 					return infra, &SSHConfig{}, nil
 				},
 			},
-			isError: false,
+			isError:       false,
 			ExpectedError: "",
 		},
 		{
@@ -1485,7 +1485,7 @@ func TestPatchConfig(t *testing.T) {
 					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
 				},
 			},
-			isError: true,
+			isError:       true,
 			ExpectedError: "Error occured while reading infra details",
 		},
 		{
@@ -1508,7 +1508,7 @@ func TestPatchConfig(t *testing.T) {
 					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
 				},
 			},
-			isError: true,
+			isError:       true,
 			ExpectedError: "Error occured while reading infra details",
 		},
 	}

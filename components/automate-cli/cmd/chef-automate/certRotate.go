@@ -669,7 +669,7 @@ func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(nu NodeOpUtil
 				writer.Errorf("%v", err)
 				rc.err = err
 				responseChan <- rc
-				return 
+				return
 			}
 
 			fmt.Printf("\nStarted Applying the Configurations in %s node: %s \n", remoteService, hostIP)
