@@ -9,42 +9,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
-
 func TestGetBastionIamRole(t *testing.T) {
 	ser := newAwsDeployemnt("")
 	tests := []struct {
-		description string
+		description        string
 		MockhttputilsToken httputils.HTTPClient
-		MockhttputilsIam httputils.HTTPClient
-		wantError error
-		want bool
-		testurl string
+		MockhttputilsIam   httputils.HTTPClient
+		wantError          error
+		want               bool
+		testurl            string
 	}{
 		{
-			description: "Failed to get Token Value from the Request",
+			description: "Failed to get token value from the request",
 			MockhttputilsToken: &httputils.MockHTTPClient{
 				MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
 					return nil, nil, errors.New("failed to marshal request body")
 				},
 			},
-			wantError: errors.New("error while getting the token value= failed to marshal request body"),
-			want: false,
-			testurl: tokenurl,
+			wantError: errors.New("error while getting the token value: failed to marshal request body"),
+			want:      false,
+			testurl:   tokenurl,
 		},
 		{
-			description: "Failed to get Token Value from the Request (Error in creation of Request)",
+			description: "Failed to get token value from the request (error in creation of request)",
 			MockhttputilsToken: &httputils.MockHTTPClient{
 				MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
 					return nil, nil, errors.New("failed to create HTTP request")
 				},
 			},
-			wantError: errors.New("error while getting the token value= failed to create HTTP request"),
-			want: false,
-			testurl: tokenurl,
+			wantError: errors.New("error while getting the token value: failed to create HTTP request"),
+			want:      false,
+			testurl:   tokenurl,
 		},
 		{
-			description: "Response Code is not 200",
+			description: "Bastion IAM role is not attached",
 			MockhttputilsToken: &httputils.MockHTTPClient{
 				MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
 					return &http.Response{}, nil, nil
@@ -55,12 +53,31 @@ func TestGetBastionIamRole(t *testing.T) {
 					return &http.Response{}, []byte("Success"), nil
 				},
 			},
-			want: false,
-			wantError: errors.New("Please check if Bastion has attached IAM Role onto it"),
-			testurl: metaDataurl,
+			want:      false,
+			wantError: errors.New("Please check if Bastion has attached an IAM Role to it"),
+			testurl:   metaDataurl,
 		},
 		{
-			description: "Response Code is 200",
+			description: "Bastion IAM role is not attached (Error)",
+			MockhttputilsToken: &httputils.MockHTTPClient{
+				MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
+					return &http.Response{}, nil, nil
+				},
+			},
+			MockhttputilsIam: &httputils.MockHTTPClient{
+				MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
+					if requestMethod == http.MethodPut {
+						return nil, nil, nil
+					}
+					return  nil, nil, errors.New("failed to Make HTTP Request")
+				},
+			},
+			want:      false,
+			wantError: errors.New("error while getting the response for IAM role: failed to Make HTTP Request"),
+			testurl:   metaDataurl,
+		},
+		{
+			description: "Bastion IAM role is attached",
 			MockhttputilsToken: &httputils.MockHTTPClient{
 				MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
 					return &http.Response{}, nil, nil
@@ -73,9 +90,9 @@ func TestGetBastionIamRole(t *testing.T) {
 					}, []byte("Success"), nil
 				},
 			},
-			want: true,
+			want:      true,
 			wantError: nil,
-			testurl: metaDataurl,
+			testurl:   metaDataurl,
 		},
 	}
 
@@ -86,7 +103,7 @@ func TestGetBastionIamRole(t *testing.T) {
 			} else if tt.testurl == metaDataurl {
 				ser.httpRequestClient = tt.MockhttputilsIam
 			}
-			got, err := ser.getBastionIamRole()
+			got, err := ser.isIamRolePresent()
 			assert.Equal(t, tt.want, got)
 			if err != nil {
 				assert.Equal(t, err.Error(), tt.wantError.Error())

@@ -171,7 +171,7 @@ func TestMakeRequestWithHeaderRequestBodyError(t *testing.T) {
 	assert.NoError(t, err)
 	client := httputils.NewClient(logger)
 
-	resp, responseBody, err := client.MakeRequestWithHeaders(http.MethodPost, "https://example.com", make(chan int),"Content-Type", "application/json")
+	resp, responseBody, err := client.MakeRequestWithHeaders(http.MethodPost, "https://example.com", make(chan int), "Content-Type", "application/json")
 
 	assert.Error(t, err)
 	assert.Nil(t, resp)

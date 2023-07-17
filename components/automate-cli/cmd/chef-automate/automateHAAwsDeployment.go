@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -212,7 +213,7 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 func (a *awsDeployment) validateEnvFields() *list.List {
 	errorList := list.New()
 	if len(a.config.Aws.Config.Profile) < 1 {
-		check, _ := a.getBastionIamRole()
+		check, _ := a.isIamRolePresent()
 		if !check {
 			errorList.PushBack("Invalid local AWS Profile name or Bastion IAM role, Please Check your local AWS Profile name or Bastion IAM Role is configured properly")
 		}
@@ -455,20 +456,20 @@ func (a *awsDeployment) getAwsHAIp() error {
 	return nil
 }
 
-func (a *awsDeployment) getBastionIamRole() (bool, error) {
-	_, tokenresponseBody, err := a.httpRequestClient.MakeRequestWithHeaders("PUT", tokenurl, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
+func (a *awsDeployment) isIamRolePresent() (bool, error) {
+	_, tokenResponseBody, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodPut, tokenurl, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
 	if err != nil {
-		return false, fmt.Errorf("error while getting the token value= %v", err)
+		return false, fmt.Errorf("error while getting the token value: %v", err)
 	}
 
-	token := string(tokenresponseBody)
+	token := string(tokenResponseBody)
 
-	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders("GET", metaDataurl, nil, "X-aws-ec2-metadata-token", token)
+	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, metaDataurl, nil, "X-aws-ec2-metadata-token", token)
 	if err != nil {
-		return false, fmt.Errorf("error while getting the response for  IAM role =%v", err)
+		return false, fmt.Errorf("error while getting the response for IAM role: %v", err)
 	}
 	if resp.StatusCode != 200 {
-		return false, errors.New("Please check if Bastion has attached IAM Role onto it")
+		return false, errors.New("Please check if Bastion has attached an IAM Role to it")
 	}
 	return true, nil
 }
