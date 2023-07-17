@@ -24,6 +24,8 @@ type MockSSHUtilsImpl struct {
 	connectAndExecuteCommandOnRemoteSteamOutputFunc func(remoteCommands string) (string, error)
 	copyFileToRemoteFunc                            func(srcFilePath string, destFileName string, removeFile bool) error
 	copyFileFromRemoteFunc                          func(remoteFilePath string, outputFileName string) (string, error)
+	copyFileToRemoteWithConfigFunc                  func(srcFilePath string, destFileName string, removeFile bool, sshConfig SSHConfig) error
+	copyFileFromRemoteWithConfigFunc                func(remoteFilePath string, outputFileName string, sshConfig SSHConfig) (string, error)
 }
 
 func (msu *MockSSHUtilsImpl) getSSHConfig() *SSHConfig {
@@ -49,6 +51,12 @@ func (msu *MockSSHUtilsImpl) copyFileToRemote(srcFilePath string, destFileName s
 }
 func (msu *MockSSHUtilsImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
 	return msu.copyFileFromRemoteFunc(remoteFilePath, outputFileName)
+}
+func (msu *MockSSHUtilsImpl) copyFileToRemoteWithConfig(srcFilePath string, destFileName string, removeFile bool, sshConfig SSHConfig)  error {
+	return msu.copyFileToRemoteWithConfigFunc(srcFilePath, destFileName,removeFile,sshConfig)
+}
+func (msu *MockSSHUtilsImpl) copyFileFromRemoteWithConfig(remoteFilePath string, outputFileName string, sshConfig SSHConfig) (string, error) {
+	return msu.copyFileFromRemoteWithConfigFunc(remoteFilePath, outputFileName,sshConfig)
 }
 
 func TestAddnodeValidateError(t *testing.T) {

@@ -37,6 +37,8 @@ type SSHUtil interface {
 	connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error)
 	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
 	copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error)
+	copyFileToRemoteWithConfig(srcFilePath string, destFileName string, removeFile bool, sshConfig SSHConfig) error 
+	copyFileFromRemoteWithConfig(remoteFilePath string, outputFileName string, sshConfig SSHConfig) (string, error) 
 }
 
 type SSHUtilImpl struct {
@@ -312,6 +314,41 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 		}
 	}
 	return nil
+}
+//CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string)
+func (s *SSHUtilImpl) copyFileToRemoteWithConfig(srcFilePath string, destFileName string, removeFile bool, sshConfig SSHConfig) error {
+    cmd := "scp"
+	fmt.Printf(" ssh config in func  %+v\n", sshConfig)
+    exec_args := []string{"-P " + sshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.sshKeyFile, "-r", srcFilePath, sshConfig.sshUser + "@" + sshConfig.hostIP + ":/tmp/" + destFileName}
+    if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+        writer.Printf("\n"+"Failed to copy file %s to remote %s\n", srcFilePath, err.Error())
+        if srcFilePath == "/usr/bin/chef-automate" {
+            writer.Printf("Please copy your chef-automate binary to /usr/bin" + "\n")
+        }
+        return err
+    }
+	fmt.Println("file name after copying: ",destFileName)
+    if removeFile {
+        cmd := "rm"
+        exec_args := []string{"-rf", srcFilePath}
+        if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+            writer.Printf("Failed to copy file to remote %s\n", err.Error())
+            return err
+        }
+    }
+    return nil
+}
+
+// This function will copy file from remote to local and return new local file path
+func (s *SSHUtilImpl) copyFileFromRemoteWithConfig(remoteFilePath string, outputFileName string, sshConfig SSHConfig) (string, error) {
+    cmd := "scp"
+    destFileName := "/tmp/" + outputFileName
+    execArgs := []string{"-P " + sshConfig.sshPort, "-o StrictHostKeyChecking=no", "-o ConnectTimeout=30", "-i", sshConfig.sshKeyFile, "-r", sshConfig.sshUser + "@" + sshConfig.hostIP + ":" + remoteFilePath, destFileName}
+    if err := exec.Command(cmd, execArgs...).Run(); err != nil {
+        writer.Printf("Failed to copy file from remote %s\n", err.Error())
+        return "", err
+    }
+    return destFileName, nil
 }
 
 // This function will copy file from remote to local and return new local file path
