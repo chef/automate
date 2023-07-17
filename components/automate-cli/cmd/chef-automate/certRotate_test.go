@@ -181,6 +181,104 @@ WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
 	resolve_hostname = false
 [plugins.security]
 	nodes_dn = '- CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US'`
+	TestFrontendConfig = `[[load_balancer.v1.sys.frontend_tls]]
+	cert = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	key = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+[[global.v1.frontend_tls]]
+	cert = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	key = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""`
 )
 
 func TestIsRemotePath(t *testing.T) {
@@ -1203,7 +1301,7 @@ func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
 
 func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 	c := certRotateFlow{FileUtils: mockFS()}
-	infra := &AutomateHAInfraDetails{}
+	c, infra := getMockCertRotateFlowAndInfra()
 	fmt.Println(infra)
 	remoteService := FRONTEND
 	timestamp := time.Now().Format("20060102150405")
@@ -1211,7 +1309,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 		description        string
 		mockPatchCmdHelper *MockNodeUtilsImpl
 		ips                []string
-		sshUtil            SSHUtil
+		newSSHUtil         SSHUtil
 		timestamp          string
 		remoteService      string
 		fileName           string
@@ -1227,7 +1325,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 				},
 			},
 			ips:            []string{ValidIP},
-			sshUtil:        getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			newSSHUtil:     getMockSSHUtil(&SSHConfig{}, nil, "", nil),
 			timestamp:      time.Now().Format("20060102150405"),
 			remoteService:  FRONTEND,
 			fileName:       "cert-rotate-fe.toml",
@@ -1242,12 +1340,12 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
 			fmt.Println("ips : ", testCase.ips)
-			fmt.Println("sshutil : ", testCase.sshUtil)
+			fmt.Println("sshutil : ", testCase.newSSHUtil)
 			fmt.Println("timestamp : ", testCase.timestamp)
 			fmt.Println("remote service : ", testCase.remoteService)
 			fmt.Println("commands : ", testCase.scriptCommands)
 			fmt.Println("flags: ", testCase.flagsObj)
-			err := c.copyAndExecuteConcurrentlyToFrontEndNodes(testCase.mockPatchCmdHelper, testCase.ips, testCase.sshUtil, testCase.timestamp, testCase.remoteService, testCase.fileName, testCase.scriptCommands, testCase.flagsObj, printCertRotateOutput)
+			err := c.copyAndExecuteConcurrentlyToFrontEndNodes(testCase.mockPatchCmdHelper, testCase.ips, testCase.newSSHUtil, testCase.timestamp, testCase.remoteService, testCase.fileName, testCase.scriptCommands, testCase.flagsObj, printCertRotateOutput)
 			fmt.Println("msg: ", err)
 			if err != nil {
 				assert.EqualError(t, err, testCase.errorWant.Error())
@@ -1269,21 +1367,43 @@ func TestPatchConfig(t *testing.T) {
 		errorWant          error
 	}
 	testCases := []testCaseInfo{
+		// {
+		// 	description: "Test Case to rotate on backend",
+		// 	param: &patchFnParameters{
+		// 		sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+		// 		config:        TestOpensearchAdminAndRootCA,
+		// 		fileName:      "cert-rotate-os.toml",
+		// 		timestamp:     time.Now().Format("20060102150405"),
+		// 		remoteService: OPENSEARCH,
+		// 		infra:         infra,
+		// 		flagsObj: &certRotateFlags{
+		// 			opensearch: true,
+		// 		},
+		// 		skipIpsList: []string{},
+		// 	},
+		// 	concurrent: false,
+		// 	mockPatchCmdHelper: &MockNodeUtilsImpl{
+		// 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+		// 			return infra, &SSHConfig{}, nil
+		// 		},
+		// 	},
+		// 	errorWant: nil,
+		// },
 		{
-			description: "Test Case to rotate on backend",
+			description: "Test Case to rotate on frontend",
 			param: &patchFnParameters{
 				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-				config:        TestOpensearchAdminAndRootCA,
-				fileName:      "cert-rotate-os.toml",
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
 				timestamp:     time.Now().Format("20060102150405"),
-				remoteService: OPENSEARCH,
+				remoteService: AUTOMATE,
 				infra:         infra,
 				flagsObj: &certRotateFlags{
-					opensearch: true,
+					automate: true,
 				},
 				skipIpsList: []string{},
 			},
-			concurrent: false,
+			concurrent: true,
 			mockPatchCmdHelper: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 					return infra, &SSHConfig{}, nil
@@ -1292,9 +1412,11 @@ func TestPatchConfig(t *testing.T) {
 			errorWant: nil,
 		},
 	}
+	fmt.Printf(" infra details in test : %+v\n", infra)
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
 			err := c.patchConfig(testCase.param, testCase.concurrent, testCase.mockPatchCmdHelper)
+			fmt.Println("err : ", err)
 			if err != nil {
 				assert.EqualError(t, err, testCase.errorWant.Error())
 			} else {
@@ -1311,6 +1433,9 @@ func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+	infra.Outputs.SSHUser.Value = "ubuntu"
+	infra.Outputs.SSHKeyFile.Value = "new.pem"
+	infra.Outputs.SSHPort.Value = "22"
 	return c, infra
 }
 

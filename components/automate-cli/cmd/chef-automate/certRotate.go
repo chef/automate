@@ -606,6 +606,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool, 
 			return err
 		}
 	} else {
+		fmt.Println("calling")
 		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(nodeOpUtils, filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
 		if err != nil {
 			return err
@@ -648,48 +649,62 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 }
 
 // copyAndExecuteConcurrently will copy the toml file to each required nodes concurrently and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(nu NodeOpUtils, ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
-
+func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(nu NodeOpUtils, ips []string, sshUtils SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
+	fmt.Println("called concurrent func ")
 	responseChan := make(chan CertRotateCmdResult, len(ips))
 	defer close(responseChan)
 	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
+	//fmt.Printf(" infra details : %+v\n", infra)
+
 	for i := 0; i < len(ips); i++ {
-		SSHConfig := c.getSshDetails(infra)
-		SSHUtils := NewSSHUtil(SSHConfig)
-		SSHConfig.timeout = flagsObj.timeout
-		SSHUtils.setSSHConfig(SSHConfig)
+		fmt.Println("In for loop")
 		go func(hostIP string, responseChan chan CertRotateCmdResult) {
+			SSHConfig := c.getSshDetails(infra)
+			//fmt.Printf(" SSHConfig details : %+v\n", SSHConfig)
+			SSHUtils := NewSSHUtil(SSHConfig)
+			SSHConfig.timeout = flagsObj.timeout
+			SSHUtils.setSSHConfig(SSHConfig)
+			fmt.Println("going to for loop")
 			rc := CertRotateCmdResult{hostIP, "", nil, writer, remoteService}
+			fmt.Println("getting ssh config")
 			SSHUtils.getSSHConfig().hostIP = hostIP
 			// Copying the new toml file which includes new configurations (for frontend nodes).
+			fmt.Println("copying file to remote")
 			err = SSHUtils.copyFileToRemote(fileName, remoteService+timestamp, false)
+			fmt.Println("err printing while copying ", err)
 			if err != nil {
 				writer.Errorf("%v", err)
 				rc.err = err
 				responseChan <- rc
+				return 
 			}
+			fmt.Println("printing started applying")
 
 			fmt.Printf("\nStarted Applying the Configurations in %s node: %s \n", remoteService, hostIP)
-
+			fmt.Println("calling connect and execute")
 			output, err := SSHUtils.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				rc.err = err
 				responseChan <- rc
 				return
 			}
+			fmt.Println("output : ",output)
+			fmt.Println("output err : ",err)
 			rc.outputString = output
 			responseChan <- rc
 
 		}(ips[i], responseChan)
 	}
+	fmt.Println("calling get cert channel value")
 	getCertChannelValue(ips, responseChan, printCertRotateOutput)
 	return nil
 }
 
 func getCertChannelValue(ips []string, certRotateCmdResults chan CertRotateCmdResult, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) {
+	fmt.Println("called get cert channel value")
 	for i := 0; i < len(ips); i++ {
 		CertRotateCmdResult := <-certRotateCmdResults
 		printCertRotateOutput(CertRotateCmdResult, CertRotateCmdResult.nodeType, CertRotateCmdResult.writer)
