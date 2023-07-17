@@ -563,7 +563,7 @@ test_if_env_vars_are_configured_after_patch() {
     errors+=("Chef-Server superuser is not configured properly.")
   fi
 
-  if [ $ssl_verify_mode != "verify_peer" ]; then
+  if [ "$ssl_verify_mode" != "verify_peer" ]; then
     errors+=("Chef-Server SSL certificate verification mode is not configured properly.")
   fi
 
