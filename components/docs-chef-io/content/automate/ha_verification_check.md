@@ -72,3 +72,5 @@ Once you run the verify command, it checks all the test cases defined. After it 
 An example of a checks performed are shown in the below image:
 
 ![Config Verify Check](/images/automate/verify_checks_example.png)
+
+The above image shows the checks performed for Automate node.
