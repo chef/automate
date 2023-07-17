@@ -25,13 +25,23 @@ Before you start, take a quick tour of our prerequisite pages for [On-Premises](
 
 ## Configuration
 
-Failures occuring during the deployment of Automate HA might result to clear up everything and the start the whole process once again. To avoid this, the following CLI has been introduced which verifies the Customer Managed Database.
+Failures occuring during the deployment of Automate HA might result to clear up everything and the start the whole process once again. To avoid this, the verify CLI has been introduced which verifies the Customer Managed Database. You can run the CLI either pre or post deployment. The pre deployment CLI command is as follows:
 
 ```bash
 chef-automate verify --config config.toml
 ```
 
-The above command will trigger the `config.toml` file with config, the one you want to deploy. Once the verify command is triggered, following checks will be triggered:
+The above command will trigger the `config.toml` file with config, the one you want to deploy. 
+
+The post deployment CLI command is as follows:
+
+```bash
+chef-automate verify
+```
+
+The above command will run verify check post deployment.
+
+Once the verify command is triggered, following checks will be triggered:
 
 - System Resources (All Nodes)
 - Software Version (All Nodes)
@@ -45,4 +55,35 @@ The above command will trigger the `config.toml` file with config, the one you w
 
 If all the above checks passes, you get a report. If all the pointers in the report shows pass, it means everything is fine and you can move ahead with the Automate HA deployment.
 
+## Benefits of Running the verify Command
+
+### Pre-Deployment
+
+It is always good to know things early. Pre deployment verification will give the potential pointers of failure which may occur at the time of deployment. The pre deployment verification will ensure certain checks in the system. These checks will ensure that the failure of critical services of the end points of the system are taken care of. For example, in case of a certificate check, it will ensure that the validation of the check has already happened before the deployment process.
+
+### Post-Deployment
+
+It's always better to know the critical scenarios of a deployment process before running it. But in case of a post deployment verification sometimes it can be beneficial as the deployment will help you to identify the proper state of the command. You will be able to identify the exact potential of the commands and fix it accordiny
+
+
+
+
+
+
+
+1. pre-deployment
+
+- Know things early…potential points of failure, before deploying
+- Before deploying run these verifications checks using verify command, this will ensure that certain checks in the system will happen before the deployment is done. These checks will ensure that the failure of critical services of the end points of the system will be taken care of. The certificate check will ensure that the validation of the check has already happened before deployment. In case of back up config file, the end points of backup will be checks beflore the deployment. The failure will not happen.
+
+
+
+1. Running automate ha system
+
+- Once the systems is deployed, you will be able to idenoyt the state of the command. The you will be able to identify the potential of the command. 
+- Some checks will not be performed
+
+
 ## Reports
+
+
