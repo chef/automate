@@ -29,5 +29,5 @@ const (
 	CHEF_SERVER_TOML    = "chef_server.config.toml"
 	POSTGRESQL_TOML     = "postgresql.config.toml"
 	OPENSEARCH_TOML     = "opensearch.config.toml"
-	OCID_SHOW_APP     = "oc-id-show-app"
+	OCID_SHOW_APP       = "oc-id-show-app"
 )

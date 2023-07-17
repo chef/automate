@@ -27,7 +27,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 6;
 
 			message Network {
-				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 9090, protocol: "https" } ];
+				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10114, protocol: "https" } ];
 				google.protobuf.StringValue listen_ip = 2 [deprecated=true]; // The listen host is no longer setable(localhost only)
 			}
 
