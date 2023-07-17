@@ -28,9 +28,9 @@ const (
 	S3_BACKUP_CONFIG_MSG                = "S3 Backup Config Check"
 	FQDN_MSG                            = "FQDN Check"
 	FIREWALL_MSG                        = "Firewall Check"
-	EXTERNAL_OPENSEARCH_MSG             = "External Opensearch Check"
+	EXTERNAL_OPENSEARCH_MSG             = "External OpenSearch Check"
 	AWS_OPENSEARCH_S3_BUCKET_ACCESS_MSG = "AWS Opensearch S3 Bucket Access Check"
-	EXTERNAL_POSTGRESQL_MSG             = "External Postgresql Check"
+	EXTERNAL_POSTGRESQL_MSG             = "External PostgreSQL Check"
 	NFS_BACKUP_CONFIG_MSG               = "NFS Backup Config Check"
 )
 
