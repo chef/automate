@@ -63,26 +63,7 @@ It is always good to know things early. Pre deployment verification will give th
 
 ### Post-Deployment
 
-It's always better to know the critical scenarios of a deployment process before running it. But in case of a post deployment verification sometimes it can be beneficial as the deployment will help you to identify the proper state of the command. You will be able to identify the exact potential of the commands and fix it accordiny
-
-
-
-
-
-
-
-1. pre-deployment
-
-- Know things early…potential points of failure, before deploying
-- Before deploying run these verifications checks using verify command, this will ensure that certain checks in the system will happen before the deployment is done. These checks will ensure that the failure of critical services of the end points of the system will be taken care of. The certificate check will ensure that the validation of the check has already happened before deployment. In case of back up config file, the end points of backup will be checks beflore the deployment. The failure will not happen.
-
-
-
-1. Running automate ha system
-
-- Once the systems is deployed, you will be able to idenoyt the state of the command. The you will be able to identify the potential of the command. 
-- Some checks will not be performed
-
+It's always better to know the critical scenarios of a deployment process before running it. But in case of a post deployment verification sometimes it can be beneficial as the deployment will help you to identify the proper state of the command. You will be able to identify the exact potential of the commands and fix it accordingly.
 
 ## Reports
 
