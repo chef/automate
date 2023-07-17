@@ -884,7 +884,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
 			assert.True(t, v.Result.Skipped)
-			assert.Equal(t, constants.SKIP_BACKUP_TEST_MESSAGE, v.Result.SkipMessage)
+			assert.Equal(t, constants.SKIP_BACKUP_TEST_MESSAGE_NFS, v.Result.SkipMessage)
 		}
 	})
 	t.Run("Empty FileSystem", func(t *testing.T) {

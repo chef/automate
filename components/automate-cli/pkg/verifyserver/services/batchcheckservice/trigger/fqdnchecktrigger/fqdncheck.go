@@ -34,7 +34,7 @@ func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	}
 
 	if config.Certificate == nil {
-		return constructNilResp(config, constants.FQDN, constants.SKIP_CERT_TEST_MESSAGE)
+		return constructNilResp(config, constants.FQDN, constants.SKIP_CS_FQDN_TEST_MESSAGE)
 	}
 
 	return triggerFqdnCheck(config, endPoint, fqc.log)

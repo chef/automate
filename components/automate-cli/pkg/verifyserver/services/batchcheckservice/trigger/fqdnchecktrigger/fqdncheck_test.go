@@ -501,6 +501,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 					assert.Len(t, got, 2)
 					assert.True(t, got[0].Result.Skipped)
 					assert.True(t, got[1].Result.Skipped)
+					assert.Equal(t, constants.SKIP_CS_FQDN_TEST_MESSAGE, got[1].Result.SkipMessage)
 				} else {
 					assert.Len(t, got, tt.args.config.Hardware.ChefInfraServerNodeCount)
 					assert.NotNil(t, got[0].Result.Error)
@@ -513,7 +514,9 @@ func TestFqdnCheck_Run(t *testing.T) {
 					assert.NotNil(t, got)
 					assert.Len(t, got, 2)
 					assert.True(t, got[0].Result.Skipped)
+					assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[0].Result.SkipMessage)
 					assert.True(t, got[1].Result.Skipped)
+					assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[1].Result.SkipMessage)
 				} else {
 					assert.Equal(t, got, want)
 					assert.NotNil(t, got)
