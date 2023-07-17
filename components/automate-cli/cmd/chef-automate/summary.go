@@ -55,6 +55,7 @@ type Summary struct {
 	infra                 *AutomateHAInfraDetails
 	statusSummaryCmdFlags *StatusSummaryCmdFlags
 	sshUtil               SSHUtil
+	remoteCmdExecutor     RemoteCmdExecutor
 }
 
 type A2haHabitatAutoTfvars struct {
@@ -62,7 +63,7 @@ type A2haHabitatAutoTfvars struct {
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
 
-func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil) StatusSummary {
+func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil, remoteCmdExecutor RemoteCmdExecutor) StatusSummary {
 	return &Summary{
 		feStatus:              feStatus,
 		beStatus:              beStatus,
@@ -71,6 +72,7 @@ func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus
 		infra:                 infra,
 		statusSummaryCmdFlags: flags,
 		sshUtil:               sshUtil,
+		remoteCmdExecutor:     remoteCmdExecutor,
 	}
 }
 
@@ -346,8 +348,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		nodeMap.Postgresql.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, ss.sshUtil, writer)
-	beOutput, err := cmdUtil.Execute()
+	beOutput, err := ss.remoteCmdExecutor.ExecuteWithNodeMap(nodeMap)
 	if err != nil {
 		return err
 	}
@@ -455,7 +456,7 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		return defaultBeStatusValue
 	}
 
-	lag, err := ss.getFollowerLag(cmdResMap[defaultServiceHealthDetails].Output, serviceName, memeberId, role)
+	lag, err := ss.getFollowerLag(cmdResMap[defaultServiceHealthDetails].Output, serviceName, role)
 	if err != nil {
 		lag = "Error"
 	}
@@ -526,7 +527,7 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 	return role, nil
 }
 
-func (ss *Summary) getFollowerLag(output string, service string, memberId string, role string) (string, error) {
+func (ss *Summary) getFollowerLag(output, service, role string) (string, error) {
 	lag := initialLag
 	outputMap, err := parseStringInToMapStringInterface(output)
 	if err != nil {
