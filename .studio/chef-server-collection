@@ -403,7 +403,7 @@ test_if_login_working_with_correct_credentials() {
   bootstrap_chef_user_data || return 1
   local url="https://${chef_server_hostname}/id/auth/chef/callback"
 
-  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
+  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" "$url" \
               --header 'x-requested-with: XMLHttpRequest' \
               --header 'Content-Type: application/x-www-form-urlencoded' \
               --data-urlencode 'utf8=✓' \
@@ -411,7 +411,7 @@ test_if_login_working_with_correct_credentials() {
               --data-urlencode "password=$chef_server_test_user_password" \
               --data-urlencode 'commit=Sign+In')
 
-  if [ $res_code == 200 ]; then
+  if [ "$res_code" == 200 ]; then
     echo "User Logged In"
   else
     echo "Error Logging in with test admin user"
@@ -427,7 +427,7 @@ test_if_login_failing_with_incorrect_credentials() {
   local url="https://${chef_server_hostname}/id/auth/chef/callback"
   local incorrect_password='incorrect-password'
 
-  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
+  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" "$url" \
             --header 'x-requested-with: XMLHttpRequest' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --data-urlencode 'utf8=✓' \
@@ -435,7 +435,7 @@ test_if_login_failing_with_incorrect_credentials() {
             --data-urlencode "password=$incorrect_password" \
             --data-urlencode 'commit=Sign+In')
 
-  if [ $res_code == 302 ]; then
+  if [ "$res_code" == 302 ]; then
     echo "Login call returns HTTP STATUS 302 as expected for invalid credentials"
   else
     echo "Login call did not return HTTP STATUS 302 for invalid credentials"
@@ -450,21 +450,21 @@ test_if_env_vars_are_configured() {
   ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
 
   # Get values from in settings/production.yml
-  endpoint=$(awk '/endpoint:/ {print $2}' $ocid_config_file_path)
-  superuser=$(awk '/superuser:/ {print $2}' $ocid_config_file_path)
-  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' $ocid_config_file_path)
+  endpoint=$(awk '/endpoint:/ {print $2}' "$ocid_config_file_path")
+  superuser=$(awk '/superuser:/ {print $2}' "$ocid_config_file_path")
+  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' "$ocid_config_file_path")
 
   errors=()
 
-  if [ $endpoint != "https://127.0.0.1:443" ]; then
+  if [ "$endpoint" != "https://127.0.0.1:443" ]; then
     errors+=("Chef-Server endpoint is not configured properly.")
   fi
 
-  if [ $superuser != "pivotal" ]; then
+  if [ "$superuser" != "pivotal" ]; then
     errors+=("Chef-Server superuser is not configured properly.")
   fi
 
-  if [ $ssl_verify_mode != "verify_none" ]; then
+  if [ "$ssl_verify_mode" != "verify_none" ]; then
     errors+=("Chef-Server SSL certificate verification mode is not configured properly.")
   fi
 
@@ -504,7 +504,7 @@ test_if_webui_key_is_patched() {
 
   # elem variable hold the value 'chef-server', we opted for this syntax becz chef-server needs to be
   # to be treated as string as it contains `-`, which is not a valid JSON character
-  ocid_webui_key="$(jq --arg elem "chef-server" -r '.[$elem]."webui_key"' < $ocid_secrets_file_path)"
+  ocid_webui_key="$(jq --arg elem "chef-server" -r '.[$elem]."webui_key"' < "$ocid_secrets_file_path")"
 
   # Create a temporary file with the ocid_webui_key content
   echo "$ocid_webui_key" > temp_ocid_webui_key.pem
@@ -549,17 +549,17 @@ test_if_env_vars_are_configured_after_patch() {
   ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
 
   # Get values from in settings/production.yml
-  endpoint=$(awk '/endpoint:/ {print $2}' $ocid_config_file_path)
-  superuser=$(awk '/superuser:/ {print $2}' $ocid_config_file_path)
-  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' $ocid_config_file_path)
+  endpoint=$(awk '/endpoint:/ {print $2}' "$ocid_config_file_path")
+  superuser=$(awk '/superuser:/ {print $2}' "$ocid_config_file_path")
+  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' "$ocid_config_file_path")
 
   errors=()
 
-  if [ $endpoint != "https://test-url.com:443" ]; then
+  if [ "$endpoint" != "https://test-url.com:443" ]; then
     errors+=("Chef-Server endpoint is not configured properly.")
   fi
 
-  if [ $superuser != "testuser" ]; then
+  if [ "$superuser" != "testuser" ]; then
     errors+=("Chef-Server superuser is not configured properly.")
   fi
 
@@ -589,11 +589,11 @@ test_if_oauthapps_are_patched_correctly() {
 
   errors=()
 
-  if [ $name != "test-supermarket" ]; then
+  if [ "$name" != "test-supermarket" ]; then
     errors+=("Registered OAuth application's name is not patched correctly.")
   fi
 
-  if [ $redirect_uri != "https://sampleurl.com/auth/chef_oauth2/callback" ]; then
+  if [ "$redirect_uri" != "https://sampleurl.com/auth/chef_oauth2/callback" ]; then
     errors+=("Registered OAuth application's redirect URI is not configured correctly.")
   fi
 
