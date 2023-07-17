@@ -37,21 +37,13 @@ var commonExcludes = []string{
 // ciphers are not used for Golang services.
 var InternalCipherSuite = toCipherString(append(commonCiphers, commonExcludes...))
 
-// EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
-var dhparamCipher = []string{
-	"EECDH+AESGCM",
-	"EDH+AESGCM",
-	"AES256+EECDH",
-	"AES256+EDH",
-}
-
 // ExternalCipherSuite should be the default for ssl_ciphers for any
 // processes that handle external requests. Note that these ciphers are
 // not used for Golang services.
-var ExternalCipherSuite = toCipherString(append(append(
+var ExternalCipherSuite = toCipherString(append(
 	append(commonCiphers, commonExcludes...),
 	// Added to support AWS "classic" ELB
-	"AES256-GCM-SHA384"), dhparamCipher...))
+	"AES256-GCM-SHA384"))
 
 func toCipherString(l []string) string {
 	return strings.Join(l, ":")
