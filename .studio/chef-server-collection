@@ -601,6 +601,6 @@ test_if_oauthapps_are_patched_correctly() {
     for (( i=0; i<${#errors[@]}; i++ )); do echo "${errors[$i]}" ; done
     return 1
   else
-    echo "OAuth App values are patched correctly"
+    echo "OAuth App values are patched correctly "
   fi
 }
