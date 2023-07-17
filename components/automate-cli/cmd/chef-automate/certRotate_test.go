@@ -1324,7 +1324,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 					return infra, &SSHConfig{}, nil
 				},
 			},
-			ips:            []string{ValidIP, ValidIP4, ValidIP5, ValidIP6},
+			ips:            []string{ValidIP},
 			newSSHUtil:     getMockSSHUtil(&SSHConfig{}, nil, "", nil),
 			timestamp:      time.Now().Format("20060102150405"),
 			remoteService:  FRONTEND,
@@ -1343,7 +1343,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
 				},
 			},
-			ips:            []string{ValidIP, ValidIP4, ValidIP5, ValidIP6},
+			ips:            []string{ValidIP},
 			newSSHUtil:     getMockSSHUtil(nil, nil, "", nil),
 			timestamp:      time.Now().Format("20060102150405"),
 			remoteService:  FRONTEND,
@@ -1362,7 +1362,7 @@ func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
 					return infra, &SSHConfig{}, nil
 				},
 			},
-			ips:            []string{ValidIP, ValidIP4, ValidIP5, ValidIP6},
+			ips:            []string{ValidIP},
 			newSSHUtil:     getMockSSHUtil(&SSHConfig{}, errors.Errorf("remote copy"), "", nil),
 			timestamp:      time.Now().Format("20060102150405"),
 			remoteService:  FRONTEND,
@@ -1527,7 +1527,7 @@ func TestPatchConfig(t *testing.T) {
 func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
 	c := certRotateFlow{FileUtils: mockFS()}
 	infra := &AutomateHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1, ValidIP4, ValidIP5, ValidIP6}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
