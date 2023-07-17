@@ -25,7 +25,7 @@ Before you start, take a quick tour of our prerequisite pages for [On-Premises](
 
 ## Configuration
 
-Failures occuring during the deployment of Automate HA might result to clear up everything and the start the whole process once again. To avoid this, the verify CLI has been introduced which verifies the Customer Managed Database. You can run the CLI either pre or post deployment. The pre deployment CLI command is as follows:
+Failures occuring during the deployment of Automate HA might result to clear up everything and the start the whole process once again. To avoid this, the verify CLI has been introduced. You can run the CLI either pre or post deployment. The pre deployment CLI command is as follows:
 
 ```bash
 chef-automate verify --config config.toml
@@ -53,7 +53,7 @@ Once the verify command is triggered, following checks will be triggered:
 - FQDN with Load Balancer Reachability
 - Firewall Ports
 
-If all the above checks passes, you get a report. If all the pointers in the report shows pass, it means everything is fine and you can move ahead with the Automate HA deployment.
+You get a report irrespective of the fact that the everything passes of fails. If all the pointers in the report shows pass, it means everything is fine and you can move ahead with the Automate HA deployment.
 
 ## Benefits of Running the verify Command
 
@@ -63,8 +63,12 @@ It is always good to know things early. Pre deployment verification will give th
 
 ### Post-Deployment
 
-It's always better to know the critical scenarios of a deployment process before running it. But in case of a post deployment verification sometimes it can be beneficial as the deployment will help you to identify the proper state of the command. You will be able to identify the exact potential of the commands and fix it accordingly.
+It's always better to know the critical scenarios of a deployment process before running it. But in case of a post deployment verification sometimes it can be beneficial as the deployment will help you to identify the proper state of the command.
 
 ## Reports
 
-Once you run the verify command, it checks all the test cases defined. After it executes, you will see the full report of how many reports succeeded and how may failed. The report comes in a table structure with four columns, Parameters, Successful, Failed, and How to Resolve it. The How to Resolve it columns shows the pointers to resolve for the parameters which have failed.
+Once you run the verify command, it checks all the test cases defined. After it executes, you will see the full report of how many reports succeeded and how may failed. The report comes in a table structure with four columns, **NO.**, **IDENTIFIER**, **PARAMETER**, **STATUS**, and **MESSAGE**. The MESSAGE column shows the pointers to resolve for the parameters which have failed.
+
+An example of a checks performed are shown in the below image:
+
+![Config Verify Check](/images/automate/verify_checks_example.png)
