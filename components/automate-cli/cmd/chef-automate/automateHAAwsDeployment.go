@@ -22,10 +22,10 @@ import (
 )
 
 const (
-	DEPLOY      = "deploy"
-	PROVISION   = "provision"
-	tokenurl    = "http://169.254.169.254/latest/api/token"
-	metaDataurl = "http://169.254.169.254/latest/meta-data/iam/info"
+	DEPLOY       = "deploy"
+	PROVISION    = "provision"
+	TOKEN_URL    = "http://169.254.169.254/latest/api/token"
+	METADATA_URL = "http://169.254.169.254/latest/meta-data/iam/info"
 )
 
 type awsDeployment struct {
@@ -457,14 +457,14 @@ func (a *awsDeployment) getAwsHAIp() error {
 }
 
 func (a *awsDeployment) isIamRolePresent() (bool, error) {
-	_, tokenResponseBody, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodPut, tokenurl, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
+	_, tokenResponseBody, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodPut, TOKEN_URL, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
 	if err != nil {
 		return false, fmt.Errorf("error while getting the token value: %v", err)
 	}
 
 	token := string(tokenResponseBody)
 
-	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, metaDataurl, nil, "X-aws-ec2-metadata-token", token)
+	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, METADATA_URL, nil, "X-aws-ec2-metadata-token", token)
 	if err != nil {
 		return false, fmt.Errorf("error while getting the response for IAM role: %v", err)
 	}

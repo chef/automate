@@ -28,7 +28,7 @@ func TestGetBastionIamRole(t *testing.T) {
 			},
 			wantError: errors.New("error while getting the token value: failed to marshal request body"),
 			want:      false,
-			testurl:   tokenurl,
+			testurl:   TOKEN_URL,
 		},
 		{
 			description: "Failed to get token value from the request (error in creation of request)",
@@ -39,7 +39,7 @@ func TestGetBastionIamRole(t *testing.T) {
 			},
 			wantError: errors.New("error while getting the token value: failed to create HTTP request"),
 			want:      false,
-			testurl:   tokenurl,
+			testurl:   TOKEN_URL,
 		},
 		{
 			description: "Bastion IAM role is not attached",
@@ -55,7 +55,7 @@ func TestGetBastionIamRole(t *testing.T) {
 			},
 			want:      false,
 			wantError: errors.New("Please check if Bastion has attached an IAM Role to it"),
-			testurl:   metaDataurl,
+			testurl:   METADATA_URL,
 		},
 		{
 			description: "Bastion IAM role is not attached (Error)",
@@ -74,7 +74,7 @@ func TestGetBastionIamRole(t *testing.T) {
 			},
 			want:      false,
 			wantError: errors.New("error while getting the response for IAM role: failed to Make HTTP Request"),
-			testurl:   metaDataurl,
+			testurl:   METADATA_URL,
 		},
 		{
 			description: "Bastion IAM role is attached",
@@ -92,15 +92,15 @@ func TestGetBastionIamRole(t *testing.T) {
 			},
 			want:      true,
 			wantError: nil,
-			testurl:   metaDataurl,
+			testurl:   METADATA_URL,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			if tt.testurl == tokenurl {
+			if tt.testurl == TOKEN_URL {
 				ser.httpRequestClient = tt.MockhttputilsToken
-			} else if tt.testurl == metaDataurl {
+			} else if tt.testurl == METADATA_URL {
 				ser.httpRequestClient = tt.MockhttputilsIam
 			}
 			got, err := ser.isIamRolePresent()
