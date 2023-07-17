@@ -95,7 +95,7 @@ func skipCertificateForAutomateAndChefServerNodes(nodeType string, hardwareMap m
 	for ip, nodeTypes := range hardwareMap {
 		for _, nodeTypeMap := range nodeTypes {
 			if nodeTypeMap == nodeType {
-				result = append(result, trigger.SkippedTriggerCheckResp(ip, constants.CERTIFICATE, nodeTypeMap, constants.SKIP_NODE_CERT_TEST_MESSAGE))
+				result = append(result, trigger.SkippedTriggerCheckResp(ip, constants.CERTIFICATE, nodeTypeMap, constants.SKIP_CERT_TEST_MESSAGE))
 			}
 		}
 	}

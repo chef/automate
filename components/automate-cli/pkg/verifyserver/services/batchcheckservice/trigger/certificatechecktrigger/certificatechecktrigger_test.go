@@ -673,7 +673,7 @@ func Test_skipCertificateForAutomateAndChefServerNodes(t *testing.T) {
 					Skipped:     true,
 					Passed:      false,
 					Check:       constants.CERTIFICATE,
-					SkipMessage: constants.SKIP_NODE_CERT_TEST_MESSAGE,
+					SkipMessage: constants.SKIP_CERT_TEST_MESSAGE,
 				},
 			}, {
 				Host:      "test_ip2",
@@ -683,7 +683,7 @@ func Test_skipCertificateForAutomateAndChefServerNodes(t *testing.T) {
 					Skipped:     true,
 					Passed:      false,
 					Check:       constants.CERTIFICATE,
-					SkipMessage: constants.SKIP_NODE_CERT_TEST_MESSAGE,
+					SkipMessage: constants.SKIP_CERT_TEST_MESSAGE,
 				},
 			},
 		},
