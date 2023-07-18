@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -377,6 +378,54 @@ func TestGetFollowerLag(t *testing.T) {
 			expectedErr: nil,
 			wantErr:     false,
 		},
+		{
+			description: "Showing Lag with Parsing Error",
+			beOutput: map[string][]*CmdResult{
+				ValidIP7: {
+					&CmdResult{
+						ScriptName:  censusDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output: `{
+							"changed": false,
+							"census_groups": {
+								"automate-ha-postgresql.default": {
+									"population": {
+										"8cfc79a0be3c4e74ab717bac25a1d185": {
+											"leader": false,
+											"follower": true
+											
+										}
+									}
+								}
+							}`,
+						Error: nil,
+					},
+					&CmdResult{
+						ScriptName:  defaultServiceDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output: `{
+							"process": { "pid": 2760, "state": "up", "state_entered": 1689602436 ,
+							"sys": {
+								"member_id": "8cfc79a0be3c4e74ab717bac25a1d185"
+							}
+						}`,
+						Error: nil,
+					},
+					&CmdResult{
+						ScriptName:  defaultServiceHealthDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output:      `{"status":"OK","stdout":"Primary server is available at 10.0.192.111 with uptime: 0s\nLocal replica 10.0.192.209 is 0 bytes and 1 seconds behind the primary\n","stderr":"}`,
+						Error:       nil,
+					},
+				},
+			},
+			ip:          ValidIP7,
+			expectedErr: errors.New("ERROR"),
+			wantErr:     true,
+		},
 	}
 
 	for _, test := range testCases {
@@ -396,9 +445,15 @@ func TestGetFollowerLag(t *testing.T) {
 		assert.NoError(t, err)
 		be := ss.ShowBEStatus()
 
-		assert.Contains(t, be, ValidIP7)
-		assert.Contains(t, be, "0 bytes and 1 seconds")
-		assert.Contains(t, be, "up (pid: 2760)")
-		assert.Contains(t, be, "postgresql")
+		if test.wantErr {
+			assert.Contains(t, be, ValidIP7)
+			assert.Contains(t, be, test.expectedErr.Error())
+
+		} else {
+			assert.Contains(t, be, ValidIP7)
+			assert.Contains(t, be, "0 bytes and 1 seconds")
+			assert.Contains(t, be, "up (pid: 2760)")
+			assert.Contains(t, be, "postgresql")
+		}
 	}
 }
