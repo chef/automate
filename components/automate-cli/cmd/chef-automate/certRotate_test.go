@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -9,6 +8,7 @@ import (
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -279,7 +279,16 @@ WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
 	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
 	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
 	-----END CERTIFICATE-----"""`
+	testfile = `./testfiles/ssh`
 )
+
+var sshConfig = sshutils.SSHConfig{
+	SshUser:    "ubuntu",
+	SshPort:    "22",
+	SshKeyFile: testfile,
+	HostIP:     ValidIP,
+	Timeout:    150,
+}
 
 func TestIsRemotePath(t *testing.T) {
 	c := certRotateFlow{FileUtils: mockFS()}
@@ -1299,124 +1308,15 @@ func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
 	}
 }
 
-func TestCopyAndExecuteConcurrentlyToFrontEndNodes(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
-	c, infra := getMockCertRotateFlowAndInfra()
-	remoteService := FRONTEND
-	timestamp := time.Now().Format("20060102150405")
-	testCases := []struct {
-		description        string
-		mockPatchCmdHelper *MockNodeUtilsImpl
-		ips                []string
-		newSSHUtil         SSHUtil
-		timestamp          string
-		remoteService      string
-		fileName           string
-		scriptCommands     string
-		flagsObj           *certRotateFlags
-		isError            bool
-		ExpectedError      string
-	}{
-		{
-			description: "Success: Copying and Exectuting concurrently",
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return infra, &SSHConfig{}, nil
-				},
-			},
-			ips:            []string{ValidIP},
-			newSSHUtil:     getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-			timestamp:      time.Now().Format("20060102150405"),
-			remoteService:  FRONTEND,
-			fileName:       "cert-rotate-fe.toml",
-			scriptCommands: fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, DATE_FORMAT),
-			flagsObj: &certRotateFlags{
-				automate: true,
-			},
-			isError:       false,
-			ExpectedError: "",
-		},
-		{
-			description: "Error occured while reading infra details",
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
-				},
-			},
-			ips:            []string{ValidIP},
-			newSSHUtil:     getMockSSHUtil(nil, nil, "", nil),
-			timestamp:      time.Now().Format("20060102150405"),
-			remoteService:  FRONTEND,
-			fileName:       "cert-rotate-fe.toml",
-			scriptCommands: fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, DATE_FORMAT),
-			flagsObj: &certRotateFlags{
-				automate: true,
-			},
-			isError:       true,
-			ExpectedError: "Error occured while reading infra details",
-		},
-		{
-			description: "Failure: Copying and Exectuting concurrently",
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return infra, &SSHConfig{}, nil
-				},
-			},
-			ips:            []string{ValidIP},
-			newSSHUtil:     getMockSSHUtil(&SSHConfig{}, errors.Errorf("remote copy"), "", nil),
-			timestamp:      time.Now().Format("20060102150405"),
-			remoteService:  FRONTEND,
-			fileName:       "cert-rotate-fe.toml",
-			scriptCommands: fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, DATE_FORMAT),
-			flagsObj: &certRotateFlags{
-				automate: true,
-			},
-			isError:       false,
-			ExpectedError: "",
-		},
-		{
-			description: "Failure: Copying and Exectuting concurrently",
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return infra, &SSHConfig{}, nil
-				},
-			},
-			ips:            []string{ValidIP, ValidIP4, ValidIP5, ValidIP6},
-			newSSHUtil:     getMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("remote execution")),
-			timestamp:      time.Now().Format("20060102150405"),
-			remoteService:  FRONTEND,
-			fileName:       "cert-rotate-fe.toml",
-			scriptCommands: fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, DATE_FORMAT),
-			flagsObj: &certRotateFlags{
-				automate: true,
-			},
-			isError:       false,
-			ExpectedError: "",
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.description, func(t *testing.T) {
-			output := c.copyAndExecuteConcurrentlyToFrontEndNodes(testCase.mockPatchCmdHelper, testCase.ips, testCase.newSSHUtil, testCase.timestamp, testCase.remoteService, testCase.fileName, testCase.scriptCommands, testCase.flagsObj, printCertRotateOutput)
-			if testCase.isError {
-				assert.EqualError(t, output, testCase.ExpectedError)
-			} else {
-				assert.NoError(t, output)
-			}
-		})
-	}
-}
-
 func TestPatchConfig(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
-	c, infra := getMockCertRotateFlowAndInfra()
+	_, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
-		description        string
-		param              *patchFnParameters
-		concurrent         bool
-		mockPatchCmdHelper *MockNodeUtilsImpl
-		isError            bool
-		ExpectedError      string
+		description   string
+		param         *patchFnParameters
+		concurrent    bool
+		MockSSHUtil   sshutils.SSHUtil
+		isError       bool
+		ExpectedError string
 	}
 	testCases := []testCaseInfo{
 		{
@@ -1434,9 +1334,15 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			concurrent: false,
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return infra, &SSHConfig{}, nil
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
 				},
 			},
 			isError:       false,
@@ -1457,18 +1363,32 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			concurrent: true,
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return infra, &SSHConfig{}, nil
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
 				},
 			},
 			isError:       false,
 			ExpectedError: "",
 		},
 		{
-			description: "Error occured while reading infra details on frontend",
+			description: "remote copying failed on on frontend",
 			param: &patchFnParameters{
-				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("Error occured while reading infra details")),
 				config:        TestFrontendConfig,
 				fileName:      "cert-rotate-fe.toml",
 				timestamp:     time.Now().Format("20060102150405"),
@@ -1480,13 +1400,65 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			concurrent: true,
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  errors.New("remote copying failed on node"),
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
 				},
 			},
 			isError:       true,
-			ExpectedError: "Error occured while reading infra details",
+			ExpectedError: "remote copying failed on node",
+		},
+		{
+			description: "remote execution failed on on frontend",
+			param: &patchFnParameters{
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: AUTOMATE,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					automate: true,
+				},
+				skipIpsList: []string{},
+			},
+			concurrent: true,
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  errors.New("remote execution failed"),
+							Output: "",
+						},
+					}
+				},
+			},
+			isError:       false,
+			ExpectedError: "",
 		},
 		{
 			description: "Error occured while reading infra details on backend",
@@ -1502,19 +1474,17 @@ func TestPatchConfig(t *testing.T) {
 				},
 				skipIpsList: []string{},
 			},
-			concurrent: false,
-			mockPatchCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
-				},
-			},
+			concurrent:    false,
 			isError:       true,
 			ExpectedError: "Error occured while reading infra details",
 		},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			output := c.patchConfig(testCase.param, testCase.concurrent, testCase.mockPatchCmdHelper)
+			c := certRotateFlow{FileUtils: mockFS(),
+				SSHUtil: testCase.MockSSHUtil,
+				Writer:  getMockWriterImpl()}
+			output := c.patchConfig(testCase.param, testCase.concurrent)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {

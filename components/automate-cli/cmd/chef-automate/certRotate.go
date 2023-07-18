@@ -16,7 +16,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/pkg/errors"
@@ -134,6 +136,8 @@ type certRotateFlags struct {
 
 type certRotateFlow struct {
 	FileUtils fileutils.FileUtils
+	SSHUtil   sshutils.SSHUtil
+	Writer    *cli.Writer
 }
 
 type patchFnParameters struct {
@@ -145,14 +149,6 @@ type patchFnParameters struct {
 	infra         *AutomateHAInfraDetails
 	flagsObj      *certRotateFlags
 	skipIpsList   []string
-}
-
-type CertRotateCmdResult struct {
-	hostIp       string
-	outputString string
-	err          error
-	writer       *cli.Writer
-	nodeType     string
 }
 
 func init() {
@@ -191,7 +187,11 @@ func init() {
 
 func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		c := certRotateFlow{FileUtils: &fileutils.FileSystemUtils{}}
+		log, err := logger.NewLogger("text", "info")
+		if err != nil {
+			return err
+		}
+		c := certRotateFlow{FileUtils: &fileutils.FileSystemUtils{}, SSHUtil: sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor())}
 		return c.certRotate(cmd, args, flagsObj)
 	}
 }
@@ -287,8 +287,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 		skipIpsList:   skipIpsList,
 	}
 
-	nodeOpUtils := &NodeUtilsImpl{}
-	err := c.patchConfig(patchFnParam, true, nodeOpUtils)
+	err := c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -327,9 +326,8 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 		skipIpsList:   skipIpsList,
 	}
 
-	nodeOpUtils := &NodeUtilsImpl{}
 	// patching on PG
-	err := c.patchConfig(patchFnParam, false, nodeOpUtils)
+	err := c.patchConfig(patchFnParam, false)
 	if err != nil {
 		return err
 	}
@@ -372,7 +370,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	patchFnParam.remoteService = remoteService
 	patchFnParam.skipIpsList = skipIpsList
 
-	err = c.patchConfig(patchFnParam, true, nodeOpUtils)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -434,8 +432,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		skipIpsList:   skipIpsList,
 	}
 
-	nodeOpUtils := &NodeUtilsImpl{}
-	err = c.patchConfig(patchFnParam, false, nodeOpUtils)
+	err = c.patchConfig(patchFnParam, false)
 	if err != nil {
 		return err
 	}
@@ -495,7 +492,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	patchFnParam.remoteService = remoteService
 	patchFnParam.skipIpsList = skipIpsList
 
-	err = c.patchConfig(patchFnParam, true, nodeOpUtils)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -513,8 +510,7 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	patchFnParam.config = peerConfig
 	patchFnParam.timestamp = time.Now().Format("20060102150405")
 	patchFnParam.skipIpsList = []string{flagsObj.node}
-	nodeOpUtils := &NodeUtilsImpl{}
-	err := c.patchConfig(patchFnParam, false, nodeOpUtils)
+	err := c.patchConfig(patchFnParam, false)
 	if err != nil {
 		return err
 	}
@@ -564,7 +560,7 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAPatchingForPg(automatesConfig ma
 }
 
 // patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool, nodeOpUtils NodeOpUtils) error {
+func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool) error {
 
 	f, err := os.Create(param.fileName)
 	if err != nil {
@@ -592,7 +588,17 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool, 
 
 	//collect ips on which need to perform action/cert-rotation
 	filteredIps := c.getFilteredIps(ips, param.skipIpsList)
-
+	filteredIpsString := strings.Join(filteredIps, ", ")
+	sshConfig := c.getSshDetails(param.infra)
+	sshConfig.hostIP = filteredIpsString
+	sshConfig.timeout = param.flagsObj.timeout
+	configRes := sshutils.SSHConfig{
+		SshUser:    sshConfig.sshUser,
+		SshPort:    sshConfig.sshPort,
+		SshKeyFile: sshConfig.sshKeyFile,
+		HostIP:     sshConfig.hostIP,
+		Timeout:    sshConfig.timeout,
+	}
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
 	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
@@ -606,11 +612,12 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool, 
 			return err
 		}
 	} else {
-		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(nodeOpUtils, filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
+		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(filteredIps, configRes, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
 		if err != nil {
 			return err
 		}
 	}
+	//.(SSHUtil.SSHConfig)
 
 	return nil
 }
@@ -648,73 +655,49 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 }
 
 // copyAndExecuteConcurrently will copy the toml file to each required nodes concurrently and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(nu NodeOpUtils, ips []string, sshUtils SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) error {
-	responseChan := make(chan CertRotateCmdResult, len(ips))
-	defer close(responseChan)
-	infra, _, err := nu.getHaInfraDetails()
-	if err != nil {
-		return err
+func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(ips []string, sshConfig sshutils.SSHConfig, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(sshutils.Result, string, *cli.Writer)) error {
+
+	sshConfig.Timeout = flagsObj.timeout
+	copyResults := c.SSHUtil.CopyFileToRemoteConcurrently(sshConfig, fileName, remoteService+timestamp, false, ips)
+	isError := false
+	for _, result := range copyResults {
+		if result.Error != nil {
+			c.Writer.Errorf("Remote copying automate-verify CLI failed on node : %s with error: %v\n", result.HostIP, result.Error)
+			isError = true
+		}
+	}
+	if isError {
+		return fmt.Errorf("remote copying failed on node")
 	}
 
-	for i := 0; i < len(ips); i++ {
-		hostIP := ips[i]
-		go func(hostIP string, responseChan chan CertRotateCmdResult) {
-			SSHConfig := c.getSshDetails(infra)
-			SSHConfig.timeout = flagsObj.timeout
-			rc := CertRotateCmdResult{hostIP, "", nil, writer, remoteService}
-			SSHConfig.hostIP = hostIP
-			// Copying the new toml file which includes new configurations (for frontend nodes).
-			err = sshUtils.copyFileToRemoteWithConfig(fileName, remoteService+timestamp, false, *SSHConfig)
-			if err != nil {
-				writer.Errorf("%v", err)
-				rc.err = err
-				responseChan <- rc
-				return
-			}
-
-			fmt.Printf("\nStarted Applying the Configurations in %s node: %s \n", remoteService, hostIP)
-			output, err := sshUtils.connectAndExecuteCommandOnRemote(scriptCommands, true)
-			if err != nil {
-				rc.err = err
-				responseChan <- rc
-				return
-			}
-			rc.outputString = output
-			responseChan <- rc
-
-		}(hostIP, responseChan)
+	fmt.Printf("\nStarted Applying the Configurations in %s node: %s \n", remoteService, ips)
+	excuteResults := c.SSHUtil.ExecuteConcurrently(sshConfig, scriptCommands, ips)
+	for _, result := range excuteResults {
+		printCertRotateOutput(result, remoteService, writer)
 	}
-	getCertChannelValue(ips, responseChan, printCertRotateOutput)
 	return nil
 }
 
-func getCertChannelValue(ips []string, certRotateCmdResults chan CertRotateCmdResult, printCertRotateOutput func(CertRotateCmdResult, string, *cli.Writer)) {
-	for i := 0; i < len(ips); i++ {
-		CertRotateCmdResult := <-certRotateCmdResults
-		printCertRotateOutput(CertRotateCmdResult, CertRotateCmdResult.nodeType, CertRotateCmdResult.writer)
-	}
-}
-
-func printCertRotateOutput(cmdResult CertRotateCmdResult, remoteService string, writer *cli.Writer) {
+func printCertRotateOutput(cmdResult sshutils.Result, remoteService string, writer *cli.Writer) {
 	writer.Printf("\n=======================================================================\n")
 
-	if cmdResult.err != nil || strings.Contains(cmdResult.outputString, "DeploymentServiceCallError") {
+	if cmdResult.Error != nil || strings.Contains(cmdResult.Output, "DeploymentServiceCallError") {
 		printCertRotateErrorOutput(cmdResult, remoteService, writer)
 	} else {
-		writer.Printf("Output for Host IP %s : \n%s", cmdResult.hostIp, cmdResult.outputString+"\n")
-		writer.Success("Command is executed on node : " + cmdResult.hostIp + "\n")
+		writer.Printf("Output for Host IP %s : \n%s", cmdResult.HostIP, cmdResult.Output+"\n")
+		writer.Success("Command is executed on node : " + cmdResult.HostIP + "\n")
 	}
 	writer.BufferWriter().Flush()
 }
 
-func printCertRotateErrorOutput(cmdResult CertRotateCmdResult, remoteService string, writer *cli.Writer) {
+func printCertRotateErrorOutput(cmdResult sshutils.Result, remoteService string, writer *cli.Writer) {
 	isOutputError := false
-	if strings.Contains(cmdResult.outputString, "DeploymentServiceCallError") {
+	if strings.Contains(cmdResult.Output, "DeploymentServiceCallError") {
 		isOutputError = true
-		writer.Failf(CMD_FAILED_MSG, remoteService, cmdResult.hostIp, cmdResult.outputString)
+		writer.Failf(CMD_FAILED_MSG, remoteService, cmdResult.HostIP, cmdResult.Output)
 	}
 	if !isOutputError {
-		writer.Failf(CMD_FAILED_MSG, remoteService, cmdResult.hostIp, cmdResult.err.Error())
+		writer.Failf(CMD_FAILED_MSG, remoteService, cmdResult.HostIP, cmdResult.Error.Error())
 	}
 }
 
