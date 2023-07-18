@@ -154,7 +154,7 @@ enable_custom_certs = false
 # ============== AWS network Config ============================
 ## === INPUT NEEDED ===
 
-# Eg.: profile = "default", In case you attached the IAM role to the bastion machine, leave this field empty.
+# Eg.: profile = "default", Leave this field empty if you have an IAM role attached to the bastion machine.
 profile = ""
 
 # Eg.: region = "us-east-1"
