@@ -256,8 +256,8 @@ func getMockSSHUtil(sshConfig *SSHConfig, CFTRError error, CSECOROutput string, 
 		copyFileToRemoteFunc: func(srcFilePath string, destFileName string, removeFile bool) error {
 			return CFTRError
 		},
-		copyFileToRemoteWithConfigFunc: func(srcFilePath string, destFileName string, removeFile bool, sshConfig SSHConfig) error {
-			return CFTRError
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return CSECOROutput, CSECORError
 		},
 	}
 }
