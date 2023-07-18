@@ -32,13 +32,14 @@ Environment="HOME={{.HomeEnv}}"
 [Install]
 WantedBy=multi-user.target
 `
+	BINARY_FILE_NAME = "chef-automate"
 )
 
 type systemdInput struct {
 	ServiceName        string
 	ServiceDescription string
 	ServiceCommand     string
-	HomeEnv            string  
+	HomeEnv            string
 }
 
 type CreateSystemdServiceImpl struct {
@@ -204,7 +205,7 @@ func (css *CreateSystemdServiceImpl) Create() error {
 	}
 	css.Logger.Debugf("Service %s is not running on this system", SERVICE_NAME)
 
-	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, filepath.Base(currentBinaryPath))
+	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, BINARY_FILE_NAME)
 	css.Logger.Debugf("Full binary destination path %s", fullBinaryDestination)
 	err = css.SystemdCreateUtils.CreateDestinationAndCopy(currentBinaryPath, fullBinaryDestination)
 	if err != nil {
