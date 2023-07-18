@@ -365,6 +365,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
 		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
 		assert.True(t, got[0].Result.Skipped)
+		assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[0].Result.SkipMessage)
 	})
 	t.Run("Nil SSHUser", func(t *testing.T) {
 		config := &models.Config{
@@ -389,6 +390,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			assert.Equal(t, constants.SSH_USER, v.Result.Check)
 			assert.Nil(t, v.Result.Error)
 			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SKIP_SSH_USER_TEST_MESSAGE, v.Result.SkipMessage)
 		}
 	})
 	t.Run("Empty SSHUser", func(t *testing.T) {

@@ -22,7 +22,7 @@ func NewSystemResourceCheck(log logger.Logger, port string) *SystemResourceCheck
 func (src *SystemResourceCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for config.HardWare if empty of nil
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.SYSTEM_RESOURCES, true, true, true)
+		return trigger.HardwareNil(constants.SYSTEM_RESOURCES, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, true, true)
 	}
 
 	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, config.DeploymentState)

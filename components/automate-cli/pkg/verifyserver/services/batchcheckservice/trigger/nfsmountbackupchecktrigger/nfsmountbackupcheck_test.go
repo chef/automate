@@ -635,7 +635,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Passed Response for chef-server,automate,opensearch and postgresql",
 			args: args{
 				config: &models.Config{
-					Hardware:       hardware,
+					Hardware: hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -654,7 +654,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Failure Mount Response for chef-server,automate,opensearch and postgresql",
 			args: args{
 				config: &models.Config{
-					Hardware:       hardware,
+					Hardware: hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -674,7 +674,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Recived Internal Server Error From the API",
 			args: args{
 				config: &models.Config{
-					Hardware:       hardware,
+					Hardware: hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -693,7 +693,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			name: "Invalid Response from service",
 			args: args{
 				config: &models.Config{
-					Hardware:       hardware,
+					Hardware: hardware,
 					Backup: &models.Backup{
 						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
@@ -852,6 +852,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
 			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, v.Result.SkipMessage)
 		}
 	})
 
@@ -883,6 +884,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
 			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
 			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SKIP_BACKUP_TEST_MESSAGE_NFS, v.Result.SkipMessage)
 		}
 	})
 	t.Run("Empty FileSystem", func(t *testing.T) {

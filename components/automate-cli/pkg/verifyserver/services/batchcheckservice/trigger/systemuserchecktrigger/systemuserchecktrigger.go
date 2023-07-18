@@ -22,7 +22,7 @@ func NewSystemUserCheck(log logger.Logger, port string) *SystemUserCheck {
 func (suc *SystemUserCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for config.HardWare if empty of nil
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.SYSTEM_USER, true, true, true)
+		return trigger.HardwareNil(constants.SYSTEM_USER, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, true, true)
 	}
 
 	return trigger.RunCheck(config, suc.log, suc.port, constants.SYSTEM_USER_CHECK_API_PATH, "")

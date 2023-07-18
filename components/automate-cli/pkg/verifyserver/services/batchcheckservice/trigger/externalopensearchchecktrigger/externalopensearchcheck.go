@@ -25,10 +25,10 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for nil or empty req body
 	if config.Hardware == nil {
-		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, false, false, false)
+		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, constants.SKIP_MISSING_HARDWARE_MESSAGE, false, false, false)
 	}
 	if config.ExternalOS == nil {
-		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH)
+		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH, constants.SKIP_MANAGED_OS_TEST_MESSAGE)
 	}
 
 	if isEmptyExternalOS(config.ExternalOS) {
@@ -85,15 +85,15 @@ func getOpensearchRequest(details *models.ExternalOS) models.ExternalOSRequest {
 
 }
 
-func externalOSNillResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+func externalOSNillResp(config *models.Config, checktype, message string) []models.CheckTriggerResponse {
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE, message))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, message))
 	}
 
 	return triggerResps

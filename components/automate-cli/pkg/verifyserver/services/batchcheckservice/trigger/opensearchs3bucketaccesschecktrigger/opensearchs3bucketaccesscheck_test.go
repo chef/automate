@@ -10,9 +10,9 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	cfg "github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
-	cfg "github.com/chef/automate/lib/config"
 )
 
 var (
@@ -246,6 +246,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
 					assert.True(t, got[0].Result.Skipped)
+					assert.Equal(t, constants.SKIP_OS_BUCKET_TEST_MESSAGE, got[0].Result.SkipMessage)
 				} else if tt.name == "Empty OS and Object storage" {
 					assert.Len(t, got, 1)
 					assert.Equal(t, "dave.com", got[0].Host)
@@ -261,6 +262,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
 					assert.True(t, got[0].Result.Skipped)
+					assert.Equal(t, constants.SKIP_OS_BUCKET_TEST_SELF_MANAGED_MESSAGE, got[0].Result.SkipMessage)
 				} else {
 					assert.Equal(t, want, got)
 					assert.NotNil(t, got)

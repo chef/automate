@@ -310,7 +310,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				},
 			},
 			httpStatusResponse: `{"error":{"code":400, "message":"opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty"}}`,
-			response: "opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty",
+			response:           "opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty",
 		},
 		{
 			name:           "Gateway Timeout",
@@ -334,7 +334,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				},
 			},
 			httpStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
-			response: "context deadline exceeded",
+			response:           "context deadline exceeded",
 		},
 		{
 			name:     "Empty OS",
@@ -420,6 +420,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					assert.Equal(t, "127.0.0.1", got[0].Host)
 					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 					assert.True(t, got[0].Result.Skipped)
+					assert.Equal(t, constants.SKIP_MANAGED_OS_TEST_MESSAGE, got[0].Result.SkipMessage)
 				} else {
 					assert.Nil(t, got[0].Result.Error)
 					assert.Equal(t, constants.LOCALHOST, got[0].Host)
@@ -450,7 +451,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 			},
 		}
 		isError := false
-		server, host, port := createDummyServer(t, http.StatusOK, true,"")
+		server, host, port := createDummyServer(t, http.StatusOK, true, "")
 		defer server.Close()
 		svc := NewExternalOpensearchCheck(
 			logger.NewLogrusStandardLogger(),
@@ -494,7 +495,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 			},
 		}
 		isError := false
-		server, host, port := createDummyServer(t, http.StatusOK, false,"")
+		server, host, port := createDummyServer(t, http.StatusOK, false, "")
 		defer server.Close()
 		svc := NewExternalOpensearchCheck(
 			logger.NewLogrusStandardLogger(),
