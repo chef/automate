@@ -147,19 +147,19 @@ resource "aws_route_table" "route3" {
 
 
 resource "aws_route_table_association" "nat1" {
-  count          = (length(var.public_custom_subnets) == 0 && (var.aws_cidr_block_addr != "" || length(var.private_custom_subnets) > 0)) ? 1 : 0
+  count          = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[0].id : aws_subnet.default[0].id
   route_table_id = aws_route_table.route1[0].id
 }
 
 resource "aws_route_table_association" "nat2" {
-  count          = (length(var.public_custom_subnets) == 0 && (var.aws_cidr_block_addr != "" || length(var.private_custom_subnets) > 0)) ? 1 : 0
+  count          = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[1].id : aws_subnet.default[1].id
   route_table_id = aws_route_table.route2[0].id
 }
 
 resource "aws_route_table_association" "nat3" {
-  count          = (length(var.public_custom_subnets) == 0 && (var.aws_cidr_block_addr != "" || length(var.private_custom_subnets) > 0)) ? 1 : 0
+  count          = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[2].id : aws_subnet.default[2].id
   route_table_id = aws_route_table.route3[0].id
 }
