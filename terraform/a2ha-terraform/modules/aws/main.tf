@@ -2,6 +2,9 @@ resource "random_id" "random" {
   byte_length = 4
 }
 
+data "aws_availability_zones" "available" {
+}
+
 data "aws_vpc" "default" {
   id = var.aws_vpc_id
 }
@@ -26,17 +29,152 @@ data "aws_subnet" "public" {
   id    = local.public_subnet_ids_list[count.index]
 }
 
+data "aws_internet_gateway" "default" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+resource "aws_subnet" "default" {
+  count             = (length(var.private_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 3 : 0
+  vpc_id            = data.aws_vpc.default.id
+  cidr_block        = cidrsubnet("${var.aws_cidr_block_addr}/18", 8, count.index + 1)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_private"))
+}
+
+resource "aws_subnet" "public" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 3 : 0
+  vpc_id                  = data.aws_vpc.default.id
+  cidr_block              = cidrsubnet("${var.aws_cidr_block_addr}/18", 8, count.index + 4)
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = true
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_public"))
+}
+
+resource "aws_eip" "eip1" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  vpc              = true
+  public_ipv4_pool = "amazon"
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_eip"))
+}
+
+resource "aws_eip" "eip2" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  vpc              = true
+  public_ipv4_pool = "amazon"
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_eip"))
+}
+
+resource "aws_eip" "eip3" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  vpc              = true
+  public_ipv4_pool = "amazon"
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_eip"))
+}
+
+resource "aws_nat_gateway" "nat1" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  allocation_id = aws_eip.eip1[0].id
+  subnet_id     = aws_subnet.public[0].id
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
+
+  depends_on = [data.aws_internet_gateway.default]
+}
+
+resource "aws_nat_gateway" "nat2" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  allocation_id = aws_eip.eip2[0].id
+  subnet_id     = aws_subnet.public[1].id
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
+
+  depends_on = [data.aws_internet_gateway.default]
+}
+
+resource "aws_nat_gateway" "nat3" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  allocation_id = aws_eip.eip3[0].id
+  subnet_id     = aws_subnet.public[2].id
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
+
+  depends_on = [data.aws_internet_gateway.default]
+}
+
+resource "aws_route_table" "route1" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  vpc_id = data.aws_vpc.default.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat1[0].id
+  }
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
+
+}
+
+resource "aws_route_table" "route2" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  vpc_id = data.aws_vpc.default.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat2[0].id
+  }
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
+
+}
+
+resource "aws_route_table" "route3" {
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
+  vpc_id = data.aws_vpc.default.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat3[0].id
+  }
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
+
+}
+
+
+resource "aws_route_table_association" "nat1" {
+  count          = (length(var.public_custom_subnets) == 0 && (var.aws_cidr_block_addr != "" || length(var.private_custom_subnets) > 0)) ? 1 : 0
+  subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[0].id : aws_subnet.default[0].id
+  route_table_id = aws_route_table.route1[0].id
+}
+
+resource "aws_route_table_association" "nat2" {
+  count          = (length(var.public_custom_subnets) == 0 && (var.aws_cidr_block_addr != "" || length(var.private_custom_subnets) > 0)) ? 1 : 0
+  subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[1].id : aws_subnet.default[1].id
+  route_table_id = aws_route_table.route2[0].id
+}
+
+resource "aws_route_table_association" "nat3" {
+  count          = (length(var.public_custom_subnets) == 0 && (var.aws_cidr_block_addr != "" || length(var.private_custom_subnets) > 0)) ? 1 : 0
+  subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[2].id : aws_subnet.default[2].id
+  route_table_id = aws_route_table.route3[0].id
+}
+
 locals {
   ami = var.aws_ami_id
 }
 
 resource "aws_instance" "chef_automate_postgresql" {
-  count = (length(var.private_custom_subnets) == 0 || var.setup_managed_services) ? 0 : var.postgresql_instance_count
+  count = ((length(var.private_custom_subnets) == 0 && var.aws_cidr_block_addr == "") || var.setup_managed_services) ? 0 : var.postgresql_instance_count
 
   ami                         = local.ami
   instance_type               = var.postgresql_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
-  subnet_id                   = element(data.aws_subnet.default.*.id, count.index)
+  subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
@@ -78,15 +216,16 @@ resource "aws_instance" "chef_automate_postgresql" {
     http_tokens            = "required"
     instance_metadata_tags = "enabled"
   }
+  depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
 resource "aws_instance" "chef_automate_opensearch" {
-  count = (length(var.private_custom_subnets) == 0 || var.setup_managed_services) ? 0 : var.opensearch_instance_count
+  count = ((length(var.private_custom_subnets) == 0 && var.aws_cidr_block_addr == "") || var.setup_managed_services) ? 0 : var.opensearch_instance_count
 
   ami                         = local.ami
   instance_type               = var.opensearch_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
-  subnet_id                   = element(data.aws_subnet.default.*.id, count.index)
+  subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false //Changes to false as Dashboards are no longer enabled
   ebs_optimized               = true
@@ -117,16 +256,17 @@ resource "aws_instance" "chef_automate_opensearch" {
     http_tokens            = "required"
     instance_metadata_tags = "enabled"
   }
+  depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
 
 resource "aws_instance" "chef_automate" {
-  count = length(var.private_custom_subnets) > 0 ? var.automate_instance_count : 0
+  count = (length(var.private_custom_subnets) > 0 || var.aws_cidr_block_addr != "") ? var.automate_instance_count : 0
 
   ami                         = local.ami
   instance_type               = var.automate_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
-  subnet_id                   = element(data.aws_subnet.default.*.id, count.index)
+  subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id, aws_security_group.chef_automate_ui.id]
   associate_public_ip_address = false
   ebs_optimized               = true
@@ -159,17 +299,18 @@ resource "aws_instance" "chef_automate" {
     http_tokens            = "required"
     instance_metadata_tags = "enabled"
   }
-  
+  depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
+
 }
 
 resource "aws_instance" "chef_server" {
-  count = length(var.private_custom_subnets) > 0 ? var.chef_server_instance_count : 0
+  count = (length(var.private_custom_subnets) > 0 || var.aws_cidr_block_addr != "") ? var.chef_server_instance_count : 0
 
 
   ami                         = local.ami
   instance_type               = var.chef_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
-  subnet_id                   = element(data.aws_subnet.default.*.id, count.index)
+  subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id, aws_security_group.chef_automate_ui.id]
   associate_public_ip_address = false
   ebs_optimized               = true
@@ -202,5 +343,6 @@ resource "aws_instance" "chef_server" {
     http_tokens            = "required"
     instance_metadata_tags = "enabled"
   }
+  depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
