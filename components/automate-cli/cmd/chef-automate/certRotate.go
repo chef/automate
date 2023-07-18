@@ -547,13 +547,11 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAPatchingForPg(automatesConfig ma
 	oldRootCA := ""
 	skipIpsList := []string{}
 	for ip, config := range automatesConfig {
-		if config.Global.V1.External.Postgresql != nil && config.Global.V1.External.Postgresql.Ssl != nil {
 			if config.Global.V1.External.Postgresql.Ssl.RootCert != nil {
 				oldRootCA = config.Global.V1.External.Postgresql.Ssl.RootCert.Value
 				if oldRootCA == newRootCA {
 					skipIpsList = append(skipIpsList, ip)
 				}
-			}
 		}
 	}
 	return skipIpsList
