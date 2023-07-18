@@ -54,7 +54,6 @@ type Summary struct {
 	spinnerTimeout        time.Duration
 	infra                 *AutomateHAInfraDetails
 	statusSummaryCmdFlags *StatusSummaryCmdFlags
-	sshUtil               SSHUtil
 	remoteCmdExecutor     RemoteCmdExecutor
 }
 
@@ -63,7 +62,7 @@ type A2haHabitatAutoTfvars struct {
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
 
-func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil, remoteCmdExecutor RemoteCmdExecutor) StatusSummary {
+func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, remoteCmdExecutor RemoteCmdExecutor) StatusSummary {
 	return &Summary{
 		feStatus:              feStatus,
 		beStatus:              beStatus,
@@ -71,7 +70,6 @@ func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus
 		spinnerTimeout:        spinnerTimeout,
 		infra:                 infra,
 		statusSummaryCmdFlags: flags,
-		sshUtil:               sshUtil,
 		remoteCmdExecutor:     remoteCmdExecutor,
 	}
 }
@@ -362,7 +360,6 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 }
 
 func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd, serviceName, serviceType string) error {
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, ss.sshUtil, writer)
 
 	// Status Script
 	status := GenerateOriginalAutomateCLICommand(
@@ -396,7 +393,7 @@ func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		nodeMap.ChefServer.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	feOutput, err := cmdUtil.Execute()
+	feOutput, err := ss.remoteCmdExecutor.ExecuteWithNodeMap(nodeMap)
 	if err != nil {
 		return err
 	}
@@ -571,12 +568,13 @@ func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType stri
 		}
 	}
 
-	return FeStatusValue{
+	feStatusValue := FeStatusValue{
 		serviceName: serviceType,
 		ipAddress:   ip,
 		status:      status,
 		Opensearch:  osStatus,
 	}
+	return feStatusValue
 }
 
 func (ss *Summary) opensearchStatusInFE(osStatusOutput *CmdResult) string {

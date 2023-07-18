@@ -36,8 +36,8 @@ Incorrect postgresql IP, 127.0.3 IP address validation failed`
 | NAME       | IP ADDRESS   | HEALTH | PROCESS        | LAG                   | UPTIME        | ROLE     |
 +------------+--------------+--------+----------------+-----------------------+---------------+----------+
 | postgresql | 198.51.100.7 | OK     | up (pid: 2760) | 0 bytes and 1 seconds |`
-	displayFEAutomate         = `| automate    | 198.51.100.1 | ERROR  | Unknown    |`
-	displayFECS               = `| chef-server | 198.51.100.2 | ERROR  | Unknown    |`
+	displayFEAutomate         = `| automate    | 198.51.100.1 | OK     | "green" (Active: 100.0) |`
+	displayFECS               = `| chef-server | 198.51.100.2 | OK     | "green" (Active: 100.0) |`
 	mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 )
 
@@ -47,7 +47,7 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil), &MockRemoteCmdExecutor{
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, &MockRemoteCmdExecutor{
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
@@ -74,7 +74,7 @@ func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil), &MockRemoteCmdExecutor{
+	}, &MockRemoteCmdExecutor{
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
@@ -100,7 +100,7 @@ func TestCheckIPAddressesOnlyByServices(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil), &MockRemoteCmdExecutor{
+	}, &MockRemoteCmdExecutor{
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
@@ -127,7 +127,7 @@ func TestCheckIPAddressesError(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil), &MockRemoteCmdExecutor{
+	}, &MockRemoteCmdExecutor{
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
@@ -151,7 +151,7 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil), &MockRemoteCmdExecutor{
+	}, &MockRemoteCmdExecutor{
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
@@ -165,15 +165,55 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 	assert.Equal(t, postgresqlIps, []string(nil))
 	assert.Contains(t, getSingleErrorFromList(errList).Error(), invalidIpAddress)
 }
+
+// {OsStatus 10.0.192.172 []  <nil>}
 func TestRunFENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
 	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2}
-	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil, &MockRemoteCmdExecutor{
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, &MockRemoteCmdExecutor{
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-			return nil, nil
+			if strings.Contains(strings.Join(nodeMap.Automate.CmdInputs.NodeIps, ","), ValidIP1) {
+
+				return map[string][]*CmdResult{
+					ValidIP1: {
+						&CmdResult{
+							ScriptName:  "OsStatus",
+							HostIP:      ValidIP1,
+							OutputFiles: []string{},
+							Error:       nil,
+							Output:      `{"cluster_name":"opensearch","status":"green","timed_out":false,"number_of_nodes":3,"number_of_data_nodes":3,"discovered_master":true,"active_primary_shards":35,"active_shards":74,"relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,"number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,"active_shards_percent_as_number":100.0}`,
+						},
+						&CmdResult{
+							ScriptName:  "Status",
+							HostIP:      ValidIP1,
+							OutputFiles: []string{},
+							Error:       nil,
+							Output:      ``,
+						},
+					},
+				}, nil
+				// displayFEAutomate, nil
+			}
+			return map[string][]*CmdResult{
+				ValidIP2: {
+					&CmdResult{
+						ScriptName:  "OsStatus",
+						HostIP:      ValidIP2,
+						OutputFiles: []string{},
+						Error:       nil,
+						Output:      `{"cluster_name":"opensearch","status":"green","timed_out":false,"number_of_nodes":3,"number_of_data_nodes":3,"discovered_master":true,"active_primary_shards":35,"active_shards":74,"relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,"number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,"active_shards_percent_as_number":100.0}`,
+					},
+					&CmdResult{
+						ScriptName:  "Status",
+						HostIP:      ValidIP2,
+						OutputFiles: []string{},
+						Error:       nil,
+						Output:      ``,
+					},
+				},
+			}, nil
 		},
 	})
 	err := ss.Prepare()
@@ -346,7 +386,7 @@ func TestGetFollowerLag(t *testing.T) {
 		ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
 			node:         test.ip,
 			isPostgresql: true,
-		}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil), &MockRemoteCmdExecutor{
+		}, &MockRemoteCmdExecutor{
 			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 				return test.beOutput, nil
 			},
