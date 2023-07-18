@@ -12,18 +12,18 @@ import (
 
 func convTfvarToJson(filename string) string {
 	if len(strings.TrimSpace(filename)) < 1 {
-		writer.Printf("Invalid or empty argument")
+		writer.Println("Invalid or empty argument")
 		return ""
 	}
 	src, err := ioutil.ReadFile(filename) // nosemgrep
 	if err != nil {
-		writer.Printf("Error reading %q: %s", filename, err)
+		writer.Printf("Error reading %q: %s\n", filename, err)
 		return ""
 	}
 
 	f, diags := hclsyntax.ParseConfig(src, filename, hcl.Pos{Line: 1, Column: 1})
 	if diags.HasErrors() {
-		writer.Printf("Error parsing %q: %s", filename, diags.Error())
+		writer.Printf("Error parsing %q: %s\n", filename, diags.Error())
 		return ""
 	}
 	if f.Body == nil {
@@ -33,7 +33,7 @@ func convTfvarToJson(filename string) string {
 
 	attrs, diags := f.Body.JustAttributes()
 	if diags.HasErrors() {
-		writer.Printf("Error evaluating %q: %s", filename, diags.Error())
+		writer.Printf("Error evaluating %q: %s\n", filename, diags.Error())
 		return ""
 	}
 
@@ -41,12 +41,12 @@ func convTfvarToJson(filename string) string {
 	for name, attr := range attrs {
 		value, diags := attr.Expr.Value(nil)
 		if diags.HasErrors() {
-			writer.Printf("Error evaluating %q in %q: %s", name, filename, diags.Error())
+			writer.Printf("Error evaluating %q in %q: %s\n", name, filename, diags.Error())
 			return ""
 		}
 		buf, err := ctyjson.Marshal(value, value.Type())
 		if err != nil {
-			writer.Printf("Error converting %q in %q to JSON: %s", name, filename, err)
+			writer.Printf("Error converting %q in %q to JSON: %s\n", name, filename, err)
 			return ""
 		}
 		values[name] = json.RawMessage(buf)
@@ -54,7 +54,7 @@ func convTfvarToJson(filename string) string {
 
 	output, err := json.MarshalIndent(values, "", "  ")
 	if err != nil {
-		writer.Printf("Error marshalling %q to JSON: %s", filename, err)
+		writer.Printf("Error marshalling %q to JSON: %s\n", filename, err)
 		return ""
 	}
 	return string(output)
