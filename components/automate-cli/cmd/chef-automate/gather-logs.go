@@ -446,6 +446,8 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 	g.AddCopiesFromPath("config", "/hab/svc")
 	g.AddCopiesFromPath("logs", "/hab/svc")
 
+	g.AddCopiesFromPath("pg_log", "/hab/svc")
+
 	// local status
 	g.AddCommand("df_h", "df", "-h")
 	g.AddCommand("df_i", "df", "-i")
