@@ -5,7 +5,7 @@ resource "aws_efs_file_system" "backups" {
 }
 
 resource "aws_efs_mount_target" "backups" {
-  count           = 3
+  count           = length(var.subnet_id)
   file_system_id  = aws_efs_file_system.backups.id
   subnet_id       = element(var.subnet_id, count.index)
   security_groups = [var.mount_id]

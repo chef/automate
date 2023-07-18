@@ -80,8 +80,6 @@ module "efs" {
   tag_name                = var.tag_name
   subnet_id               = module.aws.subnet_id
   mount_id                = module.aws.mount_id
-
-  depends_on = [module.aws]
 }
 
 module "s3" {
