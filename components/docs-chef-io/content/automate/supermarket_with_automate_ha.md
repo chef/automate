@@ -37,4 +37,6 @@ The output of the above command looks like as shown below:
 
 {{< figure src="/images/automate/ha_output_ocid_app.png" alt="OC-ID Application Output">}}
 
+{{< note >}} If you are doing backup and restore in Automate HA where in the source HA cluster you have a different `secret_key_base` in the OC-ID configuration then make sure you patch the same `secret_key_base` after you restore in the target HA cluster. {{< /note >}}
+
 Refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/#supermarket-configuration) page to view the Supermarket configuration steps.
