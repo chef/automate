@@ -444,8 +444,8 @@ func TestS3ConfigSkippedResponse(t *testing.T) {
 			args: args{
 				config: &models.Config{
 					Hardware: &models.Hardware{
-						AutomateNodeCount: 1,
-						AutomateNodeIps:   []string{constants.LOCALHOST},
+						AutomateNodeCount:        1,
+						AutomateNodeIps:          []string{constants.LOCALHOST},
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{constants.LOCALHOST},
 					},
@@ -454,22 +454,24 @@ func TestS3ConfigSkippedResponse(t *testing.T) {
 			},
 			want: []models.CheckTriggerResponse{
 				{
-					NodeType: "automate",
+					NodeType:  "automate",
 					CheckType: "s3-backup-config",
 					Result: models.ApiResult{
-						Passed: false,
-						Skipped: true,
-						Check: "s3-backup-config",
+						Passed:      false,
+						Skipped:     true,
+						Check:       "s3-backup-config",
+						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_S3,
 					},
 					Host: constants.LOCALHOST,
 				},
 				{
-					NodeType: "chef-infra-server",
+					NodeType:  "chef-infra-server",
 					CheckType: "s3-backup-config",
 					Result: models.ApiResult{
-						Passed: false,
-						Skipped: true,
-						Check: "s3-backup-config",
+						Passed:      false,
+						Skipped:     true,
+						Check:       "s3-backup-config",
+						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_S3,
 					},
 					Host: constants.LOCALHOST,
 				},
@@ -478,7 +480,7 @@ func TestS3ConfigSkippedResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := s3ConfigSkippedResponse(tt.args.config, tt.args.checkType)
+			got := s3ConfigSkippedResponse(tt.args.config, tt.args.checkType, constants.SKIP_BACKUP_TEST_MESSAGE_S3)
 			assert.Equal(t, tt.want, got)
 		})
 	}
