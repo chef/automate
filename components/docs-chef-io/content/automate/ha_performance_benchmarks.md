@@ -29,24 +29,8 @@ The following assumptions were used for calculating performance and system speci
 1. Compliance scan report size of aproximately 1MB
 1. No additional requests to the Automate API endpoints
 1. Data retention period of 30 days for compliance and converge data.
- 
-### Front-end Server Information
 
-| Nodes  | CCR/m | Infra FE Server Count | Automate FE Server Count | Frontend Specs             |
-|--------|-------|-----------------------|--------------------------|----------------------------|
-| 20000  | 333   | 2                     | 2                        | 8 vCPU, 16GB (c5.2xlarge)  |  
-| 60000  | 1000  | 2                     | 2                        | 8 vCPU, 16GB (c5.2xlarge)  |
-| 100000 | 1666  | 3                     | 3                        | 16 vCPU, 32GB (c5.4xlarge) |
-
-### Back-end Server Information
-
-| Nodes  | OpenSearch Count | Opensearch Specs                     | PostgreSQL Count | PostgreSQL Specs          |
-|--------|------------------|--------------------------------------|------------------|---------------------------|
-| 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD | 
-| 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
-| 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 32GB (m5.2xlarge), 1 TB SSD |
-
-## 5 node cluster
+### 5 node cluster deployment
 
 When deploying Automate Cluster using a 5 node cluster configuration the following specs were used for testing. When multiple database services are running on the same system the performance of the shared system resources becomes even more important for OpenSearch and Postgresql, with storage performance being particularly important. Both services are very write heavy and any slowness from the storage systems can have a large impact with both services and can lead to issues with excesive requests times on the front-ends.
 
@@ -55,6 +39,28 @@ When deploying Automate Cluster using a 5 node cluster configuration the followi
 | 10000  | 166   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  |
 | 20000  | 333   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge), 6TB SSD  |
 | 30000  | 500   | 2               | 16 vCPU, 32GB (c5.4xlarge) | 3               | 16 vCPU, 64GB (m5.4xlarge), 11TB SSD |
+
+### Complete cluster deployment
+
+A complete cluster deployment will seperate various components of the Automate HA cluster into seperate sets of systems. This is to minimize impact on performance and failures in the cluster from impacting other services. 
+ 
+#### Front-end Server Information
+
+| Nodes  | CCR/m | Infra FE Server Count | Automate FE Server Count | Frontend Specs             |
+|--------|-------|-----------------------|--------------------------|----------------------------|
+| 20000  | 333   | 2                     | 2                        | 8 vCPU, 16GB (c5.2xlarge)  |  
+| 60000  | 1000  | 2                     | 2                        | 8 vCPU, 16GB (c5.2xlarge)  |
+| 100000 | 1666  | 3                     | 3                        | 16 vCPU, 32GB (c5.4xlarge) |
+
+#### Back-end Server Information
+
+| Nodes  | OpenSearch Count | Opensearch Specs                     | PostgreSQL Count | PostgreSQL Specs          |
+|--------|------------------|--------------------------------------|------------------|---------------------------|
+| 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD | 
+| 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
+| 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 32GB (m5.2xlarge), 1 TB SSD |
+
+
 
 ## Tuning the Cluster
 
