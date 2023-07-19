@@ -14,6 +14,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
@@ -153,12 +154,6 @@ func checkKnownHosts(knownHostPath string) ssh.HostKeyCallback {
 	return kh
 }
 
-func getLastLine(input string) string {
-	lines := strings.Split(input, "\n")
-	lastLine := lines[len(lines)-1]
-	return lastLine
-}
-
 func addHostKey(host, khFilePath string, remote net.Addr, pubKey ssh.PublicKey) error {
 
 	content, err := os.ReadFile(khFilePath)
@@ -166,7 +161,7 @@ func addHostKey(host, khFilePath string, remote net.Addr, pubKey ssh.PublicKey) 
 		writer.Errorf("Error while reading the known hosts file:%v", err)
 		return err
 	}
-	lastLine := getLastLine(string(content))
+	lastLine := stringutils.GetLastLine(string(content))
 
 	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
 	// if not nil then connection stops.

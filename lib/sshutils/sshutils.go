@@ -10,6 +10,7 @@ import (
 
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
@@ -337,7 +338,7 @@ func (s *SSHUtilImpl) AddHostKey(host, known_hosts_path string, remote net.Addr,
 		s.logger.Error("Error while reading the known hosts file:", err)
 		return err
 	}
-	lastLine := getLastLine(string(content))
+	lastLine := stringutils.GetLastLine(string(content))
 
 	// Open the known hosts file in append mode
 	f, err := os.OpenFile(known_hosts_path, os.O_APPEND|os.O_WRONLY, 0600)
