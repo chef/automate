@@ -295,6 +295,10 @@ type MockPullConfigs struct {
 	getExceptionIpsFunc       func() []string
 	setExceptionIpsFunc       func(ips []string)
 	getOsCertsByIpFunc        func(map[string]*ConfigKeys) []CertByIP
+	setInfraAndSSHUtilFunc    func(*AutomateHAInfraDetails, SSHUtil)
+}
+
+func (m *MockPullConfigs) setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil) {
 }
 
 func (m *MockPullConfigs) fetchInfraConfig() (*ExistingInfraConfigToml, error) {

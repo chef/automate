@@ -291,7 +291,7 @@ var sshConfig = sshutils.SSHConfig{
 }
 
 func TestIsRemotePath(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -336,7 +336,7 @@ func TestIsRemotePath(t *testing.T) {
 }
 
 func TestGetIPV4(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -381,7 +381,7 @@ func TestGetIPV4(t *testing.T) {
 }
 
 func TestGetRemoteFileDetails(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	type testCaseInfo struct {
 		testCaseDescription    string
@@ -476,7 +476,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 }
 
 func TestGetCerts(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	infra := &AutomateHAInfraDetails{}
 
@@ -1308,6 +1308,545 @@ func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
 	}
 }
 
+func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
+	infra := NewMockInfra()
+	c := NewMockCertRotate()
+
+	type testCaseInfo struct {
+		description     string
+		sshUtil         SSHUtil
+		certs           *certificates
+		infra           *AutomateHAInfraDetails
+		MockPullConfigs PullConfigs
+		skipIpsList     []string
+		ExpectedError   string
+		wantError       bool
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "same root ca",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP7, ValidIP7},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "Different rootca",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent + "a",
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "Error while pulling chefserver config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+		{
+			description: "Error while pulling Automate config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c.pullConfigs = testCase.MockPullConfigs
+			skipIpsListGot, err := c.getSkipIpsListForPgRootCAPatching(testCase.infra, testCase.sshUtil, testCase.certs)
+			if !testCase.wantError {
+				assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+			} else {
+				assert.Error(t, err)
+			}
+
+		})
+	}
+}
+
+func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
+	infra := NewMockInfra()
+	c := NewMockCertRotate()
+
+	type testCaseInfo struct {
+		description     string
+		sshUtil         SSHUtil
+		certs           *certificates
+		infra           *AutomateHAInfraDetails
+		MockPullConfigs PullConfigs
+		nodesCn         string
+		flagsObj        *certRotateFlags
+		skipIpsList     []string
+		ExpectedError   string
+		wantError       bool
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "same root ca and cn",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra:    infra,
+			nodesCn:  "chefnode",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP4, ValidIP4},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "diff root ca and cn",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent + "a",
+			},
+			infra:    infra,
+			nodesCn:  "chefnodee",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "same CN with node flag",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra: infra,
+			flagsObj: &certRotateFlags{
+				node: ValidIP4,
+			},
+			nodesCn: "chefnode",
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP4, ValidIP4},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "diff CN with node flag",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra: infra,
+			flagsObj: &certRotateFlags{
+				node: ValidIP4,
+			},
+			nodesCn: "chefnode",
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "Error while fetching chefserver config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			flagsObj: &certRotateFlags{
+				node: ValidIP4,
+			},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+		{
+			description: "Error while fetching automate config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c.pullConfigs = testCase.MockPullConfigs
+			skipIpsListGot, err := c.getSkipIpsListForOsRootCACNPatching(testCase.infra, testCase.sshUtil, testCase.certs, testCase.nodesCn, testCase.flagsObj)
+			if !testCase.wantError {
+				assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+			} else {
+				assert.Error(t, err)
+			}
+
+		})
+	}
+}
+
 func TestPatchConfig(t *testing.T) {
 	_, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
@@ -1481,9 +2020,9 @@ func TestPatchConfig(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			c := certRotateFlow{FileUtils: mockFS(),
-				SSHUtil: testCase.MockSSHUtil,
-				Writer:  getMockWriterImpl()}
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl()}
 			output := c.patchConfig(testCase.param, testCase.concurrent)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
@@ -1495,7 +2034,10 @@ func TestPatchConfig(t *testing.T) {
 }
 
 func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	return NewMockCertRotate(), NewMockInfra()
+}
+
+func NewMockInfra() *AutomateHAInfraDetails {
 	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
@@ -1504,7 +2046,12 @@ func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
 	infra.Outputs.SSHUser.Value = "ubuntu"
 	infra.Outputs.SSHKeyFile.Value = "new.pem"
 	infra.Outputs.SSHPort.Value = "22"
-	return c, infra
+	return infra
+}
+
+func NewMockCertRotate() certRotateFlow {
+	c := certRotateFlow{fileUtils: mockFS()}
+	return c
 }
 
 func mockFS() *fileutils.MockFileSystemUtils {
