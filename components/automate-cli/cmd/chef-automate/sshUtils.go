@@ -90,6 +90,7 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 	if homePath == "" {
 		errStr := "Environment variable HOME cannot be empty. Please set a value for HOME env"
 		writer.Errorln(errStr)
+		writer.BufferWriter().Flush()
 		return nil, errors.New(errStr)
 	}
 	sshDirPath := filepath.Join(os.Getenv("HOME"), ".ssh")
