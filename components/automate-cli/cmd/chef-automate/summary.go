@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -30,6 +31,7 @@ const (
 	initialHealth               = "ERROR"
 	initialFormattedDuration    = "0d 0h 0m 0s"
 	initialRole                 = "Unknown"
+	initialLag                  = "NA"
 	defaultServiceDetails       = "DefaultServiceDetails"
 	defaultServiceHealthDetails = "DefaultServiceHealthDetails"
 	censusDetails               = "CensusDetails"
@@ -52,7 +54,7 @@ type Summary struct {
 	spinnerTimeout        time.Duration
 	infra                 *AutomateHAInfraDetails
 	statusSummaryCmdFlags *StatusSummaryCmdFlags
-	sshUtil               SSHUtil
+	remoteCmdExecutor     RemoteCmdExecutor
 }
 
 type A2haHabitatAutoTfvars struct {
@@ -60,7 +62,7 @@ type A2haHabitatAutoTfvars struct {
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
 
-func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil) StatusSummary {
+func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, remoteCmdExecutor RemoteCmdExecutor) StatusSummary {
 	return &Summary{
 		feStatus:              feStatus,
 		beStatus:              beStatus,
@@ -68,7 +70,7 @@ func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus
 		spinnerTimeout:        spinnerTimeout,
 		infra:                 infra,
 		statusSummaryCmdFlags: flags,
-		sshUtil:               sshUtil,
+		remoteCmdExecutor:     remoteCmdExecutor,
 	}
 }
 
@@ -196,6 +198,7 @@ func (ss *Summary) automateNodeMap(automateIps []string) *NodeTypeAndCmd {
 	return automateNodeMap
 }
 
+// returns automateIps, chefServerIps, opensearchIps, postgresqlIps, errList
 func (ss *Summary) getIPAddressesFromFlagOrInfra() ([]string, []string, []string, []string, *list.List) {
 	errorList := list.New()
 	if ss.statusSummaryCmdFlags.node != "" {
@@ -343,8 +346,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		nodeMap.Postgresql.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, ss.sshUtil, writer)
-	beOutput, err := cmdUtil.Execute()
+	beOutput, err := ss.remoteCmdExecutor.ExecuteWithNodeMap(nodeMap)
 	if err != nil {
 		return err
 	}
@@ -358,7 +360,6 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 }
 
 func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd, serviceName, serviceType string) error {
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, ss.sshUtil, writer)
 
 	// Status Script
 	status := GenerateOriginalAutomateCLICommand(
@@ -392,7 +393,7 @@ func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		nodeMap.ChefServer.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	feOutput, err := cmdUtil.Execute()
+	feOutput, err := ss.remoteCmdExecutor.ExecuteWithNodeMap(nodeMap)
 	if err != nil {
 		return err
 	}
@@ -431,6 +432,7 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		process:     fmt.Sprintf("%s (pid: %s)", initialServiceState, initialServicePid),
 		upTime:      initialFormattedDuration,
 		role:        initialRole,
+		lag:         initialLag,
 	}
 
 	for _, output := range outputs {
@@ -451,6 +453,11 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		return defaultBeStatusValue
 	}
 
+	lag, err := ss.getFollowerLag(cmdResMap[defaultServiceHealthDetails].Output, serviceName, role)
+	if err != nil {
+		lag = "Error"
+	}
+
 	return BeStatusValue{
 		serviceName: serviceName,
 		ipAddress:   ip,
@@ -458,6 +465,7 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
 		upTime:      formattedDuration,
 		role:        role,
+		lag:         lag,
 	}
 }
 
@@ -516,6 +524,30 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 	return role, nil
 }
 
+func (ss *Summary) getFollowerLag(output, service, role string) (string, error) {
+	lag := initialLag
+	outputMap, err := parseStringInToMapStringInterface(output)
+	if err != nil {
+		return lag, err
+	}
+
+	if service == postgresql {
+		if role == "Follower" {
+			// Define the regular expression pattern to match the substring
+			pattern := `(\d+ bytes and \d+ seconds)`
+
+			// Compile the regular expression pattern
+			regExp := regexp.MustCompile(pattern)
+
+			// Find the first matching substring of the stdout string
+			lag = regExp.FindString(outputMap["stdout"].(string))
+
+			return lag, nil
+		}
+	}
+	return lag, nil
+}
+
 func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
 	var osStatus, status string
 
@@ -535,12 +567,13 @@ func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType stri
 		}
 	}
 
-	return FeStatusValue{
+	feStatusValue := FeStatusValue{
 		serviceName: serviceType,
 		ipAddress:   ip,
 		status:      status,
 		Opensearch:  osStatus,
 	}
+	return feStatusValue
 }
 
 func (ss *Summary) opensearchStatusInFE(osStatusOutput *CmdResult) string {
@@ -630,9 +663,9 @@ func (ss *Summary) ShowBEStatus() string {
 		tTemp := table.Table{}
 		tTemp.Render()
 		for _, status := range ss.beStatus {
-			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.upTime, status.role})
+			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.lag, status.upTime, status.role})
 		}
-		t.AppendHeader(table.Row{"Name", "IP Address", "Health", "Process", "Uptime", "Role"})
+		t.AppendHeader(table.Row{"Name", "IP Address", "Health", "Process", "Lag", "Uptime", "Role"})
 		return t.Render()
 	}
 	return ""
