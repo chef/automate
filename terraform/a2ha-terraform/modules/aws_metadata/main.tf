@@ -15,3 +15,10 @@ data "http" "getEc2PrivateIP" {
     X-aws-ec2-metadata-token = chomp(data.local_file.readToken.content)
   }
 }
+
+data "http" "getBastionRole" {
+  url = "http://169.254.169.254/latest/meta-data/iam/info"
+  request_headers = {
+    X-aws-ec2-metadata-token = chomp(data.local_file.readToken.content)
+  }
+}

@@ -110,7 +110,7 @@ Run the following steps on Bastion Host Machine:
     - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
     - Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
     - Set AWS Config Details:
-        - Set `profile`, by default `profile` is `"default"`
+        - Set the AWS `profile`. In case you attached the IAM role to the bastion machine, leave this field empty.
         - Set `region`, by default `region` is `"us-east-1"`
         - Set `aws_vpc_id`, which you had created as Prerequisite step. Example: `"vpc12318h"`
         - Set `private_custom_subnets` to the 3 private subnets we created in prerequisites step and set `public_custom_subnets` to the 3 public subnets we created in prerequisites step: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`

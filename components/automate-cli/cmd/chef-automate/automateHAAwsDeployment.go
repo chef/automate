@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,6 +13,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/local-user-service/password"
+	"github.com/chef/automate/lib/httputils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
@@ -19,19 +22,24 @@ import (
 )
 
 const (
-	DEPLOY    = "deploy"
-	PROVISION = "provision"
+	DEPLOY       = "deploy"
+	PROVISION    = "provision"
+	TOKEN_URL    = "http://169.254.169.254/latest/api/token"
+	METADATA_URL = "http://169.254.169.254/latest/meta-data/iam/info"
 )
 
 type awsDeployment struct {
 	config     AwsConfigToml
 	configPath string
 	AWSConfigIp
+	httpRequestClient httputils.HTTPClient
 }
 
 func newAwsDeployemnt(configPath string) *awsDeployment {
+	log := logger.NewLogrusStandardLogger()
 	return &awsDeployment{
-		configPath: configPath,
+		configPath:        configPath,
+		httpRequestClient: httputils.NewClient(log),
 	}
 }
 
@@ -205,7 +213,10 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 func (a *awsDeployment) validateEnvFields() *list.List {
 	errorList := list.New()
 	if len(a.config.Aws.Config.Profile) < 1 {
-		errorList.PushBack("Invalid or empty aws profile name")
+		err := a.isIamRolePresent()
+		if err != nil {
+			errorList.PushBack("Invalid local AWS Profile name or Bastion IAM role, Please Check your local AWS Profile name or Bastion IAM Role is configured properly")
+		}
 	}
 	if len(a.config.Aws.Config.Region) < 1 {
 		errorList.PushBack("Invalid or empty aws region")
@@ -442,5 +453,23 @@ func (a *awsDeployment) getAwsHAIp() error {
 		return err
 	}
 	a.AWSConfigIp = *ConfigIp
+	return nil
+}
+
+func (a *awsDeployment) isIamRolePresent() error {
+	_, tokenResponseBody, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodPut, TOKEN_URL, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
+	if err != nil {
+		return fmt.Errorf("error while getting the token value: %v", err)
+	}
+
+	token := string(tokenResponseBody)
+
+	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, METADATA_URL, nil, "X-aws-ec2-metadata-token", token)
+	if err != nil {
+		return fmt.Errorf("error while getting the response for IAM role: %v", err)
+	}
+	if resp.StatusCode != 200 {
+		return errors.New("Please check if Bastion has attached an IAM Role to it")
+	}
 	return nil
 }

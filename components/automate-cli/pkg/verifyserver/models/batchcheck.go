@@ -87,6 +87,7 @@ type ExternalPG struct {
 type Config struct {
 	SSHUser         *SSHUser       `json:"ssh_user"`
 	Arch            string         `json:"arch"`
+	Profile         string         `json:"profile"`
 	Backup          *Backup        `json:"backup"`
 	Hardware        *Hardware      `json:"hardware"`
 	ExternalDbType  string         `json:"external_db_type"`
@@ -280,14 +281,19 @@ func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
 				BucketName: haConfig.Architecture.Aws.S3BucketName,
 			},
 		}
-		cred := credentials.NewSharedCredentials("", "")
-		creds, err := cred.Get()
-		if err != nil {
-			log.Println("populateAwsS3BucketName:", err)
-		}
-		c.Backup.ObjectStorage.AccessKey = creds.AccessKeyID
-		c.Backup.ObjectStorage.SecretKey = creds.SecretAccessKey
 		c.Backup.ObjectStorage.AWSRegion = haConfig.Aws.Config.Region
+
+		if haConfig.Aws.Config.Profile != "" {
+			cred := credentials.NewSharedCredentials("", "")
+			creds, err := cred.Get()
+			if err != nil {
+				log.Println("populateAwsS3BucketName:", err)
+			}
+
+			c.Backup.ObjectStorage.AccessKey = creds.AccessKeyID
+			c.Backup.ObjectStorage.SecretKey = creds.SecretAccessKey
+		}
+
 	}
 }
 
