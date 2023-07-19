@@ -21,7 +21,6 @@ rotation_max_files = 10
 rotation_max_megabytes = 100
 max_error_logs_per_second = 1000
 
-
 [sql]
 timeout = 5000
 pool_init_size = 20
@@ -30,12 +29,6 @@ pool_queue_max = 20
 pool_queue_timeout = 2000
 user="automate-cs-ocid"
 db_name="automate-cs-ocid"
-
-
-[depsolver]
-pool_max_size=5
-pool_init_size=5
-pool_queue_max=50
 
 [ocid]
   secret_key_base = ""
