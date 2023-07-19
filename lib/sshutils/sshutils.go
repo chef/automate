@@ -119,7 +119,7 @@ func (s *SSHUtilImpl) GetClientConfig(sshConfig SSHConfig) (*ssh.ClientConfig, e
 func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.PublicKey) error {
 	homePath := os.Getenv("HOME")
 	if homePath == "" {
-		return errors.New("Environment variable HOME vcannot be empty. Please set a value for HOME env")
+		return errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
 	}
 	knownHostPath := filepath.Join(homePath, ".automate_known_hosts")
 	var keyErr *knownhosts.KeyError
