@@ -209,7 +209,8 @@ resource "aws_instance" "chef_automate_postgresql" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device
+      root_block_device,
+      subnet_id
     ]
   }
   metadata_options {
@@ -250,7 +251,9 @@ resource "aws_instance" "chef_automate_opensearch" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device    ]
+      root_block_device,
+      subnet_id
+    ]
   }
   metadata_options {
     http_endpoint          = "enabled"
@@ -292,7 +295,8 @@ resource "aws_instance" "chef_automate" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device
+      root_block_device,
+      subnet_id
     ]
   }
   metadata_options {
@@ -336,7 +340,8 @@ resource "aws_instance" "chef_server" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device
+      root_block_device,
+      subnet_id
     ]
   }
   metadata_options {
