@@ -1642,7 +1642,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			wantError:     false,
 		},
 		{
-			description: "same rootca with node flag",
+			description: "same CN with node flag",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
 				rootCA: FileContent,
@@ -1661,8 +1661,8 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 									External: &shared.External{
 										Opensearch: &shared.External_Opensearch{
 											Ssl: &shared.External_Opensearch_SSL{
-												RootCert: &wrapperspb.StringValue{
-													Value: FileContent,
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
 												},
 											},
 										},
@@ -1680,8 +1680,8 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 									External: &shared.External{
 										Opensearch: &shared.External_Opensearch{
 											Ssl: &shared.External_Opensearch_SSL{
-												RootCert: &wrapperspb.StringValue{
-													Value: FileContent,
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
 												},
 											},
 										},
@@ -1698,7 +1698,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			wantError:     false,
 		},
 		{
-			description: "diff rootca with node flag",
+			description: "diff CN with node flag",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
 				rootCA: FileContent+"a",
