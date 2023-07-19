@@ -141,12 +141,22 @@ type certRotateFlow struct {
 	pullConfigs PullConfigs
 }
 
+func NewCertRotateFlow(fileUtils fileutils.FileUtils, sshUtil sshutils.SSHUtil, writer *cli.Writer, pullConfigs PullConfigs) *certRotateFlow {
+	return &certRotateFlow{
+		fileUtils:   fileUtils,
+		sshUtil:     sshUtil,
+		writer:      writer,
+		pullConfigs: pullConfigs,
+	}
+}
+
 type patchFnParameters struct {
 	sshUtil       SSHUtil
 	config        string
 	fileName      string
 	timestamp     string
 	remoteService string
+	concurrent    bool
 	infra         *AutomateHAInfraDetails
 	flagsObj      *certRotateFlags
 	skipIpsList   []string
@@ -192,7 +202,7 @@ func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args 
 		if err != nil {
 			return err
 		}
-		c := certRotateFlow{fileUtils: &fileutils.FileSystemUtils{}, sshUtil: sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), pullConfigs: NewPullConfigs(&AutomateHAInfraDetails{}, &SSHUtilImpl{})}
+		c := NewCertRotateFlow(&fileutils.FileSystemUtils{}, sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer, NewPullConfigs(&AutomateHAInfraDetails{}, &SSHUtilImpl{}))
 		return c.certRotate(cmd, args, flagsObj)
 	}
 }
@@ -276,19 +286,20 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 
 	// Creating and patching the required configurations.
 	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
-
+	concurrent := true
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
 		config:        config,
 		fileName:      fileName,
 		timestamp:     timestamp,
 		remoteService: remoteService,
+		concurrent:    concurrent,
 		infra:         infra,
 		flagsObj:      flagsObj,
 		skipIpsList:   skipIpsList,
 	}
 
-	err := c.patchConfig(patchFnParam, true)
+	err := c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -315,20 +326,21 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
 	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
-
+	concurrent := false
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
 		config:        config,
 		fileName:      fileName,
 		timestamp:     timestamp,
 		remoteService: remoteService,
+		concurrent:    concurrent,
 		infra:         infra,
 		flagsObj:      flagsObj,
 		skipIpsList:   skipIpsList,
 	}
 
 	// patching on PG
-	err := c.patchConfig(patchFnParam, false)
+	err := c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -352,8 +364,9 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	patchFnParam.fileName = filenameFe
 	patchFnParam.remoteService = remoteService
 	patchFnParam.skipIpsList = skipIpsList
+	patchFnParam.concurrent = true
 
-	err = c.patchConfig(patchFnParam, true)
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -427,19 +440,20 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	} else {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
 	}
-
+	concurrent := false
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
 		config:        config,
 		fileName:      fileName,
 		timestamp:     timestamp,
 		remoteService: remoteService,
+		concurrent:    concurrent,
 		infra:         infra,
 		flagsObj:      flagsObj,
 		skipIpsList:   skipIpsList,
 	}
 
-	err = c.patchConfig(patchFnParam, false)
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -482,8 +496,9 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	patchFnParam.fileName = filenameFe
 	patchFnParam.remoteService = remoteService
 	patchFnParam.skipIpsList = skipIpsList
+	patchFnParam.concurrent = true
 
-	err = c.patchConfig(patchFnParam, true)
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -528,7 +543,8 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	patchFnParam.config = peerConfig
 	patchFnParam.timestamp = time.Now().Format("20060102150405")
 	patchFnParam.skipIpsList = []string{flagsObj.node}
-	err := c.patchConfig(patchFnParam, false)
+	patchFnParam.concurrent = false
+	err := c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -576,7 +592,7 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAPatchingForPg(automatesConfig ma
 }
 
 // patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool) error {
+func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	f, err := os.Create(param.fileName)
 	if err != nil {
 		return err
@@ -620,7 +636,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters, concurrent bool) 
 	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
-	if !concurrent {
+	if !param.concurrent {
 		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
 		if err != nil {
 			return err

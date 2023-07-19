@@ -1852,7 +1852,6 @@ func TestPatchConfig(t *testing.T) {
 	type testCaseInfo struct {
 		description   string
 		param         *patchFnParameters
-		concurrent    bool
 		MockSSHUtil   sshutils.SSHUtil
 		isError       bool
 		ExpectedError string
@@ -1866,13 +1865,13 @@ func TestPatchConfig(t *testing.T) {
 				fileName:      "cert-rotate-os.toml",
 				timestamp:     time.Now().Format("20060102150405"),
 				remoteService: OPENSEARCH,
+				concurrent:    false,
 				infra:         infra,
 				flagsObj: &certRotateFlags{
 					opensearch: true,
 				},
 				skipIpsList: []string{},
 			},
-			concurrent: false,
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
@@ -1895,13 +1894,13 @@ func TestPatchConfig(t *testing.T) {
 				fileName:      "cert-rotate-fe.toml",
 				timestamp:     time.Now().Format("20060102150405"),
 				remoteService: AUTOMATE,
+				concurrent:    true,
 				infra:         infra,
 				flagsObj: &certRotateFlags{
 					automate: true,
 				},
 				skipIpsList: []string{},
 			},
-			concurrent: true,
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
@@ -1932,13 +1931,13 @@ func TestPatchConfig(t *testing.T) {
 				fileName:      "cert-rotate-fe.toml",
 				timestamp:     time.Now().Format("20060102150405"),
 				remoteService: AUTOMATE,
+				concurrent:    true,
 				infra:         infra,
 				flagsObj: &certRotateFlags{
 					automate: true,
 				},
 				skipIpsList: []string{},
 			},
-			concurrent: true,
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
@@ -1969,13 +1968,13 @@ func TestPatchConfig(t *testing.T) {
 				fileName:      "cert-rotate-fe.toml",
 				timestamp:     time.Now().Format("20060102150405"),
 				remoteService: AUTOMATE,
+				concurrent:    true,
 				infra:         infra,
 				flagsObj: &certRotateFlags{
 					automate: true,
 				},
 				skipIpsList: []string{},
 			},
-			concurrent: true,
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
@@ -2007,13 +2006,13 @@ func TestPatchConfig(t *testing.T) {
 				fileName:      "cert-rotate-os.toml",
 				timestamp:     time.Now().Format("20060102150405"),
 				remoteService: OPENSEARCH,
+				concurrent:    false,
 				infra:         infra,
 				flagsObj: &certRotateFlags{
 					opensearch: true,
 				},
 				skipIpsList: []string{},
 			},
-			concurrent:    false,
 			isError:       true,
 			ExpectedError: "Error occured while reading infra details",
 		},
@@ -2023,7 +2022,7 @@ func TestPatchConfig(t *testing.T) {
 			c := certRotateFlow{fileUtils: mockFS(),
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl()}
-			output := c.patchConfig(testCase.param, testCase.concurrent)
+			output := c.patchConfig(testCase.param)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {
