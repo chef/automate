@@ -1,6 +1,7 @@
 package sshutils
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
@@ -27,9 +29,10 @@ type SSHConfig struct {
 }
 
 type SSHUtilImpl struct {
-	SshClient ISshClient
-	logger    logger.Logger
-	Exec      command.Executor
+	SshClient  ISshClient
+	logger     logger.Logger
+	Exec       command.Executor
+	sshDirPath string
 }
 
 type SSHUtil interface {
@@ -111,6 +114,21 @@ func (s *SSHUtilImpl) GetClientConfig(sshConfig SSHConfig) (*ssh.ClientConfig, e
 		s.logger.Errorf("Parsing key failed: %v", err)
 		return nil, err
 	}
+	homePath := os.Getenv("HOME")
+	if homePath == "" {
+		return nil, errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
+	}
+	sshDirPath := filepath.Join(os.Getenv("HOME"), ".ssh")
+	exists, err := fileutils.PathExists(sshDirPath)
+	if err != nil {
+		s.logger.Errorln("Error evaluating path:", err)
+		return nil, err
+	}
+	if !exists {
+		s.logger.Errorf("Path %s does not exist\n", sshDirPath)
+		return nil, errors.New(fmt.Sprintf("Path %s does not exist", sshDirPath))
+	}
+	s.sshDirPath = sshDirPath
 	// Client config
 	return &ssh.ClientConfig{
 		User:            sshConfig.SshUser,
@@ -120,11 +138,7 @@ func (s *SSHUtilImpl) GetClientConfig(sshConfig SSHConfig) (*ssh.ClientConfig, e
 }
 
 func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.PublicKey) error {
-	homePath := os.Getenv("HOME")
-	if homePath == "" {
-		return errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
-	}
-	knownHostPath := filepath.Join(homePath, AUTOMATE_KNOWN_HOSTS)
+	knownHostPath := filepath.Join(s.sshDirPath, AUTOMATE_KNOWN_HOSTS)
 	var keyErr *knownhosts.KeyError
 	kh, err := s.CheckKnownHosts(knownHostPath)
 	if err != nil {

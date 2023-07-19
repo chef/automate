@@ -14,6 +14,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
@@ -85,16 +86,26 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 	var (
 		keyErr *knownhosts.KeyError
 	)
+	homePath := os.Getenv("HOME")
+	if homePath == "" {
+		return nil, errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
+	}
+	sshDirPath := filepath.Join(os.Getenv("HOME"), ".ssh")
+	exists, err := fileutils.PathExists(sshDirPath)
+	if err != nil {
+		writer.Errorf("Error evaluating path: %v\n", err)
+		return nil, err
+	}
+	if !exists {
+		writer.Errorf("Path %s does not exist\n", sshDirPath)
+		return nil, errors.New(fmt.Sprintf("Path %s does not exist", sshDirPath))
+	}
 	// Client config
 	return &ssh.ClientConfig{
 		User: s.SshConfig.sshUser,
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
-			homePath := os.Getenv("HOME")
-			if homePath == "" {
-				return errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
-			}
-			knownHostPath := filepath.Join(homePath, sshutils.AUTOMATE_KNOWN_HOSTS)
+			knownHostPath := filepath.Join(sshDirPath, sshutils.AUTOMATE_KNOWN_HOSTS)
 			kh := checkKnownHosts(knownHostPath)
 			hErr := kh(host, remote, pubKey)
 			// Reference: https://blog.golang.org/go1.13-errors

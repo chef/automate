@@ -750,6 +750,32 @@ func TestAddHostKey(t *testing.T) {
 			},
 			wantErr: nil,
 		},
+		{
+			description: "If the Adding host key was successfully done, existing known host file with new line at end",
+			args: args{
+				host: nodeIp1,
+				remote: &netAddressTest{
+					Address: nodeIp1,
+				},
+				pubkey: &sshPublicKeyTest{
+					key:  "test-key",
+					data: []byte("test-data"),
+				},
+				MockSshClient: &sshutils.MockSshClient{
+					Normalizefunc: func(address string) string {
+						return nodeIp1
+					},
+					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
+						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+							return nil
+						}, nil
+					},
+				},
+				existingContent: nodeIp2 + " test-key dGVzdC1kYXRh\n",
+				expectedContent: nodeIp2 + " test-key dGVzdC1kYXRh\n" + nodeIp1 + " test-key dGVzdC1kYXRh",
+			},
+			wantErr: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
@@ -765,9 +791,7 @@ func TestAddHostKey(t *testing.T) {
 			content, err = ioutil.ReadFile(f.Name())
 			assert.NoError(t, err)
 			actualContent := string(content)
-			if actualContent != tt.args.expectedContent {
-				t.Errorf("Unexpected file content.\nExpected: %q\nActual: %q", tt.args.expectedContent, actualContent)
-			}
+			assert.Equal(t, tt.args.expectedContent, actualContent)
 		})
 	}
 }
