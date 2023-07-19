@@ -28,6 +28,7 @@ The following assumptions were used for calculating performance and system speci
 1. Chef Client converge size of aproximately 400KB
 1. Compliance scan report size of aproximately 1MB
 1. No additional requests to the Automate API endpoints
+1. Data retention period of 30 days for compliance and converge data.
  
 ### Front-end Server Information
 
@@ -39,11 +40,21 @@ The following assumptions were used for calculating performance and system speci
 
 ### Back-end Server Information
 
-| Nodes  | OpenSearch Count | Opensearch Specs           | PostgreSQL Count | PostgreSQL Specs          |
-|--------|------------------|----------------------------|------------------|---------------------------|
-| 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge) | 3                | 8 vCPU, 16GB (c5.2xlarge) | 
-| 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge) | 3                | 8 vCPU, 16GB (c5.2xlarge) |
-| 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge) | 3                | 8 vCPU, 32GB (m5.2xlarge) |
+| Nodes  | OpenSearch Count | Opensearch Specs                     | PostgreSQL Count | PostgreSQL Specs          |
+|--------|------------------|--------------------------------------|------------------|---------------------------|
+| 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD | 
+| 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 20TB SSD | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
+| 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge), 20TB SSD | 3                | 8 vCPU, 32GB (m5.2xlarge), 1 TB SSD |
+
+## 5 node cluster
+
+When deploying Automate Cluster using a 5 node cluster configuration the following specs were used for testing. The biggest variable that comes into play here is the shared system resources for the backend servers between OpenSearch and Postgresql. The biggest impact is the performance of the storage systems as both PostgreSQL and OpenSearch, slow write performance will have a large impact on both services and can lead to issues with excesive requests times on the front-ends.
+
+| Nodes  | CCR/m | FE Server Count | Frontend Specs             | BE Server Count | Backend Specs              |
+|--------|-------|-----------------|----------------------------|-----------------|----------------------------|
+| 10000  | 166   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge) |
+| 20000  | 333   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge) |
+| 30000  | 500   | 2               | 16 vCPU, 32GB (c5.4xlarge) | 3               | 16 vCPU, 64GB (m5.4xlarge) |
 
 ## Tuning the Cluster
 
