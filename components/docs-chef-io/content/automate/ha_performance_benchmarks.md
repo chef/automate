@@ -24,7 +24,7 @@ There are several factors that can increase the load of the Automate HA cluster 
 
 The following assumptions were used for calculating performance and system specifications
 
-1. 60-minute Chef Client converge interval with 2 Compliance scans per day.
+1. 60-minute Chef Client converge interval with 1 compliance scans per node per day.
 1. Chef Client converge size of aproximately 400KB
 1. Compliance scan report size of aproximately 1MB
 1. No additional requests to the Automate API endpoints
