@@ -383,7 +383,7 @@ func (c *certRotateFlow) getSkipIpsListForPgRootCAPatching(infra *AutomateHAInfr
 	}
 
 	//get frontend ips to skip root-ca patch
-	skipIpsList := c.getFrontIpsToSkipRootCAPatchingForPg(automateCurrentConfig, certs.rootCA, infra)
+	skipIpsList := c.getFrontendIPsToSkipRootCAPatchingForPg(automateCurrentConfig, certs.rootCA, infra)
 
 	//fetching current config from chefServer
 	chefServerCurrentConfig, err := c.pullConfigs.pullChefServerConfigs()
@@ -391,7 +391,7 @@ func (c *certRotateFlow) getSkipIpsListForPgRootCAPatching(infra *AutomateHAInfr
 	if err != nil {
 		return nil, err
 	}
-	newskipIpsList := c.getFrontIpsToSkipRootCAPatchingForPg(chefServerCurrentConfig, certs.rootCA, infra)
+	newskipIpsList := c.getFrontendIPsToSkipRootCAPatchingForPg(chefServerCurrentConfig, certs.rootCA, infra)
 	skipIpsList = append(skipIpsList, newskipIpsList...)
 
 	return skipIpsList, nil
@@ -574,8 +574,7 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAandCNPatchingForOs(automatesConf
 	return skipIpsList
 }
 
-
-func (c *certRotateFlow) getFrontIpsToSkipRootCAPatchingForPg(automatesConfig map[string]*deployment.AutomateConfig, newRootCA string, infra *AutomateHAInfraDetails) []string {
+func (c *certRotateFlow) getFrontendIPsToSkipRootCAPatchingForPg(automatesConfig map[string]*deployment.AutomateConfig, newRootCA string, infra *AutomateHAInfraDetails) []string {
 	oldRootCA := ""
 	skipIpsList := []string{}
 	for ip, config := range automatesConfig {
@@ -629,7 +628,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	}
 
 	var scriptCommands string
-	command := getScriptCommand(param, scriptCommands)
+	command := getScriptCommands(param, scriptCommands)
 	if !param.concurrent {
 		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
 		if err != nil {
@@ -646,7 +645,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 }
 
 // Defining set of commands which run on particular remoteservice nodes
-func getScriptCommand(param *patchFnParameters, scriptCommands string) string {
+func getScriptCommands(param *patchFnParameters, scriptCommands string) string {
 	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
 		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, DATE_FORMAT)
 	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {

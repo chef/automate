@@ -1238,7 +1238,7 @@ func TestGetFrontIpsToSkipRootCAandCNPatchingForOs(t *testing.T) {
 	}
 }
 
-func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
+func TestGetFrontendIPsToSkipRootCAPatchingForPg(t *testing.T) {
 	c, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -1301,7 +1301,7 @@ func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
 			configMap := map[string]*deployment.AutomateConfig{
 				ValidIP: testCase.automatesConfig,
 			}
-			skipIpsListGot := c.getFrontIpsToSkipRootCAPatchingForPg(configMap, testCase.newRootCA, infra)
+			skipIpsListGot := c.getFrontendIPsToSkipRootCAPatchingForPg(configMap, testCase.newRootCA, infra)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 
 		})
@@ -1991,6 +1991,43 @@ func TestPatchConfig(t *testing.T) {
 							HostIP: "",
 							Error:  errors.New("remote execution failed"),
 							Output: "",
+						},
+					}
+				},
+			},
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description: "Deployment service error on frontend",
+			param: &patchFnParameters{
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: AUTOMATE,
+				concurrent:    true,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					automate: true,
+				},
+				skipIpsList: []string{},
+			},
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "DeploymentServiceCallError",
 						},
 					}
 				},
