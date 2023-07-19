@@ -1,6 +1,6 @@
 provider "aws" {
   region  = var.aws_region
-  profile = length(var.aws_profile) > 0 ? var.aws_profile : ""
+  profile = var.aws_profile 
 }
 
 module "aws_metadata" {

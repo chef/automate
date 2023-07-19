@@ -213,8 +213,8 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 func (a *awsDeployment) validateEnvFields() *list.List {
 	errorList := list.New()
 	if len(a.config.Aws.Config.Profile) < 1 {
-		isIAMRole, _ := a.isIamRolePresent()
-		if !isIAMRole {
+		err := a.isIamRolePresent()
+		if err != nil {
 			errorList.PushBack("Invalid local AWS Profile name or Bastion IAM role, Please Check your local AWS Profile name or Bastion IAM Role is configured properly")
 		}
 	}
@@ -456,20 +456,20 @@ func (a *awsDeployment) getAwsHAIp() error {
 	return nil
 }
 
-func (a *awsDeployment) isIamRolePresent() (bool, error) {
+func (a *awsDeployment) isIamRolePresent() error {
 	_, tokenResponseBody, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodPut, TOKEN_URL, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
 	if err != nil {
-		return false, fmt.Errorf("error while getting the token value: %v", err)
+		return fmt.Errorf("error while getting the token value: %v", err)
 	}
 
 	token := string(tokenResponseBody)
 
 	resp, _, err := a.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, METADATA_URL, nil, "X-aws-ec2-metadata-token", token)
 	if err != nil {
-		return false, fmt.Errorf("error while getting the response for IAM role: %v", err)
+		return fmt.Errorf("error while getting the response for IAM role: %v", err)
 	}
 	if resp.StatusCode != 200 {
-		return false, errors.New("Please check if Bastion has attached an IAM Role to it")
+		return errors.New("Please check if Bastion has attached an IAM Role to it")
 	}
-	return true, nil
+	return nil
 }
