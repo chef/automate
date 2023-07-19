@@ -7,6 +7,7 @@ SWAGGER_FILES=$(shell find $(SWAGGER_DIR) -name '*.swagger.json')
 STATIC_SWAGGER_FILES=$(shell find data/automate/api-static/ -type f | sort -n)
 
 preview_netlify: chef_web_docs
+	rm -rf chef-web-docs/_vendor/github.com/chef/automate/docs-chef-io/*
 	cp -R content/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/content
 	cp -R data/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/data
 	cp -R layouts/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/layouts
