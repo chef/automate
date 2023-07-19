@@ -43,8 +43,8 @@ The following assumptions were used for calculating performance and system speci
 | Nodes  | OpenSearch Count | Opensearch Specs                     | PostgreSQL Count | PostgreSQL Specs          |
 |--------|------------------|--------------------------------------|------------------|---------------------------|
 | 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD | 
-| 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 20TB SSD | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
-| 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge), 20TB SSD | 3                | 8 vCPU, 32GB (m5.2xlarge), 1 TB SSD |
+| 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
+| 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 32GB (m5.2xlarge), 1 TB SSD |
 
 ## 5 node cluster
 
