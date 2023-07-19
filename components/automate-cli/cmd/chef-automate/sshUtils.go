@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -15,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/knownhosts"
 )
 
 type SSHConfig struct {
@@ -77,11 +80,37 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 		writer.Errorf("Parsing key failed: %v", err)
 		return nil, err
 	}
+	var (
+		keyErr *knownhosts.KeyError
+	)
 	// Client config
 	return &ssh.ClientConfig{
-		User:            s.SshConfig.sshUser,
-		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		User: s.SshConfig.sshUser,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+			homePath := os.Getenv("HOME")
+			if homePath == "" {
+				return errors.New("Environment variable HOME vcannot be empty. Please set a value for HOME env")
+			}
+			knownHostPath := filepath.Join(homePath, ".automate_known_hosts")
+			kh := checkKnownHosts(knownHostPath)
+			hErr := kh(host, remote, pubKey)
+			// Reference: https://blog.golang.org/go1.13-errors
+			// To understand what errors.As is.
+			if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
+				// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
+				// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
+				// and if host is known then there is key mismatch the connection is then rejected.
+				writer.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
+				return keyErr
+			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
+				// host key not found in known_hosts then give a warning and continue to connect.
+				// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
+				return addHostKey(host, knownHostPath, remote, pubKey)
+			}
+			// writer.Printf("Pub key exists for %s.\n", host)
+			return nil
+		}),
 	}, nil
 }
 
@@ -103,6 +132,58 @@ func (s *SSHUtilImpl) getConnection() (*ssh.Client, error) {
 		return nil, err
 	}
 	return conn, err
+}
+
+func createKnownHosts(knownHostPath string) {
+	f, fErr := os.OpenFile(knownHostPath, os.O_CREATE, 0600)
+	if fErr != nil {
+		writer.Errorf("%v", fErr)
+		return
+	}
+	f.Close()
+}
+
+func checkKnownHosts(knownHostPath string) ssh.HostKeyCallback {
+	createKnownHosts(knownHostPath)
+	kh, e := knownhosts.New(knownHostPath)
+	if e != nil {
+		writer.Errorf("%v", e)
+		return nil
+	}
+	return kh
+}
+
+func getLastLine(input string) string {
+	lines := strings.Split(input, "\n")
+	lastLine := lines[len(lines)-1]
+	return lastLine
+}
+
+func addHostKey(host, khFilePath string, remote net.Addr, pubKey ssh.PublicKey) error {
+
+	content, err := os.ReadFile(khFilePath)
+	if err != nil {
+		writer.Errorf("Error while reading the known hosts file:%v", err)
+		return err
+	}
+	lastLine := getLastLine(string(content))
+
+	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
+	// if not nil then connection stops.
+
+	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if fErr != nil {
+		return fErr
+	}
+	defer f.Close()
+
+	knownHosts := knownhosts.Normalize(remote.String())
+	line := knownhosts.Line([]string{knownHosts}, pubKey)
+	if lastLine != "" {
+		line = "\n" + line
+	}
+	_, err = f.WriteString(line)
+	return err
 }
 
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error) {
