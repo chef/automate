@@ -16,6 +16,8 @@ import (
 	"golang.org/x/crypto/ssh/knownhosts"
 )
 
+const AUTOMATE_KNOWN_HOSTS = ".automate_known_hosts"
+
 type SSHConfig struct {
 	SshUser    string
 	SshPort    string
@@ -122,7 +124,7 @@ func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.P
 	if homePath == "" {
 		return errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
 	}
-	knownHostPath := filepath.Join(homePath, ".automate_known_hosts")
+	knownHostPath := filepath.Join(homePath, AUTOMATE_KNOWN_HOSTS)
 	var keyErr *knownhosts.KeyError
 	kh, err := s.CheckKnownHosts(knownHostPath)
 	if err != nil {

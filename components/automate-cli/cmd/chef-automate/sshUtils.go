@@ -14,6 +14,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -93,7 +94,7 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 			if homePath == "" {
 				return errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
 			}
-			knownHostPath := filepath.Join(homePath, ".automate_known_hosts")
+			knownHostPath := filepath.Join(homePath, sshutils.AUTOMATE_KNOWN_HOSTS)
 			kh := checkKnownHosts(knownHostPath)
 			hErr := kh(host, remote, pubKey)
 			// Reference: https://blog.golang.org/go1.13-errors

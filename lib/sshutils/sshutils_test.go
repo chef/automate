@@ -655,7 +655,7 @@ func TestCheckKnownHosts(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
 			khdir := t.TempDir()
-			_, gotError := sshu.CheckKnownHosts(filepath.Join(khdir, ".automate_known_hosts"))
+			_, gotError := sshu.CheckKnownHosts(filepath.Join(khdir, sshutils.AUTOMATE_KNOWN_HOSTS))
 			assert.Equal(t, gotError, tt.wantedError)
 		})
 	}
@@ -676,7 +676,7 @@ func TestCreateKnownHosts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			khdir := t.TempDir()
-			gotError := sshu.CreateKnownHosts(filepath.Join(khdir, ".automate_known_hosts"))
+			gotError := sshu.CreateKnownHosts(filepath.Join(khdir, sshutils.AUTOMATE_KNOWN_HOSTS))
 			assert.Equal(t, gotError, tt.wantedError)
 		})
 	}
