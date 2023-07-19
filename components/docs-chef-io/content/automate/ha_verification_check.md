@@ -31,7 +31,7 @@ Failures occuring during the deployment of Automate HA might result to clear up 
 chef-automate verify --config config.toml
 ```
 
-The above command will trigger the `config.toml` file with config, the one you want to deploy. 
+The above command will trigger the `config.toml` file with config, the one you want to deploy.
 
 The post deployment CLI command is as follows:
 
@@ -73,4 +73,6 @@ An example of a checks performed are shown in the below image:
 
 ![Config Verify Check](/images/automate/verify_checks_example.png)
 
-The above image shows the checks performed for Automate node.
+The above image shows the checks performed for Automate node. The checks in the above image are also performed on all the nodes in Automate HA, i.e., Chef Server, PostgreSQL, OpenSearch, and Chef Automate (the one showed above).
+
+THe verify command checks all the nodes in Automate HA and with that it also provides the remediation steps for failures.
