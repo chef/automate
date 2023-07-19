@@ -88,17 +88,23 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 	)
 	homePath := os.Getenv("HOME")
 	if homePath == "" {
-		return nil, errors.New("Environment variable HOME cannot be empty. Please set a value for HOME env")
+		errStr := "Environment variable HOME cannot be empty. Please set a value for HOME env"
+		writer.Errorln(errStr)
+		return nil, errors.New(errStr)
 	}
 	sshDirPath := filepath.Join(os.Getenv("HOME"), ".ssh")
 	exists, err := fileutils.PathExists(sshDirPath)
 	if err != nil {
-		writer.Errorf("Error evaluating path: %v\n", err)
-		return nil, err
+		errStr := fmt.Sprintf("Error evaluating path: %v\n", err)
+		writer.Errorln(errStr)
+		writer.BufferWriter().Flush()
+		return nil, errors.New(errStr)
 	}
 	if !exists {
-		writer.Errorf("Path %s does not exist\n", sshDirPath)
-		return nil, errors.New(fmt.Sprintf("Path %s does not exist", sshDirPath))
+		errStr := fmt.Sprintf("Path %s does not exist", sshDirPath)
+		writer.Errorln(errStr)
+		writer.BufferWriter().Flush()
+		return nil, errors.New(errStr)
 	}
 	// Client config
 	return &ssh.ClientConfig{
