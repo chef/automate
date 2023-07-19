@@ -1310,7 +1310,7 @@ func TestGetFrontIpsToSkipRootCAPatchingForPg(t *testing.T) {
 
 func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 	infra := NewMockInfra()
-	c := NewMockCertRotate()
+	c := NewCertRotate()
 
 	type testCaseInfo struct {
 		description     string
@@ -1506,7 +1506,7 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 
 func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 	infra := NewMockInfra()
-	c := NewMockCertRotate()
+	c := NewCertRotate()
 
 	type testCaseInfo struct {
 		description     string
@@ -1642,7 +1642,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			wantError:     false,
 		},
 		{
-			description: "same CN with node flag",
+			description: "same rootca with node flag",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
 				rootCA: FileContent,
@@ -1661,8 +1661,8 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 									External: &shared.External{
 										Opensearch: &shared.External_Opensearch{
 											Ssl: &shared.External_Opensearch_SSL{
-												ServerName: &wrapperspb.StringValue{
-													Value: "chefnode",
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
 												},
 											},
 										},
@@ -1680,8 +1680,8 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 									External: &shared.External{
 										Opensearch: &shared.External_Opensearch{
 											Ssl: &shared.External_Opensearch_SSL{
-												ServerName: &wrapperspb.StringValue{
-													Value: "chefnode",
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
 												},
 											},
 										},
@@ -1698,10 +1698,10 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			wantError:     false,
 		},
 		{
-			description: "diff CN with node flag",
+			description: "diff rootca with node flag",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
-				rootCA: FileContent,
+				rootCA: FileContent+"a",
 			},
 			infra: infra,
 			flagsObj: &certRotateFlags{
@@ -2032,8 +2032,8 @@ func TestPatchConfig(t *testing.T) {
 	}
 }
 
-func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
-	return NewMockCertRotate(), NewMockInfra()
+func getMockCertRotateFlowAndInfra() (*certRotateFlow, *AutomateHAInfraDetails) {
+	return NewCertRotate(), NewMockInfra()
 }
 
 func NewMockInfra() *AutomateHAInfraDetails {
@@ -2048,8 +2048,8 @@ func NewMockInfra() *AutomateHAInfraDetails {
 	return infra
 }
 
-func NewMockCertRotate() certRotateFlow {
-	c := certRotateFlow{fileUtils: mockFS()}
+func NewCertRotate() *certRotateFlow {
+	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{})
 	return c
 }
 

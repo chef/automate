@@ -471,11 +471,10 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	}
 	// Patching root-ca to frontend-nodes for maintaining the connection.
-	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
-	skipIpsList, err = c.getSkipIpsListForOsRootCACNPatching(infra, sshUtil, certs, cn, flagsObj)
+	skipIpsList, err = c.getSkipIpsListForOsRootCACNPatching(infra, sshUtil, certs, nodesCn, flagsObj)
 	if err != nil {
 		return err
 	}
@@ -484,10 +483,10 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	// Creating and patching the required configurations.
 	var configFe string
 	if flagsObj.node != "" {
-		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
+		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, nodesCn)
 		skipMessage = SKIP_FRONT_END_IPS_MSG_CN
 	} else {
-		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
+		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, nodesCn)
 		skipMessage = SKIP_FRONT_END_IPS_MSG_OS
 	}
 	c.skipMessagePrinter(remoteService, skipMessage, "", skipIpsList)
@@ -507,7 +506,6 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 func (c *certRotateFlow) getSkipIpsListForOsRootCACNPatching(infra *AutomateHAInfraDetails, sshUtil SSHUtil, certs *certificates, nodesCn string, flagsObj *certRotateFlags) ([]string, error) {
 
-	//fetching current config from automate
 	c.pullConfigs.setInfraAndSSHUtil(infra, sshUtil)
 	//fetching current config from automate
 	automateCurrentConfig, err := c.pullConfigs.pullAutomateConfigs()
@@ -576,7 +574,7 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAandCNPatchingForOs(automatesConf
 	return skipIpsList
 }
 
-// getFrontIpsToSkipRootCAPatchingForPg compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
+
 func (c *certRotateFlow) getFrontIpsToSkipRootCAPatchingForPg(automatesConfig map[string]*deployment.AutomateConfig, newRootCA string, infra *AutomateHAInfraDetails) []string {
 	oldRootCA := ""
 	skipIpsList := []string{}
@@ -629,27 +627,32 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 		HostIP:     sshConfig.hostIP,
 		Timeout:    sshConfig.timeout,
 	}
-	// Defining set of commands which run on particular remoteservice nodes
+
 	var scriptCommands string
-	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
-		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, DATE_FORMAT)
-	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
-		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
-	}
+	command := getScriptCommand(param, scriptCommands)
 	if !param.concurrent {
 		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
 		if err != nil {
 			return err
 		}
 	} else {
-		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(filteredIps, configRes, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj, printCertRotateOutput)
+		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(filteredIps, configRes, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
 		if err != nil {
 			return err
 		}
 	}
-	//.(SSHUtil.SSHConfig)
 
 	return nil
+}
+
+// Defining set of commands which run on particular remoteservice nodes
+func getScriptCommand(param *patchFnParameters, scriptCommands string) string {
+	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
+		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, DATE_FORMAT)
+	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
+		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
+	}
+	return scriptCommands
 }
 
 func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
@@ -685,7 +688,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 }
 
 // copyAndExecuteConcurrently will copy the toml file to each required nodes concurrently and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(ips []string, sshConfig sshutils.SSHConfig, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags, printCertRotateOutput func(sshutils.Result, string, *cli.Writer)) error {
+func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(ips []string, sshConfig sshutils.SSHConfig, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
 
 	sshConfig.Timeout = flagsObj.timeout
 	copyResults := c.sshUtil.CopyFileToRemoteConcurrently(sshConfig, fileName, remoteService+timestamp, false, ips)
