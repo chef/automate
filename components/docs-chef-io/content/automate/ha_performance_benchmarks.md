@@ -48,13 +48,13 @@ The following assumptions were used for calculating performance and system speci
 
 ## 5 node cluster
 
-When deploying Automate Cluster using a 5 node cluster configuration the following specs were used for testing. The biggest variable that comes into play here is the shared system resources for the backend servers between OpenSearch and Postgresql. The biggest impact is the performance of the storage systems as both PostgreSQL and OpenSearch, slow write performance will have a large impact on both services and can lead to issues with excesive requests times on the front-ends.
+When deploying Automate Cluster using a 5 node cluster configuration the following specs were used for testing. When multiple database services are running on the same system the performance of the shared system resources becomes even more important for OpenSearch and Postgresql, with storage performance being particularly important. Both services are very write heavy and any slowness from the storage systems can have a large impact with both services and can lead to issues with excesive requests times on the front-ends.
 
-| Nodes  | CCR/m | FE Server Count | Frontend Specs             | BE Server Count | Backend Specs              |
-|--------|-------|-----------------|----------------------------|-----------------|----------------------------|
-| 10000  | 166   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge) |
-| 20000  | 333   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge) |
-| 30000  | 500   | 2               | 16 vCPU, 32GB (c5.4xlarge) | 3               | 16 vCPU, 64GB (m5.4xlarge) |
+| Nodes  | CCR/m | FE Server Count | Frontend Specs                        | BE Server Count | Backend Specs              |
+|--------|-------|-----------------|---------------------------------------|-----------------|----------------------------|
+| 10000  | 166   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  |
+| 20000  | 333   | 2               | 8 vCPU, 16GB (c5.2xlarge)  | 3               | 16 vCPU, 64GB (m5.4xlarge), 6TB SSD  |
+| 30000  | 500   | 2               | 16 vCPU, 32GB (c5.4xlarge) | 3               | 16 vCPU, 64GB (m5.4xlarge), 11TB SSD |
 
 ## Tuning the Cluster
 
