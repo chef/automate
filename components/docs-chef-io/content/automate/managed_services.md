@@ -191,7 +191,7 @@ Before switching to external AWS PostgreSQL RDS/OpenSearch services, take s3 bac
 
 ### Create a Backup
 
-Make a backup with the [backup create]({{< ref "cli_chef_automate/#chef-automate-backup-create" >}}) command:
+Make a backup with the [backup create]({{< relref "cli/#chef-automate-backup-create" >}}) command:
 
 ```shell
 chef-automate backup create
@@ -205,7 +205,7 @@ Success: Created backup 20180518010336
 
 ### List Backups
 
-You can list existing backups with the [backup list]({{< ref "cli_chef_automate/#chef-automate-backup-list" >}}) command:
+You can list existing backups with the [backup list]({{< relref "cli/#chef-automate-backup-list" >}}) command:
 
 ```shell
 chef-automate backup list
@@ -610,7 +610,7 @@ When your Chef Automate instance is equipped with internet connectivity, you can
 
 ### Create a Backup
 
-Make a backup with the [`backup create`]({{< ref "cli_chef_automate/#chef-automate-backup-create" >}}) command:
+Make a backup with the [`backup create`]({{< relref "cli/#chef-automate-backup-create" >}}) command:
 
 ```shell
 chef-automate backup create
@@ -625,7 +625,7 @@ Success: Created backup 20180518010336
 
 ### List Backups
 
-You can list existing backups with the [`backup list`]({{< ref "cli_chef_automate/#chef-automate-backup-list" >}}) command:
+You can list existing backups with the [`backup list`]({{< relref "cli/#chef-automate-backup-list" >}}) command:
 
 ```shell
 chef-automate backup list

@@ -1,7 +1,7 @@
 +++
-title = "Automate CLI (Standalone)"
+title = "Chef Automate CLI"
+aliases = ['cli_chef_automate', 'cli_chef_automate_ha']
 
-date = 2018-03-26T15:29:24-07:00
 draft = false
 
 gh_repo = "automate"
@@ -9,13 +9,13 @@ toc_layout = "cli_chef_automate_toc"
 
 [menu]
   [menu.automate]
-    title = "Automate CLI (Standalone)"
+    title = "Automate CLI"
     parent = "automate/reference"
-    identifier = "automate/reference/cli_chef_automate.md Automate CLI (Standalone)"
+    identifier = "automate/reference/cli_chef_automate.md Automate CLI"
     weight = 24
 +++
 
-## Chef Automate CLI Commands
+## `chef-automate` CLI Commands
 
 {{< automate/automate_cli_commands data_path="automate/cli_chef_automate/commands" >}}
 

@@ -1,53 +1,35 @@
-<aside class="sticky sidebar" data-sticky data-top-anchor="utility-bar:bottom" data-btm-anchor="footer:top">
-  <span>
-    <strong>
-      <h4 class="mini-toc-header">Table Of Contents</h4>
-    </strong>
-    <button class="close-button hide-for-large" aria-label="Close menu" type="button" data-close>
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </span>
-  <p>
+<aside class="sticky sidebar hide-for-print" data-sticky data-top-anchor="utility-bar:bottom" data-btm-anchor="page-content:bottom">
+  <div id="table-of-contents">
+    <span>
+      <span class="mini-toc-nav">Table Of Contents</span>
+      <button class="close-button hide-for-large" aria-label="Close menu" type="button" data-close>
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </span>
     <a href="#{{ anchorize ( .Title )}}">{{ .Title }}</a>
-    {{ $page := .Title }}
-  </p>
-  <ul>
-    <li>
-      <a href = "#automate-cli-commands">Automate CLI Commands</a>
-      <ul>
-        {{ range .Site.Data.automate.cli_chef_automate.commands }}
-        {{ if and (eq $page "Automate CLI (HA)") (or (not .compatible_with) (eq .compatible_with "AutomateHA")) }}
-          {{ $command := .name }}
-          {{ if ne $command "chef-automate"}}
-            {{ $command := replaceRE `chef-automate ` "" $command }}
-            <li>
-              <a href = "#{{ .name | urlize}}">{{ $command }}</a>
-            </li>
-          {{ else}}
-            <li>
-              <a href = "#{{ .name | urlize}}">{{ $command }}</a>
-            </li>
-          {{ end }}
-          {{ end }} 
-          {{ if and (eq $page "Automate CLI (Standalone)") (or (not .compatible_with) (eq .compatible_with "Automate")) }}
-          {{ $command := .name }}
-          {{ if ne $command "chef-automate"}}
-            {{ $command := replaceRE `chef-automate ` "" $command }}
-            <li>
-              <a href = "#{{ .name | urlize}}">{{ $command }}</a>
-            </li>
-          {{ else}}
-            <li>
-              <a href = "#{{ .name | urlize}}">{{ $command }}</a>
-            </li>
-          {{ end }}
-          {{ end }} 
+    <ul>
+      <li>
+        <a href = "#automate-cli-commands">Automate CLI Commands</a>
+        <ul>
+          {{ range .Site.Data.automate.cli_chef_automate.commands }}
+            {{ $command := .name }}
+            {{ if ne $command "chef-automate"}}
+              {{ $command := replaceRE `chef-automate ` "" $command }}
+              <li>
+                <a href = "#{{ .name | urlize}}">{{ $command }}</a>
+              </li>
+            {{ else}}
+              <li>
+                <a href = "#{{ .name | urlize}}">{{ $command }}</a>
+              </li>
+            {{ end }}
 
-        {{ end }}
-      </ul>
-    </li>
-    <li>
-      <a href = "#error-codes">Error Codes</a>
-    </li>
-  </ul>
+          {{ end }}
+        </ul>
+      </li>
+      <li>
+        <a href = "#error-codes">Error Codes</a>
+      </li>
+    </ul>
+  </div>
 </aside>
