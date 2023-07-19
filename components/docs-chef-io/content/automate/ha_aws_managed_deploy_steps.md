@@ -110,7 +110,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Set `backup_config` to `"s3"` or `efs`.
    - If `backup_config` is `s3`, uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
-   - Don't set `fqdn` for the AWS deployment.
+   - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *Postgresql*, *OpenSearch*.
    - Set AWS Config Details:
       - Set `profile`. The default value of `profile` is `"default"`.
@@ -153,6 +153,13 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
    #Run provision command to deploy `automate.aib` with set `config.toml`
    chef-automate provision-infra config.toml --airgap-bundle automate.aib
+    "
+    ```
+
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
+
+    ```bash
+    sudo -- sh -c "
 
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
@@ -166,7 +173,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
-  If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
 - Create a file `a2.fqdn.toml`
 

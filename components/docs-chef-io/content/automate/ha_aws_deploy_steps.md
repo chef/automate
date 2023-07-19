@@ -161,7 +161,8 @@ Run the following steps on Bastion Host Machine:
     ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
-   If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+
 
 -   create a file `a2.fqdn.toml`
 
