@@ -533,16 +533,15 @@ func (ss *Summary) getFollowerLag(output, service, role string) (string, error) 
 
 	if service == postgresql {
 		if role == "Follower" {
-			// Define the regular expression pattern to match the desired substring
+			// Define the regular expression pattern to match the substring
 			pattern := `(\d+ bytes and \d+ seconds)`
 
 			// Compile the regular expression pattern
 			regExp := regexp.MustCompile(pattern)
 
-			// Find the first lag of the pattern in the input string
+			// Find the first matching substring of the stdout string
 			lag = regExp.FindString(outputMap["stdout"].(string))
 
-			// Print the matched substring
 			return lag, nil
 		}
 	}

@@ -58,7 +58,7 @@ do
   for file in *; 
   do
     # Extract the contents of the tar file
-    knife upload file -s $SERVER_URL/organizations/"org$i" --config-option cookbook_path=/home/ubuntu/cookbook
+    knife upload $file -s $SERVER_URL/organizations/"org$i" --config-option cookbook_path=/home/ubuntu/cookbook
   done
 done
 
