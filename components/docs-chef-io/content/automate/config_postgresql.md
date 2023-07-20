@@ -1,14 +1,14 @@
 +++
-title = "HA PostgreSQL Node config"
+title = "HA PostgreSQL Node Config"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA PostgreSQL Node config"
+    title = "HA PostgreSQL Node Config"
     parent = "automate/deploy_high_availability/configuration"
-    identifier = "automate/deploy_high_availability/configuration/config_postgresql.md HA PostgreSQL Node config"
-    weight = 230
+    identifier = "automate/deploy_high_availability/configuration/config_postgresql.md HA PostgreSQL Node Config"
+    weight = 220
 +++
 
 {{< warning >}}
