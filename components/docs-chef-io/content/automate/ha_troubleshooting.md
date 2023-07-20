@@ -58,7 +58,7 @@ The cached artifact does not exist in offline mode. This issue occurs in an air 
 
 ```bash
 "level=error msg=""Failed to restore services"" backup_id=20210913105135 error=""msg=\""failed to install\""
-"package=chef/back up-gateway/0.1.0/20210817045252 output=0 Enabling feature : OFFLINE_INSTALL\n Installing chef/backup - gateway/0.1.0/20210817045252\nxxx\nxxx Cached artifact not found in offline mode : chef/backup ­ gateway/0.1.0/20210817045252\nxxx\n: exit status 1"" restore_id=20210913135429 Sep 13 13:54:48 ip-172- 31-64- 42 hab[7228]: deployment-service.default(O): time=""2021-09- 13T13:54:48Z"" level=info msg=""finished streaming call with code OK"" grpc .code=OK grpc .method=DeployStatus grpc .request.deadline=""2021-09-13T15:54:29Z"""
+"package=chef/back up-gateway/0.1.0/20210817045252 output=0 Enabling feature : OFFLINE_INSTALL\n Installing chef/backup - gateway/0.1.0/20210817045252\nxxx\nxxx Cached artifact not found in offline mode : chef/backup gateway/0.1.0/20210817045252\nxxx\n: exit status 1"" restore_id=20210913135429 Sep 13 13:54:48 ip-172- 31-64- 42 hab[7228]: deployment-service.default(O): time=""2021-09- 13T13:54:48Z"" level=info msg=""finished streaming call with code OK"" grpc .code=OK grpc .method=DeployStatus grpc .request.deadline=""2021-09-13T15:54:29Z"""
 "grpc .service=chef .automate.domain .deployment.Deployment grpc.start_time=""2021-09- 13T13:54:47Z""
 grpc .time_ms=1229.028 span .kind =server system=grpc
 ```
