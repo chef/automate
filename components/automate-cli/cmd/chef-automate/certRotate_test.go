@@ -1762,7 +1762,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			description: "diff CN with node flag",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
-				rootCA: FileContent+"a",
+				rootCA: FileContent + "a",
 			},
 			infra: infra,
 			flagsObj: &certRotateFlags{
@@ -1915,7 +1915,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 													Value: "chefnodee",
 												},
 												RootCert: &wrapperspb.StringValue{
-													Value: FileContent+"a",
+													Value: FileContent + "a",
 												},
 											},
 										},
@@ -1973,7 +1973,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 													Value: "chefnodee",
 												},
 												RootCert: &wrapperspb.StringValue{
-													Value: FileContent+"a",
+													Value: FileContent + "a",
 												},
 											},
 										},
@@ -1985,7 +1985,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 			},
 
-			skipIpsList:   []string{ValidIP1,ValidIP2},
+			skipIpsList:   []string{ValidIP1, ValidIP2},
 			ExpectedError: "",
 			wantError:     false,
 		},
@@ -2011,7 +2011,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 													Value: "chefnodee",
 												},
 												RootCert: &wrapperspb.StringValue{
-													Value: FileContent+"a",
+													Value: FileContent + "a",
 												},
 											},
 										},
@@ -2063,7 +2063,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 			},
 
-			skipIpsList:   []string{ValidIP2,ValidIP3},
+			skipIpsList:   []string{ValidIP2, ValidIP3},
 			ExpectedError: "",
 			wantError:     false,
 		},
@@ -2295,7 +2295,7 @@ func TestPatchConfig(t *testing.T) {
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl()}
 			testDir := t.TempDir()
-			fPath := filepath.Join(testDir,testCase.param.fileName)
+			fPath := filepath.Join(testDir, testCase.param.fileName)
 			testCase.param.fileName = fPath
 			output := c.patchConfig(testCase.param)
 			if testCase.isError {
