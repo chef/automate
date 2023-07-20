@@ -45,8 +45,10 @@ Disables swapping (along with memlock). Swapping can dramatically decrease perfo
 ```toml
 [cluster]
 name = "opensearch"
+max_shards_per_node= "2000"
 ```
-This section configures cluster settings. It sets the name of the OpenSearch cluster to "opensearch".
+- This section configures cluster settings. It sets the name of the OpenSearch cluster to "opensearch".
+- If we want to set the max_shards_per_node value for opensearch we can use this settings. The default value is set to 2000.
 
 ### Discovery
 
