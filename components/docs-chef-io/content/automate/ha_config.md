@@ -121,6 +121,9 @@ chef-automate config patch path/to/chef_server-config.toml --cs
 
 ### Patch Configuration for Postgresql cluster
 
+For Information on PostgreSQL node configs visit links below:
+- Click [here](/automate/config_postgresql) for PostgreSQL
+
 To patch the configuration for the Postgresql cluster, run the following command:
 
 ```bash
@@ -132,6 +135,9 @@ chef-automate config patch path/to/postgresql-config.toml --pg
 ```
 
 ### Patch Configuration for OpenSearch cluster
+
+For Information on OpenSearch node configs visit links below:
+- Click [here](/automate/config_opensearch) for OpenSearch
 
 To patch the configuration for the OpenSearch cluster, run the following command:
 
@@ -173,6 +179,9 @@ chef-automate config set path/to/chef_server-config.toml --cs
 
 ### Set Configuration for Postgresql cluster
 
+For Information on PostgreSQL node configs visit links below:
+- Click [here](/automate/config_postgresql) for PostgreSQL
+
 To set the configuration for the Postgresql cluster, run the following command:
 
 ```bash
@@ -184,6 +193,9 @@ chef-automate config set path/to/postgresql-config.toml --pg
 ```
 
 ### Set Configuration for OpenSearch cluster
+
+For Information on OpenSearch node configs visit links below:
+- Click [here](/automate/config_opensearch) for OpenSearch
 
 To set the configuration for the OpenSearch cluster, run the following command:
 
