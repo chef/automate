@@ -68,8 +68,8 @@ Follow these steps if you want to use the AWS certificates in your network infra
 1. Copy and paste the certificate ARN into the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the `config.toml` file. For example:
 
     ```text
-    automate_lb_certificate_arn = “areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9332-26a59a6ce4e”
-    chef_server_lb_certificate_arn = “areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9932-262a59a6ce4e”
+    automate_lb_certificate_arn = "areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9332-26a59a6ce4e"
+    chef_server_lb_certificate_arn = "areas:am:a-southeast-2:112758395563:certificate/9b9fcc04-6513-4ac5-9932-262a59a6ce4e"
     ```
 
 1. Save and close the file.

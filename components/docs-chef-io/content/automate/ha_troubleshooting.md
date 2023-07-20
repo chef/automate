@@ -42,7 +42,7 @@ There are some cases in which deployment doesn't exit successfully.
 The restore command fails when other users or services access the nodes' databases. This happens when the restore service tries to drop the database when some services are still running and are referring to the database.
 
 ```bash
-Level=error msg=“Failed to restore services” backup_id=20210914082922 error=“failed to import database dump from automate-cs-oc-erchef/pg_data/automate-cs-oc-erchef.fc: error dropping database \”automate-cs-oc-erchef\”: pg: database \”automate-cs-oc-erchef\” is being accessed by other users” restore_id=20210914130646
+Level=error msg="Failed to restore services" backup_id=20210914082922 error="failed to import database dump from automate-cs-oc-erchef/pg_data/automate-cs-oc-erchef.fc: error dropping database \"automate-cs-oc-erchef\": pg: database \"automate-cs-oc-erchef\" is being accessed by other users" restore_id=20210914130646
 ```
 
 #### Solution
@@ -58,7 +58,7 @@ The cached artifact does not exist in offline mode. This issue occurs in an air 
 
 ```bash
 "level=error msg=""Failed to restore services"" backup_id=20210913105135 error=""msg=\""failed to install\""
-"package=chef/back up-gateway/0.1.0/20210817045252 output=0 Enabling feature : OFFLINE_INSTALL\n» Installing chef/backup - gateway/0.1.0/20210817045252\nxxx\nxxx Cached artifact not found in offline mode : chef/backup ­ gateway/0.1.0/20210817045252\nxxx\n: exit status 1"" restore_id=20210913135429 Sep 13 13:54:48 ip-172- 31-64- 42 hab[7228]: deployment-service.default(O): time=""2021-09- 13T13:54:48Z"" level=info msg=""finished streaming call with code OK"" grpc .code=OK grpc .method=DeployStatus grpc .request.deadline=""2021-09-13T15:54:29Z"""
+"package=chef/back up-gateway/0.1.0/20210817045252 output=0 Enabling feature : OFFLINE_INSTALL\n Installing chef/backup - gateway/0.1.0/20210817045252\nxxx\nxxx Cached artifact not found in offline mode : chef/backup gateway/0.1.0/20210817045252\nxxx\n: exit status 1"" restore_id=20210913135429 Sep 13 13:54:48 ip-172- 31-64- 42 hab[7228]: deployment-service.default(O): time=""2021-09- 13T13:54:48Z"" level=info msg=""finished streaming call with code OK"" grpc .code=OK grpc .method=DeployStatus grpc .request.deadline=""2021-09-13T15:54:29Z"""
 "grpc .service=chef .automate.domain .deployment.Deployment grpc.start_time=""2021-09- 13T13:54:47Z""
 grpc .time_ms=1229.028 span .kind =server system=grpc
 ```
@@ -89,7 +89,7 @@ Execute the following command from the bastion host from any location:
 When Chef Automate instances cannot locate the S3 bucket, the following error is displayed:
 
 ```bash
-BackupRestoreError: Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get “https://s3.amazonaws.com/a2backup?delimiter=%2F&list-type=2&prefix=elasticsearch%2F”
+BackupRestoreError: Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup?delimiter=%2F&list-type=2&prefix=elasticsearch%2F"
 ```
 
 #### Solution
