@@ -381,6 +381,19 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # run_time_limit = 0.5
 ```
 
+#### OC-ID
+
+Now, you can configure and integrate an existing private Supermarket with an Airgapped installation of Chef Automate. `secret_key_base` is an attribute introduced as optional setting. By default a unique `secret_key_base` gets generated internally for the OC-ID rails application. If you want to set it to something custom you can assign it a random string which will be used by OC-ID as the `secret_key_base`. Below is the syntax to set the configuration for integration.
+
+```toml
+[ocid.v1.sys.ocid]
+    secret_key_base = ""
+[ocid.v1.sys.ocid.chef_server_config]
+    endpoint="https://127.0.0.1:443"
+    superuser="pivotal"
+    ssl_verify_mode="verify_none"
+```
+
 #### Configure Inflight Data Collector Request Maximum
 
 You can specify the maximum number of inflight data collector requests. The default value is sixty times the number of the machine's available CPUs.

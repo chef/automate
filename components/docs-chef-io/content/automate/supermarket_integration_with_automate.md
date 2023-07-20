@@ -17,43 +17,12 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
 
 ## Pre-requisites
 
-1. To start with the supermarket integration, firstly, use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** for Automate on an internet-connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirements. You can also refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the validation of airgapped installation.
-
-1. SSH into to your ec2 instance and download the Chef Automate command-line tool from the current release channel.
-
-    ```cd
-    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
-    ```
-
-1. Download the airgapped installation bundle of the latest automate version to an internet-connected machine using the following command:
-
-    ```bash
-    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o </path/to/airgap-install-bundle>
-    ```
-
-    Or download the airgapped bundle of a specific version of automate using the command below:
-
-    ```bash
-    curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
-
-    ```
-
-1. Deploy the Airgap Installation Bundle using the following command:
-
-    ```bash
-    chef-automate deploy --airgap-bundle automate-<version>.aib --product automate --product infra-server
-    ```
+1. To start with the supermarket integration, firstly, use the `chef-automate` binary to create an **Airgap Installation Bundle (`.aib`)** for Automate on an internet-connected host. Refer to the [System Requirement](/automate/system_requirements/) page for the hardware and software requirements. Refer to the [Airgapped Installation](/automate/airgapped_installation/) page for the complete steps of airgapped installation. Once you are done with the deployment of Automate, following the steps below:
 
 1. Check the status of all the components using the following command:
 
     ```bash
     chef-automate status
-    ```
-
-1. Check the logs using the following command:
-
-    ```bash
-    journalctl -u chef-automate -f
     ```
 
 1. Create a user using the following command:
@@ -62,7 +31,7 @@ Chef Supermarket is the site for cookbooks. It provides a searchable cookbook re
     chef-server-ctl command
     ```
 
-    N.B. For more help on how to create user using the `chef-server-ctl` utility, refer this [documentation](https://docs.chef.io/server/ctl_chef_server/#user-create)
+    N.B. For more help on how to create user using the `chef-server-ctl` utility, refer this [documentation](https://docs.chef.io/server/ctl_chef_server/#user-create).
 
 ## Register Supermarket with Automate Embedded Chef Identity
 
@@ -106,7 +75,7 @@ When you install Chef Automate, it bundles the Chef-Server OC-ID component as an
     chef-automate config patch ocid-apps.toml
     ```
 
-Once the patch is successfully applied, the new application will get registered with Chef Identity.
+    Once the patch is successfully applied, the new application will get registered with Chef Identity.
 
 1. Verify whether the new configuration has been applied or not by running the following command:
 
@@ -181,4 +150,4 @@ To configure the supermarket in Chef Automate, follow the steps given below:
 
     {{< figure src="/images/automate/standalone_supermarket_app_board.png" alt="Supermarket Board">}}
 
-You have successfully logged in to the supermarket using the credentials of `chef-server` through the **Chef Identity** service running as part of Airgapped Automate.
+You have successfully logged in to the supermarket using the credentials of `chef-server` through the **Chef Identity** service running as part of Airgapped Automate. Refer to the Configuration page, to check the optional settings for integration of private Supermarket in Chef Automate.
