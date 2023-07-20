@@ -85,11 +85,6 @@ The bastion server can patch new configurations in all nodes using the commands 
 
 ### Patch Configuration for Frontend cluster
 
-For Information on Frontend cluster configs visit links below:
-- Click [here](/automate/config_automate) for Automate
-- Click [here](/automate/config_chef_server) for Chef Server
-The configs which are common for Automate and Chef server both can be patched with --fe flag
-
 To patch configuration for the Frontend cluster (includes Automate and Chef Server), run the following command:
 
 ```bash
@@ -102,9 +97,6 @@ chef-automate config patch path/to/automate-config.toml --fe
 
 ### Patch Configuration for Automate cluster
 
-For Information on Automate node configs visit links below:
-- Click [here](/automate/config_automate) for Automate
-
 To patch the configuration for Automate cluster, run the following command:
 
 ```bash
@@ -116,9 +108,6 @@ chef-automate config patch path/to/automate-config.toml --a2
 ```
 
 ### Patch Configuration for Chef Server cluster
-
-For Information on Chef Server node configs visit links below:
-- Click [here](/automate/config_automate) for Chef Server
 
 To patch the configuration for the Chef Server cluster, run the following command:
 
@@ -133,7 +122,7 @@ chef-automate config patch path/to/chef_server-config.toml --cs
 ### Patch Configuration for Postgresql cluster
 
 For Information on PostgreSQL node configs visit links below:
-- Click [here](/automate/config_automate) for PostgreSQL
+- Click [here](/automate/config_postgresql) for PostgreSQL
 
 To patch the configuration for the Postgresql cluster, run the following command:
 
@@ -148,7 +137,7 @@ chef-automate config patch path/to/postgresql-config.toml --pg
 ### Patch Configuration for OpenSearch cluster
 
 For Information on OpenSearch node configs visit links below:
-- Click [here](/automate/config_automate) for OpenSearch
+- Click [here](/automate/config_opensearch) for OpenSearch
 
 To patch the configuration for the OpenSearch cluster, run the following command:
 
@@ -166,9 +155,6 @@ Setting new configurations in all nodes can be done from the bastion server usin
 
 ### Set Configuration for Automate cluster
 
-For Information on Automate node configs visit links below:
-- Click [here](/automate/config_automate) for Automate
-
 To set the configuration for Automate cluster, run the following command:
 
 ```bash
@@ -180,9 +166,6 @@ chef-automate config set path/to/automate-config.toml --a2
 ```
 
 ### Set Configuration for Chef Server cluster
-
-For Information on Chef Server node configs visit links below:
-- Click [here](/automate/config_automate) for Chef Server
 
 To set the configuration for the Chef Server cluster, run the following command:
 
@@ -197,7 +180,7 @@ chef-automate config set path/to/chef_server-config.toml --cs
 ### Set Configuration for Postgresql cluster
 
 For Information on PostgreSQL node configs visit links below:
-- Click [here](/automate/config_automate) for PostgreSQL
+- Click [here](/automate/config_postgresql) for PostgreSQL
 
 To set the configuration for the Postgresql cluster, run the following command:
 
@@ -212,7 +195,7 @@ chef-automate config set path/to/postgresql-config.toml --pg
 ### Set Configuration for OpenSearch cluster
 
 For Information on OpenSearch node configs visit links below:
-- Click [here](/automate/config_automate) for OpenSearch
+- Click [here](/automate/config_opensearch) for OpenSearch
 
 To set the configuration for the OpenSearch cluster, run the following command:
 
