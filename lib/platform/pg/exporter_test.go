@@ -27,7 +27,6 @@ func NewDBMock() (pg.DBProvider, *pg.MockDB) {
 	return mockDBProvider{
 		mockDB: &db,
 	}, &db
-
 }
 
 var testExpectedEnv = []string{
