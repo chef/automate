@@ -103,10 +103,11 @@ func (p *PlatformConnInfo) PsqlCmdOptions() []command.Opt {
 // PostgreSQL database. It assumes connections can be made via TLS and
 // authentication happens via client certificates.
 type A2ConnInfo struct {
-	User  string
-	Host  string
-	Port  uint64
-	Certs TLSCertPaths
+	User     string
+	Host     string
+	Password string
+	Port     uint64
+	Certs    TLSCertPaths
 }
 
 func (c *A2ConnInfo) String() string {
@@ -114,14 +115,20 @@ func (c *A2ConnInfo) String() string {
 }
 
 func (c *A2ConnInfo) ConnURI(dbname string) string {
-	return fmt.Sprintf("postgresql://%s@%s:%d/%s?sslmode=verify-ca&sslcert=%s&sslkey=%s&sslrootcert=%s",
-		c.User, c.Host, c.Port, dbname, c.Certs.Cert, c.Certs.Key, c.Certs.RootCert)
+	return fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=verify-ca&sslcert=%s&sslkey=%s&sslrootcert=%s",
+		c.User, c.Password, c.Host, c.Port, dbname, c.Certs.Cert, c.Certs.Key, c.Certs.RootCert)
+}
+
+func (c *A2ConnInfo) InsecureConnURI(dbname string) string {
+	return fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable",
+		c.User, c.Password, c.Host, c.Port, dbname)
 }
 
 func (c *A2ConnInfo) PsqlCmdOptions() []command.Opt {
 	return []command.Opt{
 		command.Envvar("PGUSER", c.User),
 		command.Envvar("PGHOST", c.Host),
+		command.Envvar("PGPASSWORD", c.Password),
 		command.Envvar("PGPORT", strconv.FormatUint(c.Port, 10)),
 		command.Envvar("PGSSLMODE", "verify-ca"),
 		command.Envvar("PGSSLKEY", c.Certs.Key),
@@ -167,7 +174,7 @@ func (c *A1ConnInfo) ConnURI(dbname string) string {
 // InitPgPassfile creates a temporary pgpass file. The format of the file
 // is defined by:
 //
-//     https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html
+//	https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html
 //
 // The filename is returned if the file has been successfully written
 // and synced to disk. Otherwise, an error is returned. The caller is
