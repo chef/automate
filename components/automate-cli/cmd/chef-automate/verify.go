@@ -316,7 +316,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.Aws)
 		configDetails, err := fetchAwsConfigFromTerraform()
 		if err != nil {
-			return status.New(status.ConfigVerifyError, err.Error())
+			return status.Wrap(errors.New("Cannot run verify command before provision in AWS deployment.\nPlease run 'chef-automate provision-infra config.toml --airgap-bundle automate.aib' to provision your infra"), status.ConfigVerifyError, err.Error())
 		}
 
 		v.automateIPs = configDetails.AutomateIps

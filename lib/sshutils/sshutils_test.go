@@ -2,7 +2,9 @@ package sshutils_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"net"
+	"path/filepath"
 
 	"testing"
 
@@ -652,7 +654,8 @@ func TestCheckKnownHosts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			_, gotError := sshu.CheckKnownHosts()
+			khdir := t.TempDir()
+			_, gotError := sshu.CheckKnownHosts(filepath.Join(khdir, sshutils.AUTOMATE_KNOWN_HOSTS))
 			assert.Equal(t, gotError, tt.wantedError)
 		})
 	}
@@ -672,7 +675,8 @@ func TestCreateKnownHosts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			gotError := sshu.CreateKnownHosts()
+			khdir := t.TempDir()
+			gotError := sshu.CreateKnownHosts(filepath.Join(khdir, sshutils.AUTOMATE_KNOWN_HOSTS))
 			assert.Equal(t, gotError, tt.wantedError)
 		})
 	}
@@ -682,10 +686,12 @@ func TestAddHostKey(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	type args struct {
-		host          string
-		remote        *netAddressTest
-		pubkey        ssh.PublicKey
-		MockSshClient sshutils.ISshClient
+		host            string
+		remote          *netAddressTest
+		pubkey          ssh.PublicKey
+		MockSshClient   sshutils.ISshClient
+		existingContent string
+		expectedContent string
 	}
 	tests := []struct {
 		description string
@@ -693,19 +699,19 @@ func TestAddHostKey(t *testing.T) {
 		wantErr     error
 	}{
 		{
-			description: "If the Adding host key was successfully done",
+			description: "If the Adding host key was successfully done, empty known host file",
 			args: args{
 				host: nodeIp1,
 				remote: &netAddressTest{
 					Address: nodeIp1,
 				},
 				pubkey: &sshPublicKeyTest{
-					key:  "",
-					data: nil,
+					key:  "test-key",
+					data: []byte("test-data"),
 				},
 				MockSshClient: &sshutils.MockSshClient{
 					Normalizefunc: func(address string) string {
-						return ""
+						return nodeIp1
 					},
 					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
 						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
@@ -713,6 +719,60 @@ func TestAddHostKey(t *testing.T) {
 						}, nil
 					},
 				},
+				existingContent: "",
+				expectedContent: nodeIp1 + " test-key dGVzdC1kYXRh",
+			},
+			wantErr: nil,
+		},
+		{
+			description: "If the Adding host key was successfully done, existing known host file",
+			args: args{
+				host: nodeIp1,
+				remote: &netAddressTest{
+					Address: nodeIp1,
+				},
+				pubkey: &sshPublicKeyTest{
+					key:  "test-key",
+					data: []byte("test-data"),
+				},
+				MockSshClient: &sshutils.MockSshClient{
+					Normalizefunc: func(address string) string {
+						return nodeIp1
+					},
+					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
+						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+							return nil
+						}, nil
+					},
+				},
+				existingContent: nodeIp2 + " test-key dGVzdC1kYXRh",
+				expectedContent: nodeIp2 + " test-key dGVzdC1kYXRh\n" + nodeIp1 + " test-key dGVzdC1kYXRh",
+			},
+			wantErr: nil,
+		},
+		{
+			description: "If the Adding host key was successfully done, existing known host file with new line at end",
+			args: args{
+				host: nodeIp1,
+				remote: &netAddressTest{
+					Address: nodeIp1,
+				},
+				pubkey: &sshPublicKeyTest{
+					key:  "test-key",
+					data: []byte("test-data"),
+				},
+				MockSshClient: &sshutils.MockSshClient{
+					Normalizefunc: func(address string) string {
+						return nodeIp1
+					},
+					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
+						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+							return nil
+						}, nil
+					},
+				},
+				existingContent: nodeIp2 + " test-key dGVzdC1kYXRh\n",
+				expectedContent: nodeIp2 + " test-key dGVzdC1kYXRh\n" + nodeIp1 + " test-key dGVzdC1kYXRh",
 			},
 			wantErr: nil,
 		},
@@ -720,8 +780,18 @@ func TestAddHostKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			gotError := sshu.AddHostKey(tt.args.host, tt.args.remote, tt.args.pubkey)
+			khdir := t.TempDir()
+			f, err := ioutil.TempFile(khdir, "")
+			assert.NoError(t, err)
+			content := []byte(tt.args.existingContent)
+			_, err = f.Write(content)
+			assert.NoError(t, err)
+			gotError := sshu.AddHostKey(tt.args.host, f.Name(), tt.args.remote, tt.args.pubkey)
 			assert.Equal(t, gotError, tt.wantErr)
+			content, err = ioutil.ReadFile(f.Name())
+			assert.NoError(t, err)
+			actualContent := string(content)
+			assert.Equal(t, tt.args.expectedContent, actualContent)
 		})
 	}
 }
