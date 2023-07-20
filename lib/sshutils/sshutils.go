@@ -340,12 +340,6 @@ func (s *SSHUtilImpl) CheckKnownHosts(knownHostPath string) (ssh.HostKeyCallback
 	return kh, nil
 }
 
-func getLastLine(input string) string {
-	lines := strings.Split(input, "\n")
-	lastLine := lines[len(lines)-1]
-	return lastLine
-}
-
 func (s *SSHUtilImpl) AddHostKey(host, known_hosts_path string, remote net.Addr, pubKey ssh.PublicKey) error {
 	// add host key if host is not found in known_hosts, error object is returned, if nil then connection proceeds,
 	// if not nil then connection stops.
