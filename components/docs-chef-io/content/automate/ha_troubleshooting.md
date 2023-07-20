@@ -42,7 +42,7 @@ There are some cases in which deployment doesn't exit successfully.
 The restore command fails when other users or services access the nodes' databases. This happens when the restore service tries to drop the database when some services are still running and are referring to the database.
 
 ```bash
-Level=error msg=“Failed to restore services” backup_id=20210914082922 error=“failed to import database dump from automate-cs-oc-erchef/pg_data/automate-cs-oc-erchef.fc: error dropping database \”automate-cs-oc-erchef\”: pg: database \”automate-cs-oc-erchef\” is being accessed by other users” restore_id=20210914130646
+Level=error msg="Failed to restore services" backup_id=20210914082922 error="failed to import database dump from automate-cs-oc-erchef/pg_data/automate-cs-oc-erchef.fc: error dropping database \"automate-cs-oc-erchef\": pg: database \"automate-cs-oc-erchef\" is being accessed by other users" restore_id=20210914130646
 ```
 
 #### Solution
@@ -89,7 +89,7 @@ Execute the following command from the bastion host from any location:
 When Chef Automate instances cannot locate the S3 bucket, the following error is displayed:
 
 ```bash
-BackupRestoreError: Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get “https://s3.amazonaws.com/a2backup?delimiter=%2F&list-type=2&prefix=elasticsearch%2F”
+BackupRestoreError: Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup?delimiter=%2F&list-type=2&prefix=elasticsearch%2F"
 ```
 
 #### Solution
