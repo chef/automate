@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -1522,7 +1523,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 	}
 	testCases := []testCaseInfo{
 		{
-			description: "same root ca and cn",
+			description: "same root ca and cn in all ips",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
 				rootCA: FileContent,
@@ -1533,7 +1534,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			MockPullConfigs: &MockPullConfigs{
 				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1555,7 +1556,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP1: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1577,23 +1578,23 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 			},
 
-			skipIpsList:   []string{ValidIP4, ValidIP4},
+			skipIpsList:   []string{ValidIP, ValidIP1},
 			ExpectedError: "",
 			wantError:     false,
 		},
 		{
-			description: "diff root ca and cn",
+			description: "same root ca in all ips but different cn in one ip",
 			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			certs: &certificates{
-				rootCA: FileContent + "a",
+				rootCA: FileContent,
 			},
 			infra:    infra,
-			nodesCn:  "chefnodee",
+			nodesCn:  "chefnode",
 			flagsObj: &certRotateFlags{},
 			MockPullConfigs: &MockPullConfigs{
 				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1615,7 +1616,67 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP1: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "diff root ca and cn in all ips",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent + "a",
+			},
+			infra:    infra,
+			nodesCn:  "chefnodee",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP1: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1655,7 +1716,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			MockPullConfigs: &MockPullConfigs{
 				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1674,7 +1735,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP1: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1693,7 +1754,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 			},
 
-			skipIpsList:   []string{ValidIP4, ValidIP4},
+			skipIpsList:   []string{ValidIP, ValidIP1},
 			ExpectedError: "",
 			wantError:     false,
 		},
@@ -1711,7 +1772,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			MockPullConfigs: &MockPullConfigs{
 				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1730,7 +1791,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				},
 				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
 					return map[string]*deployment.AutomateConfig{
-						ValidIP4: {
+						ValidIP1: {
 							Global: &shared.GlobalConfig{
 								V1: &shared.V1{
 									External: &shared.External{
@@ -1831,6 +1892,180 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			skipIpsList:   []string{},
 			ExpectedError: "ERROR",
 			wantError:     true,
+		},
+		{
+			description: "same root ca and cn in one of the automate and chefserver ips ",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra:    infra,
+			nodesCn:  "chefnode",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent+"a",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						ValidIP1: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP2: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						ValidIP3: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent+"a",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP1,ValidIP2},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "same rootca and cn in chefserver",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra:    infra,
+			nodesCn:  "chefnode",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent+"a",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP2: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						ValidIP3: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP2,ValidIP3},
+			ExpectedError: "",
+			wantError:     false,
 		},
 	}
 	for _, testCase := range testCases {
@@ -2059,8 +2294,10 @@ func TestPatchConfig(t *testing.T) {
 			c := certRotateFlow{fileUtils: mockFS(),
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl()}
+			testDir := t.TempDir()
+			fPath := filepath.Join(testDir,testCase.param.fileName)
+			testCase.param.fileName = fPath
 			output := c.patchConfig(testCase.param)
-			defer os.Remove(testCase.param.fileName)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {

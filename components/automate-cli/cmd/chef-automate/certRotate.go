@@ -560,18 +560,33 @@ func (c *certRotateFlow) getFrontIpsToSkipRootCAandCNPatchingForOs(automatesConf
 			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
 				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
 				if c.getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, oldRootCA, node) {
-					skipIpsList = append(skipIpsList, ip)
+					if !isStringPresent(skipIpsList, ip) {
+						// If not present, append the string to the array
+						skipIpsList = append(skipIpsList, ip)
+					}
 				}
 			}
 			if config.Global.V1.External.Opensearch.Ssl.RootCert != nil {
 				oldRootCA = config.Global.V1.External.Opensearch.Ssl.RootCert.Value
 				if c.getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, oldRootCA, node) {
-					skipIpsList = append(skipIpsList, ip)
+					if !isStringPresent(skipIpsList, ip) {
+						// If not present, append the string to the array
+						skipIpsList = append(skipIpsList, ip)
+					}
 				}
 			}
 		}
 	}
 	return skipIpsList
+}
+
+func isStringPresent(arr []string, str string) bool {
+	for _, s := range arr {
+		if s == str {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *certRotateFlow) getFrontendIPsToSkipRootCAPatchingForPg(automatesConfig map[string]*deployment.AutomateConfig, newRootCA string, infra *AutomateHAInfraDetails) []string {
