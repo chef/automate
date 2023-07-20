@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"reflect"
 	"regexp"
 	"strings"
@@ -19,6 +18,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/config/genconfig"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/pmt"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/imdario/mergo"
@@ -60,6 +62,10 @@ func init() {
 	configCmd.AddCommand(showConfigCmd)
 	configCmd.AddCommand(patchConfigCmd)
 	configCmd.AddCommand(setConfigCmd)
+	configCmd.AddCommand(genConfigCmd)
+
+	//config gen flags
+	genConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml")
 
 	//config show flags
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml [Standalone]")
@@ -148,6 +154,17 @@ var showConfigCmd = &cobra.Command{
 	},
 }
 
+var genConfigCmd = &cobra.Command{
+	Use:   "gen [/path/to/write/config.toml]",
+	Short: "generate the Automate HA configuration",
+	Long:  "Prompt based Config Generation command. It will output the config in the provided file, if file path is not provided then it will print on STDOUT.",
+	RunE:  runGenCmd,
+	Args:  cobra.RangeArgs(0, 2),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
+
 var patchConfigCmd = &cobra.Command{
 	Use:   "patch path/to/config.toml",
 	Short: "patch the Chef Automate configuration", Long: "Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.",
@@ -167,6 +184,70 @@ var setConfigCmd = &cobra.Command{
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
+}
+
+func runGenCmd(cmd *cobra.Command, args []string) error {
+	fsu := fileutils.NewFileSystemUtils()
+	p := pmt.PromptFactory(os.Stdin, os.Stdout, fsu)
+	g := genconfig.GenConfigImpFactory(p)
+
+	err := g.GenConfigWithPrompts()
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.FailedToGenConfig,
+			"Failed to generate config with given input values to the prompts.",
+		)
+	}
+	t, err := g.Toml()
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.MarshalError,
+			"Marshaling configuration to TOML failed",
+		)
+	}
+
+	// Handle writing to a file if a path was given
+	if len(args) > 0 && args[0] != "" {
+		outFile, err := filepath.Abs(args[0])
+		if err != nil {
+			return status.Annotate(err, status.FileAccessError)
+		}
+
+		err = checkConfigGenFileExist(outFile, fsu)
+		if err != nil {
+			return err
+		}
+		err = fsu.WriteFile(outFile, t, 0644)
+		if err != nil {
+			return status.Wrap(err, status.FileAccessError, fmt.Sprint("Failed to write to file: ", outFile))
+		}
+	} else {
+		writer.Println("")
+		writer.Println(string(t))
+	}
+
+	status.GlobalResult = t
+	return nil
+}
+
+func checkConfigGenFileExist(outFile string, fsu fileutils.FileUtils) error {
+	if _, err := fsu.Stat(outFile); err == nil {
+		if configCmdFlags.overwriteFile {
+			return nil
+		}
+		p := pmt.PromptFactory(os.Stdin, os.Stdout, fsu)
+		ok, err := p.Confirm(fmt.Sprintf("%s file already exists. Do you wish to overwrite it?", outFile), "yes", "no")
+		if err != nil {
+			return status.Wrap(err, status.PromptFailed, err.Error())
+		}
+		if !ok {
+			err = errors.New("failed to confirm overwrite")
+			return status.Annotate(err, status.FileAccessError)
+		}
+	}
+	return nil
 }
 
 func runShowCmd(cmd *cobra.Command, args []string) error {
@@ -821,7 +902,7 @@ func getMergedOpensearchInterface(rawOutput string, pemFilePath string, remoteSe
 		return "", err
 	}
 
-	pemBytes, err := ioutil.ReadFile(pemFilePath) // nosemgrep
+	pemBytes, err := os.ReadFile(pemFilePath)
 	if err != nil {
 		return "", err
 	}
@@ -844,7 +925,7 @@ func getMergedPostgresqlInterface(rawOutput string, pemFilePath string, remoteSe
 		return "", err
 	}
 
-	pemBytes, err := ioutil.ReadFile(pemFilePath) // nosemgrep
+	pemBytes, err := os.ReadFile(pemFilePath)
 	if err != nil {
 		return "", err
 	}
@@ -961,7 +1042,7 @@ func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 
 // getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
 func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
-	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
+	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
 		return nil, err
 	}
@@ -1070,7 +1151,7 @@ func createTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 
 func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 
-	tomlbyt, _ := ioutil.ReadFile(srcString) // nosemgrep
+	tomlbyt, _ := os.ReadFile(srcString)
 	destString := string(tomlbyt)
 	var dest dc.AutomateConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {

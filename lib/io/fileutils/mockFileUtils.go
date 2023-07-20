@@ -1,7 +1,9 @@
 package fileutils
 
 import (
+	"io/fs"
 	"os"
+	"time"
 )
 
 type MockFileSystemUtils struct {
@@ -19,6 +21,7 @@ type MockFileSystemUtils struct {
 	MoveFunc                   func(sourceFile string, destinationFile string) error
 	RemoveFirstLineFunc        func(filePath string) error
 	GetFilePermissionFunc      func(filePath string) (int64, error)
+	StatFunc                   func(name string) (os.FileInfo, error)
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -62,4 +65,46 @@ func (fsu *MockFileSystemUtils) RemoveFirstLine(filePath string) error {
 }
 func (fsu *MockFileSystemUtils) GetFilePermission(filePath string) (int64, error) {
 	return fsu.GetFilePermissionFunc(filePath)
+}
+func (fsu *MockFileSystemUtils) Stat(name string) (os.FileInfo, error) {
+	return fsu.StatFunc(name)
+}
+
+type MockFileInfo struct {
+	NameFunc    func() string      // base name of the file
+	SizeFunc    func() int64       // length in bytes for regular files; system-dependent for others
+	ModeFunc    func() fs.FileMode // file mode bits
+	ModTimeFunc func() time.Time   // modification time
+	IsDirFunc   func() bool        // abbreviation for Mode().IsDir()
+	SysFunc     func() any         // underlying data source (can return nil)
+}
+
+// IsDir implements fs.FileInfo.
+func (mfi MockFileInfo) IsDir() bool {
+	return mfi.IsDirFunc()
+}
+
+// ModTime implements fs.FileInfo.
+func (mfi MockFileInfo) ModTime() time.Time {
+	return mfi.ModTimeFunc()
+}
+
+// Mode implements fs.FileInfo.
+func (mfi MockFileInfo) Mode() fs.FileMode {
+	return mfi.ModeFunc()
+}
+
+// Name implements fs.FileInfo.
+func (mfi MockFileInfo) Name() string {
+	return mfi.NameFunc()
+}
+
+// Size implements fs.FileInfo.
+func (mfi MockFileInfo) Size() int64 {
+	return mfi.SizeFunc()
+}
+
+// Sys implements fs.FileInfo.
+func (mfi MockFileInfo) Sys() any {
+	return mfi.SysFunc
 }

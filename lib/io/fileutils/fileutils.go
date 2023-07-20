@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -38,6 +37,7 @@ type FileUtils interface {
 	Move(sourceFile string, destinationFile string) error
 	RemoveFirstLine(filePath string) error
 	GetFilePermission(filePath string) (int64, error)
+	Stat(name string) (os.FileInfo, error)
 }
 
 type FileSystemUtils struct{}
@@ -89,6 +89,10 @@ func (fsu *FileSystemUtils) RemoveFirstLine(filePath string) error {
 
 func (fsu *FileSystemUtils) GetFilePermission(filePath string) (int64, error) {
 	return GetFilePermission(filePath)
+}
+
+func (fsu *FileSystemUtils) Stat(name string) (os.FileInfo, error) {
+	return os.Stat(name)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -172,11 +176,19 @@ func WriteToFile(filepath string, data []byte) error {
 }
 
 func ReadFile(filename string) ([]byte, error) {
-	return ioutil.ReadFile(filename) // nosemgrep
+	home := os.Getenv("HOME")
+	path := filename
+	if strings.Index(path, "~") == 0 {
+		if home == "" {
+			return []byte{}, errors.New("path not found, as $HOME is not defined to resolve '~' in the given path: " + filename)
+		}
+		path = strings.Replace(path, "~", home, 1)
+	}
+	return os.ReadFile(path)
 }
 
 func WriteFile(filepath string, data []byte, perm os.FileMode) error {
-	return ioutil.WriteFile(filepath, data, perm) // nosemgrep
+	return os.WriteFile(filepath, data, perm)
 }
 
 func CreateTempFile(content string, filename string) (string, error) {

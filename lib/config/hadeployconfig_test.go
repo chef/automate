@@ -846,3 +846,159 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 		})
 	}
 }
+
+func TestHaDeployConfigInitArchitecture(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitArchitecture()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitAutomate(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitAutomate()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitChefServer(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitChefServer()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitOpenSearch(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitOpenSearch()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitPostgresql(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitPostgresql()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitExistingInfra(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitExistingInfra()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitExternal(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitExternal()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitAws(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitAws()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitObjectStorage(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitObjectStorage()
+	assert.NotNil(t, a)
+}
+
+func TestObjectStorageInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitObjectStorage()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestAwsSettingsInitConfigAwsSettings(t *testing.T) {
+	c := NewHaDeployConfig().InitAws()
+	a := c.InitConfigAwsSettings()
+	assert.NotNil(t, a)
+}
+
+func TestArchitectureInitExistingInfra(t *testing.T) {
+	c := NewHaDeployConfig().InitArchitecture()
+	a := c.InitExistingInfra()
+	assert.NotNil(t, a)
+}
+
+func TestArchitectureInitAws(t *testing.T) {
+	c := NewHaDeployConfig().InitArchitecture()
+	a := c.InitAws()
+	assert.NotNil(t, a)
+}
+
+func TestAutomateSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitAutomate()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestChefServerSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitChefServer()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestOpensearchSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitOpenSearch()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestPostgresqlSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitPostgresql()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestExistingInfraSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitExistingInfra()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestExternalSettingsInitDatabase(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal()
+	a := c.InitDatabase()
+	assert.NotNil(t, a)
+}
+
+func TestExternalDBSettingsInitPostgresql(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal().InitDatabase()
+	a := c.InitPostgresql()
+	assert.NotNil(t, a)
+}
+
+func TestExternalDBSettingsInitOpenSearch(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal().InitDatabase()
+	a := c.InitOpenSearch()
+	assert.NotNil(t, a)
+}
+
+func TestExternalOsSettingsInitOpenSearchAws(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal().InitDatabase().InitOpenSearch()
+	a := c.InitOpenSearchAws()
+	assert.NotNil(t, a)
+}
+
+func TestConfigAutomateSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitAutomate().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}
+
+func TestConfigSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitPostgresql().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}
+
+func TestConfigChefServerSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitChefServer().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}
+
+func TestConfigOpensearchSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitOpenSearch().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}

@@ -50,6 +50,9 @@ const (
 const (
 	VerifyChecksError                 = 125
 	ConfigVerifyError                 = 124
+	PromptFailed                      = 126
+	FailedToGenConfig                 = 127
+	HardwareCalError                  = 128
 	IpAccessError                     = 123
 	InsufficientSpaceError            = 122
 	CalDestDirSizeError               = 121
@@ -104,6 +107,9 @@ const (
 var ErrorMetadata = map[int][]string{
 	VerifyChecksError:                 {"125", "VerifyChecksError", "Verify Checks failed"},
 	ConfigVerifyError:                 {"124", "ConfigVerifyError", "Config Verification failed"},
+	HardwareCalError:                  {"128", "HardwareCalError", "Hardware Calculator failed to provide Hardware Estimates"},
+	PromptFailed:                      {"126", "PromptFailed", "Prompt failed and exited with error"},
+	FailedToGenConfig:                 {"127", "FailedToGenConfig", "Failed to Generate config with given inputs"},
 	InsufficientSpaceError:            {"122", "InsufficientSpaceError", "Insufficient disk space"},
 	CalDestDirSizeError:               {"121", "CalDestDirSizeError", "Error in calculating Dest directory size"},
 	CalESDirSizeError:                 {"120", "CalESDirSizeError", "Error in calculating ES directory size"},

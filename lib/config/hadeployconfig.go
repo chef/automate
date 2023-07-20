@@ -239,3 +239,185 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 	}
 	return nil
 }
+
+func (c *HaDeployConfig) InitArchitecture() *Architecture {
+	if c.Architecture == nil {
+		c.Architecture = &Architecture{}
+	}
+	return c.Architecture
+}
+
+func (c *Architecture) InitExistingInfra() *ConfigInitials {
+	if c.ExistingInfra == nil {
+		c.ExistingInfra = &ConfigInitials{}
+	}
+	return c.ExistingInfra
+}
+
+func (c *Architecture) InitAws() *ConfigInitials {
+	if c.Aws == nil {
+		c.Aws = &ConfigInitials{}
+	}
+	return c.Aws
+}
+
+func (c *HaDeployConfig) InitAutomate() *AutomateSettings {
+	if c.Automate == nil {
+		c.Automate = &AutomateSettings{}
+	}
+	return c.Automate
+}
+
+func (c *AutomateSettings) InitConfig() *ConfigAutomateSettings {
+	if c.Config == nil {
+		c.Config = &ConfigAutomateSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitChefServer() *ChefServerSettings {
+	if c.ChefServer == nil {
+		c.ChefServer = &ChefServerSettings{}
+	}
+	return c.ChefServer
+}
+
+func (c *ChefServerSettings) InitConfig() *ConfigChefServerSettings {
+	if c.Config == nil {
+		c.Config = &ConfigChefServerSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitOpenSearch() *OpensearchSettings {
+	if c.Opensearch == nil {
+		c.Opensearch = &OpensearchSettings{}
+	}
+	return c.Opensearch
+}
+
+func (c *OpensearchSettings) InitConfig() *ConfigOpensearchSettings {
+	if c.Config == nil {
+		c.Config = &ConfigOpensearchSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitPostgresql() *PostgresqlSettings {
+	if c.Postgresql == nil {
+		c.Postgresql = &PostgresqlSettings{}
+	}
+	return c.Postgresql
+}
+
+func (c *PostgresqlSettings) InitConfig() *ConfigSettings {
+	if c.Config == nil {
+		c.Config = &ConfigSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitExistingInfra() *ExistingInfraSettings {
+	if c.ExistingInfra == nil {
+		c.ExistingInfra = &ExistingInfraSettings{}
+	}
+	return c.ExistingInfra
+}
+
+func (c *ExistingInfraSettings) InitConfig() *ConfigExistingInfraSettings {
+	if c.Config == nil {
+		c.Config = &ConfigExistingInfraSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitExternal() *ExternalSettings {
+	if c.External == nil {
+		c.External = &ExternalSettings{}
+	}
+	return c.External
+}
+
+func (c *ExternalSettings) InitDatabase() *ExternalDBSettings {
+	if c.Database == nil {
+		c.Database = &ExternalDBSettings{}
+	}
+	return c.Database
+}
+
+func (c *ExternalDBSettings) InitPostgresql() *ExternalPgSettings {
+	if c.PostgreSQL == nil {
+		c.PostgreSQL = &ExternalPgSettings{}
+	}
+	return c.PostgreSQL
+}
+
+func (c *ExternalDBSettings) InitOpenSearch() *ExternalOsSettings {
+	if c.OpenSearch == nil {
+		c.OpenSearch = &ExternalOsSettings{}
+	}
+	return c.OpenSearch
+}
+
+func (c *ExternalOsSettings) InitOpenSearchAws() *AwsExternalOsSettings {
+	if c.Aws == nil {
+		c.Aws = &AwsExternalOsSettings{}
+	}
+	return c.Aws
+}
+
+func (c *ConfigAutomateSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *ConfigSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *ConfigChefServerSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *ConfigOpensearchSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *HaDeployConfig) InitAws() *AwsSettings {
+	if c.Aws == nil {
+		c.Aws = &AwsSettings{}
+	}
+	return c.Aws
+}
+
+func (c *AwsSettings) InitConfigAwsSettings() *ConfigAwsSettings {
+	if c.Config == nil {
+		c.Config = &ConfigAwsSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitObjectStorage() *ObjectStorage {
+	if c.ObjectStorage == nil {
+		c.ObjectStorage = &ObjectStorage{}
+	}
+	return c.ObjectStorage
+}
+
+func (c *ObjectStorage) InitConfig() *ConfigObjectStorage {
+	if c.Config == nil {
+		c.Config = &ConfigObjectStorage{}
+	}
+	return c.Config
+}
