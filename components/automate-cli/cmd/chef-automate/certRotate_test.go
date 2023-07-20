@@ -2060,6 +2060,7 @@ func TestPatchConfig(t *testing.T) {
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl()}
 			output := c.patchConfig(testCase.param)
+			defer os.Remove(testCase.param.fileName)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {
