@@ -27,6 +27,7 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+- gen - generate the Automate HA configuration
 - patch - patch the Chef Automate configuration
 - set - set the Chef Automate configuration
 - show - show the Chef Automate configuration
