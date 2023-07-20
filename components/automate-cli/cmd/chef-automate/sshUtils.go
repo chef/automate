@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 
@@ -22,6 +23,8 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
+
+var mutex sync.Mutex
 
 type SSHConfig struct {
 	sshUser    string
@@ -112,6 +115,8 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 		User: s.SshConfig.sshUser,
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+			mutex.Lock()
+			defer mutex.Unlock()
 			knownHostPath := filepath.Join(sshDirPath, sshutils.AUTOMATE_KNOWN_HOSTS)
 			kh := checkKnownHosts(knownHostPath)
 			hErr := kh(host, remote, pubKey)

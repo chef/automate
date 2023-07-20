@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -19,6 +20,8 @@ import (
 )
 
 const AUTOMATE_KNOWN_HOSTS = ".automate_known_hosts"
+
+var mutex sync.Mutex
 
 type SSHConfig struct {
 	SshUser    string
@@ -138,6 +141,8 @@ func (s *SSHUtilImpl) GetClientConfig(sshConfig SSHConfig) (*ssh.ClientConfig, e
 }
 
 func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	knownHostPath := filepath.Join(s.sshDirPath, AUTOMATE_KNOWN_HOSTS)
 	var keyErr *knownhosts.KeyError
 	kh, err := s.CheckKnownHosts(knownHostPath)
