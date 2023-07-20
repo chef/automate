@@ -383,15 +383,11 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 
 #### OC-ID
 
-Now, you can configure and integrate an existing private Supermarket with an Airgapped installation of Chef Automate. `secret_key_base` is an attribute introduced as optional setting. By default a unique `secret_key_base` gets generated internally for the OC-ID rails application. If you want to set it to something custom you can assign it a random string which will be used by OC-ID as the `secret_key_base`. Below is the syntax to set the configuration for integration.
+Now, you can configure and integrate an existing private Supermarket with Chef Automate. `secret_key_base` is an attribute introduced as optional setting in Automate which will be used to encrypt the cookies and other information. By default a unique `secret_key_base` gets generated internally for the OC-ID service running as part of Chef Automate. If you want to set it to something custom you can assign it a random string which will be used by OC-ID as the `secret_key_base`. Below is the syntax to set the configuration for the OC-ID service.
 
 ```toml
 [ocid.v1.sys.ocid]
     secret_key_base = ""
-[ocid.v1.sys.ocid.chef_server_config]
-    endpoint="https://127.0.0.1:443"
-    superuser="pivotal"
-    ssl_verify_mode="verify_none"
 ```
 
 #### Configure Inflight Data Collector Request Maximum
