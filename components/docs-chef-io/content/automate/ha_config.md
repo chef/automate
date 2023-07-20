@@ -1,5 +1,5 @@
 +++
-title = "Configuration"
+title = "Overview"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Configuration"
-    identifier = "automate/deploy_high_availability/ha_config.md Configuration"
-    parent = "automate/deploy_high_availability"
-    weight = 50
+    title = "Overview"
+    identifier = "automate/deploy_high_availability/configuration/ha_config.md Overview"
+    parent = "automate/deploy_high_availability/configuration"
+    weight = 200
 +++
 
 {{< note >}}
