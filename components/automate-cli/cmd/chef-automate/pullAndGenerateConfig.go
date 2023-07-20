@@ -197,6 +197,7 @@ type PullConfigs interface {
 	getExceptionIps() []string
 	setExceptionIps(ips []string)
 	getOsCertsByIp(map[string]*ConfigKeys) []CertByIP
+	setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil)
 }
 
 type PullConfigsImpl struct {
@@ -214,6 +215,11 @@ func NewPullConfigs(infra *AutomateHAInfraDetails, sshUtil SSHUtil) PullConfigs 
 
 func (p *PullConfigsImpl) getExceptionIps() []string {
 	return p.exceptionIps
+}
+
+func (p *PullConfigsImpl) setInfraAndSSHUtil(infra *AutomateHAInfraDetails, sshUtil SSHUtil) {
+	p.infra = infra
+	p.sshUtil = sshUtil
 }
 
 func (p *PullConfigsImpl) setExceptionIps(ips []string) {

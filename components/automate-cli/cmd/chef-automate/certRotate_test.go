@@ -3,10 +3,12 @@ package main
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -49,11 +51,247 @@ xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
 VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
 WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
 -----END CERTIFICATE-----`
-	ValidCertPath = "./certRotate.go"
+	ValidCertPath                = "./certRotate.go"
+	TestOpensearchAdminAndRootCA = `
+	[tls]
+	rootCA = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	admin_cert = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	admin_key = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	ssl_cert = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	ssl_key = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+[plugins.security.authcz]
+	admin_dn = '- CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US'
+[plugins.security.ssl.transport]
+	enforce_hostname_verification = false
+	resolve_hostname = false
+[plugins.security]
+	nodes_dn = '- CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US'`
+	TestFrontendConfig = `[[load_balancer.v1.sys.frontend_tls]]
+	cert = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	key = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+[[global.v1.frontend_tls]]
+	cert = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""
+	key = """-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----"""`
+	testfile = `./testfiles/ssh`
 )
 
+var sshConfig = sshutils.SSHConfig{
+	SshUser:    "ubuntu",
+	SshPort:    "22",
+	SshKeyFile: testfile,
+	HostIP:     ValidIP,
+	Timeout:    150,
+}
+
 func TestIsRemotePath(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -98,7 +336,7 @@ func TestIsRemotePath(t *testing.T) {
 }
 
 func TestGetIPV4(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -143,7 +381,7 @@ func TestGetIPV4(t *testing.T) {
 }
 
 func TestGetRemoteFileDetails(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	type testCaseInfo struct {
 		testCaseDescription    string
@@ -238,7 +476,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 }
 
 func TestGetCerts(t *testing.T) {
-	c := certRotateFlow{FileUtils: mockFS()}
+	c := certRotateFlow{fileUtils: mockFS()}
 
 	infra := &AutomateHAInfraDetails{}
 
@@ -708,63 +946,6 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 	}
 }
 
-func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
-	c, infra := getMockCertRotateFlowAndInfra()
-	type testCaseInfo struct {
-		testCaseDescription string
-		remoteService       string
-		newRootCA           string
-		currentCertsInfo    *certShowCertificates
-		skipIpsList         []string
-	}
-
-	testCases := []testCaseInfo{
-		{
-			testCaseDescription: "Automate root-ca patching in chef-server | same root-ca",
-			remoteService:       AUTOMATE,
-			newRootCA:           FileContent,
-			currentCertsInfo: &certShowCertificates{
-				AutomateRootCert: FileContent,
-			},
-			skipIpsList: c.getIps(CHEF_SERVER, infra),
-		},
-		{
-			testCaseDescription: "Automate root-ca patching in chef-server | different root-ca",
-			remoteService:       AUTOMATE,
-			newRootCA:           FileContent + "a",
-			currentCertsInfo: &certShowCertificates{
-				AutomateRootCert: FileContent,
-			},
-			skipIpsList: []string{},
-		},
-		{
-			testCaseDescription: "Postgresql root-ca patching in frontend | same root-ca",
-			remoteService:       POSTGRESQL,
-			newRootCA:           FileContent,
-			currentCertsInfo: &certShowCertificates{
-				PostgresqlRootCert: FileContent,
-			},
-			skipIpsList: c.getIps("frontend", infra),
-		},
-		{
-			testCaseDescription: "Postgresql root-ca patching in frontEnd | different root-ca",
-			remoteService:       POSTGRESQL,
-			newRootCA:           FileContent + "a",
-			currentCertsInfo: &certShowCertificates{
-				PostgresqlRootCert: FileContent,
-			},
-			skipIpsList: []string{},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.getFrontEndIpsForSkippingRootCAPatching(testCase.remoteService, testCase.newRootCA, infra, testCase.currentCertsInfo)
-			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
-		})
-	}
-}
-
 func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 	c, infra := getMockCertRotateFlowAndInfra()
 	nodesDn, _ := getDistinguishedNameFromKey(FileContent)
@@ -775,70 +956,71 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 		newRootCA           string
 		newCn               string
 		oldCn               string
+		oldRootCA           string
 		node                string
-		currentCertsInfo    *certShowCertificates
 		infra               *AutomateHAInfraDetails
-		skipIpsList         []string
+		isIpSkip            bool
 	}
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same cn and root-ca",
+			testCaseDescription: "Comparing old cn nd old rootCA | same cn and root-ca",
 			newRootCA:           FileContent,
+			oldRootCA:           FileContent,
 			newCn:               newCn,
 			oldCn:               newCn,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-			},
-			infra:       infra,
-			skipIpsList: c.getIps("frontend", infra),
+			infra:               infra,
+			isIpSkip:            true,
 		},
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same root-ca different cn",
+			testCaseDescription: "Comparing old cn nd old rootCA | same root-ca different cn",
 			newRootCA:           FileContent,
+			oldRootCA:           FileContent,
 			newCn:               newCn + "n",
 			oldCn:               "",
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-			},
-			infra:       infra,
-			skipIpsList: []string{},
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same cn and node flag",
-			newCn:               newCn,
-			oldCn:               newCn,
-			node:                ValidIP4,
-			currentCertsInfo:    &certShowCertificates{},
 			infra:               infra,
-			skipIpsList:         c.getIps("frontend", infra),
+			isIpSkip:            false,
 		},
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching | different cn and node flag",
-			newCn:               newCn + "n",
-			oldCn:               newCn,
-			node:                ValidIP4,
-			currentCertsInfo:    &certShowCertificates{},
-			infra:               infra,
-			skipIpsList:         []string{},
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | different root-ca",
+			testCaseDescription: "Comparing old cn nd old rootCA | different root-ca",
 			newRootCA:           FileContent + "a",
+			oldRootCA:           FileContent,
 			newCn:               newCn,
 			oldCn:               newCn,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-			},
-			infra:       infra,
-			skipIpsList: []string{},
+			infra:               infra,
+			isIpSkip:            false,
+		},
+		{
+			testCaseDescription: "Comparing old cn nd old rootCA | different root-ca same cn",
+			newRootCA:           FileContent + "a",
+			oldRootCA:           FileContent,
+			newCn:               newCn,
+			oldCn:               newCn,
+			infra:               infra,
+			isIpSkip:            false,
+		},
+		{
+			testCaseDescription: "Comparing old cn | different cn with node flag",
+			newCn:               newCn + "a",
+			oldCn:               newCn,
+			infra:               infra,
+			node:                ValidIP,
+			isIpSkip:            false,
+		},
+		{
+			testCaseDescription: "Comparing old cn | same cn with node flag",
+			newCn:               newCn,
+			oldCn:               newCn,
+			infra:               infra,
+			node:                ValidIP,
+			isIpSkip:            true,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.oldCn, testCase.node, testCase.currentCertsInfo, infra)
-			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+			isIpSkipped := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.oldCn, testCase.oldRootCA, testCase.node)
+			assert.Equal(t, testCase.isIpSkip, isIpSkipped)
 		})
 	}
 }
@@ -878,16 +1060,23 @@ func TestGetFilteredIps(t *testing.T) {
 	}
 }
 
-func TestGetOldCn(t *testing.T) {
+func TestGetFrontIpsToSkipRootCAandCNPatchingForOs(t *testing.T) {
+	c, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
 		testCaseDescription string
 		automatesConfig     *deployment.AutomateConfig
-		OldCnExpected       string
+		newRootCA           string
+		oldRootCA           string
+		newCn               string
+		oldCn               string
+		node                string
+		infra               *AutomateHAInfraDetails
+		skipIpsList         []string
 	}
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Getting cn value",
+			testCaseDescription: "Opensearch root-ca and cn patching | same rootca and CN ",
 			automatesConfig: &deployment.AutomateConfig{
 				Global: &shared.GlobalConfig{
 					V1: &shared.V1{
@@ -897,72 +1086,1008 @@ func TestGetOldCn(t *testing.T) {
 									ServerName: &wrapperspb.StringValue{
 										Value: "chefnode",
 									},
+									RootCert: &wrapperspb.StringValue{
+										Value: FileContent,
+									},
 								},
 							},
 						},
 					},
 				},
 			},
-			OldCnExpected: "chefnode",
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent,
+			newCn:       "chefnode",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{ValidIP},
 		},
 		{
-			testCaseDescription: "Getting cn value with field are nil",
+			testCaseDescription: "Opensearch root-ca and cn patching | diff rootca and CN",
 			automatesConfig: &deployment.AutomateConfig{
 				Global: &shared.GlobalConfig{
 					V1: &shared.V1{
-						External: &shared.External{},
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
 					},
 				},
 			},
-			OldCnExpected: "",
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent + "a",
+			newCn:       "chefnode1",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "Getting cn value server name as nil",
+			testCaseDescription: "Opensearch root-ca and cn patching | same rootca and diff CN",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent,
+			newCn:       "chefnode1",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | diff rootca and same CN",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+								RootCert: &wrapperspb.StringValue{
+									Value: FileContent,
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent + "a",
+			newCn:       "chefnode",
+			oldCn:       "chefnode",
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | diff CN with node flag",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			newCn:       "chefnode1",
+			oldCn:       "chefnode",
+			node:        ValidIP,
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching | same CN with node flag",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{Opensearch: &shared.External_Opensearch{
+							Ssl: &shared.External_Opensearch_SSL{
+								ServerName: &wrapperspb.StringValue{
+									Value: "chefnode",
+								},
+							},
+						},
+						},
+					},
+				},
+			},
+			newCn:       "chefnode",
+			oldCn:       "chefnode",
+			node:        ValidIP,
+			infra:       infra,
+			skipIpsList: []string{ValidIP},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescription, func(t *testing.T) {
+			configMap := map[string]*deployment.AutomateConfig{
+				ValidIP: testCase.automatesConfig,
+			}
+			skipIpsListGot := c.getFrontIpsToSkipRootCAandCNPatchingForOs(configMap, testCase.newRootCA, testCase.newCn, testCase.node, infra)
+			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+
+		})
+	}
+}
+
+func TestGetFrontendIPsToSkipRootCAPatchingForPg(t *testing.T) {
+	c, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		testCaseDescription string
+		automatesConfig     *deployment.AutomateConfig
+		newRootCA           string
+		oldRootCA           string
+		infra               *AutomateHAInfraDetails
+		skipIpsList         []string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Postgresql root-ca comparing | same rootca ",
 			automatesConfig: &deployment.AutomateConfig{
 				Global: &shared.GlobalConfig{
 					V1: &shared.V1{
 						External: &shared.External{
-							Opensearch: &shared.External_Opensearch{
-								Ssl: &shared.External_Opensearch_SSL{},
+							Postgresql: &shared.External_Postgresql{
+								Ssl: &shared.External_Postgresql_SSL{
+									RootCert: &wrapperspb.StringValue{
+										Value: FileContent,
+									},
+								},
 							},
 						},
 					},
 				},
 			},
-			OldCnExpected: "",
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent,
+			infra:       infra,
+			skipIpsList: []string{ValidIP},
 		},
 		{
-			testCaseDescription: "Getting cn value server name as nil",
+			testCaseDescription: "Postgresql root-ca comparing | diff rootca ",
 			automatesConfig: &deployment.AutomateConfig{
 				Global: &shared.GlobalConfig{
 					V1: &shared.V1{
-						External: &shared.External{},
+						External: &shared.External{
+							Postgresql: &shared.External_Postgresql{
+								Ssl: &shared.External_Postgresql_SSL{
+									RootCert: &wrapperspb.StringValue{
+										Value: FileContent,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
-			OldCnExpected: "",
+			oldRootCA:   FileContent,
+			newRootCA:   FileContent + "a",
+			infra:       infra,
+			skipIpsList: []string{},
 		},
 	}
 
 	for _, testCase := range testCases {
-		t.Run("GetOldCn", func(t *testing.T) {
+		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			configMap := map[string]*deployment.AutomateConfig{
 				ValidIP: testCase.automatesConfig,
 			}
-			oldCn := getOldCn(configMap)
-			assert.Equal(t, testCase.OldCnExpected, oldCn)
+			skipIpsListGot := c.getFrontendIPsToSkipRootCAPatchingForPg(configMap, testCase.newRootCA, infra)
+			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+
 		})
 	}
 }
 
-func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
-	c := certRotateFlow{FileUtils: mockFS()}
+func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
+	infra := NewMockInfra()
+	c := NewCertRotate()
+
+	type testCaseInfo struct {
+		description     string
+		sshUtil         SSHUtil
+		certs           *certificates
+		infra           *AutomateHAInfraDetails
+		MockPullConfigs PullConfigs
+		skipIpsList     []string
+		ExpectedError   string
+		wantError       bool
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "same root ca",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP7, ValidIP7},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "Different rootca",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent + "a",
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "Error while pulling chefserver config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+		{
+			description: "Error while pulling Automate config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c.pullConfigs = testCase.MockPullConfigs
+			skipIpsListGot, err := c.getSkipIpsListForPgRootCAPatching(testCase.infra, testCase.sshUtil, testCase.certs)
+			if !testCase.wantError {
+				assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+			} else {
+				assert.Error(t, err)
+			}
+
+		})
+	}
+}
+
+func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
+	infra := NewMockInfra()
+	c := NewCertRotate()
+
+	type testCaseInfo struct {
+		description     string
+		sshUtil         SSHUtil
+		certs           *certificates
+		infra           *AutomateHAInfraDetails
+		MockPullConfigs PullConfigs
+		nodesCn         string
+		flagsObj        *certRotateFlags
+		skipIpsList     []string
+		ExpectedError   string
+		wantError       bool
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "same root ca and cn",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra:    infra,
+			nodesCn:  "chefnode",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP4, ValidIP4},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "diff root ca and cn",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent + "a",
+			},
+			infra:    infra,
+			nodesCn:  "chefnodee",
+			flagsObj: &certRotateFlags{},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "same CN with node flag",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent,
+			},
+			infra: infra,
+			flagsObj: &certRotateFlags{
+				node: ValidIP4,
+			},
+			nodesCn: "chefnode",
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnode",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{ValidIP4, ValidIP4},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "diff CN with node flag",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				rootCA: FileContent+"a",
+			},
+			infra: infra,
+			flagsObj: &certRotateFlags{
+				node: ValidIP4,
+			},
+			nodesCn: "chefnode",
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP4: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Opensearch: &shared.External_Opensearch{
+											Ssl: &shared.External_Opensearch_SSL{
+												ServerName: &wrapperspb.StringValue{
+													Value: "chefnodee",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "",
+			wantError:     false,
+		},
+		{
+			description: "Error while fetching chefserver config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			flagsObj: &certRotateFlags{
+				node: ValidIP4,
+			},
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+		{
+			description: "Error while fetching automate config",
+			sshUtil:     GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			certs: &certificates{
+				publicCert:  FileContent,
+				privateCert: FileContent,
+				rootCA:      FileContent,
+			},
+			infra: infra,
+			MockPullConfigs: &MockPullConfigs{
+				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return nil, errors.New("ERROR")
+				},
+				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+					return map[string]*deployment.AutomateConfig{
+						ValidIP7: {
+							Global: &shared.GlobalConfig{
+								V1: &shared.V1{
+									External: &shared.External{
+										Postgresql: &shared.External_Postgresql{
+											Ssl: &shared.External_Postgresql_SSL{
+												RootCert: &wrapperspb.StringValue{
+													Value: FileContent,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}, nil
+				},
+			},
+
+			skipIpsList:   []string{},
+			ExpectedError: "ERROR",
+			wantError:     true,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c.pullConfigs = testCase.MockPullConfigs
+			skipIpsListGot, err := c.getSkipIpsListForOsRootCACNPatching(testCase.infra, testCase.sshUtil, testCase.certs, testCase.nodesCn, testCase.flagsObj)
+			if !testCase.wantError {
+				assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+			} else {
+				assert.Error(t, err)
+			}
+
+		})
+	}
+}
+
+func TestPatchConfig(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description   string
+		param         *patchFnParameters
+		MockSSHUtil   sshutils.SSHUtil
+		isError       bool
+		ExpectedError string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Test Case to rotate on backend",
+			param: &patchFnParameters{
+				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+				config:        TestOpensearchAdminAndRootCA,
+				fileName:      "cert-rotate-os.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: OPENSEARCH,
+				concurrent:    false,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					opensearch: true,
+				},
+				skipIpsList: []string{},
+			},
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description: "Test Case to rotate on frontend",
+			param: &patchFnParameters{
+				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: AUTOMATE,
+				concurrent:    true,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					automate: true,
+				},
+				skipIpsList: []string{},
+			},
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description: "remote copying failed on on frontend",
+			param: &patchFnParameters{
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: AUTOMATE,
+				concurrent:    true,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					automate: true,
+				},
+				skipIpsList: []string{},
+			},
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  errors.New("remote copying failed on node"),
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			isError:       true,
+			ExpectedError: "remote copying failed on node",
+		},
+		{
+			description: "remote execution failed on on frontend",
+			param: &patchFnParameters{
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: AUTOMATE,
+				concurrent:    true,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					automate: true,
+				},
+				skipIpsList: []string{},
+			},
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  errors.New("remote execution failed"),
+							Output: "",
+						},
+					}
+				},
+			},
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description: "Deployment service error on frontend",
+			param: &patchFnParameters{
+				config:        TestFrontendConfig,
+				fileName:      "cert-rotate-fe.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: AUTOMATE,
+				concurrent:    true,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					automate: true,
+				},
+				skipIpsList: []string{},
+			},
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "DeploymentServiceCallError",
+						},
+					}
+				},
+			},
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description: "Error occured while reading infra details on backend",
+			param: &patchFnParameters{
+				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("Error occured while reading infra details")),
+				config:        TestOpensearchAdminAndRootCA,
+				fileName:      "cert-rotate-os.toml",
+				timestamp:     time.Now().Format("20060102150405"),
+				remoteService: OPENSEARCH,
+				concurrent:    false,
+				infra:         infra,
+				flagsObj: &certRotateFlags{
+					opensearch: true,
+				},
+				skipIpsList: []string{},
+			},
+			isError:       true,
+			ExpectedError: "Error occured while reading infra details",
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl()}
+			output := c.patchConfig(testCase.param)
+			if testCase.isError {
+				assert.EqualError(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+			}
+		})
+	}
+}
+
+func getMockCertRotateFlowAndInfra() (*certRotateFlow, *AutomateHAInfraDetails) {
+	return NewCertRotate(), NewMockInfra()
+}
+
+func NewMockInfra() *AutomateHAInfraDetails {
 	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	return c, infra
+	infra.Outputs.SSHUser.Value = "ubuntu"
+	infra.Outputs.SSHKeyFile.Value = "new.pem"
+	infra.Outputs.SSHPort.Value = "22"
+	return infra
+}
+
+func NewCertRotate() *certRotateFlow {
+	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{})
+	return c
 }
 
 func mockFS() *fileutils.MockFileSystemUtils {
