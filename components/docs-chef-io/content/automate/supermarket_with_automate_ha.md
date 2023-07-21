@@ -40,4 +40,4 @@ Before starting this page, refer to the [Supermarket Integration](/automate/supe
 
 1. The configuration of supermarket in Chef Automate HA can be done in the same way as Standalone Automate. Refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/#supermarket-configuration) page to view the configuration steps.
 
-Refer to the [Configuration](/automate/configuration/#oc-id) page, to check the optional settings for integration of private Supermarket in Chef Automate.
+Refer to the [Configuration](/automate/configuration/#encrypt-cookies-with-custom-secret-key-in-oc-id-service) page, to check the optional settings for integration of private Supermarket in Chef Automate.

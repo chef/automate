@@ -152,4 +152,4 @@ To configure the supermarket in Chef Automate, follow the steps given below:
 
 You have successfully logged in to the supermarket using the credentials of `chef-server` through the **Chef Identity** service running as part of Airgapped Automate.
 
-Refer to the [Configuration](/automate/configuration/#encrypt-cookies-with-custom-key-in-oc-id-service) page, to check the optional settings for integration of private Supermarket in Chef Automate.
+Refer to the [Configuration](/automate/configuration/#encrypt-cookies-with-custom-secret-key-in-oc-id-service) page, to check the optional settings for integration of private Supermarket in Chef Automate.
