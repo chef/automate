@@ -313,4 +313,4 @@ Download and Install the [Chef Workstation](https://www.chef.io/downloads/tools/
 
 ## Use Existing Private Supermarket with Automate HA
 
-You can register a Supermarket with Automate HA in an on-premises setup. You can refer to the integration page of [Supermarket with Automate HA](/automate/supermarket_with_automate_ha/).
+If you are using private instance of Supermarket with Chef Backend, you can refer to [Supermarket with Automate HA](/automate/supermarket_with_automate_ha/) to ensure that your same private instance of Supermarket works with Automate HA cluster.
