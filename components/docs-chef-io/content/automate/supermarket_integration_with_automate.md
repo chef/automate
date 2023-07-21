@@ -1,6 +1,5 @@
 +++
 title = "Supermarket Integration"
-date = 2020-02-11T14:24:00-08:00
 weight = 20
 draft = false
 gh_repo = "automate"
@@ -46,13 +45,13 @@ When you install Chef Automate, it bundles the Chef-Server OC-ID component as an
             redirect_uri = ""
     ```
 
-    Update the URL of the supermarket website in the `redirect_uri` as per the actual supermarket URL. Refer to the code below:
+    Update the FQDN/Host Name of your supermarket website in the `redirect_uri`. Refer to the code below:
 
     ```cd
     [ocid.v1.sys.ocid.oauth_application_config]
         [[ocid.v1.sys.ocid.oauth_application_config.oauth_applications]]
             name = "supermarket"
-            redirect_uri = "https://example-supermarket.com/auth/chef_oauth2/callback"
+            redirect_uri = "https://<YOUR SUPERMARKET FQDN>/auth/chef_oauth2/callback"
     ```
 
     To add more than one application with the OC-ID service, keep repeating the above code in the file with the respective application details. For example:
