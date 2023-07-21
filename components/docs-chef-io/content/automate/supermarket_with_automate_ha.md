@@ -8,7 +8,7 @@ gh_repo = "automate"
     title = "Supermarket with Automate HA"
     parent = "automate/deploy_high_availability"
     identifier = "automate/deploy_high_availability/supermarket_with_automate_ha.md Supermarket with Automate HA"
-    weight = 75
+    weight = 85
 +++
 
 This page will discuss the integration of Supermarket with Automate HA setup. The page will guide you to register an existing private Supermarket with [on-premises deployment](/automate/ha_onprim_deployment_procedure/) of Automate HA.
