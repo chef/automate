@@ -60,7 +60,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 ### Run these steps on Bastion Host Machine
 
-### There are 2 ways to create config
+### Use any of the two ways below to create config
 
 #### CLI helper prompts
 

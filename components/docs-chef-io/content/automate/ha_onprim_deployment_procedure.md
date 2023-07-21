@@ -61,7 +61,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 ### Run these steps on Bastion Host Machine
 
-### There are 2 ways to create config
+### Use any of the two ways below to create config
 
 #### CLI helper prompts
 
