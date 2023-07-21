@@ -19,9 +19,9 @@ Chef Automate is an enterprise dashboard that provides a full suite of capabilit
 
 Chef Automate integrates with:
 
-- [Chef Infra Client](/chef_client_overview/) for infrastructure automation
-- [Chef InSpec](/inspec/) for application automation
-- [Chef Habitat](/habitat/) for compliance and security automation
+- [Chef Infra Server](/server/) and [Chef Infra Client](/chef_client_overview/) for infrastructure automation
+- [Chef InSpec](/inspec/) for compliance and security automation
+- [Chef Habitat](/habitat/) for application automation
 
 You can integrate Chef Automate with any or all of these open-source tools to consolidate their data for actionable insights.
 Chef Automate comes with comprehensive 24x7 support services for the entire platform, including open-source components.
