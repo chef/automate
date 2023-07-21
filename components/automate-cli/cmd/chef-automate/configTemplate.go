@@ -139,6 +139,12 @@ type OpensearchConfig struct {
 	} `protobuf:"bytes,,opt,name=transport,proto3" toml:"transport,omitempty" json:"transport,omitempty" mapstructure:"transport,omitempty"`
 }
 
+type PatchOpensearchConfig struct {
+	Cluster *struct {
+		MaxShardsPerNode string `protobuf:"bytes,,opt,name=max_shards_per_node,proto3" toml:"max_shards_per_node,omitempty" json:"max_shards_per_node,omitempty" mapstructure:"max_shards_per_node,omitempty"`
+	} `protobuf:"bytes,,opt,name=cluster,proto3" toml:"cluster,omitempty" json:"cluster,omitempty" mapstructure:"cluster,omitempty"`
+}
+
 type TLS struct {
 	AdminCert string `protobuf:"bytes,,opt,name=admin_cert,proto3" toml:"admin_cert,omitempty" json:"admin_cert,omitempty" mapstructure:"admin_cert,omitempty"`
 	AdminKey  string `protobuf:"bytes,,opt,name=admin_key,proto3" toml:"admin_key,omitempty" json:"admin_key,omitempty" mapstructure:"admin_key,omitempty"`
