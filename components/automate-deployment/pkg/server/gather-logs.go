@@ -155,13 +155,49 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 
 	// Postgresql
 	// FIXME: Move this to using config.
-	connInfo := pg.A2ConnInfo{
-		Host:  "localhost",
-		Port:  5432,
-		User:  "automate",
-		Certs: pg.A2SuperuserCerts,
+	var host, user, password string
+	var port int
+	var certs pg.TLSCertPaths
+
+	if s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetEnable().GetValue() {
+		if s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetNodes() != nil {
+			host = strings.Split(s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetNodes()[0].GetValue(), ":")[0]
+			p, err := strconv.Atoi(strings.Split(s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetNodes()[0].GetValue(), ":")[1])
+			if err != nil {
+				return nil, err
+			}
+			port = p
+		}
+		if s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetAuth().GetPassword().GetSuperuser() != nil {
+			user = s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetAuth().GetPassword().GetSuperuser().GetUsername().GetValue()
+			password = s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetAuth().GetPassword().GetSuperuser().GetPassword().GetValue()
+		}
+		certs = pg.TLSCertPaths{
+			RootCert: "/hab/svc/automate-pg-gateway/config/_a2_platform_external_pg_root_ca.crt",
+		}
+	} else {
+		host = "localhost"
+		port = int(s.deployment.Config.Postgresql.GetV1().GetSys().GetService().GetPort().GetValue())
+		user = s.deployment.Config.Postgresql.GetV1().GetSys().GetSuperuser().GetName().GetValue()
+		password = ""
+		certs = pg.A2SuperuserCerts
 	}
-	connectionURI := connInfo.ConnURI("template1")
+
+	connInfo := pg.A2ConnInfo{
+		Host:     host,
+		Port:     uint64(port),
+		User:     user,
+		Password: password,
+		Certs:    certs,
+	}
+
+	var connectionURI string
+	if s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetSsl().GetEnable().GetValue() ||
+		!s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetEnable().GetValue() {
+		connectionURI = connInfo.ConnURI("template1")
+	} else {
+		connectionURI = connInfo.InsecureConnURI("template1")
+	}
 
 	pcmd := pg.PSQLCmd()[0]
 
@@ -207,7 +243,7 @@ func (s *server) GatherLogsDownload(
 
 	// Open our file to transfer
 	// We should potentially compare value given against archive files in directory
-	//   to prevent path traversal exploits
+	// to prevent path traversal exploits
 	file, err := os.Open(bundlePath)
 	if err != nil {
 		return err
