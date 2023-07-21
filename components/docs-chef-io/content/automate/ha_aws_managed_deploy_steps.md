@@ -71,7 +71,17 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
 {{< /warning >}}
 
+
 ### Run these steps on Bastion Host Machine
+
+### There are 2 ways to create config
+
+#### CLI helper prompts
+
+1. Run the command below and answer all the prompts to generate a config
+    `chef-automate config gen config.toml`
+
+#### Manually filling config template
 
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
@@ -155,6 +165,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    chef-automate provision-infra config.toml --airgap-bundle automate.aib
     "
     ```
+
+### Run Deployment
 
 1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
 
