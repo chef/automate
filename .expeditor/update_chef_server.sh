@@ -42,6 +42,7 @@ file_for_pkg=(
     [bookshelf]="components/automate-cs-bookshelf/habitat/plan.sh"
     [oc_bifrost]="components/automate-cs-oc-bifrost/habitat/plan.sh"
     [oc_erchef]="components/automate-cs-oc-erchef/habitat/plan.sh"
+    [oc_id]="components/automate-cs-ocid/habitat/plan.sh"
     [openresty-noroot]="components/automate-workflow-nginx/habitat/plan.sh"
 )
 

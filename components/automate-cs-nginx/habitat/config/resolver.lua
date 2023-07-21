@@ -9,6 +9,7 @@ local upstream_resolver = { }
 -- These names map directly to named upstreams
 upstream_resolver.chef = "opscode_chef"
 upstream_resolver.erchef = "automate-cs-oc-erchef"
+upstream_resolver.ocid = "automate-cs-ocid"
 upstream_resolver.acct = "opscode_account"
 
 -- Resolve an upstream, applying any necessary darklaunch controls.

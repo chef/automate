@@ -18,6 +18,7 @@ import "config/shared/global.proto";
 import "config/cs_nginx/config_request.proto";
 import "config/deployment/config_request.proto";
 import "config/dex/config_request.proto";
+import "config/ocid/config_request.proto";
 import "config/opensearch/config_request.proto";
 import "config/esgateway/config_request.proto";
 import "config/es_sidecar/config_request.proto";
@@ -108,4 +109,5 @@ message AutomateConfig {
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
 	chef.automate.infra.opensearch.ConfigRequest opensearch = 49;
 	chef.automate.domain.report_manager.ConfigRequest report_manager = 50;
+    chef.automate.domain.ocid.ConfigRequest ocid = 51;
 }

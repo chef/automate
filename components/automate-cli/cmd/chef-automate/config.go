@@ -66,6 +66,7 @@ func init() {
 
 	//config gen flags
 	genConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml")
+	configCmd.AddCommand(ocIdShowAppCmd)
 
 	//config show flags
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml [Standalone]")
@@ -130,6 +131,10 @@ func init() {
 	setConfigCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Set toml configuration to the postgresql node[DUPLICATE]")
 	setConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
+
+	//config oc-id-show-app flags
+	ocIdShowAppCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, waitTimeout, DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config oc-id-show-app process")
+	ocIdShowAppCmd.PersistentFlags().SetAnnotation(waitTimeout, docs.Compatibility, []string{docs.CompatiblewithStandalone, docs.CompatiblewithHA})
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -248,6 +253,16 @@ func checkConfigGenFileExist(outFile string, fsu fileutils.FileUtils) error {
 		}
 	}
 	return nil
+}
+
+var ocIdShowAppCmd = &cobra.Command{
+	Use:   "oc-id-show-app",
+	Short: "Get the details of the oauth applications registered with OC-ID",
+	Long:  "Get the details of the oauth applications registered with OC-ID",
+	RunE:  runOcIdShowAppCommand,
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
 }
 
 func runShowCmd(cmd *cobra.Command, args []string) error {
@@ -716,6 +731,54 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		writer.Success("Configuration set")
+	}
+	return nil
+}
+
+func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
+			return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+		}
+
+		frontendCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
+		frontend := &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCmd,
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   true,
+				Args:                     args,
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 true,
+			},
+		}
+
+		nodeMap := &NodeTypeAndCmd{
+			Frontend: frontend,
+			Infra:    infra,
+		}
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
+
+		_, cmdExecErr := cmdUtil.Execute()
+
+		if cmdExecErr != nil {
+			return cmdExecErr
+		}
+	} else {
+		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
+		content, err := os.ReadFile(oauthAppDetailsFilePath)
+		if err != nil {
+			printErr := "Could not find the file with the registered application details. Pls restart OC-ID to generate it."
+			writer.Errorln(printErr)
+			return err
+		}
+		registeredAppDetails := string(content)
+		writer.Println(registeredAppDetails)
 	}
 	return nil
 }
