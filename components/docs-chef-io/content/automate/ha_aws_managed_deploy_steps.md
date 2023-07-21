@@ -74,7 +74,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
 ### Run these steps on Bastion Host Machine
 
-### Use any of the two ways below to create config
+### Use one of the two ways below to create config
 
 #### CLI helper prompts
 
