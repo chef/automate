@@ -66,9 +66,7 @@ output "random_id" {
 }
 
 output "subnet_id" {
-
   value = length(var.private_custom_subnets) > 0 ? var.private_custom_subnets : aws_subnet.default.*.id
-
 }
 
 output "mount_id" {
