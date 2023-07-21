@@ -48,7 +48,7 @@ Disables swapping (along with memlock). Swapping can dramatically decrease perfo
 ```toml
 [cluster]
 name = "opensearch"
-max_shards_per_node= "2000"
+max_shards_per_node= "1000"
 ```
 
 - This section configures cluster settings.
