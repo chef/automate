@@ -61,12 +61,11 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 ### Run these steps on Bastion Host Machine
 
-### Use one of the two ways below to create config
+### Use any one of the two ways below to create config
 
 #### CLI helper prompts
 
-1. Run the command below and answer all the prompts to generate a config
-    `chef-automate config gen config.toml`
+1. Run the command `chef-automate config gen config.toml` and answer all the prompts to generate a config
 
 #### Manually filling config template
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
