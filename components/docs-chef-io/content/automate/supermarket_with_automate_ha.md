@@ -19,7 +19,7 @@ Before starting this page, refer to the [Supermarket Integration](/automate/supe
 
 1. The overall steps to register an existing private instance of Supermarket with Automate HA is same as the steps to register it with [Standalone](/automate/supermarket_integration_with_automate/#register-supermarket-with-automate-embedded-chef-identity) Automate. The only difference is in the way we patch the `.toml` file in Automate HA.
 
-1. Trigger the `config patch` command with the `.toml` file you created in the previous step on all the automate and chef server nodes from the bastion node as follows:
+1. Now, patch the configuration on all the frontend nodes from the Bastion node using the command below:
 
     ```bash
     // Frontend Nodes
