@@ -211,19 +211,19 @@ func (c *AwsHaProvisionConfig) PromptCidrBlockAddr() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPrivateSubnet() (err error) {
-	privateSubnet1, err := c.Prompt.InputStringRequired("AWS Private Subnet 1:")
+	privateSubnet1, err := c.Prompt.InputStringRequired("AWS Private Subnet 1")
 	if err != nil {
 		return
 	}
 	c.Config.InitAws().InitConfigAwsSettings().PrivateCustomSubnets = []string{privateSubnet1}
 
-	privateSubnet2, err := c.Prompt.InputStringRequired("AWS Private Subnet 2:")
+	privateSubnet2, err := c.Prompt.InputStringRequired("AWS Private Subnet 2")
 	if err != nil {
 		return
 	}
 	c.Config.InitAws().InitConfigAwsSettings().PrivateCustomSubnets = append(c.Config.InitAws().InitConfigAwsSettings().PrivateCustomSubnets, privateSubnet2)
 
-	privateSubnet3, err := c.Prompt.InputStringRequired("AWS Private Subnet 3:")
+	privateSubnet3, err := c.Prompt.InputStringRequired("AWS Private Subnet 3")
 	if err != nil {
 		return
 	}
@@ -828,7 +828,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateAdminPassword() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate", AWS_MACHINE_TYPE_REGEX, "t3.medium")
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate", AWS_MACHINE_TYPE_REGEX, "m5.large")
 	if err != nil {
 		return
 	}
@@ -899,7 +899,7 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerNodes() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server", AWS_MACHINE_TYPE_REGEX, "t3.medium")
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server", AWS_MACHINE_TYPE_REGEX, "m5.large")
 	if err != nil {
 		return
 	}

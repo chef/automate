@@ -90,7 +90,7 @@ func TestPromptsCidrAWSManaged(t *testing.T) {
 	automateNodeCount := 1
 	input(b, fmt.Sprint(automateNodeCount)+"\r")
 
-	automateInstanceType := "t3.medium"
+	automateInstanceType := "m5.large"
 	input(b, "\r")
 
 	automateVolSize := 200
@@ -115,7 +115,7 @@ func TestPromptsCidrAWSManaged(t *testing.T) {
 	chefInfraServerNodeCount := 1
 	input(b, fmt.Sprint(chefInfraServerNodeCount)+"\r")
 
-	chefInfraServerInstanceType := "t3.medium"
+	chefInfraServerInstanceType := "m5.large"
 	input(b, "\r")
 
 	chefInfraServerVolSize := 200
@@ -1552,4 +1552,17 @@ func TestAwsHaProvisionConfigFactory(t *testing.T) {
 	c := AwsHaProvisionConfigFactory(p)
 
 	assert.NotNil(t, c)
+}
+
+func TestSetDefaultValuesForDBNodes(t *testing.T) {
+	defaultInstanceCount := "0"
+	c := AwsHaProvisionConfig{
+		Config: &config.HaDeployConfig{},
+	}
+	c.SetDefaultValuesForDBNodes()
+
+	assert.Equal(t, defaultInstanceCount, c.Config.Postgresql.Config.InstanceCount)
+	assert.Equal(t, defaultInstanceCount, c.Config.Opensearch.Config.InstanceCount)
+	assert.Equal(t, false, c.Config.Postgresql.Config.EnableCustomCerts)
+	assert.Equal(t, false, c.Config.Opensearch.Config.EnableCustomCerts)
 }
