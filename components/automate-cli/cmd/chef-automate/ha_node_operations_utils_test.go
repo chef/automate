@@ -938,6 +938,37 @@ func TestPrePatchForFrontendNodes(t *testing.T) {
 	})
 }
 
+func TestPrePatchForOsNodes(t *testing.T) {
+
+	tomlFileContent := `[cluster]
+	max_shards_per_node = "2000"`
+
+	filePath, err := fileutils.CreateTempFile(tomlFileContent, OPENSEARCH_TOML)
+	assert.NoError(t, err)
+	defer fileutils.DeleteFile(filePath)
+
+	t.Run("with toml file content", func(t *testing.T) {
+		cmpInput := &CmdInputs{
+			InputFiles: []string{OPENSEARCH_TOML},
+			Args:       []string{filePath},
+		}
+		err := prePatchForOsNodes(cmpInput, NewSSHUtil(&SSHConfig{}), nil, "", nil)
+		assert.NoError(t, err)
+	})
+	t.Run("with invalid toml file content", func(t *testing.T) {
+		tomlFileContent := `
+	[cluster`
+		filePath, err := fileutils.CreateTempFile(tomlFileContent, OPENSEARCH_TOML)
+		assert.NoError(t, err)
+		cmpInput := &CmdInputs{
+			InputFiles: []string{OPENSEARCH_TOML},
+			Args:       []string{filePath},
+		}
+		err = prePatchForOsNodes(cmpInput, NewSSHUtil(&SSHConfig{}), nil, "", nil)
+		assert.Error(t, err, "expected '.' or ']'")
+	})
+}
+
 func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
 	mnu := NewNodeUtils(&MockRemoteCmdExecutor{
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
