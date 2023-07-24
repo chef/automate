@@ -297,7 +297,7 @@ func (c *AwsHaProvisionConfig) PromptDatabases() (err error) {
 		if err != nil {
 			return err
 		}
-		c.SetZeroDBNodes()
+		c.SetDefaultValuesForDBNodes()
 	} else {
 		err := c.PromptChefManaged()
 		if err != nil {
@@ -1278,10 +1278,12 @@ func (c *AwsHaProvisionConfig) PromptBackup() (err error) {
 	return
 }
 
-func (c *AwsHaProvisionConfig) SetZeroDBNodes() {
+func (c *AwsHaProvisionConfig) SetDefaultValuesForDBNodes() {
 	c.Config.InitOpenSearch().InitConfig()
 	c.Config.Opensearch.Config.InstanceCount = "0"
+	c.Config.Opensearch.Config.EnableCustomCerts = false
 
 	c.Config.InitPostgresql().InitConfig()
 	c.Config.Postgresql.Config.InstanceCount = "0"
+	c.Config.Postgresql.Config.EnableCustomCerts = false
 }

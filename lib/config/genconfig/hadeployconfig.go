@@ -67,7 +67,7 @@ func (c *HaDeployConfigGen) Prompts() (err error) {
 		return
 	}
 	if isExternalDb {
-		c.SetZeroDBNodes()
+		c.SetDefaultValuesForDBNodes()
 	} else {
 		err = c.PromptOpenSearch()
 		if err != nil {
@@ -106,12 +106,14 @@ func (c *HaDeployConfigGen) PromptCustomCerts() (err error) {
 	return
 }
 
-func (c *HaDeployConfigGen) SetZeroDBNodes() {
+func (c *HaDeployConfigGen) SetDefaultValuesForDBNodes() {
 	c.Config.InitOpenSearch().InitConfig()
 	c.Config.Opensearch.Config.InstanceCount = "0"
+	c.Config.Opensearch.Config.EnableCustomCerts = false
 
 	c.Config.InitPostgresql().InitConfig()
 	c.Config.Postgresql.Config.InstanceCount = "0"
+	c.Config.Postgresql.Config.EnableCustomCerts = false
 }
 
 func (c *HaDeployConfigGen) PromptExternalDb() (hasExternalDb bool, err error) {
