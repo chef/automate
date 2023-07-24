@@ -1423,3 +1423,16 @@ func TestPromptExternalOpenSearchRootCert(t *testing.T) {
 
 	assert.Equal(t, certFileContent, c.Config.External.Database.OpenSearch.OpensearchRootCert)
 }
+
+func TestSetDefaultValuesForDBNodesOnPrem(t *testing.T) {
+	defaultInstanceCount := "0"
+	c := HaDeployConfigGen{
+		Config: &config.HaDeployConfig{},
+	}
+	c.SetDefaultValuesForDBNodes()
+
+	assert.Equal(t, defaultInstanceCount, c.Config.Postgresql.Config.InstanceCount)
+	assert.Equal(t, defaultInstanceCount, c.Config.Opensearch.Config.InstanceCount)
+	assert.Equal(t, false, c.Config.Postgresql.Config.EnableCustomCerts)
+	assert.Equal(t, false, c.Config.Opensearch.Config.EnableCustomCerts)
+}
