@@ -127,7 +127,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
           - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
           - The master password value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
       - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.
-      - Use the [Hardware Requirement Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx) to get information on which instance type you will need for your load.
+      - Please refer to the [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#hardware-requirements) to get information on which instance type you will need for your load.
       - Set Instance Type for:
          - Chef Automate in `automate_server_instance_type`.
          - Chef Infra Server in `chef_server_instance_type`.

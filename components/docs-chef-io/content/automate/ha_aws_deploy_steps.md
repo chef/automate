@@ -117,7 +117,7 @@ Run the following steps on Bastion Host Machine:
         - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequisite. This value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
         - Set `setup_managed_services` as `false`, As these deployment steps are for Non-Managed Services AWS Deployment. Default value is `false`.
         - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
-        - Please use the [Hardware Requirement Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx) to get information for which instance type you will need for your load.
+        - Please refer to the [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#hardware-requirements) to get information for which instance type you will need for your load.
         - Set Instance Type for Chef Automate in `automate_server_instance_type`.
         - Set Instance Type for Chef Infra Server in `chef_server_instance_type`.
         - Set Instance Type for OpenSearch in `opensearch_server_instance_type`.
