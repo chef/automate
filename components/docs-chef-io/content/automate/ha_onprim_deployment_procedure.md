@@ -74,9 +74,6 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     #Download the latest Airgapped Bundle.
     #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
     curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
-
-    #Generate init config and then generate init config for existing infrastructure
-    chef-automate init-config-ha existing_infra
     "
     ```
 
@@ -92,36 +89,77 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     sudo -- sh -c "
     #Move the Chef Automate CLI to `/usr/bin`.
     cp -f chef-automate /usr/bin/chef-automate
-
-    #Generate init config and then generate init config for existing infrastructure
-    chef-automate init-config-ha existing_infra
     "
     ```
 
 1. Update Config with relevant data. Click [here](#sample-config) for sample config
+1. Generate config using below command and provide prompted details for config.
 
    ```bash
-   vi config.toml
+   chef-automate config gen config.toml
    ```
+   - Select `Chef Automate HA` as topology
+   - Select `On-Premise` as deployment type
+   - Choose `Deployment` as config type
+   - 
+   - Provide ssh user name for ssh login
+   - provide ssh group name of ssh user, default is same as name given for ssh user
+   - Provide ssh port number for ssh login, default port is 22
+   - Provide ssh login key file path, default path will be `/.ssh/id_rsa`
+   - In case you have custom certificates for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch then choose `yes` otherwise select `no`, if you have selected `yes` then you will be prompt for root-certs, public certificates and private certificates for services later in flow
+   - provide Automte FQDN example `automate.example.com`
+   - provide ssl root certificate path for Automate FQDN
+   - provide admin login password which you want to set for Automate dashboard,
+   - Provide total number of node you want to keep for Automate node.
+   - In case you havve custom certificates for Automate Node select `yes` other wise select `no`, 
+   - If you have select `yes` for above then you will be prompt for do you have different certificates for each node, choose accordingly `yes` or `no`
+     - Provide private key file path for Automate node
+     - Provide public key file path for Automate node
+   - Now it will ask for node IP Address for each Automate node
 
-   - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
-   - Add the IP address of each machine in the relevant service section; multiple IPs should be in double quotes (`"`) and separated with a comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
-      - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
-      - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be two machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
-      - Thus, the overall minimum number of machines needed will be 5.
-   - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
-   - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
-   - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
-   - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs.
-   - We support only private key authentication.
-   - Provide `backup_config` based on the type of backup storage you have. This field can be optionally left empty during deployment and can be patched at later point. Allowed values are `object_storage` and `file_system`.
-   - If `backup_config` is `object_storage`, make sure to fill values under `[object_storage.config]`. User must create the bucket themselves and make sure to assign correct [IAM policy for bucket access](/automate/backup/#aws-s3-permissions) if you are using AWS s3.
-   - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
-   - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
+   - provide Chef Server FQDN example `chef-server.example.com`
+   - provide ssl root certificate path for Chef Server FQDN
+   - Provide total number of node you want to keep for Chef Server node.
+   - In case you havve custom certificates for Automate Node select `yes` other wise select `no`, 
+   - If you have select `yes` for above then you will be prompt for do you have different certificates for each node, choose accordingly `yes` or `no`
+     - Provide private key file path for Chef Server node
+     - Provide public key file path for Chef Server node
+   - Now it will ask for node IP Address for each Chef Server node
+  
+   - If you want to use External Databases like AWS managed databases or any other customer managed external databases then select `yes` other wise `no`
+   - If you are using Chef managed databases then provide number of node you want to have for opensearch
+   - Now In case you have custom certificates for opensearch then select `yes`
+   - If you have different certificates for each opensearch node then select `no`
+   - provide root-ca certificates for opensearch
+   - provide admin certificates for opensearch
+   - provide admin key certificates for opensearch
+   - now provide private certificates, public certificates, and node ip for each node of opensearch on prompt
+
+
+   - If you are using Chef managed databases then provide number of node you want to have for Postgresql
+   - Now In case you have custom certificates for Postgresql then select `yes`
+   - If you have different certificates for each Postgresql node then select `no`
+   - provide root-ca certificates for Postgresql
+   - provide admin certificates for Postgresql
+   - provide admin key certificates for Postgresql
+   - now provide private certificates, public certificates, and node ip for each node of Postgresql on prompt
+   - 
+   - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
+   - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be two machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
+   - Thus, the overall minimum number of machines needed will be 5
+   - 
+   - 
+   - 
+   - select `yes` if you want to configure backup in config
+   - select backup type from Aws S3, Minio, Object Storage, File System and NFS.
+   - provide details for backup configurations like bucket name, access key, secrect key, url and region for s3, Minio or object storage, User must create the bucket themselves and make sure to assign correct [IAM policy for bucket access](/automate/backup/#aws-s3-permissions) if you are using AWS s3.
+   - in case of NFS of File System backup provide backup location path.
+   - Now all set, we can find generated config in config.toml file or file name provided for config gen command.
+   - 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
 
-1. Continue with the deployment after updating the config:
+2. Continue with the deployment after updating the config:
 
    ```bash
    #Run commands as sudo.
@@ -150,108 +188,51 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 {{< /note >}}
 
 ```config
-# This is a Chef Automate on-prem HA mode configuration file. You can run
-# 'chef-automate deploy' with this config file, and it should
-# successfully create a new Chef Automate HA instance with default settings.
-[architecture.existing_infra]
-ssh_user = ""
-# custom ssh group name, it will be defaulted to ssh_user
-# Eg.: ssh_group_name = "ubuntu"
-ssh_group_name = ""
-# private ssh key file path to access instances
-# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
-ssh_key_file = ""
-ssh_port = "22"
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-architecture = "existing_nodes"
-# DON'T MODIFY THE BELOW LINE (workspace_path)
-workspace_path = "/hab/a2_deploy_workspace"
-backup_mount = "/mnt/automate_backups"
+[architecture]
+  [architecture.existing_infra]
+    ssh_user = "ec2-user"
+    ssh_group_name = "ec2-user"
+    ssh_key_file = "/home/ec2-user/jay-sydney-key.pem"
+    ssh_port = "22"
+    secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+    secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+    architecture = "existing_nodes"
+    workspace_path = "/hab/a2_deploy_workspace"
+    backup_mount = "/mnt/automate_backups"
+    backup_config = "file_system"
 
-# Eg.: backup_config = "object_storage" or "file_system"
-backup_config = ""
-# If backup_config = "object_storage" fill out [object_storage.config] as well 
-[object_storage.config]
-bucket_name = ""
-access_key = ""
-secret_key = ""
-endpoint = ""
-# [Optional] Mention object_storage region if applicable
-# Eg: region = "us-west-1"
-region = ""
-# ============== EC2 Nodes Config ======================
-[automate.config]
-# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
-fqdn = ""
-instance_count = "2"
-config_file = "configs/automate.toml"
-# Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
+[automate]
+  [automate.config]
+    admin_password = "Progress@123"
+    fqdn = "jay-a2-server.eng.chefdemo.net"
+    config_file = "configs/automate.toml"
+    root_ca = "-----BEGIN CERTIFICATE-----
+    <Certificates>
+    -----END CERTIFICATE-----"
+    instance_count = "2"
 
-# Add Automate Load Balancer root-ca
-# root_ca = """root_ca_contents"""
+[chef_server]
+  [chef_server.config]
+    fqdn = "jay-cs-server.eng.chefdemo.net"
+    lb_root_ca = "-----BEGIN CERTIFICATE-----
+    <Certificates>
+    -----END CERTIFICATE-----"
+    instance_count = "2"
 
-# Add Automate node internal public and private keys
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
+[opensearch]
+  [opensearch.config]
+    instance_count = "3"
 
-# Or you can provide certificates at the node level using the below fields
-# [[automate.config.certs_by_ip]]
-# ip = "A.B.C.D"
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-[chef_server.config]
-instance_count = "2"
-# Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
+[postgresql]
+  [postgresql.config]
+    instance_count = "3"
 
-# Add Chef Server node internal public and private keys
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-
-# Or you can provide certificates at the node level using the below fields
-# [[chef_server.config.certs_by_ip]]
-# ip = "I.J.K.L"
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-[opensearch.config]
-instance_count = "3"
-# Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
-# Add OpenSearch root-ca and keys
-# root_ca = """root_ca_contents"""
-# admin_key = """admin_private_key_contents"""
-# admin_cert = """admin_public_key_contents"""
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-# Or you can provide certificates at the node level using the below fields
-# [[opensearch.config.certs_by_ip]]
-# ip = "A1.A2.A3.A4"
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-[postgresql.config]
-instance_count = "3"
-# Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
-# Add Postgresql root-ca and keys
-# root_ca = """root_ca_contents"""
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-# Or you can provide certificates at the node level using the below fields
-# [[postgresql.config.certs_by_ip]]
-# ip = "D1.D2.D3.D4"
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-[existing_infra.config]
-## === INPUT NEEDED ===
-# provide comma separate IP address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
-# No of IP address should be same as No of instance_count count mentioned above in
-# automate.config, chef_server.config, opensearch.config, and postgresql.config
-automate_private_ips = ["A.B.C.D","D.E.F.G"]
-chef_server_private_ips = ["I.J.K.L","M.N.O.P"]
-opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
-postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
+[existing_infra]
+  [existing_infra.config]
+    automate_private_ips = ["192.0.0.1", "192.0.0.2"]
+    chef_server_private_ips = ["192.0.0.3", "192.0.0.4"]
+    opensearch_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7"]
+    postgresql_private_ips = ["192.0.0.8", "192.0.0.9", "192.0.0.10"]
 ```
 
 #### Minimum changes to be made for On-Premise Deployment
