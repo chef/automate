@@ -645,7 +645,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	var scriptCommands string
 	command := getScriptCommands(param, scriptCommands)
 	if !param.concurrent {
-		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
+		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
 		if err != nil {
 			return err
 		}
