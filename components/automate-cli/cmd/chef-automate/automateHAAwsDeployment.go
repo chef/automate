@@ -115,9 +115,11 @@ func (a *awsDeployment) generateConfig(state string) error {
 		}
 		var arch = strings.Trim(string(archBytes), "\n")
 		a.config.Architecture.ConfigInitials.Architecture = arch
-		err = a.getAwsHAIp()
-		if err != nil {
-			return status.Wrap(err, status.IpAccessError, "Error in fetching node IPs in aws mode")
+		if state == DEPLOY {
+			err = a.getAwsHAIp()
+			if err != nil {
+				return status.Wrap(err, status.IpAccessError, "Error in fetching node IPs in aws mode")
+			}
 		}
 	}
 	errList := a.validateConfigFields()
