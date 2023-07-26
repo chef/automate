@@ -46,8 +46,8 @@ The operating system and the supported version for different nodes in AWS deploy
 
 | Operating Systems                    | Supported Version                                                                                                                                                                                                                                         |
 | :----------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Red Hat Enterprise Linux (64 Bit OS) | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
-| Ubuntu (64 Bit OS)                   | 16.04.x, 18.04.x, 20.04.x                                                                                                                                                                                                                                 |
+| Red Hat Enterprise Linux (64 Bit OS) | 7, 8, 9. For 9 ed25519 ssh key algorithms is required & 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8, 9. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
+| Ubuntu (64 Bit OS)                   | 16.04.x, 18.04.x, 20.04.x, 22.04.x. For 22.04.x ed25519 ssh key algorithms is required.                                                                                                                                                                                                                               |
 | Centos (64 Bit OS)                   | 7                                                                                                                                                                                                                                                         |
 | Amazon Linux 2 (64 Bit OS)           | 2 (kernel 5.10)                                                                                                                                                                                                                                           |
 | SUSE Linux Enterprise Server         | 12.5                                                                                                                                                                                                                                                      |
@@ -195,7 +195,7 @@ The AWS deployment specific pre-requisites are as follows:
 -   SSH Key Pair should be created in AWS, creating Bastion machine using that pair.
     Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 -   SSH users should use key-based SSH login without a passphrase.
--   The user's SSH key should be generated using algorithm `ed25519` without a passphrase.
+-   The user's SSH key should be generated using algorithm `ed25519` and `RSA(2048)` without a passphrase.
 -   This SSH user should be a local Linux user on the Bastion machine.
 -   This SSH user should have sudo privileges on the Bastion machine.
 -   Use the SSH user to access all machines using the same SSH private key.
