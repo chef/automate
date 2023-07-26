@@ -869,12 +869,13 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if len(a2Fqdn) > 0 {
 		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
 	}
-	if a2PrivKey := getPrivateKeyFromFE(a2ConfigMap); len(a2PrivKey) > 0 {
+	if a2PrivKey, a2PubKey := getPrivateAndPublicKeyFromFE(a2ConfigMap); len(a2PrivKey) > 0 && len(a2PubKey) > 0 {
 		sharedConfigToml.Automate.Config.PrivateKey = a2PrivKey
-	}
-	if a2PubKey := getPublicKeyFromFE(a2ConfigMap); len(a2PubKey) > 0 {
 		sharedConfigToml.Automate.Config.PublicKey = a2PubKey
 	}
+	// if a2PubKey := getPublicKeyFromFE(a2ConfigMap); len(a2PubKey) > 0 {
+	// 	sharedConfigToml.Automate.Config.PublicKey = a2PubKey
+	// }
 	sharedConfigToml.Automate.Config.EnableCustomCerts = true
 
 	// Build CertsByIP for ChefServer
@@ -894,12 +895,13 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
 		sharedConfigToml.Automate.Config.RootCA = csRootCA
 	}
-	if csPrivKey := getPrivateKeyFromFE(csConfigMap); len(csPrivKey) > 0 {
+	if csPrivKey, csPubKey := getPrivateAndPublicKeyFromFE(csConfigMap); len(csPrivKey) > 0 && len(csPubKey) > 0 {
 		sharedConfigToml.ChefServer.Config.PrivateKey = csPrivKey
-	}
-	if csPubKey := getPublicKeyFromFE(csConfigMap); len(csPubKey) > 0 {
 		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
 	}
+	// if csPubKey := getPublicKeyFromFE(csConfigMap); len(csPubKey) > 0 {
+	// 	sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
+	// }
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 
 	objStorageConfig := getOpenSearchObjectStorageConfig(a2ConfigMap)
@@ -1205,16 +1207,16 @@ func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
-func getPrivateKeyFromFE(config map[string]*dc.AutomateConfig) string {
+func getPrivateAndPublicKeyFromFE(config map[string]*dc.AutomateConfig) (string, string) {
 	if config == nil {
-		return ""
+		return "", ""
 	}
 	for _, ele := range config {
 		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Key != "" {
-			return ele.GetGlobal().V1.FrontendTls[0].Key
+			return ele.GetGlobal().V1.FrontendTls[0].Key, ele.GetGlobal().V1.FrontendTls[0].Cert
 		}
 	}
-	return ""
+	return "", ""
 }
 
 func getPublicKeyFromFE(config map[string]*dc.AutomateConfig) string {
