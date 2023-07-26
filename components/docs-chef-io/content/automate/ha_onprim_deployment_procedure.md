@@ -118,7 +118,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Now it will ask for node IP Address for each Automate node
 
 
-   - provide Chef Server FQDN example `chef-server.example.com`
+   - provide Chef Server FQDN example `chefinfraserver.example.com`
    - provide ssl root certificate path for Chef Server FQDN
    - Provide total number of node you want to keep for Chef Server node.
    - In case you havve custom certificates for Automate Node select `yes` other wise select `no`, 
@@ -136,7 +136,6 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - provide admin key certificates for opensearch
    - now provide private certificates, public certificates, and node ip for each node of opensearch on prompt
 
-
    - If you are using Chef managed databases then provide number of node you want to have for Postgresql
    - Now In case you have custom certificates for Postgresql then select `yes`
    - If you have different certificates for each Postgresql node then select `no`
@@ -144,19 +143,19 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - provide admin certificates for Postgresql
    - provide admin key certificates for Postgresql
    - now provide private certificates, public certificates, and node ip for each node of Postgresql on prompt
-   - 
+  
+
    - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
    - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be two machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
    - Thus, the overall minimum number of machines needed will be 5
-   - 
-   - 
-   - 
+   
+ 
    - select `yes` if you want to configure backup in config
    - select backup type from Aws S3, Minio, Object Storage, File System and NFS.
    - provide details for backup configurations like bucket name, access key, secrect key, url and region for s3, Minio or object storage, User must create the bucket themselves and make sure to assign correct [IAM policy for bucket access](/automate/backup/#aws-s3-permissions) if you are using AWS s3.
    - in case of NFS of File System backup provide backup location path.
    - Now all set, we can find generated config in config.toml file or file name provided for config gen command.
-   - 
+  
    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
 
 2. Continue with the deployment after updating the config:
@@ -204,7 +203,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 [automate]
   [automate.config]
     admin_password = "Progress@123"
-    fqdn = "jay-a2-server.eng.chefdemo.net"
+    fqdn = "automate.example.com"
     config_file = "configs/automate.toml"
     root_ca = "-----BEGIN CERTIFICATE-----
     <Certificates>
@@ -213,7 +212,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 [chef_server]
   [chef_server.config]
-    fqdn = "jay-cs-server.eng.chefdemo.net"
+    fqdn = "chefinfraserver.example.com"
     lb_root_ca = "-----BEGIN CERTIFICATE-----
     <Certificates>
     -----END CERTIFICATE-----"
@@ -235,19 +234,6 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     postgresql_private_ips = ["192.0.0.8", "192.0.0.9", "192.0.0.10"]
 ```
 
-#### Minimum changes to be made for On-Premise Deployment
-
-- Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
-- Give the `ssh_key_file` path; this key should have access to all the Machines or VMs. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
-- Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VMs. E.g.: `chefautomate.example.com`
-- `automate_private_ips` Eg: ["192.0.0.1"]
-- `chef_server_private_ips` Eg: ["192.0.1.1"]
-- `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
-- `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
-- Optional - In case of adding a backup configuration, make sure to fill in the following format in the sample.
-  - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - in are `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`.
-  - For **File System** - `backup_config = "file_system"`.
-
 ## On-Premise Setup with AWS Managed Services
 
 ### Prerequisites
@@ -265,17 +251,42 @@ See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion
 Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for sample config of AWS Managed Services.
 
 - Set AWS Config Details:
+  - follow above steps to generate rest of configs, for AWS managed services `config gen` command will ask like 
+    ```bash
+     Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
+      ▸ yes
+        no
+    ```
+    select yes and choose which `AWS Managed` as type
+    ```bash
+    Type of External DB you will use:
+    ▸ AWS Managed
+      Self Managed
+    ```
+  -  next `config gen` will ask for aws database details like `opensearch domain name`, `opensearch domain url`, `opensearch user name`, `opensearch user passwords`, provide above details as per aws managed database you have configured.
 
-  - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
-  - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
-  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps. 
-    - The master username value which you used while creating AWS RDS Postgresql can be used for both `superuser_username` and `dbuser_username`
-    - The master password value which you used while creating AWS RDS Postgresql can be used for both `superuser_password` and `dbuser_password`
-  - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
-  - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
-  - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
-  - Leave postgresql_root_cert and opensearch_root_cert blank in case of On-Premise with AWS Managed Services.
-  - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`.  [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
+  -  Now it will ask do you want use default certificates of AWS, in case you have different certificates then default then select `no` and provide you own certificates, otherwise select `yes`
+    ```bash 
+     Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL:
+     ▸ yes
+       no
+    ```
+   - now provide `aws opensearch snapshot arn`, `aws opensearch snapshot user accesskey`, `aws opensearch snapshot secrect key`, this values are required for to take backup from aws opensearch, please refer (/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
+   - We need to provide details of AWS managed postgresql (RDS), now it will ask for `RDS url and port` format will be `<url>:<port>`, `RDS postgresql super username`, `RDS postgresql super user password`, `RDS postgresql database username`, `RDS postgresql database user password`
+   - Aws database have default ssl certificates, select `yes` if you want to use default certificates, If you have other then default certificates then select `no` and provide your own certificates.
+   ```bash
+    Do you want to use Default AWS Cert to connect with AWS Managed RDS PostgreSQL URL:
+    ▸ yes
+      no
+   ```
+  - If you want to  conigure backup then select `yes` for backup configuration promot
+   ```bash
+    Backup need to be configured during deployment:
+    ▸ yes
+      no
+   ```
+   for AWS managed database deployment backup options are only S3 as of now, please provide the detials of S3 like `bucket name`, `access key`, `secrect key`, `region`
+
 
 Continue with the deployment after updating the config:
 
@@ -296,46 +307,74 @@ Continue with the deployment after updating the config:
 ### Sample config to setup On-Premise Deployment with AWS Managed Services
 
 ```config
-# ============== External Database Services ======================
-## === INPUT NEEDED ===
-# In case you are trying to deploy with AWS Managed Services, set the type as "aws"
-# If you are trying an externally managed database set type as "self-managed"
-[external.database]
-# eg type = "aws" or "self-managed"
-type = "aws"
-[external.database.postgre_sql]
-# eg: instance_url = "managed-rds-db.cww4poze5gkx.ap-northeast-1.rds.amazonaws.com:5432"
-instance_url = ""
-# eg: username = "postgres"
-superuser_username = ""
-# eg: password = "Progress123"
-superuser_password = ""
-# eg: dbuser_username = "postgres"
-dbuser_username = ""
-# eg: dbuser_password = "Progress123"
-dbuser_password = ""
-# In the case of AWS-managed RDS, leave it blank
-# eg: postgresql_root_cert = "<cert_content>"
-postgresql_root_cert = ""
-[external.database.open_search]
-# eg: managed_opensearch_domain_name = "managed-services-os"
-opensearch_domain_name = ""
-# eg: opensearch_domain_url = "search-managed-services-os-eckom3msrwqlmjlgbdu.us-east-1.es.amazonaws.com"
-opensearch_domain_url = ""
-# eg: opensearch_username = "admin"
-opensearch_username = ""
-# eg: opensearch_user_password = "Progress@123"
-opensearch_user_password = ""
-# In the case of AWS-managed OpenSearch, leave it blanks
-# eg: opensearch_root_cert = "<cert_content>"
-opensearch_root_cert = ""
-[external.database.open_search.aws]
-# eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
-aws_os_snapshot_role_arn = ""
-# eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
-os_snapshot_user_access_key_id = ""
-# eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
-os_snapshot_user_access_key_secret = ""
+[architecture]
+  [architecture.existing_infra]
+    ssh_user = "ec2-user"
+    ssh_group_name = "ec2-user"
+    ssh_key_file = "/home/ec2-user/jay-sydney-key.pem"
+    ssh_port = "22"
+    secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+    secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+    architecture = "existing_nodes"
+    workspace_path = "/hab/a2_deploy_workspace"
+    backup_mount = "/mnt/automate_backups"
+    backup_config = "object_storage"
+
+[object_storage]
+  [object_storage.config]
+    bucket_name = "fdjlfdsklfds"
+    access_key = "CCAI..............."
+    secret_key = "JVS................"
+    endpoint = "https://s3.amazonaws.com"
+    region = "us-east-2"
+
+[automate]
+  [automate.config]
+    admin_password = "adminpassword"
+    fqdn = "automate.example.com"
+    config_file = "configs/automate.toml"
+    root_ca = "-----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+
+[chef_server]
+  [chef_server.config]
+    fqdn = "chefinfraserver.example.com"
+    lb_root_ca = "-----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+
+[opensearch]
+  [opensearch.config]
+    instance_count = "0"
+
+[postgresql]
+  [postgresql.config]
+    instance_count = "0"
+
+[existing_infra]
+  [existing_infra.config]
+    automate_private_ips = ["192.0.0.1", "192.0.0.2"]
+    chef_server_private_ips = ["192.0.0.3", "192.0.0.4"]
+
+[external]
+  [external.database]
+    type = "aws"
+    [external.database.postgre_sql]
+      instance_url = "pg.aws.com:5432"
+      superuser_username = "masteruser"
+      superuser_password = "masterpassword"
+      dbuser_username = "dbusername"
+      dbuser_password = "dbpassword"
+    [external.database.open_search]
+      opensearch_domain_name = "opensearchdomain"
+      opensearch_domain_url = "os.aws.com"
+      opensearch_username = "osuser"
+      opensearch_user_password = "opensearchpassowrd"
+      [external.database.open_search.aws]
+        aws_os_snapshot_role_arn = "......"
+        os_snapshot_user_access_key_id = "......"
+        os_snapshot_user_access_key_secret = "......"
 ```
 
 ## On-Premise Setup with Self-Managed Services
@@ -350,17 +389,31 @@ See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion
 Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
 
 - Set Self-Managed Config Details:
-  - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
-  - Set `type` as `self-managed`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
-  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for your Self Managed RDS.
-    - You can use the same values for both `superuser_username` and `dbuser_username` too
-    - You can use the same values for both `superuser_password` and `dbuser_password` too
-  - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
-  - Provide the Root ca value of Postgresql `postgresql_root_cert`.
-  - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for your Self Managed OpenSearch.
-  - Set `opensearch_domain_url` as the URL with Port No. For example: `"10.1.2.234:9200"`.
-  - Provide the Root ca value of OpenSearch `opensearch_root_cert`.
-  - Leave the [external.database.open_search.aws] config as blank as it is specific for AWS Managed Services.
+  - follow above steps to generate rest of configs, for AWS managed services `config gen` command will ask like 
+    ```bash
+     Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
+      ▸ yes
+        no
+    ```
+    select yes and choose which `AWS Managed` as type
+    ```bash
+    Type of External DB you will use:
+      AWS Managed
+    ▸ Self Managed
+    ```
+   -  next `config gen` will ask for customer database details like `opensearch domain name`, `opensearch domain url:port`, `opensearch user name`, `opensearch user passwords`, provide above details as per aws managed database you have configured.
+
+   - provide ssl root certificates path for opensearch
+   - We need to provide details of customer postgresql, now it will ask for datbase `url and port` format will be `<url>:<port>`, `postgresql super username`, `postgresql super user password`, `postgresql database username`, `postgresql database user password`
+   - provide ssl root certificates path for opensearch
+   - If you want to  conigure backup then select `yes` for backup configuration promot
+   ```bash
+    Backup need to be configured during deployment:
+    ▸ yes
+      no
+   ```
+   for customer managed database deployment backup options are S3, object storage and minio as of now, please provide the detials of like `bucket name`, `access key`, `secrect key`, `region`, `endpoint` etc.
+
 
 Continue with the deployment after updating the config:
 
@@ -381,46 +434,73 @@ Continue with the deployment after updating the config:
 ### Sample config to setup On-Premise Deployment with Self Managed Services
 
 ```config
-# ============== External Database Services ======================
-## === INPUT NEEDED ===
-# In case you are trying to deploy with AWS Managed Services, set the type as "aws"
-# If you are trying an externally managed database set type as "self-managed"
-[external.database]
-# eg type = "aws" or "self-managed"
-type = "self-managed"
-[external.database.postgre_sql]
-# eg: instance_url = "A.B.C.D:7432"
-instance_url = ""
-# eg: username = "postgres"
-superuser_username = ""
-# eg: password = "Progress123"
-superuser_password = ""
-# eg: dbuser_username = "postgres"
-dbuser_username = ""
-# eg: dbuser_password = "Progress123"
-dbuser_password = ""
-# In the case of AWS-managed RDS, leave it blank
-# eg: postgresql_root_cert = "<cert_content>"
-postgresql_root_cert = ""
-[external.database.open_search]
-# eg: managed_opensearch_domain_name = "chefnode"
-opensearch_domain_name = ""
-# eg: opensearch_domain_url = "A.B.C.D:9200"
-opensearch_domain_url = ""
-# eg: opensearch_username = "admin"
-opensearch_username = ""
-# eg: opensearch_user_password = "Progress@123"
-opensearch_user_password = ""
-# In the case of AWS-managed OpenSearch, leave it blanks
-# eg: opensearch_root_cert = "<cert_content>"
-opensearch_root_cert = ""
-[external.database.open_search.aws]
-# eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
-aws_os_snapshot_role_arn = ""
-# eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
-os_snapshot_user_access_key_id = ""
-# eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
-os_snapshot_user_access_key_secret = ""
+[architecture]
+  [architecture.existing_infra]
+    ssh_user = "ec2-user"
+    ssh_group_name = "ec2-user"
+    ssh_key_file = "/home/ec2-user/jay-sydney-key.pem"
+    ssh_port = "22"
+    secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+    secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+    architecture = "existing_nodes"
+    workspace_path = "/hab/a2_deploy_workspace"
+    backup_mount = "/mnt/automate_backups"
+    backup_config = "object_storage"
+
+[object_storage]
+  [object_storage.config]
+    bucket_name = "example-bucket"
+    access_key = "JVS......."
+    secret_key = "VIK........"
+    endpoint = "https://objectstorage.example.com"
+
+[automate]
+  [automate.config]
+    admin_password = "adminpassword"
+    fqdn = "automate.example.com"
+    config_file = "configs/automate.toml"
+    root_ca = "-----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+
+[chef_server]
+  [chef_server.config]
+    fqdn = "chefinfraserver.example.com"
+    lb_root_ca = "-----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+
+[opensearch]
+  [opensearch.config]
+    instance_count = "0"
+
+[postgresql]
+  [postgresql.config]
+    instance_count = "0"
+
+[existing_infra]
+  [existing_infra.config]
+    automate_private_ips = ["192.0.0.1", "192.0.0.2"]
+    chef_server_private_ips = ["192.0.0.3", "192.0.0.4"]
+
+[external]
+  [external.database]
+    type = "self-managed"
+    [external.database.postgre_sql]
+      instance_url = "pg.example.com:5432"
+      superuser_username = "superusername"
+      superuser_password = "superuserpassowrd"
+      dbuser_username = "databaseusername"
+      dbuser_password = "databaseuserpassword"
+      postgresql_root_cert = "-----BEGIN CERTIFICATE-----
+      -----END CERTIFICATE-----"
+    [external.database.open_search]
+      opensearch_domain_name = "opensearch-domain"
+      opensearch_domain_url = "opensearch.example.com:9200"
+      opensearch_username = "opensearchusername"
+      opensearch_user_password = "opensearchuserpassword;"
+      opensearch_root_cert = "-----BEGIN CERTIFICATE-----
+      -----END CERTIFICATE-----"
 ```
 
 ## Add More Nodes to the OnPrem Deployment
