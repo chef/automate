@@ -92,7 +92,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     "
     ```
 
-2. Generate config using below command and provide prompted details for config.
+2. Generate config using below command and provide .
 
    ```bash
    chef-automate config gen config.toml
@@ -106,7 +106,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Provide ssh port number for ssh login, default port is 22
    - Provide ssh login key file path, default path will be `/.ssh/id_rsa`
    - In case you have custom certificates for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch then choose `yes` otherwise select `no`, if you have selected `yes` then you will be prompt for root-certs, public certificates and private certificates for services later in flow
-   - provide Automte FQDN example `automate.example.com`
+   - provide Automte FQDN example `chefautomate.example.com`
    - provide ssl root certificate path for Automate FQDN
    - provide admin login password which you want to set for Automate dashboard,
    - Provide total number of node you want to keep for Automate node.
@@ -202,7 +202,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 [automate]
   [automate.config]
     admin_password = "Progress@123"
-    fqdn = "automate.example.com"
+    fqdn = "chefautomate.example.com"
     config_file = "configs/automate.toml"
     root_ca = "-----BEGIN CERTIFICATE-----
     <Certificates>
@@ -330,7 +330,7 @@ Continue with the deployment after updating the config:
 [automate]
   [automate.config]
     admin_password = "adminpassword"
-    fqdn = "automate.example.com"
+    fqdn = "chefautomate.example.com"
     config_file = "configs/automate.toml"
     root_ca = "-----BEGIN CERTIFICATE-----
     -----END CERTIFICATE-----"
@@ -456,7 +456,7 @@ Continue with the deployment after updating the config:
 [automate]
   [automate.config]
     admin_password = "adminpassword"
-    fqdn = "automate.example.com"
+    fqdn = "chefautomate.example.com"
     config_file = "configs/automate.toml"
     root_ca = "-----BEGIN CERTIFICATE-----
     -----END CERTIFICATE-----"
