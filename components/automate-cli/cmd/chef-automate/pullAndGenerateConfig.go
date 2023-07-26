@@ -873,9 +873,6 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		sharedConfigToml.Automate.Config.PrivateKey = a2PrivKey
 		sharedConfigToml.Automate.Config.PublicKey = a2PubKey
 	}
-	// if a2PubKey := getPublicKeyFromFE(a2ConfigMap); len(a2PubKey) > 0 {
-	// 	sharedConfigToml.Automate.Config.PublicKey = a2PubKey
-	// }
 	sharedConfigToml.Automate.Config.EnableCustomCerts = true
 
 	// Build CertsByIP for ChefServer
@@ -899,9 +896,6 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		sharedConfigToml.ChefServer.Config.PrivateKey = csPrivKey
 		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
 	}
-	// if csPubKey := getPublicKeyFromFE(csConfigMap); len(csPubKey) > 0 {
-	// 	sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
-	// }
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 
 	objStorageConfig := getOpenSearchObjectStorageConfig(a2ConfigMap)
@@ -1212,23 +1206,11 @@ func getPrivateAndPublicKeyFromFE(config map[string]*dc.AutomateConfig) (string,
 		return "", ""
 	}
 	for _, ele := range config {
-		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Key != "" {
+		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Key != "" && ele.Global.V1.FrontendTls[0].Cert != "" {
 			return ele.GetGlobal().V1.FrontendTls[0].Key, ele.GetGlobal().V1.FrontendTls[0].Cert
 		}
 	}
 	return "", ""
-}
-
-func getPublicKeyFromFE(config map[string]*dc.AutomateConfig) string {
-	if config == nil {
-		return ""
-	}
-	for _, ele := range config {
-		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Cert != "" {
-			return ele.GetGlobal().V1.FrontendTls[0].Cert
-		}
-	}
-	return ""
 }
 
 func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {

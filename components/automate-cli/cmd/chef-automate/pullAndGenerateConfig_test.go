@@ -251,54 +251,34 @@ func TestGetOSORPGRootCAEmpty(t *testing.T) {
 	assert.Equal(t, "", out)
 }
 
-func Test_getPrivateKeyFromFE(t *testing.T) {
+func Test_getPrivateAndPublicKeyFromFE(t *testing.T) {
 	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
 		{
-			Key: PrivateKeyContents,
-		},
-	}
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, PrivateKeyContents, output)
-}
-
-func Test_getPrivateKeyFromFEEmpty(t *testing.T) {
-	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
-		{
-			Key: "",
-		},
-	}
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, "", output)
-}
-
-func Test_getPrivateKeyFromFEEmptyMap(t *testing.T) {
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{})
-	assert.Equal(t, "", output)
-}
-
-func Test_getPublicKeyFromFE(t *testing.T) {
-	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
-		{
+			Key:  PrivateKeyContents,
 			Cert: PublicKeyContents,
 		},
 	}
-	output := getPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, PublicKeyContents, output)
+	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
+	assert.Equal(t, PrivateKeyContents, privateKey)
+	assert.Equal(t, PublicKeyContents, publicKey)
 }
 
-func Test_getPublicKeyFromFEEmpty(t *testing.T) {
+func Test_getPrivateAndPublicKeyFromFEEmpty(t *testing.T) {
 	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
 		{
+			Key:  "",
 			Cert: "",
 		},
 	}
-	output := getPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, "", output)
+	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
+	assert.Equal(t, "", privateKey)
+	assert.Equal(t, "", publicKey)
 }
 
-func Test_getPublicKeyKeyFromFEEmptyMap(t *testing.T) {
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{})
-	assert.Equal(t, "", output)
+func Test_getPrivateAndPublicKeyFromFEEmptyMap(t *testing.T) {
+	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{})
+	assert.Equal(t, "", privateKey)
+	assert.Equal(t, "", publicKey)
 }
 
 func Test_getPrivateKeyAndPublicKeyFromBE(t *testing.T) {
