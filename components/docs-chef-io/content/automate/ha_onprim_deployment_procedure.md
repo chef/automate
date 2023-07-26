@@ -190,7 +190,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "/home/ec2-user/jay-sydney-key.pem"
+    ssh_key_file = "/home/ec2-user/my-key.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -371,9 +371,9 @@ Continue with the deployment after updating the config:
       opensearch_username = "osuser"
       opensearch_user_password = "opensearchpassowrd"
       [external.database.open_search.aws]
-        aws_os_snapshot_role_arn = "......"
-        os_snapshot_user_access_key_id = "......"
-        os_snapshot_user_access_key_secret = "......"
+        aws_os_snapshot_role_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
+        os_snapshot_user_access_key_id = "CCAI..............."
+        os_snapshot_user_access_key_secret = "JVS................"
 ```
 
 ## On-Premise Setup with Self-Managed Services
