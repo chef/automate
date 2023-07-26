@@ -92,8 +92,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     "
     ```
 
-1. Update Config with relevant data. Click [here](#sample-config) for sample config
-1. Generate config using below command and provide prompted details for config.
+2. Generate config using below command and provide prompted details for config.
 
    ```bash
    chef-automate config gen config.toml
