@@ -254,13 +254,13 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
   - follow above steps to generate rest of configs, for AWS managed services `config gen` command will ask like 
     ```bash
      Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
-      ▸ yes
+      > yes
         no
     ```
     select yes and choose which `AWS Managed` as type
     ```bash
     Type of External DB you will use:
-    ▸ AWS Managed
+    > AWS Managed
       Self Managed
     ```
   -  next `config gen` will ask for aws database details like `opensearch domain name`, `opensearch domain url`, `opensearch user name`, `opensearch user passwords`, provide above details as per aws managed database you have configured.
@@ -268,23 +268,23 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
   -  Now it will ask do you want use default certificates of AWS, in case you have different certificates then default then select `no` and provide you own certificates, otherwise select `yes`
     ```bash 
      Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL:
-     ▸ yes
+     > yes
        no
     ```
    - now provide `aws opensearch snapshot arn`, `aws opensearch snapshot user accesskey`, `aws opensearch snapshot secrect key`, this values are required for to take backup from aws opensearch, please refer (/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
    - We need to provide details of AWS managed postgresql (RDS), now it will ask for `RDS url and port` format will be `<url>:<port>`, `RDS postgresql super username`, `RDS postgresql super user password`, `RDS postgresql database username`, `RDS postgresql database user password`
    - Aws database have default ssl certificates, select `yes` if you want to use default certificates, If you have other then default certificates then select `no` and provide your own certificates.
-   ```bash
-    Do you want to use Default AWS Cert to connect with AWS Managed RDS PostgreSQL URL:
-    ▸ yes
-      no
-   ```
+    ```bash
+      Do you want to use Default AWS Cert to connect with AWS Managed RDS PostgreSQL URL:
+      > yes
+        no
+    ```
   - If you want to  conigure backup then select `yes` for backup configuration promot
-   ```bash
-    Backup need to be configured during deployment:
-    ▸ yes
-      no
-   ```
+    ```bash
+      Backup need to be configured during deployment:
+      > yes
+        no
+    ```
    for AWS managed database deployment backup options are only S3 as of now, please provide the detials of S3 like `bucket name`, `access key`, `secrect key`, `region`
 
 
@@ -392,14 +392,14 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
   - follow above steps to generate rest of configs, for AWS managed services `config gen` command will ask like 
     ```bash
      Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
-      ▸ yes
+      > yes
         no
     ```
     select yes and choose which `AWS Managed` as type
     ```bash
     Type of External DB you will use:
       AWS Managed
-    ▸ Self Managed
+    > Self Managed
     ```
    -  next `config gen` will ask for customer database details like `opensearch domain name`, `opensearch domain url:port`, `opensearch user name`, `opensearch user passwords`, provide above details as per aws managed database you have configured.
 
@@ -407,11 +407,11 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
    - We need to provide details of customer postgresql, now it will ask for datbase `url and port` format will be `<url>:<port>`, `postgresql super username`, `postgresql super user password`, `postgresql database username`, `postgresql database user password`
    - provide ssl root certificates path for opensearch
    - If you want to  conigure backup then select `yes` for backup configuration promot
-   ```bash
-    Backup need to be configured during deployment:
-    ▸ yes
-      no
-   ```
+    ```bash
+      Backup need to be configured during deployment:
+      > yes
+        no
+    ```
    for customer managed database deployment backup options are S3, object storage and minio as of now, please provide the detials of like `bucket name`, `access key`, `secrect key`, `region`, `endpoint` etc.
 
 
