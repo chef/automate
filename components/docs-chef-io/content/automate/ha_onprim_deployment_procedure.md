@@ -114,6 +114,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - If you have select `yes` for above then you will be prompt for do you have different certificates for each node, choose accordingly `yes` or `no`
      - Provide private key file path for Automate node
      - Provide public key file path for Automate node
+     - Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
    - Now it will ask for node IP Address for each Automate node
 
 

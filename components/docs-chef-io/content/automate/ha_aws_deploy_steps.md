@@ -106,7 +106,7 @@ Run the following steps on Bastion Host Machine:
      > AWS
     ```
     - provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
-    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates.
+    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
     ```bash
         Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
         > no

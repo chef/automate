@@ -17,64 +17,65 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Custom certificates can be added during deployment for different services.
+Custom certificates can be added during deployment for different services, to provide custom certificates using `config gen` command follow below steps.
 
 ## Setting common certificates for all the nodes of a service
 
-The following services support custom certificates:
+During config generation process, following pompts will ask for custom certificates provide relavent certificate paths for the services.
 
 ### Common custom certificate for Chef Automate
 
-To add a common custom certificate for all the nodes of the Chef Automate service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
+To add a common custom certificates for all the node of Chef Automate servies, select 
 
-```toml
-[automate.config]
-enable_custom_certs = true
-
-# Add Automate Load Balancer root-ca
-root_ca = """ADD_YOUR_ROOT_CA_HERE"""
-
-# Add Automate node internal public and private keys
-private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
+```bash
+  Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
+    no
+  ▸ yes
 ```
-
+```bash
+  Do you have custom certs for Automate Nodes:
+  ▸ yes
+    no
+```
+```bash
+Provide Private Key file path for Automate Service: 
+Provide Public Key file path for Automate Service:
+```
 ### Common custom certificate for Chef Server
-
-To add a common custom certificate for all the nodes of the Chef Server service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
-
-```toml
-[chef_server.config]
-enable_custom_certs = true
-private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
+```bash
+ Do you have custom certs for Chef Infra Server Nodes:
+  ▸ yes
+    no
 ```
-
-### Common custom certificate for OpenSearch
-
-To add a common custom certificate for all the nodes of the OpenSearch service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
-
-```toml
-[opensearch.config]
-enable_custom_certs = true
-root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
-private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
-admin_key = """ADD_YOUR_ADMIN_KEY_HERE"""
-admin_cert = """ADD_YOUR_ADMIN_CERT_HERE"""
+```bash
+Provide Private Key file path for Chef Infra Server Service:
+Provide Public Cert file path for Chef Infra Server Service:
 ```
-
 ### Common custom certificate for PostgreSQL
-
-To add a common custom certificate for all the nodes of the PostgreSQL service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
-
-```toml
-[postgresql.config]
-enable_custom_certs = true
-root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
-private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
+```bash
+ Do you have custom certs for Postgresql Services Nodes:
+  ▸ yes
+    no
 ```
+```bash
+Provide Private Key file path for Postgresql Service:
+Provide Public Cert file path for Postgresql Service:
+Provide Root CA file path for Postgresql Service:
+```
+### Common custom certificate for OpenSearch
+```bash
+  Do you have custom certs for OpenSearch Nodes:
+  ▸ yes
+    no
+```
+```bash
+Provide Private Key file path for OpenSearch Service:
+Provide Public Cert file path for OpenSearch Service:
+Provide Root CA file path for OpenSearch Service:
+Provide Admin Cert file path for OpenSearch Service:
+Provide Admin Key file path for OpenSearch Service:
+```
+
 
 ## Setting unique certificates for different nodes of a service
 
@@ -89,86 +90,99 @@ For on-prem installations, the following services support unique custom certific
 
 {{< /note >}}
 
-### Unique custom certificates for Chef Automate
 
-To add unique custom certificates for 2 the nodes of the Chef Automate service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
+To add unique custom certificates for servies using `config gen` command, follow below steps during config genration process.
 
-```toml
-[automate.config]
-enable_custom_certs = true
-
-# Add Automate Load Balancer root-ca
-root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
-
-[[automate.config.certs_by_ip]]
-ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-[[automate.config.certs_by_ip]]
-ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
+```bash 
+  Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
+    no
+  ▸ yes
+```
+### Unique custom certificates for Automate
+To add unique custom certificates for 2 the nodes of the Chef Automate service
+```bash
+  Do you have custom certs for Automate Nodes:
+  ▸ yes
+    no
+  Do each Automate Node have same Certs:
+    yes
+  ▸ no
+  
+  Node IP address: <Node 1 Ip Address>
+  Provide Private Key file path for Automate Node on IP: <Node 1 IP>:
+  Provide Public Cert file path for Automate Node on IP: <Node 1 IP>:
+  
+  Node IP address: <Node 2 Ip Address>
+  Provide Private Key file path for Automate Node on IP: <Node 2 IP>:
+  Provide Public Key file path for Automate Node on IP: <Node 2 IP>:
 ```
 
-### Unique custom certificates for Chef Server
-
-To add unique custom certificates for 2 the nodes of the Chef Server service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
-
-```toml
-[chef_server.config]
-enable_custom_certs = true
-[[chef_server.config.certs_by_ip]]
-ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-[[chef_server.config.certs_by_ip]]
-ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
+### Unique custom certificates for Chef Infra Server
+To add unique custom certificates for 2 the nodes of the Chef Infra Server service
+```bash
+  Do you have custom certs for Chef Infra Server Nodes:
+  ▸ yes
+    no
+  Do each Chef Infra Server Node have same Certs:
+    yes
+  ▸ no
+  
+  Node IP address: <Node 1 Ip Address>
+  Provide Private Key file path for Chef Infra Server Node on IP: <Node 1 IP>:
+  Provide Public Key file path for Chef Infra Server Node on IP: <Node 1 IP>:
+  
+  Node IP address: <Node 2 Ip Address>
+  Provide Private Key file path for Chef Infra Server Node on IP: <Node 2 IP>:
+  Provide Public Key file path for Chef Infra Server Node on IP: <Node 2 IP>:
 ```
 
-### Unique custom certificates for OpenSearch
-
-To add unique custom certificates for 3 of the nodes of the OpenSearch service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
-
-```toml
-[opensearch.config]
-enable_custom_certs = true
-root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
-admin_key = """ADD_YOUR_ADMIN_KEY_HERE"""
-admin_cert = """ADD_YOUR_ADMIN_CERT_HERE"""
-[[opensearch.config.certs_by_ip]]
-ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-[[opensearch.config.certs_by_ip]]
-ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
-[[opensearch.config.certs_by_ip]]
-ip = "ADD_YOUR_THIRD_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_THIRD_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_THIRD_IP_ADDRESS_HERE"""
+### Unique custom certificates for Opensearch
+To add unique custom certificates for 2 the nodes of the Opensearch service
+```bash
+  Do you have custom certs for OpenSearch Nodes:
+  ▸ yes
+    no
+  Do each OpenSearch Node have same Certs:
+    yes
+  ▸ no
+  
+  Provide Root CA file path for OpenSearch Service:
+  Provide Admin Cert file path for OpenSearch Service:
+  Provide Admin Key file path for OpenSearch Service:
+  
+  Node IP address: <Node 1 Ip Address>
+  Provide Private Key file path for OpenSearch Node on IP: <Node 1 IP>:
+  Provide Public Key file path for OpenSearch Node on IP: <Node 1 IP>:
+  
+  Node IP address: <Node 2 Ip Address>
+  Provide Private Key file path for OpenSearch Node on IP: <Node 2 IP>:
+  Provide Public Key file path for OpenSearch Node on IP: <Node 2 IP>:
+  
+  Node IP address: <Node 3 Ip Address>
+  Provide Private Key file path for OpenSearch Node on IP: <Node 3 IP>:
+  Provide Public Key file path for OpenSearch Node on IP: <Node 3 IP>:
 ```
 
-### Unique custom certificates for PostgreSQL
-
-To add unique custom certificates for 3 of the nodes of the PostgreSQL service, add the configurations given below in the `config.toml` file before running the `chef-automate deploy` command:
-
-```toml
-[postgresql.config]
-enable_custom_certs = true
-root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
-[[postgresql.config.certs_by_ip]]
-ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
-[[postgresql.config.certs_by_ip]]
-ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
-[[postgresql.config.certs_by_ip]]
-ip = "ADD_YOUR_THIRD_IP_ADDRESS_HERE"
-private_key = """ADD_YOUR_PRIVATE_KEY_OF_THIRD_IP_ADDRESS_HERE"""
-public_key = """ADD_YOUR_PUBLIC_KEY_OF_THIRD_IP_ADDRESS_HERE"""
+### Unique custom certificates for Postgresql
+To add unique custom certificates for 2 the nodes of the Postgresql service
+```bash
+  Do you have custom certs for Postgresql Nodes:
+  ▸ yes
+    no
+  Do each Postgresql Node have same Certs:
+    yes
+  ▸ no
+  
+  Provide Root CA file path for Postgresql Service:
+  Node IP address: <Node 1 Ip Address>
+  Provide Private Key file path for Postgresql Node on IP: <Node 1 IP>:
+  Provide Public Cert file path for Postgresql Node on IP: <Node 1 IP>:
+  
+  Node IP address: <Node 2 Ip Address>
+  Provide Private Key file path for Postgresql Node on IP: <Node 2 IP>:
+  Provide Public Cert file path for Postgresql Node on IP: <Node 2 IP>:
+  
+  Node IP address: <Node 3 Ip Address>
+  Provide Private Key file path for Postgresql Node on IP: <Node 3 IP>:
+  Provide Public Cert file path for Postgresql Node on IP: <Node 3 IP>:
 ```

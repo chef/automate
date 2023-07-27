@@ -110,7 +110,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
      > AWS
     ```
     - provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
-    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates.
+    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
     ```bash
         Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
         > no
@@ -284,96 +284,77 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 {{< /note >}}
 
 ```config
-[architecture.aws]
-ssh_user = "ec2-user"
-ssh_group_name = "ec2-user"
-ssh_port = "22"
-ssh_key_file = "~/.ssh/my-key.pem"
-backup_config = "s3"
-s3_bucketName = "My-Bucket-Name"
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-architecture = "aws"
-workspace_path = "/hab/a2_deploy_workspace"
-backup_mount = ""
+[architecture]
+  [architecture.aws]
+    ssh_user = "ec2-user"
+    ssh_group_name = "ec2-user"
+    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_port = "22"
+    secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+    secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+    architecture = "aws"
+    workspace_path = "/hab/a2_deploy_workspace"
+    backup_mount = "/mnt/automate_backups"
+    backup_config = "s3"
+    s3_bucketName = "My-Bucket-Name"
 
-[automate.config]
-admin_password = "MY-AUTOMATE-UI-PASSWORD"
-fqdn = ""
-instance_count = "2"
-config_file = "configs/automate.toml"
-enable_custom_certs = false
+[automate]
+  [automate.config]
+    admin_password = "test@343423"
+    fqdn = "chefautomate.example.com"
+    config_file = "configs/automate.toml"
+    root_ca = "-----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----"
+    instance_count = "2"
 
-# Add Automate Load Balancer root-ca
-# root_ca = """root_ca_contents"""
+[chef_server]
+  [chef_server.config]
+    fqdn = "chefserver.example.com"
+    lb_root_ca = "-----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----"
+    instance_count = "2"
 
-# Add Automate node internal public and private keys
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
+[opensearch]
+  [opensearch.config]
+    instance_count = "0"
 
-[chef_server.config]
-instance_count = "2"
-enable_custom_certs = false
+[postgresql]
+  [postgresql.config]
+    instance_count = "0"
 
-# Add Chef Server node internal public and private keys
-# private_key = """private_key_contents"""
-# public_key = """public_key_contents"""
-
-[opensearch.config]
-instance_count = "0"
-enable_custom_certs = false
-
-[postgresql.config]
-instance_count = "0"
-enable_custom_certs = false
-
-[aws.config]
-profile = "default"
-region = "ap-southeast-2"
-aws_vpc_id  = "vpc12318h"
-aws_cidr_block_addr  = ""
-private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
-public_custom_subnets = ["subnet-p556d512", "subnet-p556d513", "subnet-p556d514"]
-ssh_key_pair_name = "my-key"
-setup_managed_services = true
-managed_opensearch_domain_name = "automate-ha"
-managed_opensearch_domain_url = "vpc-automate-ha-a6uhtsu.ap-southeast-2.es.amazonaws.com"
-managed_opensearch_username = "MY-USER-NAME"
-managed_opensearch_user_password = "MY-OPENSEARCH-PASSWORD"
-managed_opensearch_certificate = "This is AWS ROOT-CA, we can keep this empty, this will be the part of airgap bundle, as AWS root-ca is available"
-aws_os_snapshot_role_arn = "we can keep empty, terrafrom code will create and use it"
-os_snapshot_user_access_key_id = "we can keep empty, terrafrom code will create and use it"
-os_snapshot_user_access_key_secret = "we can keep empty, terrafrom code will create and use it"
-managed_rds_instance_url = "database-1.jux.ap-southeast-2.rds.amazonaws.com:5432"
-managed_rds_superuser_username = "MY-POSTGRES-SUPER-USER-NAME"
-managed_rds_superuser_password = "MY-POSTGRES-PASSWORD"
-managed_rds_dbuser_username = "MY-DB-USERNAME"
-managed_rds_dbuser_password = "MY-DB-PASSWORD"
-managed_rds_certificate = "This is AWS ROOT-CA, we can keep this empty, this will be the part of airgap bundle, as AWS root-ca is available"
-ami_id = "ami-08d4ac5b634553e16"
-delete_on_termination = true
-automate_server_instance_type = "m5.large"
-chef_server_instance_type = "m5.large"
-opensearch_server_instance_type = "m5.large"
-postgresql_server_instance_type = "m5.large"
-automate_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
-chef_server_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
-chef_ebs_volume_iops = "100"
-chef_ebs_volume_size = "200"
-chef_ebs_volume_type = "gp3"
-opensearch_ebs_volume_iops = "100"
-opensearch_ebs_volume_size = "200"
-opensearch_ebs_volume_type = "gp3"
-postgresql_ebs_volume_iops = "100"
-postgresql_ebs_volume_size = "200"
-postgresql_ebs_volume_type = "gp3"
-automate_ebs_volume_iops = "100"
-automate_ebs_volume_size = "200"
-automate_ebs_volume_type = "gp3"
-lb_access_logs = "false"
-X-Contact = ""
-X-Dept = ""
-X-Project = ""
+[aws]
+  [aws.config]
+    profile = "default"
+    region = "us-east-2"
+    aws_vpc_id = "vpc12318h"
+    private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
+    public_custom_subnets = ["subnet-p556d512", "subnet-p556d513", "subnet-p556d514"]
+    ssh_key_pair_name = "my-key"
+    setup_managed_services = true
+    managed_opensearch_domain_name = "automate-ha"
+    managed_opensearch_domain_url = "vpc-automate-ha-a6uhtsu.ap-southeast-2.es.amazonaws.com"
+    managed_opensearch_username = "MY-USER-NAME"
+    managed_opensearch_user_password = "MY-OPENSEARCH-PASSWORD"
+    aws_os_snapshot_role_arn = "......."
+    os_snapshot_user_access_key_id = "......."
+    os_snapshot_user_access_key_secret = "......."
+    managed_rds_instance_url = "database-1.jux.us-east-2.rds.amazonaws.com:5432"
+    managed_rds_superuser_username = "MY-POSTGRES-SUPER-USER-NAME"
+    managed_rds_superuser_password = "MY-POSTGRES-PASSWORD"
+    managed_rds_dbuser_username = "MY-DB-USERNAME"
+    managed_rds_dbuser_password = "MY-DB-PASSWORD"
+    ami_id = "ami-08d4ac5b634553e16"
+    automate_server_instance_type = "m5.large"
+    chef_server_instance_type = "m5.large"
+    automate_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
+    chef_server_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
+    chef_ebs_volume_iops = "100"
+    chef_ebs_volume_size = "200"
+    chef_ebs_volume_type = "gp3"
+    automate_ebs_volume_iops = "100"
+    automate_ebs_volume_size = "200"
+    automate_ebs_volume_type = "gp3"
+    lb_access_logs = "true"
 ```
 
 #### Minimum Changes required in sample config
