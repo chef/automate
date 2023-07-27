@@ -1,8 +1,6 @@
 +++
 title = "AWS Deployment"
-
 draft = false
-
 gh_repo = "automate"
 
 [menu]
@@ -23,12 +21,13 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 ### Prerequisites
 
--   Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
--   If you want to use Default VPC we have to create public and private subnet, If subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
--   We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
--   We recommend to create a new vpc. And Bastion should be in the same VPC.
--   Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
-     Set these in `~/.aws/credentials` in Bastion Host or attach an IAM role on bastion host:
+- Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
+- If you want to use Default VPC, we have to create public and private subnets, If subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
+- We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
+- We recommend creating a new vpc. And Bastion should be in the same VPC.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`.
+
+    Set these in `~/.aws/credentials` in Bastion Host:
 
     ```bash
     sudo su -
@@ -42,19 +41,17 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
     echo "region=<AWS-REGION>" >> ~/.aws/credentials
     ```
 
--   Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
-    Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
--   Have SSH Key Pair ready in AWS, so new VM's are created using that pair.
-    Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
--   We do not support passphrase for Private Key authentication.
--   Preferred key type will be ed25519
--   Make sure your linux has `sysctl` utility available in all nodes.
+- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`. Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
+- Have SSH Key Pair ready in AWS so new VMs are created using that pair. Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
+- We do not support passphrases for Private Key authentication.
+- Preferred key type will be ed25519
+- Ensure your Linux has the `sysctl` utility available in all nodes.
 
 {{< warning >}}
 
--   PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
--   We currently don't support AD managed users in nodes. We only support local linux users.
--   If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
+- PLEASE DO NOT MODIFY THE WORKSPACE PATH. It should always be "/hab/a2_deploy_workspace".
+- We currently don't support AD managed users in nodes. We only support local Linux users.
+- If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 
 {{< /warning >}}
 
@@ -64,15 +61,15 @@ Run the following steps on Bastion Host Machine:
 
 {{< note >}}
 
--   Make sure that bastion machine is in the same vpc, as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
--   Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
--   If you choose `backup_config` as `s3` then provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
--   If you choose `backup_config` as `efs` then we will create the EFS and mount on all frontend and backend node.
--   If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
+- Ensure the bastion machine is in the same vpc as in `config.toml`. Otherwise, we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
+- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use a CIDR block, will fail if a consecutive cidr block is not available.
+- If you choose `backup_config` as `s3`, provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exists, it is directly used for backup configuration, and if it doesn't exist, then the deployment process will create `s3_bucketName`.
+- If you choose `backup_config` as `efs`, we will create the EFS and mount it on all frontend and backend nodes.
+- If you choose `backup_config` as `" "` (empty), you have to manually do the backup configuration after the deployment. But we recommended that to use `backup_config` be set to `s3` or `efs` at the time of deployment.
 
 {{< /note >}}
 
-1. Run below commands to download latest Automate CLI and Airgapped Bundle:
+1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
     ```bash
     #Run commands as sudo.
@@ -81,8 +78,7 @@ Run the following steps on Bastion Host Machine:
     curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
     | gunzip - > chef-automate && chmod +x chef-automate \
     | cp -f chef-automate /usr/bin/chef-automate
-
-    #Download latest Airgapped Bundle.
+    #Download the latest Airgapped Bundle.
     #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
     curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
     "
@@ -90,148 +86,157 @@ Run the following steps on Bastion Host Machine:
 
     {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
-1. Generate config with relevant data using below command 
+1. Generate config with relevant data using the below command:
+
     ```bash
         chef-automate config gen config.toml
     ```
-    - Select `Chef Automate HA` as topology
+
+    - Select `Chef Automate HA` as topology.
+
     ```bash
     Choose Topology:
         Chef Automate HA
     ```
-    - Select deployment type as `AWS`
+
+    - Select deployment type as `AWS`.
+
     ```bash
-    Choose type of Deployment Type:
+    Choose the type of Deployment Type:
        On-Premise
      > AWS
     ```
-    - Provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
-    - If you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
+
+    - Provide  `ssh user name`, `ssh group name`, `ssh port no`, and `ssh key file path`.
+    - If you have your Automate, ChefServer, OpenSearch, and Postgresql certificates, select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to learn more about adding service certificates during deployment.
+
     ```bash
-        Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
+        Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, or OpenSearch:
         > no
           yes
     ```
-    - Provide `AWS profile name` skip this if IAM role configured on bastion host
-    - Filter and select AWS region from list
+
+    - Provide `AWS profile name`. Skip this if the IAM role is configured on the bastion host.
+    - Filter and select the AWS region from the list.
     - Give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
-    - We have two options as CIDR Block and subnets ids, 
-      - Select  `yes` for CIDR and provide `CIDR` block Example `10.0.1.0`
-      - Select `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, we recommend to use subnet ids.
+    - To create subnets, we have two options: CIDR Block and subnets ids. Select `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. For example, `subnet-07e469d218301533`, subnets should be created under the same VPC provided above. We need three private subnets; if you want to keep the load balancer on public IP, we need three public subnets as well; it is recommended to use subnet ids.
+
     ```bash
         Do you want to use AWS CIDR Block:
         > yes
           no
     ```
-    - Give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
-    - If you want to terminate all the resources on deletion then select  `on`
+
+    - Give the `ssh key pair name` name used for creating the ssh key pair, `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
+    - If you want to terminate all the resources on deletion, select  `on`.
+
     ```bash
         Delete on termination should be:
         > off
           on
     ```
-    - If you want to enable access log on AWS loadbalancers then select `yes`
+
+    - If you want to enable access log on AWS load balancers, select `yes`.
+
     ```bash
         Do you want to Enable Access Logs on AWS Load Balancer:
         > yes
           no
     ```
+
     - Give Automate FQDN example `chefautomate.example.com`
-    - Give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
-    - Give path of Automate loadbalance FQDN ssl root ca cerificates
+    - Give Automate loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
+    - Give the path of Automate loadbalance FQDN ssl root ca-certificates
     - Set automate dashboard login password
-    - Set how many automate node want to have in cluster, recomended is atleast `two`
-    - Set automate instance type, recomended is `m5.large`
-    - Set automate EBS volume size, based on your load needs.
-    - Set automate EBS volume type, default is `gp3`, change as per your requirement.
-    - Set automate EBS volume IOPS, based on your load needs.
-    - 
+    - Set how many automate nodes want to have in the cluster; recommended is at least `two`.
+    - Set automate instance type; recommended is `m5.large`.
+    - Set automate EBS volume size based on your load needs.
+    - Set to automate EBS volume type; default is `gp3`; change as required.
+    - Set automate EBS volume IOPS based on your load needs.
     - Give Chef Server FQDN example `chefserver.example.com`
     - Give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
-    - Give path of Chef Server loadbalance FQDN ssl root ca cerificates
+    - Give the path of Chef Server loadbalance FQDN ssl root ca certificates
     - Set Chef Server dashboard login password
-    - Set how many Chef Server node want to have in cluster, recomended is atleast `two`
-    - Set Chef Server instance type, recomended is `m5.large`
-    - Set Chef Server EBS volume size, based on your load needs.
-    - Set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
-    - Set Chef Server EBS volume IOPS, based on your load needs.
-    - Select `no` for chef managed database deloyment
+    - Set how many Chef Server nodes want to have in the cluster; recommended is at least `two`.
+    - Set Chef Server instance type, recommended is `m5.large`.
+    - Set Chef Server EBS volume size based on your load needs.
+    - Set Chef Server EBS volume type; default is `gp3`; change as per your requirement.
+    - Set Chef Server EBS volume IOPS based on your load needs.
+    - Select `no` for chef-managed database deployment:
+
     ```bash
         Do you want to use AWS Managed Databases:
          yes
         > no
     ```
-    - Set number of postgresql node you want, recomended is three nodes
-    - Set postgresql instance type, recomended is `m5.large`
-    - Set postgresql EBS volume size, based on your load needs.
-    - Set postgresql EBS volume type, default is `gp3`, change as per your requirement.
-    - Set postgresql EBS volume IOPS, based on your load needs.
-  
-    - Set number of opensearch node you want, recomended is three nodes
-    - Set opensearch instance type, recomended is `m5.large`
-    - Set opensearch EBS volume size, based on your load needs.
-    - Set opensearch EBS volume type, default is `gp3`, change as per your requirement.
-    - Set opensearch EBS volume IOPs, based on your load needs.
-    - If you want to configure database during deployment then select `yes` and provide detials accordingly for selected backup type, for S3 backup provide detials like `bucket name`.
+
+    - Set the number of Postgresql nodes you want; the recommended is three nodes
+    - Set postgresql instance type, recommended is `m5.large`.
+    - Set PostgreSQL EBS volume size based on your load needs.
+    - Set PostgreSQL EBS volume type; default is `gp3`; change as required.
+    - Set PostgreSQL EBS volume IOPS based on your load needs.
+    - Set the number of OpenSearch nodes you want; the recommended is three nodes
+    - Set OpenSearch instance type, recommended is `m5.large`.
+    - Set OpenSearch EBS volume size based on your load needs.
+    - Set OpenSearch EBS volume type; default is `gp3`; change as required.
+    - Set OpenSearch EBS volume IOPs, based on your load needs.
+    - If you want to configure the database during deployment, select `yes` and provide details accordingly for the selected backup type; for S3 backup, provide details like `bucket name`.
+
     ```bash
-    Backup need to be configured during deployment:
+    The backup needs to be configured during deployment:
     > yes
       no
     Which backup option will you use:
     > AWS S3
       EFS
     ```
-    All done we can find generated config file with name given in `config gen` command
 
-    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
+    All done, we can find generated config file with the name given in the `config gen` command
 
-2. Continue with the provisioning the infra after updating config:
+    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more about adding certificates for services during deployment. {{< /note >}}
+
+1. Continue with the provisioning of the infra after updating the config:
 
     ```bash
     #Run commands as sudo.
     sudo -- sh -c "
     #Print data in the config
     cat config.toml
-
     #Run provision command to deploy `automate.aib` with set `config.toml`
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
     "
     ```
 
-3. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of a previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
 
     ```bash
     sudo -- sh -c "
     #Run deploy command to deploy `automate.aib` with set `config.toml`
     chef-automate deploy config.toml --airgap-bundle automate.aib
-
-    #After Deployment is done successfully. Check status of Chef Automate HA services
+    #After Deployment is done successfully. Check the status of Chef Automate HA services
     chef-automate status summary
-
-    #Check Chef Automate HA deployment information, using the following command
+    #Check Chef Automate HA deployment information using the following command
     chef-automate info
     "
     ```
 
-4. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
-  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`. If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
 
-
--   create a file `a2.fqdn.toml`
+- create a file `a2.fqdn.toml`
 
     ```toml
-    [global]
+    [Global]
      [global.v1]
       fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTP"
     ```
 
--   Run the command to apply the config from bastion
+- Run the command to apply the config from the bastion
 
     ```toml
      chef-automate config patch a2.fqdn.toml --automate
     ```
 
--   create a file `cs.fqdn.toml`
+- Create a file `cs.fqdn.toml`
 
     ```toml
     [global]
@@ -241,32 +246,29 @@ Run the following steps on Bastion Host Machine:
       node = "https://AUTOMATE-DNS-URL"
     ```
 
--   Run the command to apply the config from the bastion
+- Run the command to apply the config from the bastion
 
     ```toml
      chef-automate config patch cs.fqdn.toml --chef_server
     ```
 
-{{< note >}} DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command. {{< /note >}}
+{{< note >}} DNS should have entries for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in the `chef-automate info` command. {{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-After successful deployment we can proceed with node bootstraping please Refer [this](/automate/ha_node_bootstraping) docs.
+
+After successful deployment, we can proceed with node bootstrapping; please Refer to [this](/automate/ha_node_bootstraping) docs.
 
 ### Sample config
 
 {{< note >}}
-
--   Assuming 8+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
-
+Assuming 8+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
 {{< /note >}}
 
 {{< note >}}
 
--   User only needs to create/setup **the bastion node** with IAM role of Admin access, and s3 bucket access attached to it.
-
--   Following config will create s3 bucket for backup.
-
--   To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
+- User only needs to create/set up **the bastion node** with the IAM role of Admin access and s3 bucket access attached.
+- The following config will create an s3 bucket for backup.
+- To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`
 
 {{< /note >}}
 
@@ -283,7 +285,6 @@ After successful deployment we can proceed with node bootstraping please Refer [
     workspace_path = "/hab/a2_deploy_workspace"
     backup_mount = "/mnt/automate_backups"
     backup_config = "efs"
-
 [automate]
   [automate.config]
     admin_password = "admin-password"
@@ -292,22 +293,18 @@ After successful deployment we can proceed with node bootstraping please Refer [
     root_ca = "-----BEGIN CERTIFICATE-----
     -----END CERTIFICATE-----"
     instance_count = "2"
-
 [chef_server]
   [chef_server.config]
     fqdn = "chefserver.example.com"
     lb_root_ca = "-----BEGIN CERTIFICATE-----
     -----END CERTIFICATE-----"
     instance_count = "2"
-
 [opensearch]
   [opensearch.config]
     instance_count = "3"
-
 [postgresql]
   [postgresql.config]
     instance_count = "3"
-
 [aws]
   [aws.config]
     profile = "default"
@@ -341,55 +338,52 @@ After successful deployment we can proceed with node bootstraping please Refer [
 
 ## Add more nodes In AWS Deployment post deployment
 
-The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
-For example,
+The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
 
--   if you want to add 2 nodes to automate, you have to run the:
+- If you want to add two nodes to automate, you have to run the:
 
     ```sh
     chef-automate node add --automate-count 2
     ```
 
--   If you want to add 3 nodes to chef-server, you have to run the:
+- If you want to add three nodes to the chef-server, you have to run the:
 
     ```sh
     chef-automate node add --chef-server-count 3
     ```
 
--   If you want to add 1 node to OpenSearch, you have to run the:
+- If you want to add one node to OpenSearch, you have to run the:
 
     ```sh
     chef-automate node add --opensearch-count 1
     ```
 
--   If you want to add 2 nodes to PostgreSQL you have to run:
+- If you want to add two nodes to PostgreSQL, you have to run the:
 
     ```sh
     chef-automate node add --postgresql-count 2
     ```
 
-You can mix and match different services if you want to add nodes across various services.
+You can mix and match different services to add nodes across various services.
 
--   If you want to add 1 node to automate and 2 nodes to PostgreSQL, you have to run:
+- If you want to add one node to automate and two nodes to PostgreSQL, you have to run:
 
     ```sh
     chef-automate node add --automate-count 1 --postgresql-count 2
     ```
 
--   If you want to add 1 node to automate, 2 nodes to chef-server, and 2 nodes to PostgreSQL you have to run:
+- If you want to add one node to automate, two nodes to chef-server, and two nodes to PostgreSQL, you have to run:
 
     ```sh
     chef-automate node add --automate-count 1 --chef-server-count 2 --postgresql-count 2
     ```
 
-Once the command executes, it will add the supplied number of nodes to your automate setup. The changes might take a while.
+Once the command executes, it will add the supplied nodes to your automated setup. The changes might take a while.
 
 {{< note >}}
 
--   If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
-    For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
--   The new node will be configured with the certificates which were already configured in your HA setup.
-
+- If you have patched some external config to any existing services, then apply the same on the new nodes. For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+- The new node will be configured with the certificates already configured in your HA setup.
 {{< /note >}}
 
 {{< warning >}}
@@ -400,36 +394,33 @@ Downgrading the number of instance_count for the backend nodes will result in da
 
 {{< warning >}}
 
--   We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
-
--   Removal of nodes for PostgreSQL or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete PostgreSQL or OpenSearch nodes.
-
--   Below process can be done for `chef-server` and `automate`.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
+- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
+- Below process can be done for `chef-server` and `automate`.
 
 {{< /warning >}}
 
-The command requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove as an argument when you run the command.
-For example,
+The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
 
--   If you want to remove node of automate, you have to run the:
+- If you want to remove the node of automate, you have to run the:
 
     ```sh
     chef-automate node remove --automate-ip "<automate-ip-address>"
     ```
 
--   If you want to remove node of chef-server, you have to run the:
+- If you want to remove the node of the chef-server, you have to run the:
 
     ```sh
     chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
     ```
 
--   If you want to remove node of OpenSearch, you have to run the:
+- If you want to remove the node of OpenSearch, you have to run the:
 
     ```sh
     chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
     ```
 
--   If you want to remove node of PostgreSQL you have to run:
+- If you want to remove the node of PostgreSQL, you have to run the:
 
     ```sh
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
@@ -437,22 +428,23 @@ For example,
 
 Once the command executes, it will remove the supplied node from your HA setup. The changes might take a while.
 
-## Uninstall chef automate HA
+## Uninstall Chef automate HA
 
 {{< danger >}}
 
--   Running clean up command will remove all AWS resources created by `provision-infra` command
--   Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
-    {{< /danger >}}
+- Running the clean-up command will remove all AWS resources created by the `provision-infra` command
+- Adding the `--force` flag will remove storage (Object Storage/ NFS) if it is created by provision-infra`.
 
-To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+{{< /danger >}}
+
+To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
 
 ```bash
-    chef-automate cleanup --aws-deployment --force
+chef-automate cleanup --aws-deployment --force
 ```
 
-or
+OR
 
 ```bash
-    chef-automate cleanup --aws-deployment
+chef-automate cleanup --aws-deployment
 ```

@@ -1,8 +1,6 @@
 +++
 title = "AWS Managed Services Deployment"
-
 draft = false
-
 gh_repo = "automate"
 
 [menu]
@@ -24,16 +22,16 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ### Prerequisites
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC, then you have to create Public and Private Subnet, if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
-- We recommend to create a new VPC. And Bastion should be in the same VPC.
-- Setup AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node going to be created. Click [here](/automate/create_amazon_rds/) to know more.
-- Setup AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node going to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
-- For Backup with Managed Service we have only one option which is `Amazon S3`.
+- If you want to use Default VPC, you have to create a Public and Private Subnet if subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
+- We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
+- We recommend creating a new VPC. And Bastion should be in the same VPC.
+- Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_rds/) to know more.
+- Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
+- For Backup with Managed Service, we have only one option: ' Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 - Preferred key type will be ed25519
-- Make sure your linux has `sysctl` utility available in all nodes.
+- Ensure your Linux has the `sysctl` utility available in all nodes.
 
 Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
@@ -49,31 +47,32 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   echo "region=<AWS-REGION>" >> ~/.aws/credentials
   ```
 
-- Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
+- Have SSH Key Pair ready in AWS so new VMs are created using that pair.\
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-- We do not support passphrase for Private Key authentication.
-- Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
+- We do not support passphrases for Private Key authentication.
+- Make sure that the bastion machine should be in the same vpc as mentioned in `config.toml`; otherwise, we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
 - Create the below attributes by following [this document.](/automate/managed_services/#enabling-opensearch-backup-restore)
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
   - `os_snapshot_user_access_key_secret`
-  
+
   Add this to your `config.toml`
-- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly used for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
-- We recommended to use `backup_config` to be set to `s3` at the time of deployment.
+
+- If you choose `backup_config` as `s3`, provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exists, it is directly used for backup configuration, and if it doesn't exist, then the deployment process will create `s3_bucketName`.
+- We recommended using `backup_config` to be set to `s3` at the time of deployment.
 
 {{< warning >}}
 
-- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
-- We currently don't support AD managed users in nodes. We only support local linux users.
-- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
+- PLEASE DO NOT MODIFY THE WORKSPACE PATH; it should always be "/hab/a2_deploy_workspace"
+- We currently don't support AD managed users in nodes. We only support local Linux users.
+- If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 
 {{< /warning >}}
 
 ### Run these steps on Bastion Host Machine
 
-1. Run below commands to download latest Automate CLI and Airgapped Bundle:
+1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
    ```bash
    #Run commands as sudo.
@@ -82,8 +81,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
    | gunzip - > chef-automate && chmod +x chef-automate \
    | cp -f chef-automate /usr/bin/chef-automate
-
-   #Download latest Airgapped Bundle.
+   #Download the latest Airgapped Bundle.
    #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
    "
@@ -93,196 +91,205 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
 
+1. Generate config with relevant data using the below command:
 
-1. Generate config with relevant data using below command 
     ```bash
         chef-automate config gen config.toml
     ```
+
     - Select `Chef Automate HA` as topology
+
     ```bash
     Choose Topology:
         Chef Automate HA
     ```
-    - select deployment type as `AWS`
+
+    - Select deployment type as `AWS`
+
     ```bash
-    Choose type of Deployment Type:
+    Choose the type of Deployment Type:
        On-Premise
      > AWS
     ```
-    - Provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
-    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
+
+    - Provide  `ssh user name`, `ssh group name`, `ssh port no`, and `ssh key file path`.
+    - If you have your Automate, ChefServer, OpenSearch, and Postgresql certificates, select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to learn more about adding service certificates during deployment.
+
     ```bash
-        Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
+        Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, or OpenSearch:
         > no
           yes
     ```
-    - Provide `AWS profile name` skip this if IAM role configured on bastion host
-    - Filter and select AWS region from list
+
+    - Provide `AWS profile name`; skip this if the IAM role configured on the bastion host
+    - Filter and select the AWS region from the list
     - Give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
-    - To create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
+    - To create subnets, we have two options: CIDR Block and subnets ids; select `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. For example, for `subnet-07e469d218301533`, subnets should be created under the same VPC provided above; we need three private subnets; if you want to keep loadbalancer on public IP, then we need three public subnets as well, it is recommended to use subnet ids.
+
     ```bash
         Do you want to use AWS CIDR Block:
         > yes
           no
     ```
-    - Give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
-    - If you want to terminate all the resources on deletion then select  `on`
+
+    - Give the `ssh key pair name` name used for creating the ssh key pair, `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
+    - If you want to terminate all the resources on deletion, select  `on`.
+
     ```bash
         Delete on termination should be:
         > off
           on
     ```
-    - If you want to enable access log on AWS loadbalancers then select `yes`
+
+    - If you want to enable access log on AWS loadbalancers, select `yes`.
+
     ```bash
         Do you want to Enable Access Logs on AWS Load Balancer:
         > yes
           no
     ```
-    - Give Automate FQDN example `chefautomate.example.com`
-    - Give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
-    - Give path of Automate loadbalance FQDN ssl root ca cerificates
-    - Set automate dashboard login password
-    - Set how many automate node want to have in cluster, recomended is atleast `two`
-    - Set automate instance type, recomended is `m5.large`
-    - Set automate EBS volume size, based on your load needs.
-    - Set automate EBS volume type, default is `gp3`, change as per your requirement.
-    - Set automate EBS volume IOPS, based on your load needs.
-    - 
-    - Give Chef Server FQDN example `chefserver.example.com`
+
+    - Give Automate FQDN example `chefautomate.example.com`.
+    - Give Automate loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
+    - Give the path of Automate loadbalance FQDN ssl root ca certificates.
+    - Set automate dashboard login password.
+    - Set how many automate nodes want to have in the cluster; recommended is at least `two`.
+    - Set automate instance type; recommended is `m5.large`.
+    - Set automate EBS volume size based on your load needs.
+    - Set to automate EBS volume type; default is `gp3`; change as per your requirement.
+    - Set automate EBS volume IOPS based on your load needs.
+    - Give Chef Server FQDN example `chefserver.example.com`.
     - Give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
-    - Give path of Chef Server loadbalance FQDN ssl root ca cerificates
-    - Set Chef Server dashboard login password
-    - Set how many Chef Server node want to have in cluster, recomended is atleast `two`
-    - Set Chef Server instance type, recomended is `m5.large`
-    - Set Chef Server EBS volume size, based on your load needs.
-    - Set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
-    - Set Chef Server EBS volume IOPS, based on your load needs.
-    - Select `yes` for chef managed database deloyment
+    - Give the path of Chef Server loadbalance FQDN ssl root ca certificates.
+    - Set Chef Server dashboard login password.
+    - Set how many Chef Server nodes want to have in the cluster; recommended is at least `two`.
+    - Set Chef Server instance type, recommended is `m5.large`.
+    - Set Chef Server EBS volume size based on your load needs.
+    - Set Chef Server EBS volume type; default is `gp3`; change as per your requirement.
+    - Set Chef Server EBS volume IOPS based on your load needs.
+    - Select `yes` for chef-managed database deployment.
+
     ```bash
         Do you want to use AWS Managed Databases:
        > yes
          no
     ```
-    - Provide AWS managed opensearch details like `opensearch domain name`, `opensearch domain url` url should be without http or https and without port example `vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com`, `opensearch username`, `opensearch password`, from the **Managed AWS OpenSearch** created in the Prerequisite steps.
-    - For AWS managed databases we have default amazon ssl certificates , If you want to use default then select `yes`, In case you have your own certificates for amazon opensarch the select `no` and provide your certificates
+
+    - Provide AWS managed OpenSearch details like `opensearch domain name`, and `opensearch domain url` URL should be without HTTP or HTTPS and port example `vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com`, `opensearch username`, `opensearch password`, from the **Managed AWS OpenSearch** created in the Prerequisite steps.
+    - For AWS-managed databases, we have default Amazon SSL certificates; if you want to use the default, then select `yes`; in case you have your certificates for Amazon OpenSearch, choose `no` and provide your certificates
+
     ```bash
-        Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL:
+        Do you want to use Default AWS Cert to connect with the AWS Managed OpenSearch Domain URL:
       > yes
         no
     ```
-  -  Provide `Amazon openserch snapshot role ARN`,  `Amazon openserch snapshot user access key`,  `Amazon openserch snapshot user access secrect key` to take backup from Amazon opensearch, [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
-  -  To configure Amazon RDS Postgresql, provide details of `Amazon RDS Postgresql URL:<Port>` url along with port in formate of <url>:<port>, `RDS super username`, `RDS superuser password`, `RDS database username`, `RDS database user password`, from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
-     - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
-     - The master password value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
-  -  Same for postgresql if you want to use default ssl certificates from Amazon then select `yes`, Incase you have your own certificates then select `no` and provide your certificates.
-  ```bash
-        Do you want to use Default AWS Cert to connect with AWS Managed Postgresql Domain URL:
+
+    - Provide `Amazon OpenSearch snapshot role ARN`,  `Amazon OpenSearch snapshot user access key`, and `Amazon OpenSearch snapshot user access secret key` to take a backup from Amazon OpenSearch, [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
+    - To configure Amazon RDS Postgresql, provide details of `Amazon RDS Postgresql URL:<Port>` URL along with port in the format of <url>:<port>, `RDS super username`, `RDS superuser password`, `RDS database username`, `RDS database user password`, from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
+    - The master username value you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`.
+    - The master password value you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`.
+    - Same is for PostgreSQL; select' yes' if you want to use default SSL certificates from Amazon. If you have your certificates, choose `no` and provide your certificates.
+
+    ```bash
+        Do you want to use Default AWS Cert to connect with the AWS Managed Postgresql Domain URL:
       > yes
         no
-  ```
-  
-  -  Backup can be configured along with deployment then select `yes` and provide backup S3 `bucket name` If the bucket name does not exist, it will be created for you automatically, Incase you want configure post deployment then select `no` and proceed
-  
-  ```bash
-      Backup need to be configured during deployment:
+    ```
+
+    - Backup can be configured along with deployment, then select `yes` and provide backup S3 `bucket name` If the bucket name does not exist, it will be created for you automatically; In case you want to configure post-deployment, then select `no` and proceed
+
+    ```bash
+      The backup needs to be configured during deployment:
       > yes
         no
-  ```
-  All done we can find generated config file with name given in `config gen` command
+    ```
+
+    all done, we can find generated config file with the name given in the `config gen` command
+
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
+    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more about adding certificates for services during deployment. {{< /note >}}
 
-   {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
+1. Continue with the deployment after updating the config:
 
-1. Continue with the deployment after updating config:
-
-   ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Print data in the config
-   cat config.toml
-
-   #Run provision command to deploy `automate.aib` with set `config.toml`
-   chef-automate provision-infra config.toml --airgap-bundle automate.aib
+    ```bash
+    #Run commands as sudo.
+    sudo -- sh -c "
+    #Print data in the config
+    cat config.toml
+    #Run provision command to deploy `automate.aib` with set `config.toml`
+    chef-automate provision-infra config.toml --airgap-bundle automate.aib
     "
     ```
 
-2. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
 
     ```bash
     sudo -- sh -c "
-
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
-
-   #After Deployment is done successfully. Check status of Chef Automate HA services
+   #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status summary
-   
-   #Check Chef Automate HA deployment information, using the following command
+
+   #Check Chef Automate HA deployment information using the following command
    chef-automate info
    "
    ```
 
-3. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
-  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
-  
-- Create a file `a2.fqdn.toml`
+1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
+  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
 
-  ```toml
-  [global]
-   [global.v1]
-    fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTP"
-  ```
+    - Create a file `a2.fqdn.toml`
 
-- Run the command to apply the config from bastion
+    ```toml
+    [global]
+      [global.v1]
+        fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTP"
+    ```
 
-  ```toml
-   chef-automate config patch a2.fqdn.toml --automate
-  ```
+    - Run the command to apply the config from the bastion
 
-- Create a file `cs.fqdn.toml`
-  
-  ```toml
-  [global]
-   [global.v1]
-    fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTPS"
-  [global.v1.external.automate]
-    node = "https://AUTOMATE-DNS-URL" 
-  ```
+    ```toml
+    chef-automate config patch a2.fqdn.toml --automate
+    ```
 
-- Run the command to apply the config from the bastion
+    - Create a file `cs.fqdn.toml`
 
-  ```toml
-   chef-automate config patch cs.fqdn.toml --chef_server
-  ```
+    ```toml
+    [global]
+      [global.v1]
+        fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTPS"
+      [global.v1.external.automate]
+        node = "https://AUTOMATE-DNS-URL"
+    ```
+
+    - Run the command to apply the config from the bastion
+
+    ```toml
+    chef-automate config patch cs.fqdn.toml --chef_server
+    ```
 
 {{< note >}}
 
-- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
-  Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/).
-- DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command
+- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`, Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/).
+- DNS should have entries for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in the `chef-automate info` command
 
 {{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-After successful deployment we can proceed with node bootstraping please Refer [this](/automate/ha_node_bootstraping) docs.
 
-### Sample config
+After successful deployment, we can proceed with node bootstrapping. Please Refer to [this](/automate/ha_node_bootstraping) docs.
 
-{{< note >}}
+### Sample Config
 
-- Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS PostgreSQL and Managed OpenSearch)
-
-{{< /note >}}
+{{< note >}} Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS Postgresql, and Managed OpenSearch) {{< /note >}}
 
 {{< note >}}
 
-- User only needs to create/setup **the bastion node**, an **user** with IAM role of Admin access, and the s3 bucket access attached to it.
-
-- Following config will create s3 bucket for backup.
-
-- To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
+- User only needs to create/set up **the bastion node**, a **user** with IAM role of Admin access and the s3 bucket access attached to it.
+- The following config will create an s3 bucket for backup.
+- To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
 
 {{< /note >}}
 
@@ -300,7 +307,6 @@ After successful deployment we can proceed with node bootstraping please Refer [
     backup_mount = "/mnt/automate_backups"
     backup_config = "s3"
     s3_bucketName = "My-Bucket-Name"
-
 [automate]
   [automate.config]
     admin_password = "test@343423"
@@ -309,22 +315,18 @@ After successful deployment we can proceed with node bootstraping please Refer [
     root_ca = "-----BEGIN CERTIFICATE-----
     -----END CERTIFICATE-----"
     instance_count = "2"
-
 [chef_server]
   [chef_server.config]
     fqdn = "chefserver.example.com"
     lb_root_ca = "-----BEGIN CERTIFICATE-----
     -----END CERTIFICATE-----"
     instance_count = "2"
-
 [opensearch]
   [opensearch.config]
     instance_count = "0"
-
 [postgresql]
   [postgresql.config]
     instance_count = "0"
-
 [aws]
   [aws.config]
     profile = "default"
@@ -360,32 +362,31 @@ After successful deployment we can proceed with node bootstraping please Refer [
     lb_access_logs = "true"
 ```
 
-#### Minimum Changes required in sample config
+#### Minimum Changes required in the sample config
 
-- Provide `ssh_user` which has access to all the machines. Eg: `ec2-user`
-- Provide `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
-- Provide `region` Eg: `ap-southeast-2`
-- Provide `aws_vpc_id` Eg: `vpc-0a12*****`
-- Provide `private_custom_subnets` and `public_custom_subnets`
-- Provide `ssh_key_pair_name` Eg: `user-key`
-- Provide `setup_managed_services` Eg: `true`
-- Provide `managed_opensearch_domain_name`,`managed_opensearch_domain_url`,`managed_opensearch_username`,`managed_opensearch_user_password`
-- Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`
-- Provide `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
-- Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
+- Provide `ssh_user` which has access to all the machines. E.g., `ec2-user`
+- Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `~/.ssh/user-key.pem`.
+- Provide `region` Eg: `ap-southeast-2`.
+- Provide `aws_vpc_id` Eg: `vpc-0a12*****`.
+- Provide `private_custom_subnets` and `public_custom_subnets`.
+- Provide `ssh_key_pair_name` Eg: `user-key`.
+- Provide `setup_managed_services` Eg: `true`.
+- Provide `managed_opensearch_domain_name`,`managed_opensearch_domain_url`,`managed_opensearch_username`,`managed_opensearch_user_password`.
+- Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`.
+- Provide `ami_id` for the region where the infra is created. Eg: `ami-0bb66b6ba59664870`.
+- Provide `certificate ARN` for both automate and Chef servers in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn`, respectively.
 
 ## Add more nodes In AWS Deployment post deployment
 
-The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
-For example,
+The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
 
-- if you want to add 2 nodes to automate, you have to run the:
+- If you want to add two nodes to automate, you have to run the:
 
     ```sh
     chef-automate node add --automate-count 2
     ```
 
-- If you want to add 3 nodes to chef-server, you have to run the:
+- If you want to add three nodes to the chef-server, you have to run the:
 
     ```sh
         chef-automate node add --chef-server-count 3
