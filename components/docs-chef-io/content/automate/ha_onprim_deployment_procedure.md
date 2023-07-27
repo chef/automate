@@ -191,7 +191,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "/home/ec2-user/my-key.pem"
+    ssh_key_file = "~/.ssh/my-key.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -311,7 +311,7 @@ Continue with the deployment after updating the config:
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "/home/ec2-user/jay-sydney-key.pem"
+    ssh_key_file = "~/.ssh/my-key.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -438,7 +438,7 @@ Continue with the deployment after updating the config:
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "/home/ec2-user/jay-sydney-key.pem"
+    ssh_key_file = "~/.ssh/my-key.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
