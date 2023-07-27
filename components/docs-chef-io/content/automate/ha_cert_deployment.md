@@ -30,11 +30,11 @@ To add a common custom certificates for all the node of Chef Automate servies, s
 ```bash
   Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
     no
-  ▸ yes
+  > yes
 ```
 ```bash
   Do you have custom certs for Automate Nodes:
-  ▸ yes
+  > yes
     no
 ```
 ```bash
@@ -44,7 +44,7 @@ Provide Public Key file path for Automate Service:
 ### Common custom certificate for Chef Server
 ```bash
  Do you have custom certs for Chef Infra Server Nodes:
-  ▸ yes
+  > yes
     no
 ```
 ```bash
@@ -54,7 +54,7 @@ Provide Public Cert file path for Chef Infra Server Service:
 ### Common custom certificate for PostgreSQL
 ```bash
  Do you have custom certs for Postgresql Services Nodes:
-  ▸ yes
+  > yes
     no
 ```
 ```bash
@@ -65,7 +65,7 @@ Provide Root CA file path for Postgresql Service:
 ### Common custom certificate for OpenSearch
 ```bash
   Do you have custom certs for OpenSearch Nodes:
-  ▸ yes
+  > yes
     no
 ```
 ```bash
@@ -96,17 +96,17 @@ To add unique custom certificates for servies using `config gen` command, follow
 ```bash 
   Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
     no
-  ▸ yes
+  > yes
 ```
 ### Unique custom certificates for Automate
 To add unique custom certificates for 2 the nodes of the Chef Automate service
 ```bash
   Do you have custom certs for Automate Nodes:
-  ▸ yes
+  > yes
     no
   Do each Automate Node have same Certs:
     yes
-  ▸ no
+  > no
   
   Node IP address: <Node 1 Ip Address>
   Provide Private Key file path for Automate Node on IP: <Node 1 IP>:
@@ -121,11 +121,11 @@ To add unique custom certificates for 2 the nodes of the Chef Automate service
 To add unique custom certificates for 2 the nodes of the Chef Infra Server service
 ```bash
   Do you have custom certs for Chef Infra Server Nodes:
-  ▸ yes
+  > yes
     no
   Do each Chef Infra Server Node have same Certs:
     yes
-  ▸ no
+  > no
   
   Node IP address: <Node 1 Ip Address>
   Provide Private Key file path for Chef Infra Server Node on IP: <Node 1 IP>:
@@ -140,11 +140,11 @@ To add unique custom certificates for 2 the nodes of the Chef Infra Server servi
 To add unique custom certificates for 2 the nodes of the Opensearch service
 ```bash
   Do you have custom certs for OpenSearch Nodes:
-  ▸ yes
+  > yes
     no
   Do each OpenSearch Node have same Certs:
     yes
-  ▸ no
+  > no
   
   Provide Root CA file path for OpenSearch Service:
   Provide Admin Cert file path for OpenSearch Service:
@@ -167,11 +167,11 @@ To add unique custom certificates for 2 the nodes of the Opensearch service
 To add unique custom certificates for 2 the nodes of the Postgresql service
 ```bash
   Do you have custom certs for Postgresql Nodes:
-  ▸ yes
+  > yes
     no
   Do each Postgresql Node have same Certs:
     yes
-  ▸ no
+  > no
   
   Provide Root CA file path for Postgresql Service:
   Node IP address: <Node 1 Ip Address>
