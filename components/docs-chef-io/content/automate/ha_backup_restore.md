@@ -32,6 +32,12 @@ In information technology, a data backup is a copy of computer data taken and st
 
 Data restore is the process of copying backup data from secondary storage and restoring it to its original location or a new location. A restoring process is carried out to return lost, stolen, or damaged data to its original condition or move it to a new location.
 
+{{< note >}}
+
+When restoring an Automate HA system, you will need to stop the Automate-installed Chef frontends so that they are not contacting the database during the restore.
+
+{{< /note >}}
+
 ## Chef Automate High Availability (HA) Backups
 
 You can manually back up the OpenSearch, Postgres, and Chef Automate Server data and configurations. The built-in Chef Automate CLI has no automated backup procedure that periodically backups the data.
