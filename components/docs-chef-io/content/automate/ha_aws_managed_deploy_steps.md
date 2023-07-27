@@ -179,8 +179,10 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
         Do you want to use Default AWS Cert to connect with AWS Managed Postgresql Domain URL:
       > yes
         no
-    ```
+  ```
+  
   -  Backup can be configured along with deployment then select `yes` and provide backup S3 `bucket name` If the bucket name does not exist, it will be created for you automatically, Incase you want configure post deployment then select `no` and proceed
+  
   ```bash
       Backup need to be configured during deployment:
       > yes
