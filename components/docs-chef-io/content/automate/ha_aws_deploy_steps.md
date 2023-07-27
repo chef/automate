@@ -28,7 +28,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 -   We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
 -   We recommend to create a new vpc. And Bastion should be in the same VPC.
 -   Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
-     Set these in `~/.aws/credentials` in Bastion Host:
+     Set these in `~/.aws/credentials` in Bastion Host or attach an IAM role on bastion host:
 
     ```bash
     sudo su -
@@ -99,77 +99,79 @@ Run the following steps on Bastion Host Machine:
     Choose Topology:
         Chef Automate HA
     ```
-    - select deployment type as `AWS`
+    - Select deployment type as `AWS`
     ```bash
     Choose type of Deployment Type:
        On-Premise
      > AWS
     ```
-    - provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
-    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
+    - Provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
+    - If you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
     ```bash
         Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
         > no
           yes
     ```
-    - provide `AWS profile name` skip this if IAM role configured on bashtion host
-    - filter and select AWS region from list
-    - give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
-    - to create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
+    - Provide `AWS profile name` skip this if IAM role configured on bastion host
+    - Filter and select AWS region from list
+    - Give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
+    - We have two options as CIDR Block and subnets ids, 
+      - Select  `yes` for CIDR and provide `CIDR` block Example `10.0.1.0`
+      - Select `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
     ```bash
         Do you want to use AWS CIDR Block:
         > yes
           no
     ```
-    - give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
-    - if you want to terminate all the resources on deletion then select  `on`
+    - Give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
+    - If you want to terminate all the resources on deletion then select  `on`
     ```bash
         Delete on termination should be:
         > off
           on
     ```
-    - if you want to enable access log on AWS loadbalancers then select `yes`
+    - If you want to enable access log on AWS loadbalancers then select `yes`
     ```bash
         Do you want to Enable Access Logs on AWS Load Balancer:
         > yes
           no
     ```
-    - give Automate FQDN example `chefautomate.example.com`
-    - give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
-    - give path of Automate loadbalance FQDN ssl root ca cerificates
-    - set automate dashboard login password
-    - set how many automate node want to have in cluster, recomended is atleast `two`
-    - set automate instance type, recomended is `m5.large`
-    - set automate EBS volume size, based on your load needs.
-    - set automate EBS volume type, default is `gp3`, change as per your requirement.
-    - set automate EBS volume IOPS, based on your load needs.
+    - Give Automate FQDN example `chefautomate.example.com`
+    - Give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
+    - Give path of Automate loadbalance FQDN ssl root ca cerificates
+    - Set automate dashboard login password
+    - Set how many automate node want to have in cluster, recomended is atleast `two`
+    - Set automate instance type, recomended is `m5.large`
+    - Set automate EBS volume size, based on your load needs.
+    - Set automate EBS volume type, default is `gp3`, change as per your requirement.
+    - Set automate EBS volume IOPS, based on your load needs.
     - 
-    - give Chef Server FQDN example `chefserver.example.com`
-    - give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
-    - give path of Chef Server loadbalance FQDN ssl root ca cerificates
-    - set Chef Server dashboard login password
-    - set how many Chef Server node want to have in cluster, recomended is atleast `two`
-    - set Chef Server instance type, recomended is `m5.large`
-    - set Chef Server EBS volume size, based on your load needs.
-    - set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
-    - set Chef Server EBS volume IOPS, based on your load needs.
-    - select `no` for chef managed database deloyment
+    - Give Chef Server FQDN example `chefserver.example.com`
+    - Give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
+    - Give path of Chef Server loadbalance FQDN ssl root ca cerificates
+    - Set Chef Server dashboard login password
+    - Set how many Chef Server node want to have in cluster, recomended is atleast `two`
+    - Set Chef Server instance type, recomended is `m5.large`
+    - Set Chef Server EBS volume size, based on your load needs.
+    - Set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
+    - Set Chef Server EBS volume IOPS, based on your load needs.
+    - Select `no` for chef managed database deloyment
     ```bash
         Do you want to use AWS Managed Databases:
          yes
         > no
     ```
-    - set number of postgresql node you want, recomended is three nodes
-    - set postgresql instance type, recomended is `m5.large`
-    - set postgresql EBS volume size, based on your load needs.
-    - set postgresql EBS volume type, default is `gp3`, change as per your requirement.
-    - set postgresql EBS volume IOPS, based on your load needs.
+    - Set number of postgresql node you want, recomended is three nodes
+    - Set postgresql instance type, recomended is `m5.large`
+    - Set postgresql EBS volume size, based on your load needs.
+    - Set postgresql EBS volume type, default is `gp3`, change as per your requirement.
+    - Set postgresql EBS volume IOPS, based on your load needs.
   
-    - set number of opensearch node you want, recomended is three nodes
-    - set opensearch instance type, recomended is `m5.large`
-    - set opensearch EBS volume size, based on your load needs.
-    - set opensearch EBS volume type, default is `gp3`, change as per your requirement.
-    - set opensearch EBS volume IOPs, based on your load needs.
+    - Set number of opensearch node you want, recomended is three nodes
+    - Set opensearch instance type, recomended is `m5.large`
+    - Set opensearch EBS volume size, based on your load needs.
+    - Set opensearch EBS volume type, default is `gp3`, change as per your requirement.
+    - Set opensearch EBS volume IOPs, based on your load needs.
     - If you want to configure database during deployment then select `yes` and provide detials accordingly for selected backup type, for S3 backup provide detials like `bucket name`.
     ```bash
     Backup need to be configured during deployment:
@@ -179,7 +181,7 @@ Run the following steps on Bastion Host Machine:
     > AWS S3
       EFS
     ```
-    all done we can find generated config file with name given in `config gen` command
+    All done we can find generated config file with name given in `config gen` command
 
     {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
 

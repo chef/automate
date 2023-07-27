@@ -102,13 +102,13 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Choose `Deployment` as config type
    - 
    - Provide ssh user name for ssh login
-   - provide ssh group name of ssh user, default is same as name given for ssh user
+   - Provide ssh group name of ssh user, default is same as name given for ssh user
    - Provide ssh port number for ssh login, default port is 22
    - Provide ssh login key file path, default path will be `/.ssh/id_rsa`
    - In case you have custom certificates for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch then choose `yes` otherwise select `no`, if you have selected `yes` then you will be prompt for root-certs, public certificates and private certificates for services later in flow
-   - provide Automte FQDN example `chefautomate.example.com`
-   - provide ssl root certificate path for Automate FQDN
-   - provide admin login password which you want to set for Automate dashboard,
+   - Provide Automte FQDN example `chefautomate.example.com`
+   - Provide ssl root certificate path for Automate FQDN
+   - Provide admin login password which you want to set for Automate dashboard,
    - Provide total number of node you want to keep for Automate node.
    - In case you havve custom certificates for Automate Node select `yes` other wise select `no`, 
    - If you have select `yes` for above then you will be prompt for do you have different certificates for each node, choose accordingly `yes` or `no`
@@ -131,18 +131,18 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - If you are using Chef managed databases then provide number of node you want to have for opensearch
    - Now In case you have custom certificates for opensearch then select `yes`
    - If you have different certificates for each opensearch node then select `no`
-   - provide root-ca certificates for opensearch
-   - provide admin certificates for opensearch
-   - provide admin key certificates for opensearch
+   - Provide root-ca certificates for opensearch
+   - Provide admin certificates for opensearch
+   - Provide admin key certificates for opensearch
    - now provide private certificates, public certificates, and node ip for each node of opensearch on prompt
 
    - If you are using Chef managed databases then provide number of node you want to have for Postgresql
    - Now In case you have custom certificates for Postgresql then select `yes`
    - If you have different certificates for each Postgresql node then select `no`
-   - provide root-ca certificates for Postgresql
-   - provide admin certificates for Postgresql
-   - provide admin key certificates for Postgresql
-   - now provide private certificates, public certificates, and node ip for each node of Postgresql on prompt
+   - Provide root-ca certificates for Postgresql
+   - Provide admin certificates for Postgresql
+   - Provide admin key certificates for Postgresql
+   - Now provide private certificates, public certificates, and node ip for each node of Postgresql on prompt
   
 
    - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
@@ -150,10 +150,10 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Thus, the overall minimum number of machines needed will be 5
    
  
-   - select `yes` if you want to configure backup in config
-   - select backup type from Aws S3, Minio, Object Storage, File System and NFS.
-   - provide details for backup configurations like bucket name, access key, secrect key, url and region for s3, Minio or object storage, User must create the bucket themselves and make sure to assign correct [IAM policy for bucket access](/automate/backup/#aws-s3-permissions) if you are using AWS s3.
-   - in case of NFS of File System backup provide backup location path.
+   - Select `yes` if you want to configure backup in config
+   - Select backup type from Aws S3, Minio, Object Storage, File System and NFS.
+   - Provide details for backup configurations like bucket name, access key, secrect key, url and region for s3, Minio or object storage, User must create the bucket themselves and make sure to assign correct [IAM policy for bucket access](/automate/backup/#aws-s3-permissions) if you are using AWS s3.
+   - In case of NFS of File System backup provide backup location path.
    - Now all set, we can find generated config in config.toml file or file name provided for config gen command.
   
    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}

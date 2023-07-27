@@ -109,72 +109,72 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
        On-Premise
      > AWS
     ```
-    - provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
+    - Provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
     - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates. Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment.
     ```bash
         Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
         > no
           yes
     ```
-    - provide `AWS profile name` skip this if IAM role configured on bashtion host
-    - filter and select AWS region from list
-    - give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
-    - to create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
+    - Provide `AWS profile name` skip this if IAM role configured on bastion host
+    - Filter and select AWS region from list
+    - Give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
+    - To create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
     ```bash
         Do you want to use AWS CIDR Block:
         > yes
           no
     ```
-    - give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
-    - if you want to terminate all the resources on deletion then select  `on`
+    - Give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
+    - If you want to terminate all the resources on deletion then select  `on`
     ```bash
         Delete on termination should be:
         > off
           on
     ```
-    - if you want to enable access log on AWS loadbalancers then select `yes`
+    - If you want to enable access log on AWS loadbalancers then select `yes`
     ```bash
         Do you want to Enable Access Logs on AWS Load Balancer:
         > yes
           no
     ```
-    - give Automate FQDN example `chefautomate.example.com`
-    - give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
-    - give path of Automate loadbalance FQDN ssl root ca cerificates
-    - set automate dashboard login password
-    - set how many automate node want to have in cluster, recomended is atleast `two`
-    - set automate instance type, recomended is `m5.large`
-    - set automate EBS volume size, based on your load needs.
-    - set automate EBS volume type, default is `gp3`, change as per your requirement.
-    - set automate EBS volume IOPS, based on your load needs.
+    - Give Automate FQDN example `chefautomate.example.com`
+    - Give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
+    - Give path of Automate loadbalance FQDN ssl root ca cerificates
+    - Set automate dashboard login password
+    - Set how many automate node want to have in cluster, recomended is atleast `two`
+    - Set automate instance type, recomended is `m5.large`
+    - Set automate EBS volume size, based on your load needs.
+    - Set automate EBS volume type, default is `gp3`, change as per your requirement.
+    - Set automate EBS volume IOPS, based on your load needs.
     - 
-    - give Chef Server FQDN example `chefserver.example.com`
-    - give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
-    - give path of Chef Server loadbalance FQDN ssl root ca cerificates
-    - set Chef Server dashboard login password
-    - set how many Chef Server node want to have in cluster, recomended is atleast `two`
-    - set Chef Server instance type, recomended is `m5.large`
-    - set Chef Server EBS volume size, based on your load needs.
-    - set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
-    - set Chef Server EBS volume IOPS, based on your load needs.
-    - select `yes` for chef managed database deloyment
+    - Give Chef Server FQDN example `chefserver.example.com`
+    - Give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
+    - Give path of Chef Server loadbalance FQDN ssl root ca cerificates
+    - Set Chef Server dashboard login password
+    - Set how many Chef Server node want to have in cluster, recomended is atleast `two`
+    - Set Chef Server instance type, recomended is `m5.large`
+    - Set Chef Server EBS volume size, based on your load needs.
+    - Set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
+    - Set Chef Server EBS volume IOPS, based on your load needs.
+    - Select `yes` for chef managed database deloyment
     ```bash
         Do you want to use AWS Managed Databases:
        > yes
          no
     ```
-    - provide AWS managed opensearch details like `opensearch domain name`, `opensearch domain url` url should be without http or https and without port example `vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com`, `opensearch username`, `opensearch password`, from the **Managed AWS OpenSearch** created in the Prerequisite steps.
+    - Provide AWS managed opensearch details like `opensearch domain name`, `opensearch domain url` url should be without http or https and without port example `vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com`, `opensearch username`, `opensearch password`, from the **Managed AWS OpenSearch** created in the Prerequisite steps.
     - For AWS managed databases we have default amazon ssl certificates , If you want to use default then select `yes`, In case you have your own certificates for amazon opensarch the select `no` and provide your certificates
     ```bash
         Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL:
       > yes
         no
     ```
-  -  provide `Amazon openserch snapshot role ARN`,  `Amazon openserch snapshot user access key`,  `Amazon openserch snapshot user access secrect key` to take backup from Amazon opensearch, [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
+  -  Provide `Amazon openserch snapshot role ARN`,  `Amazon openserch snapshot user access key`,  `Amazon openserch snapshot user access secrect key` to take backup from Amazon opensearch, [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
   -  To configure Amazon RDS Postgresql, provide details of `Amazon RDS Postgresql URL:<Port>` url along with port in formate of <url>:<port>, `RDS super username`, `RDS superuser password`, `RDS database username`, `RDS database user password`, from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
      - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
      - The master password value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
-  -  same for postgresql if you want to use default ssl certificates from Amazon then select `yes`, Incase you have your own certificates then select `no` and provide your certificates.
+  -  Same for postgresql if you want to use default ssl certificates from Amazon then select `yes`, Incase you have your own certificates then select `no` and provide your certificates.
   ```bash
         Do you want to use Default AWS Cert to connect with AWS Managed Postgresql Domain URL:
       > yes
@@ -188,7 +188,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       > yes
         no
   ```
-  all done we can find generated config file with name given in `config gen` command
+  All done we can find generated config file with name given in `config gen` command
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
