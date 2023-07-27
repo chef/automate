@@ -117,7 +117,7 @@ Run the following steps on Bastion Host Machine:
     - Give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
     - We have two options as CIDR Block and subnets ids, 
       - Select  `yes` for CIDR and provide `CIDR` block Example `10.0.1.0`
-      - Select `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
+      - Select `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, we recommend to use subnet ids.
     ```bash
         Do you want to use AWS CIDR Block:
         > yes
