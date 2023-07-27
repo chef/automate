@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // mockTransport is a mock implementation of the http.RoundTripper interface
@@ -102,134 +103,197 @@ func GetRequestJsonWithSameFrontEnd() models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
-		  "ssh_user": {
+		"ssh_user": {
 			"user_name": "ubuntu",
 			"private_key": "test_key",
 			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
+		},
+		"arch": "existing_nodes",
+		"backup": {
 			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
+				"mount_location": "/mnt/automate_backups"
 			}
-		  },
-		  "hardware": {
+		},
+		"hardware": {
 			"automate_node_count": 1,
 			"automate_node_ips": [
-			  "5.6.7.8"
+				"1.2.3.4"
 			],
 			"chef_infra_server_node_count": 1,
 			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
+				"5.6.7.8"
 			],
 			"postgresql_node_count": 1,
 			"postgresql_node_ips": [
-			  "9.10.11.12"
+				"9.10.11.12"
 			],
 			"opensearch_node_count": 1,
 			"opensearch_node_ips": [
-			  "14.15.16.17"
+				"14.15.16.17"
 			]
-		  },
-		  "certificate": {
-			"fqdn":"my_fqdn",
-			"root_cert":"---- VALID ROOT CA ----",
-			"nodes":[
-				{
-					"ip":"5.6.7.8",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"9.10.11.12",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"14.15.16.17",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				}
-			]
-		  }
-		}`), &ipConfig)
+		},
+		"certificate": [
+			{
+				"fqdn": "automate_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "automate",
+				"nodes": [
+					{
+						"ip": "5.6.7.8",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "chef_server_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "chef-infra-server",
+				"nodes": [
+					{
+						"ip": "5.6.7.8",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "postgresql",
+				"nodes": [
+					{
+						"ip": "9.10.11.12",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "opensearch",
+				"nodes": [
+					{
+						"ip": "14.15.16.17",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			}
+		]
+	}`), &ipConfig)
 	return ipConfig
 }
 
-func GetRequestJson() models.Config {
-	ipConfig := models.Config{}
+func GetRequestJson() *models.Config {
+	ipConfig := &models.Config{}
 
 	json.Unmarshal([]byte(`{
-		  "ssh_user": {
+		"ssh_user": {
 			"user_name": "ubuntu",
 			"private_key": "test_key",
 			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
+		},
+		"arch": "existing_nodes",
+		"backup": {
 			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
+				"mount_location": "/mnt/automate_backups"
 			}
-		  },
-		  "hardware": {
+		},
+		"hardware": {
 			"automate_node_count": 1,
 			"automate_node_ips": [
-			  "1.2.3.4"
+				"1.2.3.4"
 			],
 			"chef_infra_server_node_count": 1,
 			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
+				"5.6.7.8"
 			],
 			"postgresql_node_count": 1,
 			"postgresql_node_ips": [
-			  "9.10.11.12"
+				"9.10.11.12"
 			],
 			"opensearch_node_count": 1,
 			"opensearch_node_ips": [
-			  "14.15.16.17"
+				"14.15.16.17"
 			]
-		  },
-		  "certificate": {
-			"fqdn":"my_fqdn",
-			"root_cert":"---- VALID ROOT CA ----",
-			"nodes":[
-				{
-					"ip":"1.2.3.4",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"5.6.7.8",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"9.10.11.12",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"14.15.16.17",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				}
-			]
-		  }
-		}`), &ipConfig)
+		},
+		"certificate": [
+			{
+				"fqdn": "automate_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "automate",
+				"nodes": [
+					{
+						"ip": "1.2.3.4",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "chef_server_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "chef-infra-server",
+				"nodes": [
+					{
+						"ip": "5.6.7.8",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "postgresql",
+				"nodes": [
+					{
+						"ip": "9.10.11.12",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "opensearch",
+				"nodes": [
+					{
+						"ip": "14.15.16.17",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			}
+		]
+	}`), &ipConfig)
 	return ipConfig
 }
 
@@ -483,4 +547,156 @@ func TestCertificateCheck_Run(t *testing.T) {
 		}
 	})
 
+	t.Run("Nil Cert", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			Certificate: nil,
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 4)
+		assert.Equal(t, "12.12.1.7", ctr[1].Host)
+		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
+		assert.Nil(t, ctr[0].Result.Error)
+		require.True(t, ctr[0].Result.Skipped)
+	})
+
+	t.Run("Empty Cert", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.2"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.3"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.4"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.5"},
+			},
+			Certificate: []*models.Certificate{},
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 4)
+
+		for _, v := range ctr {
+			require.Equal(t, constants.CERTIFICATE, v.Result.Check)
+			assert.NotEmpty(t, v.Host)
+			require.False(t, v.Result.Skipped)
+			require.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			require.Equal(t, constants.MISSING_CERTIFICATE, v.Result.Error.Message)
+		}
+
+	})
+
+	t.Run("Nodes Empty", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.2"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.3"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.4"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.5"},
+			},
+			Certificate: []*models.Certificate{
+				{
+					Fqdn:         "example.com",
+					FqdnRootCert: "root_ca",
+					NodeType:     constants.AUTOMATE,
+					Nodes:        []*models.NodeCert{},
+				},
+			},
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 1)
+
+		for _, v := range ctr {
+			require.Equal(t, constants.CERTIFICATE, v.Result.Check)
+			assert.NotEmpty(t, v.Host)
+			require.True(t, v.Result.Skipped)
+		}
+
+	})
+
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}
+
+func Test_skipCertificateForAutomateAndChefServerNodes(t *testing.T) {
+	type args struct {
+		nodeType    string
+		hardwareMap map[string][]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{{
+		name: "Check response for automate nodes",
+		args: args{
+			nodeType: constants.AUTOMATE,
+			hardwareMap: map[string][]string{
+				"test_ip":  {constants.AUTOMATE},
+				"test_ip2": {constants.AUTOMATE},
+			},
+		},
+		want: []models.CheckTriggerResponse{
+			{
+				Host:      "test_ip",
+				NodeType:  constants.AUTOMATE,
+				CheckType: constants.CERTIFICATE,
+				Result: models.ApiResult{
+					Skipped:     true,
+					Passed:      false,
+					Check:       constants.CERTIFICATE,
+					SkipMessage: constants.SKIP_CERT_TEST_MESSAGE,
+				},
+			}, {
+				Host:      "test_ip2",
+				NodeType:  constants.AUTOMATE,
+				CheckType: constants.CERTIFICATE,
+				Result: models.ApiResult{
+					Skipped:     true,
+					Passed:      false,
+					Check:       constants.CERTIFICATE,
+					SkipMessage: constants.SKIP_CERT_TEST_MESSAGE,
+				},
+			},
+		},
+	},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := skipCertificateForAutomateAndChefServerNodes(tt.args.nodeType, tt.args.hardwareMap)
+			assert.Equal(t, len(tt.want), len(got))
+			for _, w := range tt.want {
+				assert.Contains(t, got, w)
+			}
+
+		})
+	}
 }

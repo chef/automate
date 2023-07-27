@@ -16,9 +16,9 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+- Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** with Chef Backend should not migrate with this.
+
 - Also, for the customers using a standalone Chef Infra Server, cookbooks should be in the database or S3 but not in the file system.
-- Automate HA does not support supermarket authentication with chef-server user credentials. Post migration to Automate HA those customer users will not be able to log in with chef-server user credentials to their Supermarket.
 
 {{< /warning >}}
 
@@ -310,3 +310,7 @@ Bootstrap the nodes to update the `chef_server_url` using the following steps:
 ## Use Automate HA for Chef-Backend User
 
 Download and Install the [Chef Workstation](https://www.chef.io/downloads/tools/workstation) from the Bastion machine or local machine install chef-workstation. You can refer to the [Workstation page](https://docs.chef.io/workstation/getting_started/#set-up-your-chef-repo) to set up your Workstation.
+
+## Use Existing Private Supermarket with Automate HA
+
+If you are using private instance of Supermarket with Chef Backend, you can refer to [Supermarket with Automate HA](/automate/supermarket_with_automate_ha/) to ensure that your same private instance of Supermarket works with Automate HA cluster.

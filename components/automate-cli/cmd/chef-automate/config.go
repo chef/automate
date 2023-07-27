@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"reflect"
 	"regexp"
 	"strings"
@@ -19,6 +18,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/config/genconfig"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/pmt"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/imdario/mergo"
@@ -40,7 +42,6 @@ var configCmdFlags = struct {
 }{}
 
 const (
-	dateFormat       = "%Y%m%d%H%M%S"
 	postgresql       = "postgresql"
 	opensearch_const = "opensearch"
 	PRODUCT_WARNING  = `Ignored 'products' from [deployment.v1.svc]`
@@ -61,6 +62,11 @@ func init() {
 	configCmd.AddCommand(showConfigCmd)
 	configCmd.AddCommand(patchConfigCmd)
 	configCmd.AddCommand(setConfigCmd)
+	configCmd.AddCommand(genConfigCmd)
+
+	//config gen flags
+	genConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml")
+	configCmd.AddCommand(ocIdShowAppCmd)
 
 	//config show flags
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml [Standalone]")
@@ -126,6 +132,10 @@ func init() {
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Set toml configuration to the postgresql node[DUPLICATE]")
 	setConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 
+	//config oc-id-show-app flags
+	ocIdShowAppCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, waitTimeout, DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config oc-id-show-app process")
+	ocIdShowAppCmd.PersistentFlags().SetAnnotation(waitTimeout, docs.Compatibility, []string{docs.CompatiblewithStandalone, docs.CompatiblewithHA})
+
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
 	configCmd.PersistentFlags().SetAnnotation("timeout", docs.Compatibility, []string{docs.CompatiblewithStandalone})
@@ -149,6 +159,17 @@ var showConfigCmd = &cobra.Command{
 	},
 }
 
+var genConfigCmd = &cobra.Command{
+	Use:   "gen [/path/to/write/config.toml]",
+	Short: "generate the Automate HA configuration",
+	Long:  "Prompt based Config Generation command. It will output the config in the provided file, if file path is not provided then it will print on STDOUT.",
+	RunE:  runGenCmd,
+	Args:  cobra.RangeArgs(0, 2),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
+
 var patchConfigCmd = &cobra.Command{
 	Use:   "patch path/to/config.toml",
 	Short: "patch the Chef Automate configuration", Long: "Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.",
@@ -165,6 +186,80 @@ var setConfigCmd = &cobra.Command{
 	Long:  "Set the Chef Automate configuration for the deployment. It will replace the Chef Automate configuration with the given configuration and apply any required changes.",
 	RunE:  runSetCommand,
 	Args:  cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
+
+func runGenCmd(cmd *cobra.Command, args []string) error {
+	fsu := fileutils.NewFileSystemUtils()
+	p := pmt.PromptFactory(os.Stdin, os.Stdout, fsu)
+	g := genconfig.GenConfigImpFactory(p)
+
+	err := g.GenConfigWithPrompts()
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.FailedToGenConfig,
+			"Failed to generate config with given input values to the prompts.",
+		)
+	}
+	t, err := g.Toml()
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.MarshalError,
+			"Marshaling configuration to TOML failed",
+		)
+	}
+
+	// Handle writing to a file if a path was given
+	if len(args) > 0 && args[0] != "" {
+		outFile, err := filepath.Abs(args[0])
+		if err != nil {
+			return status.Annotate(err, status.FileAccessError)
+		}
+
+		err = checkConfigGenFileExist(outFile, fsu)
+		if err != nil {
+			return err
+		}
+		err = fsu.WriteFile(outFile, t, 0644)
+		if err != nil {
+			return status.Wrap(err, status.FileAccessError, fmt.Sprint("Failed to write to file: ", outFile))
+		}
+	} else {
+		writer.Println("")
+		writer.Println(string(t))
+	}
+
+	status.GlobalResult = t
+	return nil
+}
+
+func checkConfigGenFileExist(outFile string, fsu fileutils.FileUtils) error {
+	if _, err := fsu.Stat(outFile); err == nil {
+		if configCmdFlags.overwriteFile {
+			return nil
+		}
+		p := pmt.PromptFactory(os.Stdin, os.Stdout, fsu)
+		ok, err := p.Confirm(fmt.Sprintf("%s file already exists. Do you wish to overwrite it?", outFile), "yes", "no")
+		if err != nil {
+			return status.Wrap(err, status.PromptFailed, err.Error())
+		}
+		if !ok {
+			err = errors.New("failed to confirm overwrite")
+			return status.Annotate(err, status.FileAccessError)
+		}
+	}
+	return nil
+}
+
+var ocIdShowAppCmd = &cobra.Command{
+	Use:   "oc-id-show-app",
+	Short: "Get the details of the oauth applications registered with OC-ID",
+	Long:  "Get the details of the oauth applications registered with OC-ID",
+	RunE:  runOcIdShowAppCommand,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
@@ -360,7 +455,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		configFile := args[0]
 		configFileName := stringutils.GetFileName(configFile)
 		frontendPrefix := "frontend" + "_" + timestamp + "_"
-		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+configFileName, dateFormat)
+		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+configFileName, DATE_FORMAT)
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -375,7 +470,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		automatePrefix := "automate" + "_" + timestamp + "_"
-		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, automatePrefix+configFileName, dateFormat)
+		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, automatePrefix+configFileName, DATE_FORMAT)
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -390,7 +485,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		chefserverPrefix := "chef_server" + "_" + timestamp + "_"
-		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, chefserverPrefix+configFileName, dateFormat)
+		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, chefserverPrefix+configFileName, DATE_FORMAT)
 		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -405,7 +500,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		postgresqlPrefix := "postgresql" + "_" + timestamp + "_"
-		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", postgresqlPrefix+configFileName)
+		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, "postgresql", "%s", postgresqlPrefix+configFileName)
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
@@ -420,7 +515,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		opensearchPrefix := "opensearch" + "_" + timestamp + "_"
-		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", opensearchPrefix+configFileName)
+		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, "opensearch", "%s", opensearchPrefix+configFileName)
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
@@ -640,6 +735,54 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
+			return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+		}
+
+		frontendCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
+		frontend := &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCmd,
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   true,
+				Args:                     args,
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 true,
+			},
+		}
+
+		nodeMap := &NodeTypeAndCmd{
+			Frontend: frontend,
+			Infra:    infra,
+		}
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
+
+		_, cmdExecErr := cmdUtil.Execute()
+
+		if cmdExecErr != nil {
+			return cmdExecErr
+		}
+	} else {
+		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
+		content, err := os.ReadFile(oauthAppDetailsFilePath)
+		if err != nil {
+			printErr := "Could not find the file with the registered application details. Pls restart OC-ID to generate it."
+			writer.Errorln(printErr)
+			return err
+		}
+		registeredAppDetails := string(content)
+		writer.Println(registeredAppDetails)
+	}
+	return nil
+}
+
 type ResultConfigSet struct {
 	HostIP string
 	Output string
@@ -650,7 +793,7 @@ type ResultConfigSet struct {
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
 	resultChan := make(chan ResultConfigSet, len(frontendIps))
 	configFile := remoteService + timestamp
-	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, dateFormat)
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, DATE_FORMAT)
 	originalSSHConfig := sshUtil.getSSHConfig()
 
 	for _, hostIP := range frontendIps {
@@ -787,7 +930,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 
 // setConfigForPostgresqlAndOpensearch set the configuration for postgresql and opensearch nodes in Automate HA
 func setConfigForPostgresqlAndOpensearch(remoteService string, timestamp string, sshUtil SSHUtil, hostIP string, tomlFilePath string, writer *cli.Writer) error {
-	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, remoteService, "%s", remoteService+timestamp)
 
 	sshUtil.getSSHConfig().hostIP = hostIP
 	printConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP, writer)
@@ -822,7 +965,7 @@ func getMergedOpensearchInterface(rawOutput string, pemFilePath string, remoteSe
 		return "", err
 	}
 
-	pemBytes, err := ioutil.ReadFile(pemFilePath) // nosemgrep
+	pemBytes, err := os.ReadFile(pemFilePath)
 	if err != nil {
 		return "", err
 	}
@@ -845,7 +988,7 @@ func getMergedPostgresqlInterface(rawOutput string, pemFilePath string, remoteSe
 		return "", err
 	}
 
-	pemBytes, err := ioutil.ReadFile(pemFilePath) // nosemgrep
+	pemBytes, err := os.ReadFile(pemFilePath)
 	if err != nil {
 		return "", err
 	}
@@ -962,7 +1105,7 @@ func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 
 // getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
 func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
-	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
+	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
 		return nil, err
 	}
@@ -992,6 +1135,7 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAIn
 	//Getting Existing config from server
 	var existingConfig PostgresqlConfig
 	var reqConfig PostgresqlConfig
+	var emptyConfig PostgresqlConfig
 	srcInputString, err := getConfigFromRemoteServer(infra, postgresql, config, sshUtil)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
@@ -1008,6 +1152,9 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAIn
 		return existingConfig, reqConfig, err
 	}
 	reqConfig = reqConfigInterface.(PostgresqlConfig)
+	if !isConfigChanged(emptyConfig, reqConfig) {
+		return existingConfig, reqConfig, status.Annotate(errors.New("Incorrect Config"), status.ConfigError)
+	}
 	mergo.Merge(&reqConfig, existingConfig)
 	return existingConfig, reqConfig, nil
 }
@@ -1017,6 +1164,7 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomateHA
 	//Getting Existing config from server
 	var existingConfig OpensearchConfig
 	var reqConfig OpensearchConfig
+	var emptyConfig OpensearchConfig
 	srcInputString, err := getConfigFromRemoteServer(infra, opensearch_const, config, sshUtil)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
@@ -1033,7 +1181,9 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomateHA
 		return existingConfig, reqConfig, err
 	}
 	reqConfig = reqConfigInterface.(OpensearchConfig)
-
+	if !isConfigChanged(emptyConfig, reqConfig) {
+		return existingConfig, reqConfig, status.Annotate(errors.New("Incorrect Config"), status.ConfigError)
+	}
 	mergo.Merge(&reqConfig, existingConfig)
 	return existingConfig, reqConfig, nil
 }
@@ -1064,7 +1214,7 @@ func createTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 
 func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 
-	tomlbyt, _ := ioutil.ReadFile(srcString) // nosemgrep
+	tomlbyt, _ := os.ReadFile(srcString)
 	destString := string(tomlbyt)
 	var dest dc.AutomateConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"errors"
+
 	dc "github.com/chef/automate/api/config/deployment"
 	shared "github.com/chef/automate/api/config/shared"
 	"github.com/stretchr/testify/assert"
@@ -249,54 +251,34 @@ func TestGetOSORPGRootCAEmpty(t *testing.T) {
 	assert.Equal(t, "", out)
 }
 
-func Test_getPrivateKeyFromFE(t *testing.T) {
+func Test_getPrivateAndPublicKeyFromFE(t *testing.T) {
 	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
 		{
-			Key: PrivateKeyContents,
-		},
-	}
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, PrivateKeyContents, output)
-}
-
-func Test_getPrivateKeyFromFEEmpty(t *testing.T) {
-	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
-		{
-			Key: "",
-		},
-	}
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, "", output)
-}
-
-func Test_getPrivateKeyFromFEEmptyMap(t *testing.T) {
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{})
-	assert.Equal(t, "", output)
-}
-
-func Test_getPublicKeyFromFE(t *testing.T) {
-	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
-		{
+			Key:  PrivateKeyContents,
 			Cert: PublicKeyContents,
 		},
 	}
-	output := getPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, PublicKeyContents, output)
+	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
+	assert.Equal(t, PrivateKeyContents, privateKey)
+	assert.Equal(t, PublicKeyContents, publicKey)
 }
 
-func Test_getPublicKeyFromFEEmpty(t *testing.T) {
+func Test_getPrivateAndPublicKeyFromFEEmpty(t *testing.T) {
 	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
 		{
+			Key:  "",
 			Cert: "",
 		},
 	}
-	output := getPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
-	assert.Equal(t, "", output)
+	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{ip1: automateConfigKeys})
+	assert.Equal(t, "", privateKey)
+	assert.Equal(t, "", publicKey)
 }
 
-func Test_getPublicKeyKeyFromFEEmptyMap(t *testing.T) {
-	output := getPrivateKeyFromFE(map[string]*dc.AutomateConfig{})
-	assert.Equal(t, "", output)
+func Test_getPrivateAndPublicKeyFromFEEmptyMap(t *testing.T) {
+	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{})
+	assert.Equal(t, "", privateKey)
+	assert.Equal(t, "", publicKey)
 }
 
 func Test_getPrivateKeyAndPublicKeyFromBE(t *testing.T) {
@@ -477,15 +459,6 @@ func Test_getAwsHAConfigFromTFVars(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, params)
 	assert.Equal(t, "true", params.BackupConfigEFS)
-	assert.Equal(t, "/home/test-user/keys.pem", params.AwsSshKeyFile)
-	assert.Equal(t, "22", params.SshPort)
-	assert.Equal(t, 3, params.PostgresqlInstanceCount)
-	assert.Equal(t, 1, params.AutomateInstanceCount)
-	assert.Equal(t, 3, params.OpensearchInstanceCount)
-	assert.Equal(t, 1, params.ChefServerInstanceCount)
-	assert.Equal(t, "test-user", params.SshUser)
-	assert.Equal(t, "A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com", params.AutomateFqdn)
-
 }
 
 func TestGetOsCertsByIp(t *testing.T) {
@@ -596,6 +569,472 @@ func TestGetOsCertsByIp(t *testing.T) {
 
 			for i := 0; i < len(certByIpGet); i++ {
 				assert.Equal(t, testCase.ExpectedCertsByIp[i].NodesDn, certByIpGet[i].NodesDn)
+			}
+		})
+	}
+}
+
+func TestGetOpensearchDetails(t *testing.T) {
+	type testCaseInfo struct {
+		testCaseDescreption    string
+		InstanceURL            string
+		Username               string
+		password               string
+		rootCert               string
+		serverName             string
+		accessKey              string
+		secretKey              string
+		roleArn                string
+		ExpectedOpensearchToml *ExternalOpensearchToml
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescreption: "With Http URL",
+			InstanceURL:         "http://testopensearch:9200/",
+			Username:            "admin",
+			password:            "pass",
+			rootCert:            "----certs----",
+			serverName:          "test server",
+			accessKey:           "test-access",
+			secretKey:           "test-secret",
+			roleArn:             "test-role-arn",
+			ExpectedOpensearchToml: &ExternalOpensearchToml{
+				OpensearchInstanceURL:       "testopensearch:9200",
+				OpensearchSuperUserName:     "admin",
+				OpensearchSuperUserPassword: "pass",
+				OpensearchRootCert:          "----certs----",
+				OpensearchDomainName:        "test server",
+				AWS: ExternalAwsToml{
+					AwsOsSnapshotRoleArn:  "test-role-arn",
+					OsUserAccessKeyId:     "test-access",
+					OsUserAccessKeySecret: "test-secret",
+				},
+			},
+		},
+		{
+			testCaseDescreption: "With Https URL",
+			InstanceURL:         "https://testopensearch:9200/",
+			Username:            "admin",
+			password:            "pass",
+			rootCert:            "----certs----",
+			serverName:          "test server",
+			accessKey:           "test-access",
+			secretKey:           "test-secret",
+			roleArn:             "test-role-arn",
+			ExpectedOpensearchToml: &ExternalOpensearchToml{
+				OpensearchInstanceURL:       "testopensearch:9200",
+				OpensearchSuperUserName:     "admin",
+				OpensearchSuperUserPassword: "pass",
+				OpensearchRootCert:          "----certs----",
+				OpensearchDomainName:        "test server",
+				AWS: ExternalAwsToml{
+					AwsOsSnapshotRoleArn:  "test-role-arn",
+					OsUserAccessKeyId:     "test-access",
+					OsUserAccessKeySecret: "test-secret",
+				},
+			},
+		},
+		{
+			testCaseDescreption: "With cert blank",
+			InstanceURL:         "https://testopensearch:9200/",
+			Username:            "admin",
+			password:            "pass",
+			rootCert:            "",
+			serverName:          "test server",
+			accessKey:           "test-access",
+			secretKey:           "test-secret",
+			roleArn:             "test-role-arn",
+			ExpectedOpensearchToml: &ExternalOpensearchToml{
+				OpensearchInstanceURL:       "testopensearch:9200",
+				OpensearchSuperUserName:     "admin",
+				OpensearchSuperUserPassword: "pass",
+				OpensearchRootCert:          "",
+				OpensearchDomainName:        "test server",
+				AWS: ExternalAwsToml{
+					AwsOsSnapshotRoleArn:  "test-role-arn",
+					OsUserAccessKeyId:     "test-access",
+					OsUserAccessKeySecret: "test-secret",
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
+			externalOsConfig := setExternalOpensearchDetails(testCase.InstanceURL, testCase.Username, testCase.password, testCase.rootCert, testCase.serverName, testCase.accessKey, testCase.secretKey, testCase.roleArn)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchInstanceURL, externalOsConfig.OpensearchInstanceURL)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchDomainName, externalOsConfig.OpensearchDomainName)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchSuperUserName, externalOsConfig.OpensearchSuperUserName)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchSuperUserPassword, externalOsConfig.OpensearchSuperUserPassword)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.OpensearchRootCert, externalOsConfig.OpensearchRootCert)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.AWS.AwsOsSnapshotRoleArn, externalOsConfig.AWS.AwsOsSnapshotRoleArn)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.AWS.OsUserAccessKeyId, externalOsConfig.AWS.OsUserAccessKeyId)
+			assert.Equal(t, testCase.ExpectedOpensearchToml.AWS.OsUserAccessKeySecret, externalOsConfig.AWS.OsUserAccessKeySecret)
+		})
+	}
+}
+
+func TestGetPGDetails(t *testing.T) {
+	type testCaseInfo struct {
+		testCaseDescreption string
+		InstanceURL         string
+		SuperUsername       string
+		SuperUserPassword   string
+		DBUserName          string
+		DBUserPassword      string
+		rootCert            string
+		ExpectedPGToml      *ExternalPostgreSQLToml
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescreption: "With cert",
+			InstanceURL:         "testopensearch:5432",
+			SuperUsername:       "admin",
+			SuperUserPassword:   "pass",
+			DBUserName:          "admin",
+			DBUserPassword:      "pass",
+			rootCert:            "----certs----",
+			ExpectedPGToml: &ExternalPostgreSQLToml{
+				PostgreSQLInstanceURL:       "testopensearch:5432",
+				PostgreSQLSuperUserName:     "admin",
+				PostgreSQLSuperUserPassword: "pass",
+				PostgreSQLDBUserName:        "admin",
+				PostgreSQLDBUserPassword:    "pass",
+				PostgreSQLRootCert:          "----certs----",
+			},
+		},
+		{
+			testCaseDescreption: "With empty cert",
+			InstanceURL:         "testopensearch:5432",
+			SuperUsername:       "admin",
+			SuperUserPassword:   "pass",
+			DBUserName:          "admin",
+			DBUserPassword:      "pass",
+			rootCert:            "",
+			ExpectedPGToml: &ExternalPostgreSQLToml{
+				PostgreSQLInstanceURL:       "testopensearch:5432",
+				PostgreSQLSuperUserName:     "admin",
+				PostgreSQLSuperUserPassword: "pass",
+				PostgreSQLDBUserName:        "admin",
+				PostgreSQLDBUserPassword:    "pass",
+				PostgreSQLRootCert:          "",
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
+			externalPGConfig := setExternalPGDetails(testCase.InstanceURL, testCase.SuperUsername, testCase.SuperUserPassword, testCase.DBUserName, testCase.DBUserPassword, testCase.rootCert)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLInstanceURL, externalPGConfig.PostgreSQLInstanceURL)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLSuperUserName, externalPGConfig.PostgreSQLSuperUserName)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLSuperUserPassword, externalPGConfig.PostgreSQLSuperUserPassword)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLDBUserName, externalPGConfig.PostgreSQLDBUserName)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLDBUserPassword, externalPGConfig.PostgreSQLDBUserPassword)
+			assert.Equal(t, testCase.ExpectedPGToml.PostgreSQLRootCert, externalPGConfig.PostgreSQLRootCert)
+		})
+	}
+}
+
+func TestDetermineDBType(t *testing.T) {
+	testCases := []struct {
+		name         string
+		a2ConfigMap  map[string]*dc.AutomateConfig
+		dbtype       string
+		expectedType string
+		expectedErr  error
+	}{
+		{
+			name: "When db type is self managed but customer had patched aws",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_SELF_MANAGED,
+			expectedType: TYPE_AWS,
+			expectedErr:  nil,
+		},
+		{
+			name: "When db type is aws but customer had patched self managed",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "basic_auth",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_AWS,
+			expectedType: TYPE_SELF_MANAGED,
+			expectedErr:  nil,
+		},
+		{
+			name: "When global.external.opensearch not present",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_AWS,
+			expectedType: "",
+			expectedErr:  errors.New("automate config error found"),
+		},
+		{
+			name: "When invalid type comes in db type",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       "old_type",
+			expectedType: "old_type",
+			expectedErr:  errors.New(`unsupported db type. It should be either "aws" or "self-managed" or ""`),
+		},
+		{
+			name: "When invalid type comes in db type",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       "",
+			expectedType: "",
+			expectedErr:  nil,
+		},
+		{
+			name: "When scheme is invalid",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Auth: &shared.External_Opensearch_Authentication{
+										Scheme: &wrapperspb.StringValue{
+											Value: "aws_os_invalid",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			dbtype:       TYPE_AWS,
+			expectedType: "",
+			expectedErr:  errors.New("automate config Value in Global.V1.External.Opensearch.Auth.Scheme can be either basic_auth or aws_os"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dbType, err := determineDBType(tc.a2ConfigMap, tc.dbtype)
+			if tc.expectedErr != nil {
+				assert.Equal(t, tc.expectedErr, err)
+			} else {
+				assert.Equal(t, tc.expectedType, dbType)
+			}
+		})
+	}
+}
+
+func TestDetermineBkpConfig(t *testing.T) {
+	tests := []struct {
+		name           string
+		a2ConfigMap    map[string]*dc.AutomateConfig
+		currConfig     string
+		s3             string
+		fs             string
+		expectedResult string
+		expectedErr    error
+	}{
+		{
+			name: "When backup has s3 and os has s3",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "s3",
+										},
+									},
+								},
+							},
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "s3",
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "s3_backup",
+			expectedErr:    nil,
+		},
+		{
+			name: "When missing OS config",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: nil,
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "",
+			expectedErr:    errors.New("automate config Global.V1.External.Opensearch missing"),
+		},
+		{
+			name: "When missing location value in opensearch",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{},
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "",
+			expectedErr:    errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup"),
+		},
+		{
+			name: "When setting present on backup and os",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "fs",
+										},
+									},
+								},
+							},
+							Backups: &shared.Backups{
+								Filesystem: &shared.Backups_Filesystem{
+									Path: &wrapperspb.StringValue{
+										Value: "/var/opt/backups",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "fs_backup",
+			expectedErr:    nil,
+		},
+		{
+			name: "When missing the backup value",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "s3",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "",
+			expectedErr:    errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup"),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := determineBkpConfig(tc.a2ConfigMap, tc.currConfig, tc.s3, tc.fs)
+			if tc.expectedErr != nil {
+				assert.Equal(t, tc.expectedErr, err)
+			} else {
+				assert.Equal(t, tc.expectedResult, result)
 			}
 		})
 	}

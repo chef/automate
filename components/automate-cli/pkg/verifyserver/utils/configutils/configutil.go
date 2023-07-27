@@ -5,7 +5,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func GetIps(hardware models.Hardware) []string {
+func GetIps(hardware *models.Hardware) []string {
 	var ipArray []string
 
 	ipArray = append(ipArray, hardware.AutomateNodeIps...)
@@ -15,7 +15,7 @@ func GetIps(hardware models.Hardware) []string {
 	return ipArray
 }
 
-func GetNodeTypeMap(hardware models.Hardware) map[string][]string {
+func GetNodeTypeMap(hardware *models.Hardware) map[string][]string {
 	hostMap := make(map[string][]string)
 
 	for _, ip := range hardware.AutomateNodeIps {
@@ -31,4 +31,16 @@ func GetNodeTypeMap(hardware models.Hardware) map[string][]string {
 		hostMap[ip] = append(hostMap[ip], constants.OPENSEARCH)
 	}
 	return hostMap
+}
+
+func GetCertificateMap(certificateList []*models.Certificate) map[string]*models.Certificate {
+
+	certificateMap := make(map[string]*models.Certificate)
+
+	for _, certificate := range certificateList {
+		certificateMap[certificate.NodeType] = certificate
+	}
+
+	return certificateMap
+
 }

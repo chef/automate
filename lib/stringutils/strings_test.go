@@ -33,3 +33,23 @@ func TestTitleReplace(t *testing.T) {
 	assert.Equal(t, "Helloworld", stringutils.TitleReplace("helloworld", "-", " "))
 	assert.Equal(t, "Hello Chef", stringutils.TitleReplace("hello chef", "_", "-"))
 }
+
+func TestGetLastLine(t *testing.T) {
+	// Test case 1: Empty input string
+	input := ""
+	expected := ""
+	actual := stringutils.GetLastLine(input)
+	assert.Equal(t, actual, expected)
+
+	// Test case 2: Single line input
+	input = "Hello, World!"
+	expected = "Hello, World!"
+	actual = stringutils.GetLastLine(input)
+	assert.Equal(t, actual, expected)
+
+	// Test case 3: Multiple lines input
+	input = "Line 1\nLine 2\nLine 3\nLast line"
+	expected = "Last line"
+	actual = stringutils.GetLastLine(input)
+	assert.Equal(t, actual, expected)
+}

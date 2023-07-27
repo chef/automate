@@ -43,7 +43,7 @@ func newGatherLogsCmd() *cobra.Command {
 		RunE:  runGatherLogsCmd,
 		Args:  cobra.RangeArgs(0, 3),
 		Annotations: map[string]string{
-			docs.Tag: docs.FrontEnd,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
@@ -445,6 +445,8 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 	g.AddCopiesFromPath("user.toml", "/hab/user")
 	g.AddCopiesFromPath("config", "/hab/svc")
 	g.AddCopiesFromPath("logs", "/hab/svc")
+
+	g.AddCopiesFromPath("pg_log", "/hab/svc")
 
 	// local status
 	g.AddCommand("df_h", "df", "-h")

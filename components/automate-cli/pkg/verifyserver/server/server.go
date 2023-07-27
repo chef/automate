@@ -24,25 +24,29 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/sshuseraccesschecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/certificatevalidation"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/mockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/sshusercheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/executil"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/systemresource"
 	"github.com/chef/automate/lib/userutils"
 	"github.com/gofiber/fiber/v2"
@@ -93,7 +97,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddBatchCheckService(
 			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(
 				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
-				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, port),
+				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, fileutils.NewFileSystemUtils(), port),
 				certificatechecktrigger.NewCertificateCheck(l, port),
 				externalopensearchchecktrigger.NewExternalOpensearchCheck(l, port),
 				externalpostgresqlchecktrigger.NewExternalPostgresCheck(l, port),
@@ -105,21 +109,22 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
-			))).
-		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, systemresource.NewSystemResourceInfoImpl())).
+			), l, port)).
+		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, httputils.NewClient(l),systemresource.NewSystemResourceInfoImpl())).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
 		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).
-		AddMockServerServices(startmockserverservice.New(l)).
+		AddMockServerService(mockserverservice.NewMockServersServiceImp(l)).
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
-		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
 		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
 		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
 		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
-		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT))
-
+		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
+		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
+		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
+		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l)))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

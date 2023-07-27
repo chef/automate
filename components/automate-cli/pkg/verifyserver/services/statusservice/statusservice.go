@@ -54,12 +54,12 @@ func (ss *StatusService) GetServicesFromHabSvcStatus() (*[]models.ServiceDetails
 		ss.Log.Error("Error while running '"+constants.HABSTATUSCMD+"' command: ", err)
 		return nil, errors.New("error getting services from hab svc status")
 	}
-	return ss.ParseHabSvcStatus(string(output))
+	return ParseHabSvcStatus(string(output))
 }
 
 // Parse the output of hab svc status
 // TODO: We need to update the below function/regex if the output of hab svc status changes
-func (ss *StatusService) ParseHabSvcStatus(output string) (*[]models.ServiceDetails, error) {
+func ParseHabSvcStatus(output string) (*[]models.ServiceDetails, error) {
 	response := make([]models.ServiceDetails, 0)
 
 	tableStart := strings.Index(output, "package")

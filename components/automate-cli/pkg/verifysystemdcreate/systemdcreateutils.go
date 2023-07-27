@@ -15,6 +15,7 @@ type SystemdCreateUtils interface {
 	SystemdRunning() error
 	CreateDestinationAndCopy(binarySrcPath, binaryDestPath string) error
 	ExecuteShellCommand(name string, arg []string) error
+	GetEnv() string
 }
 
 type SystemdCreateUtilsImpl struct{}
@@ -51,4 +52,8 @@ func (scu *SystemdCreateUtilsImpl) CreateDestinationAndCopy(binarySrcPath, binar
 
 func (scu *SystemdCreateUtilsImpl) ExecuteShellCommand(name string, arg []string) error {
 	return exec.Command(name, arg...).Run()
+}
+
+func (scu *SystemdCreateUtilsImpl) GetEnv() string {
+	return os.Getenv("HOME")
 }

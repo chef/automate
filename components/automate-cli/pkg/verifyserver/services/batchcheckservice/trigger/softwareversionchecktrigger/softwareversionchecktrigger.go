@@ -19,6 +19,16 @@ func NewSoftwareVersionCheck(log logger.Logger, port string) *SoftwareVersionChe
 	}
 }
 
-func (svc *SoftwareVersionCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (svc *SoftwareVersionCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	// Check for config.HardWare if empty of nil
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.SOFTWARE_VERSIONS, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, true, true)
+	}
+
 	return trigger.RunCheck(config, svc.log, svc.port, constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
+}
+
+func (ss *SoftwareVersionCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
 }

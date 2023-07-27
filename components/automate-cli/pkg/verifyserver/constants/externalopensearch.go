@@ -8,5 +8,4 @@ const (
 	EXTERNAL_OPENSEARCH_RESOLUTION_MSG = "Ensure that the OpenSearch configuration provided is correct. Review security group or firewall settings as well on the infrastructure"
 	STATUS_PASS                        = "PASS"
 	STATUS_FAIL                        = "FAIL"
-	HTTPS_PORT                         = 443
 )

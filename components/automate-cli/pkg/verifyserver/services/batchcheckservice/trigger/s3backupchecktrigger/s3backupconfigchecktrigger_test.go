@@ -8,11 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -183,16 +182,17 @@ func getRequest() models.S3ConfigRequest {
 
 func TestS3BackupConfigCheck_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 
 	tests := []struct {
-		name           string
-		isPassed       bool
-		args           args
-		response       string
-		httpStatusCode int
-		isError        bool
+		name                   string
+		isPassed               bool
+		args                   args
+		response               string
+		httpStatusCode         int
+		isError                bool
+		requiredStatusResponse string
 	}{
 		{
 			name:           "All the s3 checks passed",
@@ -200,12 +200,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -224,12 +224,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 1,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -248,13 +248,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusInternalServerError,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
-							Endpoint:   endPoint,
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							BucketName: BucketName,
 							BasePath:   basePath,
 							AccessKey:  accessKey,
@@ -264,7 +263,8 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			response:               "Internal Server Error",
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name:           "Gateway Timeout",
@@ -272,28 +272,31 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusGatewayTimeout,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"1.1.1.1", "2.2.2.2"},
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
+							AWSRegion:  "ap-south",
 						},
 					},
 				},
 			},
-			response: "error while connecting to the endpoint, received invalid status code",
+			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
+			response:               "context deadline exceeded",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var want []models.CheckTriggerResponse
-			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed)
+			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed, tt.requiredStatusResponse)
 			defer server.Close()
 
 			svc := NewS3BackupConfigCheck(
@@ -324,8 +327,56 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 	}
 }
 
+func TestRunS3BackupCheck(t *testing.T) {
+	t.Run("NIl Hardware", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: nil,
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, "-", got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+		assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[0].Result.SkipMessage)
+
+	})
+
+	t.Run("Empty Object storage", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{constants.LOCALHOST},
+			},
+			Backup: &models.Backup{
+				ObjectStorage: &models.ObjectStorage{},
+			},
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, constants.LOCALHOST, got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+		assert.Equal(t, constants.S3_BACKUP_MISSING, got[0].Result.Error.Message)
+		assert.False(t, got[0].Result.Skipped)
+	})
+}
+
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var got models.S3ConfigRequest
@@ -359,6 +410,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL
@@ -368,4 +420,68 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 	port := address[colonIndex+1:]
 
 	return server, ip, port
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewS3BackupConfigCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}
+
+func TestS3ConfigSkippedResponse(t *testing.T) {
+	type args struct {
+		config    *models.Config
+		checkType string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{
+		{
+			name: "Make the skip Response",
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount:        1,
+						AutomateNodeIps:          []string{constants.LOCALHOST},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{constants.LOCALHOST},
+					},
+				},
+				checkType: "s3-backup-config",
+			},
+			want: []models.CheckTriggerResponse{
+				{
+					NodeType:  "automate",
+					CheckType: "s3-backup-config",
+					Result: models.ApiResult{
+						Passed:      false,
+						Skipped:     true,
+						Check:       "s3-backup-config",
+						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_S3,
+					},
+					Host: constants.LOCALHOST,
+				},
+				{
+					NodeType:  "chef-infra-server",
+					CheckType: "s3-backup-config",
+					Result: models.ApiResult{
+						Passed:      false,
+						Skipped:     true,
+						Check:       "s3-backup-config",
+						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_S3,
+					},
+					Host: constants.LOCALHOST,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := s3ConfigSkippedResponse(tt.args.config, tt.args.checkType, constants.SKIP_BACKUP_TEST_MESSAGE_S3)
+			assert.Equal(t, tt.want, got)
+		})
+	}
 }

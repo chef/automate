@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +35,7 @@ func TestParse(t *testing.T) {
 						Architecture:                "aws",
 						WorkspacePath:               "/hab/a2_deploy_workspace",
 						BackupMount:                 "/mnt/automate_backups",
-						BackupConfig:                "",
+						BackupConfig:                "s3",
 						S3BucketName:                "",
 						HabitatUIDGid:               "",
 					},
@@ -54,7 +53,7 @@ func TestParse(t *testing.T) {
 				},
 
 				ChefServer: &ChefServerSettings{
-					Config: &ConfigSettings{
+					Config: &ConfigChefServerSettings{
 						InstanceCount:     "",
 						EnableCustomCerts: false,
 					},
@@ -154,7 +153,7 @@ func TestParse(t *testing.T) {
 						ConfigFile:        "configs/automate.toml",
 						InstanceCount:     "2",
 						EnableCustomCerts: true,
-						RootCA: `-----BEGIN CERTIFICATE-----
+						FqdnRootCA: `-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
 U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
@@ -231,7 +230,7 @@ csKeX402wz9P7XM5eGsToNpAZq41Q7mFzz14DfqFNttaCMHMYi4k
 				},
 
 				ChefServer: &ChefServerSettings{
-					Config: &ConfigSettings{
+					Config: &ConfigChefServerSettings{
 						InstanceCount:     "2",
 						EnableCustomCerts: true,
 						PrivateKey: `-----BEGIN PRIVATE KEY-----
@@ -518,8 +517,8 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						ChefServerInstanceType:        "t3.medium",
 						OpensearchServerInstanceType:  "m5.large",
 						PostgresqlServerInstanceType:  "m5.large",
-						AutomateLbCertificateArn:      "arn:aws:acm:ca-central-1:112758395563:certificate/1754e15c-5834-44b0-82a7-0508c3155601",
-						ChefServerLbCertificateArn:    "arn:aws:acm:ca-central-1:112758395563:certificate/1754e15c-5834-44b0-82a7-0508c3155601",
+						AutomateLbCertificateArn:      "arn:aws:acm....",
+						ChefServerLbCertificateArn:    "arn:aws:acm....",
 						AutomateEbsVolumeIops:         "100",
 						AutomateEbsVolumeSize:         "50",
 						AutomateEbsVolumeType:         "gp3",
@@ -554,7 +553,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						SSHUser:      "ubuntu",
 						SSHGroupName: "ubuntu",
 
-						SSHKeyFile:       "~/.ssh/A2HA.pem",
+						SSHKeyFile:       "./testdata/A2HA.pem",
 						SSHPort:          "22",
 						SecretsKeyFile:   "/hab/a2_deploy_workspace/secrets.key",
 						SecretsStoreFile: "/hab/a2_deploy_workspace/secrets.json",
@@ -580,11 +579,14 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						InstanceCount:     "2",
 						ConfigFile:        "configs/automate.toml",
 						TeamsPort:         "",
+						FqdnRootCA:        "-----BEGIN CERTIFICATE-----\nMIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl\nMCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp\nU3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw\nNjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE\nChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp\nZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3\nDQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf\n8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN\n+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0\nX9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa\nK4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA\n1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G\nA1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR\nzt0fhvRbVazc1xDCDqmI56FspGowaDELMAkGA1UEBhMCVVMxJTAjBgNVBAoTHFN0\nYXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD\nbGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w\nDQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3\nL7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D\neruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl\nxy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp\nVSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY\nWQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=\n-----END CERTIFICATE-----",
 						EnableCustomCerts: false,
 					},
 				},
 				ChefServer: &ChefServerSettings{
-					Config: &ConfigSettings{
+					Config: &ConfigChefServerSettings{
+						ChefServerFqdn:    "chefautomate.example.com",
+						FqdnRootCA:        "-----BEGIN CERTIFICATE-----\nMIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl\nMCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp\nU3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw\nNjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE\nChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp\nZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3\nDQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf\n8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN\n+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0\nX9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa\nK4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA\n1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G\nA1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR\nzt0fhvRbVazc1xDCDqmI56FspGowaDELMAkGA1UEBhMCVVMxJTAjBgNVBAoTHFN0\nYXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD\nbGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w\nDQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3\nL7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D\neruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl\nxy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp\nVSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY\nWQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=\n-----END CERTIFICATE-----",
 						InstanceCount:     "2",
 						EnableCustomCerts: false,
 					},
@@ -676,7 +678,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 					},
 				},
 				ChefServer: &ChefServerSettings{
-					Config: &ConfigSettings{
+					Config: &ConfigChefServerSettings{
 						InstanceCount:     "2",
 						EnableCustomCerts: false,
 					},
@@ -746,38 +748,38 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						LoggingMonitoringManagement: "",
 						Architecture:                "existing_nodes",
 						WorkspacePath:               "/hab/a2_deploy_workspace",
-						BackupMount:                 "/mnt/automate_backups",
-						BackupConfig:                "",
+						BackupMount:                 "automate_backups",
+						BackupConfig:                "object_storage",
 						S3BucketName:                "",
 						HabitatUIDGid:               "",
 					},
 				},
 				ObjectStorage: &ObjectStorage{
 					Config: &ConfigObjectStorage{
-						BucketName: "",
-						AccessKey:  "",
-						SecretKey:  "",
-						Endpoint:   "",
+						BucketName: "test",
+						AccessKey:  "test_access_key",
+						SecretKey:  "test_secret_key",
+						Endpoint:   "s3_endpoint",
 						Region:     "",
 					},
 				},
 				Automate: &AutomateSettings{
 					Config: &ConfigAutomateSettings{
 						AdminPassword:     "",
-						Fqdn:              "",
-						ConfigFile:        "configs/automate.toml",
+						Fqdn:              "https://chefautomate.example.com",
+						ConfigFile:        "automate.toml",
 						TeamsPort:         "",
 						InstanceCount:     "",
 						EnableCustomCerts: true,
-						RootCA:            "a2_cert",
+						FqdnRootCA:        "a2_cert",
 						PrivateKey:        "a2_pvt_key",
 						PublicKey:         "a2_public_key",
 						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "a2_pvt_key", PublicKey: "a2_public_key"}},
 					},
 				},
 				ChefServer: &ChefServerSettings{
-					Config: &ConfigSettings{
-						InstanceCount:     "",
+					Config: &ConfigChefServerSettings{
+						InstanceCount:     "two",
 						EnableCustomCerts: true,
 						PrivateKey:        "cs_pvt_key",
 						PublicKey:         "cs_public_key",
@@ -791,9 +793,9 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						RootCA:            "os_cert",
 						PrivateKey:        "os_pvt_key",
 						PublicKey:         "os_public_key",
-						AdminCert:         "os_admin_cert",
+						AdminCert:         "",
 						AdminKey:          "os_admin_key",
-						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
+						CertsByIP:         &[]CertByIP{{IP: "", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
 					},
 				},
 				Postgresql: &PostgresqlSettings{
@@ -803,12 +805,12 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						RootCA:            "pg_cert",
 						PrivateKey:        "pg_pvt_key",
 						PublicKey:         "pg_pvt_key",
-						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "pg_pvt_key", PublicKey: "pg_pvt_key"}},
+						CertsByIP:         &[]CertByIP{{IP: "0.0.1", PrivateKey: "pg_pvt_key", PublicKey: "pg_pvt_key"}},
 					},
 				},
 				ExistingInfra: &ExistingInfraSettings{
 					Config: &ConfigExistingInfraSettings{
-						AutomatePrivateIps:   []string{},
+						AutomatePrivateIps:   []string{"1324.2534.1"},
 						ChefServerPrivateIps: []string{},
 						OpensearchPrivateIps: []string{},
 						PostgresqlPrivateIps: []string{},
@@ -820,29 +822,183 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 		}, {
 			name:    "Parse OnPrem Config file not found",
 			args:    args{configFile: "./testdata/OnPremConfig.toml"},
-			want:    nil,
+			want:    &HaDeployConfig{},
 			wantErr: true,
 			err:     errors.New("error reading config TOML file: open ./testdata/OnPremConfig.toml: no such file or directory"),
 		},
 		{
 			name:    "Error unmarshalling toml file",
 			args:    args{configFile: "./testdata/UnmarshalErr.toml"},
-			want:    nil,
+			want:    &HaDeployConfig{},
 			wantErr: true,
 			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := HaDeployConfig{}
-			got, err := config.Parse(tt.args.configFile)
+			config := &HaDeployConfig{}
+			err := config.Parse(tt.args.configFile)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
 			// Compare the actual and expected configuration structs
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("got %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, config)
 		})
 	}
+}
+
+func TestHaDeployConfigInitArchitecture(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitArchitecture()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitAutomate(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitAutomate()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitChefServer(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitChefServer()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitOpenSearch(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitOpenSearch()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitPostgresql(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitPostgresql()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitExistingInfra(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitExistingInfra()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitExternal(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitExternal()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitAws(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitAws()
+	assert.NotNil(t, a)
+}
+
+func TestHaDeployConfigInitObjectStorage(t *testing.T) {
+	c := NewHaDeployConfig()
+	a := c.InitObjectStorage()
+	assert.NotNil(t, a)
+}
+
+func TestObjectStorageInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitObjectStorage()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestAwsSettingsInitConfigAwsSettings(t *testing.T) {
+	c := NewHaDeployConfig().InitAws()
+	a := c.InitConfigAwsSettings()
+	assert.NotNil(t, a)
+}
+
+func TestArchitectureInitExistingInfra(t *testing.T) {
+	c := NewHaDeployConfig().InitArchitecture()
+	a := c.InitExistingInfra()
+	assert.NotNil(t, a)
+}
+
+func TestArchitectureInitAws(t *testing.T) {
+	c := NewHaDeployConfig().InitArchitecture()
+	a := c.InitAws()
+	assert.NotNil(t, a)
+}
+
+func TestAutomateSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitAutomate()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestChefServerSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitChefServer()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestOpensearchSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitOpenSearch()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestPostgresqlSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitPostgresql()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestExistingInfraSettingsInitConfig(t *testing.T) {
+	c := NewHaDeployConfig().InitExistingInfra()
+	a := c.InitConfig()
+	assert.NotNil(t, a)
+}
+
+func TestExternalSettingsInitDatabase(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal()
+	a := c.InitDatabase()
+	assert.NotNil(t, a)
+}
+
+func TestExternalDBSettingsInitPostgresql(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal().InitDatabase()
+	a := c.InitPostgresql()
+	assert.NotNil(t, a)
+}
+
+func TestExternalDBSettingsInitOpenSearch(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal().InitDatabase()
+	a := c.InitOpenSearch()
+	assert.NotNil(t, a)
+}
+
+func TestExternalOsSettingsInitOpenSearchAws(t *testing.T) {
+	c := NewHaDeployConfig().InitExternal().InitDatabase().InitOpenSearch()
+	a := c.InitOpenSearchAws()
+	assert.NotNil(t, a)
+}
+
+func TestConfigAutomateSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitAutomate().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}
+
+func TestConfigSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitPostgresql().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}
+
+func TestConfigChefServerSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitChefServer().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
+}
+
+func TestConfigOpensearchSettingsInitCertsByIP(t *testing.T) {
+	c := NewHaDeployConfig().InitOpenSearch().InitConfig()
+	a := c.InitCertsByIP()
+	assert.NotNil(t, a)
 }

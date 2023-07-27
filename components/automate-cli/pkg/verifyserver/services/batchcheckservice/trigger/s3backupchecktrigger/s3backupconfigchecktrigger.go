@@ -22,9 +22,42 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 	}
 }
 
-func (svc *S3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.Hardware == nil {
+		return []models.CheckTriggerResponse{
+			trigger.SkippedTriggerCheckResp("-", constants.S3_BACKUP_CONFIG, constants.AUTOMATE, constants.SKIP_MISSING_HARDWARE_MESSAGE),
+		}
+	}
+
+	if config.Backup == nil || config.Backup.ObjectStorage == nil {
+		return s3ConfigSkippedResponse(config, constants.S3_BACKUP_CONFIG, constants.SKIP_BACKUP_TEST_MESSAGE_S3)
+	}
+
+	if !isObjectStorage(config ) {
+		return emptyResp(config, constants.S3_BACKUP_CONFIG)
+	}
+
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
+}
+
+func s3ConfigSkippedResponse(config *models.Config, checkType, message string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE, message))
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, message))
+	}
+
+	return triggerResps
+}
+
+func (ss *S3BackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
 }
 
 // runCheckForS3Config triggers the API on gives node automate nodes only for validating s3 backup config
@@ -54,7 +87,11 @@ func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerRespo
 	return result
 }
 
-func getS3CheckRequest(object models.ObjectStorage) models.S3ConfigRequest {
+func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
+	//passing a default value if s3 bucket path not provided
+	if object.BasePath == "" {
+		object.BasePath = "automate"
+	}
 	return models.S3ConfigRequest{
 		Endpoint:   object.Endpoint,
 		BucketName: object.BucketName,
@@ -63,4 +100,26 @@ func getS3CheckRequest(object models.ObjectStorage) models.S3ConfigRequest {
 		SecretKey:  object.SecretKey,
 		Region:     object.AWSRegion,
 	}
+}
+
+func isObjectStorage(config *models.Config) bool {
+	backup := config.Backup
+	if backup.ObjectStorage.BucketName == "" {
+		return false
+	} else if config.Profile != "" {
+		if backup.ObjectStorage.AccessKey == "" ||
+			backup.ObjectStorage.SecretKey == "" {
+			return false
+		}
+	}
+	return true
+}
+
+func emptyResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, trigger.ErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, constants.S3_BACKUP_MISSING))
+	}
+
+	return resps
 }

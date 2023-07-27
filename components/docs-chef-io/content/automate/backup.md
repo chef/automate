@@ -181,7 +181,7 @@ See how to [restore from GCS]({{< ref "restore/#restore-from-a-google-cloud-stor
 
 ### Create a Backup
 
-Make a backup with the [`backup create`]({{< ref "cli_chef_automate/#chef-automate-backup-create" >}}) command:
+Make a backup with the [`backup create`]({{< relref "cli/#chef-automate-backup-create" >}}) command:
 
 ```shell
 chef-automate backup create
@@ -195,7 +195,7 @@ Success: Created backup 20180518010336
 ```
 
 Restores from a filesystem backup may fail with incorrect directory permissions.
-Run the [`fix-repo-permissions` command]({{< ref "cli_chef_automate/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
+Run the [`fix-repo-permissions` command]({{< relref "cli/#chef-automate-backup-fix-repo-permissions" >}}) to address such issues:
 
 ```shell
 sudo chef-automate backup fix-repo-permissions <path>
@@ -203,7 +203,7 @@ sudo chef-automate backup fix-repo-permissions <path>
 
 ### List Backups
 
-You can list existing backups with the [`backup list`]({{< ref "cli_chef_automate/#chef-automate-backup-list" >}}) command:
+You can list existing backups with the [`backup list`]({{< relref "cli/#chef-automate-backup-list" >}}) command:
 
 ```shell
 chef-automate backup list
@@ -250,7 +250,7 @@ where `bucket_name` is the name of the GCS bucket and `base_path` is an optional
 
 ## Delete Backups
 
-To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< ref "cli_chef_automate/#chef-automate-backup-delete" >}}).
+To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< relref "cli/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list
@@ -300,4 +300,4 @@ chef-automate debug set-log-level deployment-service debug
 
 ## References
 
-See the [`chef-automate backup` command reference]({{< ref "cli_chef_automate/#chef-automate-backup" >}}).
+See the [`chef-automate backup` command reference]({{< relref "cli/#chef-automate-backup" >}}).

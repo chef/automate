@@ -20,7 +20,7 @@ ssh_port = ""
 ssh_key_file = ""
 
 # Eg.: backup_config = "efs" or "s3"
-backup_config = ""
+backup_config = "s3"
 
 #    Note: 1. To create new bucket, make sure to give a unique name
 #          2. User can also add existing bucket 

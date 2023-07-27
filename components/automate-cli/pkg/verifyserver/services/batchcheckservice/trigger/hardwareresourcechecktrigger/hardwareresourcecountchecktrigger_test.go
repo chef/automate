@@ -2,12 +2,14 @@ package hardwareresourcechecktrigger
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/require"
 
@@ -160,7 +162,7 @@ const (
 	  }`
 )
 
-func GetRequestJson() models.Config {
+func GetRequestJson() *models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
@@ -194,7 +196,7 @@ func GetRequestJson() models.Config {
 			]
 		  }
 		}`), &ipConfig)
-	return ipConfig
+	return &ipConfig
 }
 
 // mockTransport is a mock implementation of the http.RoundTripper interface
@@ -264,11 +266,10 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 			}
 		}
 	})
-
 	t.Run("Returns error", func(t *testing.T) {
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`invalid JSON`))
+			w.Write([]byte(`{"status":"failure", "result":[], "error":{"code":400, "message":"Invalid JSON"}}`))
 		}))
 		err := startMockServerOnCustomPort(mockServer, "1134")
 		assert.NoError(t, err)
@@ -293,7 +294,11 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing.T) {
 	t.Run("cannot reach", func(t *testing.T) {
 		// create the CheckTrigger instance to be tested
-		hrc := HardwareResourceCountCheck{log: logger.NewTestLogger(), host: "invalid-url"}
+		hrc := HardwareResourceCountCheck{log: logger.NewTestLogger(), httpRequestClient: &httputils.MockHTTPClient{
+			MakeRequestFunc : func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+				return nil, []byte(""), errors.New("")
+			},
+		},host: "invalid-url"}
 
 		// make the HTTP request to an invalid URL
 		resp, err := hrc.TriggerHardwareResourceCountCheck(GetRequestJson())
@@ -315,4 +320,11 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		require.Error(t, err)
 		require.Nil(t, resp)
 	})
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewHardwareResourceCountCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
 }

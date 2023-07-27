@@ -8,8 +8,9 @@ type OpensearchConfig struct {
 		MemoryLock *bool `protobuf:"bytes,,opt,name=memory_lock,proto3" toml:"memory_lock,omitempty" json:"memory_lock,omitempty" mapstructure:"memory_lock,omitempty"`
 	} `protobuf:"bytes,,opt,name=bootstrap,proto3" toml:"bootstrap,omitempty" json:"bootstrap,omitempty" mapstructure:"bootstrap,omitempty"`
 	Cluster *struct {
-		Name    string `protobuf:"bytes,,opt,name=name,proto3" toml:"name,omitempty" json:"name,omitempty" mapstructure:"name,omitempty"`
-		Routing struct {
+		Name             string `protobuf:"bytes,,opt,name=name,proto3" toml:"name,omitempty" json:"name,omitempty" mapstructure:"name,omitempty"`
+		MaxShardsPerNode string `protobuf:"bytes,,opt,name=max_shards_per_node,proto3" toml:"max_shards_per_node,omitempty" json:"max_shards_per_node,omitempty" mapstructure:"max_shards_per_node,omitempty"`
+		Routing          struct {
 			Allocation struct {
 				AwarenessAttributes            string `protobuf:"bytes,,opt,name=awareness_attributes,proto3" toml:"awareness_attributes,omitempty" json:"awareness_attributes,omitempty" mapstructure:"awareness_attributes,omitempty"`
 				NodeConcurrentRecoveries       string `protobuf:"bytes,,opt,name=node_concurrent_recoveries,proto3" toml:"node_concurrent_recoveries,omitempty" json:"node_concurrent_recoveries,omitempty" mapstructure:"node_concurrent_recoveries,omitempty"`
@@ -136,6 +137,12 @@ type OpensearchConfig struct {
 	Transport *struct {
 		Port int `protobuf:"bytes,,opt,name=port,proto3" toml:"port,omitzero" json:"port,omitzero" mapstructure:"port,omitzero"`
 	} `protobuf:"bytes,,opt,name=transport,proto3" toml:"transport,omitempty" json:"transport,omitempty" mapstructure:"transport,omitempty"`
+}
+
+type PatchOpensearchConfig struct {
+	Cluster *struct {
+		MaxShardsPerNode string `protobuf:"bytes,,opt,name=max_shards_per_node,proto3" toml:"max_shards_per_node,omitempty" json:"max_shards_per_node,omitempty" mapstructure:"max_shards_per_node,omitempty"`
+	} `protobuf:"bytes,,opt,name=cluster,proto3" toml:"cluster,omitempty" json:"cluster,omitempty" mapstructure:"cluster,omitempty"`
 }
 
 type TLS struct {

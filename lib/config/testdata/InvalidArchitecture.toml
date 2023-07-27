@@ -1,0 +1,4 @@
+[archture.existing_infra]
+## === INPUT NEEDED ===
+# Eg.: ssh_user = "ubuntu"
+ssh_user = ""

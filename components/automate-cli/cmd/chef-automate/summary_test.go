@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -27,13 +28,17 @@ Incorrect postgresql IP, 127.0.0 IP address validation failed
 Incorrect postgresql IP, 127.0.1 IP address validation failed
 Incorrect postgresql IP, 127.0.2 IP address validation failed
 Incorrect postgresql IP, 127.0.3 IP address validation failed`
-	displayBE = `+------------+--------------+--------+--------------+-------------+---------+
-| NAME       | IP ADDRESS   | HEALTH | PROCESS      | UPTIME      | ROLE    |
-+------------+--------------+--------+--------------+-------------+---------+
-| postgresql | 198.51.100.7 | ERROR  | down (pid: ) | 0d 0h 0m 0s | Unknown |
-+------------+--------------+--------+--------------+-------------+---------+`
-	displayFEAutomate         = `| automate    | 198.51.100.1 | ERROR  | Unknown    |`
-	displayFECS               = `| chef-server | 198.51.100.2 | ERROR  | Unknown    |`
+	displayBE = `+------------+--------------+--------+--------------+-----+-------------+---------+
+| NAME       | IP ADDRESS   | HEALTH | PROCESS      | LAG | UPTIME      | ROLE    |
++------------+--------------+--------+--------------+-----+-------------+---------+
+| postgresql | 198.51.100.7 | ERROR  | down (pid: ) | NA  | 0d 0h 0m 0s | Unknown |
++------------+--------------+--------+--------------+-----+-------------+---------+`
+	pgFollowerNode = `+------------+--------------+--------+----------------+-----------------------+---------------+----------+
+| NAME       | IP ADDRESS   | HEALTH | PROCESS        | LAG                   | UPTIME        | ROLE     |
++------------+--------------+--------+----------------+-----------------------+---------------+----------+
+| postgresql | 198.51.100.7 | OK     | up (pid: 2760) | 0 bytes and 1 seconds |`
+	displayFEAutomate         = `| automate    | 198.51.100.1 | OK     | "green" (Active: 100.0) |`
+	displayFECS               = `| chef-server | 198.51.100.2 | OK     | "green" (Active: 100.0) |`
 	mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 )
 
@@ -43,7 +48,11 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+	})
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -66,7 +75,11 @@ func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+	})
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -88,7 +101,11 @@ func TestCheckIPAddressesOnlyByServices(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+	})
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -111,7 +128,11 @@ func TestCheckIPAddressesError(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+	})
 
 	_, _, _, _, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 1)
@@ -131,7 +152,11 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+	})
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 16)
@@ -141,35 +166,63 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 	assert.Equal(t, postgresqlIps, []string(nil))
 	assert.Contains(t, getSingleErrorFromList(errList).Error(), invalidIpAddress)
 }
+
+// {OsStatus 10.0.192.172 []  <nil>}
 func TestRunFENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
 	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2}
-	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil)
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			if strings.Contains(strings.Join(nodeMap.Automate.CmdInputs.NodeIps, ","), ValidIP1) {
+
+				return map[string][]*CmdResult{
+					ValidIP1: {
+						&CmdResult{
+							ScriptName:  "OsStatus",
+							HostIP:      ValidIP1,
+							OutputFiles: []string{},
+							Error:       nil,
+							Output:      `{"cluster_name":"opensearch","status":"green","timed_out":false,"number_of_nodes":3,"number_of_data_nodes":3,"discovered_master":true,"active_primary_shards":35,"active_shards":74,"relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,"number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,"active_shards_percent_as_number":100.0}`,
+						},
+						&CmdResult{
+							ScriptName:  "Status",
+							HostIP:      ValidIP1,
+							OutputFiles: []string{},
+							Error:       nil,
+							Output:      ``,
+						},
+					},
+				}, nil
+				// displayFEAutomate, nil
+			}
+			return map[string][]*CmdResult{
+				ValidIP2: {
+					&CmdResult{
+						ScriptName:  "OsStatus",
+						HostIP:      ValidIP2,
+						OutputFiles: []string{},
+						Error:       nil,
+						Output:      `{"cluster_name":"opensearch","status":"green","timed_out":false,"number_of_nodes":3,"number_of_data_nodes":3,"discovered_master":true,"active_primary_shards":35,"active_shards":74,"relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,"number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,"active_shards_percent_as_number":100.0}`,
+					},
+					&CmdResult{
+						ScriptName:  "Status",
+						HostIP:      ValidIP2,
+						OutputFiles: []string{},
+						Error:       nil,
+						Output:      ``,
+					},
+				},
+			}, nil
+		},
+	})
 	err := ss.Prepare()
 	assert.NoError(t, err)
 	fe := ss.ShowFEStatus()
 	assert.Contains(t, fe, displayFEAutomate)
 	assert.Contains(t, fe, displayFECS)
 
-}
-func TestRunBENodeDiaplay(t *testing.T) {
-	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
-	infra := &AutomateHAInfraDetails{}
-	// infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7}
-	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{hostIP: ValidIP7}, nil, nil)
-
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil)
-	// Mock the time to a specific time
-	mockTime := time.Date(2023, 3, 15, 12, 0, 0, 0, time.UTC)
-	nowFunc = func() time.Time { return mockTime }
-	err := ss.Prepare()
-	assert.NoError(t, err)
-	be := ss.ShowBEStatus()
-	assert.Equal(t, be, displayBE)
 }
 
 func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError error) *MockSSHUtilsImpl {
@@ -264,5 +317,143 @@ func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError
 		setSSHConfigFunc: func(sshConfig *SSHConfig) {
 			// No return for this function
 		},
+	}
+}
+
+func TestGetFollowerLag(t *testing.T) {
+	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
+
+	testCases := []struct {
+		description string
+		beOutput    map[string][]*CmdResult
+		expectedErr error
+		ip          string
+		wantErr     bool
+	}{
+		{
+			description: "Showing Lag with No Error for Follower node",
+			beOutput: map[string][]*CmdResult{
+				ValidIP7: {
+					&CmdResult{
+						ScriptName:  censusDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output: `{
+							"changed": false,
+							"census_groups": {
+								"automate-ha-postgresql.default": {
+									"population": {
+										"8cfc79a0be3c4e74ab717bac25a1d185": {
+											"leader": false,
+											"follower": true
+											}
+										}
+									}
+								}
+							}`,
+						Error: nil,
+					},
+					&CmdResult{
+						ScriptName:  defaultServiceDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output: `{
+							"process": { "pid": 2760, "state": "up", "state_entered": 1689602436 },
+							"sys": {
+								"member_id": "8cfc79a0be3c4e74ab717bac25a1d185"
+							}
+						}`,
+						Error: nil,
+					},
+					&CmdResult{
+						ScriptName:  defaultServiceHealthDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output:      `{"status":"OK","stdout":"Primary server is available at 10.0.192.111 with uptime: 0s\nLocal replica 10.0.192.209 is 0 bytes and 1 seconds behind the primary\n","stderr":""}`,
+						Error:       nil,
+					},
+				},
+			},
+			ip:          ValidIP7,
+			expectedErr: nil,
+			wantErr:     false,
+		},
+		{
+			description: "Showing Lag with Parsing Error",
+			beOutput: map[string][]*CmdResult{
+				ValidIP7: {
+					&CmdResult{
+						ScriptName:  censusDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output: `{
+							"changed": false,
+							"census_groups": {
+								"automate-ha-postgresql.default": {
+									"population": {
+										"8cfc79a0be3c4e74ab717bac25a1d185": {
+											"leader": false,
+											"follower": true
+											
+										}
+									}
+								}
+							}`,
+						Error: nil,
+					},
+					&CmdResult{
+						ScriptName:  defaultServiceDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output: `{
+							"process": { "pid": 2760, "state": "up", "state_entered": 1689602436 ,
+							"sys": {
+								"member_id": "8cfc79a0be3c4e74ab717bac25a1d185"
+							}
+						}`,
+						Error: nil,
+					},
+					&CmdResult{
+						ScriptName:  defaultServiceHealthDetails,
+						HostIP:      ValidIP7,
+						OutputFiles: []string{},
+						Output:      `{"status":"OK","stdout":"Primary server is available at 10.0.192.111 with uptime: 0s\nLocal replica 10.0.192.209 is 0 bytes and 1 seconds behind the primary\n","stderr":"}`,
+						Error:       nil,
+					},
+				},
+			},
+			ip:          ValidIP7,
+			expectedErr: errors.New("ERROR"),
+			wantErr:     true,
+		},
+	}
+
+	for _, test := range testCases {
+
+		infra := &AutomateHAInfraDetails{}
+		infra.Outputs.PostgresqlPrivateIps.Value = []string{test.ip}
+		ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
+			node:         test.ip,
+			isPostgresql: true,
+		}, &MockRemoteCmdExecutor{
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				return test.beOutput, nil
+			},
+		})
+
+		err := ss.Prepare()
+		assert.NoError(t, err)
+		be := ss.ShowBEStatus()
+
+		if test.wantErr {
+			assert.Contains(t, be, ValidIP7)
+			assert.Contains(t, be, test.expectedErr.Error())
+
+		} else {
+			assert.Contains(t, be, ValidIP7)
+			assert.Contains(t, be, "0 bytes and 1 seconds")
+			assert.Contains(t, be, "up (pid: 2760)")
+			assert.Contains(t, be, "postgresql")
+		}
 	}
 }

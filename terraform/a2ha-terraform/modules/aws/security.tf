@@ -121,6 +121,16 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_443_tcp" {
   security_group_id = aws_security_group.chef_automate_ui.id
 }
 
+# Allow Verify service
+resource "aws_security_group_rule" "ingress_chef_automate_allow_7799_tcp" {
+  type              = "ingress"
+  from_port         = 7799
+  to_port           = 7799
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.chef_automate.id
+}
+
 # Allow elasticsearch clients
 resource "aws_security_group_rule" "ingress_chef_automate_allow_elasticsearch_tcp" {
   type                     = "ingress"

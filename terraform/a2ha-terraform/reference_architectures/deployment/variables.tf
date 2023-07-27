@@ -10,6 +10,11 @@ variable "ami_filter_virt_type" {
   default = "hvm"
 }
 
+variable "automate_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "automate_ebs_volume_iops" {
   default = 100
 }
@@ -50,6 +55,10 @@ variable "aws_os_snapshot_role_arn" {
   default = ""
 }
 
+variable "aws_os_snapshot_role_arn_deployment" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -73,11 +82,28 @@ variable "backup_config_efs" {
   default = "false"
 }
 
+variable "backup_config_efs_deployment" {
+  default = "false"
+}
+
 variable "backup_config_s3" {
   default = "false"
 }
 
+variable "backup_config_s3_deployment" {
+  default = "false"
+}
+
 variable "bucket_name" {
+}
+
+variable "chef_server_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
+variable "bucket_name_deployment" {
+  default = "chef-automate-ha"
 }
 
 variable "chef_ebs_volume_iops" {
@@ -109,6 +135,9 @@ variable "delete_on_termination" {
 }
 
 variable "managed_opensearch_certificate" {
+}
+
+variable "managed_opensearch_certificate_deployment" {
   default = ""
 }
 
@@ -120,7 +149,15 @@ variable "managed_opensearch_domain_url" {
   default = ""
 }
 
+variable "managed_opensearch_domain_url_deployment" {
+  default = ""
+}
+
 variable "managed_opensearch_user_password" {
+  default = ""
+}
+
+variable "managed_opensearch_user_password_deployment" {
   default = ""
 }
 
@@ -128,11 +165,22 @@ variable "managed_opensearch_username" {
   default = ""
 }
 
-variable "managed_rds_certificate" {
+variable "managed_opensearch_username_deployment" {
   default = ""
 }
 
+variable "managed_rds_certificate" {
+}
+
 variable "managed_rds_dbuser_password" {
+  default = ""
+}
+
+variable "managed_rds_certificate_deployment" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_password_deployment" {
   default = ""
 }
 
@@ -140,7 +188,15 @@ variable "managed_rds_dbuser_username" {
   default = ""
 }
 
+variable "managed_rds_dbuser_username_deployment" {
+  default = ""
+}
+
 variable "managed_rds_instance_url" {
+  default = ""
+}
+
+variable "managed_rds_instance_url_deployment" {
   default = ""
 }
 
@@ -148,8 +204,21 @@ variable "managed_rds_superuser_password" {
   default = ""
 }
 
+variable "managed_rds_superuser_password_deployment" {
+  default = ""
+}
+
 variable "managed_rds_superuser_username" {
   default = ""
+}
+
+variable "managed_rds_superuser_username_deployment" {
+  default = ""
+}
+
+variable "opensearch_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "opensearch_ebs_volume_iops" {
@@ -180,8 +249,21 @@ variable "os_snapshot_user_access_key_id" {
   default = ""
 }
 
+variable "os_snapshot_user_access_key_id_deployment" {
+  default = ""
+}
+
 variable "os_snapshot_user_access_key_secret" {
   default = ""
+}
+
+variable "os_snapshot_user_access_key_secret_deployment" {
+  default = ""
+}
+
+variable "postgresql_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "postgresql_ebs_volume_iops" {

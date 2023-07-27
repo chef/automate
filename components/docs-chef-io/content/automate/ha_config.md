@@ -1,5 +1,5 @@
 +++
-title = "Configuration"
+title = "Overview"
 
 draft = false
 
@@ -7,22 +7,26 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Configuration"
-    identifier = "automate/deploy_high_availability/ha_config.md Configuration"
-    parent = "automate/deploy_high_availability"
-    weight = 50
+    title = "Overview"
+    identifier = "automate/deploy_high_availability/configuration/ha_config.md Overview"
+    parent = "automate/deploy_high_availability/configuration"
+    weight = 200
 +++
 
 {{< note >}}
 
 - All the nodes will apply the Frontend patch/set wherever the Postgresql and OpenSearch changes will be used to only one cluster node.
-- After patching/setting, some services will restart. So the health status will take up to 2 minutes to show healthy.
+- After patching/setting any configuration, certain services will restart. The time required for your services to regain stability may vary depending on the amount of data stored in your system.
 
 {{< /note >}}
 
 {{< warning >}}
 
+<<<<<<< HEAD
 - For certificate rotation, don't use `config patch`. Instead, the `cert-rotate` command can be used. To know more, see [certificate rotation](/automate/ha_cert_rotaion).
+=======
+- For certificate rotation, don't use `config patch`. Instead, the `cert-rotate` command can be used. To know more about certificate rotation, click [here](/automate/ha_cert_rotation)
+>>>>>>> main
 - While patching the same from **the provision host**, structures such as TLS from the OpenSearch configuration .toml file and SSL from the PostgreSQL configuration toml file will be ignored.
 
 {{< /warning >}}
@@ -121,6 +125,9 @@ chef-automate config patch path/to/chef_server-config.toml --cs
 
 ### Patch Configuration for Postgresql cluster
 
+For Information on PostgreSQL node configs visit links below:
+- Click [here](/automate/config_postgresql) for PostgreSQL
+
 To patch the configuration for the Postgresql cluster, run the following command:
 
 ```bash
@@ -132,6 +139,9 @@ chef-automate config patch path/to/postgresql-config.toml --pg
 ```
 
 ### Patch Configuration for OpenSearch cluster
+
+For Information on OpenSearch node configs visit links below:
+- Click [here](/automate/config_opensearch) for OpenSearch
 
 To patch the configuration for the OpenSearch cluster, run the following command:
 
@@ -173,6 +183,9 @@ chef-automate config set path/to/chef_server-config.toml --cs
 
 ### Set Configuration for Postgresql cluster
 
+For Information on PostgreSQL node configs visit links below:
+- Click [here](/automate/config_postgresql) for PostgreSQL
+
 To set the configuration for the Postgresql cluster, run the following command:
 
 ```bash
@@ -185,6 +198,9 @@ chef-automate config set path/to/postgresql-config.toml --pg
 
 ### Set Configuration for OpenSearch cluster
 
+For Information on OpenSearch node configs visit links below:
+- Click [here](/automate/config_opensearch) for OpenSearch
+
 To set the configuration for the OpenSearch cluster, run the following command:
 
 ```bash
@@ -193,4 +209,12 @@ chef-automate config set path/to/opensearch-config.toml --opensearch
 chef-automate config set path/to/opensearch-config.toml -o
 #or
 chef-automate config set path/to/opensearch-config.toml --os
+```
+
+### How to patch max shards per node for opensearch
+To configure OpenSearch max shard per node, create a TOML file that contains the partial configuration below. Change max_shards_per_node as needed, and then run [command]({{< relref "ha_config/#patch-configuration-for-opensearch-cluster" >}}) to apply change.
+
+```toml
+[cluster]
+  max_shards_per_node = "2000"
 ```

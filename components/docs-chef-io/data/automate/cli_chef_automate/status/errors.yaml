@@ -132,3 +132,18 @@ errors:
 - name: InsufficientSpaceError
   description: Insufficient disk space
   code: "122"
+- name: ConfigVerifyError
+  description: Config Verification failed
+  code: "124"
+- name: VerifyChecksError
+  description: Verify Checks failed
+  code: "125"
+- name: PromptFailed
+  description: Prompt failed and exited with error
+  code: "126"
+- name: FailedToGenConfig
+  description: Failed to Generate config with given inputs
+  code: "127"
+- name: HardwareCalError
+  description: Hardware Calculator failed to provide Hardware Estimates
+  code: "128"

@@ -1,0 +1,206 @@
+
+# This is a Chef Automate on-prem HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+
+[architecture.existing_infra]
+## === INPUT NEEDED ===
+# Eg.: ssh_user = "ubuntu"
+ssh_user = "ubuntu"
+
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = "ubuntu"
+
+# private ssh key file path to access instances
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
+ssh_key_file = "./testdata/A2HA.pem"
+
+# custome ssh port no to connect instances, default will be 22
+# Eg.: ssh_port = "22"
+ssh_port = "22"
+
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "existing_nodes"
+workspace_path = "/hab/a2_deploy_workspace"
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "/mnt/automate_backups"
+
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = "file_system"
+
+# If backup_config = "object_storage" fill out [object_storage.config] as well
+## Object storage similar to AWS S3 Bucket
+[object_storage.config]
+bucket_name = ""
+access_key = ""
+secret_key = ""
+# For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
+# Include protocol to the enpoint value. Eg: https://customdns1.com or http://customdns2.com
+endpoint = ""
+
+# [Optional] Mention object_storage region if applicable
+# Eg: region = "us-west-1"
+region = "us-west-1"
+## === ===
+
+# ============== EC2 Nodes Config ======================
+[automate.config]
+## === INPUT NEEDED ===
+
+# Password for Automate UI for 'admin' user.
+admin_password = "123456789"
+
+
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = "chefautomate.example.com"
+
+# No. of Automate Frontend Machine or VM eg.: instance_count = "2"
+instance_count = "2"
+
+## === ===
+
+
+# teams_port = ""
+config_file = "configs/automate.toml"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+# Add Automate load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
+# [[automate.config.certs_by_ip]]
+# ip = ""
+# private_key = ""
+# public_key = ""
+
+[chef_server.config]
+## === INPUT NEEDED ===
+
+# No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
+instance_count = "2"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+# Add Chef Server load balancer root-ca and keys
+# private_key = ""
+# public_key = ""
+# [[chef_server.config.certs_by_ip]]
+# ip = ""
+# private_key = ""
+# public_key = ""
+
+## === ===
+
+[opensearch.config]
+## === INPUT NEEDED ===
+
+# No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = "3"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+# Add OpenSearch load balancer root-ca and keys
+# root_ca = ""
+# admin_key = ""
+# admin_cert = ""
+# private_key = ""
+# public_key = ""
+# [[opensearch.config.certs_by_ip]]
+# ip = ""
+# private_key = ""
+# public_key = ""
+
+## === ===
+
+[postgresql.config]
+## === INPUT NEEDED ===
+
+# No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = "3"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+# Add postgresql load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
+# [[postgresql.config.certs_by_ip]]
+# ip = ""
+# private_key = ""
+# public_key = ""
+
+## === ===
+
+[existing_infra.config]
+## === INPUT NEEDED ===
+
+# provide comma-seperated IP addresses of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No. of IP address should be the same as the No. of instance_count count mentioned above in
+# automate.config, chef_server.config, opensearch.config and postgresql.config
+automate_private_ips = ["192.0.0.11", "192.0.0.12"]
+chef_server_private_ips = ["192.0.0.11", "192.0.0.12"]
+opensearch_private_ips = ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+postgresql_private_ips = ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+## === ===
+
+# ============== External Datbase Services ======================
+
+## === INPUT NEEDED ===
+# In case you are trying to deploy with AWS Managed Services set type as "aws"
+# If you are trying external managed database set type as "self-managed"
+
+[external.database]
+
+# eg type = "aws" or "self-managed"
+type = "aws"
+
+[external.database.postgre_sql]
+
+# eg: instance_url = "managed-rds-db.c5gkx.ap-northeast-1.rds.amazonaws.com:5432"
+instance_url = "managed-rds-db.c5gkx.ap-northeast-1.rds.amazonaws.com:5432"
+
+# eg: username = "postgres"
+superuser_username = "postgres"
+
+# eg: password = "Progress123"
+superuser_password = "Progress123"
+
+# eg: dbuser_username = "postgres"
+dbuser_username = "postgres"
+
+# eg: dbuser_password = "Progress123"
+dbuser_password = "Progress123"
+
+# In case of AWS managed RDS leave it blank
+postgresql_root_cert = ""
+
+[external.database.open_search]
+
+# eg: managed_opensearch_domain_name = "managed-services-os"
+opensearch_domain_name = "managed-services-os"
+
+# eg: opensearch_domain_url = "search-managed-services-os.us-east-1.es.amazonaws.com"
+opensearch_domain_url = "search-managed-services-os.us-east-1.es.amazonaws.com"
+
+# eg: opensearch_username = "admin"
+opensearch_username = "admin"
+
+# eg: opensearch_user_password = "Progress@123"
+opensearch_user_password = "Progress@123"
+
+# In case of AWS managed opensearch leave it blank
+opensearch_root_cert = ""
+
+[external.database.open_search.aws]
+
+# eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
+aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
+
+# eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
+os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
+
+# eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
+os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"

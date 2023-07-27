@@ -23,11 +23,27 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 	}
 }
 
-func (epc *ExternalPostgresCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	// Check for nil or empty req body
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.EXTERNAL_POSTGRESQL, constants.SKIP_MISSING_HARDWARE_MESSAGE, false, false, false)
+	}
+	if config.ExternalPG == nil {
+		return externalPGNillResp(config, constants.EXTERNAL_POSTGRESQL, constants.SKIP_MANAGED_PG_TEST_MESSAGE)
+	}
+	if isEmptyExternalPG(config.ExternalPG) {
+		return externalPGEmptyResp(config, constants.EXTERNAL_POSTGRESQL)
+	}
+
 	return runCheckForPostgresql(config, epc.port, epc.log)
 }
 
-func runCheckForPostgresql(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
+func (ss *ExternalPostgresCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
+func runCheckForPostgresql(config *models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Postgresql check for automate and chef server nodes")
 	req := getPostgresRequest(config.ExternalPG)
 	var result []models.CheckTriggerResponse
@@ -58,7 +74,7 @@ func runCheckForPostgresql(config models.Config, port string, log logger.Logger)
 
 }
 
-func getPostgresRequest(details models.ExternalPG) models.ExternalPgRequest {
+func getPostgresRequest(details *models.ExternalPG) models.ExternalPgRequest {
 	host, port, _ := net.SplitHostPort(details.PGInstanceURL)
 	return models.ExternalPgRequest{
 		PostgresqlInstanceUrl:       host,
@@ -69,4 +85,44 @@ func getPostgresRequest(details models.ExternalPG) models.ExternalPgRequest {
 		PostgresqlDbUserPassword:    details.PGDbUserPassword,
 		PostgresqlRootCert:          details.PGRootCert,
 	}
+}
+
+func externalPGNillResp(config *models.Config, checkType, message string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE, message))
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, message))
+	}
+
+	return triggerResps
+}
+
+func isEmptyExternalPG(externalPG *models.ExternalPG) bool {
+	return externalPG.PGInstanceURL == "" ||
+		externalPG.PGSuperuserName == "" ||
+		externalPG.PGSuperuserPassword == "" ||
+		externalPG.PGDbUserName == "" ||
+		externalPG.PGDbUserPassword == "" ||
+		externalPG.PGRootCert == ""
+}
+
+func externalPGEmptyResp(config *models.Config, checkType string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+	count := 0
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, trigger.ErrTriggerCheckResp(ip, checkType, constants.AUTOMATE, constants.PG_DETAILS_MISSING))
+		count++
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, trigger.ErrTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, constants.PG_DETAILS_MISSING))
+		count++
+	}
+
+	return triggerResps
 }

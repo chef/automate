@@ -15,10 +15,22 @@ import (
 )
 
 var (
-	certificate = models.Certificate{
-		AutomateFqdn:   "www.example.com",
-		ChefServerFqdn: "www.example.com",
-		RootCert:       "rootcert",
+	fqdn                = "www.example.com"
+	rootCert            = "rootcert"
+	certificateAutomate = []*models.Certificate{{
+		Fqdn:         fqdn,
+		FqdnRootCert: rootCert,
+		Nodes:        nil,
+		NodeType:     constants.AUTOMATE,
+	},
+	}
+
+	certificateChefServer = []*models.Certificate{{
+		Fqdn:         fqdn,
+		FqdnRootCert: rootCert,
+		Nodes:        nil,
+		NodeType:     constants.CHEF_INFRA_SERVER,
+	},
 	}
 )
 
@@ -65,7 +77,7 @@ const (
 			  "passed": false,
 			  "success_msg": "",
 			  "error_msg": "FQDN is not reachable",
-			  "resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+			  "resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 			},
 			{
 			  "title": "Nodes are reachable",
@@ -167,7 +179,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -200,7 +212,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -234,7 +246,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -265,7 +277,7 @@ const (
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "FQDN is not reachable",
-						"resolution_msg": "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
+						"resolution_msg": "Ensure FQDN is reachable and mapped to load balancer.Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 					},
 					{
 						"title": "Nodes are reachable",
@@ -290,25 +302,26 @@ const (
 func TestFqdnCheck_Run(t *testing.T) {
 
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
-		name       string
-		args       args
-		isPassed   bool
-		response   string
-		httpStatus int
-		isError    bool
+		name                   string
+		args                   args
+		isPassed               bool
+		response               string
+		httpStatus             int
+		isError                bool
+		requiredStatusResponse string
 	}{
 		{
-			// 	name: "Passed Automate Node Check",
+			name: "Passed Automate Node Check",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: certificate,
+					Certificate: certificateAutomate,
 					APIToken:    token,
 				},
 			},
@@ -320,12 +333,12 @@ func TestFqdnCheck_Run(t *testing.T) {
 		{
 			name: "Failure Check Automate Nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: certificate,
+					Certificate: certificateAutomate,
 					APIToken:    token,
 				},
 			},
@@ -337,12 +350,12 @@ func TestFqdnCheck_Run(t *testing.T) {
 		{
 			name: "Failure Chef server fqn node Nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    "test-token",
 				},
 			},
@@ -354,12 +367,12 @@ func TestFqdnCheck_Run(t *testing.T) {
 		{
 			name: "Passed Chef server Node Check",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
@@ -371,12 +384,12 @@ func TestFqdnCheck_Run(t *testing.T) {
 		{
 			name: "Failed Chef server Node Check for more than one node",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8", "5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
@@ -388,46 +401,48 @@ func TestFqdnCheck_Run(t *testing.T) {
 		{
 			name: "Couldn't call API for chef server nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
-			isPassed:   false,
-			response:   "error while connecting to the endpoint, received invalid status code",
-			httpStatus: http.StatusInternalServerError,
-			isError:    true,
+			isPassed:               false,
+			response:               "Internal Server Error",
+			httpStatus:             http.StatusInternalServerError,
+			isError:                true,
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name: "400 Bad Reqest",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
-			isPassed:   false,
-			response:   "error while connecting to the endpoint, received invalid status code",
-			httpStatus: http.StatusBadRequest,
-			isError:    true,
+			isPassed:               false,
+			response:               "fqdn, root_cert and nodes can't be empty, Please provide all the required fields.",
+			httpStatus:             http.StatusBadRequest,
+			isError:                true,
+			requiredStatusResponse: `{"error":{"code":400,"message":"fqdn, root_cert and nodes can't be empty, Please provide all the required fields."}}`,
 		},
 		{
 			name: "Passed Automate Node Check Post Deployment",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate:     certificate,
+					Certificate:     certificateAutomate,
 					DeploymentState: "post-deploy",
 					APIToken:        token,
 				},
@@ -437,13 +452,39 @@ func TestFqdnCheck_Run(t *testing.T) {
 			httpStatus: http.StatusOK,
 			isError:    false,
 		},
+		{
+			name: "Hardware nil",
+			args: args{
+				config: &models.Config{
+					Hardware: nil,
+				},
+			},
+
+			isError: false,
+		},
+		{
+			name: "Nil Certificate",
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount:        1,
+						AutomateNodeIps:          []string{"127.0.0.1"},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"127.0.0.1"},
+					},
+					Certificate: nil,
+				},
+			},
+
+			isError: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var want []models.CheckTriggerResponse
 			json.Unmarshal([]byte(tt.response), &want)
 
-			server, host, port := createDummyServer(t, tt.httpStatus, tt.isPassed)
+			server, host, port := createDummyServer(t, tt.httpStatus, tt.isPassed, tt.requiredStatusResponse)
 			defer server.Close()
 
 			fqc := NewFqdnCheck(
@@ -455,22 +496,39 @@ func TestFqdnCheck_Run(t *testing.T) {
 			got := fqc.Run(tt.args.config)
 
 			if tt.isError {
-				assert.Len(t, got, tt.args.config.Hardware.ChefInfraServerNodeCount)
-				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, "chef-infra-server", got[0].NodeType)
-				assert.Equal(t, got[0].Result.Error.Code, tt.httpStatus)
-				assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				if tt.name == "Nil Certificate" {
+					assert.NotNil(t, got)
+					assert.Len(t, got, 2)
+					assert.True(t, got[0].Result.Skipped)
+					assert.True(t, got[1].Result.Skipped)
+					assert.Equal(t, constants.SKIP_CS_FQDN_TEST_MESSAGE, got[1].Result.SkipMessage)
+				} else {
+					assert.Len(t, got, tt.args.config.Hardware.ChefInfraServerNodeCount)
+					assert.NotNil(t, got[0].Result.Error)
+					assert.Equal(t, "chef-infra-server", got[0].NodeType)
+					assert.Equal(t, got[0].Result.Error.Code, tt.httpStatus)
+					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				}
 			} else {
-				assert.Equal(t, got, want)
-				assert.NotNil(t, got)
-				assert.Nil(t, got[0].Result.Error)
+				if tt.name == "Hardware nil" {
+					assert.NotNil(t, got)
+					assert.Len(t, got, 2)
+					assert.True(t, got[0].Result.Skipped)
+					assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[0].Result.SkipMessage)
+					assert.True(t, got[1].Result.Skipped)
+					assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[1].Result.SkipMessage)
+				} else {
+					assert.Equal(t, got, want)
+					assert.NotNil(t, got)
+					assert.Nil(t, got[0].Result.Error)
+				}
 			}
 
 		})
 	}
 }
 
-func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var got models.FqdnRequest
@@ -507,6 +565,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL
@@ -521,7 +580,17 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 func getRequest() models.FqdnRequest {
 
 	return models.FqdnRequest{
-		Fqdn:     certificate.AutomateFqdn,
-		RootCert: certificate.RootCert,
+		Fqdn:     fqdn,
+		RootCert: rootCert,
 	}
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewFqdnCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 2, len(resp))
+	assert.Equal(t, 1, len(resp["automate"]["https"]))
+	assert.Equal(t, 1, len(resp["chef-infra-server"]["https"]))
+	assert.Equal(t, true, true)
 }

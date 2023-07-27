@@ -21,4 +21,4 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 - node-delete - Delete node by node uuid
-supported_on: Automate
+supported_on: Bastion

@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -16,6 +18,8 @@ import (
 	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
+
+const GET_OS_PASSWORD = "sudo HAB_LICENSE=accept-no-persist hab pkg exec chef/automate-platform-tools secrets-helper show userconfig.os_password"
 
 type ConfigKeys struct {
 	rootCA     string
@@ -34,175 +38,152 @@ type ObjectStorageConfig struct {
 }
 
 type HAAwsAutoTfvars struct {
-	AwsProfile                         string      `json:"aws_profile"`
-	AwsRegion                          string      `json:"aws_region"`
-	Endpoint                           string      `json:"endpoint"`
-	SecretKey                          string      `json:"secret_key"`
-	AccessKey                          string      `json:"access_key"`
-	BucketName                         string      `json:"bucket_name"`
-	Architecture                       string      `json:"architecture"`
-	SshKeyFileName                     string      `json:"aws_ssh_key_pair_name"`
-	AwsSshKeyFile                      string      `json:"ssh_key_file"`
-	SshPort                            string      `json:"ssh_port"`
-	SshUser                            string      `json:"ssh_user"`
-	SSHGroupName                       string      `json:"ssh_group_name"`
-	HabitatUidGid                      string      `json:"habitat_uid_gid"`
-	PostgresqlArchiveDiskFsPath        string      `json:"postgresql_archive_disk_fs_path"`
-	PostgresqlInstanceCount            int         `json:"postgresql_instance_count"`
-	NfsMountPath                       string      `json:"nfs_mount_path"`
-	OpensearchCertsByIp                interface{} `json:"opensearch_certs_by_ip"`
-	PostgresqlCertsByIp                interface{} `json:"postgresql_certs_by_ip"`
-	ChefServerCertsByIp                interface{} `json:"chef_server_certs_by_ip"`
-	AutomateCertsByIp                  interface{} `json:"automate_certs_by_ip"`
-	OpensearchNodesDn                  string      `json:"opensearch_nodes_dn"`
-	OpensearchAdminDn                  string      `json:"opensearch_admin_dn"`
-	OpensearchCustomCertsEnabled       bool        `json:"opensearch_custom_certs_enabled"`
-	PostgresqlCustomCertsEnabled       bool        `json:"postgresql_custom_certs_enabled"`
-	ChefServerCustomCertsEnabled       bool        `json:"chef_server_custom_certs_enabled"`
-	AutomateCustomCertsEnabled         bool        `json:"automate_custom_certs_enabled"`
-	PostgresqlPublicKey                string      `json:"postgresql_public_key"`
-	OpensearchAdminCert                string      `json:"opensearch_admin_cert"`
-	OpensearchPublicKey                string      `json:"opensearch_public_key"`
-	ChefServerPublicKey                string      `json:"chef_server_public_key"`
-	AutomatePublicKey                  string      `json:"automate_public_key"`
-	PostgresqlPrivateKey               string      `json:"postgresql_private_key"`
-	OpensearchPrivateKey               string      `json:"opensearch_private_key"`
-	OpensearchAdminKey                 string      `json:"opensearch_admin_key"`
-	ChefServerPrivateKey               string      `json:"chef_server_private_key"`
-	AutomatePrivateKey                 string      `json:"automate_private_key"`
-	PostgresqlRootCa                   string      `json:"postgresql_root_ca"`
-	OpensearchRootCa                   string      `json:"opensearch_root_ca"`
-	AutomateRootCa                     string      `json:"automate_root_ca"`
-	OpensearchInstanceCount            int         `json:"opensearch_instance_count"`
-	ChefServerInstanceCount            int         `json:"chef_server_instance_count"`
-	AutomateInstanceCount              int         `json:"automate_instance_count"`
-	AutomateFqdn                       string      `json:"automate_fqdn"`
-	AutomateConfigFile                 string      `json:"automate_config_file"`
-	OpensearchRootCert                 string      `json:"opensearch_root_cert"`
-	PostgresqlRootCert                 string      `json:"postgresql_root_cert"`
-	AwsVpcId                           string      `json:"aws_vpc_id"`
-	AmiID                              string      `json:"aws_ami_id"`
-	AwsCidrBlockAddr                   string      `json:"aws_cidr_block_addr"`
-	PrivateCustomSubnets               []string    `json:"private_custom_subnets"`
-	PublicCustomSubnets                []string    `json:"public_custom_subnets"`
-	AutomateLbCertificateArn           string      `json:"automate_lb_certificate_arn"`
-	ChefServerLbCertificateArn         string      `json:"chef_server_lb_certificate_arn"`
-	AwsManagedRdsPostgresqlCertificate string      `json:"managed_rds_certificate"`
-	ManagedRdsDbuserPassword           string      `json:"managed_rds_dbuser_password"`
-	ManagedRdsDbuserUsername           string      `json:"managed_rds_dbuser_username"`
-	ManagedRdsSuperuserPassword        string      `json:"managed_rds_superuser_password"`
-	ManagedRdsSuperuserUsername        string      `json:"managed_rds_superuser_username"`
-	ManagedRdsInstanceUrl              string      `json:"managed_rds_instance_url"`
-	OsSnapshotUserAccessKeySecret      string      `json:"os_snapshot_user_access_key_secret"`
-	OsSnapshotUserAccessKeyId          string      `json:"os_snapshot_user_access_key_id"`
-	AwsOsSnapshotRoleArn               string      `json:"aws_os_snapshot_role_arn"`
-	ManagedOpensearchCertificate       string      `json:"managed_opensearch_certificate"`
-	ManagedOpensearchUserPassword      string      `json:"managed_opensearch_user_password"`
-	ManagedOpensearchUsername          string      `json:"managed_opensearch_username"`
-	ManagedOpensearchDomainUrl         string      `json:"managed_opensearch_domain_url"`
-	ManagedOpensearchDomainName        string      `json:"managed_opensearch_domain_name"`
-	AwsSetupManagedServices            bool        `json:"setup_managed_services"`
-	ExistingPostgresqlPrivateIps       []string    `json:"existing_postgresql_private_ips"`
-	ExistingOpensearchPrivateIps       []string    `json:"existing_opensearch_private_ips"`
-	ExistingChefServerPrivateIps       []string    `json:"existing_chef_server_private_ips"`
-	ExistingAutomatePrivateIps         []string    `json:"existing_automate_private_ips"`
-	BackupConfigS3                     string      `json:"backup_config_s3"`
-	BackupConfigEFS                    string      `json:"backup_config_efs"`
-	AutomateAdminPassword              string      `json:"automate_admin_password"`
-	LBAccessLogs                       string      `json:"lb_access_logs"`
-	DeleteOnTermination                string      `json:"delete_on_termination"`
-	AutomateServerInstanceType         string      `json:"automate_server_instance_type"`
-	AutomateEbsVolumeIops              string      `json:"automate_ebs_volume_iops"`
-	AutomateEbsVolumeSize              string      `json:"automate_ebs_volume_size"`
-	AutomateEbsVolumeType              string      `json:"automate_ebs_volume_type"`
-	ChefServerInstanceType             string      `json:"chef_server_instance_type"`
-	ChefEbsVolumeIops                  string      `json:"chef_ebs_volume_iops"`
-	ChefEbsVolumeSize                  string      `json:"chef_ebs_volume_size"`
-	ChefEbsVolumeType                  string      `json:"chef_ebs_volume_type"`
-	OpensearchServerInstanceType       string      `json:"opensearch_server_instance_type"`
-	OpensearchEbsVolumeIops            string      `json:"opensearch_ebs_volume_iops"`
-	OpensearchEbsVolumeSize            string      `json:"opensearch_ebs_volume_size"`
-	OpensearchEbsVolumeType            string      `json:"opensearch_ebs_volume_type"`
-	PostgresqlServerInstanceType       string      `json:"postgresql_server_instance_type"`
-	PostgresqlEbsVolumeIops            string      `json:"postgresql_ebs_volume_iops"`
-	PostgresqlEbsVolumeSize            string      `json:"postgresql_ebs_volume_size"`
-	PostgresqlEbsVolumeType            string      `json:"postgresql_ebs_volume_type"`
+	AwsProfile                         string   `json:"aws_profile"`
+	AwsRegion                          string   `json:"aws_region"`
+	Endpoint                           string   `json:"endpoint"`
+	SecretKey                          string   `json:"secret_key"`
+	AccessKey                          string   `json:"access_key"`
+	BucketName                         string   `json:"bucket_name"`
+	Architecture                       string   `json:"architecture"`
+	SshKeyFileName                     string   `json:"aws_ssh_key_pair_name"`
+	AwsVpcId                           string   `json:"aws_vpc_id"`
+	AmiID                              string   `json:"aws_ami_id"`
+	AwsCidrBlockAddr                   string   `json:"aws_cidr_block_addr"`
+	PrivateCustomSubnets               []string `json:"private_custom_subnets"`
+	PublicCustomSubnets                []string `json:"public_custom_subnets"`
+	AutomateLbCertificateArn           string   `json:"automate_lb_certificate_arn"`
+	ChefServerLbCertificateArn         string   `json:"chef_server_lb_certificate_arn"`
+	AwsManagedRdsPostgresqlCertificate string   `json:"managed_rds_certificate"`
+	ManagedRdsDbuserPassword           string   `json:"managed_rds_dbuser_password"`
+	ManagedRdsDbuserUsername           string   `json:"managed_rds_dbuser_username"`
+	ManagedRdsSuperuserPassword        string   `json:"managed_rds_superuser_password"`
+	ManagedRdsSuperuserUsername        string   `json:"managed_rds_superuser_username"`
+	ManagedRdsInstanceUrl              string   `json:"managed_rds_instance_url"`
+	OsSnapshotUserAccessKeySecret      string   `json:"os_snapshot_user_access_key_secret"`
+	OsSnapshotUserAccessKeyId          string   `json:"os_snapshot_user_access_key_id"`
+	AwsOsSnapshotRoleArn               string   `json:"aws_os_snapshot_role_arn"`
+	ManagedOpensearchCertificate       string   `json:"managed_opensearch_certificate"`
+	ManagedOpensearchUserPassword      string   `json:"managed_opensearch_user_password"`
+	ManagedOpensearchUsername          string   `json:"managed_opensearch_username"`
+	ManagedOpensearchDomainUrl         string   `json:"managed_opensearch_domain_url"`
+	ManagedOpensearchDomainName        string   `json:"managed_opensearch_domain_name"`
+	AwsSetupManagedServices            bool     `json:"setup_managed_services"`
+	ExistingPostgresqlPrivateIps       []string `json:"existing_postgresql_private_ips"`
+	ExistingOpensearchPrivateIps       []string `json:"existing_opensearch_private_ips"`
+	ExistingChefServerPrivateIps       []string `json:"existing_chef_server_private_ips"`
+	ExistingAutomatePrivateIps         []string `json:"existing_automate_private_ips"`
+	BackupConfigS3                     string   `json:"backup_config_s3"`
+	BackupConfigEFS                    string   `json:"backup_config_efs"`
+	LBAccessLogs                       string   `json:"lb_access_logs"`
+	DeleteOnTermination                string   `json:"delete_on_termination"`
+	AutomateServerInstanceType         string   `json:"automate_server_instance_type"`
+	AutomateEbsVolumeIops              string   `json:"automate_ebs_volume_iops"`
+	AutomateEbsVolumeSize              string   `json:"automate_ebs_volume_size"`
+	AutomateEbsVolumeType              string   `json:"automate_ebs_volume_type"`
+	ChefServerInstanceType             string   `json:"chef_server_instance_type"`
+	ChefEbsVolumeIops                  string   `json:"chef_ebs_volume_iops"`
+	ChefEbsVolumeSize                  string   `json:"chef_ebs_volume_size"`
+	ChefEbsVolumeType                  string   `json:"chef_ebs_volume_type"`
+	OpensearchServerInstanceType       string   `json:"opensearch_server_instance_type"`
+	OpensearchEbsVolumeIops            string   `json:"opensearch_ebs_volume_iops"`
+	OpensearchEbsVolumeSize            string   `json:"opensearch_ebs_volume_size"`
+	OpensearchEbsVolumeType            string   `json:"opensearch_ebs_volume_type"`
+	PostgresqlServerInstanceType       string   `json:"postgresql_server_instance_type"`
+	PostgresqlEbsVolumeIops            string   `json:"postgresql_ebs_volume_iops"`
+	PostgresqlEbsVolumeSize            string   `json:"postgresql_ebs_volume_size"`
+	PostgresqlEbsVolumeType            string   `json:"postgresql_ebs_volume_type"`
 }
 
 type HATfvars struct {
-	Region                          string      `json:"region"`
-	Endpoint                        string      `json:"endpoint"`
-	SecretKey                       string      `json:"secret_key"`
-	AccessKey                       string      `json:"access_key"`
-	BucketName                      string      `json:"bucket_name"`
-	SshKeyFile                      string      `json:"ssh_key_file"`
-	SshPort                         string      `json:"ssh_port"`
-	SshUser                         string      `json:"ssh_user"`
-	SSHGroupName                    string      `json:"ssh_group_name"`
-	HabitatUidGid                   string      `json:"habitat_uid_gid"`
-	PostgresqlArchiveDiskFsPath     string      `json:"postgresql_archive_disk_fs_path"`
-	PostgresqlInstanceCount         int         `json:"postgresql_instance_count"`
-	NfsMountPath                    string      `json:"nfs_mount_path"`
-	OpensearchCertsByIp             interface{} `json:"opensearch_certs_by_ip"`
-	PostgresqlCertsByIp             interface{} `json:"postgresql_certs_by_ip"`
-	ChefServerCertsByIp             interface{} `json:"chef_server_certs_by_ip"`
-	AutomateCertsByIp               interface{} `json:"automate_certs_by_ip"`
-	OpensearchNodesDn               string      `json:"opensearch_nodes_dn"`
-	OpensearchAdminDn               string      `json:"opensearch_admin_dn"`
-	OpensearchCustomCertsEnabled    bool        `json:"opensearch_custom_certs_enabled"`
-	PostgresqlCustomCertsEnabled    bool        `json:"postgresql_custom_certs_enabled"`
-	ChefServerCustomCertsEnabled    bool        `json:"chef_server_custom_certs_enabled"`
-	AutomateCustomCertsEnabled      bool        `json:"automate_custom_certs_enabled"`
-	PostgresqlPublicKey             string      `json:"postgresql_public_key"`
-	OpensearchAdminCert             string      `json:"opensearch_admin_cert"`
-	OpensearchPublicKey             string      `json:"opensearch_public_key"`
-	ChefServerPublicKey             string      `json:"chef_server_public_key"`
-	AutomatePublicKey               string      `json:"automate_public_key"`
-	PostgresqlPrivateKey            string      `json:"postgresql_private_key"`
-	OpensearchPrivateKey            string      `json:"opensearch_private_key"`
-	OpensearchAdminKey              string      `json:"opensearch_admin_key"`
-	ChefServerPrivateKey            string      `json:"chef_server_private_key"`
-	AutomatePrivateKey              string      `json:"automate_private_key"`
-	PostgresqlRootCa                string      `json:"postgresql_root_ca"`
-	OpensearchRootCa                string      `json:"opensearch_root_ca"`
-	AutomateRootCa                  string      `json:"automate_root_ca"`
-	OpensearchInstanceCount         int         `json:"opensearch_instance_count"`
-	ChefServerInstanceCount         int         `json:"chef_server_instance_count"`
-	AutomateInstanceCount           int         `json:"automate_instance_count"`
-	AutomateFqdn                    string      `json:"automate_fqdn"`
-	AutomateConfigFile              string      `json:"automate_config_file"`
-	OpensearchRootCert              string      `json:"opensearch_root_cert"`
-	PostgresqlRootCert              string      `json:"postgresql_root_cert"`
-	AwsVpcId                        string      `json:"aws_vpc_id"`
-	AmiID                           string      `json:"ami_id"`
-	AwsCidrBlockAddr                string      `json:"aws_cidr_block_addr"`
-	PrivateCustomSubnets            []string    `json:"private_custom_subnets"`
-	PublicCustomSubnets             []string    `json:"public_custom_subnets"`
-	SSHKeyPairName                  string      `json:"ssh_key_pair_name"`
-	ManagedRdsDbuserPassword        string      `json:"managed_rds_dbuser_password"`
-	ManagedRdsDbuserUsername        string      `json:"managed_rds_dbuser_username"`
-	ManagedRdsSuperuserPassword     string      `json:"managed_rds_superuser_password"`
-	ManagedRdsSuperuserUsername     string      `json:"managed_rds_superuser_username"`
-	ManagedRdsInstanceUrl           string      `json:"managed_rds_instance_url"`
-	OsSnapshotUserAccessKeySecret   string      `json:"os_snapshot_user_access_key_secret"`
-	OsSnapshotUserAccessKeyId       string      `json:"os_snapshot_user_access_key_id"`
-	AwsOsSnapshotRoleArn            string      `json:"aws_os_snapshot_role_arn"`
-	ManagedOpensearchUserPassword   string      `json:"managed_opensearch_user_password"`
-	ManagedOpensearchUsername       string      `json:"managed_opensearch_username"`
-	ManagedOpensearchDomainUrl      string      `json:"managed_opensearch_domain_url"`
-	ManagedOpensearchDomainName     string      `json:"managed_opensearch_domain_name"`
-	SetupSelfManagedServices        string      `json:"setup_self_managed_services"`
-	SetupManagedServices            string      `json:"setup_managed_services"`
-	ExistingPostgresqlPrivateIps    []string    `json:"existing_postgresql_private_ips"`
-	ExistingOpensearchPrivateIps    []string    `json:"existing_opensearch_private_ips"`
-	ExistingChefServerPrivateIps    []string    `json:"existing_chef_server_private_ips"`
-	ExistingAutomatePrivateIps      []string    `json:"existing_automate_private_ips"`
-	BackupConfigS3                  string      `json:"backup_config_s3"`
-	BackupConfigEFS                 string      `json:"backup_config_efs"`
-	AutomateAdminPassword           string      `json:"automate_admin_password"`
-	TeamsPort                       int         `json:"teams_port"`
-	SecretsKeyFile                  string      `json:"secrets_key_file"`
-	SecretsStoreFile                string      `json:"secrets_store_file"`
+	Region                       string      `json:"region"`
+	Endpoint                     string      `json:"endpoint"`
+	SecretKey                    string      `json:"secret_key"`
+	AccessKey                    string      `json:"access_key"`
+	BucketName                   string      `json:"bucket_name"`
+	SshKeyFile                   string      `json:"ssh_key_file"`
+	SshPort                      string      `json:"ssh_port"`
+	SshUser                      string      `json:"ssh_user"`
+	SSHGroupName                 string      `json:"ssh_group_name"`
+	HabitatUidGid                string      `json:"habitat_uid_gid"`
+	PostgresqlArchiveDiskFsPath  string      `json:"postgresql_archive_disk_fs_path"`
+	PostgresqlInstanceCount      int         `json:"postgresql_instance_count"`
+	NfsMountPath                 string      `json:"nfs_mount_path"`
+	OpensearchCertsByIp          interface{} `json:"opensearch_certs_by_ip"`
+	PostgresqlCertsByIp          interface{} `json:"postgresql_certs_by_ip"`
+	ChefServerCertsByIp          interface{} `json:"chef_server_certs_by_ip"`
+	AutomateCertsByIp            interface{} `json:"automate_certs_by_ip"`
+	OpensearchNodesDn            string      `json:"opensearch_nodes_dn"`
+	OpensearchAdminDn            string      `json:"opensearch_admin_dn"`
+	OpensearchCustomCertsEnabled bool        `json:"opensearch_custom_certs_enabled"`
+	PostgresqlCustomCertsEnabled bool        `json:"postgresql_custom_certs_enabled"`
+	ChefServerCustomCertsEnabled bool        `json:"chef_server_custom_certs_enabled"`
+	AutomateCustomCertsEnabled   bool        `json:"automate_custom_certs_enabled"`
+	PostgresqlPublicKey          string      `json:"postgresql_public_key"`
+	OpensearchAdminCert          string      `json:"opensearch_admin_cert"`
+	OpensearchPublicKey          string      `json:"opensearch_public_key"`
+	ChefServerPublicKey          string      `json:"chef_server_public_key"`
+	AutomatePublicKey            string      `json:"automate_public_key"`
+	PostgresqlPrivateKey         string      `json:"postgresql_private_key"`
+	OpensearchPrivateKey         string      `json:"opensearch_private_key"`
+	OpensearchAdminKey           string      `json:"opensearch_admin_key"`
+	ChefServerPrivateKey         string      `json:"chef_server_private_key"`
+	AutomatePrivateKey           string      `json:"automate_private_key"`
+	PostgresqlRootCa             string      `json:"postgresql_root_ca"`
+	OpensearchRootCa             string      `json:"opensearch_root_ca"`
+	AutomateRootCa               string      `json:"automate_root_ca"`
+	OpensearchInstanceCount      int         `json:"opensearch_instance_count"`
+	ChefServerInstanceCount      int         `json:"chef_server_instance_count"`
+	AutomateInstanceCount        int         `json:"automate_instance_count"`
+	AutomateFqdn                 string      `json:"automate_fqdn"`
+	AutomateConfigFile           string      `json:"automate_config_file"`
+	OpensearchRootCert           string      `json:"opensearch_root_cert"`
+	PostgresqlRootCert           string      `json:"postgresql_root_cert"`
+	AwsVpcId                     string      `json:"aws_vpc_id"`
+	AmiID                        string      `json:"ami_id"`
+	AwsCidrBlockAddr             string      `json:"aws_cidr_block_addr"`
+	PrivateCustomSubnets         []string    `json:"private_custom_subnets"`
+	PublicCustomSubnets          []string    `json:"public_custom_subnets"`
+	SSHKeyPairName               string      `json:"ssh_key_pair_name"`
+
+	BucketNameDep                         string `json:"bucket_name_deployment"`
+	ManagedOpensearchDomainUrlDep         string `json:"managed_opensearch_domain_url_deployment"`
+	ManagedOpensearchUsernameDep          string `json:"managed_opensearch_username_deployment"`
+	ManagedOpensearchUserPasswordDep      string `json:"managed_opensearch_user_password_deployment"`
+	ManagedOpensearchCertificateDep       string `json:"managed_opensearch_certificate_deployment"`
+	AwsOsSnapshotRoleArnDep               string `json:"aws_os_snapshot_role_arn_deployment"`
+	OsSnapshotUserAccessKeyIdDep          string `json:"os_snapshot_user_access_key_id_deployment"`
+	OsSnapshotUserAccessKeySecretDep      string `json:"os_snapshot_user_access_key_secret_deployment"`
+	ManagedRdsInstanceUrlDep              string `json:"managed_rds_instance_url_deployment"`
+	ManagedRdsSuperuserUsernameDep        string `json:"managed_rds_superuser_username_deployment"`
+	ManagedRdsSuperuserPasswordDep        string `json:"managed_rds_superuser_password_deployment"`
+	ManagedRdsDbuserUsernameDep           string `json:"managed_rds_dbuser_username_deployment"`
+	ManagedRdsDbuserPasswordDep           string `json:"managed_rds_dbuser_password_deployment"`
+	AwsManagedRdsPostgresqlCertificateDep string `json:"managed_rds_certificate_deployment"`
+
+	ManagedRdsDbuserPassword      string   `json:"managed_rds_dbuser_password"`
+	ManagedRdsDbuserUsername      string   `json:"managed_rds_dbuser_username"`
+	ManagedRdsSuperuserPassword   string   `json:"managed_rds_superuser_password"`
+	ManagedRdsSuperuserUsername   string   `json:"managed_rds_superuser_username"`
+	ManagedRdsInstanceUrl         string   `json:"managed_rds_instance_url"`
+	OsSnapshotUserAccessKeySecret string   `json:"os_snapshot_user_access_key_secret"`
+	OsSnapshotUserAccessKeyId     string   `json:"os_snapshot_user_access_key_id"`
+	AwsOsSnapshotRoleArn          string   `json:"aws_os_snapshot_role_arn"`
+	ManagedOpensearchUserPassword string   `json:"managed_opensearch_user_password"`
+	ManagedOpensearchUsername     string   `json:"managed_opensearch_username"`
+	ManagedOpensearchDomainUrl    string   `json:"managed_opensearch_domain_url"`
+	ManagedOpensearchDomainName   string   `json:"managed_opensearch_domain_name"`
+	SetupSelfManagedServices      string   `json:"setup_self_managed_services"`
+	SetupManagedServices          string   `json:"setup_managed_services"`
+	ExistingPostgresqlPrivateIps  []string `json:"existing_postgresql_private_ips"`
+	ExistingOpensearchPrivateIps  []string `json:"existing_opensearch_private_ips"`
+	ExistingChefServerPrivateIps  []string `json:"existing_chef_server_private_ips"`
+	ExistingAutomatePrivateIps    []string `json:"existing_automate_private_ips"`
+	BackupConfigS3                string   `json:"backup_config_s3"`
+	BackupConfigEFS               string   `json:"backup_config_efs"`
+	AutomateAdminPassword         string   `json:"automate_admin_password"`
+	TeamsPort                     int      `json:"teams_port"`
+	SecretsKeyFile                string   `json:"secrets_key_file"`
+	SecretsStoreFile              string   `json:"secrets_store_file"`
 }
 type PullConfigs interface {
 	pullOpensearchConfigs() (map[string]*ConfigKeys, error)
@@ -216,6 +197,7 @@ type PullConfigs interface {
 	getExceptionIps() []string
 	setExceptionIps(ips []string)
 	getOsCertsByIp(map[string]*ConfigKeys) []CertByIP
+	setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil)
 }
 
 type PullConfigsImpl struct {
@@ -233,6 +215,11 @@ func NewPullConfigs(infra *AutomateHAInfraDetails, sshUtil SSHUtil) PullConfigs 
 
 func (p *PullConfigsImpl) getExceptionIps() []string {
 	return p.exceptionIps
+}
+
+func (p *PullConfigsImpl) setInfraAndSSHUtil(infra *AutomateHAInfraDetails, sshUtil SSHUtil) {
+	p.infra = infra
+	p.sshUtil = sshUtil
 }
 
 func (p *PullConfigsImpl) setExceptionIps(ips []string) {
@@ -332,6 +319,61 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 	return ipConfigMap, nil
 }
 
+func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s3, fs string) (string, error) {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Opensearch != nil {
+			osBkpLocation := ""
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Location != nil {
+				osBkpLocation = ele.Global.V1.External.Opensearch.Backup.Location.Value
+			}
+			if ele.Global.V1.Backups == nil && ele.Global.V1.External.Opensearch.Backup == nil {
+				return "", nil
+			} else if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Location != nil &&
+				ele.Global.V1.Backups.Location.Value == "s3" &&
+				osBkpLocation == "s3" {
+				return s3, nil
+			} else if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Filesystem != nil &&
+				ele.Global.V1.Backups.Filesystem.Path != nil &&
+				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 &&
+				osBkpLocation == "fs" {
+				return fs, nil
+			} else {
+				return "", errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
+			}
+		} else {
+			return "", errors.New("automate config Global.V1.External.Opensearch missing")
+		}
+	}
+	return currConfig, nil
+}
+
+func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (string, error) {
+	if dbtype == TYPE_AWS || dbtype == TYPE_SELF_MANAGED {
+		for _, ele := range a2ConfigMap {
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Auth != nil &&
+				ele.Global.V1.External.Opensearch.Auth.Scheme != nil {
+				if ele.Global.V1.External.Opensearch.Auth.Scheme.Value == "basic_auth" {
+					return TYPE_SELF_MANAGED, nil
+				} else if ele.Global.V1.External.Opensearch.Auth.Scheme.Value == "aws_os" {
+					return TYPE_AWS, nil
+				} else {
+					return "", errors.New("automate config Value in Global.V1.External.Opensearch.Auth.Scheme can be either basic_auth or aws_os")
+				}
+			} else {
+				return "", errors.New("automate config error found")
+			}
+		}
+	} else if dbtype == "" {
+		return dbtype, nil
+	}
+	return "", errors.New(`unsupported db type. It should be either "aws" or "self-managed" or ""`)
+}
+
 func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := getExistingHAConfig()
 	if err != nil {
@@ -345,6 +387,19 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
+
+	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
+	if err != nil {
+		return nil, status.New(status.ConfigError, err.Error())
+	}
+	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
+
+	dbtype, err := determineDBType(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
+	if err != nil {
+		return nil, status.New(status.ConfigError, err.Error())
+	}
+	sharedConfigToml.ExternalDB.Database.Type = dbtype
+
 	// checking onprem with managed or self managed services
 	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
 	if len(strings.TrimSpace(sharedConfigToml.ExternalDB.Database.Type)) < 1 {
@@ -395,6 +450,30 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 			sharedConfigToml.Postgresql.Config.RootCA = pgRootCA
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	} else {
+		externalOsDetails, err := p.getExternalOpensearchDetails(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
+		if err != nil {
+			return nil, err
+		}
+		if externalOsDetails != nil {
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = externalOsDetails.OpensearchDomainName
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = externalOsDetails.OpensearchInstanceURL
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = externalOsDetails.OpensearchRootCert
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = externalOsDetails.OpensearchSuperUserName
+			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = externalOsDetails.OpensearchSuperUserPassword
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = externalOsDetails.AWS.AwsOsSnapshotRoleArn
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = externalOsDetails.AWS.OsUserAccessKeyId
+			sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = externalOsDetails.AWS.OsUserAccessKeySecret
+		}
+		externalPgDetails := getExternalPGDetails(a2ConfigMap)
+		if externalPgDetails != nil {
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = externalPgDetails.PostgreSQLDBUserName
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = externalPgDetails.PostgreSQLDBUserPassword
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = externalPgDetails.PostgreSQLInstanceURL
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert = externalPgDetails.PostgreSQLRootCert
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName = externalPgDetails.PostgreSQLSuperUserName
+			sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = externalPgDetails.PostgreSQLSuperUserPassword
+		}
 	}
 
 	// Build CertsByIP for Automate
@@ -450,7 +529,141 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
 	}
 
+	root_ca, fqdn, err := getChefServerFqdnAndLBRootCA(EXISTING_INFRA_MODE)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server FQDN and LB_ROOT_CA")
+	}
+	sharedConfigToml.ChefServer.Config.RootCA, sharedConfigToml.ChefServer.Config.Fqdn = root_ca, fqdn
+
 	return sharedConfigToml, nil
+}
+
+func (p *PullConfigsImpl) getOSpassword() (string, error) {
+	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
+		p.sshUtil.getSSHConfig().hostIP = ip
+		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_OS_PASSWORD, true)
+		if err != nil {
+			return "", err
+		}
+		return strings.TrimSpace(rawOutput), nil
+	}
+	return "", nil
+
+}
+
+func (p *PullConfigsImpl) getExternalOpensearchDetails(a2ConfigMap map[string]*dc.AutomateConfig, dbType string) (*ExternalOpensearchToml, error) {
+	for _, ele := range a2ConfigMap {
+		roleArn := ""
+		if ele.Global.V1.External.Opensearch.Backup != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3.Settings != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn != nil {
+			roleArn = ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value
+		}
+
+		if dbType == TYPE_AWS {
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Auth != nil &&
+				ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
+				return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value,
+					ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+					ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value,
+					ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value,
+					roleArn,
+				), nil
+			}
+		} else if dbType == TYPE_SELF_MANAGED {
+			osPass, err := p.getOSpassword()
+			if err != nil {
+				return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch password")
+			}
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Auth != nil &&
+				ele.Global.V1.External.Opensearch.Auth.BasicAuth != nil {
+				return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
+					ele.Global.V1.External.Opensearch.Auth.BasicAuth.Username.Value,
+					osPass,
+					ele.Global.V1.External.Opensearch.Ssl.RootCert.Value,
+					ele.Global.V1.External.Opensearch.Ssl.ServerName.Value,
+					"",
+					"",
+					roleArn,
+				), nil
+			}
+		} else {
+			return nil, status.New(status.ConfigError, fmt.Sprintf("Database type %s is invalid", dbType))
+		}
+	}
+
+	return nil, nil
+}
+
+func setExternalOpensearchDetails(instanceUrl, superUserName, superPassword, rootCert, domainName, accessKey, secretKey, roleArn string) *ExternalOpensearchToml {
+	nodeUrl, _ := url.Parse(instanceUrl)
+	return &ExternalOpensearchToml{
+		OpensearchInstanceURL:       nodeUrl.Host,
+		OpensearchSuperUserName:     superUserName,
+		OpensearchSuperUserPassword: superPassword,
+		OpensearchRootCert:          rootCert,
+		OpensearchDomainName:        domainName,
+		AWS: ExternalAwsToml{
+			OsUserAccessKeyId:     accessKey,
+			OsUserAccessKeySecret: secretKey,
+			AwsOsSnapshotRoleArn:  roleArn,
+		},
+	}
+}
+
+func getExternalPGDetails(a2ConfigMap map[string]*dc.AutomateConfig) *ExternalPostgreSQLToml {
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1.External.Postgresql.Nodes != nil &&
+			ele.Global.V1.External.Postgresql.Auth.Password.Superuser != nil &&
+			ele.Global.V1.External.Postgresql.Auth.Password.Dbuser != nil {
+			return setExternalPGDetails(
+				ele.Global.V1.External.Postgresql.Nodes[0].Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Username.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Username.Value,
+				ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value,
+				ele.Global.V1.External.Postgresql.Ssl.RootCert.Value,
+			)
+		}
+	}
+	return nil
+}
+
+func setExternalPGDetails(instanceUrl, superUserName, superUserPassword, dBUserName, dBUserPassword, rootCerts string) *ExternalPostgreSQLToml {
+	return &ExternalPostgreSQLToml{
+		PostgreSQLInstanceURL:       instanceUrl,
+		PostgreSQLSuperUserName:     superUserName,
+		PostgreSQLSuperUserPassword: superUserPassword,
+		PostgreSQLDBUserName:        dBUserName,
+		PostgreSQLDBUserPassword:    dBUserPassword,
+		PostgreSQLRootCert:          rootCerts,
+	}
+}
+
+func getChefServerFqdnAndLBRootCA(deploymentType string) (string, string, error) {
+	if deploymentType == EXISTING_INFRA_MODE {
+		ExistingInfraConfig, err := getExistingInfraConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
+		if err != nil {
+			return "", "", err
+		}
+		return ExistingInfraConfig.ChefServer.Config.RootCA, ExistingInfraConfig.ChefServer.Config.Fqdn, nil
+	} else if deploymentType == AWS_MODE {
+		AWSConfig, err := getAwsConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
+		if err != nil {
+			return "", "", err
+		}
+		return AWSConfig.ChefServer.Config.RootCA, AWSConfig.ChefServer.Config.Fqdn, nil
+	}
+	return "", "", errors.New("deployment type unknown")
 }
 
 func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []CertByIP {
@@ -537,6 +750,13 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
+
+	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "s3", "efs")
+	if err != nil {
+		return nil, err
+	}
+	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
+
 	// checking AWS with managed services or Non managed services
 	logrus.Debug(sharedConfigToml.Aws.Config.SetupManagedServices)
 	if !isManagedServicesOn() {
@@ -607,6 +827,30 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 			sharedConfigToml.Postgresql.Config.PublicKey = pgPubKey
 		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	} else {
+		externalOsDetails, err := p.getExternalOpensearchDetails(a2ConfigMap, TYPE_AWS)
+		if err != nil {
+			return nil, err
+		}
+		if externalOsDetails != nil {
+			sharedConfigToml.Aws.Config.OpensearchDomainName = externalOsDetails.OpensearchDomainName
+			sharedConfigToml.Aws.Config.OpensearchDomainUrl = externalOsDetails.OpensearchInstanceURL
+			sharedConfigToml.Aws.Config.OpensearchCertificate = externalOsDetails.OpensearchRootCert
+			sharedConfigToml.Aws.Config.OpensearchUsername = externalOsDetails.OpensearchSuperUserName
+			sharedConfigToml.Aws.Config.OpensearchUserPassword = externalOsDetails.OpensearchSuperUserPassword
+			sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = externalOsDetails.AWS.AwsOsSnapshotRoleArn
+			sharedConfigToml.Aws.Config.OsUserAccessKeyId = externalOsDetails.AWS.OsUserAccessKeyId
+			sharedConfigToml.Aws.Config.OsUserAccessKeySecret = externalOsDetails.AWS.OsUserAccessKeySecret
+		}
+		externalPgDetails := getExternalPGDetails(a2ConfigMap)
+		if externalPgDetails != nil {
+			sharedConfigToml.Aws.Config.RDSDBUserName = externalPgDetails.PostgreSQLDBUserName
+			sharedConfigToml.Aws.Config.RDSDBUserPassword = externalPgDetails.PostgreSQLDBUserPassword
+			sharedConfigToml.Aws.Config.RDSInstanceUrl = externalPgDetails.PostgreSQLInstanceURL
+			sharedConfigToml.Aws.Config.RDSCertificate = externalPgDetails.PostgreSQLRootCert
+			sharedConfigToml.Aws.Config.RDSSuperUserName = externalPgDetails.PostgreSQLSuperUserName
+			sharedConfigToml.Aws.Config.RDSSuperUserPassword = externalPgDetails.PostgreSQLSuperUserPassword
+		}
 	}
 
 	// Build CertsByIP for Automate
@@ -625,10 +869,8 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if len(a2Fqdn) > 0 {
 		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
 	}
-	if a2PrivKey := getPrivateKeyFromFE(a2ConfigMap); len(a2PrivKey) > 0 {
+	if a2PrivKey, a2PubKey := getPrivateAndPublicKeyFromFE(a2ConfigMap); len(a2PrivKey) > 0 && len(a2PubKey) > 0 {
 		sharedConfigToml.Automate.Config.PrivateKey = a2PrivKey
-	}
-	if a2PubKey := getPublicKeyFromFE(a2ConfigMap); len(a2PubKey) > 0 {
 		sharedConfigToml.Automate.Config.PublicKey = a2PubKey
 	}
 	sharedConfigToml.Automate.Config.EnableCustomCerts = true
@@ -650,10 +892,8 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
 		sharedConfigToml.Automate.Config.RootCA = csRootCA
 	}
-	if csPrivKey := getPrivateKeyFromFE(csConfigMap); len(csPrivKey) > 0 {
+	if csPrivKey, csPubKey := getPrivateAndPublicKeyFromFE(csConfigMap); len(csPrivKey) > 0 && len(csPubKey) > 0 {
 		sharedConfigToml.ChefServer.Config.PrivateKey = csPrivKey
-	}
-	if csPubKey := getPublicKeyFromFE(csConfigMap); len(csPubKey) > 0 {
 		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
 	}
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
@@ -671,6 +911,12 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if len(objStorageConfig.secrectKey) > 0 {
 		sharedConfigToml.Aws.Config.OsUserAccessKeySecret = objStorageConfig.secrectKey
 	}
+
+	root_ca, fqdn, err := getChefServerFqdnAndLBRootCA(AWS_MODE)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server FQDN and LB_ROOT_CA")
+	}
+	sharedConfigToml.ChefServer.Config.RootCA, sharedConfigToml.ChefServer.Config.Fqdn = root_ca, fqdn
 
 	return sharedConfigToml, nil
 }
@@ -838,26 +1084,26 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 		sharedConfigToml.Automate.Config.TeamsPort = strconv.Itoa(tfvarConfig.TeamsPort)
 	}
 
-	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(awsAutoTfvarConfig.NfsMountPath)
-	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(awsAutoTfvarConfig.HabitatUidGid)
+	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(tfvarConfig.NfsMountPath)
+	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(tfvarConfig.HabitatUidGid)
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = strings.TrimSpace(awsAutoTfvarConfig.Architecture)
-	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(awsAutoTfvarConfig.AwsSshKeyFile)
-	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(awsAutoTfvarConfig.SshPort)
-	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(awsAutoTfvarConfig.SshUser)
-	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(awsAutoTfvarConfig.SSHGroupName)
+	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
+	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
+	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
+	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(tfvarConfig.SSHGroupName)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
-	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.AutomateInstanceCount)
-	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(awsAutoTfvarConfig.AutomateConfigFile)
-	sharedConfigToml.Automate.Config.EnableCustomCerts = awsAutoTfvarConfig.AutomateCustomCertsEnabled
-	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(awsAutoTfvarConfig.AutomateAdminPassword)
-	sharedConfigToml.ChefServer.Config.EnableCustomCerts = awsAutoTfvarConfig.ChefServerCustomCertsEnabled
-	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.ChefServerInstanceCount)
-	sharedConfigToml.Postgresql.Config.EnableCustomCerts = awsAutoTfvarConfig.PostgresqlCustomCertsEnabled
-	sharedConfigToml.Postgresql.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.PostgresqlInstanceCount)
-	sharedConfigToml.Opensearch.Config.EnableCustomCerts = awsAutoTfvarConfig.OpensearchCustomCertsEnabled
-	sharedConfigToml.Opensearch.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.OpensearchInstanceCount)
-	sharedConfigToml.Opensearch.Config.AdminDn = strings.TrimSpace(awsAutoTfvarConfig.OpensearchAdminDn)
-	sharedConfigToml.Opensearch.Config.NodesDn = strings.TrimSpace(awsAutoTfvarConfig.OpensearchNodesDn)
+	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
+	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
+	sharedConfigToml.Automate.Config.EnableCustomCerts = tfvarConfig.AutomateCustomCertsEnabled
+	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(tfvarConfig.AutomateAdminPassword)
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = tfvarConfig.ChefServerCustomCertsEnabled
+	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(tfvarConfig.ChefServerInstanceCount)
+	sharedConfigToml.Postgresql.Config.EnableCustomCerts = tfvarConfig.PostgresqlCustomCertsEnabled
+	sharedConfigToml.Postgresql.Config.InstanceCount = strconv.Itoa(tfvarConfig.PostgresqlInstanceCount)
+	sharedConfigToml.Opensearch.Config.EnableCustomCerts = tfvarConfig.OpensearchCustomCertsEnabled
+	sharedConfigToml.Opensearch.Config.InstanceCount = strconv.Itoa(tfvarConfig.OpensearchInstanceCount)
+	sharedConfigToml.Opensearch.Config.AdminDn = strings.TrimSpace(tfvarConfig.OpensearchAdminDn)
+	sharedConfigToml.Opensearch.Config.NodesDn = strings.TrimSpace(tfvarConfig.OpensearchNodesDn)
 	sharedConfigToml.Aws.Config.Profile = strings.TrimSpace(awsAutoTfvarConfig.AwsProfile)
 	sharedConfigToml.Aws.Config.Region = strings.TrimSpace(awsAutoTfvarConfig.AwsRegion)
 	sharedConfigToml.Aws.Config.AwsVpcId = strings.TrimSpace(awsAutoTfvarConfig.AwsVpcId)
@@ -869,17 +1115,20 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 	sharedConfigToml.Aws.Config.SSHKeyPairName = strings.TrimSpace(awsAutoTfvarConfig.SshKeyFileName)
 	sharedConfigToml.Aws.Config.AutomateLbCertificateArn = strings.TrimSpace(awsAutoTfvarConfig.AutomateLbCertificateArn)
 	sharedConfigToml.Aws.Config.ChefServerLbCertificateArn = strings.TrimSpace(awsAutoTfvarConfig.ChefServerLbCertificateArn)
-	sharedConfigToml.Aws.Config.OpensearchDomainUrl = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchDomainUrl)
+	sharedConfigToml.Aws.Config.OpensearchDomainUrl = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainUrlDep)
 	sharedConfigToml.Aws.Config.OpensearchDomainName = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchDomainName)
-	sharedConfigToml.Aws.Config.OpensearchCertificate = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchCertificate)
-	sharedConfigToml.Aws.Config.OpensearchUsername = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchUsername)
-	sharedConfigToml.Aws.Config.OpensearchUserPassword = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchUserPassword)
-	sharedConfigToml.Aws.Config.RDSCertificate = strings.TrimSpace(awsAutoTfvarConfig.AwsManagedRdsPostgresqlCertificate)
-	sharedConfigToml.Aws.Config.RDSDBUserName = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsDbuserUsername)
-	sharedConfigToml.Aws.Config.RDSDBUserPassword = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsDbuserPassword)
-	sharedConfigToml.Aws.Config.RDSInstanceUrl = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsInstanceUrl)
-	sharedConfigToml.Aws.Config.RDSSuperUserName = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsSuperuserUsername)
-	sharedConfigToml.Aws.Config.RDSSuperUserPassword = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsSuperuserPassword)
+	sharedConfigToml.Aws.Config.OpensearchCertificate = strings.TrimSpace(tfvarConfig.ManagedOpensearchCertificateDep)
+	sharedConfigToml.Aws.Config.OpensearchUsername = strings.TrimSpace(tfvarConfig.ManagedOpensearchUsernameDep)
+	sharedConfigToml.Aws.Config.OpensearchUserPassword = strings.TrimSpace(tfvarConfig.ManagedOpensearchUserPasswordDep)
+	sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = strings.TrimSpace(tfvarConfig.AwsOsSnapshotRoleArnDep)
+	sharedConfigToml.Aws.Config.OsUserAccessKeyId = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeyIdDep)
+	sharedConfigToml.Aws.Config.OsUserAccessKeySecret = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeySecretDep)
+	sharedConfigToml.Aws.Config.RDSCertificate = strings.TrimSpace(tfvarConfig.AwsManagedRdsPostgresqlCertificateDep)
+	sharedConfigToml.Aws.Config.RDSDBUserName = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserUsernameDep)
+	sharedConfigToml.Aws.Config.RDSDBUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserPasswordDep)
+	sharedConfigToml.Aws.Config.RDSInstanceUrl = strings.TrimSpace(tfvarConfig.ManagedRdsInstanceUrlDep)
+	sharedConfigToml.Aws.Config.RDSSuperUserName = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserUsernameDep)
+	sharedConfigToml.Aws.Config.RDSSuperUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserPasswordDep)
 	sharedConfigToml.Aws.Config.LBAccessLogs = strings.TrimSpace(awsAutoTfvarConfig.LBAccessLogs)
 	sharedConfigToml.Aws.Config.DeleteOnTermination, _ = strconv.ParseBool(awsAutoTfvarConfig.DeleteOnTermination)
 	sharedConfigToml.Aws.Config.AutomateServerInstanceType = strings.TrimSpace(awsAutoTfvarConfig.AutomateServerInstanceType)
@@ -952,28 +1201,16 @@ func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
-func getPrivateKeyFromFE(config map[string]*dc.AutomateConfig) string {
+func getPrivateAndPublicKeyFromFE(config map[string]*dc.AutomateConfig) (string, string) {
 	if config == nil {
-		return ""
+		return "", ""
 	}
 	for _, ele := range config {
-		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Key != "" {
-			return ele.GetGlobal().V1.FrontendTls[0].Key
+		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Key != "" && ele.Global.V1.FrontendTls[0].Cert != "" {
+			return ele.GetGlobal().V1.FrontendTls[0].Key, ele.GetGlobal().V1.FrontendTls[0].Cert
 		}
 	}
-	return ""
-}
-
-func getPublicKeyFromFE(config map[string]*dc.AutomateConfig) string {
-	if config == nil {
-		return ""
-	}
-	for _, ele := range config {
-		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Cert != "" {
-			return ele.GetGlobal().V1.FrontendTls[0].Cert
-		}
-	}
-	return ""
+	return "", ""
 }
 
 func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {

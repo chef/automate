@@ -12,6 +12,7 @@ import (
 )
 
 const CONFIG_TOML_PATH = "../../pkg/testfiles/onprem"
+const CONFIG_AWS_TOML_PATH = "../../pkg/testfiles/aws"
 const TEST_IP_1 = "192.0.2.11"
 
 type MockSSHUtilsImpl struct {
@@ -384,7 +385,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -393,6 +394,15 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		},
 		isManagedServicesOnFunc: func() bool {
 			return false
+		},
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -437,7 +447,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return errors.New("random")
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -445,6 +455,12 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		},
 		isManagedServicesOnFunc: func() bool {
 			return false
+		},
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -490,7 +506,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -519,6 +535,18 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
+		},
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
@@ -556,7 +584,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -576,6 +604,18 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -596,4 +636,141 @@ OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
+}
+
+func TestAddnodeExecuteSyncConfigToAllNodes(t *testing.T) {
+
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	mockNodeUtil := newMockNodeUtilsImplForAddOnprem()
+
+	t.Run("With sync config error", func(t *testing.T) {
+
+		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+			return errors.New("sync error")
+		}
+		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
+
+		err := nodeAdd.runDeploy()
+		assert.Error(t, err, "sync error")
+	})
+	t.Run("With sync config error and deploy error", func(t *testing.T) {
+
+		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+			return errors.New("sync error")
+		}
+		mockNodeUtil.executeAutomateClusterCtlCommandAsyncfunc = func(command string, args []string, helpDocs string) error {
+			return errors.New("deploy error")
+		}
+		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
+
+		err := nodeAdd.runDeploy()
+		assert.Error(t, err, "sync error")
+	})
+}
+
+func TestAddnodeExecuteSaveConfigFromAllNodeType(t *testing.T) {
+
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	mockNodeUtil := newMockNodeUtilsImplForAddOnprem()
+
+	t.Run("With save config error", func(t *testing.T) {
+
+		mockNodeUtil.saveConfigToBastionFunc = func() error {
+			return errors.New("error fetching config")
+		}
+		mockNodeUtil.pullAndUpdateConfigFunc = PullConfFunc
+		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
+
+		err := nodeAdd.Execute(nil, nil)
+		assert.Error(t, err, "error fetching config")
+	})
+
+	t.Run("no error", func(t *testing.T) {
+
+		mockNodeUtil.saveConfigToBastionFunc = func() error {
+			return nil
+		}
+		mockNodeUtil.pullAndUpdateConfigFunc = PullConfFunc
+		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
+
+		err := nodeAdd.Execute(nil, nil)
+		assert.NoError(t, err)
+	})
+}
+
+func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
+	return &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
+			return nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			return &AWSConfigIp{
+				configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+				configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+				configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+				configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+			}, nil
+		},
+		executeShellCommandFunc: func() error {
+			return nil
+		},
+		moveAWSAutoTfvarsFileFunc: func(path string) error {
+			return nil
+		},
+		modifyTfArchFileFunc: func(path string) error {
+			return nil
+		},
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			return 0, nil
+		},
+	}
+}
+
+func createNewAddNodeOnprem(mockNodeUtilsImpl *MockNodeUtilsImpl, mockSSHUtilsImpl *MockSSHUtilsImpl, w *majorupgrade_utils.CustomWriter) HAModifyAndDeploy {
+
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: TEST_IP_1,
+	}
+	return NewAddNodeOnPrem(
+		w.CliWriter,
+		flags,
+		mockNodeUtilsImpl,
+		CONFIG_TOML_PATH,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
 }

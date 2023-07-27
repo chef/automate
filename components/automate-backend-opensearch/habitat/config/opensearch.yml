@@ -15,6 +15,7 @@
 # Use a descriptive name for your cluster:
 #
 cluster.name: {{cfg.cluster.name}}
+cluster.max_shards_per_node: {{cfg.cluster.max_shards_per_node}}
 #
 # ------------------------------------ Node ------------------------------------
 #

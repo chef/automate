@@ -18,6 +18,10 @@ type Cmd struct {
 	CmdInputs *CmdInputs
 }
 
+func NewCmd() *Cmd {
+	return &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+}
+
 type CmdInputs struct {
 	Cmd                      string
 	Args                     []string
@@ -43,6 +47,16 @@ type NodeTypeAndCmd struct {
 	Infra      *AutomateHAInfraDetails
 }
 
+func NewNodeTypeAndCmd() *NodeTypeAndCmd {
+	return &NodeTypeAndCmd{
+		Frontend:   NewCmd(),
+		Automate:   NewCmd(),
+		ChefServer: NewCmd(),
+		Opensearch: NewCmd(),
+		Postgresql: NewCmd(),
+	}
+}
+
 type CmdResult struct {
 	ScriptName  string
 	HostIP      string
@@ -55,6 +69,7 @@ type RemoteCmdExecutor interface {
 	Execute() (map[string][]*CmdResult, error)
 	ExecuteWithNodeMap(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error)
 	GetSshUtil() SSHUtil
+	SetWriter(writer *cli.Writer)
 }
 
 type remoteCmdExecutor struct {
@@ -67,6 +82,7 @@ type MockRemoteCmdExecutor struct {
 	ExecuteFunc            func() (map[string][]*CmdResult, error)
 	ExecuteWithNodeMapFunc func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error)
 	GetSshUtilFunc         func() SSHUtil
+	SetWriterFunc          func(cli *cli.Writer)
 }
 
 func (m *MockRemoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {
@@ -79,6 +95,10 @@ func (m *MockRemoteCmdExecutor) ExecuteWithNodeMap(nodeMap *NodeTypeAndCmd) (map
 
 func (m *MockRemoteCmdExecutor) GetSshUtil() SSHUtil {
 	return m.GetSshUtilFunc()
+}
+
+func (m *MockRemoteCmdExecutor) SetWriter(cli *cli.Writer) {
+	m.SetWriterFunc(cli)
 }
 
 func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) RemoteCmdExecutor {
@@ -100,6 +120,10 @@ func (c *remoteCmdExecutor) GetSshUtil() SSHUtil {
 	return c.SshUtil
 }
 
+func (c *remoteCmdExecutor) SetWriter(writer *cli.Writer) {
+	c.Output = writer
+}
+
 func (c *remoteCmdExecutor) ExecuteWithNodeMap(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 	return c.execute(nodeMap)
 }
@@ -117,47 +141,47 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 	switch true {
 	case nodeMap.Frontend.CmdInputs.NodeType:
 		const remoteService string = FRONTEND
-		nodeIps, err := preCmdExecCheck(nodeMap.Frontend, c.SshUtil, nodeMap.Infra, remoteService, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Frontend, c.SshUtil, nodeMap.Infra, remoteService, c.Output)
 		if err != nil {
 			return cmdResult, err
 		}
-		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, nodeMap.Frontend.CmdInputs.InputFilesPrefix, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, nodeMap.Frontend.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Automate.CmdInputs.NodeType:
 		const remoteService string = AUTOMATE
-		nodeIps, err := preCmdExecCheck(nodeMap.Automate, c.SshUtil, nodeMap.Infra, remoteService, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Automate, c.SshUtil, nodeMap.Infra, remoteService, c.Output)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, nodeMap.Automate.CmdInputs.InputFilesPrefix, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, nodeMap.Automate.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.ChefServer.CmdInputs.NodeType:
 		const remoteService string = CHEF_SERVER
-		nodeIps, err := preCmdExecCheck(nodeMap.ChefServer, c.SshUtil, nodeMap.Infra, remoteService, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.ChefServer, c.SshUtil, nodeMap.Infra, remoteService, c.Output)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, nodeMap.ChefServer.CmdInputs.InputFilesPrefix, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, nodeMap.ChefServer.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Postgresql.CmdInputs.NodeType:
 		const remoteService string = POSTGRESQL
-		nodeIps, err := preCmdExecCheck(nodeMap.Postgresql, c.SshUtil, nodeMap.Infra, remoteService, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Postgresql, c.SshUtil, nodeMap.Infra, remoteService, c.Output)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, nodeMap.Postgresql.CmdInputs.InputFilesPrefix, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, nodeMap.Postgresql.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Opensearch.CmdInputs.NodeType:
 		const remoteService string = OPENSEARCH
-		nodeIps, err := preCmdExecCheck(nodeMap.Opensearch, c.SshUtil, nodeMap.Infra, remoteService, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Opensearch, c.SshUtil, nodeMap.Infra, remoteService, c.Output)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, nodeMap.Opensearch.CmdInputs.InputFilesPrefix, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, nodeMap.Opensearch.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	default:
 		return cmdResult, errors.New("Missing or Unsupported flag")
@@ -246,7 +270,8 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 	}
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, false)
-	if err != nil && len(output) == 0 {
+	if err != nil {
+		rc.Output = output
 		rc.Error = err
 		resultChan <- rc
 		return
@@ -386,7 +411,9 @@ func isValidIPFormat(ip string) bool {
 func printOutput(remoteService string, result CmdResult, outputFiles []string, cliWriter *cli.Writer) {
 	var resultFiles []string
 	var err error
-	if result.Error != nil {
+	if result.Error != nil && len(strings.TrimSpace(result.Output)) != 0 {
+		printErrorMessage(remoteService, result.HostIP, cliWriter, result.Output)
+	} else if result.Error != nil {
 		printErrorMessage(remoteService, result.HostIP, cliWriter, result.Error.Error())
 	} else {
 		printSuccessMessage(remoteService, result.HostIP, cliWriter, result.Output)
@@ -463,9 +490,7 @@ func appendChildFileToParentFile(hostIp, parent, child string) (string, error) {
 
 // checkResultOutputForError checks If the output contains the word "error" then return error
 func checkResultOutputForError(output string) error {
-	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") &&
-		!strings.Contains(strings.ToUpper(strings.TrimSpace(output)),
-			strings.ToUpper("PreflightError: One or more preflight checks failed")) {
+	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
 		return errors.New(output)
 	}
 	return nil

@@ -76,6 +76,13 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		}
 	}
 
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
+	err = dni.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	previousCount, err := dni.nodeUtils.calculateTotalInstanceCount()
 	if err != nil {
 		return err
@@ -234,12 +241,23 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {
-	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config)
+	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config, DEPLOY)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
-	return dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
+	syncErr := dni.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }
 
 func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {

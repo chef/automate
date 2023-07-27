@@ -1,0 +1,37 @@
+name: chef-automate config gen
+synopsis: generate the Automate HA configuration
+usage: |
+  chef-automate config gen [/path/to/write/config.toml] [flags]
+description: |
+  Prompt based Config Generation command. It will output the config in the provided file, if file path is not provided then it will print on STDOUT.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for gen
+- name: overwrite
+  shorthand: O
+  default_value: "false"
+  usage: Overwrite existing config.toml
+inherited_options:
+- name: auto-approve
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+- name: timeout
+  shorthand: t
+  default_value: "10"
+  usage: Request timeout in seconds
+  compatible_with_options: Automate
+see_also:
+- chef-automate config - Chef Automate configuration
+supported_on: Bastion

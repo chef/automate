@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	cli "github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -83,6 +83,12 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	err = ani.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	if !ani.flags.autoAccept {
 		res, err := ani.promptUserConfirmation()
 		if err != nil {
@@ -191,12 +197,20 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
+	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
-	return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }
 
 func (ani *AddNodeOnPremImpl) validateCmdArgs() *list.List {

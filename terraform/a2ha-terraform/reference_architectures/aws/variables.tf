@@ -51,7 +51,7 @@ variable "aws_os_snapshot_role_arn" {
 }
 
 variable "aws_profile" {
-  default     = "default"
+  default     = ""
   description = "The AWS profile to use from your ~/.aws/credentials file."
 }
 
@@ -118,7 +118,6 @@ variable "destroy_bucket" {
 }
 
 variable "managed_opensearch_certificate" {
-  default = ""
 }
 
 variable "managed_opensearch_domain_name" {
@@ -138,7 +137,6 @@ variable "managed_opensearch_username" {
 }
 
 variable "managed_rds_certificate" {
-  default = ""
 }
 
 variable "managed_rds_dbuser_password" {

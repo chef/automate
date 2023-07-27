@@ -69,7 +69,7 @@ type ConfigAutomateSettings struct {
 	Fqdn              string      `toml:"fqdn,omitempty"`
 	ConfigFile        string      `toml:"config_file,omitempty"`
 	TeamsPort         string      `toml:"teams_port,omitempty"`
-	RootCA            string      `toml:"root_ca,omitempty"`
+	FqdnRootCA        string      `toml:"root_ca,omitempty"`
 	InstanceCount     string      `toml:"instance_count,omitempty"`
 	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
 	PrivateKey        string      `toml:"private_key,omitempty"`
@@ -78,7 +78,7 @@ type ConfigAutomateSettings struct {
 }
 
 type ChefServerSettings struct {
-	Config *ConfigSettings `toml:"config,omitempty"`
+	Config *ConfigChefServerSettings `toml:"config,omitempty"`
 }
 
 type PostgresqlSettings struct {
@@ -87,6 +87,16 @@ type PostgresqlSettings struct {
 
 type OpensearchSettings struct {
 	Config *ConfigOpensearchSettings `toml:"config,omitempty"`
+}
+
+type ConfigChefServerSettings struct {
+	ChefServerFqdn    string      `toml:"fqdn,omitempty"`
+	FqdnRootCA        string      `toml:"lb_root_ca,omitempty"`
+	InstanceCount     string      `toml:"instance_count,omitempty"`
+	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
+	PrivateKey        string      `toml:"private_key,omitempty"`
+	PublicKey         string      `toml:"public_key,omitempty"`
+	CertsByIP         *[]CertByIP `toml:"certs_by_ip,omitempty"`
 }
 type ConfigOpensearchSettings struct {
 	AdminCert         string      `toml:"admin_cert,omitempty"`
@@ -213,16 +223,201 @@ type AwsExternalOsSettings struct {
 	OsSnapshotUserAccessKeySecret string `toml:"os_snapshot_user_access_key_secret,omitempty"`
 }
 
-func (c *HaDeployConfig) Parse(configFile string) (*HaDeployConfig, error) {
+func NewHaDeployConfig() *HaDeployConfig {
+	return &HaDeployConfig{}
+}
+
+func (c *HaDeployConfig) Parse(configFile string) error {
 	fileUtils := &fileutils.FileSystemUtils{}
 	templateBytes, err := fileUtils.ReadFile(configFile)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config TOML file: %w", err)
+		return fmt.Errorf("error reading config TOML file: %w", err)
 	}
-	config := HaDeployConfig{}
-	err = ptoml.Unmarshal(templateBytes, &config)
+	err = ptoml.Unmarshal(templateBytes, c) // Pass pointer to c
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling config TOML file: %w", err)
+		return fmt.Errorf("error unmarshalling config TOML file: %w", err)
 	}
-	return &config, nil
+	return nil
+}
+
+func (c *HaDeployConfig) InitArchitecture() *Architecture {
+	if c.Architecture == nil {
+		c.Architecture = &Architecture{}
+	}
+	return c.Architecture
+}
+
+func (c *Architecture) InitExistingInfra() *ConfigInitials {
+	if c.ExistingInfra == nil {
+		c.ExistingInfra = &ConfigInitials{}
+	}
+	return c.ExistingInfra
+}
+
+func (c *Architecture) InitAws() *ConfigInitials {
+	if c.Aws == nil {
+		c.Aws = &ConfigInitials{}
+	}
+	return c.Aws
+}
+
+func (c *HaDeployConfig) InitAutomate() *AutomateSettings {
+	if c.Automate == nil {
+		c.Automate = &AutomateSettings{}
+	}
+	return c.Automate
+}
+
+func (c *AutomateSettings) InitConfig() *ConfigAutomateSettings {
+	if c.Config == nil {
+		c.Config = &ConfigAutomateSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitChefServer() *ChefServerSettings {
+	if c.ChefServer == nil {
+		c.ChefServer = &ChefServerSettings{}
+	}
+	return c.ChefServer
+}
+
+func (c *ChefServerSettings) InitConfig() *ConfigChefServerSettings {
+	if c.Config == nil {
+		c.Config = &ConfigChefServerSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitOpenSearch() *OpensearchSettings {
+	if c.Opensearch == nil {
+		c.Opensearch = &OpensearchSettings{}
+	}
+	return c.Opensearch
+}
+
+func (c *OpensearchSettings) InitConfig() *ConfigOpensearchSettings {
+	if c.Config == nil {
+		c.Config = &ConfigOpensearchSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitPostgresql() *PostgresqlSettings {
+	if c.Postgresql == nil {
+		c.Postgresql = &PostgresqlSettings{}
+	}
+	return c.Postgresql
+}
+
+func (c *PostgresqlSettings) InitConfig() *ConfigSettings {
+	if c.Config == nil {
+		c.Config = &ConfigSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitExistingInfra() *ExistingInfraSettings {
+	if c.ExistingInfra == nil {
+		c.ExistingInfra = &ExistingInfraSettings{}
+	}
+	return c.ExistingInfra
+}
+
+func (c *ExistingInfraSettings) InitConfig() *ConfigExistingInfraSettings {
+	if c.Config == nil {
+		c.Config = &ConfigExistingInfraSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitExternal() *ExternalSettings {
+	if c.External == nil {
+		c.External = &ExternalSettings{}
+	}
+	return c.External
+}
+
+func (c *ExternalSettings) InitDatabase() *ExternalDBSettings {
+	if c.Database == nil {
+		c.Database = &ExternalDBSettings{}
+	}
+	return c.Database
+}
+
+func (c *ExternalDBSettings) InitPostgresql() *ExternalPgSettings {
+	if c.PostgreSQL == nil {
+		c.PostgreSQL = &ExternalPgSettings{}
+	}
+	return c.PostgreSQL
+}
+
+func (c *ExternalDBSettings) InitOpenSearch() *ExternalOsSettings {
+	if c.OpenSearch == nil {
+		c.OpenSearch = &ExternalOsSettings{}
+	}
+	return c.OpenSearch
+}
+
+func (c *ExternalOsSettings) InitOpenSearchAws() *AwsExternalOsSettings {
+	if c.Aws == nil {
+		c.Aws = &AwsExternalOsSettings{}
+	}
+	return c.Aws
+}
+
+func (c *ConfigAutomateSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *ConfigSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *ConfigChefServerSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *ConfigOpensearchSettings) InitCertsByIP() *[]CertByIP {
+	if c.CertsByIP == nil {
+		c.CertsByIP = &[]CertByIP{}
+	}
+	return c.CertsByIP
+}
+
+func (c *HaDeployConfig) InitAws() *AwsSettings {
+	if c.Aws == nil {
+		c.Aws = &AwsSettings{}
+	}
+	return c.Aws
+}
+
+func (c *AwsSettings) InitConfigAwsSettings() *ConfigAwsSettings {
+	if c.Config == nil {
+		c.Config = &ConfigAwsSettings{}
+	}
+	return c.Config
+}
+
+func (c *HaDeployConfig) InitObjectStorage() *ObjectStorage {
+	if c.ObjectStorage == nil {
+		c.ObjectStorage = &ObjectStorage{}
+	}
+	return c.ObjectStorage
+}
+
+func (c *ObjectStorage) InitConfig() *ConfigObjectStorage {
+	if c.Config == nil {
+		c.Config = &ConfigObjectStorage{}
+	}
+	return c.Config
 }

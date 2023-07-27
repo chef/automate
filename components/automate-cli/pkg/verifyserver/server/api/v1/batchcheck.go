@@ -24,8 +24,11 @@ func (h *Handler) BatchCheck(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
 
-	resp := h.BatchCheckService.BatchCheck(req.Checks, req.Config)
-	return c.Status(fiber.StatusOK).JSON(response.BuildSuccessResponse(resp.Result))
+	resp, err := h.BatchCheckService.BatchCheck(req.Checks, req.Config)
+	if err != nil {
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(response.BuildSuccessResponse(resp))
 }
 
 func validateChecks(checks []string) error {

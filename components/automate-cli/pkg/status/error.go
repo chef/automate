@@ -6,14 +6,14 @@
 //
 // The library can be used to initialize new errors:
 //
-//		err := status.New(status.MustBeRootError, "You must be root to run this command")
+//	err := status.New(status.MustBeRootError, "You must be root to run this command")
 //
 // Or to wrap an existing err:
 //
-//		_, err := ioutil.ReadAll("myfile")
-//		if err != nil {
-//			return status.Wrap(err, FileAccessError, "Unable to read myfile")
-//		}
+//	_, err := ioutil.ReadAll("myfile")
+//	if err != nil {
+//		return status.Wrap(err, FileAccessError, "Unable to read myfile")
+//	}
 //
 // Each error type is a public constant that reflects the integer representation
 // of the error.
@@ -21,15 +21,14 @@
 // To access the extended information in the error you can use status.Error
 // interface:
 //
-//		if err, ok := err.(status.Error); ok {
-//			fmt.Println(err.ExitCode())
-//			fmt.Println(err.Description())
+//	if err, ok := err.(status.Error); ok {
+//		fmt.Println(err.ExitCode())
+//		fmt.Println(err.Description())
 //
-//			for _, f := range err.StackTrace() {
-//				fmt.Printf("%+s:%d", f)
-//			}
+//		for _, f := range err.StackTrace() {
+//			fmt.Printf("%+s:%d", f)
 //		}
-//
+//	}
 package status
 
 import (
@@ -49,6 +48,12 @@ const (
 // When an invocation of the chef-automate CLI results in a Failure it exits with
 // one of the following codes that identifies the error types.
 const (
+	VerifyChecksError                 = 125
+	ConfigVerifyError                 = 124
+	PromptFailed                      = 126
+	FailedToGenConfig                 = 127
+	HardwareCalError                  = 128
+	IpAccessError                     = 123
 	InsufficientSpaceError            = 122
 	CalDestDirSizeError               = 121
 	CalESDirSizeError                 = 120
@@ -100,6 +105,11 @@ const (
 // an error code and its type and a description, but also as a way to generate
 // documentation.
 var ErrorMetadata = map[int][]string{
+	VerifyChecksError:                 {"125", "VerifyChecksError", "Verify Checks failed"},
+	ConfigVerifyError:                 {"124", "ConfigVerifyError", "Config Verification failed"},
+	HardwareCalError:                  {"128", "HardwareCalError", "Hardware Calculator failed to provide Hardware Estimates"},
+	PromptFailed:                      {"126", "PromptFailed", "Prompt failed and exited with error"},
+	FailedToGenConfig:                 {"127", "FailedToGenConfig", "Failed to Generate config with given inputs"},
 	InsufficientSpaceError:            {"122", "InsufficientSpaceError", "Insufficient disk space"},
 	CalDestDirSizeError:               {"121", "CalDestDirSizeError", "Error in calculating Dest directory size"},
 	CalESDirSizeError:                 {"120", "CalESDirSizeError", "Error in calculating ES directory size"},

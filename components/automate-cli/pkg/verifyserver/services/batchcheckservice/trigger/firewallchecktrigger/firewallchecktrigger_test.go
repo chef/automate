@@ -3,7 +3,7 @@ package firewallchecktrigger
 import (
 	"encoding/json"
 
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -17,19 +17,25 @@ import (
 )
 
 var (
-	hardware = models.Hardware{
-		AutomateNodeIps:        []string{"10.0.0.1"},
+	hardware = &models.Hardware{
+		AutomateNodeIps:        []string{"10.0.0.1", "10.0.0.2"},
 		PostgresqlNodeIps:      []string{"10.0.0.3", "10.0.0.6"},
 		OpenSearchNodeIps:      []string{"10.0.0.5", "10.0.0.10"},
 		ChefInfraServerNodeIps: []string{"10.0.0.7"},
 	}
 
-	nodeCert = models.NodeCert{
+	certificatelist = []*models.Certificate{
+		{
+			Nodes: nodes,
+		},
+	}
+
+	nodeCert = &models.NodeCert{
 		IP:  "10.0.0.1",
 		Key: "test-key",
 	}
 
-	nodes = []models.NodeCert{nodeCert}
+	nodes = []*models.NodeCert{nodeCert}
 )
 
 const (
@@ -60,7 +66,7 @@ const (
 				  "passed": false,
 				  "success_msg": "",
 				  "error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-				  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+				  "resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>"
 				}
 			  ]
 			}
@@ -71,138 +77,32 @@ const (
 			"status": "SUCCESS",
 			"host": "10.0.0.1",
 			"node_type": "automate",
+			"check_type": "",
 			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
+			  "passed": true,
+			  "msg": "",
+			  "check": "",
+			  "checks": [
+				{
+					"title": "Check for reachability of service at destination port from the source node",
+					"passed": true,
+					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
+					"error_msg": "",
+					"resolution_msg": "",
+				  	"skipped": false
+				},
+				{
+					"title": "Check for reachability of service at destination port from the source node",
+					"passed": true,
+					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
+					"error_msg": "",
+					"resolution_msg": "",
+				  	"skipped": false
+				}
+			  ],
+			  "skipped": false
 			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		}
+		  }
 	]
 	 `
 
@@ -211,136 +111,30 @@ const (
 			"status": "SUCCESS",
 			"host": "10.0.0.1",
 			"node_type": "automate",
+			"check_type": "",
 			"result": {
 				"passed": false,
+				"msg": "",
+				"check": "",
 				"checks": [
 					{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
+						"resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>",
+						"skipped": false
+					},
 					{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+						"resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>",
+						"skipped": false
 					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
+				],
+				"skipped": false
 			}
 		}
 	]`
@@ -364,18 +158,9 @@ const (
 
 func TestMakeRequests(t *testing.T) {
 	// Create a sample configuration
-	config := models.Config{
-		Hardware: hardware,
-		Certificate: models.Certificate{
-
-			Nodes: []models.NodeCert{
-				{IP: "10.0.0.1",
-					Cert: "cert",
-					Key:  "key",
-				},
-			},
-			RootCert: "root_cert",
-		},
+	config := &models.Config{
+		Hardware:    hardware,
+		Certificate: certificatelist,
 	}
 
 	// Define the expected result
@@ -412,31 +197,31 @@ func TestMakeRequests(t *testing.T) {
 	makeRequests(config, mapRequests)
 	requestsForautomate, ok := mapRequests[constants.AUTOMATE]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForautomate), 4)
+	assert.Equal(t, len(requestsForautomate), 8)
 
 	requestsForchefServer, ok := mapRequests[constants.CHEF_INFRA_SERVER]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForchefServer), 5)
+	assert.Equal(t, 4, len(requestsForchefServer))
 
 	//As there are two postgress nodes which needs to interact with eachother
 	requestsForPostgres, ok := mapRequests[constants.POSTGRESQL]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForPostgres), 12)
+	assert.Equal(t, len(requestsForPostgres), 10)
 
 	requestsForOpensearch, ok := mapRequests[constants.OPENSEARCH]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForOpensearch), 10)
+	assert.Equal(t, len(requestsForOpensearch), 8)
 
 	require.Equal(t, expected[0].SourceNodeIP, requestsForautomate[0].SourceNodeIP)
 	require.Equal(t, expected[0].DestinationNodeIP, requestsForautomate[0].DestinationNodeIP)
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseResponse bool, isFailed bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseResponse bool, isFailed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == constants.FIREWALL_API_PATH {
-				body, err := ioutil.ReadAll(r.Body)
+				body, err := io.ReadAll(r.Body)
 				require.NoError(t, err)
 
 				var req models.FirewallRequest
@@ -471,6 +256,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL
@@ -485,29 +271,28 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 func TestFirewallCheck_Run(t *testing.T) {
 
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
-		name                 string
-		args                 args
-		response             string
-		httpStatusCode       int
-		isError              bool
-		invalidParseResponse bool
-		isFailed             bool
+		name                   string
+		args                   args
+		response               string
+		httpStatusCode         int
+		isError                bool
+		invalidParseResponse   bool
+		isFailed               bool
+		requiredStatusResponse string
 	}{
 		{
 			name: "Automate Pg Passed",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			response:       apiTriggerAutomatePgPass,
@@ -516,15 +301,13 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Automate Pg failure",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			isFailed:       true,
@@ -534,34 +317,31 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Internal Server Error For automate and other nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
-			response:             "error while connecting to the endpoint, received invalid status code",
-			httpStatusCode:       http.StatusInternalServerError,
-			isError:              true,
-			invalidParseResponse: false,
+			response:               "Internal Server Error",
+			httpStatusCode:         http.StatusInternalServerError,
+			isError:                true,
+			invalidParseResponse:   false,
+			requiredStatusResponse: `{"error":{"code":500,"message":"Internal Server Error"}}`,
 		},
 		{
 			name: "Error in parsing the response",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			response:             "error while parsing the response data",
@@ -571,28 +351,45 @@ func TestFirewallCheck_Run(t *testing.T) {
 		}, {
 			name: "Status Bad Request",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
+						OpenSearchNodeIps: []string{"10.0.0.5"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
-			response:             "error while connecting to the endpoint, received invalid status code",
-			httpStatusCode:       http.StatusBadRequest,
-			isError:              true,
-			invalidParseResponse: true,
+			response:               "source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty",
+			httpStatusCode:         http.StatusBadRequest,
+			isError:                true,
+			invalidParseResponse:   true,
+			requiredStatusResponse: `{"error":{"code":400,"message":"source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty"}}`,
+		},
+		{
+			name: "Hardware Nil",
+			args: args{
+				config: &models.Config{
+					Hardware: nil,
+					Certificate: []*models.Certificate{
+						{
+							Nodes: nodes,
+						},
+					},
+					ExternalOS: nil,
+					ExternalPG: nil,
+				},
+			},
+			response:       "",
+			httpStatusCode: http.StatusOK,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
+
 				// Create a dummy server
-				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed)
+				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed, tt.requiredStatusResponse)
 				defer server.Close()
 
 				fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), port)
@@ -612,6 +409,13 @@ func TestFirewallCheck_Run(t *testing.T) {
 						assert.NotNil(t, got[i].Host)
 					}
 
+				} else if tt.name == "Hardware Nil" {
+					assert.Len(t, got, 5)
+					for _, v := range got {
+						assert.Equal(t, constants.FIREWALL, v.CheckType)
+						assert.Equal(t, constants.FIREWALL, v.Result.Check)
+						assert.True(t, v.Result.Skipped)
+					}
 				} else {
 					var want []models.CheckTriggerResponse
 					json.Unmarshal([]byte(tt.response), &want)
@@ -627,4 +431,15 @@ func TestFirewallCheck_Run(t *testing.T) {
 		})
 
 	}
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 4, len(resp))
+	assert.Equal(t, 4, len(resp["postgresql"]["tcp"]))
+	assert.Equal(t, 1, len(resp["postgresql"]["udp"]))
+	assert.Equal(t, 3, len(resp["opensearch"]["tcp"]))
+	assert.Equal(t, true, true)
 }

@@ -13,25 +13,32 @@ var osTestVersion = map[string][]string{
 	"Ubuntu":        {"16.04.x", "18.04.x", "20.04.x", "22.04.x"},
 	"Centos":        {"7"},
 	"Amazon Linux":  {"2"},
-	"SUSE Linux":    {"12"},
+	"SUSE Linux":    {"12.5"},
 	"Debian":        {"9", "10", "11", "12"},
 }
 
 const (
-	successfile        = "./testfiles/success.txt"
-	failurefile        = "./testfiles/failure.txt"
-	versionfile        = "./testfiles/version.txt"
-	failfilepath       = "./failfilepath"
-	LinuxVersionTitle  = "Linux Version Check"
-	KernalVersionTitle = "Kernal Version Check"
-	MkdirTitle         = "mkdir availability"
-	OpensslTitle       = "openssl availability"
-	StatTitle          = "stat availability"
-	MkdirIsAvailable   = "mkdir is available"
-	OpensslIsAvailable = "openssl is available"
-	StatIsAvailable    = "stat is available"
-	successKernelfile  = "./testfiles/successkernel.txt"
-	failureKernelfile  = "./testfiles/failurekernel.txt"
+	osReleaseRedHatFail  = "./testfiles/os_release_red_hat_failure.txt"
+	osReleaseUbuntuFail  = "./testfiles/os_release_ubuntu_failure.txt"
+	osReleaseDebian      = "./testfiles/os_release_debian.txt"
+	osReleaseSuse        = "./testfiles/os_release_suse.txt"
+	osReleaseAmazonLinux = "./testfiles/os_release_amazon_linux.txt"
+	osReleaseRedHat      = "./testfiles/os_release_red_hat.txt"
+	osReleaseCentos      = "./testfiles/os_release_centos.txt"
+	successfile          = "./testfiles/os_release_ubuntu.txt"
+	failurefile          = "./testfiles/failure.txt"
+	versionfile          = "./testfiles/os_release_suse_failure.txt"
+	failfilepath         = "./failfilepath"
+	LinuxVersionTitle    = "Linux Version Check"
+	KernalVersionTitle   = "Kernal Version Check"
+	MkdirTitle           = "mkdir availability"
+	OpensslTitle         = "openssl availability"
+	StatTitle            = "stat availability"
+	MkdirIsAvailable     = "mkdir is available"
+	OpensslIsAvailable   = "openssl is available"
+	StatIsAvailable      = "stat is available"
+	successKernelfile    = "./testfiles/successkernel.txt"
+	failureKernelfile    = "./testfiles/failurekernel.txt"
 )
 
 var (
@@ -553,7 +560,7 @@ func TestCheckOsVersion(t *testing.T) {
 			},
 		},
 		{
-			description: "If the os and version both are correct",
+			description: "If the os and version both are correct for Ubuntu",
 			args: args{
 				osFilepath: successfile,
 			},
@@ -568,7 +575,82 @@ func TestCheckOsVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
-			description: "If the os name is correct but version is incorrect",
+			description: "If the os and version both are correct for red_hat",
+			args: args{
+				osFilepath: osReleaseRedHat,
+			},
+			expectedBody: &models.Checks{
+				Title:         "Linux Version Check",
+				Passed:        true,
+				SuccessMsg:    "Red Hat version is 9.2",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os and version both are correct for centos",
+			args: args{
+				osFilepath: osReleaseCentos,
+			},
+			expectedBody: &models.Checks{
+				Title:         "Linux Version Check",
+				Passed:        true,
+				SuccessMsg:    "CentOS version is 7",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os and version both are correct for amazon linux",
+			args: args{
+				osFilepath: osReleaseAmazonLinux,
+			},
+			expectedBody: &models.Checks{
+				Title:         "Linux Version Check",
+				Passed:        true,
+				SuccessMsg:    "Amazon Linux version is 2",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os and version both are correct for debian",
+			args: args{
+				osFilepath: osReleaseDebian,
+			},
+			expectedBody: &models.Checks{
+				Title:         "Linux Version Check",
+				Passed:        true,
+				SuccessMsg:    "Debian version is 11",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os and version both are correct for SUSE",
+			args: args{
+				osFilepath: osReleaseSuse,
+			},
+			expectedBody: &models.Checks{
+				Title:         "Linux Version Check",
+				Passed:        true,
+				SuccessMsg:    "SUSE Linux version is 12.5",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os name is correct but version is incorrect for SUSE",
 			args: args{
 				osFilepath: versionfile,
 			},
@@ -578,6 +660,36 @@ func TestCheckOsVersion(t *testing.T) {
 				SuccessMsg:    "",
 				ErrorMsg:      "SUSE Linux version is not supported by automate",
 				ResolutionMsg: "Ensure SUSE Linux correct version is installed on the node",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os name is correct but version is incorrect for Ubuntu",
+			args: args{
+				osFilepath: osReleaseUbuntuFail,
+			},
+			expectedBody: &models.Checks{
+				Title:         LinuxVersionTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      "Ubuntu version is not supported by automate",
+				ResolutionMsg: "Ensure Ubuntu correct version is installed on the node",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the os name is correct but version is incorrect for Red Hat",
+			args: args{
+				osFilepath: osReleaseRedHatFail,
+			},
+			expectedBody: &models.Checks{
+				Title:         LinuxVersionTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      "Red Hat version is not supported by automate",
+				ResolutionMsg: "Ensure Red Hat correct version is installed on the node",
 			},
 			wantErr:     false,
 			expectedErr: "",
@@ -600,7 +712,7 @@ func TestCheckOsVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got, err := sv.checkOsVersion(tt.args.osFilepath)
+			got, _, err := sv.checkOsVersion(tt.args.osFilepath)
 			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
 				return
@@ -618,6 +730,7 @@ func TestCheckKernelVersion(t *testing.T) {
 	})
 	type args struct {
 		kernelFilePath string
+		osname         string
 	}
 	tests := []struct {
 		description  string
@@ -630,6 +743,7 @@ func TestCheckKernelVersion(t *testing.T) {
 			description: "If the Kernal version is supported",
 			args: args{
 				kernelFilePath: successKernelfile,
+				osname:         AMAZON_LINUX,
 			},
 			expectedBody: &models.Checks{
 				Title:         "Kernal Version Check",
@@ -642,9 +756,10 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
-			description: "If the Kernal Version entered is not supported",
+			description: "If the Kernal Version entered is not supported suse linux",
 			args: args{
 				kernelFilePath: failureKernelfile,
+				osname:         SUSE_LINUX,
 			},
 			expectedBody: &models.Checks{
 				Title:         KernalVersionTitle,
@@ -657,9 +772,25 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
+			description: "If the Kernal Version entered is not supported Amazon linux",
+			args: args{
+				kernelFilePath: failureKernelfile,
+				osname:         AMAZON_LINUX,
+			},
+			expectedBody: &models.Checks{
+				Title:  "Kernal Version Check",
+				Passed: false, SuccessMsg: "",
+				ErrorMsg:      "Linux kernel version is not equal to 5.10",
+				ResolutionMsg: "Use a linux version whose kernel version is equal to 5.10",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
 			description: "If not able to get the kernal Version",
 			args: args{
 				kernelFilePath: failfilepath,
+				osname:         AMAZON_LINUX,
 			},
 			expectedBody: &models.Checks{},
 			wantErr:      true,
@@ -668,7 +799,7 @@ func TestCheckKernelVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got, err := sv.checkKernelVersion(tt.args.kernelFilePath)
+			got, err := sv.checkKernelVersion(tt.args.kernelFilePath, tt.args.osname)
 			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
 				return

@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	hardware = models.Hardware{
+	hardware = &models.Hardware{
 		AutomateNodeCount:        1,
 		AutomateNodeIps:          []string{"172.154.0.1"},
 		ChefInfraServerNodeCount: 1,
@@ -618,7 +618,7 @@ const (
 
 func TestNfsBackupConfigCheck_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
 		name                  string
@@ -634,10 +634,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Passed Response for chef-server,automate,opensearch and postgresql",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -653,10 +653,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Failure Mount Response for chef-server,automate,opensearch and postgresql",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -673,16 +673,16 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Recived Internal Server Error From the API",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
 				},
 			},
-			response:       "Error while triggering NFS Mount API from Batch Check API: 500 Internal Server Error",
+			response:       "unexpected end of JSON input",
 			isPassed:       false,
 			httpStatusCode: http.StatusInternalServerError,
 			isError:        true,
@@ -692,10 +692,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Invalid Response from service",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -712,15 +712,15 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Checking for Same Front end Nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:        hardware.AutomateNodeIps,
 						ChefInfraServerNodeIps: hardware.AutomateNodeIps,
 						PostgresqlNodeIps:      hardware.PostgresqlNodeIps,
 						OpenSearchNodeIps:      hardware.OpenSearchNodeIps,
 					},
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -759,7 +759,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 				assert.Len(t, got, 4)
 				assert.NotNil(t, got[0].Result.Error)
 				assert.NotNil(t, got[0].Host)
-				assert.Contains(t, tt.response, got[0].Result.Error.Error())
+				assert.Contains(t, tt.response, got[0].Result.Error.Message)
 
 			} else {
 				var want []models.CheckTriggerResponse
@@ -826,4 +826,95 @@ func getRequest() models.NFSMountRequest {
 		OpensearchNodeIPs:      hardware.OpenSearchNodeIps,
 		MountLocation:          mountLocation,
 	}
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}
+
+func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing.T) {
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: nil,
+		}
+
+		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, v.Result.SkipMessage)
+		}
+	})
+
+	t.Run("Nil FileSystem", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			Backup: &models.Backup{
+				FileSystem: nil,
+			},
+		}
+
+		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, "12.12.1.6", got[0].Host)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SKIP_BACKUP_TEST_MESSAGE_NFS, v.Result.SkipMessage)
+		}
+	})
+	t.Run("Empty FileSystem", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			Backup: &models.Backup{
+				FileSystem: &models.FileSystem{},
+			},
+		}
+
+		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		for _, v := range got {
+			assert.Equal(t, "12.12.1.6", got[0].Host)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
+			assert.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			assert.Equal(t, constants.MOUNT_LOCATION_MISSING, v.Result.Error.Message)
+			assert.False(t, v.Result.Skipped)
+		}
+	})
+
 }

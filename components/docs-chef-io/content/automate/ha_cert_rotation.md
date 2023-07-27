@@ -41,7 +41,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of automate cluster:
 
-`chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --root-ca <path of root certificate of automate load balancer> --a2`
+`chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --a2`
 
 You can also use `--automate` or `-a` instead of a2 flag
 
@@ -95,3 +95,24 @@ You can also use `--opensearch` or `-o` instead of the os flag
 
 {{< note >}} Since admin-cert and admin-key are common in all nodes, So if you want to rotate admin-cert and admin-key, you must first run this open search cluster command: 
 `chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os`{{< /note >}}
+
+
+### Rotate Automate Load Balancer Root CA
+
+To rotate the Automate Load balancer root certificate: 
+
+1. Create a root_ca.toml file with the following content. Replace server_name with Automate Fqdn and root_cert with Automate Load balancer root certificate. 
+
+    ```toml
+    [cs_nginx.v1.sys.ngx.http]
+      ssl_verify_depth = 6
+    [global.v1.external.automate.ssl]
+      server_name = "https://<automatefqdn.example.com>"
+      root_cert = """<Root_CA_Content>"""
+    ```
+
+1. Run the following command to apply your configuration on Chef-Server from bastion:
+
+    ```shell
+    chef-automate config patch root_ca.toml --cs
+    ```

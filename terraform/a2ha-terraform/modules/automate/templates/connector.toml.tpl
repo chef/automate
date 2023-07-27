@@ -41,7 +41,7 @@
   svc_name = "automate-ha-opensearch"
   svc_port = ${opensearch_listen_port}
   managed_opensearch_domain_name = "${managed_opensearch_domain_name}"
-  managed_opensearch_certificate = "${managed_opensearch_certificate}"
+  managed_opensearch_certificate = """${managed_opensearch_certificate}"""
   managed_opensearch_domain_url = "${managed_opensearch_domain_url}"
   managed_opensearch_user_password = "${managed_opensearch_user_password}"
   managed_opensearch_username = "${managed_opensearch_username}"
@@ -52,7 +52,7 @@
 
   [services.postgresql]
   ips = ${postgresql_ips}
-  managed_rds_certificate        = "${managed_rds_certificate}"
+  managed_rds_certificate        = """${managed_rds_certificate}"""
   managed_rds_dbuser_password    = "${managed_rds_dbuser_password}"
   managed_rds_dbuser_username    = "${managed_rds_dbuser_username}"
   managed_rds_instance_url       = "${managed_rds_instance_url}"

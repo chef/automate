@@ -85,6 +85,7 @@ For on-prem installations, the following services support unique custom certific
 - If you are using unique custom certificates for each node of a service, then you can skip the Public and Private Keys before the `certs_by_ip` section for that service.
 - If you are using unique custom certificates for each node of a service, then make sure to define keys for all the IPs for that service. For example, if you are using 3 nodes for PostgreSQL service, then you need to define keys for all 3 IPs using 3 `certs_by_ip` sections.
 - If you have defined keys at both the places (common and inside the `certs_by_ip` section), then the keys defined in the `certs_by_ip` section will be used.
+- If your are using aws deployment, post provision you will get the ip addresses of the nodes. To add certs_by_ip, first do provision and then add those fields in the config.toml, then run deploy
 
 {{< /note >}}
 

@@ -139,6 +139,9 @@ Z4wjUCokbRJ8gbC7tuVgQk6DNM123j9djBm+A+5WlbvHUrD5trfbkp8kUJY4jaJF
 csKeX402wz9P7XM5eGsToNpAZq41Q7mFzz14DfqFNttaCMHMYi4k
 -----END CERTIFICATE-----"""
 
+# certs_by_ip = [[
+   
+# ]]
 
 [chef_server.config]
 ## === INPUT NEEDED ===
@@ -523,10 +526,10 @@ opensearch_server_instance_type = "m5.large"
 postgresql_server_instance_type = "m5.large"
 
 # eg: automate_lb_certificate_arn = "arn:aws:acm...."
-automate_lb_certificate_arn = "arn:aws:acm:ca-central-1:112758395563:certificate/1754e15c-5834-44b0-82a7-0508c3155601"
+automate_lb_certificate_arn = "arn:aws:acm...."
 
 # eg: chef_server_lb_certificate_arn = "arn:aws:acm...."
-chef_server_lb_certificate_arn = "arn:aws:acm:ca-central-1:112758395563:certificate/1754e15c-5834-44b0-82a7-0508c3155601"
+chef_server_lb_certificate_arn = "arn:aws:acm...."
 
 # eg: automate_ebs_volume_iops = "100"
 automate_ebs_volume_iops = "100"

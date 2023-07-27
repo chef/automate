@@ -28,3 +28,9 @@ func TitleReplace(s string, sep string, rep string) string {
 func IsNumeric(word string) bool {
 	return regexp.MustCompile(`^[0-9]+$`).MatchString(word)
 }
+
+func GetLastLine(input string) string {
+	lines := strings.Split(input, "\n")
+	lastLine := lines[len(lines)-1]
+	return lastLine
+}

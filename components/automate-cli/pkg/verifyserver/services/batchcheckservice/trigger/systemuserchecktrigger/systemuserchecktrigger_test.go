@@ -45,8 +45,8 @@ func TestSystemUserCheck_Run(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -76,8 +76,8 @@ func TestSystemUserCheck_Run(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -89,7 +89,31 @@ func TestSystemUserCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 1)
 		require.NotNil(t, ctr[0].Result.Error)
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
+		assert.Equal(t, "error while parsing the response data:unexpected end of JSON input", ctr[0].Result.Error.Error())
+	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		// Create a dummy server
+		server, _, port := createDummyServer(t, http.StatusInternalServerError)
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware: nil,
+		}
+
+		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
+		got := suc.Run(config)
+
+		require.Len(t, got, 5)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+			assert.Equal(t, constants.SYSTEM_USER, v.CheckType)
+			assert.True(t, v.Result.Skipped)
+		}
 	})
 }
 
@@ -127,4 +151,11 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 	port := address[colonIndex+1:]
 
 	return server, ip, port
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
 }

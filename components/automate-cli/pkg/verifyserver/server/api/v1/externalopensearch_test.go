@@ -41,7 +41,7 @@ func SetupExternalOpensearchMountHandler(eos externalopensearchservice.IExternal
 
 func SetupMockExternalOpensearchService() externalopensearchservice.IExternalOpensearchService {
 	return &externalopensearchservice.MockExternalOpensearchService{
-		GetExternalOpensearchDetailsFunc: func(reqBody models.ExternalOSRequest, port int) models.ExternalOpensearchResponse {
+		GetExternalOpensearchDetailsFunc: func(reqBody models.ExternalOSRequest) models.ExternalOpensearchResponse {
 			return models.ExternalOpensearchResponse{
 				Passed: true,
 				Checks: []models.ExternalOpensearchCheck{

@@ -389,6 +389,21 @@ func TestGetPortReachableDetails(t *testing.T) {
 			},
 		},
 		{
+			"HTTPS Server connection without root ca",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        true,
+				SuccessMsg:    fmt.Sprintf(constants.PORT_REACHABLE_SUCCESS_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+		},
+		{
 			"HTTPS Server running there but giving different server rootCA",
 			models.PortReachableRequest{
 				DestinationNodeIp:              LOCALHOST,

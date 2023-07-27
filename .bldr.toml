@@ -194,6 +194,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/ocid/*",
   "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
@@ -250,6 +251,7 @@ paths = [
   "components/compliance-service/*",
   "components/config-mgmt-service/*",
   "components/ingest-service/*",
+  "components/local-user-service/*",
   "components/notifications-client/*",
   "components/trial-license-service/*",
   "lib/authz/*",
@@ -259,6 +261,7 @@ paths = [
   "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
+  "lib/logger/*",
   "lib/platform/command/*",
   "lib/platform/sys/*",
   "lib/proc/*",
@@ -406,6 +409,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/ocid/*",
   "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
@@ -438,12 +442,14 @@ paths = [
   "components/automate-grpc/*",
   "components/es-sidecar-service/*",
   "components/local-user-service/*",
+  "lib/arrayutils/*",
   "lib/cereal/*",
+  "lib/certgenerateutils/*",
   "lib/config/*",
-  "lib/config_parser/*",
   "lib/db/*",
   "lib/executil/*",
   "lib/grpc/*",
+  "lib/hardwarecal/*",
   "lib/httputils/*",
   "lib/io/*",
   "lib/logger/*",
@@ -452,19 +458,21 @@ paths = [
   "lib/platform/config/*",
   "lib/platform/pg/*",
   "lib/platform/sys/*",
+  "lib/pmt/*",
   "lib/proc/*",
   "lib/product/*",
   "lib/proxy/*",
   "lib/reporting/*",
   "lib/secrets/*",
+  "lib/sshutils/*",
   "lib/stringutils/*",
   "lib/systemresource/*",
   "lib/tls/*",
+  "lib/toml/*",
   "lib/tracing/*",
   "lib/user/*",
   "lib/userutils/*",
   "lib/uuid4/*",
-  "lib/verification/*",
   "lib/version/*"
 ]
 
@@ -505,6 +513,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/ocid/*",
   "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
@@ -544,6 +553,7 @@ paths = [
   "components/config-mgmt-service/*",
   "components/es-sidecar-service/*",
   "components/ingest-service/*",
+  "components/local-user-service/*",
   "components/teams-service/*",
   "lib/authz/*",
   "lib/cereal/*",
@@ -553,6 +563,7 @@ paths = [
   "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
+  "lib/logger/*",
   "lib/majorupgrade_utils/*",
   "lib/platform/command/*",
   "lib/platform/config/*",
@@ -933,6 +944,12 @@ paths = [
 plan_path = "components/automate-cs-oc-erchef"
 paths = [
   "components/automate-cs-oc-erchef/*"
+]
+
+[automate-cs-ocid]
+plan_path = "components/automate-cs-ocid"
+paths = [
+  "components/automate-cs-ocid/*"
 ]
 
 [automate-cs-nginx]

@@ -1,4 +1,3 @@
-
 resource "random_id" "random" {
   byte_length = 4
 }
@@ -26,7 +25,7 @@ locals {
 }
 
 data "aws_subnet" "public" {                                  
-  count = length(var.private_custom_subnets) > 0 ? 3 : 0            
+  count = length(var.public_custom_subnets) > 0 ? 3 : 0            
   id    = local.public_subnet_ids_list[count.index]
 }
 
@@ -38,7 +37,7 @@ data "aws_internet_gateway" "default" {
 }
 
 resource "aws_subnet" "default" {
-  count             = length(var.private_custom_subnets) > 0 ? 0 : 3
+  count             = (length(var.private_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 3 : 0
   vpc_id            = data.aws_vpc.default.id
   cidr_block        = cidrsubnet("${var.aws_cidr_block_addr}/18", 8, count.index + 1)
   availability_zone = data.aws_availability_zones.available.names[count.index]
@@ -47,7 +46,7 @@ resource "aws_subnet" "default" {
 }
 
 resource "aws_subnet" "public" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 3
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 3 : 0
   vpc_id                  = data.aws_vpc.default.id
   cidr_block              = cidrsubnet("${var.aws_cidr_block_addr}/18", 8, count.index + 4)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
@@ -57,7 +56,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_eip" "eip1" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   vpc              = true
   public_ipv4_pool = "amazon"
 
@@ -65,7 +64,7 @@ resource "aws_eip" "eip1" {
 }
 
 resource "aws_eip" "eip2" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   vpc              = true
   public_ipv4_pool = "amazon"
 
@@ -73,7 +72,7 @@ resource "aws_eip" "eip2" {
 }
 
 resource "aws_eip" "eip3" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   vpc              = true
   public_ipv4_pool = "amazon"
 
@@ -81,9 +80,9 @@ resource "aws_eip" "eip3" {
 }
 
 resource "aws_nat_gateway" "nat1" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   allocation_id = aws_eip.eip1[0].id
-  subnet_id     = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public[0].id : aws_subnet.public[0].id
+  subnet_id     = aws_subnet.public[0].id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
 
@@ -91,9 +90,9 @@ resource "aws_nat_gateway" "nat1" {
 }
 
 resource "aws_nat_gateway" "nat2" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   allocation_id = aws_eip.eip2[0].id
-  subnet_id     = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public[1].id : aws_subnet.public[1].id
+  subnet_id     = aws_subnet.public[1].id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
 
@@ -101,9 +100,9 @@ resource "aws_nat_gateway" "nat2" {
 }
 
 resource "aws_nat_gateway" "nat3" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   allocation_id = aws_eip.eip3[0].id
-  subnet_id     = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public[2].id : aws_subnet.public[2].id
+  subnet_id     = aws_subnet.public[2].id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
 
@@ -111,7 +110,7 @@ resource "aws_nat_gateway" "nat3" {
 }
 
 resource "aws_route_table" "route1" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   vpc_id = data.aws_vpc.default.id
   route {
     cidr_block     = "0.0.0.0/0"
@@ -123,7 +122,7 @@ resource "aws_route_table" "route1" {
 }
 
 resource "aws_route_table" "route2" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   vpc_id = data.aws_vpc.default.id
   route {
     cidr_block     = "0.0.0.0/0"
@@ -135,7 +134,7 @@ resource "aws_route_table" "route2" {
 }
 
 resource "aws_route_table" "route3" {
-  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   vpc_id = data.aws_vpc.default.id
   route {
     cidr_block     = "0.0.0.0/0"
@@ -148,19 +147,19 @@ resource "aws_route_table" "route3" {
 
 
 resource "aws_route_table_association" "nat1" {
-  count          = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count          = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[0].id : aws_subnet.default[0].id
   route_table_id = aws_route_table.route1[0].id
 }
 
 resource "aws_route_table_association" "nat2" {
-  count          = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count          = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[1].id : aws_subnet.default[1].id
   route_table_id = aws_route_table.route2[0].id
 }
 
 resource "aws_route_table_association" "nat3" {
-  count          = length(var.public_custom_subnets) > 0 ? 0 : 1
+  count          = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[2].id : aws_subnet.default[2].id
   route_table_id = aws_route_table.route3[0].id
 }
@@ -170,7 +169,7 @@ locals {
 }
 
 resource "aws_instance" "chef_automate_postgresql" {
-  count = var.setup_managed_services ? 0 : var.postgresql_instance_count
+  count = ((length(var.private_custom_subnets) == 0 && var.aws_cidr_block_addr == "") || var.setup_managed_services) ? 0 : var.postgresql_instance_count
 
   ami                         = local.ami
   instance_type               = var.postgresql_server_instance_type
@@ -209,14 +208,20 @@ resource "aws_instance" "chef_automate_postgresql" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device
+      root_block_device,
+      subnet_id
     ]
+  }
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
 resource "aws_instance" "chef_automate_opensearch" {
-  count = var.setup_managed_services ? 0 : var.opensearch_instance_count
+  count = ((length(var.private_custom_subnets) == 0 && var.aws_cidr_block_addr == "") || var.setup_managed_services) ? 0 : var.opensearch_instance_count
 
   ami                         = local.ami
   instance_type               = var.opensearch_server_instance_type
@@ -245,14 +250,21 @@ resource "aws_instance" "chef_automate_opensearch" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device    ]
+      root_block_device,
+      subnet_id
+    ]
+  }
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
 
 resource "aws_instance" "chef_automate" {
-  count = var.automate_instance_count
+  count = (length(var.private_custom_subnets) > 0 || var.aws_cidr_block_addr != "") ? var.automate_instance_count : 0
 
   ami                         = local.ami
   instance_type               = var.automate_server_instance_type
@@ -282,16 +294,21 @@ resource "aws_instance" "chef_automate" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device
+      root_block_device,
+      subnet_id
     ]
   }
-
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
-  
+
 }
 
 resource "aws_instance" "chef_server" {
-  count = var.chef_server_instance_count
+  count = (length(var.private_custom_subnets) > 0 || var.aws_cidr_block_addr != "") ? var.chef_server_instance_count : 0
 
 
   ami                         = local.ami
@@ -322,10 +339,15 @@ resource "aws_instance" "chef_server" {
     ignore_changes = [
       tags,
       tags_all,
-      root_block_device
+      root_block_device,
+      subnet_id
     ]
   }
-  
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }

@@ -94,7 +94,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 		}, err
 	}
 
-	if status, err := ss.OSOperations.GetSnapshotStatus(client, ctx, constant.TEST_REPO_NAME, constant.TEST_SNAPSHOT_NAME); err != nil || status != "SUCCESS" {
+	if status, err := ss.OSOperations.GetSnapshotStatus(client, ctx, constant.TEST_REPO_NAME, constant.TEST_SNAPSHOT_NAME); err != nil || status == "FAILED" {
 		ss.Log.Error("Snapshot Status check failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,

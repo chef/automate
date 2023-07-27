@@ -3,7 +3,6 @@ package opensearchbackupservice
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -36,7 +35,7 @@ func TestIndexCreationFailed(t *testing.T) {
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: false, Err: errors.New("Index Creation failed")}}),
 		Log:          log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create an index on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create an index."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create an index on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create an index.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -53,7 +52,7 @@ func TestSnapshotRepoCreationFailed(t *testing.T) {
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Repo Creation failed")}}),
 		Log:          log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot Repository on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create the Snapsshot Repository."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot Repository on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create the Snapsshot Repository.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -71,7 +70,7 @@ func TestSnapshotCreationFailed(t *testing.T) {
 			{TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
 		Log: log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -89,7 +88,7 @@ func TestSnapshotStatusFailed(t *testing.T) {
 			{TestCase: false, Err: errors.New("Snapshot Creation Status is failed")}}),
 		Log: log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -106,7 +105,7 @@ func TestSnapshotDeletionFailed(t *testing.T) {
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
 		Log:          log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete the Snapshot on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete the Snapshot."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete the Snapshot on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete the Snapshot.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -123,7 +122,7 @@ func TestSnapshotRepoDeletionFailed(t *testing.T) {
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
 		Log:          log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete the Snapshot Repository on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete the Snapshot Repository."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete the Snapshot Repository on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete the Snapshot Repository.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -140,7 +139,7 @@ func TestIndexDeletionFailed(t *testing.T) {
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
 		Log:          log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete an index on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete an index."}`
+	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete an index on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete an index.","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, false)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -157,7 +156,7 @@ func TestSuccessfulBackup(t *testing.T) {
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}}),
 		Log:          log,
 	}
-	expectedResponse := `{"title":"Create test backup","passed":true,"success_msg":"OpenSearch is able to create backup to provided S3","error_msg":"","resolution_msg":""}`
+	expectedResponse := `{"title":"Create test backup","passed":true,"success_msg":"OpenSearch is able to create backup to provided S3","error_msg":"","resolution_msg":"","skipped":false}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
 	assert.Equal(t, resp.Passed, true)
 	response, _ := json.Marshal(resp.Checks[0])
@@ -214,8 +213,7 @@ func TestCreateIndex(t *testing.T) {
 
 	resp, err := os.CreateTestIndex(client, &fiber.Ctx{}, "abc")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestCreateSnapShotRepo(t *testing.T) {
@@ -245,8 +243,7 @@ func TestCreateSnapShotRepo(t *testing.T) {
 
 	resp, err := os.CreateSnapshotRepo(client, &fiber.Ctx{}, s3Request, "abc")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestDeleteSnapShot(t *testing.T) {
@@ -269,8 +266,7 @@ func TestDeleteSnapShot(t *testing.T) {
 
 	resp, err := os.DeleteTestSnapshot(client, &fiber.Ctx{}, "repo", "snapshot")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestDeleteSnapShotRepo(t *testing.T) {
@@ -293,8 +289,7 @@ func TestDeleteSnapShotRepo(t *testing.T) {
 
 	resp, err := os.DeleteTestSnapshotRepo(client, &fiber.Ctx{}, "repo")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestDeleteIndex(t *testing.T) {
@@ -317,8 +312,7 @@ func TestDeleteIndex(t *testing.T) {
 
 	resp, err := os.DeleteTestIndex(client, &fiber.Ctx{}, "index")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestCreateSnapShot(t *testing.T) {
@@ -344,8 +338,7 @@ func TestCreateSnapShot(t *testing.T) {
 
 	resp, err := os.CreateSnapshot(client, &fiber.Ctx{}, "repo", "snapshot", "index")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, true)
 }
 
 func TestGetSnapshotStatus(t *testing.T) {
@@ -378,6 +371,5 @@ func TestGetSnapshotStatus(t *testing.T) {
 
 	resp, err := os.GetSnapshotStatus(client, &fiber.Ctx{}, "repo", "snapshot")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, "SUCCESS")
 }

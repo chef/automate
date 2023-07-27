@@ -1,908 +1,781 @@
 package main
 
 import (
+	"errors"
+	"net/http"
+	"strings"
 	"testing"
 
-	verification "github.com/chef/automate/lib/verification"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
+	"github.com/chef/automate/lib/config"
+	"github.com/chef/automate/lib/httputils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/chef/automate/lib/reporting"
+	"github.com/chef/automate/lib/sshutils"
+	"github.com/chef/automate/lib/version"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	configFileName       = "config.toml"
-	parseConfigFileError = "Unable to parse config file"
+	CONFIG_FILE         = "/config_valid_config_parser.toml"
+	STATUS_API_RESPONSE = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
+	BATCH_CHECK_REQUEST = `{"status":"SUCCESS","result":{"passed":true,"node_result":[]}}`
+	AWS_CONFIG_FILE     = "/valid_config.toml"
+	DARWIN              = "darwin"
 )
 
+var AwsAutoTfvarsJsonStringEmpty = `
+{"automate_private_ips":["10.0.130.162", "10.0.153.152"], "chef_server_private_ips":["10.0.136.84", "10.0.149.79"], "postgresql_private_ips":["10.0.135.82", "10.0.159.64", "10.0.161.255"], "opensearch_private_ips":["10.0.133.254", "10.0.144.64", "10.0.163.250"], "automate_lb_fqdn":"A2-df60949d-automate-lb-1317318119.eu-west-2.elb.amazonaws.com", "automate_frontend_url":"https://A2-df60949d-automate-lb-1317318119.eu-west-2.elb.amazonaws.com", "bucket_name":"test", "aws_os_snapshot_role_arn":" ", "os_snapshot_user_access_key_id":" ", "os_snapshot_user_access_key_secret":" "}
+`
+
+func TestRunVerifyCmd(t *testing.T) {
+	tests := []struct {
+		description              string
+		mockHttputils            *httputils.MockHTTPClient
+		mockCreateSystemdService *verifysystemdcreate.MockCreateSystemdService
+		mockSystemdCreateUtils   *verifysystemdcreate.MockSystemdCreateUtils
+		mockSSHUtil              *sshutils.MockSSHUtilsImpl
+		mockVerifyCmdDeps        *verifyCmdDeps
+		configFile               string
+		wantErr                  error
+		IsAws                    bool
+		ConvTfvarToJsonFunc      func(string) string
+	}{
+		{
+			description: "bastion with aws automate-verify - success",
+			IsAws:       true,
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		},
+		{
+			description: "bastion aws without automate-verify - success",
+			IsAws:       true,
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		},
+		{
+			description: "bastion with existing automate-verify - success",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return &config.HaDeployConfig{}, nil
+				},
+			},
+			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
+			wantErr:    nil,
+		},
+		{
+			description: "bastion without automate-verify - success",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return nil, nil, errors.New("some error occurred")
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return &config.HaDeployConfig{}, nil
+				},
+			},
+			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
+			wantErr:    nil,
+		},
+		{
+			description: "Failed to get automate HA infra details",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return nil, errors.New("Unable to get automate HA infra details")
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return &config.HaDeployConfig{}, nil
+				},
+			},
+			configFile: "",
+			wantErr:    errors.New("Unable to get automate HA infra details"),
+		},
+		{
+			description: "Failed to populate HA common config",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return nil, errors.New("Failed to populate HA common config")
+				},
+			},
+			configFile: "",
+			wantErr:    errors.New("Failed to populate HA common config"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			ConvTfvarToJsonFunc = tt.ConvTfvarToJsonFunc
+			cw := majorupgrade_utils.NewCustomWriter()
+
+			vc := NewVerifyCmdFlow(tt.mockHttputils,
+				tt.mockCreateSystemdService,
+				tt.mockSystemdCreateUtils,
+				config.NewHaDeployConfig(),
+				tt.mockSSHUtil,
+				cw.CliWriter,
+				tt.mockVerifyCmdDeps,
+			)
+
+			flagsObj := &verifyCmdFlags{
+				config: tt.configFile,
+			}
+
+			err := vc.runVerifyCmd(nil, nil, flagsObj)
+			if tt.wantErr != nil {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, tt.wantErr.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
+	tests := []struct {
+		description           string
+		mockHttputils         *httputils.MockHTTPClient
+		mockHostIPs           []string
+		expectedIpsListLength int
+		BuildVersion          string
+		wantErr               error
+	}{
+
+		{
+			description: "remote with existing automate-verify - success",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(`{
+							"status": "SUCCESS",
+							"result": {
+									"status": "OK",
+									"services": [],
+									"cli_version": "2023",
+									"error": "error getting services from hab svc status"
+							}
+					}`), nil
+				},
+			},
+			mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
+			expectedIpsListLength: 0,
+			BuildVersion:          "2023",
+			wantErr:               nil,
+		},
+		{
+			description: "remote with some unreachable IP",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "10.0.0.2") {
+						return nil, nil, errors.New("failed to make HTTP request")
+					}
+					return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(`{
+							"status": "SUCCESS",
+							"result": {
+									"status": "OK",
+									"services": [],
+									"cli_version": "2023",
+									"error": "error getting services from hab svc status"
+							}
+					}`), nil
+				},
+			},
+			mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
+			expectedIpsListLength: 1,
+			BuildVersion:          "2023",
+			wantErr:               nil,
+		},
+		{
+			description: "remote with some of the machines have old cli version",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "10.0.0.2") {
+						return &http.Response{
+								StatusCode: http.StatusOK,
+							}, []byte(`{
+							"status": "SUCCESS",
+							"result": {
+									"status": "OK",
+									"services": [],
+									"cli_version": "2022",
+									"error": "error getting services from hab svc status"
+							}
+					}`), nil
+					}
+					return &http.Response{
+							StatusCode: http.StatusOK,
+						}, []byte(`{
+							"status": "SUCCESS",
+							"result": {
+									"status": "OK",
+									"services": [],
+									"cli_version": "2023",
+									"error": "error getting services from hab svc status"
+							}
+					}`), nil
+				},
+			},
+			mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
+			expectedIpsListLength: 1,
+			BuildVersion:          "2023",
+			wantErr:               nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			version.BuildTime = tt.BuildVersion
+			cw := majorupgrade_utils.NewCustomWriter()
+
+			vc := newMockVerifyCmdFlow(tt.mockHttputils, cw)
+
+			hostIpsList, err := vc.getHostIPsWithNoLatestCLI(tt.mockHostIPs)
+			if tt.wantErr != nil {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, tt.wantErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedIpsListLength, len(hostIpsList))
+			}
+		})
+	}
+}
+
 func TestVerifyCmdFunc(t *testing.T) {
+	tests := []struct {
+		test                string
+		flagsObj            *verifyCmdFlags
+		ConvTfvarToJsonFunc func(string) string
+	}{
+		{
+			test: "Existing Infra",
+			flagsObj: &verifyCmdFlags{
+				config: CONFIG_TOML_PATH + CONFIG_FILE,
+				debug:  true,
+			},
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		}, {
+			test: "Aws Infra",
+			flagsObj: &verifyCmdFlags{
+				config: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+				debug:  true,
+			},
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.test, func(t *testing.T) {
+			ConvTfvarToJsonFunc = tt.ConvTfvarToJsonFunc
+			vf := verifyCmdFunc(tt.flagsObj)
+			assert.NotNil(t, vf, "verifyCmdFunc should not be nil")
+
+			err := vf(nil, nil)
+			assert.Error(t, err, "expected an error")
+			assert.Contains(t, err.Error(), "Cannot create automate-verify service", "unexpected error message")
+		})
+	}
+}
+
+func newMockVerifyCmdFlow(mockHttputils *httputils.MockHTTPClient, cw *majorupgrade_utils.CustomWriter) *verifyCmdFlow {
+
+	mockCreateSystemdService := &verifysystemdcreate.MockCreateSystemdService{
+		CreateFun: func() error {
+			return nil
+		},
+	}
+	mockSystemdCreateUtils := &verifysystemdcreate.MockSystemdCreateUtils{
+		GetBinaryPathFunc: func() (string, error) {
+			return "", nil
+		},
+	}
+	mockSSHUtil := &sshutils.MockSSHUtilsImpl{
+		ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+	}
+	mockVerifyCmdDeps := &verifyCmdDeps{
+		getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+			return &AutomateHAInfraDetails{}, nil
+		},
+		PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+			return &config.HaDeployConfig{}, nil
+		},
+	}
+	return NewVerifyCmdFlow(mockHttputils,
+		mockCreateSystemdService,
+		mockSystemdCreateUtils,
+		config.NewHaDeployConfig(),
+		mockSSHUtil,
+		cw.CliWriter,
+		mockVerifyCmdDeps,
+	)
+}
+
+func TestBuildReports(t *testing.T) {
 	type args struct {
-		flagsObj *verifyCmdFlags
+		batchCheckResults []models.BatchCheckResult
 	}
 	tests := []struct {
 		name string
 		args args
+		want []reporting.VerificationReport
 	}{
 		{
-			name: "Test VerifyCmdFunc",
+			name: "If Report is successfully created",
 			args: args{
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip:       "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed:  true,
+								Message: "SSH User Access Check",
+								Check:   "ssh-user",
+								Checks: []models.Checks{
+									{
+										Title:         "SSH user accessible",
+										Passed:        true,
+										SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+										ErrorMsg:      "",
+										ResolutionMsg: "",
+									},
+									{
+										Title:         "Sudo password valid",
+										Passed:        true,
+										SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
+										ErrorMsg:      "",
+										ResolutionMsg: "",
+									},
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: "ssh-user",
+						Status:    "Success",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "SSH User Access Check - Success",
+							SubMessage:  nil,
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 2,
+							FailedCount:     0,
+							ToResolve:       nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Error was there form the handler or Trigger response",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip:       "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed:  false,
+								Message: "SSH User Access Check",
+								Check:   "ssh-user",
+								Checks:  nil,
+								Error: &fiber.Error{
+									Code:    400,
+									Message: "Permissions on the ssh key file do not satisfy the requirement",
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: "ssh-user",
+						Status:    "Failed",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "SSH User Access Check - Failed",
+							SubMessage:  nil,
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 0,
+							FailedCount:     1,
+							ToResolve:       []string{"Permissions on the ssh key file do not satisfy the requirement"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "If Report is successfully created with warning message",
+			args: args{
+				batchCheckResults: []models.BatchCheckResult{
+					{
+						NodeType: "automate",
+						Ip:       "1.1.1.1",
+						Tests: []models.ApiResult{
+							{
+								Passed:  true,
+								Message: constants.CERTIFICATE_MSG,
+								Check:   constants.CERTIFICATE,
+								Checks: []models.Checks{
+									{
+										Title:         "Certificate check",
+										Passed:        true,
+										SuccessMsg:    "Certificate will expire in 15 days",
+										ErrorMsg:      "Certs are expiring soon",
+										ResolutionMsg: "Certificates will expire in 15 days. Please update the certificates!",
+									},
+									{
+										Title:         "Certificate check",
+										Passed:        true,
+										SuccessMsg:    "Certificate will expire in 15 days",
+										ErrorMsg:      "Certs are expiring soon",
+										ResolutionMsg: "Certificates will expire in 15 days. Please update the certificates!",
+									},
+								},
+								Skipped: false,
+							},
+						},
+					},
+				},
+			},
+			want: []reporting.VerificationReport{
+				{
+					TableKey: "automate",
+					Report: reporting.Info{
+						Hostip:    "1.1.1.1",
+						Parameter: constants.CERTIFICATE,
+						Status:    "Success",
+						StatusMessage: &reporting.StatusMessage{
+							MainMessage: "Certificate Check - Success",
+							SubMessage:  []string{"Certs are expiring soon", "Certs are expiring soon"},
+						},
+						SummaryInfo: &reporting.SummaryInfo{
+							SuccessfulCount: 2,
+							FailedCount:     0,
+							ToResolve:       []string{"Certificates will expire in 15 days. Please update the certificates!", "Certificates will expire in 15 days. Please update the certificates!"},
+						},
+					},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := verifyCmdFunc(tt.args.flagsObj)
-			err := got(&cobra.Command{}, []string{})
-			assert.Equal(t, nil, err)
-		})
-	}
-}
+			got := buildReports(tt.args.batchCheckResults)
+			assert.Equal(t, got, tt.want)
 
-func TestRunVerifyCmd(t *testing.T) {
-	type args struct {
-		cmd      *cobra.Command
-		args     []string
-		flagsObj *verifyCmdFlags
-	}
-	tests := []struct {
-		name              string
-		args              args
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-		mockFunc          verification.Verification
-		wantErr           bool
-		err               error
-	}{
-		{
-			name: "Test VerifyHaAWSProvision",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            true,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: true,
-			mockFunc: &verification.VerificationMock{
-				VerifyHAAWSProvisionFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyHaAWSManagedProvision",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     true,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: false,
-			mockFunc: &verification.VerificationMock{
-				VerifyHAAWSManagedProvisionFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyHaOnpremDeploy",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            true,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: false,
-			mockFunc: &verification.VerificationMock{
-				VerifyOnPremDeploymentFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyHaOnPremAWSManagedDeploy",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  true,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: false,
-			mockFunc: &verification.VerificationMock{
-				VerifyOnPremAWSManagedDeploymentFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyHaOnPremCustManagedDeploy",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{configFileName},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: true,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: false,
-			mockFunc: &verification.VerificationMock{
-				VerifyOnPremCustManagedDeploymentFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyHaAWSDeploy",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               true,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: true,
-			mockFunc: &verification.VerificationMock{
-				VerifyHAAWSDeploymentFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyHaAWSManagedDeploy",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        true,
-					standaloneDeploy:          false,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: true,
-			mockFunc: &verification.VerificationMock{
-				VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: true,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyStandaloneDeploy",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          true,
-					certificates:              false,
-				},
-			},
-			A2HARBFileExist: false,
-			mockFunc: &verification.VerificationMock{
-				VerifyStandaloneDeploymentFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-		{
-			name: "Test VerifyCertificates",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: []string{},
-				flagsObj: &verifyCmdFlags{
-					file:                      "",
-					haAWSProvision:            false,
-					haAWSManagedProvision:     false,
-					haOnpremDeploy:            false,
-					haOnPremAWSManagedDeploy:  false,
-					haOnPremCustManagedDeploy: false,
-					haAWSDeploy:               false,
-					haAWSManagedDeploy:        false,
-					standaloneDeploy:          false,
-					certificates:              true,
-				},
-			},
-			A2HARBFileExist: false,
-			mockFunc: &verification.VerificationMock{
-				VerifyCertificatesFunc: func(configFile string) error {
-					return nil
-				},
-			},
-			ManagedServicesOn: false,
-			wantErr:           false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := verifyCmdFlow{
-				Verification:      tt.mockFunc,
-				A2HARBFileExist:   tt.A2HARBFileExist,
-				ManagedServicesOn: tt.ManagedServicesOn,
-			}
-
-			err := v.runVerifyCmd(tt.args.cmd, tt.args.args, tt.args.flagsObj)
-
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaAWSProvision(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaAWSProvision: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSProvisionFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-		{
-			name: "Test VerifyHaAWSProvision: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSProvisionFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaAWSProvision(tt.args.configPath)
-
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaAWSManagedProvision(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaAWSManagedProvision: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedProvisionFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-		{
-			name: "Test VerifyHaAWSManagedProvision: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedProvisionFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaAWSManagedProvision(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaAWSDeploy(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaAWSDeploy: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-		{
-			name: "Test VerifyHaAWSDeploy: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSDeploymentFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-		{
-			name: "Test VerifyHaAWSDeploy: a2ha.rb file not present",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(errProvisonInfra),
-		},
-		{
-			name: "Test VerifyHaAWSDeploy: Managed services present",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: true,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New("This flag will not verify the Managed Services Setup. Please use the --ha-aws-managed-deploy flag."),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaAWSDeploy(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaAWSManagedDeploy(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaAWSManagedDeploy: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: true,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-		{
-			name: "Test VerifyHaAWSManagedDeploy: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: true,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-		{
-			name: "Test VerifyHaAWSManagedDeploy: a2ha.rb file not present",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: true,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(errProvisonInfra),
-		},
-		{
-			name: "Test VerifyHaAWSManagedDeploy: Managed services not present",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New("Managed Services flag is not set. Cannot verify the config."),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaAWSManagedDeploy(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyStandaloneDeploy(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyStandaloneDeploy: check a2ha.rb file",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyStandaloneDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New("Deployment type does not match with the requested flag."),
-		},
-		{
-			name: "Test VerifyStandaloneDeploy: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyStandaloneDeploymentFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-		{
-			name: "Test VerifyStandaloneDeploy: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyStandaloneDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyStandaloneDeploy(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaOnpremDeploy(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaOnpremDeploy: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyOnPremDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-		{
-			name: "Test VerifyHaOnpremDeploy: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyOnPremDeploymentFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaOnpremDeploy(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaOnPremAWSManagedDeploy(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaOnPremAWSManagedDeploy: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyOnPremAWSManagedDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-		{
-			name: "Test VerifyHaOnPremAWSManagedDeploy: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyOnPremAWSManagedDeploymentFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaOnPremAWSManagedDeploy(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
-		})
-	}
-}
-
-func TestVerifyHaOnPremCustManagedDeploy(t *testing.T) {
-	type fields struct {
-		Verification      verification.Verification
-		A2HARBFileExist   bool
-		ManagedServicesOn bool
-	}
-	type args struct {
-		configPath string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-		err     error
-	}{
-		{
-			name: "Test VerifyHaOnPremCustManagedDeploy: verification successful",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyOnPremCustManagedDeploymentFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: false,
-		},
-		{
-			name: "Test VerifyHaOnPremCustManagedDeploy: verification failed",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyOnPremCustManagedDeploymentFunc: func(configFile string) error {
-						return errors.New(parseConfigFileError)
-					},
-				},
-				A2HARBFileExist:   false,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New(parseConfigFileError),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
-			}
-			err := v.verifyHaOnPremCustManagedDeploy(tt.args.configPath)
-			if tt.wantErr {
-				assert.EqualError(t, err, tt.err.Error())
-			} else {
-				assert.Equal(t, nil, err)
-			}
 		})
 	}
 }

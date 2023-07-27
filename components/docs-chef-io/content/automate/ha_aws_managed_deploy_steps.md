@@ -110,7 +110,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Set `backup_config` to `"s3"` or `efs`.
    - If `backup_config` is `s3`, uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
-   - Don't set `fqdn` for the AWS deployment.
+   - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *Postgresql*, *OpenSearch*.
    - Set AWS Config Details:
       - Set `profile`. The default value of `profile` is `"default"`.
@@ -141,6 +141,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
     {{% automate/char-warn %}}
     {{< /warning >}}
 
+   {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
+
 1. Continue with the deployment after updating config:
 
    ```bash
@@ -151,6 +153,13 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
    #Run provision command to deploy `automate.aib` with set `config.toml`
    chef-automate provision-infra config.toml --airgap-bundle automate.aib
+    "
+    ```
+
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
+
+    ```bash
+    sudo -- sh -c "
 
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
@@ -164,7 +173,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
-  If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
 - Create a file `a2.fqdn.toml`
 
@@ -293,23 +302,23 @@ managed_rds_dbuser_password = "MY-DB-PASSWORD"
 managed_rds_certificate = "This is AWS ROOT-CA, we can keep this empty, this will be the part of airgap bundle, as AWS root-ca is available"
 ami_id = "ami-08d4ac5b634553e16"
 delete_on_termination = true
-automate_server_instance_type = "t3.medium"
-chef_server_instance_type = "t3.medium"
+automate_server_instance_type = "m5.large"
+chef_server_instance_type = "m5.large"
 opensearch_server_instance_type = "m5.large"
 postgresql_server_instance_type = "m5.large"
 automate_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
 chef_server_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
 chef_ebs_volume_iops = "100"
-chef_ebs_volume_size = "50"
+chef_ebs_volume_size = "200"
 chef_ebs_volume_type = "gp3"
 opensearch_ebs_volume_iops = "100"
-opensearch_ebs_volume_size = "50"
+opensearch_ebs_volume_size = "200"
 opensearch_ebs_volume_type = "gp3"
 postgresql_ebs_volume_iops = "100"
-postgresql_ebs_volume_size = "50"
+postgresql_ebs_volume_size = "200"
 postgresql_ebs_volume_type = "gp3"
 automate_ebs_volume_iops = "100"
-automate_ebs_volume_size = "50"
+automate_ebs_volume_size = "200"
 automate_ebs_volume_type = "gp3"
 lb_access_logs = "false"
 X-Contact = ""

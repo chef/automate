@@ -52,6 +52,9 @@ admin_password = ""
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
 
+# Add Automate Load Balancer root-ca
+# root_ca = """automate_lb_root_ca_contents"""
+
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
 
@@ -66,16 +69,23 @@ config_file = "configs/automate.toml"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 
-# Add Automate Load Balancer root-ca
-# root_ca = """root_ca_contents"""
-
 # Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
 
+# [[automate.config.certs_by_ip]]
+# ip = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [chef_server.config]
 ## === INPUT NEEDED ===
+
+# Chefserver Load Balancer FQDN eg.: "chefserver.example.com"
+fqdn = ""
+
+# Add Chefserver Load Balancer root-ca
+# lb_root_ca = """chef_server_lb_root_ca_contents"""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -84,6 +94,11 @@ instance_count = ""
 enable_custom_certs = false
 
 # Add Chef Server node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
+
+# [[chef_server.config.certs_by_ip]]
+# ip = ""
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
 
@@ -105,6 +120,10 @@ enable_custom_certs = false
 # admin_cert = """admin_public_key_contents"""
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
+# [[opensearch.config.certs_by_ip]]
+# ip = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -121,6 +140,10 @@ enable_custom_certs = false
 # root_ca = """root_ca_contents"""
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
+# [[postgresql.config.certs_by_ip]]
+# ip = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -131,7 +154,7 @@ enable_custom_certs = false
 # ============== AWS network Config ============================
 ## === INPUT NEEDED ===
 
-# Eg.: profile = "default"
+# Eg.: profile = "default", Leave this field empty if you have an IAM role attached to the bastion machine.
 profile = ""
 
 # Eg.: region = "us-east-1"
@@ -176,8 +199,8 @@ managed_opensearch_username = ""
 # eg: managed_opensearch_user_password = "Progress@123"
 managed_opensearch_user_password = ""
 
-# eg: managed_opensearch_certificate = "<cert content>"
-managed_opensearch_certificate = ""
+# eg: managed_opensearch_certificate = """<cert content>"""
+managed_opensearch_certificate = """"""
 
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
 aws_os_snapshot_role_arn = ""
@@ -203,8 +226,8 @@ managed_rds_dbuser_username = ""
 # eg: managed_rds_dbuser_password = "Progress123"
 managed_rds_dbuser_password = ""
 
-# eg: managed_rds_certificate = "<cert content>"
-managed_rds_certificate = ""
+# eg: managed_rds_certificate = """<cert content>"""
+managed_rds_certificate = """"""
 
 ## === ===
 
@@ -221,16 +244,16 @@ ami_id = ""
 # eg: delete_on_termination = true or false
 delete_on_termination = true
 
-# eg: automate_server_instance_type = "t3.medium"
+# eg: automate_server_instance_type = "m5.large"
 automate_server_instance_type = ""
 
-# eg: chef_server_instance_type = "t3.medium"
+# eg: chef_server_instance_type = "m5.large"
 chef_server_instance_type = ""
 
 # eg: opensearch_server_instance_type = "m5.large"
 opensearch_server_instance_type = ""
 
-# eg: postgresql_server_instance_type = "t3.medium"
+# eg: postgresql_server_instance_type = "m5.large"
 postgresql_server_instance_type = ""
 
 # eg: automate_lb_certificate_arn = "arn:aws:acm...."
@@ -242,7 +265,7 @@ chef_server_lb_certificate_arn = ""
 # eg: automate_ebs_volume_iops = "100"
 automate_ebs_volume_iops = ""
 
-# eg: automate_ebs_volume_size = "50"
+# eg: automate_ebs_volume_size = "200"
 automate_ebs_volume_size = ""
 
 # eg: automate_ebs_volume_type = "gp3"
@@ -251,7 +274,7 @@ automate_ebs_volume_type = ""
 # eg: chef_ebs_volume_iops = "100"
 chef_ebs_volume_iops = ""
 
-# eg: chef_ebs_volume_size = "50"
+# eg: chef_ebs_volume_size = "200"
 chef_ebs_volume_size = ""
 
 # eg: chef_ebs_volume_type = "gp3"
@@ -260,7 +283,7 @@ chef_ebs_volume_type = ""
 # eg: opensearch_ebs_volume_iops = "100"
 opensearch_ebs_volume_iops = ""
 
-# eg: opensearch_ebs_volume_size = "50"
+# eg: opensearch_ebs_volume_size = "200"
 opensearch_ebs_volume_size = ""
 
 # eg: opensearch_ebs_volume_type = "gp3"
@@ -269,7 +292,7 @@ opensearch_ebs_volume_type = ""
 # eg: postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_iops = ""
 
-# eg: postgresql_ebs_volume_size = "50"
+# eg: postgresql_ebs_volume_size = "200"
 postgresql_ebs_volume_size = ""
 
 # eg: postgresql_ebs_volume_type = "gp3"
@@ -359,24 +382,22 @@ region = ""
 # Password for Automate UI for 'admin' user.
 admin_password = ""
 
-
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
+
+# Add Automate Load Balancer root-ca
+# root_ca = """automate_lb_root_ca_contents"""
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
 
 ## === ===
 
-
 # teams_port = ""
 config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-
-# Add Automate Load Balancer root-ca
-# root_ca = """root_ca_contents"""
 
 # Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
@@ -389,6 +410,12 @@ enable_custom_certs = false
 
 [chef_server.config]
 ## === INPUT NEEDED ===
+
+# Chefserver Load Balancer FQDN eg.: "chefserver.example.com"
+fqdn = ""
+
+# Add Chefserver Load Balancer root-ca
+# lb_root_ca = """chef_server_lb_root_ca_contents"""
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
@@ -488,7 +515,8 @@ dbuser_username = ""
 dbuser_password = ""
 
 # In case of AWS managed RDS leave it blank
-postgresql_root_cert = "<cert_content>"
+# eg: postgresql_root_cert = """<cert content>"""
+postgresql_root_cert = """"""
 
 [external.database.open_search]
 
@@ -505,7 +533,8 @@ opensearch_username = ""
 opensearch_user_password = ""
 
 # In case of AWS managed opensearch leave it blank
-opensearch_root_cert = "<cert_content>"
+# eg: opensearch_root_cert = """<cert content>"""
+opensearch_root_cert = """"""
 
 [external.database.open_search.aws]
 

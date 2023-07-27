@@ -41,7 +41,9 @@ There are some cases in which deployment doesn't exit successfully.
 
 The restore command fails when other users or services access the nodes' databases. This happens when the restore service tries to drop the database when some services are still running and are referring to the database.
 
-![Database Access Error](/images/automate/ha_faq_access.png)
+```bash
+Level=error msg="Failed to restore services" backup_id=20210914082922 error="failed to import database dump from automate-cs-oc-erchef/pg_data/automate-cs-oc-erchef.fc: error dropping database \"automate-cs-oc-erchef\": pg: database \"automate-cs-oc-erchef\" is being accessed by other users" restore_id=20210914130646
+```
 
 #### Solution
 
@@ -53,15 +55,21 @@ The restore command fails when other users or services access the nodes' databas
 ### Issue: Cached Artifact not found in Offline Mode
 
 The cached artifact does not exist in offline mode. This issue occurs in an air gap environment when a package tries to pull any dependency components or details from the internet.
-![Cache Artifact Error](/images/automate/ha_faq_cache.png)
+
+```bash
+"level=error msg=""Failed to restore services"" backup_id=20210913105135 error=""msg=\""failed to install\""
+"package=chef/back up-gateway/0.1.0/20210817045252 output=0 Enabling feature : OFFLINE_INSTALL\n Installing chef/backup - gateway/0.1.0/20210817045252\nxxx\nxxx Cached artifact not found in offline mode : chef/backup gateway/0.1.0/20210817045252\nxxx\n: exit status 1"" restore_id=20210913135429 Sep 13 13:54:48 ip-172- 31-64- 42 hab[7228]: deployment-service.default(O): time=""2021-09- 13T13:54:48Z"" level=info msg=""finished streaming call with code OK"" grpc .code=OK grpc .method=DeployStatus grpc .request.deadline=""2021-09-13T15:54:29Z"""
+"grpc .service=chef .automate.domain .deployment.Deployment grpc.start_time=""2021-09- 13T13:54:47Z""
+grpc .time_ms=1229.028 span .kind =server system=grpc
+```
 
 #### Solution
 
-Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-4.x.y.aib*.
+Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, `frontend-4.x.y.aib`.
 
 ##### Command Example
 
-```bash
+```text
 chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patch-config </path/to/patch.toml> --skip-preflight --s3-access-key "Access\_Key" --s3-secret-key "Secret\_Key" --airgap-bundle /var/tmp/<airgap-bundle>
 ```
 
@@ -78,9 +86,11 @@ Execute the following command from the bastion host from any location:
 
 ### Issue: Unable to Determine the Bucket Region
 
-When Chef Automate instances cannot locate the S3 bucket, the following error is displayed, *Unable to restore the backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"*
+When Chef Automate instances cannot locate the S3 bucket, the following error is displayed:
 
-![Bucket Region Error](/images/automate/ha_faq_bucket_region.png)
+```bash
+BackupRestoreError: Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup?delimiter=%2F&list-type=2&prefix=elasticsearch%2F"
+```
 
 #### Solution
 

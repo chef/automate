@@ -11,14 +11,20 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/sshutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
+
+var mutex sync.Mutex
 
 type SSHConfig struct {
 	sshUser    string
@@ -83,12 +89,36 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 	var (
 		keyErr *knownhosts.KeyError
 	)
+	homePath := os.Getenv("HOME")
+	if homePath == "" {
+		errStr := "Environment variable HOME cannot be empty. Please set a value for HOME env"
+		writer.Errorln(errStr)
+		writer.BufferWriter().Flush()
+		return nil, errors.New(errStr)
+	}
+	sshDirPath := filepath.Join(os.Getenv("HOME"), ".ssh")
+	exists, err := fileutils.PathExists(sshDirPath)
+	if err != nil {
+		errStr := fmt.Sprintf("Error evaluating path: %v\n", err)
+		writer.Errorln(errStr)
+		writer.BufferWriter().Flush()
+		return nil, errors.New(errStr)
+	}
+	if !exists {
+		errStr := fmt.Sprintf("Path %s does not exist", sshDirPath)
+		writer.Errorln(errStr)
+		writer.BufferWriter().Flush()
+		return nil, errors.New(errStr)
+	}
 	// Client config
 	return &ssh.ClientConfig{
 		User: s.SshConfig.sshUser,
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
-			kh := checkKnownHosts()
+			mutex.Lock()
+			defer mutex.Unlock()
+			knownHostPath := filepath.Join(sshDirPath, sshutils.AUTOMATE_KNOWN_HOSTS)
+			kh := checkKnownHosts(knownHostPath)
 			hErr := kh(host, remote, pubKey)
 			// Reference: https://blog.golang.org/go1.13-errors
 			// To understand what errors.As is.
@@ -101,7 +131,7 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
 				// host key not found in known_hosts then give a warning and continue to connect.
 				// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
-				return addHostKey(host, remote, pubKey)
+				return addHostKey(host, knownHostPath, remote, pubKey)
 			}
 			// writer.Printf("Pub key exists for %s.\n", host)
 			return nil
@@ -129,8 +159,8 @@ func (s *SSHUtilImpl) getConnection() (*ssh.Client, error) {
 	return conn, err
 }
 
-func createKnownHosts() {
-	f, fErr := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
+func createKnownHosts(knownHostPath string) {
+	f, fErr := os.OpenFile(knownHostPath, os.O_CREATE, 0600)
 	if fErr != nil {
 		writer.Errorf("%v", fErr)
 		return
@@ -138,9 +168,9 @@ func createKnownHosts() {
 	f.Close()
 }
 
-func checkKnownHosts() ssh.HostKeyCallback {
-	createKnownHosts()
-	kh, e := knownhosts.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
+func checkKnownHosts(knownHostPath string) ssh.HostKeyCallback {
+	createKnownHosts(knownHostPath)
+	kh, e := knownhosts.New(knownHostPath)
 	if e != nil {
 		writer.Errorf("%v", e)
 		return nil
@@ -148,10 +178,17 @@ func checkKnownHosts() ssh.HostKeyCallback {
 	return kh
 }
 
-func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+func addHostKey(host, khFilePath string, remote net.Addr, pubKey ssh.PublicKey) error {
+
+	content, err := os.ReadFile(khFilePath)
+	if err != nil {
+		writer.Errorf("Error while reading the known hosts file:%v", err)
+		return err
+	}
+	lastLine := stringutils.GetLastLine(string(content))
+
 	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
 	// if not nil then connection stops.
-	khFilePath := filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts")
 
 	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
 	if fErr != nil {
@@ -160,9 +197,12 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	defer f.Close()
 
 	knownHosts := knownhosts.Normalize(remote.String())
-	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
-	f.WriteString("\n")
-	return fileErr
+	line := knownhosts.Line([]string{knownHosts}, pubKey)
+	if lastLine != "" {
+		line = "\n" + line
+	}
+	_, err = f.WriteString(line)
+	return err
 }
 
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error) {

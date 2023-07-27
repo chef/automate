@@ -71,7 +71,8 @@ func TestPortReachable(t *testing.T) {
 					"passed": true,
 					"success_msg": "The udp service running at 13.37.213.16:1234 is reachable",
 					"error_msg": "",
-					"resolution_msg": ""
+					"resolution_msg": "",
+					"skipped":false
 				}
 			}`,
 			RequestBody: `{
@@ -108,23 +109,6 @@ func TestPortReachable(t *testing.T) {
 				"destination_node_ip": "",
 				"destination_node_port": 1234,
 				"destination_node_service_protocol": "udp"
-			  }`,
-		},
-		{
-			TestName:     "Not Given the rootCA while using HTTPS Protocol",
-			ExpectedCode: 400,
-			ExpectedBody: `{
-				"status": "FAILED",
-				"result": null,
-				"error": {
-					"code": 400,
-					"message": "RootCA value is mandatory for protocol HTTPS"
-				}
-			}`,
-			RequestBody: `{
-				"destination_node_ip": "13.37.23.16",
-				"destination_node_port": 443,
-				"destination_node_service_protocol": "https"
 			  }`,
 		},
 		{

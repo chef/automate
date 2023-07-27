@@ -2,18 +2,20 @@ package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/certificatevalidation"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/fqdnservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/mockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/sshusercheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/lib/logger"
@@ -24,11 +26,10 @@ type Handler struct {
 	StatusService                statusservice.IStatusService
 	BatchCheckService            batchcheckservice.IBatchCheckService
 	NFSMountService              nfsmountservice.NFSService
-	MockServersService           startmockserverservice.IStartMockServersService
+	MockServersService           mockserverservice.MockServersService
 	HardwareResourceCountService hardwareresourcecount.IHardwareResourceCountService
 	SoftwareVersionService       softwareversionservice.ISoftwareVersionService
 	S3ConfigService              s3configservice.IS3Config
-	StopMockServersService       stopmockserverservice.IStopMockServerService
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
 	PortReachableService         portreachableservice.IPortReachableService
 	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
@@ -36,6 +37,9 @@ type Handler struct {
 	SystemResourceService        systemresourceservice.SystemResourcesService
 	ExternalOpensearchService    externalopensearchservice.IExternalOpensearchService
 	FqdnService                  fqdnservice.IFqdnService
+	FirewallService              firewallservice.IFirewallService
+	ValidateCertificateService   certificatevalidation.IValidateCertificateService
+	SshUserCheckService          sshusercheckservice.SshUserCheckService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -47,7 +51,7 @@ func (h *Handler) AddStatusService(ss statusservice.IStatusService) *Handler {
 	return h
 }
 
-func (h *Handler) AddMockServerServices(mss startmockserverservice.IStartMockServersService) *Handler {
+func (h *Handler) AddMockServerService(mss mockserverservice.MockServersService) *Handler {
 	h.MockServersService = mss
 	return h
 }
@@ -73,11 +77,6 @@ func (h *Handler) AddHardwareResourceCountService(hrc hardwareresourcecount.IHar
 }
 func (h *Handler) AddS3ConfigService(ss s3configservice.IS3Config) *Handler {
 	h.S3ConfigService = ss
-	return h
-}
-
-func (h *Handler) AddStopMockServerService(sm stopmockserverservice.IStopMockServerService) *Handler {
-	h.StopMockServersService = sm
 	return h
 }
 
@@ -113,5 +112,20 @@ func (h *Handler) AddSystemResourceService(srs systemresourceservice.SystemResou
 
 func (h *Handler) AddExternalOpensearchService(eos externalopensearchservice.IExternalOpensearchService) *Handler {
 	h.ExternalOpensearchService = eos
+	return h
+}
+
+func (h *Handler) AddFirewallService(fw firewallservice.IFirewallService) *Handler {
+	h.FirewallService = fw
+	return h
+}
+
+func (h *Handler) AddCertificateValidation(vc certificatevalidation.IValidateCertificateService) *Handler {
+	h.ValidateCertificateService = vc
+	return h
+}
+
+func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUserCheckService) *Handler {
+	h.SshUserCheckService = ssu
 	return h
 }

@@ -27,6 +27,8 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+- gen - generate the Automate HA configuration
+- oc-id-show-app - Get the details of the oauth applications registered with OC-ID
 - patch - patch the Chef Automate configuration
 - set - set the Chef Automate configuration
 - show - show the Chef Automate configuration

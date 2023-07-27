@@ -18,4 +18,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate infrastructure - Chef Automate infrastructure
-supported_on: Automate
+supported_on: Bastion

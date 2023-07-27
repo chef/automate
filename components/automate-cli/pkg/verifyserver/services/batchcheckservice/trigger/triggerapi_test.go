@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -202,7 +203,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
 		assert.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
-		assert.Contains(t, response.Result.Error.Message, `"http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com`)
+		assert.Contains(t, response.Result.Error.Message, `error while connecting to the endpoint`)
 		require.Equal(t, "postgresql", response.NodeType)
 
 	})
@@ -211,13 +212,20 @@ func TestTriggerCheckAPI(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Return a non-OK status code
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{"error":{"code":400, "message":"Request Parameters that is 'ip', 'user_name', 'ssh_port' and 'private_key' cannot be empty"}}`))
 		}))
 		defer server.Close()
-
+		requestBody := models.SshUserChecksRequest{
+			Ip:           "1.1.1.1",
+			UserName:     "admin",
+			Port:         "22",
+			PrivateKey:   "",
+			SudoPassword: "",
+		}
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go TriggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
+		go TriggerCheckAPI(server.URL+constants.SSH_USER_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodPost, output, requestBody)
 
 		// Wait for the response
 		response := <-output
@@ -225,7 +233,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
 		assert.Equal(t, http.StatusBadRequest, response.Result.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Result.Error.Message)
+		assert.Equal(t, "Request Parameters that is 'ip', 'user_name', 'ssh_port' and 'private_key' cannot be empty", response.Result.Error.Message)
 	})
 
 	t.Run("Error decoding response JSON", func(t *testing.T) {
@@ -261,10 +269,11 @@ func TestTriggerCheckAPI(t *testing.T) {
 
 		// Wait for the response
 		response := <-output
+
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
-		require.Equal(t, http.StatusNotFound, response.Result.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Result.Error.Message)
+		require.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
+		assert.Contains(t, response.Result.Error.Message, "error while parsing the response data:invalid character '<' looking for beginning of value")
 	})
 	t.Run("Invalid Request Body", func(t *testing.T) {
 		endPoint := "http://example.com/api/v1/checks/software-versions"
@@ -292,8 +301,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 1,
 				ChefInfraServerNodeIps:   []string{host},
 			},
@@ -317,8 +326,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -342,8 +351,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				PostgresqlNodeCount: 1,
 				PostgresqlNodeIps:   []string{host},
 				OpenSearchNodeCount: 1,
@@ -425,8 +434,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -488,4 +497,186 @@ func createDummyServer() (*httptest.Server, string, string) {
 	ip := address[:colonIndex]
 	port := address[colonIndex+1:]
 	return server, ip, port
+}
+
+func TestNilResp(t *testing.T) {
+	checkType := "test_check"
+
+	// Test case 1: Only AUTOMATE and CHEF_INFRA_SERVER
+	expected1 := []models.CheckTriggerResponse{
+		{
+			NodeType:  constants.AUTOMATE,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: constants.SKIP_MISSING_HARDWARE_MESSAGE,
+				Check:       checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		},
+		{
+			NodeType:  constants.CHEF_INFRA_SERVER,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: constants.SKIP_MISSING_HARDWARE_MESSAGE,
+				Check:       checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		},
+	}
+
+	result1 := HardwareNil(checkType, constants.SKIP_MISSING_HARDWARE_MESSAGE, false, false, false)
+	assert.Equal(t, expected1, result1)
+
+	// Test case 2: Include OPENSEARCH
+	expected2 := append(expected1, models.CheckTriggerResponse{
+		NodeType:  constants.OPENSEARCH,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:      false,
+			Skipped:     true,
+			SkipMessage: constants.SKIP_MISSING_HARDWARE_MESSAGE,
+			Check:       checkType,
+		},
+		Host: constants.UNKNOWN_HOST,
+	})
+
+	result2 := HardwareNil(checkType, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, false, false)
+	assert.Equal(t, expected2, result2)
+
+	// Test case 3: Include POSTGRESQL and BASTION
+	expected3 := append(expected2, models.CheckTriggerResponse{
+		NodeType:  constants.POSTGRESQL,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:      false,
+			Skipped:     true,
+			SkipMessage: constants.SKIP_MISSING_HARDWARE_MESSAGE,
+			Check:       checkType,
+		},
+		Host: constants.UNKNOWN_HOST,
+	}, models.CheckTriggerResponse{
+		NodeType:  constants.BASTION,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:      false,
+			Skipped:     true,
+			SkipMessage: constants.SKIP_MISSING_HARDWARE_MESSAGE,
+			Check:       checkType,
+		},
+		Host: constants.LOCALHOST,
+	})
+
+	result3 := HardwareNil(checkType, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, true, true)
+	assert.Equal(t, expected3, result3)
+}
+
+func TestGetErrTriggerCheckResp(t *testing.T) {
+	ip := "192.168.0.1"
+	checkType := "test_check"
+	nodeType := "test_node"
+	errorMsg := "error message"
+
+	expected := models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: errorMsg,
+			},
+			Check: checkType,
+		},
+	}
+
+	result := ErrTriggerCheckResp(ip, checkType, nodeType, errorMsg)
+
+	assert.Equal(t, expected, result)
+}
+
+func TestGetSkippedTriggerCheckResp(t *testing.T) {
+	ip := "192.168.0.1"
+	checkType := "test_check"
+	nodeType := "test_node"
+
+	expected := models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:      false,
+			Skipped:     true,
+			Check:       checkType,
+			SkipMessage: "test",
+		},
+		Host: ip,
+	}
+
+	result := SkippedTriggerCheckResp(ip, checkType, nodeType, "test")
+
+	assert.Equal(t, expected, result)
+}
+
+func TestGetNilResp(t *testing.T) {
+	// Mock Config
+	config := &models.Config{
+		Hardware: &models.Hardware{
+			AutomateNodeIps:        []string{"1.2.3.4", "5.6.7.8"},
+			ChefInfraServerNodeIps: []string{"10.20.30.40", "50.60.70.80"},
+			PostgresqlNodeIps:      []string{"100.200.300.400", "500.600.700.800"},
+			OpenSearchNodeIps:      []string{"192.168.1.1", "192.168.1.2"},
+		},
+	}
+
+	checkType := "sampleCheckType"
+	exampleSkip := "skip test message"
+
+	expectedResponses := []models.CheckTriggerResponse{
+		SkippedTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE, exampleSkip),
+		SkippedTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE, exampleSkip),
+		SkippedTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER, exampleSkip),
+		SkippedTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER, exampleSkip),
+		SkippedTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL, exampleSkip),
+		SkippedTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL, exampleSkip),
+		SkippedTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH, exampleSkip),
+		SkippedTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH, exampleSkip),
+	}
+
+	responses := ConstructNilResp(config, checkType, exampleSkip)
+
+	assert.Equal(t, expectedResponses, responses)
+}
+
+func TestEmptyResp(t *testing.T) {
+	// Mock Config
+	config := &models.Config{
+		Hardware: &models.Hardware{
+			AutomateNodeIps:        []string{"1.2.3.4", "5.6.7.8"},
+			ChefInfraServerNodeIps: []string{"10.20.30.40", "50.60.70.80"},
+			PostgresqlNodeIps:      []string{"100.200.300.400", "500.600.700.800"},
+			OpenSearchNodeIps:      []string{"192.168.1.1", "192.168.1.2"},
+		},
+	}
+
+	checkType := "sampleCheckType"
+	message := "Sample message"
+
+	expectedResponses := []models.CheckTriggerResponse{
+		ErrTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE, message),
+		ErrTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE, message),
+		ErrTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER, message),
+		ErrTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER, message),
+		ErrTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL, message),
+		ErrTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL, message),
+		ErrTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH, message),
+		ErrTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH, message),
+	}
+
+	responses := ConstructEmptyResp(config, checkType, message)
+
+	assert.Equal(t, expectedResponses, responses)
 }

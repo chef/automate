@@ -1,11 +1,14 @@
 package fileutils_test
 
 import (
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -77,8 +80,148 @@ func TestDeleteTempFile(t *testing.T) {
 	}
 	defer tempFile.Close()
 
-	err = fileutils.DeleteTempFile(tempFile.Name())
+	err = fileutils.DeleteFile(tempFile.Name())
 	if err != nil {
 		return
 	}
+}
+
+func TestMove(t *testing.T) {
+	content := "abc"
+	filename := "file-name"
+	destinationDir := createTempDir(t)
+	defer os.RemoveAll(destinationDir)
+
+	t.Run("Move a file to new directory", func(t *testing.T) {
+		srcFile, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, srcFile, "file-name")
+		require.NoError(t, err)
+		defer fileutils.DeleteFile(srcFile)
+
+		err = fileutils.Move(srcFile, destinationDir+filename)
+		defer fileutils.DeleteFile(destinationDir + filename)
+		require.NoError(t, err)
+		fileExists, err := fileutils.PathExists(destinationDir + filename)
+		require.NoError(t, err)
+		assert.True(t, fileExists)
+	})
+
+	t.Run("Move a file to a directory and overwrite the existing file", func(t *testing.T) {
+		srcFile, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, srcFile, "file-name")
+		require.NoError(t, err)
+		defer fileutils.DeleteFile(srcFile)
+
+		existingFile := filepath.Join(destinationDir, "existing.txt")
+		err = fileutils.WriteFile(existingFile, []byte("Existing File"), 0644)
+		require.NoError(t, err)
+		err = fileutils.Move(srcFile, existingFile)
+		require.NoError(t, err)
+	})
+
+	t.Run("Invalid destinationfile", func(t *testing.T) {
+		srcFile, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, srcFile, "file-name")
+		require.NoError(t, err)
+		defer fileutils.DeleteFile(srcFile)
+
+		invalidSourceFile := "/path/to/invalid/source.txt"
+		err = fileutils.Move(invalidSourceFile, destinationDir+filename)
+		linkErr, _ := err.(*os.LinkError)
+		value := linkErr.Err.Error()
+		require.Contains(t, value, "no such file or directory", "No such file or Directory")
+	})
+}
+
+func createTempDir(t *testing.T) string {
+	dir, err := ioutil.TempDir("", "destination_*")
+	if err != nil {
+		t.Fatalf("Failed to create temporary directory: %v", err)
+	}
+	return dir
+}
+
+func TestRemoveFirstLine(t *testing.T) {
+	content := "HeaderToBeRemoved\nabc"
+	filename := "file-name"
+
+	t.Run("Remove first line", func(t *testing.T) {
+		res, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, res, "file-name")
+		require.NoError(t, err)
+		err = fileutils.RemoveFirstLine(res)
+		require.NoError(t, err)
+		fileContent, err := fileutils.ReadFile(res)
+		require.NoError(t, err)
+		assert.EqualValues(t, string(fileContent), "abc\n")
+	})
+
+	t.Run("Open file error", func(t *testing.T) {
+		err := fileutils.RemoveFirstLine(filename)
+		require.Error(t, err.(*fs.PathError), "No such file or directory")
+	})
+}
+
+func TestCreateTomlFileFromConfig(t *testing.T) {
+	tomlFilePath := "file-name"
+
+	user := struct {
+		Name string
+		Age  int
+	}{
+		Name: "John Doe",
+		Age:  30,
+	}
+
+	expectedContent := `Name = "John Doe"
+Age = 30
+`
+	defer os.Remove(tomlFilePath)
+
+	t.Run("Create toml file", func(t *testing.T) {
+		tomlFile, err := fileutils.CreateTomlFileFromConfig(user, tomlFilePath)
+		require.NoError(t, err)
+		fileByte, err := fileutils.ReadFile(tomlFile)
+		require.NoError(t, err)
+		assert.Contains(t, string(fileByte), expectedContent)
+		// err = fileutils.DeleteTempFile(tomlFile)
+		require.NoError(t, err)
+	})
+
+	invalidFile := "/path/to/invalid/file.toml"
+
+	t.Run("Open file error", func(t *testing.T) {
+		_, err := fileutils.CreateTomlFileFromConfig(user, invalidFile)
+		// fmt.Print(err.(*fs.PathError))
+		require.Error(t, err, "Failed to create/open the file")
+	})
+
+	t.Run("Error encoding the config", func(t *testing.T) {
+		var invalidConfig int
+		_, err := fileutils.CreateTomlFileFromConfig(invalidConfig, tomlFilePath)
+		require.Error(t, err, "Failed to encode")
+	})
+}
+
+func TestGetFilePermission(t *testing.T) {
+	t.Run("Permission Was Successfully Recevied", func(t *testing.T) {
+		tempdir := t.TempDir()
+
+		testData := []byte("test data")
+		filePath := path.Join(tempdir, "file")
+		ioutil.WriteFile(filePath, testData, 0400)
+		res, err := fileutils.GetFilePermission(filePath)
+		assert.NoError(t, err)
+		assert.Equal(t, res, int64(400))
+	})
+
+	t.Run("Unable to get the filepath", func(t *testing.T) {
+		testData := []byte("test data")
+		filePath := path.Join("ssh", "file")
+		ioutil.WriteFile(filePath, testData, 0400)
+		got, gotErr := fileutils.GetFilePermission(filePath)
+		want, wantErr := int64(0), errors.New("Unable to get the file on the path provided")
+		assert.Equal(t, want, got)
+		assert.Equal(t, wantErr.Error(), gotErr.Error())
+	})
 }

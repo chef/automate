@@ -4,17 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/systemresource"
 )
@@ -28,6 +25,7 @@ type NfsServiceImp struct {
 	SystemResourceInfo systemresource.SystemResourceInfo
 	port               string
 	log                logger.Logger
+	httpRequestClient  httputils.HTTPClient
 }
 
 type TempResponse struct {
@@ -35,10 +33,11 @@ type TempResponse struct {
 	MountResp   models.NFSMountResponse
 }
 
-func NewNFSMountService(log logger.Logger, port string, sysResInfo systemresource.SystemResourceInfo) *NfsServiceImp {
+func NewNFSMountService(log logger.Logger, port string, client httputils.HTTPClient, sysResInfo systemresource.SystemResourceInfo) *NfsServiceImp {
 	return &NfsServiceImp{
 		port:               port,
 		log:                log,
+		httpRequestClient:  httputils.NewClient(log),
 		SystemResourceInfo: sysResInfo,
 	}
 }
@@ -137,25 +136,19 @@ func (nm *NfsServiceImp) doAPICall(ip string, mountLocation string) (*models.NFS
 		MountLocation: mountLocation,
 	}
 
-	resp, err := httputils.MakeRequest(http.MethodPost, reqURL, reqBody)
+	_, resp, err := nm.httpRequestClient.MakeRequest(http.MethodPost, reqURL, reqBody)
 	if err != nil {
 		nm.log.Error(err.Error())
 		return nil, errors.New("Failed to send the HTTP request: " + err.Error())
 	}
 
-	return nm.getResultStructFromRespBody(resp.Body)
+	return nm.getResultStructFromRespBody(resp)
 }
 
-func (nm *NfsServiceImp) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
-	body, err := io.ReadAll(respBody) // nosemgrep
-	if err != nil {
-		nm.log.Error(err.Error())
-		return nil, errors.New("Cannot able to read data from response body: " + err.Error())
-	}
-
+func (nm *NfsServiceImp) getResultStructFromRespBody(respBody []byte) (*models.NFSMountLocResponse, error) {
 	// Converting API Response Body into Generic Response Struct.
 	apiRespStruct := response.ResponseBody{}
-	err = json.Unmarshal(body, &apiRespStruct)
+	err := json.Unmarshal(respBody, &apiRespStruct)
 	if err != nil {
 		return nil, errors.New("Failed to Unmarshal: " + err.Error())
 	}
@@ -188,7 +181,8 @@ func prepareMountResp(ip, nodeType, mountLocation string, mountLocResp *models.N
 	node.NodeType = nodeType
 
 	if err != nil {
-		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
+		checkList := createCheck("NFS mount", false, "", "NFS mount location not found", "NFS volume should be mounted on "+mountLocation)
+		node.CheckList = append(node.CheckList, checkList)
 		return node
 	}
 	checkMount(mountLocation, &node, mountLocResp)

@@ -42,9 +42,11 @@ func (pg *ExternalPostgresqlServiceImpl) GetPgConnection(req *models.ExternalPgR
 	err = pg.CheckExternalPgConnection(rootcert)
 	if err != nil {
 		pg.logger.Error(err)
+		fmt.Println(err.Error())
+		errorMsg := constants.EXTERNAL_PG_CONNECTION_ERROR_MSG + "\n " + err.Error()
 		resp = &models.ExternalPgResponse{
 			Passed: false,
-			Checks: []models.ExternalPgConnectionDetails{failResponse(constants.EXTERNAL_PG_FAIL_CONNECTION_TITLE, constants.EXTERNAL_PG_CONNECTION_ERROR_MSG, constants.EXTERNAL_PG_CONNECTION_RESOLUTION_MSG)},
+			Checks: []models.ExternalPgConnectionDetails{failResponse(constants.EXTERNAL_PG_FAIL_CONNECTION_TITLE, errorMsg, constants.EXTERNAL_PG_CONNECTION_RESOLUTION_MSG)},
 		}
 		return resp, nil
 	}
@@ -55,7 +57,7 @@ func (pg *ExternalPostgresqlServiceImpl) GetPgConnection(req *models.ExternalPgR
 	}
 
 	// delete the file when its done
-	defer pg.fileUtils.DeleteTempFile(rootcert)
+	defer pg.fileUtils.DeleteFile(rootcert)
 
 	return resp, nil
 }
@@ -96,7 +98,7 @@ func failResponse(Title string, ErrorMsg string, ResolutionMsg string) models.Ex
 		Title:         constants.EXTERNAL_PG_FAIL_CONNECTION_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      constants.EXTERNAL_PG_CONNECTION_ERROR_MSG,
+		ErrorMsg:      ErrorMsg,
 		ResolutionMsg: constants.EXTERNAL_PG_CONNECTION_RESOLUTION_MSG,
 	}
 	return Resp

@@ -15,7 +15,13 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
+type ErrorResponse struct {
+	Status  string          `json:"string"`
+	Results []models.Checks `json:"checks"`
+	Error   fiber.Error     `json:"error"`
+}
+
+func RunCheck(config *models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
 		config.Hardware.ChefInfraServerNodeCount +
@@ -98,6 +104,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	}
 
 	req, err := http.NewRequest(method, endPoint, reader)
+	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host:     host,
@@ -114,7 +121,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	}
 
 	client := http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: 35 * time.Second,
 	}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -135,14 +142,45 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		responseBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			output <- models.CheckTriggerResponse{
+				Host:     host,
+				NodeType: nodeType,
+				Result: models.ApiResult{
+					Passed: false,
+					Error: &fiber.Error{
+						Code:    http.StatusInternalServerError,
+						Message: fmt.Sprintf("error while reading checks response Body: %s", err.Error()),
+					},
+				},
+			}
+			return
+		}
+		errResponse := ErrorResponse{}
+		err = json.Unmarshal(responseBody, &errResponse)
+		if err != nil {
+			output <- models.CheckTriggerResponse{
+				Host:     host,
+				NodeType: nodeType,
+				Result: models.ApiResult{
+					Passed: false,
+					Error: &fiber.Error{
+						Code:    http.StatusInternalServerError,
+						Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
+					},
+				},
+			}
+			return
+		}
 		output <- models.CheckTriggerResponse{
 			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
 				Passed: false,
 				Error: &fiber.Error{
-					Code:    resp.StatusCode,
-					Message: "error while connecting to the endpoint, received invalid status code",
+					Code:    errResponse.Error.Code,
+					Message: errResponse.Error.Message,
 				},
 			},
 		}
@@ -181,4 +219,141 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 
 	}
 	return reader, nil
+}
+
+func HardwareNil(checkType, message string, includeOPENSEARCH bool, includePOSTGRESQL bool, includeBASTION bool) []models.CheckTriggerResponse {
+	responses := []models.CheckTriggerResponse{
+		{
+			NodeType:  constants.AUTOMATE,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		},
+		{
+			NodeType:  constants.CHEF_INFRA_SERVER,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		},
+	}
+
+	if includeOPENSEARCH {
+		responses = append(responses, models.CheckTriggerResponse{
+			NodeType:  constants.OPENSEARCH,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		})
+	}
+
+	if includePOSTGRESQL {
+		responses = append(responses, models.CheckTriggerResponse{
+			NodeType:  constants.POSTGRESQL,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		})
+	}
+
+	if includeBASTION {
+		responses = append(responses, models.CheckTriggerResponse{
+			NodeType:  constants.BASTION,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:      false,
+				Skipped:     true,
+				SkipMessage: message,
+				Check:       checkType,
+			},
+			Host: constants.LOCALHOST,
+		})
+	}
+
+	return responses
+}
+
+func ErrTriggerCheckResp(ip, checkType, nodeType, msg string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: msg,
+			},
+			Check: checkType,
+		},
+	}
+}
+
+func SkippedTriggerCheckResp(ip, checktype, nodeType, message string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checktype,
+		Result: models.ApiResult{
+			Passed:      false,
+			Skipped:     true,
+			Check:       checktype,
+			SkipMessage: message,
+		},
+		Host: ip,
+	}
+}
+
+func ConstructEmptyResp(config *models.Config, checktype, msg string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, msg))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, msg))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, msg))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, msg))
+	}
+
+	return resps
+}
+
+func ConstructNilResp(config *models.Config, checktype, message string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE, message))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, message))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL, message))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH, message))
+	}
+
+	return resps
 }

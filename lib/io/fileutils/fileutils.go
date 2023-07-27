@@ -1,15 +1,19 @@
 package fileutils
 
 import (
+	"bufio"
+	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
 
@@ -29,7 +33,11 @@ type FileUtils interface {
 	ReadFile(filename string) ([]byte, error)
 	WriteFile(filepath string, data []byte, perm os.FileMode) error
 	CreateTempFile(content string, filename string) (string, error)
-	DeleteTempFile(tempFile string) error
+	DeleteFile(fileName string) error
+	Move(sourceFile string, destinationFile string) error
+	RemoveFirstLine(filePath string) error
+	GetFilePermission(filePath string) (int64, error)
+	Stat(name string) (os.FileInfo, error)
 }
 
 type FileSystemUtils struct{}
@@ -68,8 +76,23 @@ func (fsu *FileSystemUtils) WriteFile(filepath string, data []byte, perm os.File
 func (fsu *FileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
 	return CreateTempFile(content, filename)
 }
-func (fsu *FileSystemUtils) DeleteTempFile(tempFile string) error {
-	return DeleteTempFile(tempFile)
+func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
+	return DeleteFile(filePath)
+}
+
+func (fsu *FileSystemUtils) Move(sourceFile string, destinationFile string) error {
+	return Move(sourceFile, destinationFile)
+}
+func (fsu *FileSystemUtils) RemoveFirstLine(filePath string) error {
+	return RemoveFirstLine(filePath)
+}
+
+func (fsu *FileSystemUtils) GetFilePermission(filePath string) (int64, error) {
+	return GetFilePermission(filePath)
+}
+
+func (fsu *FileSystemUtils) Stat(name string) (os.FileInfo, error) {
+	return os.Stat(name)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -153,11 +176,19 @@ func WriteToFile(filepath string, data []byte) error {
 }
 
 func ReadFile(filename string) ([]byte, error) {
-	return ioutil.ReadFile(filename) // nosemgrep
+	home := os.Getenv("HOME")
+	path := filename
+	if strings.Index(path, "~") == 0 {
+		if home == "" {
+			return []byte{}, errors.New("path not found, as $HOME is not defined to resolve '~' in the given path: " + filename)
+		}
+		path = strings.Replace(path, "~", home, 1)
+	}
+	return os.ReadFile(path)
 }
 
 func WriteFile(filepath string, data []byte, perm os.FileMode) error {
-	return ioutil.WriteFile(filepath, data, perm) // nosemgrep
+	return os.WriteFile(filepath, data, perm)
 }
 
 func CreateTempFile(content string, filename string) (string, error) {
@@ -172,6 +203,113 @@ func CreateTempFile(content string, filename string) (string, error) {
 	return tempFile.Name(), nil
 }
 
-func DeleteTempFile(tempFile string) error {
-	return os.Remove(tempFile)
+func DeleteFile(filePath string) error {
+	return os.Remove(filePath)
+}
+
+// Moves file from current/source directory to destination directory.
+// Creates the directory, if not already exists
+//
+// Example usage:
+// err := fileutils.Move("file.txt", "/path/to/my/dir/", "");
+// Incase of retriving the old file name, leave renamedFileName as empty
+func Move(sourceFile string, destinationFile string) error {
+	destinationDir, fileName := filepath.Split(destinationFile)
+
+	if err := os.MkdirAll(destinationDir, os.ModePerm); err != nil {
+		return err
+	}
+	err := os.Rename(sourceFile, destinationFile)
+	if err != nil {
+		// Checks if the error is of type *os.LinkError
+		if linkErr, ok := err.(*os.LinkError); ok {
+			// Checks the underlying error code & Handles the "file exists" error
+			if linkErr.Err.Error() == "file exists" {
+				if err = os.Remove(destinationFile); err != nil {
+					return err
+				}
+				// Retrys the rename operation
+				if err = os.Rename(sourceFile, destinationDir+fileName); err != nil {
+					return err
+				}
+			}
+		}
+		return err
+	}
+	return nil
+}
+
+func RemoveFirstLine(filePath string) error {
+	// Open the file for reading
+	file, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Create a temporary file to write the updated content
+	tempFile, err := os.CreateTemp("", "temp")
+	if err != nil {
+		return err
+	}
+	defer tempFile.Close()
+
+	// Create a scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+
+	// Skip the first line
+	scanner.Scan()
+
+	// Write the remaining lines to the temporary file
+	for scanner.Scan() {
+		line := scanner.Text()
+		_, err := tempFile.WriteString(line + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
+	// Close the files
+	file.Close()
+	tempFile.Close()
+
+	// Replace the original file with the temporary file
+	if err = os.Rename(tempFile.Name(), filePath); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// createTomlFileFromConfig created a toml file where path and struct interface is provided
+func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, error) {
+	f, err := os.Create(tomlFile)
+
+	if err != nil {
+		// failed to create/open the file
+		return "", errors.Wrap(err, "Failed to create/open the file, \n%v")
+	}
+	if err := toml.NewEncoder(f).Encode(config); err != nil {
+		// failed to encode
+		return "", errors.Wrap(err, "Failed to encode\n%v")
+	}
+	if err := f.Close(); err != nil {
+		return "", errors.Wrap(err, "Failed to close the file\n%v")
+	}
+
+	return tomlFile, nil
+}
+
+func GetFilePermission(filePath string) (int64, error) {
+	info, err := os.Stat(filePath)
+	if err != nil {
+		return 0, errors.New("Unable to get the file on the path provided")
+	}
+	permissions := info.Mode().Perm()
+	perms := fmt.Sprintf("%04o", permissions)
+	testint, err := strconv.ParseInt(perms, 10, 32)
+	if err != nil {
+		return 0, errors.New("Error while parsing the file permission")
+	}
+	return testint, nil
 }

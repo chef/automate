@@ -7,12 +7,12 @@ import (
 
 	"github.com/chef/automate/lib/logger"
 	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/sirupsen/logrus"
 )
 
 const (
 	VERIFY_SERVER_TIMEZONE = "VERIFY_SERVER_TIMEZONE"
 	DEFAULT_TIMEZONE       = "UTC"
+	LOG_REQ_BODY           = "LOG_REQ_BODY"
 )
 
 func CfgLogTimeZone() string {
@@ -34,7 +34,8 @@ func GetLogConfig(log logger.Logger) (lc fiberlogger.Config) {
 	lc = fiberlogger.Config{
 		TimeFormat: time.RFC3339,
 	}
-	if log.NewEntry().Logger.GetLevel() <= logrus.DebugLevel {
+
+	if isLogReqBodyEnabled() {
 		lc.Format = generateLogFormat(
 			"${magenta}"+strings.ToUpper(log.NewEntry().Logger.GetLevel().String())+"${reset}",
 			"time", "pid", "status", "method", "path", "latency", "error", "bytesReceived", "bytesSent", "body",
@@ -59,4 +60,9 @@ func generateLogFormat(prefix string, fields ...string) string {
 	}
 	logFormat += "\n"
 	return logFormat
+}
+
+func isLogReqBodyEnabled() bool {
+	logReqBody := strings.ToUpper(strings.TrimSpace(os.Getenv(LOG_REQ_BODY))) == "TRUE"
+	return logReqBody
 }

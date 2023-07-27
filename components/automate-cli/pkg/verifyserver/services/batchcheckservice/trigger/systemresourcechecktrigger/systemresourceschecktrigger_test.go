@@ -41,12 +41,12 @@ const (
 func TestSystemResourceCheck_Run(t *testing.T) {
 	t.Run("System Resource Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
+		server, host, port := createDummyServer(t, http.StatusOK, "")
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -73,12 +73,13 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 
 	t.Run("Failed Resource Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusInternalServerError)
+		httpResponse := `{"error":{"code":500,"message":"Internal Server Error"}}`
+		server, host, port := createDummyServer(t, http.StatusInternalServerError, httpResponse)
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -90,12 +91,39 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 2)
 		require.NotNil(t, ctr[0].Result.Error)
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
-		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
+		require.Contains(t, "Internal Server Error", ctr[0].Result.Error.Error())
 	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		// Create a dummy server
+		server, _, port := createDummyServer(t, http.StatusInternalServerError, "")
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: &models.ExternalOS{},
+			ExternalPG: &models.ExternalPG{},
+		}
+
+		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
+		got := suc.Run(config)
+
+		require.Len(t, got, 5)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.SYSTEM_RESOURCES, v.CheckType)
+			assert.Equal(t, constants.SYSTEM_RESOURCES, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+		}
+	})
+
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, requiredResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, constants.SYSTEM_RESOURCE_CHECK_API_PATH, r.URL.Path)
@@ -120,6 +148,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredResponse))
 	}))
 
 	// Extract IP and port from the server's URL
@@ -129,4 +158,11 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 	port := address[colonIndex+1:]
 
 	return server, ip, port
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
 }

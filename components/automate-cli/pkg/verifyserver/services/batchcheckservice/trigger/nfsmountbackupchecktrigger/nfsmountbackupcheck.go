@@ -2,34 +2,47 @@ package nfsmountbackupchecktrigger
 
 import (
 	"encoding/json"
-	"io"
+	"errors"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 )
 
 type NfsBackupConfigCheck struct {
-	log  logger.Logger
-	port string
-	host string
+	log               logger.Logger
+	port              string
+	host              string
+	httpRequestClient httputils.HTTPClient
 }
 
 func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigCheck {
 	return &NfsBackupConfigCheck{
-		log:  log,
-		port: port,
-		host: constants.LOCALHOST,
+		log:               log,
+		port:              port,
+		host:              constants.LOCALHOST,
+		httpRequestClient: httputils.NewClient(log),
 	}
 }
 
-func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, constants.SKIP_MISSING_HARDWARE_MESSAGE, true, true, false)
+	}
+	if config.Backup == nil || config.Backup.FileSystem == nil {
+		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG, constants.SKIP_BACKUP_TEST_MESSAGE_NFS)
+	}
+	if isMountLocationEmpty(config.Backup) {
+		return trigger.ConstructEmptyResp(config, constants.NFS_BACKUP_CONFIG, constants.MOUNT_LOCATION_MISSING)
+	}
 
 	nfsMountReq := models.NFSMountRequest{
+		ExternalDbType:         config.ExternalDbType,
 		AutomateNodeIPs:        config.Hardware.AutomateNodeIps,
 		ChefInfraServerNodeIPs: config.Hardware.ChefInfraServerNodeIps,
 		PostgresqlNodeIPs:      config.Hardware.PostgresqlNodeIps,
@@ -40,8 +53,10 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 	//Triggers only one API call for nfs mount API
 	nfsMountAPIResponse, err := nbc.triggerCheckForMountService(nfsMountReq)
 	if err != nil {
-		response := constructErrorResult(config, err)
-		return response
+		if nfsMountAPIResponse != nil {
+			return constructErrorResult(config, nfsMountAPIResponse.Error.Message, nfsMountAPIResponse.Error.Code)
+		}
+		return constructErrorResult(config, err.Error(), 500)
 
 	}
 	result := constructSuccessResult(*nfsMountAPIResponse)
@@ -53,33 +68,32 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 // triggerCheckForMountService - Call the Hardware resource API and format response
 func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
 	url := checkutils.PrepareEndPoint(ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
-	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
+	_, resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		ss.log.Error("Error while triggering NFS Mount API from Batch Check API: ", err)
 		return nil, err
 	}
-	respBody, err := io.ReadAll(resp.Body)
+	ss.log.Debug("the value of response from the trigger = ", string(resp))
+	apiResp := &models.NFSMountCheckResponse{}
+	err = json.Unmarshal(resp, &apiResp)
 	if err != nil {
-		ss.log.Error("error while connecting to the endpoint:%s", err)
+		ss.log.Error("Error while reading unmarshalled response of NFS Mount response from batch Check API : ", err)
 		return nil, err
 	}
-	apiResp := &models.NFSMountCheckResponse{}
-	err = json.Unmarshal(respBody, apiResp)
-	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of NFS Mount respons from batch Check API : ", err)
-		return apiResp, err
+	if apiResp.Error.Message != "" {
+		return apiResp, errors.New(apiResp.Error.Message)
 	}
 	return apiResp, nil
 }
 
 // constructErrorResult constructs the error response when recived from the API
-func constructErrorResult(config models.Config, err error) []models.CheckTriggerResponse {
+func constructErrorResult(config *models.Config, errMessage string, statusCode int) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
-			result = append(result, checkutils.PrepareTriggerResponse(nil, ip, types[i], err.Error(), "", "", true))
+			result = append(result, checkutils.PrepareTriggerResponse(nil, ip, types[i], errMessage, "", "", true, statusCode))
 		}
 	}
 
@@ -109,4 +123,13 @@ func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTri
 	}
 
 	return result
+}
+
+func (ss *NfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
+func isMountLocationEmpty(backup *models.Backup) bool {
+	return (backup.FileSystem.MountLocation == "")
 }

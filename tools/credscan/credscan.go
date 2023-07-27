@@ -135,24 +135,42 @@ var a2Config = config{
 		// Workaround for DST Root certificate expiry
 		{regex: `components/automate-load-balancer/habitat/cacert.pem`},
 
-		// Exclude test file for startmockserver with uses RSA KEY for test cases
-		{regex: `components/automate-cli/pkg/verifyserver/services/startmockserverservice/startmockserverservice_test.go`},
-
-		// Exclude test file for stopmockserver with uses RSA KEY for test cases
-		{regex: `components/automate-cli/pkg/verifyserver/services/stopmockserverservice/stopmockserverservice_test.go`},
+		// Exclude test file for mockserver which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/services/mockserverservice/mockserverservice_test.go`},
 
 		// Exclude test file for portreachableservice with uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/portreachableservice/portreachable_test.go`},
 
+		// Exclude test file for certificatevalidation with uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/services/certificatevalidation/certificatevalidation_test.go`},
+
+		// Exclude test file for private key validation which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/services/sshusercheckservice/testfiles/ssh.pem`},
+
+		// Exclude test file for private key validation which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/server/api/v1/sshuserchecks_test.go`},
+
+		//Exclude test file for private key validation with uses RSA KEY for test cases
+		{regex: `lib/sshutils/testfiles/ssh`},
+
 		// Test data for hadeployconfig
 		{regex: `lib/config/testdata/.*\.toml`},
+		{regex: `lib/config/testdata/.*\.pem`},
 		{regex: `lib/config/hadeployconfig_test.go`},
+
+		//Test data for PopulateWith in batchcheck models
+		{regex: `components/automate-cli/pkg/verifyserver/models/testdata/.*\.toml`},
+		{regex: `components/automate-cli/pkg/verifyserver/models/testdata/.*\.pem`},
+		{regex: `components/automate-cli/pkg/verifyserver/models/batchcheck_test.go:`},
 
 		// Exclude test file for externalopensearchservice with uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/externalopensearchservice/externalopensearchservice_test.go`},
 
 		// Exclude test file for fqdnservice which uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/fqdnservice/fqdnservice_test.go`},
+
+		// Exclude test file for verifyservice which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/testfiles/aws/valid_config.toml`},
 	},
 	contentInclude: []pattern{
 		{

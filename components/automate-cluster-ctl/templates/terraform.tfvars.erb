@@ -34,7 +34,10 @@ managed_opensearch_domain_name = "<%= config.aws.managed_opensearch_domain_name 
 managed_opensearch_domain_url = "<%= config.aws.managed_opensearch_domain_url %>"
 managed_opensearch_username = "<%= config.aws.managed_opensearch_username %>"
 managed_opensearch_user_password = "<%= config.aws.managed_opensearch_user_password %>"
-managed_opensearch_certificate = "<%= config.aws.managed_opensearch_certificate %>"
+managed_opensearch_certificate = <<-EOT
+<%= config.aws.managed_opensearch_certificate %>
+
+EOT
 aws_os_snapshot_role_arn = "<%= config.aws.aws_os_snapshot_role_arn %>"
 os_snapshot_user_access_key_id = "<%= config.aws.os_snapshot_user_access_key_id %>"
 os_snapshot_user_access_key_secret = "<%= config.aws.os_snapshot_user_access_key_secret %>"
@@ -43,7 +46,10 @@ managed_rds_superuser_username = "<%= config.aws.managed_rds_superuser_username 
 managed_rds_superuser_password = "<%= config.aws.managed_rds_superuser_password %>"
 managed_rds_dbuser_username = "<%= config.aws.managed_rds_dbuser_username %>"
 managed_rds_dbuser_password = "<%= config.aws.managed_rds_dbuser_password %>"
-managed_rds_certificate = "<%= config.aws.managed_rds_certificate %>"
+managed_rds_certificate = <<-EOT
+<%= config.aws.managed_rds_certificate %>
+
+EOT
 
 <% if config.aws.ami_filter_name %>
 ami_filter_name = "<%= config.aws.ami_filter_name %>"
@@ -163,6 +169,10 @@ managed_opensearch_domain_name = "<%= config.managed_aws.opensearch_domain_name 
 managed_opensearch_domain_url = "<%= config.managed_aws.opensearch_domain_url %>"
 managed_opensearch_username = "<%= config.managed_aws.opensearch_username %>"
 managed_opensearch_user_password = "<%= config.managed_aws.opensearch_user_password %>"
+managed_opensearch_certificate = <<-EOT
+<%= config.managed_aws.opensearch_root_cert %>
+
+EOT
 aws_os_snapshot_role_arn = "<%= config.managed_aws.aws_os_snapshot_role_arn %>"
 os_snapshot_user_access_key_id = "<%= config.managed_aws.os_snapshot_user_access_key_id %>"
 os_snapshot_user_access_key_secret = "<%= config.managed_aws.os_snapshot_user_access_key_secret %>"
@@ -171,6 +181,10 @@ managed_rds_superuser_username = "<%= config.managed_aws.superuser_username %>"
 managed_rds_superuser_password = "<%= config.managed_aws.superuser_password %>"
 managed_rds_dbuser_username = "<%= config.managed_aws.dbuser_username %>"
 managed_rds_dbuser_password = "<%= config.managed_aws.dbuser_password %>"
+managed_rds_certificate = <<-EOT
+<%= config.managed_aws.postgresql_root_cert %>
+
+EOT
 
 postgresql_root_cert = <<-EOT
 <%= config.managed_aws.postgresql_root_cert %>
@@ -184,8 +198,12 @@ EOT
 
 <% end %>
 
-# Common
+# Fields needed for all deployment types
 ################################################################################
+
+ssh_user = "<%= config.ssh_user %>"
+ssh_port = "<%= config.ssh_port %>"
+ssh_key_file = "<%= config.ssh_key_file %>"
 <% unless config.automate.admin_password.empty? %>
 automate_admin_password = "<%= config.automate.admin_password %>"
 <% end %>
@@ -196,6 +214,71 @@ automate_fqdn = "<%= config.automate.fqdn %>" # leave commented out for AWS, oth
 automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
 opensearch_instance_count = <%= config.opensearch.instance_count %>
+
+nfs_mount_path = "<%= config.backup_mount %>"
+postgresql_instance_count = <%= config.postgresql.instance_count %>
+postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
+
+habitat_uid_gid = "<%= config.habitat_uid_gid %>"
+ssh_group_name = "<%= config.ssh_group_name %>"
+
+
+<% if config.automate.teams_port %>
+teams_port = <%= config.automate.teams_port.to_i %>
+<% end %>
+
+<% if config.architecture == 'existing_nodes' and config.backup_config == 'object_storage' %>
+# ObjectStorage
+################################################################################
+bucket_name = "<%= config.object_storage.bucket_name %>"
+access_key = "<%= config.object_storage.access_key %>"
+secret_key = "<%= config.object_storage.secret_key %>"
+s3_endpoint = "<%= config.object_storage.endpoint %>"
+region = "<%= config.object_storage.region %>"
+<% end %>
+
+
+
+
+
+<% if config.state == 'deploy' %>
+<% if config.architecture == 'deployment' %>
+
+# AWS deployment config
+################################################################################
+
+<% if config.s3_bucketName %>
+bucket_name_deployment = "<%= config.s3_bucketName %>"
+<% end %>
+<% if config.backup_config == 'efs' %>
+ backup_config_efs_deployment = "true"
+<% end %>
+<% if config.backup_config == 's3' %>
+ backup_config_s3_deployment = "true"
+<% end %>
+managed_opensearch_domain_url_deployment = "<%= config.aws.managed_opensearch_domain_url %>"
+managed_opensearch_username_deployment = "<%= config.aws.managed_opensearch_username %>"
+managed_opensearch_user_password_deployment = "<%= config.aws.managed_opensearch_user_password %>"
+managed_opensearch_certificate_deployment = <<-EOT
+<%= config.aws.managed_opensearch_certificate %>
+
+EOT
+aws_os_snapshot_role_arn_deployment = "<%= config.aws.aws_os_snapshot_role_arn %>"
+os_snapshot_user_access_key_id_deployment = "<%= config.aws.os_snapshot_user_access_key_id %>"
+os_snapshot_user_access_key_secret_deployment = "<%= config.aws.os_snapshot_user_access_key_secret %>"
+managed_rds_instance_url_deployment = "<%= config.aws.managed_rds_instance_url %>"
+managed_rds_superuser_username_deployment = "<%= config.aws.managed_rds_superuser_username %>"
+managed_rds_superuser_password_deployment = "<%= config.aws.managed_rds_superuser_password %>"
+managed_rds_dbuser_username_deployment = "<%= config.aws.managed_rds_dbuser_username %>"
+managed_rds_dbuser_password_deployment = "<%= config.aws.managed_rds_dbuser_password %>"
+managed_rds_certificate_deployment = <<-EOT
+<%= config.aws.managed_rds_certificate %>
+
+EOT
+<% end %>
+
+# Certs
+################################################################################
 
 automate_root_ca = <<-EOT
 <%= config.automate.root_ca %>
@@ -269,33 +352,9 @@ opensearch_custom_certs_enabled = <%= config.opensearch.enable_custom_certs %>
 
 opensearch_admin_dn = "<%= config.opensearch.admin_dn %>"
 opensearch_nodes_dn = "<%= config.opensearch.nodes_dn %>"
-<% if config.architecture == 'existing_nodes' %>
 automate_certs_by_ip = <%= config.automate.certs_by_ip %>
 chef_server_certs_by_ip = <%= config.chef_server.certs_by_ip %>
 postgresql_certs_by_ip = <%= config.postgresql.certs_by_ip %>
 opensearch_certs_by_ip = <%= config.opensearch.certs_by_ip %>
-<% end %>
-nfs_mount_path = "<%= config.backup_mount %>"
-postgresql_instance_count = <%= config.postgresql.instance_count %>
-postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
 
-habitat_uid_gid = "<%= config.habitat_uid_gid %>"
-ssh_user = "<%= config.ssh_user %>"
-ssh_group_name = "<%= config.ssh_group_name %>"
-ssh_port = "<%= config.ssh_port %>"
-ssh_key_file = "<%= config.ssh_key_file %>"
-
-
-<% if config.automate.teams_port %>
-teams_port = <%= config.automate.teams_port.to_i %>
-<% end %>
-
-<% if config.architecture == 'existing_nodes' and config.backup_config == 'object_storage' %>
-# ObjectStorage
-################################################################################
-bucket_name = "<%= config.object_storage.bucket_name %>"
-access_key = "<%= config.object_storage.access_key %>"
-secret_key = "<%= config.object_storage.secret_key %>"
-s3_endpoint = "<%= config.object_storage.endpoint %>"
-region = "<%= config.object_storage.region %>"
 <% end %>

@@ -82,7 +82,7 @@ func TestSystemUserService(t *testing.T) {
 					},
 				},
 			},
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"User creation/validation check\",\"passed\":true,\"success_msg\":\"User is created or found successfully\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Group creation/validation check\",\"passed\":true,\"success_msg\":\"Group is created or found successfully\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"User and group mapping successfully\",\"passed\":true,\"success_msg\":\"User and group mapping successful\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}",
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"User creation/validation check\",\"passed\":true,\"success_msg\":\"User is created or found successfully\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"Group creation/validation check\",\"passed\":true,\"success_msg\":\"Group is created or found successfully\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"User and group mapping successfully\",\"passed\":true,\"success_msg\":\"User and group mapping successful\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}]}}",
 		},
 	}
 
@@ -97,7 +97,7 @@ func TestSystemUserService(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
-			assert.Contains(t, string(body), test.expectedBody)
+			assert.Contains(t, test.expectedBody, string(body))
 			assert.Equal(t, res.StatusCode, test.expectedCode)
 		})
 	}

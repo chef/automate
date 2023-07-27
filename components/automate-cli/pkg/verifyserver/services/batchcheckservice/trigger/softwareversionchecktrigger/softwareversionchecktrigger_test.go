@@ -41,18 +41,38 @@ const (
 	}`
 )
 
+var externalOS = &models.ExternalOS{
+	OSDomainName:   "example.com",
+	OSDomainURL:    "https://example.com",
+	OSUsername:     "username",
+	OSUserPassword: "password",
+	OSCert:         "certificate",
+	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
+}
+
+var externalPG = &models.ExternalPG{
+	PGInstanceURL:       "http://example.com",
+	PGSuperuserName:     "superuser",
+	PGSuperuserPassword: "superpassword",
+	PGDbUserName:        "dbuser",
+	PGDbUserPassword:    "dbpassword",
+	PGRootCert:          "rootcert",
+}
+
 func TestSoftwareVersionCheck_Run(t *testing.T) {
 	t.Run("Software Version Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
+		server, host, port := createDummyServer(t, http.StatusOK, "")
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
@@ -76,15 +96,18 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 
 	t.Run("Failed Software Version Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusInternalServerError)
+		requiredStatusResponse := `{"error":{"code":500,"message":"error while connecting to the endpoint: endpoint not found"}}`
+		server, host, port := createDummyServer(t, http.StatusInternalServerError, requiredStatusResponse)
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
@@ -93,12 +116,37 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 2)
 		require.NotNil(t, ctr[0].Result.Error)
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
+		assert.Equal(t, "error while connecting to the endpoint: endpoint not found", ctr[0].Result.Error.Error())
 	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		// Create a dummy server
+		server, _, port := createDummyServer(t, http.StatusInternalServerError, "")
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware: nil,
+		}
+
+		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 5)
+		for _, v := range ctr {
+			if v.NodeType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SOFTWARE_VERSIONS, v.CheckType)
+			assert.Equal(t, constants.SOFTWARE_VERSIONS, v.Result.Check)
+		}
+	})
+
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, constants.SOFTWARE_VERSION_CHECK_API_PATH, r.URL.Path)
@@ -121,6 +169,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(requiredStatusCode)
+		w.Write([]byte(requiredStatusResponse))
 	}))
 
 	// Extract IP and port from the server's URL
@@ -130,4 +179,11 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 	port := address[colonIndex+1:]
 
 	return server, ip, port
+}
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
 }
