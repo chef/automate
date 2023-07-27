@@ -175,7 +175,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-
+   After successful deployment we can proceed with node bootstraping please Refer [this](/automate/ha_node_bootstraping) docs.
 ### Sample config
 
 {{< note >}}

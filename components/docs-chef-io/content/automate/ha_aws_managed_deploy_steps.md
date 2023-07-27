@@ -266,6 +266,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 {{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+After successful deployment we can proceed with node bootstraping please Refer [this](/automate/ha_node_bootstraping) docs.
 
 ### Sample config
 
