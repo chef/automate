@@ -114,14 +114,14 @@ Run the following steps on Bastion Host Machine:
     ```
     - provide `AWS profile name` skip this if IAM role configured on bashtion host
     - filter and select AWS region from list
-    - give AWS VPC ID
-    - to create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well
+    - give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
+    - to create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
     ```bash
         Do you want to use AWS CIDR Block:
         > yes
           no
     ```
-    - give `ssh key pair name`, `AMI Id`,
+    - give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
     - if you want to terminate all the resources on deletion then select  `on`
     ```bash
         Delete on termination should be:
@@ -135,24 +135,24 @@ Run the following steps on Bastion Host Machine:
           no
     ```
     - give Automate FQDN example `chefautomate.example.com`
-    - give Automte loadbalancer ARN
+    - give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
     - give path of Automate loadbalance FQDN ssl root ca cerificates
     - set automate dashboard login password
     - set how many automate node want to have in cluster, recomended is atleast `two`
     - set automate instance type, recomended is `m5.large`
-    - set automate EBS volume size, check pre-requisites for minimum requirement.
-    - set automate EBS volume type, recomended is `gp3`
-    - set automate EBS volume IOPS
+    - set automate EBS volume size, based on your load needs.
+    - set automate EBS volume type, default is `gp3`, change as per your requirement.
+    - set automate EBS volume IOPS, based on your load needs.
     - 
     - give Chef Server FQDN example `chefserver.example.com`
-    - give Chef Server loadbalancer ARN
+    - give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
     - give path of Chef Server loadbalance FQDN ssl root ca cerificates
     - set Chef Server dashboard login password
     - set how many Chef Server node want to have in cluster, recomended is atleast `two`
     - set Chef Server instance type, recomended is `m5.large`
-    - set Chef Server EBS volume size, check pre-requisites for minimum requirement.
-    - set Chef Server EBS volume type, recomended is `gp3`
-    - set Chef Server EBS volume IOPS
+    - set Chef Server EBS volume size, based on your load needs.
+    - set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
+    - set Chef Server EBS volume IOPS, based on your load needs.
     - select `no` for chef managed database deloyment
     ```bash
         Do you want to use AWS Managed Databases:
@@ -161,15 +161,15 @@ Run the following steps on Bastion Host Machine:
     ```
     - set number of postgresql node you want, recomended is three nodes
     - set postgresql instance type, recomended is `m5.large`
-    - set postgresql EBS volume size, check pre-requisites for minimum requirement.
-    - set postgresql EBS volume type, recomended is `gp3`
-    - set postgresql EBS volume IOPS
+    - set postgresql EBS volume size, based on your load needs.
+    - set postgresql EBS volume type, default is `gp3`, change as per your requirement.
+    - set postgresql EBS volume IOPS, based on your load needs.
   
     - set number of opensearch node you want, recomended is three nodes
     - set opensearch instance type, recomended is `m5.large`
-    - set opensearch EBS volume size, check pre-requisites for minimum requirement.
-    - set opensearch EBS volume type, recomended is `gp3`
-    - set opensearch EBS volume IOPS
+    - set opensearch EBS volume size, based on your load needs.
+    - set opensearch EBS volume type, default is `gp3`, change as per your requirement.
+    - set opensearch EBS volume IOPs, based on your load needs.
     - If you want to configure database during deployment then select `yes` and provide detials accordingly for selected backup type, for S3 backup provide detials like `bucket name`.
     ```bash
     Backup need to be configured during deployment:
@@ -179,7 +179,7 @@ Run the following steps on Bastion Host Machine:
     > AWS S3
       EFS
     ```
-    all done you can find generated config file with name given in `config gen` command
+    all done we can find generated config file with name given in `config gen` command
 
     {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
 

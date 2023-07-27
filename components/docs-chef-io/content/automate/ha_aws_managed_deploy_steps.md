@@ -86,9 +86,6 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    #Download latest Airgapped Bundle.
    #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
-
-   #Generate init config and then generate init config for AWS infra structure
-   chef-automate init-config-ha aws
    "
    ```
 
@@ -96,47 +93,100 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
 
-1. Update Config with relevant data
 
-   ```bash
-   vi config.toml
-   ```
-
-   - Give `ssh_user` which has access to all the machines. Example: `ubuntu`.
-   - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
-   - Give `ssh_port` if your AMI runs on custom **ssh port**. The default value is 22.
-   - Give `ssh_key_file` path, downloaded from **AWS SSH Key Pair**, which you want to use to create all the VMs. This will let you access all the VMs.
-   - We support only private key authentication.
-   - Set `backup_config` to `"s3"` or `efs`.
-   - If `backup_config` is `s3`, uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
-   - Set `admin_password` to access Chef Automate UI for user `admin`.
-   - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
-   - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *PostgreSQL*, *OpenSearch*.
-   - Set AWS Config Details:
-      - Set `profile`. The default value of `profile` is `"default"`.
-      - Set `region`. The  default value of `region` is `"us-east-1"`.
-      - Set `aws_vpc_id`, created in the Prerequisites step. Example: `"vpc12318h"`.
-      - If AWS VPC uses Subnet, set `private_custom_subnets` to the 3 private subnets we created in prerequisites step and `public_custom_subnets` to the 3 public subnets we created in prerequisites step. For example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`.
-      - Set `ssh_key_pair_name`, an SSH Key Pair created as a Prerequisite. The pair value should be the name of the AWS SSH Key Pair without a `.pem` extension. The ssh key content should be the same as the content of `ssh_key_file`.
-      - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. The default value is `false`, which should be changed.
-        - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
-        - Set `managed_opensearch_domain_url` as the URL without Port No. For example: `["vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"]`.
-        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`.  [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
-        - Set `managed_rds_instance_url` as the URL with Port No. For example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
-        - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS PostgreSQL** created in the Prerequisite steps.
-          - The master username value which you used while creating AWS RDS PostgreSQL can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
-          - The master password value which you used while creating AWS RDS PostgreSQL can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
-      - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.
-      - Refer to the [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#hardware-requirements) to get information on which instance type you need for your load.
-      - Set Instance Type for:
-         - Chef Automate in `automate_server_instance_type`.
-         - Chef Infra Server in `chef_server_instance_type`.
-      - Set `automate_lb_certificate_arn` with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
-      - Set `chef_server_lb_certificate_arn` with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
-      - Set `automate_ebs_volume_iops`, `automate_ebs_volume_size` based on your load needs.
-      - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
-      - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
-
+1. Generate config with relevant data using below command 
+    ```bash
+        chef-automate config gen config.toml
+    ```
+    - Select `Chef Automate HA` as topology
+    ```bash
+    Choose Topology:
+        Chef Automate HA
+    ```
+    - select deployment type as `AWS`
+    ```bash
+    Choose type of Deployment Type:
+       On-Premise
+     > AWS
+    ```
+    - provide  `ssh user name`, `ssh group name`, `ssh port no`, `ssh key file path`
+    - if you have own certificates for Automate, ChefServer, OpenSearch and Postgresql, then select `yes` and provide relevant certificates.
+    ```bash
+        Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch:
+        > no
+          yes
+    ```
+    - provide `AWS profile name` skip this if IAM role configured on bashtion host
+    - filter and select AWS region from list
+    - give AWS VPC ID created in the Prerequisites step. Example: `"vpc12318h"`
+    - to create subnets we have two options as CIDR Block and subnets ids, select  `yes` for CIDR and `no` for subnet ids, and provide subnet ids created in the Prerequisites step. Example `subnet-07e469d218301533`, subnets should be created under same VPC provided above, we need three private subnets, if you want to keep loadbalancer on public IP then we need three public subnets as well, recomended is to use subnet ids.
+    ```bash
+        Do you want to use AWS CIDR Block:
+        > yes
+          no
+    ```
+    - give `ssh key pair name` name used for creating ssh key pair , `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
+    - if you want to terminate all the resources on deletion then select  `on`
+    ```bash
+        Delete on termination should be:
+        > off
+          on
+    ```
+    - if you want to enable access log on AWS loadbalancers then select `yes`
+    ```bash
+        Do you want to Enable Access Logs on AWS Load Balancer:
+        > yes
+          no
+    ```
+    - give Automate FQDN example `chefautomate.example.com`
+    - give Automte loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
+    - give path of Automate loadbalance FQDN ssl root ca cerificates
+    - set automate dashboard login password
+    - set how many automate node want to have in cluster, recomended is atleast `two`
+    - set automate instance type, recomended is `m5.large`
+    - set automate EBS volume size, based on your load needs.
+    - set automate EBS volume type, default is `gp3`, change as per your requirement.
+    - set automate EBS volume IOPS, based on your load needs.
+    - 
+    - give Chef Server FQDN example `chefserver.example.com`
+    - give Chef Server loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
+    - give path of Chef Server loadbalance FQDN ssl root ca cerificates
+    - set Chef Server dashboard login password
+    - set how many Chef Server node want to have in cluster, recomended is atleast `two`
+    - set Chef Server instance type, recomended is `m5.large`
+    - set Chef Server EBS volume size, based on your load needs.
+    - set Chef Server EBS volume type, default is `gp3`, change as per your requirement.
+    - set Chef Server EBS volume IOPS, based on your load needs.
+    - select `yes` for chef managed database deloyment
+    ```bash
+        Do you want to use AWS Managed Databases:
+       > yes
+         no
+    ```
+    - provide AWS managed opensearch details like `opensearch domain name`, `opensearch domain url` url should be without http or https and without port example `vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com`, `opensearch username`, `opensearch password`, from the **Managed AWS OpenSearch** created in the Prerequisite steps.
+    - For AWS managed databases we have default amazon ssl certificates , If you want to use default then select `yes`, In case you have your own certificates for amazon opensarch the select `no` and provide your certificates
+    ```bash
+        Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL:
+      > yes
+        no
+    ```
+  -  provide `Amazon openserch snapshot role ARN`,  `Amazon openserch snapshot user access key`,  `Amazon openserch snapshot user access secrect key` to take backup from Amazon opensearch, [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
+  -  To configure Amazon RDS Postgresql, provide details of `Amazon RDS Postgresql URL:<Port>` url along with port in formate of <url>:<port>, `RDS super username`, `RDS superuser password`, `RDS database username`, `RDS database user password`, from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
+     - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
+     - The master password value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
+  -  same for postgresql if you want to use default ssl certificates from Amazon then select `yes`, Incase you have your own certificates then select `no` and provide your certificates.
+  ```bash
+        Do you want to use Default AWS Cert to connect with AWS Managed Postgresql Domain URL:
+      > yes
+        no
+    ```
+  -  Backup can be configured along with deployment then select `yes` and provide backup S3 `bucket name` If the bucket name does not exist, it will be created for you automatically, Incase you want configure post deployment then select `no` and proceed
+  ```bash
+      Backup need to be configured during deployment:
+      > yes
+        no
+  ```
+  all done we can find generated config file with name given in `config gen` command
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
@@ -156,7 +206,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
     "
     ```
 
-1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
+2. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
 
     ```bash
     sudo -- sh -c "
@@ -172,7 +222,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    "
    ```
 
-1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
+3. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
   If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
 - Create a file `a2.fqdn.toml`
