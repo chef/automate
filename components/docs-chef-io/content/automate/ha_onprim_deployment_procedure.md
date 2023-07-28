@@ -88,7 +88,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     cp -f chef-automate /usr/bin/chef-automate
     "
     ```
-
+##### Steps to generate config
 1. Generate config using the below command and provide:
 
     ```bash
@@ -229,10 +229,10 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
-See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for a sample config of AWS Managed Services.
 - Set AWS Config Details:
-  - Follow the above steps to generate the rest of the configs; for AWS managed services `config gen` command will ask like:
+  - Follow the [above](#steps-to-generate-config) steps to generate the rest of the configs; for AWS managed services `config gen` command will ask like:
 
     ```bash
      Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
@@ -366,7 +366,7 @@ Continue with the deployment after updating the config:
 See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
 - Set Self-Managed Config Details:
-  - follow the above steps to generate the rest of the configs; for AWS managed services `config gen` command will ask like:
+  - follow the [above](#steps-to-generate-config) steps to generate the rest of the configs; for AWS managed services `config gen` command will ask like:
 
     ```bash
      Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
