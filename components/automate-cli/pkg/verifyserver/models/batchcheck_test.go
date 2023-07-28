@@ -332,11 +332,12 @@ func containsElement(nodes []*NodeCert, targetNode *NodeCert) bool {
 
 func TestPopulateWith(t *testing.T) {
 	tests := []struct {
-		name     string
-		filePath string
-		want     *Config
-		wantErr  bool
-		err      error
+		name                 string
+		filePath             string
+		expectedBackupConfig string
+		want                 *Config
+		wantErr              bool
+		err                  error
 	}{
 		{
 			name:     "PopulateWith Invalid OnPrem Config",
@@ -415,8 +416,9 @@ func TestPopulateWith(t *testing.T) {
 				DeploymentState: "",
 				APIToken:        "",
 			},
-			wantErr: false,
-			err:     nil,
+			expectedBackupConfig: "file_system",
+			wantErr:              false,
+			err:                  nil,
 		},
 		{
 			name:     "PopulateWith AWS Managed Config",
@@ -472,8 +474,9 @@ func TestPopulateWith(t *testing.T) {
 				DeploymentState: "",
 				APIToken:        "",
 			},
-			wantErr: false,
-			err:     nil,
+			expectedBackupConfig: "s3",
+			wantErr:              false,
+			err:                  nil,
 		},
 		{
 			name:     "PopulateWith OnPrem Config",
@@ -537,8 +540,67 @@ func TestPopulateWith(t *testing.T) {
 				DeploymentState: "",
 				APIToken:        "",
 			},
-			wantErr: false,
-			err:     nil,
+			expectedBackupConfig: "object_storage",
+			wantErr:              false,
+			err:                  nil,
+		},
+		{
+			name:     "PopulateWith OnPrem Config and FileSystem",
+			filePath: "./testdata/HaOnPremFileSystem.toml",
+			want: &Config{
+				SSHUser: &SSHUser{
+					Username:     "ubuntu",
+					PrivateKey:   "./testdata/A2HA.pem",
+					Port:         "22",
+					SudoPassword: "",
+				},
+				Arch: "existing_nodes",
+				Backup: &Backup{
+					FileSystem: &FileSystem{
+						MountLocation: "automate_backups",
+					},
+				},
+				Hardware: &Hardware{
+					AutomateNodeCount: 2,
+					AutomateNodeIps: []string{
+						"192.0.0.1", "192.0.0.2",
+					},
+					ChefInfraServerNodeCount: 2,
+					ChefInfraServerNodeIps: []string{
+						"192.0.1.1", "192.0.1.2",
+					},
+					PostgresqlNodeCount: 3,
+					PostgresqlNodeIps: []string{
+						"192.0.3.1", "192.0.3.2", "192.0.3.3",
+					},
+					OpenSearchNodeCount: 3,
+					OpenSearchNodeIps: []string{
+						"192.0.2.1", "192.0.2.2", "192.0.2.3",
+					},
+				},
+				Certificate: certificateList3,
+				ExternalOS: &ExternalOS{
+					OSDomainName:   "",
+					OSDomainURL:    "",
+					OSUsername:     "",
+					OSUserPassword: "",
+					OSCert:         "",
+					OSRoleArn:      "",
+				},
+				ExternalPG: &ExternalPG{
+					PGInstanceURL:       "",
+					PGSuperuserName:     "",
+					PGSuperuserPassword: "",
+					PGDbUserName:        "",
+					PGDbUserPassword:    "",
+					PGRootCert:          "",
+				},
+				DeploymentState: "",
+				APIToken:        "",
+			},
+			expectedBackupConfig: "file_system",
+			wantErr:              false,
+			err:                  nil,
 		},
 	}
 	for _, tt := range tests {
@@ -560,6 +622,10 @@ func TestPopulateWith(t *testing.T) {
 			err = c.PopulateWith(haConfig)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
+			} else {
+				// check backuppconfig
+				assert.Equal(t, haConfig.GetConfigInitials().BackupConfig, tt.expectedBackupConfig)
+				assert.NoError(t, err)
 			}
 
 			// assert.Equal(t, tt.want, c, tt.name)
