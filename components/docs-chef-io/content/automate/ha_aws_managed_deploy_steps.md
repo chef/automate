@@ -111,7 +111,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - If `backup_config` is `s3`, uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
    - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
-   - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *Postgresql*, *OpenSearch*.
+   - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *PostgreSQL*, *OpenSearch*.
    - Set AWS Config Details:
       - Set `profile`. The default value of `profile` is `"default"`.
       - Set `region`. The  default value of `region` is `"us-east-1"`.
@@ -123,11 +123,11 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
         - Set `managed_opensearch_domain_url` as the URL without Port No. For example: `["vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"]`.
         - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`.  [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
         - Set `managed_rds_instance_url` as the URL with Port No. For example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
-        - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
-          - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
-          - The master password value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
+        - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS PostgreSQL** created in the Prerequisite steps.
+          - The master username value which you used while creating AWS RDS PostgreSQL can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
+          - The master password value which you used while creating AWS RDS PostgreSQL can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
       - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.
-      - Please refer to the [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#hardware-requirements) to get information on which instance type you will need for your load.
+      - Refer to the [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#hardware-requirements) to get information on which instance type you need for your load.
       - Set Instance Type for:
          - Chef Automate in `automate_server_instance_type`.
          - Chef Infra Server in `chef_server_instance_type`.
@@ -219,7 +219,7 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 {{< note >}}
 
-- Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS Postgresql and Managed Opensearch)
+- Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS PostgreSQL and Managed OpenSearch)
 
 {{< /note >}}
 

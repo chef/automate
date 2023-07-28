@@ -35,7 +35,7 @@ The following assumptions were used for calculating performance and system speci
 
 ### 5 node cluster deployment
 
-The following specs were used for testing when deploying Automate Cluster using a five node cluster configuration. When multiple database services run on the same system, the performance of the shared system resources becomes even more critical for OpenSearch and Postgresql, with storage performance being critical. Both services are very write-heavy, and any slowness from the storage systems can significantly impact both services and lead to issues with excessive requests times on the front ends.
+The following specs were used for testing when deploying Automate Cluster using a five node cluster configuration. When multiple database services run on the same system, the performance of the shared system resources becomes even more critical for OpenSearch and PostgreSQL, with storage performance being critical. Both services are very write-heavy, and any slowness from the storage systems can significantly impact both services and lead to issues with excessive requests times on the front ends.
 
 | Nodes  | CCR/m | FE Server Count | Frontend Specs                        | BE Server Count | Backend Specs              |
 |--------|-------|-----------------|---------------------------------------|-----------------|----------------------------|
