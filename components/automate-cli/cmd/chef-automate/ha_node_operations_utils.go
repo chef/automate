@@ -859,6 +859,21 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		dest.LoadBalancer.V1.Sys.FrontendTls = nil
 	}
 
+	// Removing nodes in "global.v1.external.postgresql"
+	if dest.Global != nil &&
+		dest.Global.V1 != nil &&
+		dest.Global.V1.External != nil &&
+		dest.Global.V1.External.Postgresql != nil {
+		dest.Global.V1.External.Postgresql.Nodes = nil
+	}
+
+	// Removing nodes in "global.v1.external.opensearch"
+	if dest.Global != nil &&
+		dest.Global.V1 != nil &&
+		dest.Global.V1.External.Opensearch != nil {
+		dest.Global.V1.External.Opensearch.Nodes = nil
+	}
+
 	// Ignoring product key
 	if dest.Deployment == nil ||
 		dest.Deployment.V1 == nil ||
