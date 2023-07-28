@@ -35,7 +35,7 @@ The following assumptions were used for calculating performance and system speci
 
 ### 5 node cluster deployment
 
-The following specs were used for testing when deploying Automate Cluster using a five node cluster configuration. When multiple database services run on the same system, the performance of the shared system resources becomes even more critical for OpenSearch and Postgresql, with storage performance being critical. Both services are very write-heavy, and any slowness from the storage systems can significantly impact both services and lead to issues with excessive requests times on the front ends.
+The following specs were used for testing when deploying Automate Cluster using a five node cluster configuration. When multiple database services run on the same system, the performance of the shared system resources becomes even more critical for OpenSearch and PostgreSQL, with storage performance being critical. Both services are very write-heavy, and any slowness from the storage systems can significantly impact both services and lead to issues with excessive requests times on the front ends.
 
 | Nodes  | CCR/m | FE Server Count | Frontend Specs                        | BE Server Count | Backend Specs              |
 |--------|-------|-----------------|---------------------------------------|-----------------|----------------------------|
@@ -59,7 +59,7 @@ A complete cluster deployment will separate various components of the Automate H
 
 | Nodes  | OpenSearch Count | OpenSearch Specs                     | PostgreSQL Count | PostgreSQL Specs          |
 |--------|------------------|--------------------------------------|------------------|---------------------------|
-| 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD | 
+| 20000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 5TB SSD  | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
 | 60000  | 3                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 16GB (c5.2xlarge), 1 TB SSD |
 | 100000 | 5                | 16 vCPU, 64GB (m5.4xlarge), 15TB SSD | 3                | 8 vCPU, 32GB (m5.2xlarge), 1 TB SSD |
 
@@ -120,8 +120,6 @@ If a large number of Chef Infra client converges happen in a small window, it wi
 
 ## Final Notes
 
-When expanding the Automate HA cluster to handle additional nodes or loads from users, it's preferable to scale the front-end nodes horizontally by adding more nodes rather than increasing the amount of server resources on the nodes. This makes it easier to scale as new nodes are added to Chef Infra and reduces the amount of configuration tuning required on each front-end node. 
+When expanding the Automate HA cluster to handle additional nodes or loads from users, it's preferable to scale the front-end nodes horizontally by adding more nodes rather than increasing the amount of server resources on the nodes. This makes it easier to scale as new nodes are added to Chef Infra and reduces the amount of configuration tuning required on each front-end node.
 
 Tuning the configs to handle additional CPU cores can be time-consuming. It often can lead to bottlenecks or other issues in different parts of the Automate HA cluster.
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/ha_performance_benchmarks.md)

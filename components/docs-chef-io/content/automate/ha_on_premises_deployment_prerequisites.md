@@ -30,8 +30,8 @@ We recommend using 11 node cluster for standard Automate HA on-premises deployme
 |-------------------|-------|
 | Chef Automate     | 2     |
 | Chef Infra Server | 2     |
-| Postgresql DB     | 3     |
-| Opensearch DB     | 3     |
+| PostgreSQL DB     | 3     |
+| OpenSearch DB     | 3     |
 | Bastion Machine   | 1     |
 
 Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
@@ -52,7 +52,7 @@ The operating system and the supported version for different nodes in the on-pre
 | Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
-| SUSE Linux Enterprise Server 12 SP5      | 12                        |
+| SUSE Linux Enterprise Server             | 12.5                      |
 
 ### Minimum Supported Chef Tool Versions
 
@@ -75,33 +75,22 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ## Hardware Requirements
 
-{{< note >}} Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case. {{< /note >}}
+{{< note >}}
 
-We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below shows the tested **assumptions** and should not be used as exact recommendations.
+- Refer to [Performance Benchmarks](/automate/ha_performance_benchmarks) for more details on the hardware requirements.
+- Make sure the hardware requirement is not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_on_premises_deployment_prerequisites/#minimum-hardware-requirement)
 
-You can use the below assumptions in the calculator to drive into your hardware requirement:
+{{< /note >}}
 
-| Assumption                            | Value | Unit     |
-|---------------------------------------|-------|----------|
-| Number of Nodes sending data          | 5000  |          |
-| Frequency of Compliance Scan          | 1     | Per Hour |
-| Frequency of Client runs (Infra runs) | 1     | Per Hour |
-| Frequency of Event Feed               | 1     | Per Hour |
-| Data Retention policy                 | 1     | Days     |
-| Compliance scan report size           | 400   | KB       |
-| Client Run (Infra run) size           | 300   | KB       |
-| Event Feed update size                | 2     | KB       |
-| No. of Shards in OpenSearch Index     | 2     |
+### Minimum Hardware Requirement
 
-The machine requirements based on the above assumptions are listed below:
-
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space |
-|-------------------|-------|------|-----|------------------- |------------------|------------------|
-| Chef Automate     | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
-| Chef Infra Server | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
-| Postgresql DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
-| Opensearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
-| Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space  |
+| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
+| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
 
 {{< note >}}
 For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
@@ -123,7 +112,7 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
-|               | Chef Automate  | Chef Infra Server | Postgresql                          | OpenSearch                           | Bastion | Automate Load Balancer |
+|               | Chef Automate  | Chef Infra Server | PostgreSQL                          | OpenSearch                           | Bastion | Automate Load Balancer |
 |---------------|----------------|-------------------|-------------------------------------|--------------------------------------|---------| ------------- |
 | Chef Automate |                |                   | 7432                                | 9200                                 |         |               |
 | Infra Server  |                |                   | 7432                                | 9200                                 |         | 443              |
@@ -145,8 +134,8 @@ The first column in the table below represents the source of the connection. The
 | TCP      | 9200        | OpenSearch API HTTPS Access                              |
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster |
 | TCP/UDP  | 9638        | Habitat gossip (UDP)                                     |
-| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader            |
-| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down  |
+| TCP      | 7432        | HAProxy, which redirects to PostgreSQL Leader            |
+| TCP      | 6432        | Re-elect PostgreSQL Leader if PostgreSQL leader is down  |
 
 ## Certificates
 
@@ -179,7 +168,7 @@ The on-premises deployment specific pre-requisites are as follows:
 
 - Operating System Root Volume (`/`) must be at least 40GB. Temporary space (`/var/tmp`) must be at least 5GB.
 - Separate Hab volume should be provisioned and mounted at `/hab` with at least 100GB free space for all nodes except OpenSearch.
-- For OpenSearch nodes, /hab volume should be calculated based on the data retention policy, and use the  [hardware calculator](/calculator/automate_ha_hardware_calculator.xlsx) for estimation.
+- For OpenSearch nodes, /hab volume should be calculated based on the data retention policy, and use the [Performance Benchmarks](/automate/ha_performance_benchmarks) for estimation.
 
 ### SSH User
 

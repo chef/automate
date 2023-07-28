@@ -28,8 +28,8 @@ We recommend using 11 node cluster for standard Automate HA AWS deployment, as d
 | ----------------- | ----- |
 | Chef Automate     | 2     |
 | Chef Infra Server | 2     |
-| Postgresql DB     | 3     |
-| Opensearch DB     | 3     |
+| PostgreSQL DB     | 3     |
+| OpenSearch DB     | 3     |
 | Bastion Machine   | 1     |
 
 Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
@@ -83,8 +83,8 @@ Current Automate HA integrates with the following non-Chef tools:
 
 {{< note >}}
 
--   Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case.
--   Make sure the hardware requirement in not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement)
+- Refer to [Performance Benchmarks](/automate/ha_performance_benchmarks) for more details on the hardware requirements.
+- Make sure the hardware requirement in not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement)
 
 {{< /note >}}
 
@@ -94,7 +94,7 @@ Current Automate HA integrates with the following non-Chef tools:
 | ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
 | Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
 | Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
-| Postgresql DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
 | OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
 | Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
 
@@ -120,7 +120,7 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
-|                 | Chef Automate        | Chef Infra Server    | Postgresql                                | OpenSearch                           | Bastion | Automate Load Balancer |
+|                 | Chef Automate        | Chef Infra Server    | PostgreSQL                                | OpenSearch                           | Bastion | Automate Load Balancer |
 | --------------- | -------------------- | -------------------- | ----------------------------------------- | ------------------------------------ | ------- | ------------- |
 | Chef Automate   |                      |                      | 7432                                      | 9200                                 |         |               |
 | Infra Server    |                      |                      | 7432                                      | 9200                                 |         | 443              |
@@ -143,8 +143,8 @@ The first column in the table below represents the source of the connection. The
 | TCP      | 9200        | OpenSearch API HTTPS Access                               |
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster. |
 | TCP/UDP  | 9638        | Habitat gossip (UDP)                                      |
-| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader             |
-| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down   |
+| TCP      | 7432        | HAProxy, which redirects to PostgreSQL Leader             |
+| TCP      | 6432        | Re-elect PostgreSQL Leader if PostgreSQL leader is down   |
 
 ## Certificates
 
@@ -168,7 +168,7 @@ The AWS deployment specific pre-requisites are as follows:
 -   It is recommended to create a new VPC.
 -   Bastion must be in the same VPC for deployment.
 -   **In AWS Managed Services:**
-    -   Setup [AWS RDS Postgresql](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
+    -   Setup [AWS RDS PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
     -   Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
 
 ### Infra Server
