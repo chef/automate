@@ -32,7 +32,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - For Backup with Managed Service we have only one option which is `Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
 - Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
-- Preferred key type will be ed25519
+- Preferred key type will be ed25519. Deployment on RHEl 9 & Ubuntu 22.04.x the ed25519 ssh key algorithms is required.
 - Make sure your linux has `sysctl` utility available in all nodes.
 
 Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
