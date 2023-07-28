@@ -133,32 +133,32 @@ func (a *awsDeployment) generateConfig(state string) error {
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }
 
-func (e *awsDeployment) addDNTocertConfig() error {
+func (a *awsDeployment) addDNTocertConfig() error {
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
-	if e.config.Opensearch.Config.EnableCustomCerts {
+	if a.config.Opensearch.Config.EnableCustomCerts {
 		//If AdminCert is given then get the admin_dn from the cert
-		if len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) > 0 {
-			admin_dn, err := getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
+		if len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) > 0 {
+			admin_dn, err := getDistinguishedNameFromKey(a.config.Opensearch.Config.AdminCert)
 			if err != nil {
 				return err
 			}
-			e.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", admin_dn)
+			a.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", admin_dn)
 		}
 		//If PublicKey is given then get the nodes_dn from the cert
-		if len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) > 0 {
-			nodes_dn, err := getDistinguishedNameFromKey(e.config.Opensearch.Config.PublicKey)
+		if len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) > 0 {
+			nodes_dn, err := getDistinguishedNameFromKey(a.config.Opensearch.Config.PublicKey)
 			if err != nil {
 				return err
 			}
-			e.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
+			a.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 		}
 
 		NodesDn := ""
 
 		//Set the admin_dn and nodes_dn in the config for all IP addresses
-		for i := 0; i < len(e.config.Opensearch.Config.CertsByIP); i++ {
+		for i := 0; i < len(a.config.Opensearch.Config.CertsByIP); i++ {
 			//If PublicKey is given then get the node_dn from the cert
-			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
+			publicKey := a.config.Opensearch.Config.CertsByIP[i].PublicKey
 			if len(strings.TrimSpace(publicKey)) > 0 {
 				nodeDn, err := getDistinguishedNameFromKey(publicKey)
 				if err != nil {
@@ -172,11 +172,11 @@ func (e *awsDeployment) addDNTocertConfig() error {
 			}
 		}
 
-		for i := 0; i < len(e.config.Opensearch.Config.CertsByIP); i++ {
+		for i := 0; i < len(a.config.Opensearch.Config.CertsByIP); i++ {
 			//If PublicKey is given then set the nodes_dn from the cert
-			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
+			publicKey := a.config.Opensearch.Config.CertsByIP[i].PublicKey
 			if len(strings.TrimSpace(publicKey)) > 0 {
-				e.config.Opensearch.Config.CertsByIP[i].NodesDn = strings.TrimSpace(NodesDn)
+				a.config.Opensearch.Config.CertsByIP[i].NodesDn = strings.TrimSpace(NodesDn)
 			}
 		}
 	}
