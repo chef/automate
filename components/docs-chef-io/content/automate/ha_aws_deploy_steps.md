@@ -146,7 +146,7 @@ Run the following steps on Bastion Host Machine:
 
     - Give Automate FQDN example `chefautomate.example.com`
     - Give Automate loadbalancer ARN, with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
-    - Give the path of Automate loadbalance FQDN ssl root ca-certificates
+    - Give the path of Automate loadbalancer FQDN ssl root ca-certificates
     - Set automate dashboard login password
     - Set how many automate nodes want to have in the cluster; recommended is at least `two`.
     - Set automate instance type; recommended is `m5.large`.
@@ -180,7 +180,7 @@ Run the following steps on Bastion Host Machine:
     - Set OpenSearch EBS volume size based on your load needs.
     - Set OpenSearch EBS volume type; default is `gp3`; change as required.
     - Set OpenSearch EBS volume IOPs, based on your load needs.
-    - If you want to configure the database during deployment, select `yes` and provide details accordingly for the selected backup type; for S3 backup, provide details like `bucket name`.
+    - If you want to configure the backup during deployment, select `yes` and provide details accordingly for the selected backup type; for S3 backup, provide details like `bucket name`.
 
     ```bash
     The backup needs to be configured during deployment:
