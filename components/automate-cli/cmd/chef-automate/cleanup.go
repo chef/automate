@@ -53,6 +53,7 @@ const (
 		[ ! -L /hab ] && [ -d /hab ] && echo "not a symbolic, but it is directory...so deleting /hab" && sudo rm -rf /hab;
 		[ -L /hab ] && echo "/hab is the symbolic link, so deleting the content of symbolic link" && sudo rm -rf /hab/*
 		sudo rm -rf /var/automate-ha;
+		sudo rm -rf /var/tmp/*.aib*;
 		`
 
 	BACKENDCLEANUP_COMMANDS = `
@@ -61,6 +62,7 @@ const (
 		[ -L /hab ] && echo "/hab is the symbolic link, so deleting the content of symbolic link" && sudo rm -rf /hab/*
 		[ -f /bin/hab ] && sudo rm -rf /bin/hab;
 		sudo rm -rf /var/automate-ha;
+		sudo rm -rf /var/tmp/*.aib*;
 		`
 )
 
