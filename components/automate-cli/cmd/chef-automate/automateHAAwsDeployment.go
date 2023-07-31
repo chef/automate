@@ -133,6 +133,7 @@ func (a *awsDeployment) generateConfig(state string) error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
+
 	err = a.addDNTocertConfig()
 	if err != nil {
 		return err
