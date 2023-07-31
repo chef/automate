@@ -870,6 +870,7 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	// Removing nodes in "global.v1.external.opensearch"
 	if dest.Global != nil &&
 		dest.Global.V1 != nil &&
+		dest.Global.V1.External != nil &&
 		dest.Global.V1.External.Opensearch != nil {
 		dest.Global.V1.External.Opensearch.Nodes = nil
 	}
