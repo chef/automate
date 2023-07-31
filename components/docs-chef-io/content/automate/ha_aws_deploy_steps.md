@@ -261,7 +261,7 @@ After successful deployment, we can proceed with node bootstrapping; please Refe
 ### Sample config
 
 {{< note >}}
-Assuming 8+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
+Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
 {{< /note >}}
 
 {{< note >}}
