@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 	"time"
 
@@ -942,6 +943,8 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			skipIpsListGot := c.compareCurrentCertsWithNewCerts(testCase.remoteService, testCase.newCerts, testCase.flagsObj, testCase.currentCertsInfo)
+			sort.Strings(testCase.skipIpsList)
+			sort.Strings(skipIpsListGot)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 		})
 	}
@@ -1233,6 +1236,8 @@ func TestGetFrontIpsToSkipRootCAandCNPatchingForOs(t *testing.T) {
 				ValidIP: testCase.automatesConfig,
 			}
 			skipIpsListGot := c.getFrontIpsToSkipRootCAandCNPatchingForOs(configMap, testCase.newRootCA, testCase.newCn, testCase.node, infra)
+			sort.Strings(testCase.skipIpsList)
+			sort.Strings(skipIpsListGot)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 
 		})
@@ -1303,6 +1308,8 @@ func TestGetFrontendIPsToSkipRootCAPatchingForPg(t *testing.T) {
 				ValidIP: testCase.automatesConfig,
 			}
 			skipIpsListGot := c.getFrontendIPsToSkipRootCAPatchingForPg(configMap, testCase.newRootCA, infra)
+			sort.Strings(testCase.skipIpsList)
+			sort.Strings(skipIpsListGot)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 
 		})
@@ -1496,6 +1503,8 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 			c.pullConfigs = testCase.MockPullConfigs
 			skipIpsListGot, err := c.getSkipIpsListForPgRootCAPatching(testCase.infra, testCase.sshUtil, testCase.certs)
 			if !testCase.wantError {
+				sort.Strings(testCase.skipIpsList)
+				sort.Strings(skipIpsListGot)
 				assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 			} else {
 				assert.Error(t, err)
@@ -2072,6 +2081,8 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 		t.Run(testCase.description, func(t *testing.T) {
 			c.pullConfigs = testCase.MockPullConfigs
 			skipIpsListGot, err := c.getSkipIpsListForOsRootCACNPatching(testCase.infra, testCase.sshUtil, testCase.certs, testCase.nodesCn, testCase.flagsObj)
+			sort.Strings(testCase.skipIpsList)
+			sort.Strings(skipIpsListGot)
 			if !testCase.wantError {
 				assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 			} else {
