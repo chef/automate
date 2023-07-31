@@ -522,6 +522,27 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 	return nil
 }
 
+func modifyConfigForNewNodeCertByIp(instanceCount int, existingPrivateIPs []string, certsIp *[]CertByIP) error {
+	var newNode []string
+	if len(existingPrivateIPs) >= instanceCount {
+		newNode = existingPrivateIPs[len(existingPrivateIPs)-instanceCount : len(existingPrivateIPs)]
+	} else {
+		newNode = existingPrivateIPs[:]
+	}
+	if len(*certsIp) > 0 {
+		for _, ip := range newNode {
+			c := CertByIP{
+				IP:         ip,
+				PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
+				PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
+				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
+			}
+			*certsIp = append(*certsIp, c)
+		}
+	}
+	return nil
+}
+
 func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
 	if len(newIps) == 0 {
 		return nil
@@ -540,7 +561,7 @@ func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]stri
 	return nil
 }
 
-func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string) error {
+func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP) error {
 	if len(newIps) == 0 {
 		return nil
 	}
@@ -549,6 +570,11 @@ func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string) err
 		return err
 	}
 	*instanceCount = inc
+	if len(*certsIp) > 0 {
+		for _, ip := range newIps {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+	}
 	return nil
 }
 

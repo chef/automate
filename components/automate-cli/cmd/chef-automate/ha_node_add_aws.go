@@ -14,17 +14,14 @@ import (
 type AddNodeAWSImpl struct {
 	config                  AwsConfigToml
 	copyConfigForUserPrompt AwsConfigToml
-	automateIpList          []string
-	chefServerIpList        []string
-	opensearchIpList        []string
-	postgresqlIp            []string
-	nodeUtils               NodeOpUtils
-	flags                   AddDeleteNodeHACmdFlags
-	configpath              string
-	terraformPath           string
-	writer                  *cli.Writer
-	fileutils               fileutils.FileUtils
-	sshUtil                 SSHUtil
+	AWSConfigIp
+	nodeUtils     NodeOpUtils
+	flags         AddDeleteNodeHACmdFlags
+	configpath    string
+	terraformPath string
+	writer        *cli.Writer
+	fileutils     fileutils.FileUtils
+	sshUtil       SSHUtil
 }
 
 func NewAddNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
@@ -102,6 +99,7 @@ func (ani *AddNodeAWSImpl) modifyConfig() error {
 	if err != nil {
 		return err
 	}
+
 	ani.config.Automate.Config.InstanceCount = inc
 	inc, err = modifyInstanceCount(ani.config.ChefServer.Config.InstanceCount, ani.flags.chefServerCount)
 	if err != nil {
@@ -156,6 +154,10 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
+	err = ani.modifyConfigForCertByIp()
+	if err != nil {
+		return err
+	}
 	ani.config.Architecture.ConfigInitials.Architecture = "deployment"
 	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
@@ -170,4 +172,53 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 		return syncErr
 	}
 	return err
+}
+
+func (ani *AddNodeAWSImpl) getAwsHAIp() error {
+	ConfigIp, err := ani.nodeUtils.getAWSConfigIp()
+	if err != nil {
+		return err
+	}
+	ani.AWSConfigIp = *ConfigIp
+	return nil
+}
+
+func (ani *AddNodeAWSImpl) modifyConfigForCertByIp() error {
+	err := ani.getAwsHAIp()
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error fetching ips")
+	}
+	err = modifyConfigForNewNodeCertByIp(
+		ani.flags.automateCount,
+		ani.configAutomateIpList,
+		&ani.config.Automate.Config.CertsByIP,
+	)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error adding certs in automate")
+	}
+	err = modifyConfigForNewNodeCertByIp(
+		ani.flags.chefServerCount,
+		ani.configChefServerIpList,
+		&ani.config.ChefServer.Config.CertsByIP,
+	)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error adding certs in  chef-server ")
+	}
+	err = modifyConfigForNewNodeCertByIp(
+		ani.flags.opensearchCount,
+		ani.configOpensearchIpList,
+		&ani.config.Opensearch.Config.CertsByIP,
+	)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error adding certs in opensearch")
+	}
+	err = modifyConfigForNewNodeCertByIp(
+		ani.flags.postgresqlCount,
+		ani.configPostgresqlIpList,
+		&ani.config.Postgresql.Config.CertsByIP,
+	)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error adding certs in postgresql")
+	}
+	return nil
 }

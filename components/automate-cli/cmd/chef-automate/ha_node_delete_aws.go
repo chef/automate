@@ -149,21 +149,25 @@ func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Automate.Config.InstanceCount,
 			[]string{dna.ipToDelete},
+			&dna.config.Automate.Config.CertsByIP,
 		)
 	case CHEF_SERVER:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.ChefServer.Config.InstanceCount,
 			[]string{dna.ipToDelete},
+			&dna.config.ChefServer.Config.CertsByIP,
 		)
 	case POSTGRESQL:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Postgresql.Config.InstanceCount,
 			[]string{dna.ipToDelete},
+			&dna.config.Postgresql.Config.CertsByIP,
 		)
 	case OPENSEARCH:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Opensearch.Config.InstanceCount,
 			[]string{dna.ipToDelete},
+			&dna.config.Opensearch.Config.CertsByIP,
 		)
 	default:
 		return errors.New("Invalid node type")

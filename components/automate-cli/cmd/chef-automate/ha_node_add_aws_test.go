@@ -197,6 +197,14 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		syncConfigToAllNodesFunc: func() error {
 			return nil
 		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			return &AWSConfigIp{
+				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+			}, nil
+		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -436,6 +444,14 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		syncConfigToAllNodesFunc: func() error {
 			return errors.New("random")
 		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			return &AWSConfigIp{
+				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+			}, nil
+		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -504,6 +520,14 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		syncConfigToAllNodesFunc: func() error {
 			return errors.New("random")
 		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			return &AWSConfigIp{
+				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+			}, nil
+		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -571,6 +595,14 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		},
 		saveConfigToBastionFunc: func() error {
 			return nil
+		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			return &AWSConfigIp{
+				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
 		MoveFunc: func(sourceFile, destinationFile string) error {
