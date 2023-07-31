@@ -128,8 +128,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
     ```bash
         Do you want to use AWS CIDR Block:
-        > yes
-          no
+          yes
+        > no
     ```
 
     - Give the `ssh key pair name` name used for creating the ssh key pair, `AMI Id` which depends on the AWS Region and the Operating System image you want to use.,
