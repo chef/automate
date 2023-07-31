@@ -140,9 +140,6 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.Architecture.ConfigInitials.SSHKeyFile) < 1 {
 		errorList.PushBack("Invalid or empty ssh_key_file")
 	}
-	if len(e.config.Architecture.ConfigInitials.BackupMount) < 1 {
-		errorList.PushBack("Invalid or empty backup_mount")
-	}
 	if len(e.config.Automate.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty automate instance_count")
 	}
@@ -189,9 +186,9 @@ func (e *existingInfra) validateConfigFields() *list.List {
 				errorList.PushBack("Invalid or empty endpoint")
 			}
 		} else if e.config.Architecture.ConfigInitials.BackupConfig == "file_system" {
-			// if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
-			// 	errorList.PushBack("Invalid or empty access_key")
-			// }
+			if len(e.config.Architecture.ConfigInitials.BackupMount) < 1 {
+				errorList.PushBack("Invalid or empty access_key")
+			}
 		} else {
 			errorList.PushBack("Invalid or empty backup_config")
 		}
