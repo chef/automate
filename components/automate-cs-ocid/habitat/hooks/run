@@ -12,10 +12,6 @@ cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
 bundle config path "vendor/bundle"
 
-# TODO :: Remove following line once new ocid hab package is used
-echo "gem 'tzinfo-data'" >> Gemfile
-bundle install
-
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
 
