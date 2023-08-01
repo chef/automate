@@ -103,7 +103,6 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
-    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more about adding certificates for services during deployment. {{< /note >}}
 
 ##### Steps to provision
 1. Continue with the deployment after generating the config:
