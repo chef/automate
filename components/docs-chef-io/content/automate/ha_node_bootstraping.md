@@ -116,7 +116,7 @@ Once configured, `/root/.chef/credentials` will look like as shown below:
   [default]
   client_name = "<name_of_user>"
   client_key = "/root/.chef/<pem_file_of_user>"
-  chef_server_url = "https://demo-server.saas.chef.io/organizations/<name_of_organization>/"
+  chef_server_url = "https://chefinfraserver.example.com/organizations/<name_of_organization>/"
 ```
 
 1. Run the following command:
@@ -129,7 +129,7 @@ knife ssl check
 {{< note >}} `knife ssl check` might throw certificate error in which case, configuration can be done using DNS attached to Chef Server URL {{< /note >}}
 
 The above command will fetch certificate details, save them to the trusted_cert folder in **/root/.chef/**, and verify the same.
-
+### Bootstrapping a Node
 1. Run the bootstrap command.
 
 `knife bootstrap <Public_ip> -i ~/<pem_file_of_node> -U ubuntu -N <name_of_node> --sudo`
