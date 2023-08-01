@@ -97,8 +97,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     chef-automate config gen config.toml
     "
     ```
-
-    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
+    Click [here](/automate/ha_config_gen) to know more about generating config
 
 ##### Steps to deploy
 
@@ -203,6 +202,7 @@ See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to
     chef-automate config gen config.toml
     "
     ```
+    Click [here](/automate/ha_config_gen) to know more about generating config
 ##### Steps to deploy
 Continue with the deployment after generating the config:
 
@@ -313,6 +313,7 @@ See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion
     chef-automate config gen config.toml
     "
     ```
+    Click [here](/automate/ha_config_gen) to know more about generating config
 ##### Steps to deploy
 Continue with the deployment after generating the config:
 

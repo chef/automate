@@ -98,7 +98,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     chef-automate config gen config.toml
     "
     ```
-
+    Click [here](/automate/ha_config_gen) to know more about generating config
+    
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}

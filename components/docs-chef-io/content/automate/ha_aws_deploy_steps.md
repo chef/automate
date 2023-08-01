@@ -94,8 +94,7 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     "
     ```
-
-    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more about adding certificates for services during deployment. {{< /note >}}
+    Click [here](/automate/ha_config_gen) to know more about generating config
 
 
 ##### Steps to provision
