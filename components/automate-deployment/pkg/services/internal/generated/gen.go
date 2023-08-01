@@ -390,16 +390,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-cs-ocid",
-      "metadata": {
-        "name": "chef/automate-cs-ocid",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/automate-cs-nginx",
       "metadata": {
         "name": "chef/automate-cs-nginx",
@@ -672,8 +662,7 @@ var ProductMetadataJSON = `
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",
         "chef/automate-cs-oc-erchef",
-        "chef/automate-cs-nginx",
-        "chef/automate-cs-ocid"
+        "chef/automate-cs-nginx"
       ],
       "packages": null,
       "dependencies": [
