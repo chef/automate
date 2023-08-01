@@ -67,7 +67,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 
 In Case of AWS managed or Customer managed databases below fields will be required
 -  `Opensearch domain name` Opensearch domain name deployed on AWS or customer enviroment
--  `Opensearch domain url` For AWS managed provide domain url without port and protocol Example: `opensearch.example.com`, and for customer managed opensearch provide domain url along with port Example ``opensearch.example.com:9200`
+-  `Opensearch domain url` For AWS managed provide domain url without port and protocol Example: `opensearch.example.com`, and for customer managed opensearch provide domain url along with port Example `opensearch.example.com:9200`
 -  `Opensearch user name`, username to login to opensearch
 -  `Opensearch user passwords` password to login to opensearch
 -  `Opensearch root-ca` SSL root certifiates to connect with opensearch, In Case of AWS managed databases we have option to use default aws certificates - - If using default certificates then no need to provide root certificates.
