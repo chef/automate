@@ -14,6 +14,15 @@ gh_repo = "automate"
  {{% automate/ha-warn %}}
 {{< /warning >}}
 
+## Command Usage
+    ```bash 
+    sudo -- sh -c "
+    chef-automate config gen config.toml
+    "
+    ```
+    
+`config.toml` is the file where all the generated config will be saved at the end, you can choose to not provide this then the output will be shown to stdout.
+
 Refer the fields below to generate Chef Automate High Availability (HA) configuration using `chef-automate config gen` command
 
 - we need to have `Chef Automate HA` as a topology for HA deployments
