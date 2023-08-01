@@ -36,7 +36,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 -  `Automate FQDN` automate FQDN name Example `chefautomate.example.com`.
 -  `Automate FQDN ARN` for Aws deployment ARN name is requied for Automate FQDN domain.
 -  `Automate FQDN Root Certificate` ssl root certificate for Automate FQDN domain.
--  `Autoamte Admin Password` Admin password to login to automate dashboard.
+-  `Automate Admin Password` Admin password to login to automate dashboard.
 -  `Chef Server FQDN` automate FQDN name Example `chefserver.example.com`.
 -  `Chef Server FQDN ARN` for Aws deployment ARN name is requied for Chef Serversss FQDN domain.
 -  `Chef Server FQDN Root Certificate` ssl root certificate for Chef Server FQDN domain.
