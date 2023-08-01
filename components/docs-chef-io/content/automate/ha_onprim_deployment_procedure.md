@@ -92,62 +92,17 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 1. Generate config using the below command and provide:
 
     ```bash
+    sudo -- sh -c "
+    #Generate config for Automate Ha Deployment
     chef-automate config gen config.toml
+    "
     ```
-
-    - Select `Chef Automate HA` as topology.
-    - Select `On-Premise` as the deployment type.
-    - Choose `Deployment` as the config type.
-    - Provide ssh user name for ssh login.
-    - Provide the ssh group name of the ssh user; the default is the same as the name given for the ssh user.
-    - Provide ssh port number for ssh login; the default port is 22.
-    - Provide ssh login key file path; default path will be `/.ssh/id_rsa`.
-    - In case you have custom certificates for any service like Automate, Chef Infra Server, PostgreSQL, or OpenSearch, then choose `yes`; otherwise, select `no`; if you have selected `yes`, then you will be prompted for root certs, public certificates and private certificates for services later in the flow.
-    - Provide Automate FQDN example `chefautomate.example.com`.
-    - Provide SSL root certificate path for Automate FQDN.
-    - Provide the admin login password which you want to set for Automate dashboard.
-    - Provide a total number of nodes you want to keep for Automate node.
-    - In case you have custom certificates for Automate Node, select `yes`; otherwise, choose `no`.
-    - If you have selected `yes` for the above, then you will be prompted to do you have different certificates for each node; choose `yes` or `no` accordingly.
-      - Provide private key file path for Automate node.
-      - Provide public key file path for Automate node.
-      - Click [here](/automate/ha_cert_deployment) to learn more about adding service certificates during deployment.
-    - Now it will ask for the node IP Address for each Automate node.
-    - Provide Chef Server FQDN example `chefinfraserver.example.com`.
-    - Provide SSL root certificate path for Chef Server FQDN.
-    - Provide a total number of nodes you want to keep for the Chef Server node.
-    - In case you have custom certificates for Automate Node, select `yes`; otherwise, select `no`.
-    - If you have selected `yes` for the above, then you will be prompted to do you have different certificates for each node; choose accordingly `yes` or `no`.
-      - Provide a private key file path for the Chef Server node.
-      - Provide a public key file path for the Chef Server node.
-    - Now it will ask for the node IP Address for each Chef Server node.
-    - If you want to use External Databases like AWS managed databases or any other customer managed external databases, select `yes`; otherwise, select `no`.
-    - If you are using Chef managed databases, then provide the number of nodes you want to have for OpenSearch.
-    - Now, If you have custom certificates for OpenSearch, select `yes`.
-    - If you have different certificates for each OpenSearch node, then select `no`.
-    - Provide root-ca certificates for OpenSearch.
-    - Provide admin certificates for OpenSearch.
-    - Provide admin key certificates for OpenSearch.
-    - now provide private certificates, public certificates, and node ip for each node of OpenSearch on prompt.
-    - If you are using Chef managed databases, provide the number of nodes you want to have for Postgresql.
-    - Now, If you have custom certificates for Postgresql, select `yes`.
-    - If you have different certificates for each Postgresql node, then select `no`.
-    - Provide root-ca certificates for Postgresql.
-    - Provide admin certificates for Postgresql.
-    - Provide admin key certificates for Postgresql.
-    - Now, provide private certificates, public certificates, and node ip for each node of Postgresql on prompt.
-    - If we want to use the same machine for OpenSearch and Postgresql, provide the same IP for both config fields. This means that overall, three machines or VMs will be running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
-    - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means that overall, two machines or VMs will be running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
-    - Thus, the overall minimum number of machines needed will be 5.
-    - Select `yes` if you want to configure backup in config.
-    - Select backup type from Aws S3, Minio, Object Storage, File System, and NFS.
-    - Provide details for backup configurations like bucket name, access key, secret key, URL, and region for s3, Minio, or object storage; the user must create the bucket themselves and make sure to assign correct [IAM policy for bucket access](/automate/backup/#aws-s3-permissions) if you are using AWS s3.
-    - In case of NFS of File System backup, provide backup location path.
-    - Now all set, we can find generated config in config.toml file or file name provided for config gen command.
 
     {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
 
-1. Continue with the deployment after updating the config:
+##### Steps to deploy
+
+1. Continue with the deployment after generating the config:
 
     ```bash
     #Run commands as sudo.
@@ -156,14 +111,22 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     cat config.toml
     #Run deploy command to deploy `automate.aib` with set `config.toml`
     chef-automate deploy config.toml --airgap-bundle automate.aib
+    "
+    ```
+1. Verify the deployment by checking status summary
+    ```bash
+    #Run commands as sudo.
+    sudo -- sh -c "
     #After Deployment is done successfully. Check the status of Chef Automate HA services
     chef-automate status summary
     "
     ```
 
     Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-
-    After successful deployment, we can proceed with node bootstrapping; please Refer to [this](/automate/ha_node_bootstraping) docs.
+    After successful deployment, proceed with following...
+      1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
+      1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
+      1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
 ### Sample Config
 
@@ -230,54 +193,18 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
-Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for a sample config of AWS Managed Services.
-- Set AWS Config Details:
-  - Follow the [above](#steps-to-generate-config) steps to generate the rest of the configs; for AWS managed services `config gen` command will ask like:
+
+##### Steps to generate config
+1. Generate config using the below command and provide:
 
     ```bash
-     Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
-      > yes
-        no
+    sudo -- sh -c "
+    #Generate config for Automate Ha Deployment
+    chef-automate config gen config.toml
+    "
     ```
-
-    Select yes and choose `AWS Managed` as the type:
-
-    ```bash
-    Type of External DB you will use:
-    > AWS Managed
-      Self Managed
-    ```
-
-  - Next, `config gen` will ask for aws database details like `opensearch domain name`, `opensearch domain url`, `opensearch user name`, and `opensearch user passwords`; provide the above further information as per aws managed database you have configured.
-  - Now, it will ask if you want to use the default certificates of AWS; if you have different certificates than the default, select `no` and provide your certificates; otherwise, select `yes`.
-
-  ```bash
-  Do you want to use Default AWS Cert to connect with the AWS Managed OpenSearch Domain URL:
-  > yes
-  no
-  ```
-
-  - Now provide `aws OpenSearch snapshot arn`, `aws OpenSearch snapshot user accesskey`, and `aws OpenSearch snapshot secret key`; these values are required to take a backup from aws OpenSearch, please refer (/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
-  - We need to provide details of AWS managed PostgreSQL (RDS); now it will ask for `RDS URL and port` format will be `<url>:<port>`, `RDS PostgreSQL super username`, `RDS PostgreSQL super user password`, `RDS PostgreSQL database username`, `RDS PostgreSQL database user password`.
-  - Aws database has default SSL certificates; select `yes` if you want to use default certificates; if you have other than default certificates, then select `no` and provide your certificates.
-
-  ```bash
-  Do you want to use Default AWS Cert to connect with AWS Managed RDS PostgreSQL URL:
-  > yes
-  no
-  ```
-
-  - If you want to  configure backup, then select `yes` for backup configuration to promote
-
-    ```bash
-      The backup needs to be configured during deployment:
-      > yes
-        no
-    ```
-
-   For AWS managed database deployment, backup options are only S3 as of now; please provide the details of S3 like `bucket name`, `access key`, `secret key`, and `region.`
-
-Continue with the deployment after updating the config:
+##### Steps to deploy
+Continue with the deployment after generating the config:
 
 ```bash
    #Run commands as sudo.
@@ -286,11 +213,22 @@ Continue with the deployment after updating the config:
    cat config.toml
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
-   #After Deployment is done successfully. Check the status of Chef Automate HA services
-   chef-automate status summary
    "
 ```
+##### Verify Deployment
+Verify the deployment by checking status summary:
+```bash
+    sudo -- sh -c "
+    #After Deployment is done successfully. Check the status of Chef Automate HA services
+    chef-automate status summary
+    "
+```
+Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
+After successful deployment, proceed with following...
+   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
+   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
+   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 ### Sample Config to setup On-Premise Deployment with AWS Managed Services
 
 ```config
@@ -364,39 +302,19 @@ Continue with the deployment after updating the config:
 - Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites).
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
-Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
-- Set Self-Managed Config Details:
-  - follow the [above](#steps-to-generate-config) steps to generate the rest of the configs; for AWS managed services `config gen` command will ask like:
+
+
+##### Steps to generate config
+1. Generate config using the below command and provide:
 
     ```bash
-     Are you going to use External Databases, like AWS RDS and AWS OpenSearch:
-      > yes
-        no
+    sudo -- sh -c "
+    #Generate config for Automate Ha Deployment
+    chef-automate config gen config.toml
+    "
     ```
-
-    select yes and choose `AWS Managed` as the type
-
-    ```bash
-    Type of External DB you will use:
-      AWS Managed
-    > Self Managed
-    ```
-
-  - Next, `config gen` will ask for customer database details like `opensearch domain name`, `opensearch domain url:port`, `opensearch user name`, and `opensearch user passwords`; provide the above details as per aws managed database you have configured.
-  - Provide SSL root certificates path for OpenSearch
-  - We need to provide details of customer PostgreSQL; now it will ask for the database `URL and port` format will be `<url>:<port>`, `PostgreSQL super username`, `PostgreSQL super user password`, `PostgreSQL database username`, `PostgreSQL database user password`.
-  - Provide SSL root certificates path for OpenSearch
-  - If you want to  configure backup, then select `yes` for backup configuration to promote
-
-    ```bash
-      The backup needs to be configured during deployment:
-      > yes
-        no
-    ```
-
-   For customer managed database deployment, backup options are S3, object storage, and minio; please provide the details of `bucket name`, `access key`, `secret key`, `region`, `endpoint` etc.
-
-Continue with the deployment after updating the config:
+##### Steps to deploy
+Continue with the deployment after generating the config:
 
 ```bash
    #Run commands as sudo.
@@ -405,10 +323,22 @@ Continue with the deployment after updating the config:
    cat config.toml
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
-   #After Deployment is done successfully. Check the status of Chef Automate HA services
-   chef-automate status summary
    "
 ```
+##### Verify Deployment
+Verify the deployment by checking status summary:
+```bash
+    sudo -- sh -c "
+    #After Deployment is done successfully. Check the status of Chef Automate HA services
+    chef-automate status summary
+    "
+```
+Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+
+After successful deployment, proceed with following...
+   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
+   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
+   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
 ### Sample Sonfig to setup On-Premise Deployment with Self Managed Services
 
