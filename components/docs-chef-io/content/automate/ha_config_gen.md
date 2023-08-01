@@ -6,7 +6,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Automate Config Generation"
-    parent = "automate/deploy_high_availability/deployment"
+    parent = "automate/deploy_high_availability/reference"
     identifier = "automate/deploy_high_availability/reference/ha_config_gen.md Automate Config Generation"
     weight = 200
 +++
