@@ -145,6 +145,7 @@ The first column in the table below represents the source of the connection. The
 | TCP/UDP  | 9638        | Habitat gossip (UDP)                                      |
 | TCP      | 7432        | HAProxy, which redirects to PostgreSQL Leader             |
 | TCP      | 6432        | Re-elect PostgreSQL Leader if PostgreSQL leader is down   |
+| TCP      | 5432        | Allows PostgreSQL node to connect to nodes in its cluster.|
 
 ## Certificates
 
