@@ -87,6 +87,7 @@ type V1 struct {
 	Sys             *V1_System               `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
 	Svc             *V1_Service              `protobuf:"bytes,12,opt,name=svc,proto3" json:"svc,omitempty" toml:"svc,omitempty" mapstructure:"svc,omitempty"`
 	LargeReporting  *LargeReporting          `protobuf:"bytes,13,opt,name=large_reporting,json=largeReporting,proto3" json:"large_reporting,omitempty" toml:"large_reporting,omitempty" mapstructure:"large_reporting,omitempty"`
+	ChefServer      *ChefServer              `protobuf:"bytes,14,opt,name=chef_server,json=chefServer,proto3" json:"chef_server,omitempty" toml:"chef_server,omitempty" mapstructure:"chef_server,omitempty"`
 }
 
 func (x *V1) Reset() {
@@ -212,6 +213,68 @@ func (x *V1) GetLargeReporting() *LargeReporting {
 	return nil
 }
 
+func (x *V1) GetChefServer() *ChefServer {
+	if x != nil {
+		return x.ChefServer
+	}
+	return nil
+}
+
+type ChefServer struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Fqdn   *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
+	RootCa *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=root_ca,json=rootCa,proto3" json:"root_ca,omitempty" toml:"root_ca,omitempty" mapstructure:"root_ca,omitempty"`
+}
+
+func (x *ChefServer) Reset() {
+	*x = ChefServer{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_config_shared_global_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChefServer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChefServer) ProtoMessage() {}
+
+func (x *ChefServer) ProtoReflect() protoreflect.Message {
+	mi := &file_config_shared_global_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChefServer.ProtoReflect.Descriptor instead.
+func (*ChefServer) Descriptor() ([]byte, []int) {
+	return file_config_shared_global_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ChefServer) GetFqdn() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Fqdn
+	}
+	return nil
+}
+
+func (x *ChefServer) GetRootCa() *wrapperspb.StringValue {
+	if x != nil {
+		return x.RootCa
+	}
+	return nil
+}
+
 type External struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -227,7 +290,7 @@ type External struct {
 func (x *External) Reset() {
 	*x = External{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[2]
+		mi := &file_config_shared_global_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -240,7 +303,7 @@ func (x *External) String() string {
 func (*External) ProtoMessage() {}
 
 func (x *External) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[2]
+	mi := &file_config_shared_global_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -253,7 +316,7 @@ func (x *External) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External.ProtoReflect.Descriptor instead.
 func (*External) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *External) GetElasticsearch() *External_Elasticsearch {
@@ -302,7 +365,7 @@ type Mlsa struct {
 func (x *Mlsa) Reset() {
 	*x = Mlsa{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[3]
+		mi := &file_config_shared_global_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -315,7 +378,7 @@ func (x *Mlsa) String() string {
 func (*Mlsa) ProtoMessage() {}
 
 func (x *Mlsa) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[3]
+	mi := &file_config_shared_global_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -328,7 +391,7 @@ func (x *Mlsa) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Mlsa.ProtoReflect.Descriptor instead.
 func (*Mlsa) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{3}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Mlsa) GetAccept() *wrapperspb.BoolValue {
@@ -353,7 +416,7 @@ type Proxy struct {
 func (x *Proxy) Reset() {
 	*x = Proxy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[4]
+		mi := &file_config_shared_global_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -366,7 +429,7 @@ func (x *Proxy) String() string {
 func (*Proxy) ProtoMessage() {}
 
 func (x *Proxy) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[4]
+	mi := &file_config_shared_global_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -379,7 +442,7 @@ func (x *Proxy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Proxy.ProtoReflect.Descriptor instead.
 func (*Proxy) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{4}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Proxy) GetHost() *wrapperspb.StringValue {
@@ -432,7 +495,7 @@ type Backups struct {
 func (x *Backups) Reset() {
 	*x = Backups{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[5]
+		mi := &file_config_shared_global_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -445,7 +508,7 @@ func (x *Backups) String() string {
 func (*Backups) ProtoMessage() {}
 
 func (x *Backups) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[5]
+	mi := &file_config_shared_global_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -458,7 +521,7 @@ func (x *Backups) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups.ProtoReflect.Descriptor instead.
 func (*Backups) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Backups) GetLocation() *wrapperspb.StringValue {
@@ -506,7 +569,7 @@ type Log struct {
 func (x *Log) Reset() {
 	*x = Log{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[6]
+		mi := &file_config_shared_global_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -519,7 +582,7 @@ func (x *Log) String() string {
 func (*Log) ProtoMessage() {}
 
 func (x *Log) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[6]
+	mi := &file_config_shared_global_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -532,7 +595,7 @@ func (x *Log) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Log.ProtoReflect.Descriptor instead.
 func (*Log) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{6}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Log) GetLevel() *wrapperspb.StringValue {
@@ -596,7 +659,7 @@ type Disclosure struct {
 func (x *Disclosure) Reset() {
 	*x = Disclosure{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[7]
+		mi := &file_config_shared_global_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -609,7 +672,7 @@ func (x *Disclosure) String() string {
 func (*Disclosure) ProtoMessage() {}
 
 func (x *Disclosure) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[7]
+	mi := &file_config_shared_global_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -622,7 +685,7 @@ func (x *Disclosure) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Disclosure.ProtoReflect.Descriptor instead.
 func (*Disclosure) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{7}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Disclosure) GetShow() *wrapperspb.BoolValue {
@@ -653,7 +716,7 @@ type Banner struct {
 func (x *Banner) Reset() {
 	*x = Banner{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[8]
+		mi := &file_config_shared_global_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -666,7 +729,7 @@ func (x *Banner) String() string {
 func (*Banner) ProtoMessage() {}
 
 func (x *Banner) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[8]
+	mi := &file_config_shared_global_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -679,7 +742,7 @@ func (x *Banner) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Banner.ProtoReflect.Descriptor instead.
 func (*Banner) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{8}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Banner) GetShow() *wrapperspb.BoolValue {
@@ -722,7 +785,7 @@ type SessionSettings struct {
 func (x *SessionSettings) Reset() {
 	*x = SessionSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[9]
+		mi := &file_config_shared_global_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -735,7 +798,7 @@ func (x *SessionSettings) String() string {
 func (*SessionSettings) ProtoMessage() {}
 
 func (x *SessionSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[9]
+	mi := &file_config_shared_global_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -748,7 +811,7 @@ func (x *SessionSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionSettings.ProtoReflect.Descriptor instead.
 func (*SessionSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{9}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SessionSettings) GetEnableIdleTimeout() *wrapperspb.BoolValue {
@@ -776,7 +839,7 @@ type LargeReporting struct {
 func (x *LargeReporting) Reset() {
 	*x = LargeReporting{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[10]
+		mi := &file_config_shared_global_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -789,7 +852,7 @@ func (x *LargeReporting) String() string {
 func (*LargeReporting) ProtoMessage() {}
 
 func (x *LargeReporting) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[10]
+	mi := &file_config_shared_global_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -802,7 +865,7 @@ func (x *LargeReporting) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LargeReporting.ProtoReflect.Descriptor instead.
 func (*LargeReporting) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{10}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *LargeReporting) GetEnableLargeReporting() *wrapperspb.BoolValue {
@@ -823,7 +886,7 @@ type V1_System struct {
 func (x *V1_System) Reset() {
 	*x = V1_System{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[11]
+		mi := &file_config_shared_global_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -836,7 +899,7 @@ func (x *V1_System) String() string {
 func (*V1_System) ProtoMessage() {}
 
 func (x *V1_System) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[11]
+	mi := &file_config_shared_global_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -868,7 +931,7 @@ type V1_Service struct {
 func (x *V1_Service) Reset() {
 	*x = V1_Service{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[12]
+		mi := &file_config_shared_global_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -881,7 +944,7 @@ func (x *V1_Service) String() string {
 func (*V1_Service) ProtoMessage() {}
 
 func (x *V1_Service) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[12]
+	mi := &file_config_shared_global_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -912,7 +975,7 @@ type External_Elasticsearch struct {
 func (x *External_Elasticsearch) Reset() {
 	*x = External_Elasticsearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[13]
+		mi := &file_config_shared_global_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -925,7 +988,7 @@ func (x *External_Elasticsearch) String() string {
 func (*External_Elasticsearch) ProtoMessage() {}
 
 func (x *External_Elasticsearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[13]
+	mi := &file_config_shared_global_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -938,7 +1001,7 @@ func (x *External_Elasticsearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Elasticsearch.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0}
 }
 
 func (x *External_Elasticsearch) GetEnable() *wrapperspb.BoolValue {
@@ -991,7 +1054,7 @@ type External_Opensearch struct {
 func (x *External_Opensearch) Reset() {
 	*x = External_Opensearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[14]
+		mi := &file_config_shared_global_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1004,7 +1067,7 @@ func (x *External_Opensearch) String() string {
 func (*External_Opensearch) ProtoMessage() {}
 
 func (x *External_Opensearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[14]
+	mi := &file_config_shared_global_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1017,7 +1080,7 @@ func (x *External_Opensearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Opensearch.ProtoReflect.Descriptor instead.
 func (*External_Opensearch) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1}
 }
 
 func (x *External_Opensearch) GetEnable() *wrapperspb.BoolValue {
@@ -1072,7 +1135,7 @@ type External_Minio struct {
 func (x *External_Minio) Reset() {
 	*x = External_Minio{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[15]
+		mi := &file_config_shared_global_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1085,7 +1148,7 @@ func (x *External_Minio) String() string {
 func (*External_Minio) ProtoMessage() {}
 
 func (x *External_Minio) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[15]
+	mi := &file_config_shared_global_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1098,7 +1161,7 @@ func (x *External_Minio) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Minio.ProtoReflect.Descriptor instead.
 func (*External_Minio) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 2}
 }
 
 func (x *External_Minio) GetEndpoint() *wrapperspb.StringValue {
@@ -1165,7 +1228,7 @@ type External_Postgresql struct {
 func (x *External_Postgresql) Reset() {
 	*x = External_Postgresql{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[16]
+		mi := &file_config_shared_global_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1178,7 +1241,7 @@ func (x *External_Postgresql) String() string {
 func (*External_Postgresql) ProtoMessage() {}
 
 func (x *External_Postgresql) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[16]
+	mi := &file_config_shared_global_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1191,7 +1254,7 @@ func (x *External_Postgresql) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Postgresql.ProtoReflect.Descriptor instead.
 func (*External_Postgresql) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 3}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3}
 }
 
 func (x *External_Postgresql) GetEnable() *wrapperspb.BoolValue {
@@ -1243,7 +1306,7 @@ type External_Automate struct {
 func (x *External_Automate) Reset() {
 	*x = External_Automate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[17]
+		mi := &file_config_shared_global_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1256,7 +1319,7 @@ func (x *External_Automate) String() string {
 func (*External_Automate) ProtoMessage() {}
 
 func (x *External_Automate) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[17]
+	mi := &file_config_shared_global_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1269,7 +1332,7 @@ func (x *External_Automate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Automate.ProtoReflect.Descriptor instead.
 func (*External_Automate) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 4}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 4}
 }
 
 func (x *External_Automate) GetEnable() *wrapperspb.BoolValue {
@@ -1315,7 +1378,7 @@ type External_Elasticsearch_Backup struct {
 func (x *External_Elasticsearch_Backup) Reset() {
 	*x = External_Elasticsearch_Backup{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[18]
+		mi := &file_config_shared_global_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1328,7 +1391,7 @@ func (x *External_Elasticsearch_Backup) String() string {
 func (*External_Elasticsearch_Backup) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Backup) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[18]
+	mi := &file_config_shared_global_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1341,7 +1404,7 @@ func (x *External_Elasticsearch_Backup) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Elasticsearch_Backup.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Backup) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 0}
 }
 
 func (x *External_Elasticsearch_Backup) GetEnable() *wrapperspb.BoolValue {
@@ -1392,7 +1455,7 @@ type External_Elasticsearch_Authentication struct {
 func (x *External_Elasticsearch_Authentication) Reset() {
 	*x = External_Elasticsearch_Authentication{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[19]
+		mi := &file_config_shared_global_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1405,7 +1468,7 @@ func (x *External_Elasticsearch_Authentication) String() string {
 func (*External_Elasticsearch_Authentication) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Authentication) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[19]
+	mi := &file_config_shared_global_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1418,7 +1481,7 @@ func (x *External_Elasticsearch_Authentication) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use External_Elasticsearch_Authentication.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Authentication) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 1}
 }
 
 func (x *External_Elasticsearch_Authentication) GetScheme() *wrapperspb.StringValue {
@@ -1455,7 +1518,7 @@ type External_Elasticsearch_SSL struct {
 func (x *External_Elasticsearch_SSL) Reset() {
 	*x = External_Elasticsearch_SSL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[20]
+		mi := &file_config_shared_global_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1468,7 +1531,7 @@ func (x *External_Elasticsearch_SSL) String() string {
 func (*External_Elasticsearch_SSL) ProtoMessage() {}
 
 func (x *External_Elasticsearch_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[20]
+	mi := &file_config_shared_global_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1481,7 +1544,7 @@ func (x *External_Elasticsearch_SSL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Elasticsearch_SSL.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_SSL) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 2}
 }
 
 func (x *External_Elasticsearch_SSL) GetRootCert() *wrapperspb.StringValue {
@@ -1517,7 +1580,7 @@ type External_Elasticsearch_Backup_FsSettings struct {
 func (x *External_Elasticsearch_Backup_FsSettings) Reset() {
 	*x = External_Elasticsearch_Backup_FsSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[21]
+		mi := &file_config_shared_global_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1530,7 +1593,7 @@ func (x *External_Elasticsearch_Backup_FsSettings) String() string {
 func (*External_Elasticsearch_Backup_FsSettings) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Backup_FsSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[21]
+	mi := &file_config_shared_global_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1543,7 +1606,7 @@ func (x *External_Elasticsearch_Backup_FsSettings) ProtoReflect() protoreflect.M
 
 // Deprecated: Use External_Elasticsearch_Backup_FsSettings.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Backup_FsSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 0, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 0, 0}
 }
 
 func (x *External_Elasticsearch_Backup_FsSettings) GetPath() *wrapperspb.StringValue {
@@ -1574,7 +1637,7 @@ type External_Elasticsearch_Backup_S3Settings struct {
 func (x *External_Elasticsearch_Backup_S3Settings) Reset() {
 	*x = External_Elasticsearch_Backup_S3Settings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[22]
+		mi := &file_config_shared_global_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1587,7 +1650,7 @@ func (x *External_Elasticsearch_Backup_S3Settings) String() string {
 func (*External_Elasticsearch_Backup_S3Settings) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Backup_S3Settings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[22]
+	mi := &file_config_shared_global_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1600,7 +1663,7 @@ func (x *External_Elasticsearch_Backup_S3Settings) ProtoReflect() protoreflect.M
 
 // Deprecated: Use External_Elasticsearch_Backup_S3Settings.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Backup_S3Settings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 0, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 0, 1}
 }
 
 func (x *External_Elasticsearch_Backup_S3Settings) GetBucket() *wrapperspb.StringValue {
@@ -1645,7 +1708,7 @@ type External_Elasticsearch_Backup_GCSSettings struct {
 func (x *External_Elasticsearch_Backup_GCSSettings) Reset() {
 	*x = External_Elasticsearch_Backup_GCSSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[23]
+		mi := &file_config_shared_global_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1658,7 +1721,7 @@ func (x *External_Elasticsearch_Backup_GCSSettings) String() string {
 func (*External_Elasticsearch_Backup_GCSSettings) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Backup_GCSSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[23]
+	mi := &file_config_shared_global_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1671,7 +1734,7 @@ func (x *External_Elasticsearch_Backup_GCSSettings) ProtoReflect() protoreflect.
 
 // Deprecated: Use External_Elasticsearch_Backup_GCSSettings.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Backup_GCSSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 0, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 0, 2}
 }
 
 func (x *External_Elasticsearch_Backup_GCSSettings) GetBucket() *wrapperspb.StringValue {
@@ -1714,7 +1777,7 @@ type External_Elasticsearch_Backup_FsSettings_OptionalSettings struct {
 func (x *External_Elasticsearch_Backup_FsSettings_OptionalSettings) Reset() {
 	*x = External_Elasticsearch_Backup_FsSettings_OptionalSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[24]
+		mi := &file_config_shared_global_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1727,7 +1790,7 @@ func (x *External_Elasticsearch_Backup_FsSettings_OptionalSettings) String() str
 func (*External_Elasticsearch_Backup_FsSettings_OptionalSettings) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Backup_FsSettings_OptionalSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[24]
+	mi := &file_config_shared_global_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1740,7 +1803,7 @@ func (x *External_Elasticsearch_Backup_FsSettings_OptionalSettings) ProtoReflect
 
 // Deprecated: Use External_Elasticsearch_Backup_FsSettings_OptionalSettings.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Backup_FsSettings_OptionalSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 0, 0, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 0, 0, 0}
 }
 
 func (x *External_Elasticsearch_Backup_FsSettings_OptionalSettings) GetMaxSnapshotBytesPerSec() *wrapperspb.StringValue {
@@ -1769,7 +1832,7 @@ type External_Elasticsearch_Authentication_BasicAuth struct {
 func (x *External_Elasticsearch_Authentication_BasicAuth) Reset() {
 	*x = External_Elasticsearch_Authentication_BasicAuth{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[25]
+		mi := &file_config_shared_global_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1782,7 +1845,7 @@ func (x *External_Elasticsearch_Authentication_BasicAuth) String() string {
 func (*External_Elasticsearch_Authentication_BasicAuth) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Authentication_BasicAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[25]
+	mi := &file_config_shared_global_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1795,7 +1858,7 @@ func (x *External_Elasticsearch_Authentication_BasicAuth) ProtoReflect() protore
 
 // Deprecated: Use External_Elasticsearch_Authentication_BasicAuth.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Authentication_BasicAuth) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 1, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 1, 0}
 }
 
 func (x *External_Elasticsearch_Authentication_BasicAuth) GetUsername() *wrapperspb.StringValue {
@@ -1830,7 +1893,7 @@ type External_Elasticsearch_Authentication_AwsElasticsearchAuth struct {
 func (x *External_Elasticsearch_Authentication_AwsElasticsearchAuth) Reset() {
 	*x = External_Elasticsearch_Authentication_AwsElasticsearchAuth{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[26]
+		mi := &file_config_shared_global_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1843,7 +1906,7 @@ func (x *External_Elasticsearch_Authentication_AwsElasticsearchAuth) String() st
 func (*External_Elasticsearch_Authentication_AwsElasticsearchAuth) ProtoMessage() {}
 
 func (x *External_Elasticsearch_Authentication_AwsElasticsearchAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[26]
+	mi := &file_config_shared_global_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1856,7 +1919,7 @@ func (x *External_Elasticsearch_Authentication_AwsElasticsearchAuth) ProtoReflec
 
 // Deprecated: Use External_Elasticsearch_Authentication_AwsElasticsearchAuth.ProtoReflect.Descriptor instead.
 func (*External_Elasticsearch_Authentication_AwsElasticsearchAuth) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 0, 1, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 0, 1, 1}
 }
 
 func (x *External_Elasticsearch_Authentication_AwsElasticsearchAuth) GetUsername() *wrapperspb.StringValue {
@@ -1902,7 +1965,7 @@ type External_Opensearch_Backup struct {
 func (x *External_Opensearch_Backup) Reset() {
 	*x = External_Opensearch_Backup{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[27]
+		mi := &file_config_shared_global_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1915,7 +1978,7 @@ func (x *External_Opensearch_Backup) String() string {
 func (*External_Opensearch_Backup) ProtoMessage() {}
 
 func (x *External_Opensearch_Backup) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[27]
+	mi := &file_config_shared_global_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1928,7 +1991,7 @@ func (x *External_Opensearch_Backup) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Opensearch_Backup.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Backup) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 0}
 }
 
 func (x *External_Opensearch_Backup) GetEnable() *wrapperspb.BoolValue {
@@ -1979,7 +2042,7 @@ type External_Opensearch_Authentication struct {
 func (x *External_Opensearch_Authentication) Reset() {
 	*x = External_Opensearch_Authentication{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[28]
+		mi := &file_config_shared_global_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1992,7 +2055,7 @@ func (x *External_Opensearch_Authentication) String() string {
 func (*External_Opensearch_Authentication) ProtoMessage() {}
 
 func (x *External_Opensearch_Authentication) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[28]
+	mi := &file_config_shared_global_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2005,7 +2068,7 @@ func (x *External_Opensearch_Authentication) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use External_Opensearch_Authentication.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Authentication) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 1}
 }
 
 func (x *External_Opensearch_Authentication) GetScheme() *wrapperspb.StringValue {
@@ -2042,7 +2105,7 @@ type External_Opensearch_SSL struct {
 func (x *External_Opensearch_SSL) Reset() {
 	*x = External_Opensearch_SSL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[29]
+		mi := &file_config_shared_global_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2055,7 +2118,7 @@ func (x *External_Opensearch_SSL) String() string {
 func (*External_Opensearch_SSL) ProtoMessage() {}
 
 func (x *External_Opensearch_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[29]
+	mi := &file_config_shared_global_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2068,7 +2131,7 @@ func (x *External_Opensearch_SSL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Opensearch_SSL.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_SSL) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 2}
 }
 
 func (x *External_Opensearch_SSL) GetRootCert() *wrapperspb.StringValue {
@@ -2104,7 +2167,7 @@ type External_Opensearch_Backup_FsSettings struct {
 func (x *External_Opensearch_Backup_FsSettings) Reset() {
 	*x = External_Opensearch_Backup_FsSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[30]
+		mi := &file_config_shared_global_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2117,7 +2180,7 @@ func (x *External_Opensearch_Backup_FsSettings) String() string {
 func (*External_Opensearch_Backup_FsSettings) ProtoMessage() {}
 
 func (x *External_Opensearch_Backup_FsSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[30]
+	mi := &file_config_shared_global_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2130,7 +2193,7 @@ func (x *External_Opensearch_Backup_FsSettings) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use External_Opensearch_Backup_FsSettings.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Backup_FsSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 0, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 0, 0}
 }
 
 func (x *External_Opensearch_Backup_FsSettings) GetPath() *wrapperspb.StringValue {
@@ -2161,7 +2224,7 @@ type External_Opensearch_Backup_S3Settings struct {
 func (x *External_Opensearch_Backup_S3Settings) Reset() {
 	*x = External_Opensearch_Backup_S3Settings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[31]
+		mi := &file_config_shared_global_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2174,7 +2237,7 @@ func (x *External_Opensearch_Backup_S3Settings) String() string {
 func (*External_Opensearch_Backup_S3Settings) ProtoMessage() {}
 
 func (x *External_Opensearch_Backup_S3Settings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[31]
+	mi := &file_config_shared_global_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2187,7 +2250,7 @@ func (x *External_Opensearch_Backup_S3Settings) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use External_Opensearch_Backup_S3Settings.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Backup_S3Settings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 0, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 0, 1}
 }
 
 func (x *External_Opensearch_Backup_S3Settings) GetBucket() *wrapperspb.StringValue {
@@ -2232,7 +2295,7 @@ type External_Opensearch_Backup_GCSSettings struct {
 func (x *External_Opensearch_Backup_GCSSettings) Reset() {
 	*x = External_Opensearch_Backup_GCSSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[32]
+		mi := &file_config_shared_global_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2245,7 +2308,7 @@ func (x *External_Opensearch_Backup_GCSSettings) String() string {
 func (*External_Opensearch_Backup_GCSSettings) ProtoMessage() {}
 
 func (x *External_Opensearch_Backup_GCSSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[32]
+	mi := &file_config_shared_global_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2258,7 +2321,7 @@ func (x *External_Opensearch_Backup_GCSSettings) ProtoReflect() protoreflect.Mes
 
 // Deprecated: Use External_Opensearch_Backup_GCSSettings.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Backup_GCSSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 0, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 0, 2}
 }
 
 func (x *External_Opensearch_Backup_GCSSettings) GetBucket() *wrapperspb.StringValue {
@@ -2301,7 +2364,7 @@ type External_Opensearch_Backup_FsSettings_OptionalSettings struct {
 func (x *External_Opensearch_Backup_FsSettings_OptionalSettings) Reset() {
 	*x = External_Opensearch_Backup_FsSettings_OptionalSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[33]
+		mi := &file_config_shared_global_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2314,7 +2377,7 @@ func (x *External_Opensearch_Backup_FsSettings_OptionalSettings) String() string
 func (*External_Opensearch_Backup_FsSettings_OptionalSettings) ProtoMessage() {}
 
 func (x *External_Opensearch_Backup_FsSettings_OptionalSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[33]
+	mi := &file_config_shared_global_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2327,7 +2390,7 @@ func (x *External_Opensearch_Backup_FsSettings_OptionalSettings) ProtoReflect() 
 
 // Deprecated: Use External_Opensearch_Backup_FsSettings_OptionalSettings.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Backup_FsSettings_OptionalSettings) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 0, 0, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 0, 0, 0}
 }
 
 func (x *External_Opensearch_Backup_FsSettings_OptionalSettings) GetMaxSnapshotBytesPerSec() *wrapperspb.StringValue {
@@ -2356,7 +2419,7 @@ type External_Opensearch_Authentication_BasicAuth struct {
 func (x *External_Opensearch_Authentication_BasicAuth) Reset() {
 	*x = External_Opensearch_Authentication_BasicAuth{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[34]
+		mi := &file_config_shared_global_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2369,7 +2432,7 @@ func (x *External_Opensearch_Authentication_BasicAuth) String() string {
 func (*External_Opensearch_Authentication_BasicAuth) ProtoMessage() {}
 
 func (x *External_Opensearch_Authentication_BasicAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[34]
+	mi := &file_config_shared_global_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2382,7 +2445,7 @@ func (x *External_Opensearch_Authentication_BasicAuth) ProtoReflect() protorefle
 
 // Deprecated: Use External_Opensearch_Authentication_BasicAuth.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Authentication_BasicAuth) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 1, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 1, 0}
 }
 
 func (x *External_Opensearch_Authentication_BasicAuth) GetUsername() *wrapperspb.StringValue {
@@ -2417,7 +2480,7 @@ type External_Opensearch_Authentication_AwsOpensearchAuth struct {
 func (x *External_Opensearch_Authentication_AwsOpensearchAuth) Reset() {
 	*x = External_Opensearch_Authentication_AwsOpensearchAuth{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[35]
+		mi := &file_config_shared_global_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2430,7 +2493,7 @@ func (x *External_Opensearch_Authentication_AwsOpensearchAuth) String() string {
 func (*External_Opensearch_Authentication_AwsOpensearchAuth) ProtoMessage() {}
 
 func (x *External_Opensearch_Authentication_AwsOpensearchAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[35]
+	mi := &file_config_shared_global_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2443,7 +2506,7 @@ func (x *External_Opensearch_Authentication_AwsOpensearchAuth) ProtoReflect() pr
 
 // Deprecated: Use External_Opensearch_Authentication_AwsOpensearchAuth.ProtoReflect.Descriptor instead.
 func (*External_Opensearch_Authentication_AwsOpensearchAuth) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1, 1, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 1, 1, 1}
 }
 
 func (x *External_Opensearch_Authentication_AwsOpensearchAuth) GetUsername() *wrapperspb.StringValue {
@@ -2485,7 +2548,7 @@ type External_Postgresql_Backup struct {
 func (x *External_Postgresql_Backup) Reset() {
 	*x = External_Postgresql_Backup{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[36]
+		mi := &file_config_shared_global_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2498,7 +2561,7 @@ func (x *External_Postgresql_Backup) String() string {
 func (*External_Postgresql_Backup) ProtoMessage() {}
 
 func (x *External_Postgresql_Backup) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[36]
+	mi := &file_config_shared_global_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2511,7 +2574,7 @@ func (x *External_Postgresql_Backup) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Postgresql_Backup.ProtoReflect.Descriptor instead.
 func (*External_Postgresql_Backup) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 3, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3, 0}
 }
 
 func (x *External_Postgresql_Backup) GetEnable() *wrapperspb.BoolValue {
@@ -2533,7 +2596,7 @@ type External_Postgresql_Authentication struct {
 func (x *External_Postgresql_Authentication) Reset() {
 	*x = External_Postgresql_Authentication{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[37]
+		mi := &file_config_shared_global_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2546,7 +2609,7 @@ func (x *External_Postgresql_Authentication) String() string {
 func (*External_Postgresql_Authentication) ProtoMessage() {}
 
 func (x *External_Postgresql_Authentication) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[37]
+	mi := &file_config_shared_global_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2559,7 +2622,7 @@ func (x *External_Postgresql_Authentication) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use External_Postgresql_Authentication.ProtoReflect.Descriptor instead.
 func (*External_Postgresql_Authentication) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 3, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3, 1}
 }
 
 func (x *External_Postgresql_Authentication) GetScheme() *wrapperspb.StringValue {
@@ -2592,7 +2655,7 @@ type External_Postgresql_SSL struct {
 func (x *External_Postgresql_SSL) Reset() {
 	*x = External_Postgresql_SSL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[38]
+		mi := &file_config_shared_global_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2605,7 +2668,7 @@ func (x *External_Postgresql_SSL) String() string {
 func (*External_Postgresql_SSL) ProtoMessage() {}
 
 func (x *External_Postgresql_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[38]
+	mi := &file_config_shared_global_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2618,7 +2681,7 @@ func (x *External_Postgresql_SSL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Postgresql_SSL.ProtoReflect.Descriptor instead.
 func (*External_Postgresql_SSL) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 3, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3, 2}
 }
 
 // Deprecated: Do not use.
@@ -2669,7 +2732,7 @@ type External_Postgresql_Authentication_PasswordAuthentication struct {
 func (x *External_Postgresql_Authentication_PasswordAuthentication) Reset() {
 	*x = External_Postgresql_Authentication_PasswordAuthentication{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[39]
+		mi := &file_config_shared_global_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2682,7 +2745,7 @@ func (x *External_Postgresql_Authentication_PasswordAuthentication) String() str
 func (*External_Postgresql_Authentication_PasswordAuthentication) ProtoMessage() {}
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[39]
+	mi := &file_config_shared_global_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2695,7 +2758,7 @@ func (x *External_Postgresql_Authentication_PasswordAuthentication) ProtoReflect
 
 // Deprecated: Use External_Postgresql_Authentication_PasswordAuthentication.ProtoReflect.Descriptor instead.
 func (*External_Postgresql_Authentication_PasswordAuthentication) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 3, 1, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3, 1, 0}
 }
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication) GetSuperuser() *External_Postgresql_Authentication_PasswordAuthentication_User {
@@ -2724,7 +2787,7 @@ type External_Postgresql_Authentication_PasswordAuthentication_User struct {
 func (x *External_Postgresql_Authentication_PasswordAuthentication_User) Reset() {
 	*x = External_Postgresql_Authentication_PasswordAuthentication_User{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[40]
+		mi := &file_config_shared_global_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2737,7 +2800,7 @@ func (x *External_Postgresql_Authentication_PasswordAuthentication_User) String(
 func (*External_Postgresql_Authentication_PasswordAuthentication_User) ProtoMessage() {}
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication_User) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[40]
+	mi := &file_config_shared_global_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2750,7 +2813,7 @@ func (x *External_Postgresql_Authentication_PasswordAuthentication_User) ProtoRe
 
 // Deprecated: Use External_Postgresql_Authentication_PasswordAuthentication_User.ProtoReflect.Descriptor instead.
 func (*External_Postgresql_Authentication_PasswordAuthentication_User) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 3, 1, 0, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3, 1, 0, 0}
 }
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication_User) GetUsername() *wrapperspb.StringValue {
@@ -2779,7 +2842,7 @@ type External_Automate_Authentication struct {
 func (x *External_Automate_Authentication) Reset() {
 	*x = External_Automate_Authentication{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[41]
+		mi := &file_config_shared_global_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2792,7 +2855,7 @@ func (x *External_Automate_Authentication) String() string {
 func (*External_Automate_Authentication) ProtoMessage() {}
 
 func (x *External_Automate_Authentication) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[41]
+	mi := &file_config_shared_global_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2805,7 +2868,7 @@ func (x *External_Automate_Authentication) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Automate_Authentication.ProtoReflect.Descriptor instead.
 func (*External_Automate_Authentication) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 4, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 4, 0}
 }
 
 func (x *External_Automate_Authentication) GetScheme() *wrapperspb.StringValue {
@@ -2834,7 +2897,7 @@ type External_Automate_SSL struct {
 func (x *External_Automate_SSL) Reset() {
 	*x = External_Automate_SSL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[42]
+		mi := &file_config_shared_global_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2847,7 +2910,7 @@ func (x *External_Automate_SSL) String() string {
 func (*External_Automate_SSL) ProtoMessage() {}
 
 func (x *External_Automate_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[42]
+	mi := &file_config_shared_global_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2860,7 +2923,7 @@ func (x *External_Automate_SSL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use External_Automate_SSL.ProtoReflect.Descriptor instead.
 func (*External_Automate_SSL) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 4, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 4, 1}
 }
 
 func (x *External_Automate_SSL) GetRootCert() *wrapperspb.StringValue {
@@ -2890,7 +2953,7 @@ type Backups_Filesystem struct {
 func (x *Backups_Filesystem) Reset() {
 	*x = Backups_Filesystem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[43]
+		mi := &file_config_shared_global_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2903,7 +2966,7 @@ func (x *Backups_Filesystem) String() string {
 func (*Backups_Filesystem) ProtoMessage() {}
 
 func (x *Backups_Filesystem) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[43]
+	mi := &file_config_shared_global_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2916,7 +2979,7 @@ func (x *Backups_Filesystem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_Filesystem.ProtoReflect.Descriptor instead.
 func (*Backups_Filesystem) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 0}
 }
 
 func (x *Backups_Filesystem) GetPath() *wrapperspb.StringValue {
@@ -2955,7 +3018,7 @@ type Backups_S3 struct {
 func (x *Backups_S3) Reset() {
 	*x = Backups_S3{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[44]
+		mi := &file_config_shared_global_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2968,7 +3031,7 @@ func (x *Backups_S3) String() string {
 func (*Backups_S3) ProtoMessage() {}
 
 func (x *Backups_S3) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[44]
+	mi := &file_config_shared_global_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2981,7 +3044,7 @@ func (x *Backups_S3) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_S3.ProtoReflect.Descriptor instead.
 func (*Backups_S3) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 1}
 }
 
 func (x *Backups_S3) GetCredentials() *Backups_S3_AWSCredentials {
@@ -3033,7 +3096,7 @@ type Backups_GCS struct {
 func (x *Backups_GCS) Reset() {
 	*x = Backups_GCS{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[45]
+		mi := &file_config_shared_global_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3046,7 +3109,7 @@ func (x *Backups_GCS) String() string {
 func (*Backups_GCS) ProtoMessage() {}
 
 func (x *Backups_GCS) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[45]
+	mi := &file_config_shared_global_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3059,7 +3122,7 @@ func (x *Backups_GCS) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_GCS.ProtoReflect.Descriptor instead.
 func (*Backups_GCS) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 2}
 }
 
 func (x *Backups_GCS) GetCredentials() *Backups_GCS_GCPCredentials {
@@ -3103,7 +3166,7 @@ type Backups_S3_AWSCredentials struct {
 func (x *Backups_S3_AWSCredentials) Reset() {
 	*x = Backups_S3_AWSCredentials{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[46]
+		mi := &file_config_shared_global_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3116,7 +3179,7 @@ func (x *Backups_S3_AWSCredentials) String() string {
 func (*Backups_S3_AWSCredentials) ProtoMessage() {}
 
 func (x *Backups_S3_AWSCredentials) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[46]
+	mi := &file_config_shared_global_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3129,7 +3192,7 @@ func (x *Backups_S3_AWSCredentials) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_S3_AWSCredentials.ProtoReflect.Descriptor instead.
 func (*Backups_S3_AWSCredentials) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 1, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 1, 0}
 }
 
 func (x *Backups_S3_AWSCredentials) GetAccessKey() *wrapperspb.StringValue {
@@ -3181,7 +3244,7 @@ type Backups_S3_Elasticsearch struct {
 func (x *Backups_S3_Elasticsearch) Reset() {
 	*x = Backups_S3_Elasticsearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[47]
+		mi := &file_config_shared_global_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3194,7 +3257,7 @@ func (x *Backups_S3_Elasticsearch) String() string {
 func (*Backups_S3_Elasticsearch) ProtoMessage() {}
 
 func (x *Backups_S3_Elasticsearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[47]
+	mi := &file_config_shared_global_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3207,7 +3270,7 @@ func (x *Backups_S3_Elasticsearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_S3_Elasticsearch.ProtoReflect.Descriptor instead.
 func (*Backups_S3_Elasticsearch) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 1, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 1, 1}
 }
 
 func (x *Backups_S3_Elasticsearch) GetCompress() *wrapperspb.BoolValue {
@@ -3336,7 +3399,7 @@ type Backups_S3_Opensearch struct {
 func (x *Backups_S3_Opensearch) Reset() {
 	*x = Backups_S3_Opensearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[48]
+		mi := &file_config_shared_global_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3349,7 +3412,7 @@ func (x *Backups_S3_Opensearch) String() string {
 func (*Backups_S3_Opensearch) ProtoMessage() {}
 
 func (x *Backups_S3_Opensearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[48]
+	mi := &file_config_shared_global_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3362,7 +3425,7 @@ func (x *Backups_S3_Opensearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_S3_Opensearch.ProtoReflect.Descriptor instead.
 func (*Backups_S3_Opensearch) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 1, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 1, 2}
 }
 
 func (x *Backups_S3_Opensearch) GetCompress() *wrapperspb.BoolValue {
@@ -3476,7 +3539,7 @@ type Backups_S3_Bucket struct {
 func (x *Backups_S3_Bucket) Reset() {
 	*x = Backups_S3_Bucket{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[49]
+		mi := &file_config_shared_global_proto_msgTypes[50]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3489,7 +3552,7 @@ func (x *Backups_S3_Bucket) String() string {
 func (*Backups_S3_Bucket) ProtoMessage() {}
 
 func (x *Backups_S3_Bucket) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[49]
+	mi := &file_config_shared_global_proto_msgTypes[50]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3502,7 +3565,7 @@ func (x *Backups_S3_Bucket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_S3_Bucket.ProtoReflect.Descriptor instead.
 func (*Backups_S3_Bucket) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 1, 3}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 1, 3}
 }
 
 func (x *Backups_S3_Bucket) GetEndpoint() *wrapperspb.StringValue {
@@ -3537,7 +3600,7 @@ type Backups_S3_SSL struct {
 func (x *Backups_S3_SSL) Reset() {
 	*x = Backups_S3_SSL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[50]
+		mi := &file_config_shared_global_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3550,7 +3613,7 @@ func (x *Backups_S3_SSL) String() string {
 func (*Backups_S3_SSL) ProtoMessage() {}
 
 func (x *Backups_S3_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[50]
+	mi := &file_config_shared_global_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3563,7 +3626,7 @@ func (x *Backups_S3_SSL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_S3_SSL.ProtoReflect.Descriptor instead.
 func (*Backups_S3_SSL) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 1, 4}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 1, 4}
 }
 
 func (x *Backups_S3_SSL) GetRootCert() *wrapperspb.StringValue {
@@ -3584,7 +3647,7 @@ type Backups_GCS_GCPCredentials struct {
 func (x *Backups_GCS_GCPCredentials) Reset() {
 	*x = Backups_GCS_GCPCredentials{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[51]
+		mi := &file_config_shared_global_proto_msgTypes[52]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3597,7 +3660,7 @@ func (x *Backups_GCS_GCPCredentials) String() string {
 func (*Backups_GCS_GCPCredentials) ProtoMessage() {}
 
 func (x *Backups_GCS_GCPCredentials) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[51]
+	mi := &file_config_shared_global_proto_msgTypes[52]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3610,7 +3673,7 @@ func (x *Backups_GCS_GCPCredentials) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_GCS_GCPCredentials.ProtoReflect.Descriptor instead.
 func (*Backups_GCS_GCPCredentials) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 2, 0}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 2, 0}
 }
 
 func (x *Backups_GCS_GCPCredentials) GetJson() *wrapperspb.StringValue {
@@ -3640,7 +3703,7 @@ type Backups_GCS_Elasticsearch struct {
 func (x *Backups_GCS_Elasticsearch) Reset() {
 	*x = Backups_GCS_Elasticsearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[52]
+		mi := &file_config_shared_global_proto_msgTypes[53]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3653,7 +3716,7 @@ func (x *Backups_GCS_Elasticsearch) String() string {
 func (*Backups_GCS_Elasticsearch) ProtoMessage() {}
 
 func (x *Backups_GCS_Elasticsearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[52]
+	mi := &file_config_shared_global_proto_msgTypes[53]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3666,7 +3729,7 @@ func (x *Backups_GCS_Elasticsearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_GCS_Elasticsearch.ProtoReflect.Descriptor instead.
 func (*Backups_GCS_Elasticsearch) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 2, 1}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 2, 1}
 }
 
 func (x *Backups_GCS_Elasticsearch) GetCompress() *wrapperspb.BoolValue {
@@ -3738,7 +3801,7 @@ type Backups_GCS_Opensearch struct {
 func (x *Backups_GCS_Opensearch) Reset() {
 	*x = Backups_GCS_Opensearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[53]
+		mi := &file_config_shared_global_proto_msgTypes[54]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3751,7 +3814,7 @@ func (x *Backups_GCS_Opensearch) String() string {
 func (*Backups_GCS_Opensearch) ProtoMessage() {}
 
 func (x *Backups_GCS_Opensearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[53]
+	mi := &file_config_shared_global_proto_msgTypes[54]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3764,7 +3827,7 @@ func (x *Backups_GCS_Opensearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_GCS_Opensearch.ProtoReflect.Descriptor instead.
 func (*Backups_GCS_Opensearch) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 2, 2}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 2, 2}
 }
 
 func (x *Backups_GCS_Opensearch) GetCompress() *wrapperspb.BoolValue {
@@ -3828,7 +3891,7 @@ type Backups_GCS_Bucket struct {
 func (x *Backups_GCS_Bucket) Reset() {
 	*x = Backups_GCS_Bucket{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[54]
+		mi := &file_config_shared_global_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3841,7 +3904,7 @@ func (x *Backups_GCS_Bucket) String() string {
 func (*Backups_GCS_Bucket) ProtoMessage() {}
 
 func (x *Backups_GCS_Bucket) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[54]
+	mi := &file_config_shared_global_proto_msgTypes[55]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3854,7 +3917,7 @@ func (x *Backups_GCS_Bucket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Backups_GCS_Bucket.ProtoReflect.Descriptor instead.
 func (*Backups_GCS_Bucket) Descriptor() ([]byte, []int) {
-	return file_config_shared_global_proto_rawDescGZIP(), []int{5, 2, 3}
+	return file_config_shared_global_proto_rawDescGZIP(), []int{6, 2, 3}
 }
 
 func (x *Backups_GCS_Bucket) GetBasePath() *wrapperspb.StringValue {
@@ -3890,7 +3953,7 @@ var file_config_shared_global_proto_rawDesc = []byte{
 	0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69,
 	0x6e, 0x66, 0x72, 0x61, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x56, 0x31, 0x52, 0x02,
 	0x76, 0x31, 0x3a, 0x0c, 0xc2, 0xf3, 0x18, 0x08, 0x0a, 0x06, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c,
-	0x22, 0xa6, 0x07, 0x0a, 0x02, 0x56, 0x31, 0x12, 0x30, 0x0a, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x18,
+	0x22, 0xef, 0x07, 0x0a, 0x02, 0x56, 0x31, 0x12, 0x30, 0x0a, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61,
 	0x6c, 0x75, 0x65, 0x52, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x12, 0x34, 0x0a, 0x04, 0x6d, 0x6c, 0x73,
@@ -3943,12 +4006,24 @@ var file_config_shared_global_proto_rawDesc = []byte{
 	0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61,
 	0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x4c, 0x61, 0x72, 0x67, 0x65, 0x52, 0x65, 0x70,
 	0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x52, 0x0e, 0x6c, 0x61, 0x72, 0x67, 0x65, 0x52, 0x65, 0x70,
-	0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x1a, 0x46, 0x0a, 0x06, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d,
-	0x12, 0x3c, 0x0a, 0x03, 0x74, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e,
-	0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e,
-	0x66, 0x72, 0x61, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x54, 0x4c, 0x53, 0x43, 0x72,
-	0x65, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x61, 0x6c, 0x73, 0x52, 0x03, 0x74, 0x6c, 0x73, 0x1a, 0x09,
-	0x0a, 0x07, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x22, 0xe4, 0x3c, 0x0a, 0x08, 0x45, 0x78,
+	0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x12, 0x47, 0x0a, 0x0b, 0x63, 0x68, 0x65, 0x66, 0x5f, 0x73,
+	0x65, 0x72, 0x76, 0x65, 0x72, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x63, 0x68,
+	0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e, 0x66, 0x72,
+	0x61, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x43, 0x68, 0x65, 0x66, 0x53, 0x65, 0x72,
+	0x76, 0x65, 0x72, 0x52, 0x0a, 0x63, 0x68, 0x65, 0x66, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x1a,
+	0x46, 0x0a, 0x06, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x12, 0x3c, 0x0a, 0x03, 0x74, 0x6c, 0x73,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x2e, 0x63, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x2e, 0x54, 0x4c, 0x53, 0x43, 0x72, 0x65, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x61,
+	0x6c, 0x73, 0x52, 0x03, 0x74, 0x6c, 0x73, 0x1a, 0x09, 0x0a, 0x07, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x22, 0x75, 0x0a, 0x0a, 0x43, 0x68, 0x65, 0x66, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
+	0x12, 0x30, 0x0a, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x04, 0x66, 0x71,
+	0x64, 0x6e, 0x12, 0x35, 0x0a, 0x07, 0x72, 0x6f, 0x6f, 0x74, 0x5f, 0x63, 0x61, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75,
+	0x65, 0x52, 0x06, 0x72, 0x6f, 0x6f, 0x74, 0x43, 0x61, 0x22, 0xe4, 0x3c, 0x0a, 0x08, 0x45, 0x78,
 	0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x12, 0x58, 0x0a, 0x0d, 0x65, 0x6c, 0x61, 0x73, 0x74, 0x69,
 	0x63, 0x73, 0x65, 0x61, 0x72, 0x63, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x32, 0x2e,
 	0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e,
@@ -4844,284 +4919,288 @@ func file_config_shared_global_proto_rawDescGZIP() []byte {
 	return file_config_shared_global_proto_rawDescData
 }
 
-var file_config_shared_global_proto_msgTypes = make([]protoimpl.MessageInfo, 55)
+var file_config_shared_global_proto_msgTypes = make([]protoimpl.MessageInfo, 56)
 var file_config_shared_global_proto_goTypes = []interface{}{
 	(*GlobalConfig)(nil),                              // 0: chef.automate.infra.config.GlobalConfig
 	(*V1)(nil),                                        // 1: chef.automate.infra.config.V1
-	(*External)(nil),                                  // 2: chef.automate.infra.config.External
-	(*Mlsa)(nil),                                      // 3: chef.automate.infra.config.Mlsa
-	(*Proxy)(nil),                                     // 4: chef.automate.infra.config.Proxy
-	(*Backups)(nil),                                   // 5: chef.automate.infra.config.Backups
-	(*Log)(nil),                                       // 6: chef.automate.infra.config.Log
-	(*Disclosure)(nil),                                // 7: chef.automate.infra.config.Disclosure
-	(*Banner)(nil),                                    // 8: chef.automate.infra.config.Banner
-	(*SessionSettings)(nil),                           // 9: chef.automate.infra.config.SessionSettings
-	(*LargeReporting)(nil),                            // 10: chef.automate.infra.config.LargeReporting
-	(*V1_System)(nil),                                 // 11: chef.automate.infra.config.V1.System
-	(*V1_Service)(nil),                                // 12: chef.automate.infra.config.V1.Service
-	(*External_Elasticsearch)(nil),                    // 13: chef.automate.infra.config.External.Elasticsearch
-	(*External_Opensearch)(nil),                       // 14: chef.automate.infra.config.External.Opensearch
-	(*External_Minio)(nil),                            // 15: chef.automate.infra.config.External.Minio
-	(*External_Postgresql)(nil),                       // 16: chef.automate.infra.config.External.Postgresql
-	(*External_Automate)(nil),                         // 17: chef.automate.infra.config.External.Automate
-	(*External_Elasticsearch_Backup)(nil),             // 18: chef.automate.infra.config.External.Elasticsearch.Backup
-	(*External_Elasticsearch_Authentication)(nil),     // 19: chef.automate.infra.config.External.Elasticsearch.Authentication
-	(*External_Elasticsearch_SSL)(nil),                // 20: chef.automate.infra.config.External.Elasticsearch.SSL
-	(*External_Elasticsearch_Backup_FsSettings)(nil),  // 21: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings
-	(*External_Elasticsearch_Backup_S3Settings)(nil),  // 22: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings
-	(*External_Elasticsearch_Backup_GCSSettings)(nil), // 23: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings
-	(*External_Elasticsearch_Backup_FsSettings_OptionalSettings)(nil),      // 24: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings
-	(*External_Elasticsearch_Authentication_BasicAuth)(nil),                // 25: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth
-	(*External_Elasticsearch_Authentication_AwsElasticsearchAuth)(nil),     // 26: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth
-	(*External_Opensearch_Backup)(nil),                                     // 27: chef.automate.infra.config.External.Opensearch.Backup
-	(*External_Opensearch_Authentication)(nil),                             // 28: chef.automate.infra.config.External.Opensearch.Authentication
-	(*External_Opensearch_SSL)(nil),                                        // 29: chef.automate.infra.config.External.Opensearch.SSL
-	(*External_Opensearch_Backup_FsSettings)(nil),                          // 30: chef.automate.infra.config.External.Opensearch.Backup.FsSettings
-	(*External_Opensearch_Backup_S3Settings)(nil),                          // 31: chef.automate.infra.config.External.Opensearch.Backup.S3Settings
-	(*External_Opensearch_Backup_GCSSettings)(nil),                         // 32: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings
-	(*External_Opensearch_Backup_FsSettings_OptionalSettings)(nil),         // 33: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings
-	(*External_Opensearch_Authentication_BasicAuth)(nil),                   // 34: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth
-	(*External_Opensearch_Authentication_AwsOpensearchAuth)(nil),           // 35: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth
-	(*External_Postgresql_Backup)(nil),                                     // 36: chef.automate.infra.config.External.Postgresql.Backup
-	(*External_Postgresql_Authentication)(nil),                             // 37: chef.automate.infra.config.External.Postgresql.Authentication
-	(*External_Postgresql_SSL)(nil),                                        // 38: chef.automate.infra.config.External.Postgresql.SSL
-	(*External_Postgresql_Authentication_PasswordAuthentication)(nil),      // 39: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication
-	(*External_Postgresql_Authentication_PasswordAuthentication_User)(nil), // 40: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
-	(*External_Automate_Authentication)(nil),                               // 41: chef.automate.infra.config.External.Automate.Authentication
-	(*External_Automate_SSL)(nil),                                          // 42: chef.automate.infra.config.External.Automate.SSL
-	(*Backups_Filesystem)(nil),                                             // 43: chef.automate.infra.config.Backups.Filesystem
-	(*Backups_S3)(nil),                                                     // 44: chef.automate.infra.config.Backups.S3
-	(*Backups_GCS)(nil),                                                    // 45: chef.automate.infra.config.Backups.GCS
-	(*Backups_S3_AWSCredentials)(nil),                                      // 46: chef.automate.infra.config.Backups.S3.AWSCredentials
-	(*Backups_S3_Elasticsearch)(nil),                                       // 47: chef.automate.infra.config.Backups.S3.Elasticsearch
-	(*Backups_S3_Opensearch)(nil),                                          // 48: chef.automate.infra.config.Backups.S3.Opensearch
-	(*Backups_S3_Bucket)(nil),                                              // 49: chef.automate.infra.config.Backups.S3.Bucket
-	(*Backups_S3_SSL)(nil),                                                 // 50: chef.automate.infra.config.Backups.S3.SSL
-	(*Backups_GCS_GCPCredentials)(nil),                                     // 51: chef.automate.infra.config.Backups.GCS.GCPCredentials
-	(*Backups_GCS_Elasticsearch)(nil),                                      // 52: chef.automate.infra.config.Backups.GCS.Elasticsearch
-	(*Backups_GCS_Opensearch)(nil),                                         // 53: chef.automate.infra.config.Backups.GCS.Opensearch
-	(*Backups_GCS_Bucket)(nil),                                             // 54: chef.automate.infra.config.Backups.GCS.Bucket
-	(*wrapperspb.StringValue)(nil),                                         // 55: google.protobuf.StringValue
-	(*FrontendTLSCredential)(nil),                                          // 56: chef.automate.infra.config.FrontendTLSCredential
-	(*wrapperspb.BoolValue)(nil),                                           // 57: google.protobuf.BoolValue
-	(*wrapperspb.Int32Value)(nil),                                          // 58: google.protobuf.Int32Value
-	(*TLSCredentials)(nil),                                                 // 59: chef.automate.infra.config.TLSCredentials
+	(*ChefServer)(nil),                                // 2: chef.automate.infra.config.ChefServer
+	(*External)(nil),                                  // 3: chef.automate.infra.config.External
+	(*Mlsa)(nil),                                      // 4: chef.automate.infra.config.Mlsa
+	(*Proxy)(nil),                                     // 5: chef.automate.infra.config.Proxy
+	(*Backups)(nil),                                   // 6: chef.automate.infra.config.Backups
+	(*Log)(nil),                                       // 7: chef.automate.infra.config.Log
+	(*Disclosure)(nil),                                // 8: chef.automate.infra.config.Disclosure
+	(*Banner)(nil),                                    // 9: chef.automate.infra.config.Banner
+	(*SessionSettings)(nil),                           // 10: chef.automate.infra.config.SessionSettings
+	(*LargeReporting)(nil),                            // 11: chef.automate.infra.config.LargeReporting
+	(*V1_System)(nil),                                 // 12: chef.automate.infra.config.V1.System
+	(*V1_Service)(nil),                                // 13: chef.automate.infra.config.V1.Service
+	(*External_Elasticsearch)(nil),                    // 14: chef.automate.infra.config.External.Elasticsearch
+	(*External_Opensearch)(nil),                       // 15: chef.automate.infra.config.External.Opensearch
+	(*External_Minio)(nil),                            // 16: chef.automate.infra.config.External.Minio
+	(*External_Postgresql)(nil),                       // 17: chef.automate.infra.config.External.Postgresql
+	(*External_Automate)(nil),                         // 18: chef.automate.infra.config.External.Automate
+	(*External_Elasticsearch_Backup)(nil),             // 19: chef.automate.infra.config.External.Elasticsearch.Backup
+	(*External_Elasticsearch_Authentication)(nil),     // 20: chef.automate.infra.config.External.Elasticsearch.Authentication
+	(*External_Elasticsearch_SSL)(nil),                // 21: chef.automate.infra.config.External.Elasticsearch.SSL
+	(*External_Elasticsearch_Backup_FsSettings)(nil),  // 22: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings
+	(*External_Elasticsearch_Backup_S3Settings)(nil),  // 23: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings
+	(*External_Elasticsearch_Backup_GCSSettings)(nil), // 24: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings
+	(*External_Elasticsearch_Backup_FsSettings_OptionalSettings)(nil),      // 25: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings
+	(*External_Elasticsearch_Authentication_BasicAuth)(nil),                // 26: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth
+	(*External_Elasticsearch_Authentication_AwsElasticsearchAuth)(nil),     // 27: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth
+	(*External_Opensearch_Backup)(nil),                                     // 28: chef.automate.infra.config.External.Opensearch.Backup
+	(*External_Opensearch_Authentication)(nil),                             // 29: chef.automate.infra.config.External.Opensearch.Authentication
+	(*External_Opensearch_SSL)(nil),                                        // 30: chef.automate.infra.config.External.Opensearch.SSL
+	(*External_Opensearch_Backup_FsSettings)(nil),                          // 31: chef.automate.infra.config.External.Opensearch.Backup.FsSettings
+	(*External_Opensearch_Backup_S3Settings)(nil),                          // 32: chef.automate.infra.config.External.Opensearch.Backup.S3Settings
+	(*External_Opensearch_Backup_GCSSettings)(nil),                         // 33: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings
+	(*External_Opensearch_Backup_FsSettings_OptionalSettings)(nil),         // 34: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings
+	(*External_Opensearch_Authentication_BasicAuth)(nil),                   // 35: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth
+	(*External_Opensearch_Authentication_AwsOpensearchAuth)(nil),           // 36: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth
+	(*External_Postgresql_Backup)(nil),                                     // 37: chef.automate.infra.config.External.Postgresql.Backup
+	(*External_Postgresql_Authentication)(nil),                             // 38: chef.automate.infra.config.External.Postgresql.Authentication
+	(*External_Postgresql_SSL)(nil),                                        // 39: chef.automate.infra.config.External.Postgresql.SSL
+	(*External_Postgresql_Authentication_PasswordAuthentication)(nil),      // 40: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication
+	(*External_Postgresql_Authentication_PasswordAuthentication_User)(nil), // 41: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
+	(*External_Automate_Authentication)(nil),                               // 42: chef.automate.infra.config.External.Automate.Authentication
+	(*External_Automate_SSL)(nil),                                          // 43: chef.automate.infra.config.External.Automate.SSL
+	(*Backups_Filesystem)(nil),                                             // 44: chef.automate.infra.config.Backups.Filesystem
+	(*Backups_S3)(nil),                                                     // 45: chef.automate.infra.config.Backups.S3
+	(*Backups_GCS)(nil),                                                    // 46: chef.automate.infra.config.Backups.GCS
+	(*Backups_S3_AWSCredentials)(nil),                                      // 47: chef.automate.infra.config.Backups.S3.AWSCredentials
+	(*Backups_S3_Elasticsearch)(nil),                                       // 48: chef.automate.infra.config.Backups.S3.Elasticsearch
+	(*Backups_S3_Opensearch)(nil),                                          // 49: chef.automate.infra.config.Backups.S3.Opensearch
+	(*Backups_S3_Bucket)(nil),                                              // 50: chef.automate.infra.config.Backups.S3.Bucket
+	(*Backups_S3_SSL)(nil),                                                 // 51: chef.automate.infra.config.Backups.S3.SSL
+	(*Backups_GCS_GCPCredentials)(nil),                                     // 52: chef.automate.infra.config.Backups.GCS.GCPCredentials
+	(*Backups_GCS_Elasticsearch)(nil),                                      // 53: chef.automate.infra.config.Backups.GCS.Elasticsearch
+	(*Backups_GCS_Opensearch)(nil),                                         // 54: chef.automate.infra.config.Backups.GCS.Opensearch
+	(*Backups_GCS_Bucket)(nil),                                             // 55: chef.automate.infra.config.Backups.GCS.Bucket
+	(*wrapperspb.StringValue)(nil),                                         // 56: google.protobuf.StringValue
+	(*FrontendTLSCredential)(nil),                                          // 57: chef.automate.infra.config.FrontendTLSCredential
+	(*wrapperspb.BoolValue)(nil),                                           // 58: google.protobuf.BoolValue
+	(*wrapperspb.Int32Value)(nil),                                          // 59: google.protobuf.Int32Value
+	(*TLSCredentials)(nil),                                                 // 60: chef.automate.infra.config.TLSCredentials
 }
 var file_config_shared_global_proto_depIdxs = []int32{
 	1,   // 0: chef.automate.infra.config.GlobalConfig.v1:type_name -> chef.automate.infra.config.V1
-	55,  // 1: chef.automate.infra.config.V1.fqdn:type_name -> google.protobuf.StringValue
-	3,   // 2: chef.automate.infra.config.V1.mlsa:type_name -> chef.automate.infra.config.Mlsa
-	4,   // 3: chef.automate.infra.config.V1.proxy:type_name -> chef.automate.infra.config.Proxy
-	5,   // 4: chef.automate.infra.config.V1.backups:type_name -> chef.automate.infra.config.Backups
-	6,   // 5: chef.automate.infra.config.V1.log:type_name -> chef.automate.infra.config.Log
-	2,   // 6: chef.automate.infra.config.V1.external:type_name -> chef.automate.infra.config.External
-	56,  // 7: chef.automate.infra.config.V1.frontend_tls:type_name -> chef.automate.infra.config.FrontendTLSCredential
-	7,   // 8: chef.automate.infra.config.V1.disclosure:type_name -> chef.automate.infra.config.Disclosure
-	8,   // 9: chef.automate.infra.config.V1.banner:type_name -> chef.automate.infra.config.Banner
-	9,   // 10: chef.automate.infra.config.V1.session_settings:type_name -> chef.automate.infra.config.SessionSettings
-	11,  // 11: chef.automate.infra.config.V1.sys:type_name -> chef.automate.infra.config.V1.System
-	12,  // 12: chef.automate.infra.config.V1.svc:type_name -> chef.automate.infra.config.V1.Service
-	10,  // 13: chef.automate.infra.config.V1.large_reporting:type_name -> chef.automate.infra.config.LargeReporting
-	13,  // 14: chef.automate.infra.config.External.elasticsearch:type_name -> chef.automate.infra.config.External.Elasticsearch
-	16,  // 15: chef.automate.infra.config.External.postgresql:type_name -> chef.automate.infra.config.External.Postgresql
-	17,  // 16: chef.automate.infra.config.External.automate:type_name -> chef.automate.infra.config.External.Automate
-	14,  // 17: chef.automate.infra.config.External.opensearch:type_name -> chef.automate.infra.config.External.Opensearch
-	15,  // 18: chef.automate.infra.config.External.minio:type_name -> chef.automate.infra.config.External.Minio
-	57,  // 19: chef.automate.infra.config.Mlsa.accept:type_name -> google.protobuf.BoolValue
-	55,  // 20: chef.automate.infra.config.Proxy.host:type_name -> google.protobuf.StringValue
-	58,  // 21: chef.automate.infra.config.Proxy.port:type_name -> google.protobuf.Int32Value
-	55,  // 22: chef.automate.infra.config.Proxy.user:type_name -> google.protobuf.StringValue
-	55,  // 23: chef.automate.infra.config.Proxy.password:type_name -> google.protobuf.StringValue
-	55,  // 24: chef.automate.infra.config.Backups.location:type_name -> google.protobuf.StringValue
-	43,  // 25: chef.automate.infra.config.Backups.filesystem:type_name -> chef.automate.infra.config.Backups.Filesystem
-	44,  // 26: chef.automate.infra.config.Backups.s3:type_name -> chef.automate.infra.config.Backups.S3
-	45,  // 27: chef.automate.infra.config.Backups.gcs:type_name -> chef.automate.infra.config.Backups.GCS
-	55,  // 28: chef.automate.infra.config.Log.level:type_name -> google.protobuf.StringValue
-	55,  // 29: chef.automate.infra.config.Log.format:type_name -> google.protobuf.StringValue
-	57,  // 30: chef.automate.infra.config.Log.redirect_sys_log:type_name -> google.protobuf.BoolValue
-	55,  // 31: chef.automate.infra.config.Log.redirect_log_file_path:type_name -> google.protobuf.StringValue
-	57,  // 32: chef.automate.infra.config.Log.compress_rotated_logs:type_name -> google.protobuf.BoolValue
-	55,  // 33: chef.automate.infra.config.Log.max_size_rotate_logs:type_name -> google.protobuf.StringValue
-	58,  // 34: chef.automate.infra.config.Log.max_number_rotated_logs:type_name -> google.protobuf.Int32Value
-	57,  // 35: chef.automate.infra.config.Disclosure.show:type_name -> google.protobuf.BoolValue
-	55,  // 36: chef.automate.infra.config.Disclosure.message_file_path:type_name -> google.protobuf.StringValue
-	57,  // 37: chef.automate.infra.config.Banner.show:type_name -> google.protobuf.BoolValue
-	55,  // 38: chef.automate.infra.config.Banner.message:type_name -> google.protobuf.StringValue
-	55,  // 39: chef.automate.infra.config.Banner.background_color:type_name -> google.protobuf.StringValue
-	55,  // 40: chef.automate.infra.config.Banner.text_color:type_name -> google.protobuf.StringValue
-	57,  // 41: chef.automate.infra.config.SessionSettings.enable_idle_timeout:type_name -> google.protobuf.BoolValue
-	58,  // 42: chef.automate.infra.config.SessionSettings.idle_timeout_minutes:type_name -> google.protobuf.Int32Value
-	57,  // 43: chef.automate.infra.config.LargeReporting.enable_large_reporting:type_name -> google.protobuf.BoolValue
-	59,  // 44: chef.automate.infra.config.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
-	57,  // 45: chef.automate.infra.config.External.Elasticsearch.enable:type_name -> google.protobuf.BoolValue
-	55,  // 46: chef.automate.infra.config.External.Elasticsearch.nodes:type_name -> google.protobuf.StringValue
-	18,  // 47: chef.automate.infra.config.External.Elasticsearch.backup:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup
-	19,  // 48: chef.automate.infra.config.External.Elasticsearch.auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication
-	20,  // 49: chef.automate.infra.config.External.Elasticsearch.ssl:type_name -> chef.automate.infra.config.External.Elasticsearch.SSL
-	57,  // 50: chef.automate.infra.config.External.Opensearch.enable:type_name -> google.protobuf.BoolValue
-	55,  // 51: chef.automate.infra.config.External.Opensearch.nodes:type_name -> google.protobuf.StringValue
-	27,  // 52: chef.automate.infra.config.External.Opensearch.backup:type_name -> chef.automate.infra.config.External.Opensearch.Backup
-	28,  // 53: chef.automate.infra.config.External.Opensearch.auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication
-	29,  // 54: chef.automate.infra.config.External.Opensearch.ssl:type_name -> chef.automate.infra.config.External.Opensearch.SSL
-	55,  // 55: chef.automate.infra.config.External.Minio.endpoint:type_name -> google.protobuf.StringValue
-	55,  // 56: chef.automate.infra.config.External.Minio.root_user:type_name -> google.protobuf.StringValue
-	55,  // 57: chef.automate.infra.config.External.Minio.root_password:type_name -> google.protobuf.StringValue
-	57,  // 58: chef.automate.infra.config.External.Minio.enable_ssl:type_name -> google.protobuf.BoolValue
-	55,  // 59: chef.automate.infra.config.External.Minio.cert:type_name -> google.protobuf.StringValue
-	58,  // 60: chef.automate.infra.config.External.Minio.concurrent_open_search_requests:type_name -> google.protobuf.Int32Value
-	58,  // 61: chef.automate.infra.config.External.Minio.concurrent_minio_requests:type_name -> google.protobuf.Int32Value
-	57,  // 62: chef.automate.infra.config.External.Postgresql.enable:type_name -> google.protobuf.BoolValue
-	55,  // 63: chef.automate.infra.config.External.Postgresql.nodes:type_name -> google.protobuf.StringValue
-	36,  // 64: chef.automate.infra.config.External.Postgresql.backup:type_name -> chef.automate.infra.config.External.Postgresql.Backup
-	37,  // 65: chef.automate.infra.config.External.Postgresql.auth:type_name -> chef.automate.infra.config.External.Postgresql.Authentication
-	38,  // 66: chef.automate.infra.config.External.Postgresql.ssl:type_name -> chef.automate.infra.config.External.Postgresql.SSL
-	57,  // 67: chef.automate.infra.config.External.Automate.enable:type_name -> google.protobuf.BoolValue
-	55,  // 68: chef.automate.infra.config.External.Automate.node:type_name -> google.protobuf.StringValue
-	41,  // 69: chef.automate.infra.config.External.Automate.auth:type_name -> chef.automate.infra.config.External.Automate.Authentication
-	42,  // 70: chef.automate.infra.config.External.Automate.ssl:type_name -> chef.automate.infra.config.External.Automate.SSL
-	57,  // 71: chef.automate.infra.config.External.Elasticsearch.Backup.enable:type_name -> google.protobuf.BoolValue
-	55,  // 72: chef.automate.infra.config.External.Elasticsearch.Backup.location:type_name -> google.protobuf.StringValue
-	21,  // 73: chef.automate.infra.config.External.Elasticsearch.Backup.fs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings
-	22,  // 74: chef.automate.infra.config.External.Elasticsearch.Backup.s3:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings
-	23,  // 75: chef.automate.infra.config.External.Elasticsearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings
-	55,  // 76: chef.automate.infra.config.External.Elasticsearch.Authentication.scheme:type_name -> google.protobuf.StringValue
-	25,  // 77: chef.automate.infra.config.External.Elasticsearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth
-	26,  // 78: chef.automate.infra.config.External.Elasticsearch.Authentication.aws_es:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth
-	55,  // 79: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert:type_name -> google.protobuf.StringValue
-	55,  // 80: chef.automate.infra.config.External.Elasticsearch.SSL.server_name:type_name -> google.protobuf.StringValue
-	55,  // 81: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
-	55,  // 82: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
-	24,  // 83: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings
-	55,  // 84: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
-	55,  // 85: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
-	55,  // 86: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
-	47,  // 87: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
-	55,  // 88: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
-	55,  // 89: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
-	55,  // 90: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
-	52,  // 91: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
-	55,  // 92: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 93: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 94: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
-	55,  // 95: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
-	55,  // 96: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.username:type_name -> google.protobuf.StringValue
-	55,  // 97: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.password:type_name -> google.protobuf.StringValue
-	55,  // 98: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.access_key:type_name -> google.protobuf.StringValue
-	55,  // 99: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.secret_key:type_name -> google.protobuf.StringValue
-	57,  // 100: chef.automate.infra.config.External.Opensearch.Backup.enable:type_name -> google.protobuf.BoolValue
-	55,  // 101: chef.automate.infra.config.External.Opensearch.Backup.location:type_name -> google.protobuf.StringValue
-	30,  // 102: chef.automate.infra.config.External.Opensearch.Backup.fs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings
-	31,  // 103: chef.automate.infra.config.External.Opensearch.Backup.s3:type_name -> chef.automate.infra.config.External.Opensearch.Backup.S3Settings
-	32,  // 104: chef.automate.infra.config.External.Opensearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.GCSSettings
-	55,  // 105: chef.automate.infra.config.External.Opensearch.Authentication.scheme:type_name -> google.protobuf.StringValue
-	34,  // 106: chef.automate.infra.config.External.Opensearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth
-	35,  // 107: chef.automate.infra.config.External.Opensearch.Authentication.aws_os:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth
-	55,  // 108: chef.automate.infra.config.External.Opensearch.SSL.root_cert:type_name -> google.protobuf.StringValue
-	55,  // 109: chef.automate.infra.config.External.Opensearch.SSL.server_name:type_name -> google.protobuf.StringValue
-	55,  // 110: chef.automate.infra.config.External.Opensearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
-	55,  // 111: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
-	33,  // 112: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings
-	55,  // 113: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
-	55,  // 114: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
-	55,  // 115: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
-	48,  // 116: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
-	55,  // 117: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
-	55,  // 118: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
-	55,  // 119: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
-	53,  // 120: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
-	55,  // 121: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 122: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 123: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
-	55,  // 124: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
-	55,  // 125: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.username:type_name -> google.protobuf.StringValue
-	55,  // 126: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.password:type_name -> google.protobuf.StringValue
-	55,  // 127: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.access_key:type_name -> google.protobuf.StringValue
-	55,  // 128: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.secret_key:type_name -> google.protobuf.StringValue
-	57,  // 129: chef.automate.infra.config.External.Postgresql.Backup.enable:type_name -> google.protobuf.BoolValue
-	55,  // 130: chef.automate.infra.config.External.Postgresql.Authentication.scheme:type_name -> google.protobuf.StringValue
-	39,  // 131: chef.automate.infra.config.External.Postgresql.Authentication.password:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication
-	55,  // 132: chef.automate.infra.config.External.Postgresql.SSL.mode:type_name -> google.protobuf.StringValue
-	55,  // 133: chef.automate.infra.config.External.Postgresql.SSL.cert:type_name -> google.protobuf.StringValue
-	55,  // 134: chef.automate.infra.config.External.Postgresql.SSL.key:type_name -> google.protobuf.StringValue
-	55,  // 135: chef.automate.infra.config.External.Postgresql.SSL.root_cert:type_name -> google.protobuf.StringValue
-	57,  // 136: chef.automate.infra.config.External.Postgresql.SSL.enable:type_name -> google.protobuf.BoolValue
-	40,  // 137: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.superuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
-	40,  // 138: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.dbuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
-	55,  // 139: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.username:type_name -> google.protobuf.StringValue
-	55,  // 140: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.password:type_name -> google.protobuf.StringValue
-	55,  // 141: chef.automate.infra.config.External.Automate.Authentication.scheme:type_name -> google.protobuf.StringValue
-	55,  // 142: chef.automate.infra.config.External.Automate.Authentication.token:type_name -> google.protobuf.StringValue
-	55,  // 143: chef.automate.infra.config.External.Automate.SSL.root_cert:type_name -> google.protobuf.StringValue
-	55,  // 144: chef.automate.infra.config.External.Automate.SSL.server_name:type_name -> google.protobuf.StringValue
-	55,  // 145: chef.automate.infra.config.Backups.Filesystem.path:type_name -> google.protobuf.StringValue
-	55,  // 146: chef.automate.infra.config.Backups.Filesystem.es_max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 147: chef.automate.infra.config.Backups.Filesystem.es_max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	46,  // 148: chef.automate.infra.config.Backups.S3.credentials:type_name -> chef.automate.infra.config.Backups.S3.AWSCredentials
-	47,  // 149: chef.automate.infra.config.Backups.S3.es:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
-	49,  // 150: chef.automate.infra.config.Backups.S3.bucket:type_name -> chef.automate.infra.config.Backups.S3.Bucket
-	50,  // 151: chef.automate.infra.config.Backups.S3.ssl:type_name -> chef.automate.infra.config.Backups.S3.SSL
-	48,  // 152: chef.automate.infra.config.Backups.S3.os:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
-	51,  // 153: chef.automate.infra.config.Backups.GCS.credentials:type_name -> chef.automate.infra.config.Backups.GCS.GCPCredentials
-	52,  // 154: chef.automate.infra.config.Backups.GCS.es:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
-	54,  // 155: chef.automate.infra.config.Backups.GCS.bucket:type_name -> chef.automate.infra.config.Backups.GCS.Bucket
-	53,  // 156: chef.automate.infra.config.Backups.GCS.os:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
-	55,  // 157: chef.automate.infra.config.Backups.S3.AWSCredentials.access_key:type_name -> google.protobuf.StringValue
-	55,  // 158: chef.automate.infra.config.Backups.S3.AWSCredentials.secret_key:type_name -> google.protobuf.StringValue
-	55,  // 159: chef.automate.infra.config.Backups.S3.AWSCredentials.session_token:type_name -> google.protobuf.StringValue
-	57,  // 160: chef.automate.infra.config.Backups.S3.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
-	57,  // 161: chef.automate.infra.config.Backups.S3.Elasticsearch.server_side_encryption:type_name -> google.protobuf.BoolValue
-	55,  // 162: chef.automate.infra.config.Backups.S3.Elasticsearch.buffer_size:type_name -> google.protobuf.StringValue
-	55,  // 163: chef.automate.infra.config.Backups.S3.Elasticsearch.canned_acl:type_name -> google.protobuf.StringValue
-	55,  // 164: chef.automate.infra.config.Backups.S3.Elasticsearch.storage_class:type_name -> google.protobuf.StringValue
-	55,  // 165: chef.automate.infra.config.Backups.S3.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 166: chef.automate.infra.config.Backups.S3.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 167: chef.automate.infra.config.Backups.S3.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
-	55,  // 168: chef.automate.infra.config.Backups.S3.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
-	58,  // 169: chef.automate.infra.config.Backups.S3.Elasticsearch.max_retries:type_name -> google.protobuf.Int32Value
-	57,  // 170: chef.automate.infra.config.Backups.S3.Elasticsearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
-	55,  // 171: chef.automate.infra.config.Backups.S3.Elasticsearch.protocol:type_name -> google.protobuf.StringValue
-	55,  // 172: chef.automate.infra.config.Backups.S3.Elasticsearch.region:type_name -> google.protobuf.StringValue
-	55,  // 173: chef.automate.infra.config.Backups.S3.Elasticsearch.role_arn:type_name -> google.protobuf.StringValue
-	57,  // 174: chef.automate.infra.config.Backups.S3.Opensearch.compress:type_name -> google.protobuf.BoolValue
-	57,  // 175: chef.automate.infra.config.Backups.S3.Opensearch.server_side_encryption:type_name -> google.protobuf.BoolValue
-	55,  // 176: chef.automate.infra.config.Backups.S3.Opensearch.buffer_size:type_name -> google.protobuf.StringValue
-	55,  // 177: chef.automate.infra.config.Backups.S3.Opensearch.canned_acl:type_name -> google.protobuf.StringValue
-	55,  // 178: chef.automate.infra.config.Backups.S3.Opensearch.storage_class:type_name -> google.protobuf.StringValue
-	55,  // 179: chef.automate.infra.config.Backups.S3.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 180: chef.automate.infra.config.Backups.S3.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 181: chef.automate.infra.config.Backups.S3.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
-	55,  // 182: chef.automate.infra.config.Backups.S3.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
-	58,  // 183: chef.automate.infra.config.Backups.S3.Opensearch.max_retries:type_name -> google.protobuf.Int32Value
-	57,  // 184: chef.automate.infra.config.Backups.S3.Opensearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
-	55,  // 185: chef.automate.infra.config.Backups.S3.Opensearch.protocol:type_name -> google.protobuf.StringValue
-	55,  // 186: chef.automate.infra.config.Backups.S3.Opensearch.region:type_name -> google.protobuf.StringValue
-	55,  // 187: chef.automate.infra.config.Backups.S3.Opensearch.role_arn:type_name -> google.protobuf.StringValue
-	55,  // 188: chef.automate.infra.config.Backups.S3.Bucket.endpoint:type_name -> google.protobuf.StringValue
-	55,  // 189: chef.automate.infra.config.Backups.S3.Bucket.base_path:type_name -> google.protobuf.StringValue
-	55,  // 190: chef.automate.infra.config.Backups.S3.Bucket.name:type_name -> google.protobuf.StringValue
-	55,  // 191: chef.automate.infra.config.Backups.S3.SSL.root_cert:type_name -> google.protobuf.StringValue
-	55,  // 192: chef.automate.infra.config.Backups.GCS.GCPCredentials.json:type_name -> google.protobuf.StringValue
-	57,  // 193: chef.automate.infra.config.Backups.GCS.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
-	57,  // 194: chef.automate.infra.config.Backups.GCS.Elasticsearch.application_name:type_name -> google.protobuf.BoolValue
-	55,  // 195: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 196: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 197: chef.automate.infra.config.Backups.GCS.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
-	55,  // 198: chef.automate.infra.config.Backups.GCS.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
-	57,  // 199: chef.automate.infra.config.Backups.GCS.Elasticsearch.connect_timeout:type_name -> google.protobuf.BoolValue
-	57,  // 200: chef.automate.infra.config.Backups.GCS.Opensearch.compress:type_name -> google.protobuf.BoolValue
-	57,  // 201: chef.automate.infra.config.Backups.GCS.Opensearch.application_name:type_name -> google.protobuf.BoolValue
-	55,  // 202: chef.automate.infra.config.Backups.GCS.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 203: chef.automate.infra.config.Backups.GCS.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	55,  // 204: chef.automate.infra.config.Backups.GCS.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
-	55,  // 205: chef.automate.infra.config.Backups.GCS.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
-	57,  // 206: chef.automate.infra.config.Backups.GCS.Opensearch.connect_timeout:type_name -> google.protobuf.BoolValue
-	55,  // 207: chef.automate.infra.config.Backups.GCS.Bucket.base_path:type_name -> google.protobuf.StringValue
-	55,  // 208: chef.automate.infra.config.Backups.GCS.Bucket.name:type_name -> google.protobuf.StringValue
-	209, // [209:209] is the sub-list for method output_type
-	209, // [209:209] is the sub-list for method input_type
-	209, // [209:209] is the sub-list for extension type_name
-	209, // [209:209] is the sub-list for extension extendee
-	0,   // [0:209] is the sub-list for field type_name
+	56,  // 1: chef.automate.infra.config.V1.fqdn:type_name -> google.protobuf.StringValue
+	4,   // 2: chef.automate.infra.config.V1.mlsa:type_name -> chef.automate.infra.config.Mlsa
+	5,   // 3: chef.automate.infra.config.V1.proxy:type_name -> chef.automate.infra.config.Proxy
+	6,   // 4: chef.automate.infra.config.V1.backups:type_name -> chef.automate.infra.config.Backups
+	7,   // 5: chef.automate.infra.config.V1.log:type_name -> chef.automate.infra.config.Log
+	3,   // 6: chef.automate.infra.config.V1.external:type_name -> chef.automate.infra.config.External
+	57,  // 7: chef.automate.infra.config.V1.frontend_tls:type_name -> chef.automate.infra.config.FrontendTLSCredential
+	8,   // 8: chef.automate.infra.config.V1.disclosure:type_name -> chef.automate.infra.config.Disclosure
+	9,   // 9: chef.automate.infra.config.V1.banner:type_name -> chef.automate.infra.config.Banner
+	10,  // 10: chef.automate.infra.config.V1.session_settings:type_name -> chef.automate.infra.config.SessionSettings
+	12,  // 11: chef.automate.infra.config.V1.sys:type_name -> chef.automate.infra.config.V1.System
+	13,  // 12: chef.automate.infra.config.V1.svc:type_name -> chef.automate.infra.config.V1.Service
+	11,  // 13: chef.automate.infra.config.V1.large_reporting:type_name -> chef.automate.infra.config.LargeReporting
+	2,   // 14: chef.automate.infra.config.V1.chef_server:type_name -> chef.automate.infra.config.ChefServer
+	56,  // 15: chef.automate.infra.config.ChefServer.fqdn:type_name -> google.protobuf.StringValue
+	56,  // 16: chef.automate.infra.config.ChefServer.root_ca:type_name -> google.protobuf.StringValue
+	14,  // 17: chef.automate.infra.config.External.elasticsearch:type_name -> chef.automate.infra.config.External.Elasticsearch
+	17,  // 18: chef.automate.infra.config.External.postgresql:type_name -> chef.automate.infra.config.External.Postgresql
+	18,  // 19: chef.automate.infra.config.External.automate:type_name -> chef.automate.infra.config.External.Automate
+	15,  // 20: chef.automate.infra.config.External.opensearch:type_name -> chef.automate.infra.config.External.Opensearch
+	16,  // 21: chef.automate.infra.config.External.minio:type_name -> chef.automate.infra.config.External.Minio
+	58,  // 22: chef.automate.infra.config.Mlsa.accept:type_name -> google.protobuf.BoolValue
+	56,  // 23: chef.automate.infra.config.Proxy.host:type_name -> google.protobuf.StringValue
+	59,  // 24: chef.automate.infra.config.Proxy.port:type_name -> google.protobuf.Int32Value
+	56,  // 25: chef.automate.infra.config.Proxy.user:type_name -> google.protobuf.StringValue
+	56,  // 26: chef.automate.infra.config.Proxy.password:type_name -> google.protobuf.StringValue
+	56,  // 27: chef.automate.infra.config.Backups.location:type_name -> google.protobuf.StringValue
+	44,  // 28: chef.automate.infra.config.Backups.filesystem:type_name -> chef.automate.infra.config.Backups.Filesystem
+	45,  // 29: chef.automate.infra.config.Backups.s3:type_name -> chef.automate.infra.config.Backups.S3
+	46,  // 30: chef.automate.infra.config.Backups.gcs:type_name -> chef.automate.infra.config.Backups.GCS
+	56,  // 31: chef.automate.infra.config.Log.level:type_name -> google.protobuf.StringValue
+	56,  // 32: chef.automate.infra.config.Log.format:type_name -> google.protobuf.StringValue
+	58,  // 33: chef.automate.infra.config.Log.redirect_sys_log:type_name -> google.protobuf.BoolValue
+	56,  // 34: chef.automate.infra.config.Log.redirect_log_file_path:type_name -> google.protobuf.StringValue
+	58,  // 35: chef.automate.infra.config.Log.compress_rotated_logs:type_name -> google.protobuf.BoolValue
+	56,  // 36: chef.automate.infra.config.Log.max_size_rotate_logs:type_name -> google.protobuf.StringValue
+	59,  // 37: chef.automate.infra.config.Log.max_number_rotated_logs:type_name -> google.protobuf.Int32Value
+	58,  // 38: chef.automate.infra.config.Disclosure.show:type_name -> google.protobuf.BoolValue
+	56,  // 39: chef.automate.infra.config.Disclosure.message_file_path:type_name -> google.protobuf.StringValue
+	58,  // 40: chef.automate.infra.config.Banner.show:type_name -> google.protobuf.BoolValue
+	56,  // 41: chef.automate.infra.config.Banner.message:type_name -> google.protobuf.StringValue
+	56,  // 42: chef.automate.infra.config.Banner.background_color:type_name -> google.protobuf.StringValue
+	56,  // 43: chef.automate.infra.config.Banner.text_color:type_name -> google.protobuf.StringValue
+	58,  // 44: chef.automate.infra.config.SessionSettings.enable_idle_timeout:type_name -> google.protobuf.BoolValue
+	59,  // 45: chef.automate.infra.config.SessionSettings.idle_timeout_minutes:type_name -> google.protobuf.Int32Value
+	58,  // 46: chef.automate.infra.config.LargeReporting.enable_large_reporting:type_name -> google.protobuf.BoolValue
+	60,  // 47: chef.automate.infra.config.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
+	58,  // 48: chef.automate.infra.config.External.Elasticsearch.enable:type_name -> google.protobuf.BoolValue
+	56,  // 49: chef.automate.infra.config.External.Elasticsearch.nodes:type_name -> google.protobuf.StringValue
+	19,  // 50: chef.automate.infra.config.External.Elasticsearch.backup:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup
+	20,  // 51: chef.automate.infra.config.External.Elasticsearch.auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication
+	21,  // 52: chef.automate.infra.config.External.Elasticsearch.ssl:type_name -> chef.automate.infra.config.External.Elasticsearch.SSL
+	58,  // 53: chef.automate.infra.config.External.Opensearch.enable:type_name -> google.protobuf.BoolValue
+	56,  // 54: chef.automate.infra.config.External.Opensearch.nodes:type_name -> google.protobuf.StringValue
+	28,  // 55: chef.automate.infra.config.External.Opensearch.backup:type_name -> chef.automate.infra.config.External.Opensearch.Backup
+	29,  // 56: chef.automate.infra.config.External.Opensearch.auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication
+	30,  // 57: chef.automate.infra.config.External.Opensearch.ssl:type_name -> chef.automate.infra.config.External.Opensearch.SSL
+	56,  // 58: chef.automate.infra.config.External.Minio.endpoint:type_name -> google.protobuf.StringValue
+	56,  // 59: chef.automate.infra.config.External.Minio.root_user:type_name -> google.protobuf.StringValue
+	56,  // 60: chef.automate.infra.config.External.Minio.root_password:type_name -> google.protobuf.StringValue
+	58,  // 61: chef.automate.infra.config.External.Minio.enable_ssl:type_name -> google.protobuf.BoolValue
+	56,  // 62: chef.automate.infra.config.External.Minio.cert:type_name -> google.protobuf.StringValue
+	59,  // 63: chef.automate.infra.config.External.Minio.concurrent_open_search_requests:type_name -> google.protobuf.Int32Value
+	59,  // 64: chef.automate.infra.config.External.Minio.concurrent_minio_requests:type_name -> google.protobuf.Int32Value
+	58,  // 65: chef.automate.infra.config.External.Postgresql.enable:type_name -> google.protobuf.BoolValue
+	56,  // 66: chef.automate.infra.config.External.Postgresql.nodes:type_name -> google.protobuf.StringValue
+	37,  // 67: chef.automate.infra.config.External.Postgresql.backup:type_name -> chef.automate.infra.config.External.Postgresql.Backup
+	38,  // 68: chef.automate.infra.config.External.Postgresql.auth:type_name -> chef.automate.infra.config.External.Postgresql.Authentication
+	39,  // 69: chef.automate.infra.config.External.Postgresql.ssl:type_name -> chef.automate.infra.config.External.Postgresql.SSL
+	58,  // 70: chef.automate.infra.config.External.Automate.enable:type_name -> google.protobuf.BoolValue
+	56,  // 71: chef.automate.infra.config.External.Automate.node:type_name -> google.protobuf.StringValue
+	42,  // 72: chef.automate.infra.config.External.Automate.auth:type_name -> chef.automate.infra.config.External.Automate.Authentication
+	43,  // 73: chef.automate.infra.config.External.Automate.ssl:type_name -> chef.automate.infra.config.External.Automate.SSL
+	58,  // 74: chef.automate.infra.config.External.Elasticsearch.Backup.enable:type_name -> google.protobuf.BoolValue
+	56,  // 75: chef.automate.infra.config.External.Elasticsearch.Backup.location:type_name -> google.protobuf.StringValue
+	22,  // 76: chef.automate.infra.config.External.Elasticsearch.Backup.fs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings
+	23,  // 77: chef.automate.infra.config.External.Elasticsearch.Backup.s3:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings
+	24,  // 78: chef.automate.infra.config.External.Elasticsearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings
+	56,  // 79: chef.automate.infra.config.External.Elasticsearch.Authentication.scheme:type_name -> google.protobuf.StringValue
+	26,  // 80: chef.automate.infra.config.External.Elasticsearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth
+	27,  // 81: chef.automate.infra.config.External.Elasticsearch.Authentication.aws_es:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth
+	56,  // 82: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 83: chef.automate.infra.config.External.Elasticsearch.SSL.server_name:type_name -> google.protobuf.StringValue
+	56,  // 84: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
+	56,  // 85: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
+	25,  // 86: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings
+	56,  // 87: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 88: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
+	56,  // 89: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
+	48,  // 90: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
+	56,  // 91: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 92: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
+	56,  // 93: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
+	53,  // 94: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
+	56,  // 95: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 96: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 97: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 98: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 99: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 100: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 101: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.access_key:type_name -> google.protobuf.StringValue
+	56,  // 102: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.secret_key:type_name -> google.protobuf.StringValue
+	58,  // 103: chef.automate.infra.config.External.Opensearch.Backup.enable:type_name -> google.protobuf.BoolValue
+	56,  // 104: chef.automate.infra.config.External.Opensearch.Backup.location:type_name -> google.protobuf.StringValue
+	31,  // 105: chef.automate.infra.config.External.Opensearch.Backup.fs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings
+	32,  // 106: chef.automate.infra.config.External.Opensearch.Backup.s3:type_name -> chef.automate.infra.config.External.Opensearch.Backup.S3Settings
+	33,  // 107: chef.automate.infra.config.External.Opensearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.GCSSettings
+	56,  // 108: chef.automate.infra.config.External.Opensearch.Authentication.scheme:type_name -> google.protobuf.StringValue
+	35,  // 109: chef.automate.infra.config.External.Opensearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth
+	36,  // 110: chef.automate.infra.config.External.Opensearch.Authentication.aws_os:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth
+	56,  // 111: chef.automate.infra.config.External.Opensearch.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 112: chef.automate.infra.config.External.Opensearch.SSL.server_name:type_name -> google.protobuf.StringValue
+	56,  // 113: chef.automate.infra.config.External.Opensearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
+	56,  // 114: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
+	34,  // 115: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings
+	56,  // 116: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 117: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
+	56,  // 118: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
+	49,  // 119: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
+	56,  // 120: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 121: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
+	56,  // 122: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
+	54,  // 123: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
+	56,  // 124: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 125: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 126: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 127: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 128: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 129: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 130: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.access_key:type_name -> google.protobuf.StringValue
+	56,  // 131: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.secret_key:type_name -> google.protobuf.StringValue
+	58,  // 132: chef.automate.infra.config.External.Postgresql.Backup.enable:type_name -> google.protobuf.BoolValue
+	56,  // 133: chef.automate.infra.config.External.Postgresql.Authentication.scheme:type_name -> google.protobuf.StringValue
+	40,  // 134: chef.automate.infra.config.External.Postgresql.Authentication.password:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication
+	56,  // 135: chef.automate.infra.config.External.Postgresql.SSL.mode:type_name -> google.protobuf.StringValue
+	56,  // 136: chef.automate.infra.config.External.Postgresql.SSL.cert:type_name -> google.protobuf.StringValue
+	56,  // 137: chef.automate.infra.config.External.Postgresql.SSL.key:type_name -> google.protobuf.StringValue
+	56,  // 138: chef.automate.infra.config.External.Postgresql.SSL.root_cert:type_name -> google.protobuf.StringValue
+	58,  // 139: chef.automate.infra.config.External.Postgresql.SSL.enable:type_name -> google.protobuf.BoolValue
+	41,  // 140: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.superuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
+	41,  // 141: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.dbuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
+	56,  // 142: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.username:type_name -> google.protobuf.StringValue
+	56,  // 143: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.password:type_name -> google.protobuf.StringValue
+	56,  // 144: chef.automate.infra.config.External.Automate.Authentication.scheme:type_name -> google.protobuf.StringValue
+	56,  // 145: chef.automate.infra.config.External.Automate.Authentication.token:type_name -> google.protobuf.StringValue
+	56,  // 146: chef.automate.infra.config.External.Automate.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 147: chef.automate.infra.config.External.Automate.SSL.server_name:type_name -> google.protobuf.StringValue
+	56,  // 148: chef.automate.infra.config.Backups.Filesystem.path:type_name -> google.protobuf.StringValue
+	56,  // 149: chef.automate.infra.config.Backups.Filesystem.es_max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 150: chef.automate.infra.config.Backups.Filesystem.es_max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	47,  // 151: chef.automate.infra.config.Backups.S3.credentials:type_name -> chef.automate.infra.config.Backups.S3.AWSCredentials
+	48,  // 152: chef.automate.infra.config.Backups.S3.es:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
+	50,  // 153: chef.automate.infra.config.Backups.S3.bucket:type_name -> chef.automate.infra.config.Backups.S3.Bucket
+	51,  // 154: chef.automate.infra.config.Backups.S3.ssl:type_name -> chef.automate.infra.config.Backups.S3.SSL
+	49,  // 155: chef.automate.infra.config.Backups.S3.os:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
+	52,  // 156: chef.automate.infra.config.Backups.GCS.credentials:type_name -> chef.automate.infra.config.Backups.GCS.GCPCredentials
+	53,  // 157: chef.automate.infra.config.Backups.GCS.es:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
+	55,  // 158: chef.automate.infra.config.Backups.GCS.bucket:type_name -> chef.automate.infra.config.Backups.GCS.Bucket
+	54,  // 159: chef.automate.infra.config.Backups.GCS.os:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
+	56,  // 160: chef.automate.infra.config.Backups.S3.AWSCredentials.access_key:type_name -> google.protobuf.StringValue
+	56,  // 161: chef.automate.infra.config.Backups.S3.AWSCredentials.secret_key:type_name -> google.protobuf.StringValue
+	56,  // 162: chef.automate.infra.config.Backups.S3.AWSCredentials.session_token:type_name -> google.protobuf.StringValue
+	58,  // 163: chef.automate.infra.config.Backups.S3.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 164: chef.automate.infra.config.Backups.S3.Elasticsearch.server_side_encryption:type_name -> google.protobuf.BoolValue
+	56,  // 165: chef.automate.infra.config.Backups.S3.Elasticsearch.buffer_size:type_name -> google.protobuf.StringValue
+	56,  // 166: chef.automate.infra.config.Backups.S3.Elasticsearch.canned_acl:type_name -> google.protobuf.StringValue
+	56,  // 167: chef.automate.infra.config.Backups.S3.Elasticsearch.storage_class:type_name -> google.protobuf.StringValue
+	56,  // 168: chef.automate.infra.config.Backups.S3.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 169: chef.automate.infra.config.Backups.S3.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 170: chef.automate.infra.config.Backups.S3.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 171: chef.automate.infra.config.Backups.S3.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
+	59,  // 172: chef.automate.infra.config.Backups.S3.Elasticsearch.max_retries:type_name -> google.protobuf.Int32Value
+	58,  // 173: chef.automate.infra.config.Backups.S3.Elasticsearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
+	56,  // 174: chef.automate.infra.config.Backups.S3.Elasticsearch.protocol:type_name -> google.protobuf.StringValue
+	56,  // 175: chef.automate.infra.config.Backups.S3.Elasticsearch.region:type_name -> google.protobuf.StringValue
+	56,  // 176: chef.automate.infra.config.Backups.S3.Elasticsearch.role_arn:type_name -> google.protobuf.StringValue
+	58,  // 177: chef.automate.infra.config.Backups.S3.Opensearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 178: chef.automate.infra.config.Backups.S3.Opensearch.server_side_encryption:type_name -> google.protobuf.BoolValue
+	56,  // 179: chef.automate.infra.config.Backups.S3.Opensearch.buffer_size:type_name -> google.protobuf.StringValue
+	56,  // 180: chef.automate.infra.config.Backups.S3.Opensearch.canned_acl:type_name -> google.protobuf.StringValue
+	56,  // 181: chef.automate.infra.config.Backups.S3.Opensearch.storage_class:type_name -> google.protobuf.StringValue
+	56,  // 182: chef.automate.infra.config.Backups.S3.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 183: chef.automate.infra.config.Backups.S3.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 184: chef.automate.infra.config.Backups.S3.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 185: chef.automate.infra.config.Backups.S3.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
+	59,  // 186: chef.automate.infra.config.Backups.S3.Opensearch.max_retries:type_name -> google.protobuf.Int32Value
+	58,  // 187: chef.automate.infra.config.Backups.S3.Opensearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
+	56,  // 188: chef.automate.infra.config.Backups.S3.Opensearch.protocol:type_name -> google.protobuf.StringValue
+	56,  // 189: chef.automate.infra.config.Backups.S3.Opensearch.region:type_name -> google.protobuf.StringValue
+	56,  // 190: chef.automate.infra.config.Backups.S3.Opensearch.role_arn:type_name -> google.protobuf.StringValue
+	56,  // 191: chef.automate.infra.config.Backups.S3.Bucket.endpoint:type_name -> google.protobuf.StringValue
+	56,  // 192: chef.automate.infra.config.Backups.S3.Bucket.base_path:type_name -> google.protobuf.StringValue
+	56,  // 193: chef.automate.infra.config.Backups.S3.Bucket.name:type_name -> google.protobuf.StringValue
+	56,  // 194: chef.automate.infra.config.Backups.S3.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 195: chef.automate.infra.config.Backups.GCS.GCPCredentials.json:type_name -> google.protobuf.StringValue
+	58,  // 196: chef.automate.infra.config.Backups.GCS.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 197: chef.automate.infra.config.Backups.GCS.Elasticsearch.application_name:type_name -> google.protobuf.BoolValue
+	56,  // 198: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 199: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 200: chef.automate.infra.config.Backups.GCS.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 201: chef.automate.infra.config.Backups.GCS.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
+	58,  // 202: chef.automate.infra.config.Backups.GCS.Elasticsearch.connect_timeout:type_name -> google.protobuf.BoolValue
+	58,  // 203: chef.automate.infra.config.Backups.GCS.Opensearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 204: chef.automate.infra.config.Backups.GCS.Opensearch.application_name:type_name -> google.protobuf.BoolValue
+	56,  // 205: chef.automate.infra.config.Backups.GCS.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 206: chef.automate.infra.config.Backups.GCS.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 207: chef.automate.infra.config.Backups.GCS.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 208: chef.automate.infra.config.Backups.GCS.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
+	58,  // 209: chef.automate.infra.config.Backups.GCS.Opensearch.connect_timeout:type_name -> google.protobuf.BoolValue
+	56,  // 210: chef.automate.infra.config.Backups.GCS.Bucket.base_path:type_name -> google.protobuf.StringValue
+	56,  // 211: chef.automate.infra.config.Backups.GCS.Bucket.name:type_name -> google.protobuf.StringValue
+	212, // [212:212] is the sub-list for method output_type
+	212, // [212:212] is the sub-list for method input_type
+	212, // [212:212] is the sub-list for extension type_name
+	212, // [212:212] is the sub-list for extension extendee
+	0,   // [0:212] is the sub-list for field type_name
 }
 
 func init() { file_config_shared_global_proto_init() }
@@ -5156,7 +5235,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External); i {
+			switch v := v.(*ChefServer); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5168,7 +5247,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Mlsa); i {
+			switch v := v.(*External); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5180,7 +5259,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Proxy); i {
+			switch v := v.(*Mlsa); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5192,7 +5271,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups); i {
+			switch v := v.(*Proxy); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5204,7 +5283,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Log); i {
+			switch v := v.(*Backups); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5216,7 +5295,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Disclosure); i {
+			switch v := v.(*Log); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5228,7 +5307,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Banner); i {
+			switch v := v.(*Disclosure); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5240,7 +5319,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SessionSettings); i {
+			switch v := v.(*Banner); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5252,7 +5331,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LargeReporting); i {
+			switch v := v.(*SessionSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5264,7 +5343,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*V1_System); i {
+			switch v := v.(*LargeReporting); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5276,7 +5355,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*V1_Service); i {
+			switch v := v.(*V1_System); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5288,7 +5367,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch); i {
+			switch v := v.(*V1_Service); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5300,7 +5379,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch); i {
+			switch v := v.(*External_Elasticsearch); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5312,7 +5391,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Minio); i {
+			switch v := v.(*External_Opensearch); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5324,7 +5403,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Postgresql); i {
+			switch v := v.(*External_Minio); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5336,7 +5415,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Automate); i {
+			switch v := v.(*External_Postgresql); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5348,7 +5427,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Backup); i {
+			switch v := v.(*External_Automate); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5360,7 +5439,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Authentication); i {
+			switch v := v.(*External_Elasticsearch_Backup); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5372,7 +5451,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_SSL); i {
+			switch v := v.(*External_Elasticsearch_Authentication); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5384,7 +5463,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Backup_FsSettings); i {
+			switch v := v.(*External_Elasticsearch_SSL); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5396,7 +5475,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Backup_S3Settings); i {
+			switch v := v.(*External_Elasticsearch_Backup_FsSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5408,7 +5487,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Backup_GCSSettings); i {
+			switch v := v.(*External_Elasticsearch_Backup_S3Settings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5420,7 +5499,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Backup_FsSettings_OptionalSettings); i {
+			switch v := v.(*External_Elasticsearch_Backup_GCSSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5432,7 +5511,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Authentication_BasicAuth); i {
+			switch v := v.(*External_Elasticsearch_Backup_FsSettings_OptionalSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5444,7 +5523,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch_Authentication_AwsElasticsearchAuth); i {
+			switch v := v.(*External_Elasticsearch_Authentication_BasicAuth); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5456,7 +5535,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Backup); i {
+			switch v := v.(*External_Elasticsearch_Authentication_AwsElasticsearchAuth); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5468,7 +5547,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Authentication); i {
+			switch v := v.(*External_Opensearch_Backup); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5480,7 +5559,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_SSL); i {
+			switch v := v.(*External_Opensearch_Authentication); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5492,7 +5571,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Backup_FsSettings); i {
+			switch v := v.(*External_Opensearch_SSL); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5504,7 +5583,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Backup_S3Settings); i {
+			switch v := v.(*External_Opensearch_Backup_FsSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5516,7 +5595,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Backup_GCSSettings); i {
+			switch v := v.(*External_Opensearch_Backup_S3Settings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5528,7 +5607,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Backup_FsSettings_OptionalSettings); i {
+			switch v := v.(*External_Opensearch_Backup_GCSSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5540,7 +5619,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Authentication_BasicAuth); i {
+			switch v := v.(*External_Opensearch_Backup_FsSettings_OptionalSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5552,7 +5631,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Opensearch_Authentication_AwsOpensearchAuth); i {
+			switch v := v.(*External_Opensearch_Authentication_BasicAuth); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5564,7 +5643,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Postgresql_Backup); i {
+			switch v := v.(*External_Opensearch_Authentication_AwsOpensearchAuth); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5576,7 +5655,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Postgresql_Authentication); i {
+			switch v := v.(*External_Postgresql_Backup); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5588,7 +5667,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Postgresql_SSL); i {
+			switch v := v.(*External_Postgresql_Authentication); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5600,7 +5679,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Postgresql_Authentication_PasswordAuthentication); i {
+			switch v := v.(*External_Postgresql_SSL); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5612,7 +5691,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Postgresql_Authentication_PasswordAuthentication_User); i {
+			switch v := v.(*External_Postgresql_Authentication_PasswordAuthentication); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5624,7 +5703,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Automate_Authentication); i {
+			switch v := v.(*External_Postgresql_Authentication_PasswordAuthentication_User); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5636,7 +5715,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Automate_SSL); i {
+			switch v := v.(*External_Automate_Authentication); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5648,7 +5727,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_Filesystem); i {
+			switch v := v.(*External_Automate_SSL); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5660,7 +5739,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_S3); i {
+			switch v := v.(*Backups_Filesystem); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5672,7 +5751,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_GCS); i {
+			switch v := v.(*Backups_S3); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5684,7 +5763,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_S3_AWSCredentials); i {
+			switch v := v.(*Backups_GCS); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5696,7 +5775,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_S3_Elasticsearch); i {
+			switch v := v.(*Backups_S3_AWSCredentials); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5708,7 +5787,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_S3_Opensearch); i {
+			switch v := v.(*Backups_S3_Elasticsearch); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5720,7 +5799,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_S3_Bucket); i {
+			switch v := v.(*Backups_S3_Opensearch); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5732,7 +5811,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_S3_SSL); i {
+			switch v := v.(*Backups_S3_Bucket); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5744,7 +5823,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_GCS_GCPCredentials); i {
+			switch v := v.(*Backups_S3_SSL); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5756,7 +5835,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_GCS_Elasticsearch); i {
+			switch v := v.(*Backups_GCS_GCPCredentials); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5768,7 +5847,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Backups_GCS_Opensearch); i {
+			switch v := v.(*Backups_GCS_Elasticsearch); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5780,6 +5859,18 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Backups_GCS_Opensearch); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_config_shared_global_proto_msgTypes[55].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Backups_GCS_Bucket); i {
 			case 0:
 				return &v.state
@@ -5798,7 +5889,7 @@ func file_config_shared_global_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_config_shared_global_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   55,
+			NumMessages:   56,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

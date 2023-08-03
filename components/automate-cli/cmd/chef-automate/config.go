@@ -54,6 +54,7 @@ const (
 	patching                        = "Config Patch"
 	setting                         = "Config Set"
 	waitTimeout                     = "wait-timeout"
+	automateHaPath                  = "/hab/var/automate-ha"
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -556,6 +557,22 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Annotate(err, status.ConfigError)
 		}
+
+		// keep chefserver fqdn same as automate fqdn in case of standalone automate
+		if !checkIfFileExist(automateHaPath) && cfg.Global.V1.ChefServer != nil && cfg.Global.V1.ChefServer.Fqdn != nil {
+			res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+			if err != nil {
+				return err
+			}
+
+			if cfg.Global.V1.ChefServer.Fqdn.GetValue() != res.Config.Global.V1.Fqdn.GetValue() {
+				cfg.Global.V1.ChefServer.Fqdn.Value = res.Config.Global.V1.Fqdn.GetValue()
+				if cfg.Global.V1.ChefServer.RootCa != nil {
+					cfg.Global.V1.ChefServer.RootCa.Value = ""
+				}
+			}
+		}
+
 		if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
 			return err
 		}
