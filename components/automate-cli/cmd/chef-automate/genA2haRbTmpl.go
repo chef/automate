@@ -24,7 +24,9 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 ### type "{{ .ExternalDB.Database.Type}}"
 
+{{ if .Architecture.ConfigInitials.BackupMount }} 
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
+{{ end }}
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
 ### Automate frontend node related settings                 ###
