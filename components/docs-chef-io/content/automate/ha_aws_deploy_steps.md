@@ -118,6 +118,8 @@ Run the following steps on Bastion Host Machine:
     sudo chef-automate verify -c config.toml
     ```
     
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    
     Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
 ##### Steps to deploy

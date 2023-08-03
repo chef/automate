@@ -124,6 +124,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     sudo chef-automate verify -c config.toml
     ```
     
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    
     Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
 
