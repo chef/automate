@@ -595,7 +595,7 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 
 func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	errorList := list.New()
-	
+
 	if err := validateRequiredString(aws.Region, "aws region"); err != nil {
 		errorList.PushBack(err)
 	}
@@ -650,9 +650,10 @@ func validateAwsCidrBlockSettings(aws *ConfigAwsSettings) error {
 			errorList.PushBack(err)
 		}
 
-		if err := validateRequiredStringListField(aws.PublicCustomSubnets, "aws public_custom_subnets", 3); err != nil {
-			errorList.PushBack(err)
-		}
+		// Commenting the code, as per https://chefio.atlassian.net/browse/CHEF-3646 public subnets are not mandatory.
+		//if err := validateRequiredStringListField(aws.PublicCustomSubnets, "aws public_custom_subnets", 3); err != nil {
+		//	errorList.PushBack(err)
+		//}
 	} else {
 		if err := validateRequiredString(aws.AwsCidrBlockAddr, "aws aws_cidr_block_addr"); err != nil {
 			errorList.PushBack(err)
