@@ -137,7 +137,7 @@ ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}"
-backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
+{{ if .Architecture.ConfigInitials.BackupMount }} backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}" {{ end }}
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 {{ if  .Architecture.ConfigInitials.S3BucketName }} s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ else }} # s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ end }}
 {{ if .Architecture.ConfigInitials.SSHGroupName }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}" {{ else }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHUser }}" {{ end }}
