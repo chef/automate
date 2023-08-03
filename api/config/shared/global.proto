@@ -26,6 +26,8 @@ message V1 {
   System sys = 11;
   Service svc = 12;
   LargeReporting large_reporting = 13;
+  ChefServer chef_server = 14;
+
 
   message System {
     chef.automate.infra.config.TLSCredentials tls = 1;
@@ -34,6 +36,11 @@ message V1 {
   message Service {}
 
   
+}
+
+message ChefServer {
+  google.protobuf.StringValue fqdn = 1;
+  google.protobuf.StringValue root_ca = 2;
 }
 
 
