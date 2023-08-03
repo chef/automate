@@ -89,15 +89,23 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     "
     ```
 ##### Steps to generate config
-1. Generate config using the below command and provide:
+1. Generate config using the below command:
 
     ```bash
-    sudo -- sh -c "
-    #Generate config for Automate Ha Deployment
-    chef-automate config gen config.toml
-    "
+    sudo chef-automate config gen config.toml
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
+
+#####  Config Verify
+1. We verify the above config using the below command :
+
+    ```bash
+    sudo chef-automate verify -c config.toml
+    ```
+
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+
+    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
 ##### Steps to deploy
 
@@ -194,15 +202,25 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
 ##### Steps to generate config
-1. Generate config using the below command and provide:
+1. Generate config using the below command:
 
     ```bash
-    sudo -- sh -c "
-    #Generate config for Automate Ha Deployment
-    chef-automate config gen config.toml
-    "
+    sudo chef-automate config gen config.toml
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
+
+#####  Config Verify
+1. We verify the above config using the below command:
+
+    ```bash
+    sudo chef-automate verify -c config.toml
+    ```
+    
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+
+    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+
+
 ##### Steps to deploy
 Continue with the deployment after generating the config:
 
@@ -305,15 +323,24 @@ See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion
 
 
 ##### Steps to generate config
-1. Generate config using the below command and provide:
+1. Generate config using the below command:
 
     ```bash
-    sudo -- sh -c "
-    #Generate config for Automate Ha Deployment
-    chef-automate config gen config.toml
-    "
+    sudo chef-automate config gen config.toml
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
+
+#####  Config Verify
+1. We verify the above config using the below command :
+
+    ```bash
+    sudo chef-automate verify -c config.toml
+    ```
+    
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    
+    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+
 ##### Steps to deploy
 Continue with the deployment after generating the config:
 

@@ -111,6 +111,17 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
+#####  Config Verify
+1. After successful provision, run verify config command:
+
+    ```bash
+    sudo chef-automate verify -c config.toml
+    ```
+    
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    
+    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+
 ##### Steps to deploy
 
 1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of a previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
