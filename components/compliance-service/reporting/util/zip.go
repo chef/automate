@@ -109,6 +109,9 @@ func ConvertZipToTarGz(zipPath string, tarPath string) error {
 		if err != nil {
 			return err
 		}
+		if len(files) == 0 {
+			return fmt.Errorf("something went wrong, no files found")
+		}
 		// we should only ever have one folder here
 		if len(files) != 1 {
 			return fmt.Errorf("something went wrong, too many folders found")
