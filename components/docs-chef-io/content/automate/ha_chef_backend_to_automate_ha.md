@@ -4,7 +4,7 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Che Infra Server/Chef Backend to Automate HA"
+    title = "Chef Infra Server/Chef Backend to Automate HA"
     parent = "automate/deploy_high_availability/migration"
     identifier = "automate/deploy_high_availability/migration/ha_chef_backend_to_automate_ha.md Chef Backend to Automate HA"
     weight = 210
