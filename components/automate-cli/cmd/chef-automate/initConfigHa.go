@@ -309,13 +309,13 @@ type GoogleServiceAccount struct {
 }
 
 type ObjectStorageConfigToml struct {
-<<<<<<< HEAD
-	BucketName           string                   `toml:"bucket_name"`
-	AccessKey            string                   `toml:"access_key"`
-	SecretKey            string                   `toml:"secret_key"`
-	Endpoint             string                   `toml:"endpoint"`
-	Region               string                   `toml:"region"`
-	GoogleServiceAccount GoogleServiceAccountJSON `toml:"google_service_account"`
+	BucketName               string `toml:"bucket_name"`
+	AccessKey                string `toml:"access_key"`
+	SecretKey                string `toml:"secret_key"`
+	Endpoint                 string `toml:"endpoint"`
+	Region                   string `toml:"region"`
+	Location                 string `toml:"location"`
+	GoogleServiceAccountFile string `toml:"google_service_account_file"`
 }
 
 type GoogleServiceAccountJSON struct {
@@ -330,15 +330,6 @@ type GoogleServiceAccountJSON struct {
 	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url" toml:"auth_provider_x509_cert_url"`
 	ClientX509CertURL       string `json:"client_x509_cert_url" toml:client_x509_cert_url"`
 	UniverseDomain          string `json:"universe_domain" toml:"universe_domain"`
-=======
-	BucketName               string `toml:"bucket_name"`
-	AccessKey                string `toml:"access_key"`
-	SecretKey                string `toml:"secret_key"`
-	Endpoint                 string `toml:"endpoint"`
-	Region                   string `toml:"region"`
-	Location                 string `toml:"location"`
-	GoogleServiceAccountFile string `toml:"google_service_account_file"`
->>>>>>> 0d15f37cf (add the changes in a2ha.rb)
 }
 
 func init() {

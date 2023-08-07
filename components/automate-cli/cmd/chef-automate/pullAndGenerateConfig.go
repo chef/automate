@@ -30,12 +30,12 @@ type ConfigKeys struct {
 }
 
 type ObjectStorageConfig struct {
-	accessKey            string
-	secrectKey           string
-	endpoint             string
-	bucketName           string
-	RoleArn              string
-	GoogleServiceAccount *GoogleServiceAccountJSON
+	accessKey  string
+	secrectKey string
+	endpoint   string
+	bucketName string
+	RoleArn    string
+	//GoogleServiceAccount *GoogleServiceAccountJSON
 }
 
 type HAAwsAutoTfvars struct {
