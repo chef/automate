@@ -149,6 +149,7 @@ backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
+automate_dc_token "{{ .Architecture.ConfigInitials.AutomateDcToken }}"
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
 ### Automate frontend node related settings                 ###
