@@ -25,11 +25,11 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - If you want to use Default VPC, you have to create a Public and Private Subnet if subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
 - We recommend creating a new VPC. And Bastion should be in the same VPC.
-- Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_rds/) to know more.
-- Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
+- Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. To know more, see [Creating and connecting to a PostgreSQL DB instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) page.
+- Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. To know more, see [Creating and managing Amazon OpenSearch Service domains](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) page.
 - For Backup with Managed Service, we have only one option: ' Amazon S3`.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
+- For Backup and Restore with Managed Service. Click For more information, see [Enabling OpenSearch Backup restore](/automate/managed_services/#enabling-opensearch-backup-restore) section.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. For more information, see [IAM Users](/automate/ha_iam_user/) page.
 - Preferred key type will be ed25519
 - Ensure your Linux has the `sysctl` utility available in all nodes.
 
@@ -101,7 +101,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     "
     ```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+    To know more on how to generate config, visit the [Automate HA Config Generation](/automate/ha_config_gen) page.
 
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
@@ -200,9 +200,9 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com). After successful deployment, proceed with following:
 
-   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+   1. To know more on how to create user and orgs, visit [Crete Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section.
+   1. To know more about the Workstation setup, visit the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section in Node Bootstraping page.
+   1. To know more about node bootstrapping, visit the [Node Bootstraping](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
 
 ### Sample Config
 

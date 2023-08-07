@@ -97,7 +97,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     sudo chef-automate config gen config.toml
     ```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+    Update Config with relevant data. For more information, see [Sample Config](#sample-config).
 
 #### Config Verify
 
@@ -109,7 +109,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
     To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
 
-    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
 #### Steps to Deploy
 
@@ -137,9 +137,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
     Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com). After successful deployment, proceed with following:
 
-      1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-      1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-      1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+      1. To know more on how to create user and orgs, visit [Crete Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section.
+      1. To know more about the Workstation setup, visit the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section in Node Bootstraping page.
+      1. To know more about node bootstrapping, visit the [Node Bootstraping](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
 
 ### Sample Config
 
@@ -198,14 +198,15 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites) to know more.
+- Follow the [Prerequisites](#prerequisites) for On-Premise deployment.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
-- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
-- Set up AWS OpenSearch 1.3. Click [here](/automate/create_amazon_opensearch/) to know more.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
-- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
-See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+- Set up AWS RDS PostgreSQL 13.5-R1. For more information, see [Create Amazon RDS](/automate/create_amazon_rds/). Open the required port in Security Groups while creating AWS RDS Postgresql.
+- Set up AWS OpenSearch 1.3. For more information, see [Create Amazon OpenSearch](/automate/create_amazon_opensearch/).
+- For Backup and Restore with Managed Service. For more information, check the [Managed Services Prerequisites](/automate/managed_services/#prerequisites).
+- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. For more information, see [VPC and CIDR Setup](/automate/ha_vpc_setup/).
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. For more information, see [Creating IAM Users](/automate/ha_iam_user/).
+
+See the steps to run on [Bastion](#steps-to-run-on-bastion-host-machine) to download the latest Automate CLI and Airgapped Bundle.
 
 #### Steps to Generate Config
 
@@ -215,7 +216,7 @@ See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to
     sudo chef-automate config gen config.toml
     ```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+    To know more on how to generate config, visit the [Automate HA Config Generation](/automate/ha_config_gen) page.
 
 #### Config Verify
 
@@ -258,9 +259,9 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 After successful deployment, proceed with following:
 
-   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+   1. To know more on how to create user and orgs, visit [Crete Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section.
+   1. To know more about the Workstation setup, visit the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section in Node Bootstraping page.
+   1. To know more about node bootstrapping, visit the [Node Bootstraping](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
 
 ### Sample Config to setup On-Premise Deployment with AWS Managed Services
 
@@ -332,9 +333,9 @@ After successful deployment, proceed with following:
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites).
+- Follow the [Prerequisites](#prerequisites) for On-Premise deployment.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
-See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+See the steps to run on [Bastion](#run-these-steps-on-bastion-host-machine) to download the latest Automate CLI and Airgapped Bundle.
 
 #### Steps to Generate Config
 
@@ -344,7 +345,7 @@ See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion
     sudo chef-automate config gen config.toml
     ```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+    To know more on how to generate config, visit the [Automate HA Config Generation](/automate/ha_config_gen) page.
 
 #### Config Verify
 
@@ -385,9 +386,9 @@ Verify the deployment by checking status summary:
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com). After successful deployment, proceed with following:
 
-   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+   1. To know more on how to create user and orgs, visit [Crete Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section.
+   1. To know more about the Workstation setup, visit the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section in Node Bootstraping page.
+   1. To know more about node bootstrapping, visit the [Node Bootstraping](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
 
 ### Sample Config to Setup On-Premises Deployment with Self Managed Services
 
@@ -520,7 +521,7 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. To know more about the replacement of a node, visit [Replace Node In Automate HA Cluster section](#replace-node-in-automate-ha-cluster) for reference.
 - Removal of nodes for Postgresql or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 - Below process can be done for `chef-server` and `automate`.
 - Only one node can be removed simultaneously, irrespective of node type.
