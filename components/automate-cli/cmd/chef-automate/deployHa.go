@@ -25,6 +25,10 @@ func executeDeployment(args []string) error {
 			break
 		}
 	}
+	err := executeConfigVerify(configFile)
+	if err != nil {
+		return status.New(status.ConfigVerifyError, err.Error())
+	}
 	args = append(args[:indexOfConfig], args[indexOfConfig+1:]...)
 	args = append(args, "-y")
 	if isA2HARBFileExist() {
