@@ -25,11 +25,11 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - If you want to use Default VPC, you have to create a Public and Private Subnet if subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
 - We recommend creating a new VPC. And Bastion should be in the same VPC.
-- Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. To know more, see [Creating and connecting to a PostgreSQL DB instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) page.
-- Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. To know more, see [Creating and managing Amazon OpenSearch Service domains](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) page.
+- Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_rds/) to know more.
+- Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
 - For Backup with Managed Service, we have only one option: ' Amazon S3`.
-- For Backup and Restore with Managed Service. Click For more information, see [Enabling OpenSearch Backup restore](/automate/managed_services/#enabling-opensearch-backup-restore) section.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. For more information, see [IAM Users](/automate/ha_iam_user/) page.
+- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 - Preferred key type will be ed25519
 - Ensure your Linux has the `sysctl` utility available in all nodes.
 
@@ -90,9 +90,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    {{< note >}}
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
-
-#### Steps to Generate Config
-
+##### Steps to generate config
 1. Generate config with relevant data using the below command:
 
     ```bash
@@ -100,15 +98,13 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     chef-automate config gen config.toml
     "
     ```
-
-    To know more on how to generate config, visit the [Automate HA Config Generation](/automate/ha_config_gen) page.
-
+    Click [here](/automate/ha_config_gen) to know more about generating config
+    
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
 
-#### Steps to Provision
-
+##### Steps to provision
 1. Continue with the deployment after generating the config:
 
     ```bash
@@ -121,20 +117,19 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     "
     ```
 
-#### Config Verify
-
+#####  Config Verify
 1. After successful provision, run verify config command:
 
     ```bash
     sudo chef-automate verify -c config.toml
     ```
-
+    
     To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    
+    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
-#### Steps to Deploy
-
+##### Steps to deploy
 1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
 
     ```bash
@@ -143,11 +138,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    chef-automate deploy config.toml --airgap-bundle automate.aib
    "
    ```
-
-#### Verify Deployment
-
-1. Once the deployment is successful, we can verify deployment by checking status summary and information:
-
+##### Verify Deployment
+1. Once the deployment is successful, we can verify deployment by checking status summary and info
   ```bash
    sudo -- sh -c "
    #After Deployment is done successfully. Check the status of Chef Automate HA services
@@ -158,7 +150,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    "
   ```
 
-1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
+2. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
   If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
 
     - Create a file `a2.fqdn.toml`
@@ -198,11 +190,12 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
 
 {{< /note >}}
 
-Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com). After successful deployment, proceed with following:
+Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-   1. To know more on how to create user and orgs, visit [Crete Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section.
-   1. To know more about the Workstation setup, visit the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section in Node Bootstraping page.
-   1. To know more about node bootstrapping, visit the [Node Bootstraping](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
+After successful deployment, proceed with following...
+   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
+   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
+   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
 ### Sample Config
 
