@@ -5,6 +5,7 @@ package main
 import (
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	"github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/httputils"
@@ -24,6 +25,14 @@ func executeDeployment(args []string) error {
 			break
 		}
 	}
+	args = append(args[:indexOfConfig], args[indexOfConfig+1:]...)
+	args = append(args, "-y")
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs, true)
+	}
+	return errors.New(AUTOMATE_HA_INVALID_BASTION)
+}
+func executeConfigVerify(configFile string) error {
 	if len(configFile) > 1 {
 		log, err := logger.NewLogger("text", "info")
 		if err != nil {
@@ -45,12 +54,7 @@ func executeDeployment(args []string) error {
 			PopulateHaCommonConfig:    PopulateHaCommonConfig,
 		}
 		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, verifysystemdcreate.NewSystemdCreateUtilsImpl(), config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer, deps)
-		err = c.RunVerify(configFile)
+		return c.RunVerify(configFile)
 	}
-	args = append(args[:indexOfConfig], args[indexOfConfig+1:]...)
-	args = append(args, "-y")
-	if isA2HARBFileExist() {
-		return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs, true)
-	}
-	return errors.New(AUTOMATE_HA_INVALID_BASTION)
+	return status.New(status.ConfigError, "Config file not found")
 }
