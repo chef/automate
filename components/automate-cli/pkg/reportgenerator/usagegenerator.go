@@ -78,6 +78,10 @@ func getElasticSearchURL(esHostName string, esPort string, url string) (string, 
 	if externalOsEnabled {
 		return fmt.Sprintf("http://localhost:%d", osGatewayPort), nil
 	}
+
+	if esPort == strconv.Itoa(osGatewayPort) {
+		url = "http://%s:%s"
+	}
 	return fmt.Sprintf(url, esHostName, esPort), nil
 }
 
