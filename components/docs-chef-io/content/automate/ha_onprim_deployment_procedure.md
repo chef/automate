@@ -56,7 +56,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 {{< /warning >}}
 
-### Steps to run on Bastion Host Machine
+### Steps to Run on Bastion Host Machine
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
@@ -88,15 +88,19 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     cp -f chef-automate /usr/bin/chef-automate
     "
     ```
-##### Steps to generate config
+
+#### Steps to Generate Config
+
 1. Generate config using the below command:
 
     ```bash
     sudo chef-automate config gen config.toml
     ```
+
     Click [here](/automate/ha_config_gen) to know more about generating config
 
-#####  Config Verify
+#### Config Verify
+
 1. We verify the above config using the below command :
 
     ```bash
@@ -107,7 +111,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
     Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
-##### Steps to deploy
+#### Steps to Deploy
 
 1. Continue with the deployment after generating the config:
 
@@ -120,7 +124,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     chef-automate deploy config.toml --airgap-bundle automate.aib
     "
     ```
-1. Verify the deployment by checking status summary
+
+1. Verify the deployment by checking status summary:
+
     ```bash
     #Run commands as sudo.
     sudo -- sh -c "
@@ -129,8 +135,8 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     "
     ```
 
-    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-    After successful deployment, proceed with following...
+    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com). After successful deployment, proceed with following:
+
       1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
       1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
       1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
@@ -201,27 +207,30 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
-##### Steps to generate config
+#### Steps to Generate Config
+
 1. Generate config using the below command:
 
     ```bash
     sudo chef-automate config gen config.toml
     ```
+
     Click [here](/automate/ha_config_gen) to know more about generating config
 
-#####  Config Verify
+#### Config Verify
+
 1. We verify the above config using the below command:
 
     ```bash
     sudo chef-automate verify -c config.toml
     ```
-    
+
     To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
 
-    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
+#### Steps to Deploy
 
-##### Steps to deploy
 Continue with the deployment after generating the config:
 
 ```bash
@@ -233,20 +242,26 @@ Continue with the deployment after generating the config:
    chef-automate deploy config.toml --airgap-bundle automate.aib
    "
 ```
-##### Verify Deployment
+
+#### Verify Deployment
+
 Verify the deployment by checking status summary:
+
 ```bash
     sudo -- sh -c "
     #After Deployment is done successfully. Check the status of Chef Automate HA services
     chef-automate status summary
     "
 ```
+
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-After successful deployment, proceed with following...
+After successful deployment, proceed with following:
+
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
    1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+
 ### Sample Config to setup On-Premise Deployment with AWS Managed Services
 
 ```config
@@ -321,27 +336,30 @@ After successful deployment, proceed with following...
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
+#### Steps to Generate Config
 
-##### Steps to generate config
 1. Generate config using the below command:
 
     ```bash
     sudo chef-automate config gen config.toml
     ```
+
     Click [here](/automate/ha_config_gen) to know more about generating config
 
-#####  Config Verify
+#### Config Verify
+
 1. We verify the above config using the below command :
 
     ```bash
     sudo chef-automate verify -c config.toml
     ```
-    
-    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
-    
-    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
-##### Steps to deploy
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+
+    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+
+#### Steps to Deploy
+
 Continue with the deployment after generating the config:
 
 ```bash
@@ -353,22 +371,25 @@ Continue with the deployment after generating the config:
    chef-automate deploy config.toml --airgap-bundle automate.aib
    "
 ```
-##### Verify Deployment
+
+#### Verify Deployment
+
 Verify the deployment by checking status summary:
+
 ```bash
     sudo -- sh -c "
     #After Deployment is done successfully. Check the status of Chef Automate HA services
     chef-automate status summary
     "
 ```
-Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-After successful deployment, proceed with following...
+Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com). After successful deployment, proceed with following:
+
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
    1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
-### Sample Sonfig to setup On-Premise Deployment with Self Managed Services
+### Sample Config to Setup On-Premises Deployment with Self Managed Services
 
 ```config
 [architecture]
@@ -433,7 +454,7 @@ After successful deployment, proceed with following...
       -----END CERTIFICATE-----"
 ```
 
-## Add More Nodes to the OnPremises Deployment
+## Add More Nodes to the On-Premises Deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
 
@@ -589,4 +610,3 @@ Error: Upload failed: scp: /var/automate-ha: Permission denied
   ```sh
   chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
- 
