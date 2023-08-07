@@ -90,7 +90,6 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    {{< note >}}
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
-
 ##### Steps to generate config
 1. Generate config with relevant data using the below command:
 
