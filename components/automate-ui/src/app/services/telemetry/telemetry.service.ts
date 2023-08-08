@@ -27,6 +27,8 @@ export interface TelemetryData {
   properties?: Object;
 }
 
+declare let pendo: any;
+
 @Injectable()
 export class TelemetryService {
   // There is a diagram at /dev-docs/diagrams/telemetry-service-ui.png that describes
@@ -79,8 +81,18 @@ export class TelemetryService {
       }
     });
 
+    if(pendo) {
+      pendo.initialize({
+        visitor: {
+          id: 'Automate anonymouse user'
+        }
+      })
+    }
+
     this.configService.getConfig().pipe(
-      filter(config => config.telemetryEnabled),
+      filter(config => { 
+        return config.telemetryEnabled
+      }),
       map((config) => {
         this.telemetryEnabled = config.telemetryEnabled;
         this.telemetryEnabledObservable.next(config.telemetryEnabled);
@@ -90,14 +102,56 @@ export class TelemetryService {
         this.customerName = config.customerName;
         this.licenseId = config.licenseId || configService.defaultLicenseId;
         this.maxNodes = config.maxNodes;
-        this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
+        
         this.instanceId = config.deploymentId || configService.defaultDeployId;
         this.deploymentType = config.deploymentType;
+        try{
+          this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
+        } catch(e) {
+          console.log('Unable to fetch ajs_anonymous_id from config ', e)
+        }
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
+        this.initialisePendo();
         this.initiateTelemetry(trackingOperations);
       });
+  }
+
+  async initialisePendo() {
+    console.log('initialisePendo');
+    try {
+      if(pendo) {
+        pendo.identify({
+          visitor: {
+            id: this.customerId,
+            full_name: this.customerName
+        },
+        account: {
+            id: this.licenseId,
+            name: this.customerName,
+            maxNodes: this.maxNodes,
+            instanceId: this.instanceId,
+            deploymentType: this.deploymentType,
+            anonymousId: this.anonymousId,
+            automateVersion: this.buildVersion
+        }
+      });
+      }
+    } catch(e) {
+      console.log('Unable to initialise Pendo ', e);
+    }
+    
+  }
+
+  trackPendo(event?: string, properties?: any) {
+    try {
+      if(pendo) {
+        pendo.track(event, properties);
+      }
+    }catch(e) {
+      console.log('Unable to send track events to Pendo ', e);
+    }
   }
 
   get enabled(): Observable<boolean> {
@@ -205,6 +259,9 @@ export class TelemetryService {
   }
 
   track(event?: string, properties?: any) {
+    if(pendo) {
+      this.trackPendo(event, properties);
+    }
     this.trackingOperations.next({
       operation: 'track',
       identifier: event,
