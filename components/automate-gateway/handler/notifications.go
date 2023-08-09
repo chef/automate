@@ -50,7 +50,7 @@ func (s *notificationsServer) AddRule(ctx context.Context, in *pb.RuleAddRequest
 		notifications.RuleAddResponse_VALIDATION_ERROR:
 		return nil, status.Error(codes.InvalidArgument, strings.Join(resp.GetMessages(), "\n"))
 	default:
-		return nil, status.Error(codes.Internal, "Internal Error")
+		return nil, status.Error(codes.Internal, strings.Join(resp.GetMessages(), "\n"))
 	}
 }
 
@@ -77,7 +77,7 @@ func (s *notificationsServer) UpdateRule(ctx context.Context, in *pb.RuleUpdateR
 	case notifications.RuleUpdateResponse_NOT_FOUND:
 		return nil, status.Error(codes.NotFound, strings.Join(resp.GetMessages(), "\n"))
 	default:
-		return nil, status.Error(codes.Internal, "Internal Error")
+		return nil, status.Error(codes.Internal, strings.Join(resp.GetMessages(), "\n"))
 	}
 }
 
@@ -94,7 +94,7 @@ func (s *notificationsServer) DeleteRule(ctx context.Context, in *pb.RuleIdentif
 	case notifications.RuleDeleteResponse_NOT_FOUND:
 		return nil, status.Error(codes.NotFound, strings.Join(resp.GetMessages(), "\n"))
 	default:
-		return nil, status.Error(codes.Internal, "Internal Error")
+		return nil, status.Error(codes.Internal, strings.Join(resp.GetMessages(), "\n"))
 	}
 }
 
@@ -115,7 +115,7 @@ func (s *notificationsServer) GetRule(ctx context.Context, in *pb.RuleIdentifier
 	case notifications.RuleGetResponse_NOT_FOUND:
 		return nil, status.Error(codes.NotFound, strings.Join(resp.GetMessages(), "\n"))
 	default:
-		return nil, status.Error(codes.Internal, "Internal Error")
+		return nil, status.Error(codes.Internal, strings.Join(resp.GetMessages(), "\n"))
 	}
 }
 
@@ -134,7 +134,7 @@ func (s *notificationsServer) ListRules(ctx context.Context, _ *pb.RuleListReque
 		}
 		return &transformedResp, nil
 	default:
-		return nil, status.Error(codes.Internal, "Internal Error")
+		return nil, status.Error(codes.Internal, strings.Join(resp.GetMessages(), "\n"))
 	}
 }
 
@@ -157,7 +157,7 @@ func (s *notificationsServer) ValidateWebhook(ctx context.Context,
 	case notifications.URLValidationResponse_ERROR, notifications.URLValidationResponse_INVALID_URL:
 		return nil, status.Error(codes.InvalidArgument, "Could not validate url")
 	default:
-		return nil, status.Error(codes.Internal, "Internal Error")
+		return nil, status.Error(codes.Internal, strings.Join(resp.GetMessages(), "\n"))
 	}
 }
 
