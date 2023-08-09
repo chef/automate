@@ -748,7 +748,8 @@ func (db *DB) GetJob(id string) (*jobs.Job, error) {
 func (db *DB) DeleteJob(id string) error {
 	_, err := db.Exec(softDeleteJobById, id)
 	if err != nil {
-		return errors.Wrap(err, "DeleteJob unable to delete job")
+		logrus.Errorf("DeleteJob unable to delete job : %s", err.Error())
+		return errors.New("DeleteJob unable to delete job")
 	}
 
 	return nil
@@ -756,33 +757,39 @@ func (db *DB) DeleteJob(id string) error {
 
 func (db *DB) UpdateJob(inJob *jobs.Job) error {
 	if err := validateJob(inJob); err != nil {
-		return errorutils.ProcessInvalid(err, "UpdateJob error validating job")
+		logrus.Errorf("UpdateJob error validating job : %s", err.Error())
+		return errors.New("UpdateJob error validating job")
 	}
 
 	job, err := toDBJob(inJob)
 	if err != nil {
-		return errors.Wrap(err, "Update Job unable to translate job to db struct")
+		logrus.Errorf("Update Job unable to translate job to db struct : %s", err.Error())
+		return errors.New("Update Job unable to translate job to db struct")
 	}
 
 	err = Transact(db, func(tx *DBTrans) error {
 		err = tx.processJobsTagsUpdate(inJob)
 		if err != nil {
-			return errors.Wrap(err, "Update Job unable to process jobs tags update")
+			logrus.Errorf("Update Job unable to process jobs tags update : %s", err.Error())
+			return errors.New("Update Job unable to process jobs tags update")
 		}
 
 		err = tx.processJobsNodesUpdate(inJob)
 		if err != nil {
-			return errors.Wrap(err, "Update Job unable to process jobs nodes update")
+			logrus.Errorf("Update Job unable to process jobs nodes update : %s", err.Error())
+			return errors.New("Update Job unable to process jobs nodes update")
 		}
 
 		err = tx.processJobsProfilesUpdate(inJob)
 		if err != nil {
-			return errors.Wrap(err, "Update Job unable to process jobs profiles update")
+			logrus.Errorf("Update Job unable to process jobs profiles update : %s", err.Error())
+			return errors.New("Update Job unable to process jobs profiles update")
 		}
 
 		_, err = tx.Update(&job)
 		if err != nil {
-			return errors.Wrap(err, "Update Job unable to update job")
+			logrus.Errorf("Update Job unable to update job : %s", err.Error())
+			return errors.New("Update Job unable to update job")
 		}
 
 		return nil
