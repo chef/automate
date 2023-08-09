@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"strings"
 
@@ -148,7 +149,7 @@ func (s *notificationsServer) ValidateWebhook(ctx context.Context,
 
 	resp, err := s.notificationsClient.ValidateWebhook(ctx, &transformUVR)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("something went wrong")
 	}
 
 	switch resp.GetCode() {
