@@ -465,7 +465,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		var t ProfileRequest
 		err := decoder.Decode(&t)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Errorf("Received error while decoding request : %s", err.Error())
+			http.Error(w, "Error decoding request", http.StatusBadRequest)
 			return
 		}
 		profileName = t.Name
@@ -475,14 +476,15 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		file, _, err := r.FormFile("file")
 		if err != nil {
 			log.Errorf("Received error while getting file from request : %s", err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, "Error getting file", http.StatusBadRequest)
 			return
 		}
 		defer file.Close() // nolint: errcheck
 
 		_, err = io.Copy(&content, file)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Errorf("Received error while copying content : %s", err.Error())
+			http.Error(w, "Something went wrong", http.StatusBadRequest)
 			return
 		}
 
@@ -501,7 +503,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	resource := fmt.Sprintf("compliance:profiles:%s", owner)
 	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusForbidden)
+		log.Errorf("Forbidden request : %s", err.Error())
+		http.Error(w, "Forbidden request", http.StatusForbidden)
 		return
 	}
 
@@ -515,7 +518,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	stream, err := profilesClient.Create(ctx)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("Error in profile create : %s", err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -532,19 +536,22 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = stream.Send(&request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Errorf("Error in profile service : %s", err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 	log.Info("Request successfully sent to backend service")
 
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Errorf("Error in profile service : %s", err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 	data, err := json.Marshal(reply)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("Error in marshal : %s", err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
