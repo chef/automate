@@ -67,13 +67,13 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		}
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
-			"error authorizing action %q on resource %q filtered by projects %q for members %q: %s",
-			action, resource, projectsToFilter, subjects, err.Error())
+			"error authorizing request")
 	}
 	if len(filteredResp.Projects) == 0 {
-		return nil, status.Errorf(codes.PermissionDenied,
-			"unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
+		log.Warnf("unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
 			subjects, action, resource, projectsToFilter)
+		return nil, status.Errorf(codes.PermissionDenied,
+			"unauthorized members")
 	}
 	projects := filteredResp.Projects
 
@@ -112,20 +112,21 @@ func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, 
 // FilterAuthorizedPairs drives authz introspection
 // Q: There's no projects here! This can't be right!
 // A(msorens): The short answer to that is introspection is not yet project-aware.
-//    It is on the list of things to do... maybe.
-//    For the current uses of introspection we have been able to get by without projects.
-//    Should the user see this button? ... this page? .. this item in the nav bar?
-//    Where introspection-plus-projects would be needed is, for example, on the Delete
-//    button on individual rows on projects list, tokens list, teams list, etc. We had
-//    actually wired that up using introspection-sans-projects and immediately ran into
-//    performance issues: it is unacceptable to do a separate introspection network call
-//    for each row in a table. So we took that out again for the time being.
-//    You have probably already observed that for non-parameterized introspection it is
-//    now highly optimized, doing a single IntrospectAll call once the front-end cache
-//    is stale enough (I think it invalidates in 60 seconds or so).
-//    The most likely strategy for introducing parameterized introspection back in the
-//    mix is doing a single IntrospectSome passing all the ids on a given list at one
-//    time. And then we need to figure out projects, too.
+//
+//	It is on the list of things to do... maybe.
+//	For the current uses of introspection we have been able to get by without projects.
+//	Should the user see this button? ... this page? .. this item in the nav bar?
+//	Where introspection-plus-projects would be needed is, for example, on the Delete
+//	button on individual rows on projects list, tokens list, teams list, etc. We had
+//	actually wired that up using introspection-sans-projects and immediately ran into
+//	performance issues: it is unacceptable to do a separate introspection network call
+//	for each row in a table. So we took that out again for the time being.
+//	You have probably already observed that for non-parameterized introspection it is
+//	now highly optimized, doing a single IntrospectAll call once the front-end cache
+//	is stale enough (I think it invalidates in 60 seconds or so).
+//	The most likely strategy for introducing parameterized introspection back in the
+//	mix is doing a single IntrospectSome passing all the ids on a given list at one
+//	time. And then we need to figure out projects, too.
 func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
 ) ([]*pairs.Pair, error) {
 	pairsV2 := make([]*authz.Pair, len(inputPairs))
