@@ -75,7 +75,7 @@ func runServiceVersionsCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		nodeOpUtils := &NodeUtilsImpl{}
 		remoteExecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
-		if err := isFlagSet(cmd); err != nil {
+		if err := isFlagSet(cmd, &serviceVersionsCmdFlag); err != nil {
 			return err
 		}
 		return runServiceVersionsFromBastion(&serviceVersionsCmdFlag, nodeOpUtils, remoteExecutor, printServiceVersionsOutput)
@@ -273,9 +273,9 @@ func printServiceVersionsErrorOutput(cmdResult *CmdResult, remoteService string,
 	}
 }
 
-func isFlagSet(cmd *cobra.Command) error {
-	if !serviceVersionsCmdFlag.automate && !serviceVersionsCmdFlag.chefServer && !serviceVersionsCmdFlag.opensearch && !serviceVersionsCmdFlag.postgresql {
-		if len(serviceVersionsCmdFlag.node) != 0 {
+func isFlagSet(cmd *cobra.Command, flags *ServiceVersionsCmdFlags) error {
+	if !flags.automate && !flags.chefServer && !flags.opensearch && !flags.postgresql {
+		if len(flags.node) != 0 {
 			return status.Errorf(status.InvalidCommandArgsError, "Please provide service flag")
 		}
 		writer.Println(cmd.UsageString())

@@ -346,39 +346,34 @@ func TestRunServiceVersionsCmd(t *testing.T) {
 func TestIsFalgSet(t *testing.T) {
 
 	testCases := []struct {
-		isForAutomate   bool
-		isForChefServer bool
-		isForPG         bool
-		isForOS         bool
-		node            string
-		errorExepected  error
+		flags          *ServiceVersionsCmdFlags
+		errorExepected error
 	}{
 		{
+			flags:          &ServiceVersionsCmdFlags{},
 			errorExepected: errors.New("No flag is enabled. Please provide any flag"),
 		},
 		{
-			node: "12",
-
+			flags: &ServiceVersionsCmdFlags{
+				node: "12",
+			},
 			errorExepected: status.Errorf(status.InvalidCommandArgsError, "Please provide service flag"),
 		},
 		{
 
-			node:           "12",
-			isForAutomate:  true,
+			flags: &ServiceVersionsCmdFlags{
+				node:     "12",
+				automate: true,
+			},
 			errorExepected: nil,
 		},
 	}
 
-	for _, testCase := range testCases {
-		serviceVersionsCmdFlag.automate = testCase.isForAutomate
-		serviceVersionsCmdFlag.chefServer = testCase.isForChefServer
-		serviceVersionsCmdFlag.opensearch = testCase.isForOS
-		serviceVersionsCmdFlag.postgresql = testCase.isForPG
-		serviceVersionsCmdFlag.node = testCase.node
-		err := isFlagSet(&cobra.Command{})
+	for _, testCases := range testCases {
+		err := isFlagSet(&cobra.Command{}, testCases.flags)
 
-		if testCase.errorExepected != nil {
-			assert.EqualError(t, err, testCase.errorExepected.Error())
+		if testCases.errorExepected != nil {
+			assert.EqualError(t, err, testCases.errorExepected.Error())
 		} else {
 			assert.Nil(t, err)
 		}
