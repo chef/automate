@@ -221,7 +221,11 @@ postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
 
 habitat_uid_gid = "<%= config.habitat_uid_gid %>"
 ssh_group_name = "<%= config.ssh_group_name %>"
-
+<% if config.architecture != 'aws' %>
+<% unless config.automate_dc_token.nil? || config.automate_dc_token.empty? %>
+automate_dc_token = "<%= config.automate_dc_token %>"
+<% end %>
+<% end %>
 
 <% if config.automate.teams_port %>
 teams_port = <%= config.automate.teams_port.to_i %>

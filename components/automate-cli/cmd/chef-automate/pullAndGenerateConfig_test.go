@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -36,6 +37,7 @@ const (
 	RoleArn             = "Role:arn:..:123"
 	AccessKey           = "aRSHRFHIfcsjk"
 	SecretKey           = "hduysHtdKHvDrkjKnfdrYk"
+	Token               = "5625rytfdwhegduweydg37dgujhedb"
 	publicKey1          = `-----BEGIN CERTIFICATE-----
 MIIDazCCAlOgAwIBAgIJALlhQd3q75U8MA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
 BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
@@ -126,6 +128,17 @@ var automateConfigKeys = &dc.AutomateConfig{
 	Global: &shared.GlobalConfig{
 		V1: &shared.V1{
 			FrontendTls: []*shared.FrontendTLSCredential{},
+		},
+	},
+}
+var externalAutomateConfig = &dc.AutomateConfig{
+	Global: &shared.GlobalConfig{
+		V1: &shared.V1{
+			External: &shared.External{
+				Automate: &shared.External_Automate{
+					Auth: &shared.External_Automate_Authentication{},
+				},
+			},
 		},
 	},
 }
@@ -279,6 +292,30 @@ func Test_getPrivateAndPublicKeyFromFEEmptyMap(t *testing.T) {
 	privateKey, publicKey := getPrivateAndPublicKeyFromFE(map[string]*dc.AutomateConfig{})
 	assert.Equal(t, "", privateKey)
 	assert.Equal(t, "", publicKey)
+}
+
+func Test_getTokenFromCS(t *testing.T) {
+	externalAutomateConfig.Global.V1.External.Automate.Auth.Token = &wrapperspb.StringValue{Value: Token}
+	output := getTokenFromCS(map[string]*dc.AutomateConfig{Token: externalAutomateConfig})
+	fmt.Println("****: ",output)
+	assert.Equal(t, Token, output)
+}
+
+func Test_getTokenFromCSEmpty(t *testing.T) {
+	externalAutomateConfig.Global.V1.External.Automate.Auth.Token = &wrapperspb.StringValue{Value: ""}
+	output := getTokenFromCS(map[string]*dc.AutomateConfig{Token: externalAutomateConfig})
+	assert.Equal(t, "", output)
+}
+
+func Test_getTokenFromCSEmptyMap(t *testing.T) {
+	output := getTokenFromCS(map[string]*dc.AutomateConfig{})
+	assert.Equal(t, "", output)
+}
+
+func Test_getTokenFromCSEmptyConfig(t *testing.T) {
+	externalAutomateConfig.Global.V1.External.Automate.Auth.Token = &wrapperspb.StringValue{Value: ""}
+	output := getTokenFromCS(nil)
+	assert.Equal(t, "", output)
 }
 
 func Test_getPrivateKeyAndPublicKeyFromBE(t *testing.T) {
