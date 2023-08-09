@@ -20,7 +20,7 @@ The Event Creation App exposes the REST API endpoint for communication between C
 ## User Requirements
 
 - Your unique ServiceNow URL. It has the format: `https://ven12345.service-now.com`.
-- Setting up the Event Creation App requires the `x_chef_automate.api` role in configuring it. Your ServiceNow administrator can enable this for you.
+- Setting up the Event Creation App requires the `x_chef_event.api` role in configuring it. Your ServiceNow administrator can enable this for you.
 
 ## Required ServiceNow Plugins
 
