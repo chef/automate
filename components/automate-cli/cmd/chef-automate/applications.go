@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,6 +15,10 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+)
+
+const (
+	SHOW_COMMAND = "chef-automate applications show-svcs"
 )
 
 func init() {
@@ -262,7 +268,16 @@ func makeServicesReqWithFilters() *applications.ServicesReq {
 	return req
 }
 
-func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
+func ShowApplicationsHA(cmd *cobra.Command, args []string) error {
+	output, err := RunCmdOnSingleAutomateNode(cmd, args)
+	if err != nil {
+		return err
+	}
+	writer.Print(output)
+	return nil
+}
+
+func ShowApplicationsStandalone() error {
 	s := &serviceSet{
 		applicationsServiceFilters: applicationsServiceFiltersFlags,
 	}
@@ -281,11 +296,65 @@ func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
-	if !applicationsServiceFiltersFlags.FilterApplied() && !removeSvcsFlags.all {
-		return errors.New("You must filter the services to be deleted or pass the --all flag to delete all services")
+func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		if err := ShowApplicationsHA(cmd, args); err != nil {
+			return err
+		}
+	} else {
+		if err := ShowApplicationsStandalone(); err != nil {
+			return err
+		}
 	}
+	return nil
+}
 
+func RemoveApplicationsHA(cmd *cobra.Command, args []string) error {
+	var splittedString []string
+	// If user is not passing -y flag, then first we need to show the list with given conditions and then
+	// give confirmation prompt
+	if !removeSvcsFlags.yes {
+		flags := GetEnabledFlags(cmd, map[string]int{"all": 1})
+		showCmd := SHOW_COMMAND + flags
+		output, err := execCommand(showCmd)
+		if err != nil {
+			writer.Fail(err.Error())
+			return nil
+		}
+		splittedString = strings.Split(output, "\n")
+		// splittedString always contains 2 lines no matter services matches the criteria or not
+		// first line is table header and last line is empty line.
+		// >2 means it's containing the services which matches the criteria.
+		if len(splittedString) > 2 {
+			for i := 0; i < len(splittedString); i++ {
+				fmt.Println(splittedString[i])
+			}
+			prompt := fmt.Sprintf("The above %d services will be deleted. Do you wish to continue?", len(splittedString)-2)
+			proceed, err := writer.Confirm(prompt)
+			if err != nil {
+				return err
+			}
+			if !proceed {
+				return nil
+			}
+		}
+	}
+	args = append(args, "-y")
+	output, err := RunCmdOnSingleAutomateNode(cmd, args)
+	if err != nil {
+		return err
+	}
+	// len(splittedString) == 2 means list is empty it's just containing table header and empty line which means we haven't
+	// got any services to remove
+	if removeSvcsFlags.yes || len(splittedString) == 2 {
+		writer.Println(output)
+	} else {
+		writer.Println(fmt.Sprintf("Removed %d services", len(splittedString)-2))
+	}
+	return nil
+}
+
+func RemoveApplicationsStandalone() error {
 	s := &serviceSet{
 		applicationsServiceFilters: applicationsServiceFiltersFlags,
 	}
@@ -324,6 +393,22 @@ func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
+	if !applicationsServiceFiltersFlags.FilterApplied() && !removeSvcsFlags.all {
+		return errors.New("You must filter the services to be deleted or pass the --all flag to delete all services")
+	}
+	if isA2HARBFileExist() {
+		if err := RemoveApplicationsHA(cmd, args); err != nil {
+			return err
+		}
+	} else {
+		if err := RemoveApplicationsStandalone(); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -333,6 +418,14 @@ type serviceSet struct {
 	appsClient applications.ApplicationsServiceClient
 	services   []*applications.Service
 	ctx        context.Context
+}
+
+func execCommand(cmd string) (string, error) {
+	output, err := exec.Command("/bin/sh", "-c", cmd).Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
 }
 
 func (s *serviceSet) Connect() error {

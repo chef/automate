@@ -292,12 +292,13 @@ func preIAMCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 	}
 	if isA2HARBFileExist() {
-		err = RunCmdOnSingleAutomateNode(cmd, args)
+		output, err := RunCmdOnSingleAutomateNode(cmd, args)
 		if err != nil {
 			return err
 		}
+		writer.Print(output)
 		// NOTE: used os.exit as need to stop next lifecycle method to execute
-		os.Exit(1)
+		os.Exit(0)
 	}
 	return nil
 }

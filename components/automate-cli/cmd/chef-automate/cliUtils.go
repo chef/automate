@@ -25,17 +25,16 @@ func GenerateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) strin
 }
 
 // RunCmdOnSingleAutomateNode runs the command on a single automate node
-func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
+func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
 	script := GenerateOriginalAutomateCLICommand(cmd, args)
-
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	ips := infra.Outputs.AutomatePrivateIps.Value
 	if len(ips) == 0 {
-		return errors.New("No automate IPs are found")
+		return "", errors.New("No automate IPs are found")
 	}
 
 	sshConfig := &SSHConfig{
@@ -52,10 +51,10 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 		if len(strings.TrimSpace(output)) != 0 {
 			printErrorMessage("Automate", ips[0], writer, output)
 		}
-		return err
+		return "", err
 	}
-	writer.Print(output)
-	return nil
+	// writer.Print(output)
+	return output, nil
 }
 
 // RunCmdOnSingleAutomateNode runs the command on a single automate node
@@ -92,4 +91,21 @@ func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string, fi
 	writer.Printf("File downloaded %s \n", destFileName)
 
 	return nil
+}
+
+func GetEnabledFlags(cmd *cobra.Command, flagsToIgnore map[string]int) string {
+	flags := ""
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if flagsToIgnore[flag.Name] != 0 {
+			return
+		}
+		if flag.Changed {
+			if flag.Value.Type() != "bool" {
+				flags += " --" + flag.Name + " " + flag.Value.String()
+			} else {
+				flags += " --" + flag.Name
+			}
+		}
+	})
+	return flags
 }
