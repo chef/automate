@@ -165,3 +165,49 @@ func TestFeFlagEnabled(t *testing.T) {
 		})
 	}
 }
+
+func TestCAInfo(t *testing.T) {
+	tests := []struct {
+		testName        string
+		isHA            bool
+		isStandalone    bool
+		isExpectedError bool
+		errorMessage    string
+	}{
+		{"Standalone Mode", false, true, true, "exec: \"systemctl\": executable file not found in $PATH"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.testName, func(t *testing.T) {
+			err := runCAInfoCmd(&cobra.Command{}, []string{})
+			if tc.isExpectedError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestRegenRoot(t *testing.T) {
+	tests := []struct {
+		testName        string
+		isHA            bool
+		isStandalone    bool
+		isExpectedError bool
+		errorMessage    string
+	}{
+		{"Standalone Mode", false, true, true, "exec: \"systemctl\": executable file not found in $PATH"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.testName, func(t *testing.T) {
+			err := runRegenRootCmd(&cobra.Command{}, []string{})
+			if tc.isExpectedError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
