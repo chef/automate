@@ -43,7 +43,7 @@ func newApplicationsRootSubcmd() *cobra.Command {
 		Use:   "applications COMMAND",
 		Short: "Manage applications observability features",
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 }
@@ -173,7 +173,7 @@ Display a list of the habitat services stored in the applications database.
 `,
 		RunE: runApplicationsShowSvcsCmd,
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
@@ -203,7 +203,7 @@ services database.
 `,
 		RunE: runApplicationsRemoveSvcsCmd,
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
