@@ -749,7 +749,7 @@ func (db *DB) DeleteJob(id string) error {
 	_, err := db.Exec(softDeleteJobById, id)
 	if err != nil {
 		logrus.Errorf("DeleteJob unable to delete job : %s", err.Error())
-		return errors.New("DeleteJob unable to delete job")
+		return errors.New("unable to delete job")
 	}
 
 	return nil
@@ -758,38 +758,38 @@ func (db *DB) DeleteJob(id string) error {
 func (db *DB) UpdateJob(inJob *jobs.Job) error {
 	if err := validateJob(inJob); err != nil {
 		logrus.Errorf("UpdateJob error validating job : %s", err.Error())
-		return errors.New("UpdateJob error validating job")
+		return errors.New("error validating job")
 	}
 
 	job, err := toDBJob(inJob)
 	if err != nil {
 		logrus.Errorf("Update Job unable to translate job to db struct : %s", err.Error())
-		return errors.New("Update Job unable to translate job to db struct")
+		return errors.New("unable to translate job")
 	}
 
 	err = Transact(db, func(tx *DBTrans) error {
 		err = tx.processJobsTagsUpdate(inJob)
 		if err != nil {
 			logrus.Errorf("Update Job unable to process jobs tags update : %s", err.Error())
-			return errors.New("Update Job unable to process jobs tags update")
+			return errors.New("unable to process jobs")
 		}
 
 		err = tx.processJobsNodesUpdate(inJob)
 		if err != nil {
 			logrus.Errorf("Update Job unable to process jobs nodes update : %s", err.Error())
-			return errors.New("Update Job unable to process jobs nodes update")
+			return errors.New("unable to process jobs")
 		}
 
 		err = tx.processJobsProfilesUpdate(inJob)
 		if err != nil {
 			logrus.Errorf("Update Job unable to process jobs profiles update : %s", err.Error())
-			return errors.New("Update Job unable to process jobs profiles update")
+			return errors.New("unable to process jobs")
 		}
 
 		_, err = tx.Update(&job)
 		if err != nil {
 			logrus.Errorf("Update Job unable to update job : %s", err.Error())
-			return errors.New("Update Job unable to update job")
+			return errors.New("unable to update job")
 		}
 
 		return nil
