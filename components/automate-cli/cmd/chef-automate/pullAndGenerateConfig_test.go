@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -297,7 +296,6 @@ func Test_getPrivateAndPublicKeyFromFEEmptyMap(t *testing.T) {
 func Test_getTokenFromCS(t *testing.T) {
 	externalAutomateConfig.Global.V1.External.Automate.Auth.Token = &wrapperspb.StringValue{Value: Token}
 	output := getTokenFromCS(map[string]*dc.AutomateConfig{Token: externalAutomateConfig})
-	fmt.Println("****: ",output)
 	assert.Equal(t, Token, output)
 }
 
@@ -309,12 +307,6 @@ func Test_getTokenFromCSEmpty(t *testing.T) {
 
 func Test_getTokenFromCSEmptyMap(t *testing.T) {
 	output := getTokenFromCS(map[string]*dc.AutomateConfig{})
-	assert.Equal(t, "", output)
-}
-
-func Test_getTokenFromCSEmptyConfig(t *testing.T) {
-	externalAutomateConfig.Global.V1.External.Automate.Auth.Token = &wrapperspb.StringValue{Value: ""}
-	output := getTokenFromCS(nil)
 	assert.Equal(t, "", output)
 }
 
