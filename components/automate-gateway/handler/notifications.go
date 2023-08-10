@@ -149,7 +149,7 @@ func (s *notificationsServer) ValidateWebhook(ctx context.Context,
 
 	resp, err := s.notificationsClient.ValidateWebhook(ctx, &transformUVR)
 	if err != nil {
-		return nil, errors.New("error validating webhook")
+		return nil, errors.New("unable to connect: check URL, username and password.")
 	}
 
 	switch resp.GetCode() {
