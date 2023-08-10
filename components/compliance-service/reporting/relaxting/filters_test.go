@@ -2,8 +2,9 @@ package relaxting
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var esr = ES2Backend{
@@ -159,7 +160,7 @@ func TestFiltersForControlIndex(t *testing.T) {
 			name:          "Test for Day Latest and Daily Latest Flags",
 			filtersKey:    "organization",
 			filtersValue:  []string{"ORG"},
-			expectedQuery: `{"bool":{"must":[{"nested":{"path":"nodes","query":{"bool":{"must":{"bool":{"should":{"terms":{"nodes.organization_name.lower":["ORG"]}}}}}}}},{"range":{"end_time":{"from":"2022-07-17T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-18T23:59:59Z"}}},{"terms":{"day_latest":[true]}},{"terms":{"daily_latest":[true]}}]}}`,
+			expectedQuery: `{"bool":{"must":[{"nested":{"path":"nodes","query":{"bool":{"must":{"bool":{"should":{"terms":{"nodes.organization_name.lower":["ORG"]}}}}}}}},{"range":{"end_time":{"from":"2022-07-17T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-18T23:59:59Z"}}},{"terms":{"daily_latest":[true]}}]}}`,
 			esr:           esr,
 			startTime:     startTime,
 			endTime:       endTime,

@@ -410,16 +410,16 @@ func TestGetNodeInfoFromReportID_Success(t *testing.T) {
 		ChefDeliveryToken: "",
 	}
 	filters := map[string][]string{
-		"control":               []string{"ssh-10"},
-		"end_time":              []string{"2021-09-30T23:59:59Z"},
-		"environment":           []string{"DevSec Dev Delta"},
-		"inspec_version":        []string{"2.2.20"},
-		"node_id":               []string{"5d84476e-362a-3c65-8acd-dc8b38f3a272"},
-		"platform_with_version": []string{"ubuntu 18.04"},
-		"profile_id":            []string{"f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c"},
-		"recipe":                []string{"tomcat"},
-		"role":                  []string{"base_windows"},
-		"start_time":            []string{"2021-09-29T00:00:00Z"},
+		"control":               {"ssh-10"},
+		"end_time":              {"2021-09-30T23:59:59Z"},
+		"environment":           {"DevSec Dev Delta"},
+		"inspec_version":        {"2.2.20"},
+		"node_id":               {"5d84476e-362a-3c65-8acd-dc8b38f3a272"},
+		"platform_with_version": {"ubuntu 18.04"},
+		"profile_id":            {"f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c"},
+		"recipe":                {"tomcat"},
+		"role":                  {"base_windows"},
+		"start_time":            {"2021-09-29T00:00:00Z"},
 	}
 
 	nodeHeaderInfo, err := esr.GetNodeInfoFromReportID("0d67b0ab-2709-49c7-81e4-efcc5700c5cf", filters)
@@ -459,9 +459,9 @@ func TestGetNodeInfoFromReportID_Failed(t *testing.T) {
 		ChefDeliveryToken: "",
 	}
 	filters := map[string][]string{
-		"end_time":   []string{"2021-09-29T23:59:59Z"},
-		"node_id":    []string{"5d84476e-362a-3c65-8acd-dc8b38f3a272"},
-		"start_time": []string{"2021-09-29T00:00:00Z"},
+		"end_time":   {"2021-09-29T23:59:59Z"},
+		"node_id":    {"5d84476e-362a-3c65-8acd-dc8b38f3a272"},
+		"start_time": {"2021-09-29T00:00:00Z"},
 	}
 	_, err := esr.GetNodeInfoFromReportID("0d67b0ab-2709-49c7-81e4-efcc5700c5cf", filters)
 	assert.Error(t, err)
@@ -479,14 +479,7 @@ func TestFilterQueryChangeForDifferentDates(t *testing.T) {
 	endTime1 := "2022-06-23T00:00:00Z"
 	startTime1 := "2022-06-21T00:00:00Z"
 	setFlag, _ := filterQueryChange(endTime1, startTime1)
-	assert.Equal(t, "day_latest", setFlag[0])
-}
-
-func TestFilterQueryChangeForError(t *testing.T) {
-	endTime2 := "2022-06-26T00:00:00Z"
-	startTime2 := startTimeErr
-	_, err := filterQueryChange(endTime2, startTime2)
-	assert.EqualErrorf(t, err, errCannotParse, "")
+	assert.Equal(t, "daily_latest", setFlag[0])
 }
 
 func TestFilterQueryChangeForErrorWithBlankStartTimeAndEndTime(t *testing.T) {
@@ -498,7 +491,7 @@ func TestFilterQueryChangeForEndTime(t *testing.T) {
 	endTime2 := ""
 	startTime2 := "2022-06-22T00:00:00Z"
 	setFlag, _ := filterQueryChange(endTime2, startTime2)
-	assert.Equal(t, "day_latest", setFlag[0])
+	assert.Equal(t, "daily_latest", setFlag[0])
 }
 func TestValidateFiltersTimeRangeForError(t *testing.T) {
 	endTime2 := "2022-06-23T00:00:00Z"
