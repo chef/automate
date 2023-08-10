@@ -317,33 +317,47 @@ func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func showAndPrompt(cmd *cobra.Command, e IExecutor, w *cli.Writer) ([]string, bool, error) {
+	var splittedString []string
+	flags := GetEnabledFlags(cmd, map[string]int{"all": 1})
+	showCmd := SHOW_COMMAND + flags
+	output, err := e.execCommand(showCmd)
+	if err != nil {
+		return splittedString, false, err
+	}
+	splittedString = strings.Split(output, "\n")
+	// splittedString always contains 2 lines no matter services matches the criteria or not
+	// first line is table header and last line is empty line.
+	// >2 means it's containing the services which matches the criteria.
+	if len(splittedString) > 2 {
+		for i := 0; i < len(splittedString); i++ {
+			fmt.Println(splittedString[i])
+		}
+		prompt := fmt.Sprintf("The above %d services will be deleted. Do you wish to continue?", len(splittedString)-2)
+		proceed, err := w.Confirm(prompt)
+		if err != nil {
+			return splittedString, false, err
+		}
+		if !proceed {
+			return splittedString, false, nil
+		}
+	}
+	return splittedString, true, nil
+}
+
 func RemoveApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli.Writer) error {
 	var splittedString []string
 	// If user is not passing -y flag, then first we need to show the list with given conditions and then
 	// give confirmation prompt
 	if !RemoveSvcsFlags.yes {
-		flags := GetEnabledFlags(cmd, map[string]int{"all": 1})
-		showCmd := SHOW_COMMAND + flags
-		output, err := e.execCommand(showCmd)
+		var proceed bool
+		var err error
+		splittedString, proceed, err = showAndPrompt(cmd, e, w)
 		if err != nil {
 			return err
 		}
-		splittedString = strings.Split(output, "\n")
-		// splittedString always contains 2 lines no matter services matches the criteria or not
-		// first line is table header and last line is empty line.
-		// >2 means it's containing the services which matches the criteria.
-		if len(splittedString) > 2 {
-			for i := 0; i < len(splittedString); i++ {
-				fmt.Println(splittedString[i])
-			}
-			prompt := fmt.Sprintf("The above %d services will be deleted. Do you wish to continue?", len(splittedString)-2)
-			proceed, err := w.Confirm(prompt)
-			if err != nil {
-				return err
-			}
-			if !proceed {
-				return nil
-			}
+		if !proceed {
+			return nil
 		}
 	}
 	args = append(args, "-y")
@@ -358,6 +372,7 @@ func RemoveApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli
 	} else {
 		writer.Println(fmt.Sprintf("Removed %d services", len(splittedString)-2))
 	}
+
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/spf13/cobra"
@@ -120,6 +121,8 @@ func TestRemoveApplicationsHA(t *testing.T) {
 			}
 		})
 	}
+	// Resetting the Global variable to its default value
+	RemoveSvcsFlags.yes = false
 }
 
 func TestRunApplicationsRemoveSvcsCmd(t *testing.T) {
@@ -188,6 +191,10 @@ func TestRunApplicationsRemoveSvcsCmd(t *testing.T) {
 			}
 		})
 	}
+
+	// Resetting the Global variable to its default value
+	RemoveSvcsFlags.all = false
+	ApplicationsServiceFiltersFlags.serviceName = ""
 }
 
 func TestShowApplicationsHA(t *testing.T) {
@@ -266,6 +273,82 @@ func TestRunApplicationsShowSvcsCmd(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMakeServicesReqWithFilters(t *testing.T) {
+	ApplicationsServiceFiltersFlags.origin = "origin_value"
+	ApplicationsServiceFiltersFlags.serviceName = "servicename_value"
+	ApplicationsServiceFiltersFlags.version = "version_value"
+	ApplicationsServiceFiltersFlags.channel = "channel_value"
+	ApplicationsServiceFiltersFlags.application = "app_value"
+	ApplicationsServiceFiltersFlags.environment = "environment_value"
+	ApplicationsServiceFiltersFlags.site = "site_value"
+	ApplicationsServiceFiltersFlags.buildTimestamp = "timestamp_value"
+	ApplicationsServiceFiltersFlags.groupName = "group_value"
+	res := makeServicesReqWithFilters()
+	ExpectedResp := &applications.ServicesReq{
+		Filter: []string{
+			"origin:origin_value",
+			"service:servicename_value",
+			"version:version_value",
+			"channel:channel_value",
+			"application:app_value",
+			"environment:environment_value",
+			"site:site_value",
+			"buildstamp:timestamp_value",
+			"group:group_value",
+		},
+	}
+	assert.Equal(t, ExpectedResp, res)
+
+	// Setting Disconnected Flag
+	ApplicationsServiceFiltersFlags.disconnected = true
+	res = makeServicesReqWithFilters()
+	ExpectedResp = &applications.ServicesReq{
+		Filter: []string{
+			"status:disconnected",
+			"origin:origin_value",
+			"service:servicename_value",
+			"version:version_value",
+			"channel:channel_value",
+			"application:app_value",
+			"environment:environment_value",
+			"site:site_value",
+			"buildstamp:timestamp_value",
+			"group:group_value",
+		},
+	}
+	assert.Equal(t, ExpectedResp, res)
+
+	// Resetting the Global variable to its default value
+	ApplicationsServiceFiltersFlags = applicationsServiceFilters{}
+}
+
+func TestPrintTSV(t *testing.T) {
+	s := serviceSet{
+		services: []*applications.Service{
+			{
+				Id:           "37035",
+				Group:        "redis.default",
+				Release:      "core/redis/4.0.14/20220311173537",
+				Fqdn:         "ip-172-31-41-174.eu-west-3.compute.internal",
+				Application:  "DummyApp",
+				Environment:  "acceptance",
+				Disconnected: true,
+			},
+			{
+				Id:           "37035",
+				Group:        "redis.default",
+				Release:      "core/redis/4.0.14/20220311173537",
+				Fqdn:         "ip-172-31-41-174.eu-west-3.compute.internal",
+				Application:  "DummyApp",
+				Environment:  "acceptance",
+				Disconnected: false,
+			},
+		},
+	}
+	err := s.PrintTSV()
+	assert.NoError(t, err)
 }
 
 func MakeHASystem(t *testing.T) *os.File {
