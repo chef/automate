@@ -130,6 +130,13 @@ The steps to enable backup and restore in OpenSearch S3 is:
      Select Map and confirm the user and role showing up under Mapped users.
      {{< figure src="/images/automate/managed_services_os_dashboard.png" alt="Managed Service OS Dashboard">}}
 
+- In case of Automate HA, Add the following permission in OpenSearch Dashboard.
+
+  1. Navigate to the OpenSearch Dashboards url from the OpenSearch Service console.
+  1. From the OpenSearch Dashboards, navigate to *Security* in the main menu and choose *Roles*, and then select the `manage_snapshots` role.
+  1. Select `Edit role`.
+  1. Under the Index permissions, Add the `indices:admin/delete` and then select on Update to save the changes.
+
 {{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
 
 From the terminal, run the following command:
