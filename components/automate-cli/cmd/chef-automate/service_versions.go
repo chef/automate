@@ -19,7 +19,7 @@ import (
 
 const (
 	SERVICE_VERSIONS_ERROR_ON_SELF_MANAGED = "Showing the service-versions for externally configured %s is not supported."
-	BACKEND_SERVICE_VERSIONS_CMD           = `sudo HAB_LICENSE=accept-no-persist hab svc status | hab pkg exec core/gawk gawk 'NR>1 {split($1,a,"/"); printf "%s/%s %s %s\n", a[1], a[2], a[3], a[4]}'`
+	BACKEND_SERVICE_VERSIONS_CMD           = `sudo HAB_LICENSE=accept-no-persist hab svc status | awk 'NR>1 {split($1,a,"/"); printf "%s/%s %s %s\n", a[1], a[2], a[3], a[4]}'`
 	FRONTEND_SERVICE_VERSIONS_CMD          = "sudo chef-automate service-versions"
 )
 
