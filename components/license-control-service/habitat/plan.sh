@@ -12,6 +12,7 @@ pkg_license=('Chef-MLSA')
 pkg_deps=(
   chef/mlsa
   chef/automate-platform-tools
+  chef/license-audit
 )
 pkg_exports=(
   [port]=service.port
@@ -20,6 +21,7 @@ pkg_exports=(
 pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
+  [cereal-service]="port"
 )
 pkg_exposes=(port)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
