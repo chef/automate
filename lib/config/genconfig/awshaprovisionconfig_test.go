@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"testing"
 
 	"github.com/chef/automate/lib/config"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/ioutils"
 	"github.com/chef/automate/lib/pmt"
@@ -46,6 +48,8 @@ func TestPromptsCidrAWSManaged(t *testing.T) {
 
 	enableCustomCerts := false
 	input(b, "\r")
+
+	input(b, moveDown+"\r")
 
 	awsProfile := "default"
 	input(b, "\r")
@@ -208,6 +212,21 @@ func TestPromptsCidrAWSManaged(t *testing.T) {
 		Prompt:    p,
 		FileUtils: mfsu,
 		Config:    &config.HaDeployConfig{},
+		httpRequestClient: &httputils.MockHTTPClient{
+			MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
+				if url == TOKEN_URLS {
+					return &http.Response{
+						StatusCode: 200,
+					}, []byte("dummytoken"), nil
+				}
+				return &http.Response{StatusCode: 200}, []byte(`{
+					"Code" : "Success",
+					"LastUpdated" : "2023-08-09T11:23:21Z",
+					"InstanceProfileArn" : "arn:aws:iam::1234:instance-profile/bastion-role-user",
+					"InstanceProfileId" : "AIPARHU"
+				}`), nil
+			},
+		},
 	}
 
 	err := c.Prompts()
@@ -1124,6 +1143,21 @@ func testPromptsCidrAWSManagedErrRun(t *testing.T, upto int) {
 		Prompt:    p,
 		FileUtils: mfsu,
 		Config:    &config.HaDeployConfig{},
+		httpRequestClient: &httputils.MockHTTPClient{
+			MakeRequestWithHeadersfunc: func(requestMethod, url string, body interface{}, headerkey, headerValue string) (*http.Response, []byte, error) {
+				if url == TOKEN_URLS {
+					return &http.Response{
+						StatusCode: 200,
+					}, []byte("dummytoken"), nil
+				}
+				return &http.Response{StatusCode: 200}, []byte(`{
+					"Code" : "Success",
+					"LastUpdated" : "2023-08-09T11:23:21Z",
+					"InstanceProfileArn" : "arn:aws:iam::1234:instance-profile/bastion-role-user",
+					"InstanceProfileId" : "AIPARHU"
+				}`), nil
+			},
+		},
 	}
 
 	err := c.Prompts()
@@ -1155,6 +1189,9 @@ func callInput(upto int, b *bytes.Buffer) {
 	}
 	if upto >= 5 {
 		input(b, "\r")
+	}
+	if upto >= 5 {
+		input(b, moveDown+"\r")
 	}
 	if upto >= 6 {
 		input(b, "\r")

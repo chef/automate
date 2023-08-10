@@ -1,54 +1,68 @@
 package genconfig
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/chef/automate/lib/config"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/pmt"
 	"github.com/chef/automate/lib/toml"
 )
 
 const (
-	AWS_MACHINE_TYPE_REGEX        = "^((a1|c1|c3|c4|c5|c5a|c5ad|c5d|c5n|c6a|c6g|c6gd|c6gn|c6i|c6id|c7g|cc2|d2|d3|d3en|dl1|f1|g2|g3|g3s|g4ad|g4dn|g5|g5g|h1|i2|i3|i3en|i4i|im4gn|inf1|is4gen|m1|m2|m3|m4|m5|m5a|m5ad|m5d|m5dn|m5n|m5zn|m6a|m6g|m6gd|m6i|m6id|mac1|mac2|p2|p3|p3dn|p4d|r3|r4|r5|r5a|r5ad|r5b|r5d|r5dn|r5n|r6a|r6g|r6gd|r6i|r6id|t1|t2|t3|t3a|t4g|trn1|u-12tb1|u-3tb1|u-6tb1|u-9tb1|vt1|x1|x1e|x2gd|x2idn|x2iedn|x2iezn|z1d)\\.(10xlarge|112xlarge|12xlarge|16xlarge|18xlarge|24xlarge|2xlarge|32xlarge|3xlarge|48xlarge|4xlarge|56xlarge|6xlarge|8xlarge|9xlarge|large|medium|metal|micro|nano|small|xlarge))$"
-	AWS_VOL_TYPE_REGEX            = "^(gp2|gp3|io2|io1|st1|sc1)$"
-	IP_REGEX                      = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$"
-	URL_OPTIONAL_PORT_REGEX       = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](:{1}[0-9]{1,5})?$"
-	FQDN_REGEX                    = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"
-	URL_REQUIRED_PORT_REGEX       = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]:{1}[0-9]{1,5}$"
-	LINUX_USER_REGEX              = "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30})$"
-	DIR_PATH_REGEX                = "^\\/$|(\\/[a-zA-Z_0-9-]+)+$"
-	BUCKET_NAME_REGEX             = "^[a-zA-Z0-9_-]+$"
-	AWS_ACCESS_KEY_ID_REGEX       = "^[A-Z0-9]{20}$"
-	AWS_ACCESS_KEY_SECRET_REGEX   = "^[A-Za-z0-9/+=]{40}$"
-	ACCESS_KEY_ID_REGEX           = "^[A-Za-z0-9/+=]+$"
-	ACCESS_KEY_SECRET_REGEX       = "^[A-Za-z0-9/+=]+$"
-	ENDPOINT_URL                  = "^((http|https)://)[-a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)$"
-	AUTOMATE_ADMIN_PASSWORD_REGEX = "^.{8,35}$"
-	OPENSEARCH_NODETYPE           = "OpenSearch"
-	POSTGRESQL_NODETYPE           = "Postgresql"
-	AUTOMATE_NODETYPE             = "Automate"
-	CHEF_INFRA_SERVER_NODETYPE    = "Chef Infra Server"
-	PUB_CERT                      = "Public Cert"
-	PRI_KEY                       = "Private Key"
-	ADMIN_CERT                    = "Admin Cert"
-	ADMIN_KEY                     = "Admin Key"
-	ROOTCA                        = "Root CA"
+	AWS_MACHINE_TYPE_REGEX         = "^((a1|c1|c3|c4|c5|c5a|c5ad|c5d|c5n|c6a|c6g|c6gd|c6gn|c6i|c6id|c7g|cc2|d2|d3|d3en|dl1|f1|g2|g3|g3s|g4ad|g4dn|g5|g5g|h1|i2|i3|i3en|i4i|im4gn|inf1|is4gen|m1|m2|m3|m4|m5|m5a|m5ad|m5d|m5dn|m5n|m5zn|m6a|m6g|m6gd|m6i|m6id|mac1|mac2|p2|p3|p3dn|p4d|r3|r4|r5|r5a|r5ad|r5b|r5d|r5dn|r5n|r6a|r6g|r6gd|r6i|r6id|t1|t2|t3|t3a|t4g|trn1|u-12tb1|u-3tb1|u-6tb1|u-9tb1|vt1|x1|x1e|x2gd|x2idn|x2iedn|x2iezn|z1d)\\.(10xlarge|112xlarge|12xlarge|16xlarge|18xlarge|24xlarge|2xlarge|32xlarge|3xlarge|48xlarge|4xlarge|56xlarge|6xlarge|8xlarge|9xlarge|large|medium|metal|micro|nano|small|xlarge))$"
+	AWS_VOL_TYPE_REGEX             = "^(gp2|gp3|io2|io1|st1|sc1)$"
+	IP_REGEX                       = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$"
+	IP_REGEX_SAMPLE                = "10.0.0.0"
+	URL_OPTIONAL_PORT_REGEX        = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](:{1}[0-9]{1,5})?$"
+	URL_OPTIONAL_PORT_REGEX_SAMPLE = "myopensearch.com or 10.0.82.0:9200"
+	FQDN_REGEX                     = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"
+	FQDN_REGEX_SAMPLE              = "mydomain.chef.io"
+	URL_REQUIRED_PORT_REGEX        = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]:{1}[0-9]{1,5}$"
+	URL_REQUIRED_PORT_REGEX_SAMPLE = "mydomain.chef.io:5432"
+	LINUX_USER_REGEX               = "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30})$"
+	DIR_PATH_REGEX                 = "^\\/$|(\\/[a-zA-Z_0-9-]+)+$"
+	BUCKET_NAME_REGEX              = "^[a-zA-Z0-9_-]+$"
+	AWS_ACCESS_KEY_ID_REGEX        = "^[A-Z0-9]{20}$"
+	AWS_ACCESS_KEY_SECRET_REGEX    = "^[A-Za-z0-9/+=]{40}$"
+	ACCESS_KEY_ID_REGEX            = "^[A-Za-z0-9/+=]+$"
+	ACCESS_KEY_SECRET_REGEX        = "^[A-Za-z0-9/+=]+$"
+	ENDPOINT_URL                   = "^((http|https)://)[-a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)$"
+	AUTOMATE_ADMIN_PASSWORD_REGEX  = "^.{8,35}$"
+	OPENSEARCH_NODETYPE            = "OpenSearch"
+	POSTGRESQL_NODETYPE            = "Postgresql"
+	AUTOMATE_NODETYPE              = "Automate"
+	CHEF_INFRA_SERVER_NODETYPE     = "Chef Infra Server"
+	PUB_CERT                       = "Public Cert"
+	PRI_KEY                        = "Private Key"
+	ADMIN_CERT                     = "Admin Cert"
+	ADMIN_KEY                      = "Admin Key"
+	ROOTCA                         = "Root CA"
+	TOKEN_URLS                     = "http://169.254.169.254/latest/api/token"
+	METADATA_URLS                  = "http://169.254.169.254/latest/meta-data/iam/info"
 )
 
 type AwsHaProvisionConfig struct {
-	Prompt         pmt.Prompt `toml:"-"`
-	Config         *config.HaDeployConfig
-	HasCustomCerts bool                `toml:"-"`
-	FileUtils      fileutils.FileUtils `toml:"-"`
+	Prompt               pmt.Prompt `toml:"-"`
+	Config               *config.HaDeployConfig
+	HasCustomCerts       bool                `toml:"-"`
+	FileUtils            fileutils.FileUtils `toml:"-"`
+	CreateOSSnapShotCred bool
+	httpRequestClient    httputils.HTTPClient
 }
 
 func AwsHaProvisionConfigFactory(p pmt.Prompt) *AwsHaProvisionConfig {
+	log := logger.NewLogrusStandardLogger()
 	return &AwsHaProvisionConfig{
-		Prompt:    p,
-		Config:    &config.HaDeployConfig{},
-		FileUtils: fileutils.NewFileSystemUtils(),
+		Prompt:            p,
+		Config:            &config.HaDeployConfig{},
+		FileUtils:         fileutils.NewFileSystemUtils(),
+		httpRequestClient: httputils.NewClient(log),
 	}
 }
 
@@ -160,11 +174,18 @@ func (c *AwsHaProvisionConfig) PromptCidr() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptProfile() (err error) {
-	profile, err := c.Prompt.InputStringDefault("AWS Profile", "default")
+	useIAMRole, err := c.useIAMRole()
 	if err != nil {
 		return
 	}
-	c.Config.InitAws().InitConfigAwsSettings().Profile = profile
+
+	if !useIAMRole {
+		profile, err := c.Prompt.InputStringDefault("AWS Profile", "default")
+		if err != nil {
+			return err
+		}
+		c.Config.InitAws().InitConfigAwsSettings().Profile = profile
+	}
 	return
 }
 
@@ -201,8 +222,54 @@ func (c *AwsHaProvisionConfig) HasCidrBlockAddr() (isCiderBlock bool, err error)
 	return
 }
 
+func (c *AwsHaProvisionConfig) useIAMRole() (isIAMUserAvailable bool, err error) {
+
+	_, tokenResponseBody, err := c.httpRequestClient.MakeRequestWithHeaders(http.MethodPut, TOKEN_URLS, nil, "X-aws-ec2-metadata-token-ttl-seconds", "21600")
+	if err != nil {
+		return
+	}
+
+	token := string(tokenResponseBody)
+	fmt.Println("TOKEN: ", token)
+
+	resp, dataByte, err := c.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, METADATA_URLS, nil, "X-aws-ec2-metadata-token", token)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		isIAMUserAvailable = false
+		return
+	}
+
+	iamRole := getIAMRoleName(dataByte)
+
+	fmt.Println("iamRole: ", iamRole)
+
+	isIAMUserAvailable, err = c.Prompt.Confirm("Found an IAM role ("+iamRole+") attached to this machine. Do you want to continue with IAM role", "yes", "no")
+	return
+}
+
+func getIAMRoleName(respByte []byte) (IAMRoleName string) {
+
+	var result map[string]interface{}
+	err := json.Unmarshal(respByte, &result)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	instanceProfileArn, ok := result["InstanceProfileArn"].(string)
+	if !ok {
+		fmt.Println("InstanceProfileArn not found or not a string")
+		return
+	}
+	IAMRoleName = strings.Split(instanceProfileArn, "/")[1]
+	return
+}
+
 func (c *AwsHaProvisionConfig) PromptCidrBlockAddr() (err error) {
-	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address", IP_REGEX)
+	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address", IP_REGEX, IP_REGEX_SAMPLE)
 	if err != nil {
 		return
 	}
@@ -211,19 +278,19 @@ func (c *AwsHaProvisionConfig) PromptCidrBlockAddr() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPrivateSubnet() (err error) {
-	privateSubnet1, err := c.Prompt.InputStringRequired("AWS Private Subnet 1")
+	privateSubnet1, err := c.Prompt.InputStringRequired("AWS Private Subnet 1 [Eg: subnet-e556d512]")
 	if err != nil {
 		return
 	}
 	c.Config.InitAws().InitConfigAwsSettings().PrivateCustomSubnets = []string{privateSubnet1}
 
-	privateSubnet2, err := c.Prompt.InputStringRequired("AWS Private Subnet 2")
+	privateSubnet2, err := c.Prompt.InputStringRequired("AWS Private Subnet 2 [Eg: subnet-e556d514]")
 	if err != nil {
 		return
 	}
 	c.Config.InitAws().InitConfigAwsSettings().PrivateCustomSubnets = append(c.Config.InitAws().InitConfigAwsSettings().PrivateCustomSubnets, privateSubnet2)
 
-	privateSubnet3, err := c.Prompt.InputStringRequired("AWS Private Subnet 3")
+	privateSubnet3, err := c.Prompt.InputStringRequired("AWS Private Subnet 3 [Eg: subnet-e556d513]")
 	if err != nil {
 		return
 	}
@@ -365,7 +432,7 @@ func (c *AwsHaProvisionConfig) PromptAwsManagedPostgresql() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPgUrl() (err error) {
-	pgUrl, err := c.Prompt.InputStringRegex("AWS Managed RDS PostgreSQL URL:<port>", URL_REQUIRED_PORT_REGEX)
+	pgUrl, err := c.Prompt.InputStringRegex("AWS Managed RDS PostgreSQL URL:<port>", URL_REQUIRED_PORT_REGEX, URL_REQUIRED_PORT_REGEX_SAMPLE)
 	if err != nil {
 		return
 	}
@@ -457,6 +524,11 @@ func (c *AwsHaProvisionConfig) PromptAwsManagedOpenSearch() (err error) {
 		return
 	}
 
+	err = c.CreateOSSnapShotCredentials()
+	if err != nil {
+		return
+	}
+
 	err = c.PromptOsSnapshotRoleArn()
 	if err != nil {
 		return
@@ -485,7 +557,7 @@ func (c *AwsHaProvisionConfig) PromptOsDomainName() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOsDomainUrl() (err error) {
-	osDomainUrl, err := c.Prompt.InputStringRegex("AWS Managed OpenSearch Domain URL", URL_OPTIONAL_PORT_REGEX)
+	osDomainUrl, err := c.Prompt.InputStringRegex("AWS Managed OpenSearch Domain URL", URL_OPTIONAL_PORT_REGEX, URL_OPTIONAL_PORT_REGEX_SAMPLE)
 	if err != nil {
 		return
 	}
@@ -533,30 +605,51 @@ func (c *AwsHaProvisionConfig) PromptOsCert() (err error) {
 	return
 }
 
-func (c *AwsHaProvisionConfig) PromptOsSnapshotRoleArn() (err error) {
-	arn, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Snapshot Role ARN")
+func (c *AwsHaProvisionConfig) CreateOSSnapShotCredentials() (err error) {
+	CreateOSSnapShotCred, err := c.Prompt.Confirm("Create new snapshot role ARN and user credential", "yes", "no")
 	if err != nil {
 		return
 	}
-	c.Config.InitAws().InitConfigAwsSettings().AwsOsSnapshotRoleArn = arn
+	c.CreateOSSnapShotCred = CreateOSSnapShotCred
+	return
+}
+
+func (c *AwsHaProvisionConfig) PromptOsSnapshotRoleArn() (err error) {
+	if c.CreateOSSnapShotCred {
+		c.Config.InitAws().InitConfigAwsSettings().AwsOsSnapshotRoleArn = ""
+	} else {
+		arn, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Snapshot Role ARN")
+		if err != nil {
+			return err
+		}
+		c.Config.InitAws().InitConfigAwsSettings().AwsOsSnapshotRoleArn = arn
+	}
 	return
 }
 
 func (c *AwsHaProvisionConfig) PromptOsSnapshotUserAccessKeyId() (err error) {
-	keyId, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Snapshot User Access Key ID")
-	if err != nil {
-		return
+	if c.CreateOSSnapShotCred {
+		c.Config.InitAws().InitConfigAwsSettings().OsSnapshotUserAccessKeyID = ""
+	} else {
+		keyId, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Snapshot User Access Key ID")
+		if err != nil {
+			return err
+		}
+		c.Config.InitAws().InitConfigAwsSettings().OsSnapshotUserAccessKeyID = keyId
 	}
-	c.Config.InitAws().InitConfigAwsSettings().OsSnapshotUserAccessKeyID = keyId
 	return
 }
 
 func (c *AwsHaProvisionConfig) PromptOsSnapshotUserAccessKeySecret() (err error) {
-	secret, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Snapshot User Access Key Secret")
-	if err != nil {
-		return
+	if c.CreateOSSnapShotCred {
+		c.Config.InitAws().InitConfigAwsSettings().OsSnapshotUserAccessKeySecret = ""
+	} else {
+		secret, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Snapshot User Access Key Secret")
+		if err != nil {
+			return err
+		}
+		c.Config.InitAws().InitConfigAwsSettings().OsSnapshotUserAccessKeySecret = secret
 	}
-	c.Config.InitAws().InitConfigAwsSettings().OsSnapshotUserAccessKeySecret = secret
 	return
 }
 
@@ -729,7 +822,7 @@ func (c *AwsHaProvisionConfig) DefaultAutomateConfigValues() {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateFqdn() (err error) {
-	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN", FQDN_REGEX)
+	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN", FQDN_REGEX, FQDN_REGEX_SAMPLE)
 	if err != nil {
 		return
 	}
@@ -837,7 +930,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerFqdn() (err error) {
-	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN", FQDN_REGEX)
+	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN", FQDN_REGEX, FQDN_REGEX_SAMPLE)
 	if err != nil {
 		return
 	}
