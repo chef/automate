@@ -66,7 +66,7 @@ func init() {
 	serviceVersionsCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 	serviceVersionsCmd.PersistentFlags().BoolVar(&serviceVersionsCmdFlag.opensearch, "os", false, "Shows service-versions for OpenSearch nodes[DUPLICATE]")
 	serviceVersionsCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
-	serviceVersionsCmd.PersistentFlags().StringVar(&serviceVersionsCmdFlag.node, "node", "", "Pass this flag to check service-versions of perticular node in the cluster")
+	serviceVersionsCmd.PersistentFlags().StringVar(&serviceVersionsCmdFlag.node, "node", "", "Pass this flag to check service-versions of particular node in the cluster")
 	serviceVersionsCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(serviceVersionsCmd)
 }
