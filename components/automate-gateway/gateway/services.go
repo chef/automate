@@ -484,7 +484,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = io.Copy(&content, file)
 		if err != nil {
 			log.Errorf("Received error while copying content : %s", err.Error())
-			http.Error(w, "Something went wrong", http.StatusBadRequest)
+			http.Error(w, "Error copying content", http.StatusBadRequest)
 			return
 		}
 
@@ -519,7 +519,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	stream, err := profilesClient.Create(ctx)
 	if err != nil {
 		log.Errorf("Error in profile create : %s", err.Error())
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, "Error creating profile", http.StatusInternalServerError)
 		return
 	}
 
@@ -537,7 +537,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err = stream.Send(&request)
 	if err != nil {
 		log.Errorf("Error in profile service : %s", err.Error())
-		http.Error(w, "Something went wrong", http.StatusBadRequest)
+		http.Error(w, "Error profile service", http.StatusBadRequest)
 		return
 	}
 	log.Info("Request successfully sent to backend service")
@@ -545,13 +545,13 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
 		log.Errorf("Error in profile service : %s", err.Error())
-		http.Error(w, "Something went wrong", http.StatusBadRequest)
+		http.Error(w, "Error profile service", http.StatusBadRequest)
 		return
 	}
 	data, err := json.Marshal(reply)
 	if err != nil {
 		log.Errorf("Error in marshal : %s", err.Error())
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		http.Error(w, "Error in marshal", http.StatusInternalServerError)
 		return
 	}
 
