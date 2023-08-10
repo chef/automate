@@ -115,6 +115,10 @@ func TestInternalCaHA(t *testing.T) {
 			}
 		})
 	}
+	// Resetting the global variables to its default values.
+	caCmdFlags.automate = false
+	caCmdFlags.chef_server = false
+	caCmdFlags.node = ""
 }
 
 func TestFeFlagEnabled(t *testing.T) {
@@ -166,6 +170,10 @@ func TestFeFlagEnabled(t *testing.T) {
 			}
 		})
 	}
+	// Resetting the global variables to its default values.
+	caCmdFlags.automate = false
+	caCmdFlags.chef_server = false
+	caCmdFlags.node = ""
 }
 
 func TestCAInfo(t *testing.T) {
@@ -221,6 +229,8 @@ func TestCAInfo(t *testing.T) {
 			}
 		})
 	}
+	// Resetting the global variables to its default values.
+	caCmdFlags.automate = false
 }
 
 func TestRegenRoot(t *testing.T) {
@@ -276,6 +286,8 @@ func TestRegenRoot(t *testing.T) {
 			}
 		})
 	}
+	// Resetting the global variables to its default values.
+	caCmdFlags.automate = false
 }
 
 func CreateHASystem(t *testing.T) *os.File {

@@ -217,27 +217,19 @@ func getHANodes(infra *AutomateHAInfraDetails) ([]string, string, error) {
 	var remoteService string
 	if caCmdFlags.automate {
 		remoteService = AUTOMATE
-		if caCmdFlags.node != "" {
-			isValid := validateEachIp(remoteService, infra, caCmdFlags.node)
-			if !isValid {
-				return []string{}, remoteService, errors.New(fmt.Sprintf("Please Enter Valid %s IP", remoteService))
-			}
-			ips = append(ips, caCmdFlags.node)
-		} else {
-			ips = append(ips, getIps(remoteService, infra)...)
+		automateIps, err := getParticularServiceNodes(infra, remoteService)
+		if err != nil {
+			return []string{}, remoteService, err
 		}
+		ips = append(ips, automateIps...)
 	}
 	if caCmdFlags.chef_server {
 		remoteService = CHEF_SERVER
-		if caCmdFlags.node != "" {
-			isValid := validateEachIp(remoteService, infra, caCmdFlags.node)
-			if !isValid {
-				return []string{}, remoteService, errors.New(fmt.Sprintf("Please Enter Valid %s IP", remoteService))
-			}
-			ips = append(ips, caCmdFlags.node)
-		} else {
-			ips = append(ips, getIps(remoteService, infra)...)
+		chefserverIps, err := getParticularServiceNodes(infra, remoteService)
+		if err != nil {
+			return []string{}, remoteService, err
 		}
+		ips = append(ips, chefserverIps...)
 	}
 
 	if caCmdFlags.automate && caCmdFlags.chef_server {
@@ -245,6 +237,21 @@ func getHANodes(infra *AutomateHAInfraDetails) ([]string, string, error) {
 	}
 
 	return ips, remoteService, nil
+}
+
+func getParticularServiceNodes(infra *AutomateHAInfraDetails, remoteService string) ([]string, error) {
+	var ips []string
+	if caCmdFlags.node != "" {
+		isValid := validateEachIp(remoteService, infra, caCmdFlags.node)
+		if !isValid {
+			return []string{}, errors.New(fmt.Sprintf("Please Enter Valid %s IP", remoteService))
+		}
+		ips = append(ips, caCmdFlags.node)
+	} else {
+		ips = append(ips, getIps(remoteService, infra)...)
+	}
+
+	return ips, nil
 }
 
 func triggerInternalCaHA(sshConfig SSHConfig, ips []string, remoteService, scriptCommands string) error {
