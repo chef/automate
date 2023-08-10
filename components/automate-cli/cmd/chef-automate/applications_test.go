@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-	"os"
-	"runtime"
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
@@ -133,49 +131,30 @@ func TestRunApplicationsRemoveSvcsCmd(t *testing.T) {
 		TestName       string
 		FilterApplied  bool
 		AllFlagEnabled bool
-		HA             bool
 		ExpectedError  error
 	}{
 		{
-			TestName:       "HA System && Didn't used all or any filter flag",
+			TestName:       "Didn't used all or any filter flag",
 			FilterApplied:  false,
 			AllFlagEnabled: false,
-			HA:             true,
 			ExpectedError:  errors.New("You must filter the services to be deleted or pass the --all flag to delete all services"),
 		},
 		{
-			TestName:       "HA System && used all flag",
+			TestName:       "used all flag",
 			FilterApplied:  false,
 			AllFlagEnabled: true,
-			HA:             true,
 			ExpectedError:  errors.New(""),
 		},
 		{
-			TestName:       "HA System && used some filter flag",
+			TestName:       "used some filter flag",
 			FilterApplied:  true,
 			AllFlagEnabled: false,
-			HA:             true,
-			ExpectedError:  errors.New(""),
-		},
-		{
-			TestName:       "Standalone System",
-			FilterApplied:  false,
-			AllFlagEnabled: true,
-			HA:             false,
 			ExpectedError:  errors.New(""),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.TestName, func(t *testing.T) {
-			if tt.HA {
-				// In mac we can't create directory at root level, but for this test we need directory at root level.
-				// So we are omitting the test in case of Mac OS.
-				if runtime.GOOS == "darwin" {
-					return
-				}
-				defer os.Remove(MakeHASystem(t).Name())
-			}
 			RemoveSvcsFlags.all = tt.AllFlagEnabled
 			if tt.FilterApplied {
 				ApplicationsServiceFiltersFlags.serviceName = "anything"
@@ -239,31 +218,16 @@ func TestRunApplicationsShowSvcsCmd(t *testing.T) {
 
 	tests := []struct {
 		TestName      string
-		HA            bool
 		ExpectedError error
 	}{
 		{
-			TestName:      "HA System",
-			HA:            true,
-			ExpectedError: errors.New(""),
-		},
-		{
 			TestName:      "Standalone System",
-			HA:            false,
 			ExpectedError: errors.New(""),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.TestName, func(t *testing.T) {
-			if tt.HA {
-				// In mac we can't create directory at root level, but for this test we need directory at root level.
-				// So we are omitting the test in case of Mac OS.
-				if runtime.GOOS == "darwin" {
-					return
-				}
-				defer os.Remove(MakeHASystem(t).Name())
-			}
 			err := runApplicationsShowSvcsCmd(cmd, args)
 			if tt.ExpectedError != nil {
 				assert.Error(t, err)
@@ -349,16 +313,4 @@ func TestPrintTSV(t *testing.T) {
 	}
 	err := s.PrintTSV()
 	assert.NoError(t, err)
-}
-
-func MakeHASystem(t *testing.T) *os.File {
-	dirPath := initConfigHabA2HAPathFlag.a2haDirPath
-	filePath := dirPath + "/a2ha.rb"
-
-	err := os.MkdirAll(dirPath, os.ModePerm)
-	assert.NoError(t, err, "Error creating directories")
-
-	file, err := os.Create(filePath)
-	assert.NoError(t, err, "Error creating file")
-	return file
 }
