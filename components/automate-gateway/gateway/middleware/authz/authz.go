@@ -33,14 +33,14 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 
 	polInfo := policy.InfoForMethod(method, req)
 	if polInfo == nil {
-		log.Warnf("no policy annotation for method %s", method)
+		log.Errorf("no policy annotation for method %s", method)
 		return nil, status.Errorf(codes.Internal,
 			"missing policy info for method %q", method)
 	}
 
 	action, resource := polInfo.Action, polInfo.Resource
 	if action == "" || resource == "" {
-		log.Warnf("no policy annotation for method %s", method)
+		log.Errorf("no policy annotation for method %s", method)
 		return nil, status.Errorf(codes.Internal,
 			"missing policy info for method %q", method)
 	}
@@ -67,13 +67,13 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		}
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
-			"error authorizing request")
+			"Permission Denied")
 	}
 	if len(filteredResp.Projects) == 0 {
-		log.Warnf("unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
+		log.Errorf("unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
 			subjects, action, resource, projectsToFilter)
 		return nil, status.Errorf(codes.PermissionDenied,
-			"unauthorized members")
+			"Permission Denied")
 	}
 	projects := filteredResp.Projects
 
