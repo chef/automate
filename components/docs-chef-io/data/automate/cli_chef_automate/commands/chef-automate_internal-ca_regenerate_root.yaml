@@ -3,10 +3,31 @@ synopsis: |
   Regenerate the root certificate for the internal certificate authority
 usage: chef-automate internal-ca regenerate root [flags]
 options:
+- name: a2
+  default_value: "false"
+  usage: Regenerate the root certificate for automate nodes
+  compatible_with_options: AutomateHA
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Regenerate the root certificate for automate nodes
+  compatible_with_options: AutomateHA
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Regenerate the root certificate for chef_server nodes
+  compatible_with_options: AutomateHA
+- name: cs
+  default_value: "false"
+  usage: Regenerate the root certificate for chef_server nodes
+  compatible_with_options: AutomateHA
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for root
+- name: node
+  usage: Node Ip address
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: debug
   shorthand: d
@@ -20,4 +41,4 @@ inherited_options:
 see_also:
 - chef-automate internal-ca regenerate - Commands to regenerate certificates issued
   by the internal certificate authority
-supported_on: FrontEnd
+supported_on: Bastion
