@@ -310,6 +310,11 @@ func Test_getTokenFromCSEmptyMap(t *testing.T) {
 	assert.Equal(t, "", output)
 }
 
+func Test_getTokenFromCSEmptyConfig(t *testing.T) {
+	output := getTokenFromCS(nil)
+	assert.Equal(t, "", output)
+}
+
 func Test_getPrivateKeyAndPublicKeyFromBE(t *testing.T) {
 	automateConfigKeys.Global.V1.FrontendTls = []*shared.FrontendTLSCredential{
 		{
