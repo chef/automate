@@ -112,14 +112,6 @@ func runCAInfoCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func prettyDuration(d time.Duration) string {
-	if d > 24*time.Hour {
-		return fmt.Sprintf("%dd", int(d.Hours()/24))
-	}
-
-	return d.String()
-}
-
 func runRegenRootCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		rootGenCmd := "sudo " + cmd.CommandPath()
@@ -310,4 +302,12 @@ func isFeFlagEnabled(cmd *cobra.Command) error {
 		return errors.New("No flag is enabled. Please provide any flag")
 	}
 	return nil
+}
+
+func prettyDuration(d time.Duration) string {
+	if d > 24*time.Hour {
+		return fmt.Sprintf("%dd", int(d.Hours()/24))
+	}
+
+	return d.String()
 }

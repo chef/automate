@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"runtime"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -171,17 +173,49 @@ func TestCAInfo(t *testing.T) {
 		testName        string
 		isHA            bool
 		isStandalone    bool
-		isExpectedError bool
+		isFeFlagEnabled bool
+		isErrorExpected bool
 		errorMessage    string
 	}{
-		{"Standalone Mode", false, true, true, "exec: \"systemctl\": executable file not found in $PATH"},
+		{
+			testName:        "Standalone_Mode",
+			isHA:            false,
+			isStandalone:    true,
+			isFeFlagEnabled: false,
+			isErrorExpected: true,
+			errorMessage:    "Connecting to deployment-service failed: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory",
+		},
+		{
+			testName:        "HA_Mode",
+			isHA:            true,
+			isStandalone:    false,
+			isFeFlagEnabled: false,
+			isErrorExpected: true,
+			errorMessage:    "No flag is enabled. Please provide any flag",
+		},
+		{
+			testName:        "HA_Mode_with_Flag_Enabled",
+			isHA:            true,
+			isStandalone:    false,
+			isFeFlagEnabled: true,
+			isErrorExpected: true,
+			errorMessage:    "Automate Ha infra confile file not exist",
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
+			if tc.isHA {
+				if runtime.GOOS == "darwin" {
+					return
+				}
+				caCmdFlags.automate = tc.isFeFlagEnabled
+				defer os.Remove(CreateHASystem(t).Name())
+			}
 			err := runCAInfoCmd(&cobra.Command{}, []string{})
-			if tc.isExpectedError {
+			if tc.isErrorExpected {
 				assert.Error(t, err)
+				assert.EqualError(t, err, tc.errorMessage)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -194,20 +228,62 @@ func TestRegenRoot(t *testing.T) {
 		testName        string
 		isHA            bool
 		isStandalone    bool
-		isExpectedError bool
+		isFeFlagEnabled bool
+		isErrorExpected bool
 		errorMessage    string
 	}{
-		{"Standalone Mode", false, true, true, "exec: \"systemctl\": executable file not found in $PATH"},
+		{
+			testName:        "Standalone_Mode",
+			isHA:            false,
+			isStandalone:    true,
+			isFeFlagEnabled: false,
+			isErrorExpected: true,
+			errorMessage:    "Connecting to deployment-service failed: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory",
+		},
+		{
+			testName:        "HA_Mode",
+			isHA:            true,
+			isStandalone:    false,
+			isFeFlagEnabled: false,
+			isErrorExpected: true,
+			errorMessage:    "No flag is enabled. Please provide any flag",
+		},
+		{
+			testName:        "HA_Mode_with_Flag_Enabled",
+			isHA:            true,
+			isStandalone:    false,
+			isFeFlagEnabled: true,
+			isErrorExpected: true,
+			errorMessage:    "Automate Ha infra confile file not exist",
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
+			if tc.isHA {
+				if runtime.GOOS == "darwin" {
+					return
+				}
+				caCmdFlags.automate = tc.isFeFlagEnabled
+				defer os.Remove(CreateHASystem(t).Name())
+			}
 			err := runRegenRootCmd(&cobra.Command{}, []string{})
-			if tc.isExpectedError {
+			if tc.isErrorExpected {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorMessage)
 			} else {
 				assert.NoError(t, err)
 			}
 		})
 	}
+}
+
+func CreateHASystem(t *testing.T) *os.File {
+	dirPath := initConfigHabA2HAPathFlag.a2haDirPath
+	filePath := dirPath + "/a2ha.rb"
+	err := os.MkdirAll(dirPath, os.ModePerm)
+	assert.NoError(t, err, "Error creating directories")
+	file, err := os.Create(filePath)
+	assert.NoError(t, err, "Error creating file")
+	return file
 }
