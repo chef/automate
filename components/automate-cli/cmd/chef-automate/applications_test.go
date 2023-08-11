@@ -21,7 +21,7 @@ func (me MockExecutor) execCommand(cmd string) (string, error) {
 `, nil
 }
 
-func (me MockExecutor) RunCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
+func (me MockExecutor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
 	return "", nil
 }
 
@@ -109,8 +109,8 @@ func TestRemoveApplicationsHA(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.TestName, func(t *testing.T) {
-			RemoveSvcsFlags.yes = tt.AutoApproveFlagEnabled
-			err := RemoveApplicationsHA(cmd, args, tt.Executor, tt.CliWriter)
+			removeSvcsFlags.yes = tt.AutoApproveFlagEnabled
+			err := removeApplicationsHA(cmd, args, tt.Executor, tt.CliWriter)
 			if tt.ExpectedError != nil {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tt.ExpectedError.Error())
@@ -120,7 +120,7 @@ func TestRemoveApplicationsHA(t *testing.T) {
 		})
 	}
 	// Resetting the Global variable to its default value
-	RemoveSvcsFlags.yes = false
+	removeSvcsFlags.yes = false
 }
 
 func TestRunApplicationsRemoveSvcsCmd(t *testing.T) {
@@ -155,11 +155,11 @@ func TestRunApplicationsRemoveSvcsCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.TestName, func(t *testing.T) {
-			RemoveSvcsFlags.all = tt.AllFlagEnabled
+			removeSvcsFlags.all = tt.AllFlagEnabled
 			if tt.FilterApplied {
-				ApplicationsServiceFiltersFlags.serviceName = "anything"
+				applicationsServiceFiltersFlags.serviceName = "anything"
 			} else {
-				ApplicationsServiceFiltersFlags.serviceName = ""
+				applicationsServiceFiltersFlags.serviceName = ""
 			}
 			err := runApplicationsRemoveSvcsCmd(cmd, args)
 			if tt.ExpectedError != nil {
@@ -172,8 +172,8 @@ func TestRunApplicationsRemoveSvcsCmd(t *testing.T) {
 	}
 
 	// Resetting the Global variable to its default value
-	RemoveSvcsFlags.all = false
-	ApplicationsServiceFiltersFlags.serviceName = ""
+	removeSvcsFlags.all = false
+	applicationsServiceFiltersFlags.serviceName = ""
 }
 
 func TestShowApplicationsHA(t *testing.T) {
@@ -201,7 +201,7 @@ func TestShowApplicationsHA(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.TestName, func(t *testing.T) {
-			err := ShowApplicationsHA(cmd, args, tt.Executor)
+			err := showApplicationsHA(cmd, args, tt.Executor)
 			if tt.ExpectedError != nil {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tt.ExpectedError.Error())
@@ -240,15 +240,15 @@ func TestRunApplicationsShowSvcsCmd(t *testing.T) {
 }
 
 func TestMakeServicesReqWithFilters(t *testing.T) {
-	ApplicationsServiceFiltersFlags.origin = "origin_value"
-	ApplicationsServiceFiltersFlags.serviceName = "servicename_value"
-	ApplicationsServiceFiltersFlags.version = "version_value"
-	ApplicationsServiceFiltersFlags.channel = "channel_value"
-	ApplicationsServiceFiltersFlags.application = "app_value"
-	ApplicationsServiceFiltersFlags.environment = "environment_value"
-	ApplicationsServiceFiltersFlags.site = "site_value"
-	ApplicationsServiceFiltersFlags.buildTimestamp = "timestamp_value"
-	ApplicationsServiceFiltersFlags.groupName = "group_value"
+	applicationsServiceFiltersFlags.origin = "origin_value"
+	applicationsServiceFiltersFlags.serviceName = "servicename_value"
+	applicationsServiceFiltersFlags.version = "version_value"
+	applicationsServiceFiltersFlags.channel = "channel_value"
+	applicationsServiceFiltersFlags.application = "app_value"
+	applicationsServiceFiltersFlags.environment = "environment_value"
+	applicationsServiceFiltersFlags.site = "site_value"
+	applicationsServiceFiltersFlags.buildTimestamp = "timestamp_value"
+	applicationsServiceFiltersFlags.groupName = "group_value"
 	res := makeServicesReqWithFilters()
 	ExpectedResp := &applications.ServicesReq{
 		Filter: []string{
@@ -266,7 +266,7 @@ func TestMakeServicesReqWithFilters(t *testing.T) {
 	assert.Equal(t, ExpectedResp, res)
 
 	// Setting Disconnected Flag
-	ApplicationsServiceFiltersFlags.disconnected = true
+	applicationsServiceFiltersFlags.disconnected = true
 	res = makeServicesReqWithFilters()
 	ExpectedResp = &applications.ServicesReq{
 		Filter: []string{
@@ -285,7 +285,7 @@ func TestMakeServicesReqWithFilters(t *testing.T) {
 	assert.Equal(t, ExpectedResp, res)
 
 	// Resetting the Global variable to its default value
-	ApplicationsServiceFiltersFlags = applicationsServiceFilters{}
+	applicationsServiceFiltersFlags = applicationsServiceFilters{}
 }
 
 func TestPrintTSV(t *testing.T) {

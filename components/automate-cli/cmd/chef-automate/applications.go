@@ -24,7 +24,7 @@ const (
 
 type IExecutor interface {
 	execCommand(string) (string, error)
-	RunCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error)
+	runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error)
 }
 
 type Executor struct{}
@@ -89,74 +89,74 @@ func (a applicationsServiceFilters) FilterApplied() bool {
 	return false
 }
 
-var ApplicationsServiceFiltersFlags = applicationsServiceFilters{}
+var applicationsServiceFiltersFlags = applicationsServiceFilters{}
 
 func addFilteringFlagsToCmd(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(
-		&ApplicationsServiceFiltersFlags.disconnected,
+		&applicationsServiceFiltersFlags.disconnected,
 		"disconnected",
 		"D",
 		false,
 		"Select only services that are disconnected",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.origin,
+		&applicationsServiceFiltersFlags.origin,
 		"origin",
 		"o",
 		"",
 		"Select only services where the origin matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.serviceName,
+		&applicationsServiceFiltersFlags.serviceName,
 		"service-name",
 		"n",
 		"",
 		"Select only services where the name matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.version,
+		&applicationsServiceFiltersFlags.version,
 		"version",
 		"v",
 		"",
 		"Select only services where the package version matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.channel,
+		&applicationsServiceFiltersFlags.channel,
 		"channel",
 		"c",
 		"",
 		"Select only services where the subscribed channel matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.application,
+		&applicationsServiceFiltersFlags.application,
 		"application",
 		"a",
 		"",
 		"Select only services where the application name matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.environment,
+		&applicationsServiceFiltersFlags.environment,
 		"environment",
 		"e",
 		"",
 		"Select only services where the application environment matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.site,
+		&applicationsServiceFiltersFlags.site,
 		"site",
 		"s",
 		"",
 		"Select only services where the site matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.buildTimestamp,
+		&applicationsServiceFiltersFlags.buildTimestamp,
 		"buildstamp",
 		"b",
 		"",
 		"Select only services where the buildstamp matches the given pattern",
 	)
 	cmd.PersistentFlags().StringVarP(
-		&ApplicationsServiceFiltersFlags.groupName,
+		&applicationsServiceFiltersFlags.groupName,
 		"group",
 		"g",
 		"",
@@ -186,7 +186,7 @@ type removeSvcsOptions struct {
 	yes bool
 }
 
-var RemoveSvcsFlags = removeSvcsOptions{}
+var removeSvcsFlags = removeSvcsOptions{}
 
 func newApplicationsRemoveSvcsCmd() *cobra.Command {
 	c := &cobra.Command{
@@ -210,14 +210,14 @@ services database.
 	addFilteringFlagsToCmd(c)
 
 	c.PersistentFlags().BoolVar(
-		&RemoveSvcsFlags.all,
+		&removeSvcsFlags.all,
 		"all",
 		false,
 		"Delete all services in the database. This flag must be given if no other filter is given.",
 	)
 
 	c.PersistentFlags().BoolVarP(
-		&RemoveSvcsFlags.yes,
+		&removeSvcsFlags.yes,
 		"yes",
 		"y",
 		false,
@@ -230,7 +230,7 @@ services database.
 func makeServicesReqWithFilters() *applications.ServicesReq {
 	req := &applications.ServicesReq{}
 
-	flags := ApplicationsServiceFiltersFlags
+	flags := applicationsServiceFiltersFlags
 
 	// disconnected   bool
 	if flags.disconnected {
@@ -276,8 +276,8 @@ func makeServicesReqWithFilters() *applications.ServicesReq {
 	return req
 }
 
-func ShowApplicationsHA(cmd *cobra.Command, args []string, e IExecutor) error {
-	output, err := e.RunCommandOnSingleAutomateNode(cmd, args)
+func showApplicationsHA(cmd *cobra.Command, args []string, e IExecutor) error {
+	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -285,9 +285,9 @@ func ShowApplicationsHA(cmd *cobra.Command, args []string, e IExecutor) error {
 	return nil
 }
 
-func ShowApplicationsStandalone() error {
+func showApplicationsStandalone() error {
 	s := &serviceSet{
-		applicationsServiceFilters: ApplicationsServiceFiltersFlags,
+		applicationsServiceFilters: applicationsServiceFiltersFlags,
 	}
 	err := s.Connect()
 	if err != nil {
@@ -306,11 +306,11 @@ func ShowApplicationsStandalone() error {
 
 func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if err := ShowApplicationsHA(cmd, args, Executor{}); err != nil {
+		if err := showApplicationsHA(cmd, args, Executor{}); err != nil {
 			return err
 		}
 	} else {
-		if err := ShowApplicationsStandalone(); err != nil {
+		if err := showApplicationsStandalone(); err != nil {
 			return err
 		}
 	}
@@ -345,11 +345,11 @@ func showAndPrompt(cmd *cobra.Command, e IExecutor, w *cli.Writer) ([]string, bo
 	return splittedString, true, nil
 }
 
-func RemoveApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli.Writer) error {
+func removeApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli.Writer) error {
 	var splittedString []string
 	// If user is not passing -y flag, then first we need to show the list with given conditions and then
 	// give confirmation prompt
-	if !RemoveSvcsFlags.yes {
+	if !removeSvcsFlags.yes {
 		var proceed bool
 		var err error
 		splittedString, proceed, err = showAndPrompt(cmd, e, w)
@@ -361,13 +361,13 @@ func RemoveApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli
 		}
 	}
 	args = append(args, "-y")
-	output, err := e.RunCommandOnSingleAutomateNode(cmd, args)
+	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
 	if err != nil {
 		return err
 	}
 	// len(splittedString) == 2 means list is empty it's just containing table header and empty line which means we haven't
 	// got any services to remove
-	if RemoveSvcsFlags.yes || len(splittedString) == 2 {
+	if removeSvcsFlags.yes || len(splittedString) == 2 {
 		writer.Println(output)
 	} else {
 		writer.Println(fmt.Sprintf("Removed %d services", len(splittedString)-2))
@@ -376,9 +376,9 @@ func RemoveApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli
 	return nil
 }
 
-func RemoveApplicationsStandalone() error {
+func removeApplicationsStandalone() error {
 	s := &serviceSet{
-		applicationsServiceFilters: ApplicationsServiceFiltersFlags,
+		applicationsServiceFilters: applicationsServiceFiltersFlags,
 	}
 	err := s.Connect()
 	if err != nil {
@@ -399,7 +399,7 @@ func RemoveApplicationsStandalone() error {
 		return err
 	}
 
-	if !RemoveSvcsFlags.yes {
+	if !removeSvcsFlags.yes {
 		fmt.Println("")
 		prompt := fmt.Sprintf("The above %d services will be deleted. Do you wish to continue?", len(s.services))
 		proceed, err := writer.Confirm(prompt)
@@ -419,15 +419,15 @@ func RemoveApplicationsStandalone() error {
 }
 
 func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
-	if !ApplicationsServiceFiltersFlags.FilterApplied() && !RemoveSvcsFlags.all {
+	if !applicationsServiceFiltersFlags.FilterApplied() && !removeSvcsFlags.all {
 		return errors.New("You must filter the services to be deleted or pass the --all flag to delete all services")
 	}
 	if isA2HARBFileExist() {
-		if err := RemoveApplicationsHA(cmd, args, Executor{}, writer); err != nil {
+		if err := removeApplicationsHA(cmd, args, Executor{}, writer); err != nil {
 			return err
 		}
 	} else {
-		if err := RemoveApplicationsStandalone(); err != nil {
+		if err := removeApplicationsStandalone(); err != nil {
 			return err
 		}
 	}
@@ -450,7 +450,7 @@ func (e Executor) execCommand(cmd string) (string, error) {
 	return string(output), nil
 }
 
-func (e Executor) RunCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
+func (e Executor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
 	return RunCmdOnSingleAutomateNode(cmd, args)
 }
 
