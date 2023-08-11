@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -75,7 +74,7 @@ func runServiceVersionsCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		nodeOpUtils := &NodeUtilsImpl{}
 		remoteExecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
-		if err := isFlagSet(cmd, &serviceVersionsCmdFlag); err != nil {
+		if err := isServiceVersionsFlagSet(cmd, &serviceVersionsCmdFlag, nodeOpUtils); err != nil {
 			return err
 		}
 		return runServiceVersionsFromBastion(&serviceVersionsCmdFlag, nodeOpUtils, remoteExecutor, printServiceVersionsOutput)
@@ -273,13 +272,18 @@ func printServiceVersionsErrorOutput(cmdResult *CmdResult, remoteService string,
 	}
 }
 
-func isFlagSet(cmd *cobra.Command, flags *ServiceVersionsCmdFlags) error {
+func isServiceVersionsFlagSet(cmd *cobra.Command, flags *ServiceVersionsCmdFlags, nodeOpUtils NodeOpUtils) error {
 	if !flags.automate && !flags.chefServer && !flags.opensearch && !flags.postgresql {
 		if len(flags.node) != 0 {
 			return status.Errorf(status.InvalidCommandArgsError, "Please provide service flag")
 		}
-		writer.Println(cmd.UsageString())
-		return errors.New("No flag is enabled. Please provide any flag")
+		flags.automate = true
+		flags.chefServer = true
+
+		if !nodeOpUtils.isManagedServicesOn() {
+			flags.opensearch = true
+			flags.postgresql = true
+		}
 	}
 	return nil
 }

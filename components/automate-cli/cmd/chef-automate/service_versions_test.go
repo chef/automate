@@ -346,12 +346,21 @@ func TestRunServiceVersionsCmd(t *testing.T) {
 func TestIsFalgSet(t *testing.T) {
 
 	testCases := []struct {
-		flags          *ServiceVersionsCmdFlags
-		errorExepected error
+		flags           *ServiceVersionsCmdFlags
+		mockNodeOpUtils *MockNodeUtilsImpl
+		errorExepected  error
 	}{
 		{
-			flags:          &ServiceVersionsCmdFlags{},
-			errorExepected: errors.New("No flag is enabled. Please provide any flag"),
+			flags: &ServiceVersionsCmdFlags{},
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+			},
+			errorExepected: nil,
 		},
 		{
 			flags: &ServiceVersionsCmdFlags{
@@ -370,7 +379,7 @@ func TestIsFalgSet(t *testing.T) {
 	}
 
 	for _, testCases := range testCases {
-		err := isFlagSet(&cobra.Command{}, testCases.flags)
+		err := isServiceVersionsFlagSet(&cobra.Command{}, testCases.flags, testCases.mockNodeOpUtils)
 
 		if testCases.errorExepected != nil {
 			assert.EqualError(t, err, testCases.errorExepected.Error())
