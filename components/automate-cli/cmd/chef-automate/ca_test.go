@@ -14,7 +14,6 @@ func TestInternalCaHA(t *testing.T) {
 		isForChefServer bool
 		isInfraEmpty    bool
 		node            string
-		command         string
 		isErrorExpected bool
 		errorMessage    string
 	}{
@@ -91,6 +90,22 @@ func TestInternalCaHA(t *testing.T) {
 			isErrorExpected: true,
 			errorMessage:    "Not able to generate root or fetch root info: \nopen : no such file or directory\nopen : no such file or directory",
 		},
+		{
+			name:            "test_empty_service_and_node_flag",
+			isForAutomate:   false,
+			isForChefServer: false,
+			node:            "",
+			isErrorExpected: true,
+			errorMessage:    "No flag is enabled. Please provide any flag",
+		},
+		{
+			name:            "test_empty_service_but_given_node_flag",
+			isForAutomate:   false,
+			isForChefServer: false,
+			node:            "1.2.3.4",
+			isErrorExpected: true,
+			errorMessage:    "Please provide service flag",
+		},
 	}
 
 	for _, tc := range tests {
@@ -104,62 +119,7 @@ func TestInternalCaHA(t *testing.T) {
 			} else {
 				infra = getMockInfra()
 			}
-			err := runInternalCaHA(infra, tc.command)
-			if tc.isErrorExpected {
-				assert.Error(t, err)
-				assert.EqualError(t, err, tc.errorMessage)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-	// Resetting the global variables to its default values.
-	caCmdFlags.automate = false
-	caCmdFlags.chef_server = false
-	caCmdFlags.node = ""
-}
-
-func TestFeFlagEnabled(t *testing.T) {
-	tests := []struct {
-		testName        string
-		isForAutomate   bool
-		isForChefServer bool
-		node            string
-		isErrorExpected bool
-		errorMessage    string
-	}{
-		{
-			testName:        "test_valid_Flags",
-			isForAutomate:   true,
-			isForChefServer: false,
-			node:            "",
-			isErrorExpected: false,
-			errorMessage:    "",
-		},
-		{
-			testName:        "test_empty_service_and_node_flag",
-			isForAutomate:   false,
-			isForChefServer: false,
-			node:            "",
-			isErrorExpected: true,
-			errorMessage:    "No flag is enabled. Please provide any flag",
-		},
-		{
-			testName:        "test_empty_service_but_given_node_flag",
-			isForAutomate:   false,
-			isForChefServer: false,
-			node:            "1.2.3.4",
-			isErrorExpected: true,
-			errorMessage:    "Please provide service flag",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.testName, func(t *testing.T) {
-			caCmdFlags.automate = tc.isForAutomate
-			caCmdFlags.chef_server = tc.isForChefServer
-			caCmdFlags.node = tc.node
-			err := isFeFlagEnabled(&cobra.Command{})
+			err := runInternalCaHA(infra, &cobra.Command{})
 			if tc.isErrorExpected {
 				assert.Error(t, err)
 				assert.EqualError(t, err, tc.errorMessage)

@@ -91,16 +91,12 @@ func init() {
 
 func runCAInfoCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		infoCmd := "sudo " + cmd.CommandPath()
-		if err := isFeFlagEnabled(cmd); err != nil {
-			return err
-		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
 
-		if err = runInternalCaHA(infra, infoCmd); err != nil {
+		if err = runInternalCaHA(infra, cmd); err != nil {
 			return err
 		}
 
@@ -114,16 +110,12 @@ func runCAInfoCmd(cmd *cobra.Command, args []string) error {
 
 func runRegenRootCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		rootGenCmd := "sudo " + cmd.CommandPath()
-		if err := isFeFlagEnabled(cmd); err != nil {
-			return err
-		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
 
-		if err = runInternalCaHA(infra, rootGenCmd); err != nil {
+		if err = runInternalCaHA(infra, cmd); err != nil {
 			return err
 		}
 
@@ -191,12 +183,13 @@ func runGenerateRootStandalone() error {
 	return nil
 }
 
-func runInternalCaHA(infra *AutomateHAInfraDetails, scriptCommands string) error {
-	sshConfig := getSshDetails(infra)
-	if caCmdFlags.automate && caCmdFlags.chef_server && caCmdFlags.node != "" {
-		return errors.New("Please remove node flag if you have given multiple service flags.")
+func runInternalCaHA(infra *AutomateHAInfraDetails, cmd *cobra.Command) error {
+	scriptCommands := "sudo " + cmd.CommandPath()
+	if err := flagsValidation(cmd); err != nil {
+		return err
 	}
 
+	sshConfig := getSshDetails(infra)
 	ips, remoteService, err := getHANodes(infra)
 	if err != nil {
 		return err
@@ -299,7 +292,7 @@ func printInternalCASuccessMessage(remoteService string, hostIP string) {
 	writer.BufferWriter().Flush()
 }
 
-func isFeFlagEnabled(cmd *cobra.Command) error {
+func flagsValidation(cmd *cobra.Command) error {
 	if !caCmdFlags.automate && !caCmdFlags.chef_server {
 		if caCmdFlags.node != "" {
 			writer.Println("Please Provide service flag")
@@ -307,6 +300,9 @@ func isFeFlagEnabled(cmd *cobra.Command) error {
 		}
 		writer.Println(cmd.UsageString())
 		return errors.New("No flag is enabled. Please provide any flag")
+	}
+	if caCmdFlags.automate && caCmdFlags.chef_server && caCmdFlags.node != "" {
+		return errors.New("Please remove node flag if you have given multiple service flags.")
 	}
 	return nil
 }
