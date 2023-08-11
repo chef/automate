@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/license-control-service/pkg/server"
-
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -38,5 +37,3 @@ var serveCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(serveCmd)
 }
-
-

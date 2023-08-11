@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/chef/automate/components/license-control-service/licenseaudit"
-	"github.com/chef/automate/lib/cereal/postgres"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -25,10 +25,8 @@ import (
 func NewGRPC(ctx context.Context, config *Config) (*grpc.Server, error) {
 	// Setup our gRPC connection factory
 	connFactory := secureconn.NewFactory(*config.ServiceCerts)
-
 	// Register our API
 	grpcServer := connFactory.NewServer(tracing.GlobalServerInterceptor())
-
 	licenseParser := keys.NewLicenseParser(keys.BuiltinKeyData)
 
 	backend := storage.NewCurrentBackend(config.PGURL, config.MigrationsPath, config.LicenseTokenPath)
@@ -37,13 +35,11 @@ func NewGRPC(ctx context.Context, config *Config) (*grpc.Server, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize storage backend")
 	}
-
 	// Create deployment id and save it in DB
 	err = storeDeploymentID(backend)
 	if err != nil {
 		return nil, err
 	}
-
 	srv := NewLicenseControlServer(ctx, backend, licenseParser, config)
 	lc.RegisterLicenseControlServiceServer(grpcServer, srv)
 	health.RegisterHealthServer(grpcServer, srv.health)
@@ -99,36 +95,23 @@ func storeDeploymentID(backend storage.CurrentBackend) error {
 }
 
 func startCerealService(timeoutCtx context.Context, connFactory *secureconn.Factory, config *Config) (*cereal.Manager, error) {
-	// cerealConn, err := connFactory.Dial("cereal-service", config.CerealHost)
-	// if err != nil {
-	// 	return errors.Wrap(err, "error dialing cereal service")
-	//}
+	cerealConn, err := connFactory.Dial("cereal-service", config.CerealHost)
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
 
-	//cerealBackend := grpccereal.NewGrpcBackendFromConn("license-control-service", cerealConn)
+	cerealBackend := grpccereal.NewGrpcBackendFromConn("license-control-service", cerealConn)
 
 	// Set up a cereal (workflow) manager for managing nodemanager workflows.
-	cerealManager, err := cereal.NewManager(postgres.NewPostgresBackend(config.PGURL))
+	cerealManager, err := cereal.NewManager(cerealBackend)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
-
-	//defer cerealManager.Stop() //nolint:errcheck
 
 	err = licenseaudit.InitCerealManager(context.TODO(), cerealManager, 1)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
-	// err = patterns.RegisterSingleTaskWorkflowExecutor(
-	// 	cerealManager,
-	// 	AuditWorkflowName,
-	// 	true,
-	// 	&LicenseAuditTask{},
-	// 	cereal.TaskExecutorOpts{Workers: 1, Timeout: 12 * time.Second})
-	// if err != nil {
-	// 	return errors.Wrapf(err, "failed to register license audit workflow")
-	// }
-
-	//Create recurrence role.
 
 	return cerealManager, nil
 }

@@ -1,14 +1,26 @@
 package licenseaudit
 
 import (
-	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"reflect"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/lib/cereal"
 	"github.com/stretchr/testify/assert"
 )
+
+type TestExecute struct {
+	wantError bool
+}
+
+func (test TestExecute) Execute(command string) (string, error) {
+	if test.wantError {
+		return "", errors.New("Received Error from command : exit status 1")
+	}
+	return command, nil
+}
 
 func TestOnStart(t *testing.T) {
 	tests := []struct {
@@ -28,11 +40,19 @@ func TestOnStart(t *testing.T) {
 			expectedError:         "",
 		},
 		{
+			name:                  "testOnStart_GetParametsFailure",
+			isGetParameterFailure: true,
+			isEnqueueFailure:      false,
+			isFailedExpected:      true,
+			isContinueExpected:    false,
+			expectedError:         "failed to unmarshal license-audit workflow parameters: error in fetching parameters",
+		},
+		{
 			name:               "testOnStart_Enqueue_Fail",
 			isEnqueueFailure:   true,
 			isFailedExpected:   true,
 			isContinueExpected: false,
-			expectedError:      "failed to enqueue the license-audit: error in enqueuing",
+			expectedError:      "failed to enqueue the license-audit task: error in enqueuing",
 		},
 	}
 
@@ -42,10 +62,9 @@ func TestOnStart(t *testing.T) {
 			workFlow := LicenseAuditWorkflow{}
 
 			workflowInstance := &CerealWorkflow{
-				t: t,
-			}
-			if tc.isEnqueueFailure {
-				workflowInstance.failEnqueueTask = true
+				t:                 t,
+				failEnqueueTask:   tc.isEnqueueFailure,
+				failGetParameters: tc.isGetParameterFailure,
 			}
 
 			result := workFlow.OnStart(workflowInstance, cereal.StartEvent{})
@@ -69,17 +88,30 @@ type CerealWorkflow struct {
 }
 
 func (c CerealWorkflow) GetPayload(obj interface{}) error {
-	return nil
+	if c.failGetPayload {
+		return fmt.Errorf("Error in fetching payload")
+	}
+
+	var jsonString string
+	if c.isRetriesLeft {
+		jsonString = `{"Retries":3}`
+	} else {
+		jsonString = `{"Retries":0}`
+	}
+
+	jsonBytes := []byte(jsonString)
+	err := json.Unmarshal(jsonBytes, obj)
+	return err
 }
 
 func (c CerealWorkflow) GetParameters(obj interface{}) error {
-	// if c.failGetParameters {
-	// 	return fmt.Errorf("error in fetching parameters")
-	// }
-	// jsonString := `{"ControlIndexFlag":true}`
-	// jsonBytes := []byte(jsonString)
-	// err := json.Unmarshal(jsonBytes, obj)
-	return nil
+	if c.failGetParameters {
+		return fmt.Errorf("error in fetching parameters")
+	}
+	jsonString := `{"Retries":3}`
+	jsonBytes := []byte(jsonString)
+	err := json.Unmarshal(jsonBytes, obj)
+	return err
 }
 
 func (c CerealWorkflow) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpt) error {
@@ -95,8 +127,13 @@ func (c CerealWorkflow) Complete(opt ...cereal.CompleteOpt) cereal.Decision {
 }
 
 func (c CerealWorkflow) Continue(payload interface{}) cereal.Decision {
-	// workflowPayload := payload.(*MigrationWorkflowPayload)
+	workflowPayload := payload.(*AuditWorkflowPayload)
 	// assert.Equal(c.t, true, workflowPayload.ControlIndexFlag)
+	if c.isRetryTest {
+		assert.Equal(c.t, 2, workflowPayload.Retries)
+	} else {
+		assert.Equal(c.t, 3, workflowPayload.Retries)
+	}
 	return cereal.NewContinueDecision(payload)
 }
 
@@ -116,37 +153,232 @@ func (c CerealWorkflow) TotalCompletedTasks() int {
 	return 1
 }
 
-func TestLicenseAuditTask_Run(t *testing.T) {
-	type fields struct {
-		Command        string
-		ExecuteCommand ExecuteCommand
+type TaskResult struct {
+	isError         bool
+	taskResultError bool
+}
+
+func (r *TaskResult) GetParameters(obj interface{}) error {
+	return nil
+}
+
+func (r *TaskResult) Get(obj interface{}) error {
+	if r.taskResultError {
+		return fmt.Errorf("Error in fetching job results")
 	}
-	type args struct {
-		ctx  context.Context
-		task cereal.Task
+	// jsonString := `{"JobID":"1234-5678","ReportSize":8200,"PreSignedURL":"www.test.com/object"}`
+	// jsonBytes := []byte(jsonString)
+	// err := json.Unmarshal(jsonBytes, obj)
+	// return err
+	return nil
+}
+
+func (r *TaskResult) Err() error {
+	if r.isError {
+		return fmt.Errorf("error in task execution")
 	}
+	return nil
+}
+
+func TestOnTaskComplete(t *testing.T) {
+	tests := []struct {
+		name                 string
+		isGetPayloadFailure  bool
+		isEnqueueFailure     bool
+		isFailedExpected     bool
+		isContinueExpected   bool
+		isCompleteExpected   bool
+		isRetriesLeft        bool
+		isTaskError          bool
+		isRetryTest          bool
+		isParameterFailure   bool
+		expectedError        string
+		isFetchTaskResultErr bool
+	}{
+		{
+			name:                "testOnTaskComplete_Success",
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    false,
+			isFailedExpected:    false,
+			isContinueExpected:  false,
+			isCompleteExpected:  true,
+			isRetriesLeft:       true,
+			expectedError:       "",
+		},
+		{
+			name:                "testOnTaskComplete_GetPayload_Fail",
+			isGetPayloadFailure: true,
+			isEnqueueFailure:    false,
+			isFailedExpected:    true,
+			isContinueExpected:  false,
+			isCompleteExpected:  false,
+			expectedError:       "failed to unmarshal license-audit payload in OnComplete: Error in fetching payload",
+		},
+		{
+			name:                "testOnTaskComplete_NoRetriesLeft_Fail",
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    false,
+			isFailedExpected:    true,
+			isContinueExpected:  false,
+			isCompleteExpected:  false,
+			isRetriesLeft:       false,
+			isTaskError:         true,
+			expectedError:       "failed to run license-audit: error in task execution",
+		},
+		{
+			name:                 "testOnTaskComplete_GetTaskResult_fail_Retries_left",
+			isGetPayloadFailure:  false,
+			isEnqueueFailure:     false,
+			isFailedExpected:     true,
+			isContinueExpected:   false,
+			isCompleteExpected:   false,
+			isRetriesLeft:        true,
+			isFetchTaskResultErr: true,
+			expectedError:        "failed to get the task run result in OnTaskComplete for license audit: Error in fetching job results",
+		},
+		{
+			name:                "testOnTaskComplete_RetriesLeft_Success",
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    false,
+			isFailedExpected:    false,
+			isContinueExpected:  true,
+			isCompleteExpected:  false,
+			isRetriesLeft:       true,
+			isTaskError:         true,
+			isRetryTest:         true,
+			expectedError:       "",
+		},
+		{
+			name:                "testOnTaskComplete_RetriesLeft_GetParameter_Fail",
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    false,
+			isFailedExpected:    true,
+			isContinueExpected:  false,
+			isCompleteExpected:  false,
+			isRetriesLeft:       true,
+			isTaskError:         true,
+			isRetryTest:         true,
+			isParameterFailure:  true,
+			expectedError:       "failed to unmarshal license-audit workflow parameters: error in fetching parameters",
+		},
+		{
+			name:                "testOnTaskComplete_RetriesLeft_GetParameter_Fail",
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    false,
+			isFailedExpected:    true,
+			isContinueExpected:  false,
+			isCompleteExpected:  false,
+			isRetriesLeft:       true,
+			isTaskError:         true,
+			isRetryTest:         true,
+			isParameterFailure:  true,
+			expectedError:       "failed to unmarshal license-audit workflow parameters: error in fetching parameters",
+		},
+		{
+			name:                "testOnTaskComplete_RetriesLeft_EnqueueFail",
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    true,
+			isFailedExpected:    true,
+			isContinueExpected:  false,
+			isCompleteExpected:  false,
+			isRetriesLeft:       true,
+			isTaskError:         true,
+			isRetryTest:         true,
+			expectedError:       "failed to enqueue the license-audit task: error in enqueuing",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+
+			workFlow := LicenseAuditWorkflow{}
+
+			workflowInstance := &CerealWorkflow{
+				t:                 t,
+				isRetryTest:       tc.isRetryTest,
+				failGetPayload:    tc.isGetPayloadFailure,
+				isRetriesLeft:     tc.isRetriesLeft,
+				failGetParameters: tc.isParameterFailure,
+				failEnqueueTask:   tc.isEnqueueFailure,
+			}
+
+			result := workFlow.OnTaskComplete(workflowInstance, cereal.TaskCompleteEvent{
+				Result: &TaskResult{
+					isError:         tc.isTaskError,
+					taskResultError: tc.isFetchTaskResultErr,
+				},
+			})
+			assert.Equal(t, tc.isFailedExpected, result.IsFailed())
+			assert.Equal(t, tc.isContinueExpected, result.IsContinuing())
+			assert.Equal(t, tc.isCompleteExpected, result.IsComplete())
+			if tc.isFailedExpected {
+				assert.Error(t, result.Err())
+				assert.Equal(t, tc.expectedError, result.Err().Error())
+			}
+		})
+	}
+}
+
+func Test_getAppendedCommand(t *testing.T) {
 	tests := []struct {
 		name    string
-		fields  fields
-		args    args
-		want    interface{}
-		wantErr bool
+		command string
+		want    string
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Checking the output of the string",
+			command: "%s %s",
+		},
+		{
+			name:    "Getting license command",
+			command: Command,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tr := &LicenseAuditTask{
-				Command:        tt.fields.Command,
-				ExecuteCommand: tt.fields.ExecuteCommand,
-			}
-			got, err := tr.Run(tt.args.ctx, tt.args.task)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("LicenseAuditTask.Run() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LicenseAuditTask.Run() = %v, want %v", got, tt.want)
+			dateToBeAppended := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
+			tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended)
+			got := getAppendedCommand(tt.command)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_executeCommandforAudit(t *testing.T) {
+	type args struct {
+		executeCommand ExecuteCommand
+		command        string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+		err     error
+	}{
+		{
+			name:    "Getting output without error",
+			args:    args{executeCommand: &TestExecute{}, command: "test"},
+			want:    "test",
+			wantErr: false,
+		},
+		{
+			name:    "Getting error from command",
+			args:    args{executeCommand: &TestExecute{wantError: true}, command: ""},
+			want:    "",
+			wantErr: true,
+			err:     errors.New("Received Error from command : exit status 1"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := executeCommandforAudit(tt.args.executeCommand, tt.args.command)
+			assert.Equal(t, tt.want, got)
+			if !tt.wantErr {
+				assert.Empty(t, err)
+			} else {
+				assert.NotEmpty(t, err)
+				assert.Equal(t, tt.err, err)
 			}
 		})
 	}

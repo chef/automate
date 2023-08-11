@@ -50,7 +50,7 @@ func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, worke
 }
 
 func createOrUpdateWorkflowSchedule(ctx context.Context, cerealManager *cereal.Manager, scheduleName string, auditWorkflowName cereal.WorkflowName, rule *rrule.RRule) error {
-	err := cerealManager.CreateWorkflowSchedule(ctx, scheduleName, auditWorkflowName, nil, true, rule)
+	err := cerealManager.CreateWorkflowSchedule(ctx, scheduleName, auditWorkflowName, AuditWorkflowParameters{Retries: 3}, true, rule)
 
 	if err == nil {
 		return nil
@@ -87,6 +87,11 @@ type LicenseAuditTask struct {
 }
 
 type AuditWorkflowParameters struct {
+	Retries int
+}
+
+type AuditWorkflowPayload struct {
+	Retries int
 }
 
 func (s *LicenseAuditWorkflow) OnStart(w cereal.WorkflowInstance,
@@ -94,33 +99,52 @@ func (s *LicenseAuditWorkflow) OnStart(w cereal.WorkflowInstance,
 
 	logrus.Info("Starting the workflow for audit")
 
-	workflowPayload := AuditWorkflowParameters{}
-
-	err := w.EnqueueTask(LicenseAuditTaskName, AuditTaskParameters{})
+	workflowParams, err := getWorkflowParametersAndEnqueTask(w)
 	if err != nil {
-		log.WithError(errors.Wrap(err, "failed to enqueue the license-audit")).Error()
-		return w.Fail(errors.Wrap(err, "failed to enqueue the license-audit"))
+		return w.Fail(err)
 	}
-	return w.Continue(&workflowPayload)
+
+	workflowPayload := &AuditWorkflowPayload{
+		Retries: workflowParams.Retries,
+	}
+
+	return w.Continue(workflowPayload)
 }
 
 func (s *LicenseAuditWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 	ev cereal.TaskCompleteEvent) cereal.Decision {
 
-	var payload AuditWorkflowParameters
+	var payload AuditWorkflowPayload
 	if err := w.GetPayload(&payload); err != nil {
-		err = errors.Wrap(err, "failed to unmarshal license-audit payload--------")
+		err = errors.Wrap(err, "failed to unmarshal license-audit payload in OnComplete")
 		log.WithError(err).Error()
 		return w.Fail(err)
 	}
 
-	log.Debugf("Entered license-audit  > OnTaskComplete with payload-------------- %+v", payload)
+	log.Debugf("Entered license-audit  > OnTaskComplete with payload %+v", payload)
+
+	if err := ev.Result.Err(); err != nil {
+		//received error, if the retries are available enqueue the task
+		if payload.Retries > 0 {
+			logrus.Debugf("Retrying license audit")
+			_, err := getWorkflowParametersAndEnqueTask(w)
+			if err != nil {
+				return w.Fail(err)
+			}
+			payload.Retries--
+			return w.Continue(&payload)
+		}
+
+		err = errors.Wrap(err, "failed to run license-audit")
+		logrus.WithError(err).Error()
+		return w.Fail(err)
+	}
 
 	//get the results returned by task run
-	var taskParameters AuditTaskParameters
-	err := ev.Result.Get(&taskParameters)
+	var jobResult AuditWorkflowParameters
+	err := ev.Result.Get(&jobResult)
 	if err != nil {
-		err = errors.Wrap(err, "failed to get the task run result in OnTaskComplete")
+		err = errors.Wrap(err, "failed to get the task run result in OnTaskComplete for license audit")
 		logrus.WithError(err).Error()
 		return w.Fail(err)
 	}
@@ -145,23 +169,43 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 		return nil, err
 	}
 
-	//license-audit report automate -s 2023-07-12 -e 2023-07-13
-
+	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(Command))
 	if err != nil {
-		log.Errorf("Got the error for output %s %v", output, err)
+		log.Errorf("Failed to execute the command for audit")
+		return nil, err
 	}
+
+	log.Debugf("License analytics output received is %s", output)
 
 	return &job, nil
 }
 
-func executeCommandforAudit(executeCommand ExecuteCommand) (string, error) {
+// executeCommandforAudit executs the command
+func executeCommandforAudit(executeCommand ExecuteCommand, command string) (string, error) {
+	return executeCommand.Execute(command)
+}
 
+// getAppendedCommand gets the appended command with date
+func getAppendedCommand(commandToExecute string) string {
 	yesterdayDate := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
+	return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate)
+}
 
-	log.Infof("Executing the audit for yesterday date %s", yesterdayDate)
+func getWorkflowParametersAndEnqueTask(w cereal.WorkflowInstance) (AuditWorkflowParameters, error) {
+	workflowParams := AuditWorkflowParameters{}
+	err := w.GetParameters(&workflowParams)
+	if err != nil {
+		err = errors.Wrap(err, "failed to unmarshal license-audit workflow parameters")
+		logrus.WithError(err).Error()
+		return workflowParams, err
+	}
 
-	appendedCommand := fmt.Sprintf(Command, yesterdayDate, yesterdayDate)
-	//Executing the license audit command
+	err = w.EnqueueTask(LicenseAuditTaskName, AuditTaskParameters{})
+	if err != nil {
+		err = errors.Wrap(err, "failed to enqueue the license-audit task")
+		logrus.WithError(err).Error()
+		return workflowParams, err
+	}
 
-	return executeCommand.Execute(appendedCommand)
+	return workflowParams, nil
 }
