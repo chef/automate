@@ -165,11 +165,12 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 	log.Info("Executing the task For Run method")
 	var job AuditTaskParameters
 	if err := task.GetParameters(&job); err != nil {
+		err = errors.Wrap(err, "Unable to marshal Task Parameters for Audit task")
 		log.WithError(err).Error()
 		return nil, err
 	}
 
-	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(Command))
+	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(t.Command))
 	if err != nil {
 		log.Errorf("Failed to execute the command for audit")
 		return nil, err

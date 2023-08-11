@@ -1,6 +1,7 @@
 package licenseaudit
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,7 +23,7 @@ func (test TestExecute) Execute(command string) (string, error) {
 	return command, nil
 }
 
-func TestOnStart(t *testing.T) {
+func Test_OnStart(t *testing.T) {
 	tests := []struct {
 		name                  string
 		isGetParameterFailure bool
@@ -180,7 +181,7 @@ func (r *TaskResult) Err() error {
 	return nil
 }
 
-func TestOnTaskComplete(t *testing.T) {
+func Test_OnTaskComplete(t *testing.T) {
 	tests := []struct {
 		name                 string
 		isGetPayloadFailure  bool
@@ -379,6 +380,73 @@ func Test_executeCommandforAudit(t *testing.T) {
 			} else {
 				assert.NotEmpty(t, err)
 				assert.Equal(t, tt.err, err)
+			}
+		})
+	}
+}
+
+type CerealTask struct {
+	isParameterFailure bool
+}
+
+func (t *CerealTask) GetParameters(obj interface{}) error {
+	if t.isParameterFailure {
+		return fmt.Errorf("error in fetching parameters")
+	}
+	return nil
+}
+
+func (t *CerealTask) GetMetadata() cereal.TaskMetadata {
+	return cereal.TaskMetadata{}
+}
+
+func Test_Run(t *testing.T) {
+	tests := []struct {
+		name                   string
+		isGetParametersFailure bool
+		expectedErrorString    error
+		commandError           bool
+		expectedError          bool
+	}{
+		{
+			name:                   "Test Run Success",
+			isGetParametersFailure: false,
+			commandError:           false,
+			expectedError:          false,
+			expectedErrorString:    nil,
+		},
+		{
+			name:                   "Task Run paramaters failure",
+			isGetParametersFailure: true,
+			commandError:           false,
+			expectedError:          true,
+			expectedErrorString:    errors.New("Unable to marshal Task Parameters for Audit task: error in fetching parameters"),
+		},
+		{
+			name:                   "Task Run output from command failure",
+			isGetParametersFailure: false,
+			commandError:           true,
+			expectedError:          true,
+			expectedErrorString:    errors.New("Received Error from command : exit status 1"),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+
+			task := &LicenseAuditTask{
+				ExecuteCommand: &TestExecute{wantError: tc.commandError},
+				Command:        "testingcommand",
+			}
+			result, err := task.Run(context.Background(), &CerealTask{
+				isParameterFailure: tc.isGetParametersFailure,
+			})
+
+			if tc.expectedError {
+				assert.Equal(t, tc.expectedErrorString.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, result)
 			}
 		})
 	}
