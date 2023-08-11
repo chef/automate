@@ -29,6 +29,7 @@ type Config struct {
 	OptOut           string          `mapstructure:"opt_out" toml:"opt_out"`
 	TelemetryEnabled bool
 	ServiceCerts     *certs.ServiceCerts
+	CerealHost       string `mapstructure:"cereal_host" toml:"cereal_host"`
 }
 
 // ListenAddress is the address where gRPC server will bind and listen
