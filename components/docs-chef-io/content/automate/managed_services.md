@@ -127,15 +127,17 @@ The steps to enable backup and restore in OpenSearch S3 is:
       ```bash
       arn:aws:iam::123456789123:role/role-name
       ```
+
      Select Map and confirm the user and role showing up under Mapped users.
+
      {{< figure src="/images/automate/managed_services_os_dashboard.png" alt="Managed Service OS Dashboard">}}
 
-- In case of Automate HA, Add the following permission in OpenSearch Dashboard.
+- In case of Automate HA, add the following permission in OpenSearch Dashboard.
 
-  1. Navigate to the OpenSearch Dashboards url from the OpenSearch Service console.
+  1. Navigate to the OpenSearch Dashboards URL from the OpenSearch Service console.
   1. From the OpenSearch Dashboards, navigate to *Security* in the main menu and choose *Roles*, and then select the `manage_snapshots` role.
   1. Select `Edit role`.
-  1. Under the Index permissions, Add the `indices:admin/delete` and then select on Update to save the changes.
+  1. Under the Index permissions, Add the `indices:admin/delete` and then select Update to save the changes.
 
       {{< figure src="/images/automate/managed_services_os_dasboard_permission.png" alt="Managed Service OS Dashboard Permission">}}
 
