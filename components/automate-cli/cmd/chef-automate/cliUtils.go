@@ -53,7 +53,6 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, erro
 		}
 		return "", err
 	}
-	// writer.Print(output)
 	return output, nil
 }
 
