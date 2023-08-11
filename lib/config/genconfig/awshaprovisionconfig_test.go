@@ -149,6 +149,9 @@ func TestPromptsCidrAWSManaged(t *testing.T) {
 	osDefaultCerts := true
 	input(b, "\r")
 
+	// To not skip role cred
+	input(b, moveDown+"\r")
+
 	osSnapshotRoleArn := "arn-os-snapshot-role"
 	input(b, osSnapshotRoleArn+"\r")
 
