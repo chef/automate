@@ -375,9 +375,9 @@ module "bootstrap_automate" {
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url_deployment
   managed_opensearch_user_password   = var.managed_opensearch_user_password_deployment
   managed_opensearch_username        = var.managed_opensearch_username_deployment
-  aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn_deployment
-  os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id_deployment
-  os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret_deployment
+  aws_os_snapshot_role_arn           = length(trimspace(var.aws_os_snapshot_role_arn_deployment)) > 0 ? var.aws_os_snapshot_role_arn_deployment : var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = length(trimspace(var.os_snapshot_user_access_key_id_deployment)) > 0 ? var.os_snapshot_user_access_key_id_deployment : var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = length(trimspace(var.os_snapshot_user_access_key_secret_deployment)) > 0 ? var.os_snapshot_user_access_key_secret_deployment : var.os_snapshot_user_access_key_secret
   managed_rds_instance_url           = var.managed_rds_instance_url_deployment
   managed_rds_superuser_username     = var.managed_rds_superuser_username_deployment
   managed_rds_superuser_password     = var.managed_rds_superuser_password_deployment
@@ -446,9 +446,9 @@ module "automate" {
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url_deployment
   managed_opensearch_user_password   = var.managed_opensearch_user_password_deployment
   managed_opensearch_username        = var.managed_opensearch_username_deployment
-  aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn_deployment
-  os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id_deployment
-  os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret_deployment
+  aws_os_snapshot_role_arn           = length(trimspace(var.aws_os_snapshot_role_arn_deployment)) > 0 ? var.aws_os_snapshot_role_arn_deployment : var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = length(trimspace(var.os_snapshot_user_access_key_id_deployment)) > 0 ? var.os_snapshot_user_access_key_id_deployment : var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = length(trimspace(var.os_snapshot_user_access_key_secret_deployment)) > 0 ? var.os_snapshot_user_access_key_secret_deployment : var.os_snapshot_user_access_key_secret
   managed_rds_instance_url           = var.managed_rds_instance_url_deployment
   managed_rds_superuser_username     = var.managed_rds_superuser_username_deployment
   managed_rds_superuser_password     = var.managed_rds_superuser_password_deployment
@@ -522,8 +522,9 @@ module "chef_server" {
   managed_opensearch_user_password   = var.managed_opensearch_user_password_deployment
   managed_opensearch_username        = var.managed_opensearch_username_deployment
   aws_os_snapshot_role_arn           = length(trimspace(var.aws_os_snapshot_role_arn_deployment)) > 0 ? var.aws_os_snapshot_role_arn_deployment : var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = length(trimspace(var.os_snapshot_user_access_key_id_deployment)) > 0 ? var.os_snapshot_user_access_key_id_deployment : var.os_snapshot_user_access_key_id
   os_snapshot_user_access_key_secret = length(trimspace(var.os_snapshot_user_access_key_secret_deployment)) > 0 ? var.os_snapshot_user_access_key_secret_deployment : var.os_snapshot_user_access_key_secret
-  managed_rds_instance_url           = length(trimspace(var.managed_rds_instance_url_deployment)) > 0 ? var.managed_rds_instance_url_deployment : var.managed_rds_instance_url
+  managed_rds_instance_url           = var.managed_rds_instance_url_deployment
   managed_rds_superuser_username     = var.managed_rds_superuser_username_deployment
   managed_rds_superuser_password     = var.managed_rds_superuser_password_deployment
   managed_rds_dbuser_username        = var.managed_rds_dbuser_username_deployment
