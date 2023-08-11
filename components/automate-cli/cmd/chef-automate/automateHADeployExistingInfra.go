@@ -30,7 +30,14 @@ func newExistingInfa(configPath string) *existingInfra {
 }
 
 func (e *existingInfra) doDeployWork(args []string) error {
-	var err = bootstrapEnv(e, deployCmdFlags.airgap, false, DEPLOY)
+	if !deployCmdFlags.skipVerify {
+		_, configFile := getConfigFileFromArgs(args)
+		err := executeConfigVerifyAndPromptConfirmationOnError(configFile)
+		if err != nil {
+			return err
+		}
+	}
+	err := bootstrapEnv(e, deployCmdFlags.airgap, false, DEPLOY)
 	if err != nil {
 		return err
 	}

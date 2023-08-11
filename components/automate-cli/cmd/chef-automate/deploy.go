@@ -64,6 +64,7 @@ var deployCmdFlags = struct {
 	bootstrapBundlePath             string
 	userAuth                        bool
 	saas                            bool
+	skipVerify                      bool
 }{}
 
 // deployCmd represents the new command
@@ -184,6 +185,12 @@ func newDeployCmd() *cobra.Command {
 		"y",
 		false,
 		"Do not prompt for confirmation; accept defaults and continue")
+	cmd.PersistentFlags().BoolVarP(
+		&deployCmdFlags.skipVerify,
+		"skip-verify",
+		"",
+		false,
+		"Flag for skipping config verification check")
 
 	if !isDevMode() {
 		for _, flagName := range []string{
