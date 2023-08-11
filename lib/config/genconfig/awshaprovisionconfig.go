@@ -15,36 +15,43 @@ import (
 )
 
 const (
-	AWS_MACHINE_TYPE_REGEX         = "^((a1|c1|c3|c4|c5|c5a|c5ad|c5d|c5n|c6a|c6g|c6gd|c6gn|c6i|c6id|c7g|cc2|d2|d3|d3en|dl1|f1|g2|g3|g3s|g4ad|g4dn|g5|g5g|h1|i2|i3|i3en|i4i|im4gn|inf1|is4gen|m1|m2|m3|m4|m5|m5a|m5ad|m5d|m5dn|m5n|m5zn|m6a|m6g|m6gd|m6i|m6id|mac1|mac2|p2|p3|p3dn|p4d|r3|r4|r5|r5a|r5ad|r5b|r5d|r5dn|r5n|r6a|r6g|r6gd|r6i|r6id|t1|t2|t3|t3a|t4g|trn1|u-12tb1|u-3tb1|u-6tb1|u-9tb1|vt1|x1|x1e|x2gd|x2idn|x2iedn|x2iezn|z1d)\\.(10xlarge|112xlarge|12xlarge|16xlarge|18xlarge|24xlarge|2xlarge|32xlarge|3xlarge|48xlarge|4xlarge|56xlarge|6xlarge|8xlarge|9xlarge|large|medium|metal|micro|nano|small|xlarge))$"
-	AWS_VOL_TYPE_REGEX             = "^(gp2|gp3|io2|io1|st1|sc1)$"
-	IP_REGEX                       = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$"
-	IP_REGEX_SAMPLE                = "10.0.0.0"
-	URL_OPTIONAL_PORT_REGEX        = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](:{1}[0-9]{1,5})?$"
-	URL_OPTIONAL_PORT_REGEX_SAMPLE = "myopensearch.com or 10.0.82.0:9200"
-	FQDN_REGEX                     = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"
-	FQDN_REGEX_SAMPLE              = "mydomain.chef.io"
-	URL_REQUIRED_PORT_REGEX        = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]:{1}[0-9]{1,5}$"
-	URL_REQUIRED_PORT_REGEX_SAMPLE = "mydomain.chef.io:5432"
-	LINUX_USER_REGEX               = "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30})$"
-	DIR_PATH_REGEX                 = "^\\/$|(\\/[a-zA-Z_0-9-]+)+$"
-	BUCKET_NAME_REGEX              = "^[a-zA-Z0-9_-]+$"
-	AWS_ACCESS_KEY_ID_REGEX        = "^[A-Z0-9]{20}$"
-	AWS_ACCESS_KEY_SECRET_REGEX    = "^[A-Za-z0-9/+=]{40}$"
-	ACCESS_KEY_ID_REGEX            = "^[A-Za-z0-9/+=]+$"
-	ACCESS_KEY_SECRET_REGEX        = "^[A-Za-z0-9/+=]+$"
-	ENDPOINT_URL                   = "^((http|https)://)[-a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)$"
-	AUTOMATE_ADMIN_PASSWORD_REGEX  = "^.{8,35}$"
-	OPENSEARCH_NODETYPE            = "OpenSearch"
-	POSTGRESQL_NODETYPE            = "Postgresql"
-	AUTOMATE_NODETYPE              = "Automate"
-	CHEF_INFRA_SERVER_NODETYPE     = "Chef Infra Server"
-	PUB_CERT                       = "Public Cert"
-	PRI_KEY                        = "Private Key"
-	ADMIN_CERT                     = "Admin Cert"
-	ADMIN_KEY                      = "Admin Key"
-	ROOTCA                         = "Root CA"
-	TOKEN_URLS                     = "http://169.254.169.254/latest/api/token"
-	METADATA_URLS                  = "http://169.254.169.254/latest/meta-data/iam/info"
+	AWS_MACHINE_TYPE_REGEX             = "^((a1|c1|c3|c4|c5|c5a|c5ad|c5d|c5n|c6a|c6g|c6gd|c6gn|c6i|c6id|c7g|cc2|d2|d3|d3en|dl1|f1|g2|g3|g3s|g4ad|g4dn|g5|g5g|h1|i2|i3|i3en|i4i|im4gn|inf1|is4gen|m1|m2|m3|m4|m5|m5a|m5ad|m5d|m5dn|m5n|m5zn|m6a|m6g|m6gd|m6i|m6id|mac1|mac2|p2|p3|p3dn|p4d|r3|r4|r5|r5a|r5ad|r5b|r5d|r5dn|r5n|r6a|r6g|r6gd|r6i|r6id|t1|t2|t3|t3a|t4g|trn1|u-12tb1|u-3tb1|u-6tb1|u-9tb1|vt1|x1|x1e|x2gd|x2idn|x2iedn|x2iezn|z1d)\\.(10xlarge|112xlarge|12xlarge|16xlarge|18xlarge|24xlarge|2xlarge|32xlarge|3xlarge|48xlarge|4xlarge|56xlarge|6xlarge|8xlarge|9xlarge|large|medium|metal|micro|nano|small|xlarge))$"
+	AWS_MACHINE_TYPE_REGEX_DEFAULT     = "m5.large"
+	AWS_VOL_TYPE_REGEX                 = "^(gp2|gp3|io2|io1|st1|sc1)$"
+	IP_REGEX                           = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$"
+	URL_OPTIONAL_PORT_REGEX            = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](:{1}[0-9]{1,5})?$"
+	FQDN_REGEX                         = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"
+	URL_REQUIRED_PORT_REGEX            = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]:{1}[0-9]{1,5}$"
+	LINUX_USER_REGEX                   = "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30})$"
+	DIR_PATH_REGEX                     = "^\\/$|(\\/[a-zA-Z_0-9-]+)+$"
+	BUCKET_NAME_REGEX                  = "^[a-zA-Z0-9_-]+$"
+	AWS_ACCESS_KEY_ID_REGEX            = "^[A-Z0-9]{20}$"
+	AWS_ACCESS_KEY_SECRET_REGEX        = "^[A-Za-z0-9/+=]{40}$"
+	ACCESS_KEY_ID_REGEX                = "^[A-Za-z0-9/+=]+$"
+	ACCESS_KEY_SECRET_REGEX            = "^[A-Za-z0-9/+=]+$"
+	ENDPOINT_URL                       = "^((http|https)://)[-a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)$"
+	ENDPOINT_URL_SAMPLE                = "http://bucket-endpoint.com or https://bucket-endpoint.com"
+	AUTOMATE_ADMIN_PASSWORD_REGEX      = "^.{8,35}$"
+	AWS_MACHINE_TYPE_REGEX_SAMPLE      = "m5.large, m5.xlarge"
+	IP_REGEX_SAMPLE                    = "172.31.0.0"
+	URL_OPTIONAL_PORT_REGEX_SAMPLE     = "myopensearch.com or 10.0.82.0:9200"
+	FQDN_REGEX_SAMPLE                  = "mydomain.chef.io"
+	URL_REQUIRED_PORT_REGEX_SAMPLE     = "myrds.chef.io:5432"
+	LINUX_USER_REGEX_SAMPLE            = "ubuntu or ec2-user"
+	BUCKET_NAME_REGEX_SAMPLE           = "automate-backup"
+	AWS_ACCESS_KEY_ID_REGEX_SAMPLE     = "A2PBA*************SQ"
+	AWS_ACCESS_KEY_SECRET_REGEX_SAMPLE = "aPBA*********************************EE"
+	OPENSEARCH_NODETYPE                = "OpenSearch"
+	POSTGRESQL_NODETYPE                = "Postgresql"
+	AUTOMATE_NODETYPE                  = "Automate"
+	CHEF_INFRA_SERVER_NODETYPE         = "Chef Infra Server"
+	PUB_CERT                           = "Public Cert"
+	PRI_KEY                            = "Private Key"
+	ADMIN_CERT                         = "Admin Cert"
+	ADMIN_KEY                          = "Admin Key"
+	ROOTCA                             = "Root CA"
+	TOKEN_URLS                         = "http://169.254.169.254/latest/api/token"
+	METADATA_URLS                      = "http://169.254.169.254/latest/meta-data/iam/info"
 )
 
 type AwsHaProvisionConfig struct {
@@ -230,7 +237,6 @@ func (c *AwsHaProvisionConfig) useIAMRole() (isIAMUserAvailable bool, err error)
 	}
 
 	token := string(tokenResponseBody)
-	fmt.Println("TOKEN: ", token)
 
 	resp, dataByte, err := c.httpRequestClient.MakeRequestWithHeaders(http.MethodGet, METADATA_URLS, nil, "X-aws-ec2-metadata-token", token)
 	if err != nil {
@@ -243,9 +249,6 @@ func (c *AwsHaProvisionConfig) useIAMRole() (isIAMUserAvailable bool, err error)
 	}
 
 	iamRole := getIAMRoleName(dataByte)
-
-	fmt.Println("iamRole: ", iamRole)
-
 	isIAMUserAvailable, err = c.Prompt.Confirm("Found an IAM role ("+iamRole+") attached to this machine. Do you want to continue with IAM role", "yes", "no")
 	return
 }
@@ -921,7 +924,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateAdminPassword() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate", AWS_MACHINE_TYPE_REGEX, "m5.large")
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -992,7 +995,7 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerNodes() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server", AWS_MACHINE_TYPE_REGEX, "m5.large")
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -1001,7 +1004,7 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPostgresqlInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for PostgreSQL", AWS_MACHINE_TYPE_REGEX, "m5.large")
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for PostgreSQL", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -1010,7 +1013,7 @@ func (c *AwsHaProvisionConfig) PromptPostgresqlInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOpenSearchInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for OpenSearch", AWS_MACHINE_TYPE_REGEX, "m5.large")
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for OpenSearch", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -1285,7 +1288,7 @@ func (c *AwsHaProvisionConfig) PromptSsh() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptSshUser() (sshUser string, err error) {
-	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX)
+	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX, LINUX_USER_REGEX_SAMPLE)
 	if err != nil {
 		return
 	}
