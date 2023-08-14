@@ -86,7 +86,8 @@ Run the following steps on Bastion Host Machine:
 
     {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
-##### Steps to generate config
+#### Steps to Generate Config
+
 1. Generate config with relevant data using the below command:
 
     ```bash
@@ -94,10 +95,10 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     "
     ```
-    Click [here](/automate/ha_config_gen) to know more about generating config
 
+    To know more about on how to generate config, refer to the [Automate HA Config Generation](/automate/ha_config_gen) page.
 
-##### Steps to provision
+#### Steps to provision
 
 1. Continue with the provisioning of the infra after generating the config:
 
@@ -111,18 +112,19 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
-#####  Config Verify
+#### Config Verify
+
 1. After successful provision, run verify config command:
 
     ```bash
     sudo chef-automate verify -c config.toml
     ```
-    
-    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
-    
-    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
-##### Steps to deploy
+    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+
+    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+
+#### Steps to deploy
 
 1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of a previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
 
@@ -137,8 +139,10 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
-##### Verify Deployment
-1. Once the deployment is successful, we can verify deployment by checking status summary and info
+#### Verify Deployment
+
+1. Once the deployment is successful, we can verify deployment by checking status summary and info:
+
     ```bash
     sudo -- sh -c "
     #After Deployment is done successfully. Check the status of Chef Automate HA services
@@ -148,9 +152,9 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
-3. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`. If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
+1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`. If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
 
-- create a file `a2.fqdn.toml`
+- Create a file `a2.fqdn.toml`
 
     ```toml
     [Global]
@@ -184,10 +188,11 @@ Run the following steps on Bastion Host Machine:
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-After successful deployment, proceed with following...
-   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+After successful deployment, proceed with following:
+
+   1. To know moe about the user and organization creation, check the [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section in Node Bootstrapping page.
+   1. To know more about Workstation setup, see the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section.
+   1. To know more about Node bootstrapping, see the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
 
 ### Sample config
 
@@ -325,7 +330,7 @@ Downgrading the number of instance_count for the backend nodes will result in da
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, refer to [Replace Node in Automate HA Cluster](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) section for reference.
 - Removal of nodes for Postgresql or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 - Below process can be done for `chef-server` and `automate`.
 
