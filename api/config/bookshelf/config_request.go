@@ -45,6 +45,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Bookshelf.StreamDownload = w.Bool(true)
 	c.V1.Sys.Bookshelf.AwsAccessId = w.String("")
 	c.V1.Sys.Bookshelf.AwsSecretKey = w.String("")
+	c.V1.Sys.Bookshelf.StorageType = w.String("sql")
+	c.V1.Sys.Bookshelf.VirtualIp = w.String("127.0.0.1")
 
 	return c
 }
