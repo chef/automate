@@ -8,7 +8,7 @@ gh_repo = "automate"
     title = "AWS Managed Services Deployment"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_aws_managed_deploy_steps.md AWS Managed Services"
-    weight = 220
+    weight = 240
 +++
 
 {{< warning >}}
@@ -294,16 +294,3 @@ After successful deployment, proceed with following...
 
 ## Add more nodes In AWS Deployment post deployment
 
-The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
-
-- If you want to add two nodes to automate, you have to run the:
-
-    ```sh
-    chef-automate node add --automate-count 2
-    ```
-
-- If you want to add three nodes to the chef-server, you have to run the:
-
-    ```sh
-        chef-automate node add --chef-server-count 3
-    ```

@@ -1,13 +1,13 @@
 +++
-title = "On-Premise Deployment"
+title = "On-premise Deployment with Chef Managed Database​"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-Premise Deployment"
+    title = "On-premise Deployment with Chef Managed Database​"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-Premise Deployment"
+    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-premise Deployment with Chef Managed Database​"
     weight = 200
 +++
 
@@ -435,158 +435,6 @@ After successful deployment, proceed with following...
 
 ## Add More Nodes to the OnPremises Deployment
 
-The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
-
-For example,
-
-- if you want to add nodes with IP 10.1.2.23 to automate, you have to run the:
-
-    ```sh
-    chef-automate node add --automate-ips 10.1.2.23
-    ```
-
-- If you want to add nodes with IP 10.1.2.23 and 10.0.1.42 to the chef-server, you have to run the:
-
-    ```sh
-    chef-automate node add --chef-server-ips 10.1.2.23,10.0.1.42
-    ```
-
-- If you want to add nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, you have to run the:
-
-    ```sh
-    chef-automate node add --opensearch-ips 10.1.2.23,10.0.1.42
-    ```
-
-- If you want to add nodes with IP 10.1.2.23, 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
-
-    ```sh
-    chef-automate node add --postgresql-ips 10.1.2.23,10.0.1.42,10.0.1.54
-    ```
-
-You can mix and match different services to add nodes across various services.
-
-- If you want to add nodes with IP 10.1.2.23 to automate and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL, you have to run:
-
-    ```sh
-    chef-automate node add --automate-ips 10.1.2.23 --postgresql-ips 10.0.1.42,10.0.1.54
-    ```
-
-- If you want to add nodes with IP 10.1.2.23 to automate, nodes with IP 10.1.0.36 and 10.0.1.233 to chef-server, and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
-
-    ```sh
-    chef-automate node add --automate-ips 10.1.2.23 --chef-server-ips 10.1.0.36,10.0.1.233  --postgresql-ips 10.0.1.42,10.0.1.54
-    ```
-
-Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
-
-- Make sure to update your loadbalancer configuration with the IP address of the new node. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
-
-{{< note >}}
-
-- If you have patched some external config to any existing services, then apply the same on the new nodes.
-For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
-- The new node will be configured with the certificates already configured in your HA setup.
-- If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
-- If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
-
-{{< /note >}}
-
-{{< warning >}}
-It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
-{{< /warning >}}
-
 ## Remove Single Node From Cluster on OnPremises Deployment
 
-{{< warning >}}
-
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for reference.
-- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-- Below process can be done for `chef-server` and `automate`.
-- Only one node can be removed simultaneously, irrespective of node type.
-
-{{< /warning >}}
-
-The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove.
-For example,
-
-- If you want to remove the node of automate, you have to run the:
-
-    ```sh
-    chef-automate node remove --automate-ip "<automate-ip-address>"
-    ```
-
-- If you want to remove the node of the chef-server, you have to run the:
-
-    ```sh
-    chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
-    ```
-
-- If you want to remove the node of OpenSearch, you have to run the:
-
-    ```sh
-    chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
-    ```
-
-- If you want to remove the node of PostgreSQL, you have to run:
-
-    ```sh
-    chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
-    ```
-
-Once the command executes, it will remove the supplied node from your HA setup. The changes might take a while.
-
-- Make sure to remove the IP address of the deleted node from your loadbalancer configuration. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
-
-{{< note >}}
-
-- The IPs provided must be associated with a node in your HA setup.
-- Automate instance count cannot be less than 1.
-- Chef Server instance count cannot be less than 1.
-- Open search instance count cannot be less than 3.
-- Postgresql instance count cannot be less than 3.
-
-{{< /note >}}
-
 ## Replace Node in Automate HA Cluster
-
-- Add a New Node following [this](#add-more-nodes-to-the-onprem-deployment).
-- Stop the Habitat Supervisor on the node .i.e; going to be removed, use the `systemctl stop hab-sup` command to stop the
-  habitat supervisor.
-- Remove an Existing Node following [this](#remove-single-node-from-cluster-on-onprem-deployment).
-
-## Uninstall Chef automate HA
-
-{{< danger >}}
-The below section will uninstall the chef automate HA
-{{< /danger >}}
-
-### To Uninstall On-Premise
-
-To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
-
-```bash
-    chef-automate cleanup --onprem-deployment
-```
-
-## Troubleshooting
-
-### Failure to Replace Nodes
-
-```bash
-Error: Upload failed: scp: /var/automate-ha: Permission denied
-```
-
-- **Resolution**: Execute the below command.
-
-  ```sh
-  cd /hab/a2_deploy_workspace/terraform
-  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
-  cd -
-  ```
-
-- Run the `deploy` command again once the module's tainted.
-
-  ```sh
-  chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
-  ```
- 

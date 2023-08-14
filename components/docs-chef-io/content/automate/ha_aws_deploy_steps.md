@@ -8,7 +8,7 @@ gh_repo = "automate"
     title = "AWS Deployment"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_aws_deploy_steps.md AWS Deployment"
-    weight = 210
+    weight = 230
 +++
 
 {{< warning >}}
@@ -269,95 +269,9 @@ Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Post
 
 ## Add more nodes In AWS Deployment post deployment
 
-The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
-
-- If you want to add two nodes to automate, you have to run the:
-
-    ```sh
-    chef-automate node add --automate-count 2
-    ```
-
-- If you want to add three nodes to the chef-server, you have to run the:
-
-    ```sh
-    chef-automate node add --chef-server-count 3
-    ```
-
-- If you want to add one node to OpenSearch, you have to run the:
-
-    ```sh
-    chef-automate node add --opensearch-count 1
-    ```
-
-- If you want to add two nodes to PostgreSQL, you have to run the:
-
-    ```sh
-    chef-automate node add --postgresql-count 2
-    ```
-
-You can mix and match different services to add nodes across various services.
-
-- If you want to add one node to automate and two nodes to PostgreSQL, you have to run:
-
-    ```sh
-    chef-automate node add --automate-count 1 --postgresql-count 2
-    ```
-
-- If you want to add one node to automate, two nodes to chef-server, and two nodes to PostgreSQL, you have to run:
-
-    ```sh
-    chef-automate node add --automate-count 1 --chef-server-count 2 --postgresql-count 2
-    ```
-
-Once the command executes, it will add the supplied nodes to your automated setup. The changes might take a while.
-
-{{< note >}}
-
-- If you have patched some external config to any existing services, then apply the same on the new nodes. For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
-- The new node will be configured with the certificates already configured in your HA setup.
-{{< /note >}}
-
-{{< warning >}}
-Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
-{{< /warning >}}
 
 ## Remove Single Node From Cluster on AWS Deployment
 
-{{< warning >}}
-
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
-- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-- Below process can be done for `chef-server` and `automate`.
-
-{{< /warning >}}
-
-The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
-
-- If you want to remove the node of automate, you have to run the:
-
-    ```sh
-    chef-automate node remove --automate-ip "<automate-ip-address>"
-    ```
-
-- If you want to remove the node of the chef-server, you have to run the:
-
-    ```sh
-    chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
-    ```
-
-- If you want to remove the node of OpenSearch, you have to run the:
-
-    ```sh
-    chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
-    ```
-
-- If you want to remove the node of PostgreSQL, you have to run the:
-
-    ```sh
-    chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
-    ```
-
-Once the command executes, it will remove the supplied node from your HA setup. The changes might take a while.
 
 ## Uninstall Chef automate HA
 
