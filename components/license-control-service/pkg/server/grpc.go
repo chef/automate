@@ -65,16 +65,33 @@ func StartGRPC(ctx context.Context, config *Config) error {
 
 	// Setup our gRPC connection factory
 	connFactory := secureconn.NewFactory(*config.ServiceCerts)
-	cerealManager, err := startCerealService(ctx, connFactory, config)
+	// cerealManager, err := startCerealService(ctx, connFactory, config)
+	// // if err != nil {
+	// // 	log.Errorf("unable to execute and register cereal service for license control service %v", err.Error())
+	// // }
+
+	cerealConn, err := connFactory.Dial("cereal-service", config.CerealHost)
 	if err != nil {
-		log.Errorf("unable to execute and register cereal service for license control service %v", err.Error())
+		return errors.Wrap(err, "error dialing cereal service")
+	}
+
+	cerealBackend := grpccereal.NewGrpcBackendFromConn("license-control-service", cerealConn)
+
+	// Set up a cereal (workflow) manager for managing nodemanager workflows.
+	cerealManager, err := cereal.NewManager(cerealBackend)
+	if err != nil {
+		return errors.Wrap(err, "could not create cereal manager")
+	}
+
+	err = licenseaudit.InitCerealManager(context.TODO(), cerealManager, 1)
+	if err != nil {
+		return errors.Wrap(err, "could not create cereal manager")
 	}
 
 	err = cerealManager.Start(context.Background())
 	if err != nil {
 		log.Errorf("Unable to start the cereal Manager for license control service %v", err)
 	}
-
 	defer cerealManager.Stop()
 
 	return g.Serve(listener)
