@@ -50,3 +50,45 @@ func basicCmd() *cobra.Command {
 func runExampleForTestCmd(cmd *cobra.Command, _ []string) error {
 	return nil
 }
+
+func TestGetEnabledFlags(t *testing.T) {
+	// Define a Cobra command for testing purposes
+	cmd := &cobra.Command{
+		Use:   "my-command",
+		Short: "A description of my command",
+		Run: func(cmd *cobra.Command, args []string) {
+			// Not used in this test
+		},
+	}
+
+	// Define some flags for the Cobra command
+	cmd.Flags().String("string-flag", "", "A description of the string flag")
+	cmd.Flags().Int("int-flag", 0, "A description of the int flag")
+	cmd.Flags().Bool("bool-flag", false, "A description of the bool flag")
+
+	// Set the values of the string and int flags
+	cmd.Flags().Set("string-flag", "string-value")
+	cmd.Flags().Set("int-flag", "42")
+
+	tests := []struct {
+		TestName       string
+		flagsToIgnore  map[string]int
+		EnableBoolFlag bool
+		ExpectedOutput string
+	}{
+		{"Not Ignoring any flag", map[string]int{}, false, " --int-flag 42 --string-flag string-value"},
+		{"Ignoring some flag", map[string]int{"string-flag": 1}, false, " --int-flag 42"},
+		{"Bool flag enabled", map[string]int{}, true, " --bool-flag --int-flag 42 --string-flag string-value"},
+	}
+
+	for _, e := range tests {
+		t.Run(e.TestName, func(t *testing.T) {
+			cmd.Flag("bool-flag").Changed = false
+			if e.EnableBoolFlag {
+				cmd.Flag("bool-flag").Changed = true
+			}
+			flags := GetEnabledFlags(cmd, e.flagsToIgnore)
+			assert.Equal(t, e.ExpectedOutput, flags)
+		})
+	}
+}
