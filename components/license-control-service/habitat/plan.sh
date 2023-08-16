@@ -14,6 +14,8 @@ pkg_deps=(
   chef/automate-platform-tools
   chef/license-audit
 )
+pkg_svc_user=root
+pkg_svc_group=root
 pkg_exports=(
   [port]=service.port
   [host]=service.host

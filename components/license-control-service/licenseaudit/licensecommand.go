@@ -2,6 +2,7 @@ package licenseaudit
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 
 	"github.com/chef/automate/lib/logger"
@@ -21,8 +22,6 @@ func NewExecute(log logger.Logger) *Execute {
 
 func (e Execute) Execute(command string) (string, error) {
 
-	e.log.Info("Inside the  Execute method for string---------")
-
 	//Executing command
 	cmd := exec.Command("/bin/sh", "-c", command)
 
@@ -33,10 +32,12 @@ func (e Execute) Execute(command string) (string, error) {
 	//Executing the command
 	err := cmd.Run()
 	if err != nil {
-		return outputBuffer.String(), err
+		return errorBuffer.String(), err
 	}
 
-	e.log.Infof("Got the output from the license command as %s with error string as %s", outputBuffer.String(), errorBuffer.String())
+	output := fmt.Sprintf("%s %s", outputBuffer.String(), errorBuffer.String())
+
+	e.log.Infof("Got the output from the license command as %s", output)
 
 	return outputBuffer.String(), nil
 }

@@ -17,7 +17,7 @@ var (
 	WorkflowName         = cereal.NewWorkflowName("license-audit")
 	LicenseAuditTaskName = cereal.NewTaskName("license-audit-task")
 	ScheduleName         = "license-audit"
-	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit "
+	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s"
 )
 
 func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, workerCount int) error {
@@ -35,17 +35,24 @@ func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, worke
 		return err
 	}
 
-	rule, err := rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.SECONDLY,
-		Interval: 60,
-		Dtstart:  time.Now(),
-	})
-
+	rule, err := createRuleForSchedule()
 	if err != nil {
 		return errors.Wrapf(err, "Unable to create rule for schedule")
 	}
 
 	return createOrUpdateWorkflowSchedule(ctx, cerealManager, ScheduleName, WorkflowName, rule)
+
+}
+
+func createRuleForSchedule() (*rrule.RRule, error) {
+	t := time.Now()
+	modifiedTime := time.Date(t.Year(), t.Month(), t.Day(), 4, 0, 0, 0, t.Location())
+
+	return rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.DAILY,
+		Interval: 1,
+		Dtstart:  modifiedTime,
+	})
 
 }
 
@@ -149,7 +156,7 @@ func (s *LicenseAuditWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	log.Debugf("Exiting license-audit > OnTaskComplete with payload-------------- %+v", payload)
+	log.Debugf("Exiting license-audit > OnTaskComplete with payload %+v", payload)
 
 	return w.Complete()
 }
@@ -172,11 +179,11 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(t.Command))
 	if err != nil {
-		log.Errorf("Failed to execute the command for audit")
+		log.Errorf("Failed to execute the command for audit with %v as error %s", err, output)
 		return nil, err
 	}
 
-	log.Debugf("License analytics output received is %s", output)
+	log.Infof("License analytics output received is %s", output)
 
 	return &job, nil
 }
