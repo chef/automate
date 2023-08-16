@@ -216,7 +216,7 @@ func (c *AwsHaProvisionConfig) PromptVpcId() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) HasCidrBlockAddr() (isCiderBlock bool, err error) {
-	isCiderBlock, err = c.Prompt.Confirm("Create new subnets during provision", "yes", "no")
+	isCiderBlock, err = c.Prompt.Confirm("Create new subnets during provision (Requires CIDR block)", "yes", "no")
 	if err != nil {
 		return
 	}
@@ -272,7 +272,7 @@ func getIAMRoleName(respByte []byte) (IAMRoleName string) {
 }
 
 func (c *AwsHaProvisionConfig) PromptCidrBlockAddr() (err error) {
-	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address", IP_REGEX)
+	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address [Eg: 10.0.16.0]", IP_REGEX)
 	if err != nil {
 		return
 	}
