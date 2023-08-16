@@ -42,7 +42,7 @@ type Prompt interface {
 	InputStringMinMax(label string, minlen int, maxlen int) (result string, err error)
 	InputWordDefault(label string, defaultVal string) (result string, err error)
 	InputWord(label string) (result string, err error)
-	InputStringRegex(label string, regexCheck string, sampleValue ...string) (result string, err error)
+	InputStringRegex(label string, regexCheck string) (result string, err error)
 	InputString(label string) (result string, err error)
 	InputStringRequired(label string) (result string, err error)
 	InputPassword(label string) (result string, err error)
@@ -407,13 +407,10 @@ func (p *PromptImp) InputStringMinMax(label string, minlen int, maxlen int) (res
 	return promptRun(prompt, true)
 }
 
-func (p *PromptImp) InputStringRegex(label string, regexCheck string, sampleValue ...string) (result string, err error) {
+func (p *PromptImp) InputStringRegex(label string, regexCheck string) (result string, err error) {
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			if len(sampleValue) > 0 {
-				return fmt.Errorf(REGEX_CHECK_FAIL_WITH_SAMPLE_STRING, sampleValue[0])
-			}
 			return fmt.Errorf(REGEX_CHECK_FAIL, regexCheck)
 		}
 		return nil

@@ -94,7 +94,7 @@ func (c *HaDeployConfigGen) Prompts() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptCustomCerts() (err error) {
-	noCustomCerts, err := c.Prompt.Confirm("Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch", "no", "yes")
+	noCustomCerts, err := c.Prompt.Confirm("Use custom certs for one or all service like Automate, Chef Infra Server, PostgreSQL, OpenSearch", "no", "yes")
 	if err != nil {
 		return
 	}
@@ -117,7 +117,7 @@ func (c *HaDeployConfigGen) SetDefaultValuesForDBNodes() {
 }
 
 func (c *HaDeployConfigGen) PromptExternalDb() (hasExternalDb bool, err error) {
-	hasExternalDb, err = c.Prompt.Confirm("Are you going to use External Databases, like AWS RDS and AWS OpenSearch", "yes", "no")
+	hasExternalDb, err = c.Prompt.Confirm("Use External Databases for PostgresQL and OpenSearch", "yes", "no")
 	if err != nil {
 		return
 	}
@@ -143,7 +143,7 @@ func (c *HaDeployConfigGen) PromptExternalDb() (hasExternalDb bool, err error) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalDbType() (err error) {
-	isAWSManaged, err := c.Prompt.Confirm("Type of External DB you will use", "AWS Managed", "Self Managed")
+	isAWSManaged, err := c.Prompt.Confirm("Type of External DB", "AWS Managed", "Self Managed")
 	if err != nil {
 		return
 	}
@@ -256,7 +256,7 @@ func (c *HaDeployConfigGen) GetExternalOsType() (dbType string) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalPostgresqlInstanceUrl() (err error) {
-	pgUrl, err := c.Prompt.InputStringRegex(c.GetExternalPgType()+" URL:<port>", URL_REQUIRED_PORT_REGEX, URL_OPTIONAL_PORT_REGEX_SAMPLE)
+	pgUrl, err := c.Prompt.InputStringRegex(c.GetExternalPgType()+" [Eg: pgdomain.com:5432]", URL_REQUIRED_PORT_REGEX)
 	if err != nil {
 		return
 	}
@@ -308,7 +308,7 @@ func (c *HaDeployConfigGen) PromptExternalPostgresqlDbUserPassword() (err error)
 func (c *HaDeployConfigGen) PromptExternalPostgresqlRootCert() (err error) {
 	if c.Config.External.Database.Type == "aws" {
 		awsDefaultCert := false
-		awsDefaultCert, err = c.Prompt.Confirm("Do you want to use Default AWS Cert to connect with AWS Managed RDS PostgreSQL URL", "yes", "no")
+		awsDefaultCert, err = c.Prompt.Confirm("Use Default AWS Cert to connect with AWS Managed RDS PostgreSQL URL", "yes", "no")
 		if err != nil {
 			return
 		}
@@ -336,7 +336,7 @@ func (c *HaDeployConfigGen) PromptExternalPostgresqlRootCert() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalOpenSearchDomainName() (err error) {
-	domainName, err := c.Prompt.InputStringRequired(c.GetExternalOsType() + " Domain Name")
+	domainName, err := c.Prompt.InputStringRequired(c.GetExternalOsType() + " Domain Name [Eg: chef-opensearch]")
 	if err != nil {
 		return
 	}
@@ -346,7 +346,7 @@ func (c *HaDeployConfigGen) PromptExternalOpenSearchDomainName() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalOpenSearchDomainUrl() (err error) {
-	domainUrl, err := c.Prompt.InputStringRegex(c.GetExternalOsType()+" Domain URL", URL_OPTIONAL_PORT_REGEX, URL_OPTIONAL_PORT_REGEX_SAMPLE)
+	domainUrl, err := c.Prompt.InputStringRegex(c.GetExternalOsType()+" Domain URL [Eg: chef-opensearch.myosdomain.com]", URL_OPTIONAL_PORT_REGEX)
 	if err != nil {
 		return
 	}
@@ -356,7 +356,7 @@ func (c *HaDeployConfigGen) PromptExternalOpenSearchDomainUrl() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalOpenSearchUser() (err error) {
-	user, err := c.Prompt.InputStringRequired(c.GetExternalOsType() + " Username")
+	user, err := c.Prompt.InputStringRequired(c.GetExternalOsType() + " Username [Eg: admin]")
 	if err != nil {
 		return
 	}
@@ -378,7 +378,7 @@ func (c *HaDeployConfigGen) PromptExternalOpenSearchPassword() (err error) {
 func (c *HaDeployConfigGen) PromptExternalOpenSearchRootCert() (err error) {
 	if c.Config.External.Database.Type == "aws" {
 		awsDefaultCert := false
-		awsDefaultCert, err = c.Prompt.Confirm("Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL", "yes", "no")
+		awsDefaultCert, err = c.Prompt.Confirm("Use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL", "yes", "no")
 		if err != nil {
 			return
 		}
@@ -769,7 +769,7 @@ func (c *HaDeployConfigGen) PromptPostgresqlPubPriCerts(hasCustomCerts, hasCusto
 }
 
 func (c *HaDeployConfigGen) PromptNodeIp(msg string) (ip string, err error) {
-	ip, err = c.Prompt.InputStringRegex(msg, IP_REGEX, IP_REGEX_SAMPLE)
+	ip, err = c.Prompt.InputStringRegex(msg, IP_REGEX)
 	if err != nil {
 		return
 	}
@@ -778,13 +778,13 @@ func (c *HaDeployConfigGen) PromptNodeIp(msg string) (ip string, err error) {
 
 func (c *HaDeployConfigGen) PromptHaveCustomCerts(nodeType string) (customCerts, customCertsPerNode bool, err error) {
 	if c.HasCustomCerts {
-		customCerts, err = c.Prompt.Confirm("Do you have custom certs for "+nodeType+" Nodes", "yes", "no")
+		customCerts, err = c.Prompt.Confirm("Use custom certs for "+nodeType+" Nodes", "yes", "no")
 		if err != nil {
 			return
 		}
 
 		if customCerts {
-			commonCerts, err1 := c.Prompt.Confirm("Do each "+nodeType+" Node have same Certs", "yes", "no")
+			commonCerts, err1 := c.Prompt.Confirm("Use same Certs for all "+nodeType+" Node", "yes", "no")
 			if err1 != nil {
 				return commonCerts, customCertsPerNode, err1
 			}
@@ -892,7 +892,7 @@ func (c *HaDeployConfigGen) PromptAutomateCerts(hasCustomCerts, hasCustomCertsPe
 }
 
 func (c *HaDeployConfigGen) PromptChefInfraServerFqdn() (err error) {
-	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN", FQDN_REGEX, FQDN_REGEX_SAMPLE)
+	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN [Eg: my-infraserver-domain.com]", FQDN_REGEX)
 	if err != nil {
 		return
 	}
@@ -902,7 +902,7 @@ func (c *HaDeployConfigGen) PromptChefInfraServerFqdn() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptChefInfraServerFqdnRootCa() (err error) {
-	chefInfraServerFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Chef Infra Server FQDN Root CA File Path")
+	chefInfraServerFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Chef Infra Server FQDN Root CA File Path [Eg: /home/ubuntu/fqdn2-root-ca.pem]")
 	if err != nil {
 		return
 	}
@@ -921,7 +921,7 @@ func (c *HaDeployConfigGen) PromptChefInfraServerFqdnRootCa() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptAutomateFqdn() (err error) {
-	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN", FQDN_REGEX, FQDN_REGEX_SAMPLE)
+	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN [Eg: my-automate-domain.com]", FQDN_REGEX)
 	if err != nil {
 		return
 	}
@@ -931,7 +931,7 @@ func (c *HaDeployConfigGen) PromptAutomateFqdn() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptAutomateFqdnRootCa() (err error) {
-	automateFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Automate FQDN Root CA File Path")
+	automateFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Automate FQDN Root CA File Path [Eg: /home/ubuntu/fqdn2-root-ca.pem]")
 	if err != nil {
 		return
 	}
@@ -950,7 +950,7 @@ func (c *HaDeployConfigGen) PromptAutomateFqdnRootCa() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptSshUser() (sshUser string, err error) {
-	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX, LINUX_USER_REGEX_SAMPLE)
+	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX)
 	if err != nil {
 		return
 	}
@@ -980,7 +980,7 @@ func (c *HaDeployConfigGen) PromptSshPort() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptSshKey() (err error) {
-	sshKeyFile, err := c.Prompt.InputExistingFilePathDefault("SSH Key File", "~/.ssh/id_rsa")
+	sshKeyFile, err := c.Prompt.InputExistingFilePath("SSH Key File Path [*.pem downloaded for SSH Key Pair from AWS]")
 	if err != nil {
 		return
 	}
@@ -1021,11 +1021,11 @@ func (c *HaDeployConfigGen) DefaultExistingInfraValues() {
 }
 
 func (c *HaDeployConfigGen) PromptBackup() (err error) {
-	isBackupNeeded, err := c.Prompt.Confirm("Backup need to be configured during deployment", "yes", "no")
+	isBackupNeeded, err := c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitExistingInfra().BackupMount = "/mnt/automate_backups"
 
-		_, backupOption, err1 := c.Prompt.Select("Which backup option will you use", AWS_S3, MINIO, OBJECT_STORE, FILE_SYSTEM, NFS, EFS)
+		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, FILE_SYSTEM, NFS, EFS)
 		if err1 != nil {
 			return err1
 		}
@@ -1056,20 +1056,20 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 
 func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (err error) {
 
-	bucketName, err := c.Prompt.InputStringRegex("Backup bucket name", BUCKET_NAME_REGEX, BUCKET_NAME_REGEX_SAMPLE)
+	bucketName, err := c.Prompt.InputStringRegex("Bucket name", BUCKET_NAME_REGEX)
 	if err != nil {
 		return
 	}
 	c.Config.InitObjectStorage().InitConfig().BucketName = bucketName
 
 	if backupOption == AWS_S3 {
-		accessKey, err1 := c.Prompt.InputStringRegex("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX, AWS_ACCESS_KEY_ID_REGEX_SAMPLE)
+		accessKey, err1 := c.Prompt.InputStringRegex("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX)
 		if err1 != nil {
 			return err1
 		}
 		c.Config.ObjectStorage.Config.AccessKey = accessKey
 
-		secretKey, err1 := c.Prompt.InputStringRegex("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX, AWS_ACCESS_KEY_SECRET_REGEX_SAMPLE)
+		secretKey, err1 := c.Prompt.InputStringRegex("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX)
 		if err1 != nil {
 			return err1
 		}
@@ -1094,7 +1094,7 @@ func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (er
 			return err1
 		}
 		c.Config.ObjectStorage.Config.SecretKey = secretKey
-		bucketEndpoint, err1 := c.Prompt.InputStringRegex("Endpoint for bucket", ENDPOINT_URL, ENDPOINT_URL_SAMPLE)
+		bucketEndpoint, err1 := c.Prompt.InputStringRegex("Endpoint for bucket", ENDPOINT_URL)
 		if err1 != nil {
 			return err1
 		}

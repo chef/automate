@@ -216,7 +216,7 @@ func (c *AwsHaProvisionConfig) PromptVpcId() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) HasCidrBlockAddr() (isCiderBlock bool, err error) {
-	isCiderBlock, err = c.Prompt.Confirm("Do you want to use AWS CIDR Block", "yes", "no")
+	isCiderBlock, err = c.Prompt.Confirm("Create new subnets during provision", "yes", "no")
 	if err != nil {
 		return
 	}
@@ -272,7 +272,7 @@ func getIAMRoleName(respByte []byte) (IAMRoleName string) {
 }
 
 func (c *AwsHaProvisionConfig) PromptCidrBlockAddr() (err error) {
-	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address", IP_REGEX, IP_REGEX_SAMPLE)
+	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address", IP_REGEX)
 	if err != nil {
 		return
 	}
@@ -303,24 +303,24 @@ func (c *AwsHaProvisionConfig) PromptPrivateSubnet() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPublicSubnet() (err error) {
-	hasPublicSubnets, err := c.Prompt.Confirm("Do you have Public Subnets", "yes", "no")
+	hasPublicSubnets, err := c.Prompt.Confirm("Create Public Subnets", "yes", "no")
 	if err != nil {
 		return
 	}
 	if hasPublicSubnets {
-		publicSubnet1, err1 := c.Prompt.InputStringRequired("AWS Public Subnet 1:")
+		publicSubnet1, err1 := c.Prompt.InputStringRequired("AWS Public Subnet 1 [Eg: subnet-e556d514]")
 		if err1 != nil {
 			return err1
 		}
 		c.Config.InitAws().InitConfigAwsSettings().PublicCustomSubnets = []string{publicSubnet1}
 
-		publicSubnet2, err1 := c.Prompt.InputStringRequired("AWS Public Subnet 2:")
+		publicSubnet2, err1 := c.Prompt.InputStringRequired("AWS Public Subnet 2 [Eg: subnet-e556d515]")
 		if err1 != nil {
 			return err1
 		}
 		c.Config.InitAws().InitConfigAwsSettings().PublicCustomSubnets = append(c.Config.InitAws().InitConfigAwsSettings().PublicCustomSubnets, publicSubnet2)
 
-		publicSubnet3, err1 := c.Prompt.InputStringRequired("AWS Public Subnet 3:")
+		publicSubnet3, err1 := c.Prompt.InputStringRequired("AWS Public Subnet 3 [Eg: subnet-e556d515]")
 		if err1 != nil {
 			return err1
 		}
@@ -330,7 +330,7 @@ func (c *AwsHaProvisionConfig) PromptPublicSubnet() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptSshKeyPairName() (err error) {
-	sshKeyPairName, err := c.Prompt.InputStringRequired("AWS SSH Key Pair Name")
+	sshKeyPairName, err := c.Prompt.InputStringRequired("AWS SSH Key Pair Name [Eg: chef-ssh-key]")
 	if err != nil {
 		return
 	}
@@ -348,7 +348,7 @@ func (c *AwsHaProvisionConfig) PromptAmi() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptDeleteOnTermination() (err error) {
-	noDelOnTerm, err := c.Prompt.Confirm("Delete on termination should be", "off", "on")
+	noDelOnTerm, err := c.Prompt.Confirm("Delete root volume on termination", "off", "on")
 	if err != nil {
 		return
 	}
@@ -379,7 +379,7 @@ func (c *AwsHaProvisionConfig) PromptDatabases() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptIsAwsManaged() (isAwsManagedDb bool, err error) {
-	isAwsManagedDb, err = c.Prompt.Confirm("Do you want to use AWS Managed Databases", "yes", "no")
+	isAwsManagedDb, err = c.Prompt.Confirm("Use AWS Managed Databases", "yes", "no")
 	if err != nil {
 		return
 	}
@@ -435,7 +435,7 @@ func (c *AwsHaProvisionConfig) PromptAwsManagedPostgresql() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPgUrl() (err error) {
-	pgUrl, err := c.Prompt.InputStringRegex("AWS Managed RDS PostgreSQL URL:<port>", URL_REQUIRED_PORT_REGEX, URL_REQUIRED_PORT_REGEX_SAMPLE)
+	pgUrl, err := c.Prompt.InputStringRegex("AWS Managed RDS PostgreSQL [Eg: pgdomain.com:5432]", URL_REQUIRED_PORT_REGEX)
 	if err != nil {
 		return
 	}
@@ -480,7 +480,7 @@ func (c *AwsHaProvisionConfig) PromptPgDbUserPassword() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPgCert() (err error) {
-	awsDefaultCert, err := c.Prompt.Confirm("Do you want to use Default AWS Cert to connect with AWS Managed RDS PosgreSQL URL", "yes", "no")
+	awsDefaultCert, err := c.Prompt.Confirm("Use Default AWS Cert to connect with AWS Managed RDS PosgreSQL URL", "yes", "no")
 	if err != nil {
 		return
 	}
@@ -551,7 +551,7 @@ func (c *AwsHaProvisionConfig) PromptAwsManagedOpenSearch() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOsDomainName() (err error) {
-	osDomainName, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Domain Name")
+	osDomainName, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch Domain Name [Eg: chef-opensearch]")
 	if err != nil {
 		return
 	}
@@ -560,7 +560,7 @@ func (c *AwsHaProvisionConfig) PromptOsDomainName() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOsDomainUrl() (err error) {
-	osDomainUrl, err := c.Prompt.InputStringRegex("AWS Managed OpenSearch Domain URL", URL_OPTIONAL_PORT_REGEX, URL_OPTIONAL_PORT_REGEX_SAMPLE)
+	osDomainUrl, err := c.Prompt.InputStringRegex("AWS Managed OpenSearch Domain URL [Eg: chef-opensearch.myosdomain.com]", URL_OPTIONAL_PORT_REGEX)
 	if err != nil {
 		return
 	}
@@ -569,7 +569,7 @@ func (c *AwsHaProvisionConfig) PromptOsDomainUrl() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOsUserName() (err error) {
-	user, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch User Name")
+	user, err := c.Prompt.InputStringRequired("AWS Managed OpenSearch User Name [Eg: admin]")
 	if err != nil {
 		return
 	}
@@ -587,7 +587,7 @@ func (c *AwsHaProvisionConfig) PromptOsUserPassword() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOsCert() (err error) {
-	awsDefaultCert, err := c.Prompt.Confirm("Do you want to use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL", "yes", "no")
+	awsDefaultCert, err := c.Prompt.Confirm("Use Default AWS Cert to connect with AWS Managed OpenSearch Domain URL", "yes", "no")
 	if err != nil {
 		return
 	}
@@ -825,7 +825,7 @@ func (c *AwsHaProvisionConfig) DefaultAutomateConfigValues() {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateFqdn() (err error) {
-	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN", FQDN_REGEX, FQDN_REGEX_SAMPLE)
+	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN [Eg: my-automate-domain.com]", FQDN_REGEX)
 	if err != nil {
 		return
 	}
@@ -835,7 +835,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateFqdn() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateFqdnRootCa() (err error) {
-	automateFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Automate FQDN Root CA File Path")
+	automateFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Automate FQDN Root CA File Path [Eg: /home/ubuntu/fqdn1-root-ca.pem]")
 	if err != nil {
 		return
 	}
@@ -855,7 +855,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateFqdnRootCa() (err error) {
 
 func (c *AwsHaProvisionConfig) PromptHaveCustomCerts(nodeType string) (customCerts bool, err error) {
 	if c.HasCustomCerts {
-		customCerts, err = c.Prompt.Confirm("Do you have custom certs for "+nodeType+" Nodes", "yes", "no")
+		customCerts, err = c.Prompt.Confirm("Use custom certs for "+nodeType+" Nodes", "yes", "no")
 		if err != nil {
 			return
 		}
@@ -924,7 +924,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateAdminPassword() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, "m5.large")
 	if err != nil {
 		return
 	}
@@ -933,7 +933,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerFqdn() (err error) {
-	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN", FQDN_REGEX, FQDN_REGEX_SAMPLE)
+	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN [Eg: my-infraserver-domain.com]", FQDN_REGEX)
 	if err != nil {
 		return
 	}
@@ -943,7 +943,7 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerFqdn() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerFqdnRootCa() (err error) {
-	chefInfraServerFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Chef Infra Server FQDN Root CA File Path")
+	chefInfraServerFqdnRootCaFilePath, err := c.Prompt.InputExistingFilePath("Chef Infra Server FQDN Root CA File Path [Eg: /home/ubuntu/fqdn2-root-ca.pem]")
 	if err != nil {
 		return
 	}
@@ -995,7 +995,7 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerNodes() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -1004,7 +1004,7 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPostgresqlInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for PostgreSQL", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for PostgreSQL [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -1013,7 +1013,7 @@ func (c *AwsHaProvisionConfig) PromptPostgresqlInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOpenSearchInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for OpenSearch", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for OpenSearch [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
 	if err != nil {
 		return
 	}
@@ -1214,7 +1214,7 @@ func (c *AwsHaProvisionConfig) PromptOpenSearchVolType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateLoadBalancerCertArn() (err error) {
-	certArn, err := c.Prompt.InputStringRequired("AWS Load Balancer Cert ARN for Automate")
+	certArn, err := c.Prompt.InputStringRequired("AWS Load Balancer Cert ARN for Automate [Eg: arn:aws:acm:eu-west-1:*******:certificate/6b***]")
 	if err != nil {
 		return
 	}
@@ -1223,7 +1223,7 @@ func (c *AwsHaProvisionConfig) PromptAutomateLoadBalancerCertArn() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfrServerLoadBalancerCertArn() (err error) {
-	certArn, err := c.Prompt.InputStringRequired("AWS Load Balancer Cert ARN for Chef Infra Server")
+	certArn, err := c.Prompt.InputStringRequired("AWS Load Balancer Cert ARN for Chef Infra Server [Eg: arn:aws:acm:eu-west-1:*******:certificate/6b***]")
 	if err != nil {
 		return
 	}
@@ -1288,7 +1288,7 @@ func (c *AwsHaProvisionConfig) PromptSsh() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptSshUser() (sshUser string, err error) {
-	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX, LINUX_USER_REGEX_SAMPLE)
+	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX)
 	if err != nil {
 		return
 	}
@@ -1328,7 +1328,7 @@ func (c *AwsHaProvisionConfig) PromptSshKey() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptCustomCerts() (err error) {
-	noCustomCerts, err := c.Prompt.Confirm("Will you use custom certs for any service like Automate, Chef Infra Server, PostgreSQL, OpenSearch", "no", "yes")
+	noCustomCerts, err := c.Prompt.Confirm("Use custom certs for one or all service like Automate, Chef Infra Server, PostgreSQL, OpenSearch", "no", "yes")
 	if err != nil {
 		return
 	}
@@ -1341,13 +1341,13 @@ func (c *AwsHaProvisionConfig) PromptCustomCerts() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptBackup() (err error) {
-	isBackupNeeded, err := c.Prompt.Confirm("Backup need to be configured during deployment", "yes", "no")
+	isBackupNeeded, err := c.Prompt.Confirm("Configure backup during deployment", "yes", "no")
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitAws().BackupMount = "/mnt/automate_backups"
 		backupConfig := "s3"
 
 		if !c.Config.InitAws().InitConfigAwsSettings().SetupManagedServices {
-			_, backupOption, err1 := c.Prompt.Select("Which backup option will you use", "AWS S3", "EFS")
+			_, backupOption, err1 := c.Prompt.Select("Backup type", "AWS S3", "EFS")
 			if err1 != nil {
 				return err1
 			}
