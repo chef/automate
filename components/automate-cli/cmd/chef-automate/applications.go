@@ -514,7 +514,7 @@ func (s *serviceSet) PrintTSV() error {
 		len(s.statusLabelFor(svc)),
 	)
 
-	fmt.Fprintf(os.Stderr, fmtString, "id", "svc.group", "release", "FQDN", "app:env", "status")
+	fmt.Printf(fmtString, "id", "svc.group", "release", "FQDN", "app:env", "status")
 	for _, svc := range s.services {
 		fmt.Printf("%s\t%s\t%s\t%s\t%s:%s\t%s\n",
 			svc.Id,
