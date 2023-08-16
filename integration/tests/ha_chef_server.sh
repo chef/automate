@@ -176,6 +176,30 @@ do_test_deploy() {
     hab pkg exec chef/automate-cs-nginx chef-server-ctl test --smoke --skip-status
 }
 
+do_dump_logs() {
+
+  do_dump_logs_default
+
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend1_container_name"
+
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend2_container_name"
+
+    if command -v buildkite-agent; then
+
+        if ! buildkite-agent artifact upload "logs/*"
+
+        then
+
+            echo "Failed to frontend conatiner logs"
+
+        fi
+
+    fi
+
+    rm -r "$tmpdir"
+
+}
+
 do_cleanup() {
     docker stop "$_frontend1_container_name"
     docker stop "$_frontend2_container_name"
