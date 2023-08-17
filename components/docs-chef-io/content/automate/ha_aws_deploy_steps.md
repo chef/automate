@@ -94,6 +94,15 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     "
     ```
+    or 
+
+    Generate the empty config and populate manually
+    ```bash
+    sudo -- sh -c "
+    chef-automate init-ha-config aws
+    "
+    ```
+    
     Click [here](/automate/ha_config_gen) to know more about generating config
 
 

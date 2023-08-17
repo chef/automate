@@ -99,7 +99,15 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     "
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
-    
+
+    or
+
+    Generate the empty config and populate manually
+    ```bash
+    sudo -- sh -c "
+    chef-automate init-ha-config aws
+    "
+    ```
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
