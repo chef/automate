@@ -2,8 +2,18 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
+	"github.com/chef/automate/lib/config"
+	"github.com/chef/automate/lib/httputils"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/pmt"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -107,4 +117,45 @@ func GetEnabledFlags(cmd *cobra.Command, flagsToIgnore map[string]int) string {
 		}
 	})
 	return flags
+}
+
+func executeConfigVerify(configFile string) error {
+
+	log, err := logger.NewLogger("text", "info")
+	if err != nil {
+		return err
+	}
+
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(
+		verifysystemdcreate.NewSystemdCreateUtilsImpl(),
+		BINARY_DESTINATION_FOLDER,
+		SYSTEMD_PATH,
+		false,
+		writer,
+	)
+	if err != nil {
+		return err
+	}
+	deps := &verifyCmdDeps{
+		getAutomateHAInfraDetails: getAutomateHAInfraDetails,
+		PopulateHaCommonConfig:    PopulateHaCommonConfig,
+	}
+	c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, verifysystemdcreate.NewSystemdCreateUtilsImpl(), config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer, deps)
+	return c.RunVerify(configFile)
+}
+func executeConfigVerifyAndPromptConfirmationOnError(configFile string) error {
+	err := executeConfigVerify(configFile)
+	if err != nil {
+		fsu := fileutils.NewFileSystemUtils()
+		p := pmt.PromptFactory(os.Stdin, os.Stdout, fsu)
+		ok, err := p.Confirm("Config verification failed. Do you still wan to continue?", "yes", "no")
+		if err != nil {
+			return status.Wrap(err, status.PromptFailed, err.Error())
+		}
+		if !ok {
+			err = errors.New("failed to confirm overwrite")
+			return status.Annotate(err, status.ConfigVerifyError)
+		}
+	}
+	return nil
 }

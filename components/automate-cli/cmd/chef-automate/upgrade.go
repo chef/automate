@@ -54,6 +54,7 @@ var upgradeRunCmdFlags = struct {
 	acceptMLSA           bool
 	upgradeHAWorkspace   string
 	saas                 bool
+	skipVerify           bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -385,6 +386,12 @@ func restartDeploymentService() error {
 }
 
 func runAutomateHAFlow(args []string, offlineMode bool) error {
+	if !upgradeRunCmdFlags.skipVerify {
+		err := executeConfigVerifyAndPromptConfirmationOnError("")
+		if err != nil {
+			return err
+		}
+	}
 	isManagedServices := isManagedServicesOn()
 	if isManagedServices && !upgradeRunCmdFlags.upgradefrontends {
 		return status.Annotate(
@@ -965,6 +972,14 @@ func init() {
 		// Call parent help func
 		command.Parent().HelpFunc()(command, strings)
 	})
+
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.skipVerify,
+		"skip-verify",
+		"",
+		false,
+		"Flag for skipping config verification check")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("skip-storage-check", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	if !isDevMode() {
 		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
