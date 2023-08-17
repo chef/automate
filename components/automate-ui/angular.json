@@ -25,7 +25,8 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "src/modernizr-custom.js"
+              "src/modernizr-custom.js",
+              "src/bundle.js"
             ],
             "allowedCommonJsDependencies": [
               "hogan.js"
