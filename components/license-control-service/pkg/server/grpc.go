@@ -66,7 +66,7 @@ func StartGRPC(ctx context.Context, config *Config) error {
 	// Setup our gRPC connection factory
 	connFactory := secureconn.NewFactory(*config.ServiceCerts)
 
-	cerealConn, err := connFactory.Dial("cereal-service", config.CerealHost)
+	cerealConn, err := connFactory.Dial("cereal-service", config.CerealConfig.Target)
 	if err != nil {
 		return errors.Wrap(err, "error dialing cereal service")
 	}
