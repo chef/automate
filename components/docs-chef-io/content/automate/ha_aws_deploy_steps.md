@@ -25,7 +25,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - If you want to use Default VPC, we have to create public and private subnets, If subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
 - We recommend creating a new vpc. And Bastion should be in the same VPC.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`.
+- Get AWS user credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess` or attach IAM Role to the Bastion machine with the same privileges.
 
     Set these in `~/.aws/credentials` in Bastion Host:
 
@@ -111,6 +111,12 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
+{{< note >}}
+
+Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**
+
+{{< /note >}}
+
 #####  Config Verify
 1. After successful provision, run verify config command:
 
@@ -124,7 +130,7 @@ Run the following steps on Bastion Host Machine:
 
 ##### Steps to deploy
 
-1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of a previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
+1. The following command will run the deployment.
 
     ```bash
     sudo -- sh -c "
@@ -238,7 +244,7 @@ Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Post
     instance_count = "3"
 [aws]
   [aws.config]
-    profile = "default"
+    profile = "default"  #This should be commented incase if IAM role is attached
     region = "us-east-2"
     aws_vpc_id = "vpc12318h"
     private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]

@@ -29,7 +29,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
 - For Backup with Managed Service, we have only one option: ' Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
+- Get AWS user credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess` or attach IAM Role to the Bastion machine with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 - Preferred key type will be ed25519
 - Ensure your Linux has the `sysctl` utility available in all nodes.
 
@@ -117,6 +117,12 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     "
     ```
 
+{{< note >}}
+
+Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**
+
+{{< /note >}}
+
 #####  Config Verify
 1. After successful provision, run verify config command:
 
@@ -130,7 +136,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
 
 
 ##### Steps to deploy
-1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
+1. The following command will run the deployment.
 
     ```bash
     sudo -- sh -c "
@@ -245,7 +251,7 @@ After successful deployment, proceed with following...
     instance_count = "0"
 [aws]
   [aws.config]
-    profile = "default"
+    profile = "default"   #This should be commented incase if IAM role is attached
     region = "us-east-2"
     aws_vpc_id = "vpc12318h"
     private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
