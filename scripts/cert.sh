@@ -13,7 +13,7 @@ openssl genrsa -out admin.key 2048
 openssl req -new -key admin.key -out admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
  
 #Use the CSR to generate the signed node Certificate:
-openssl x509 -extfile <(printf "subjectAltName=DNS:chefadmin") -req -in admin.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out admin.pem -sha256
+openssl x509 -extfile <(printf "subjectAltName=DNS:chefadmin") -req -in admin.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out admin.pem -sha256 -days 2042
  
 # root pem cert that signed the below cert/key pairs below
 # Used for hab_sup_http_gateway_ca_cert 
