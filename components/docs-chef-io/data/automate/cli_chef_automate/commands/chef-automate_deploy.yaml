@@ -37,6 +37,9 @@ options:
   default_value: "false"
   usage: Deploy regardless of pre-flight conditions
   compatible_with_options: Automate
+- name: skip-verify
+  default_value: "false"
+  usage: Flag for skipping config verification check
 - name: upgrade-strategy
   default_value: at-once
   usage: Upgrade strategy to use for this deployment.
