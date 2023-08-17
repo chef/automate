@@ -54,6 +54,7 @@ module AutomateCluster
     default(:secrets_store_file, 'secrets.json').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
     default :backup_mount, '/mnt/automate_backups'
     default :habitat_uid_gid, ''
+    default :automate_dc_token, ''
 
     config_context :automate do
       default(:admin_password, '').writes_value do |password|

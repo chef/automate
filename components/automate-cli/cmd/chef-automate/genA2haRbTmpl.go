@@ -27,6 +27,7 @@ backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 {{ if .Architecture.ConfigInitials.BackupMount }} 
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 {{ end }}
+{{ if .Architecture.ConfigInitials.AutomateDcToken }} automate_dc_token "{{ .Architecture.ConfigInitials.AutomateDcToken }}" {{ end }}
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
 ### Automate frontend node related settings                 ###
@@ -149,6 +150,7 @@ backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
+{{ if .Architecture.ConfigInitials.AutomateDcToken }} automate_dc_token "{{ .Architecture.ConfigInitials.AutomateDcToken }}" {{ end }}
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
 ### Automate frontend node related settings                 ###

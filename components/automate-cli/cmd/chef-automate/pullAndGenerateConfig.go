@@ -46,6 +46,7 @@ type HAAwsAutoTfvars struct {
 	BucketName                         string   `json:"bucket_name"`
 	Architecture                       string   `json:"architecture"`
 	SshKeyFileName                     string   `json:"aws_ssh_key_pair_name"`
+	AutomateDcToken                    string   `json:"automate_dc_token"`
 	AwsVpcId                           string   `json:"aws_vpc_id"`
 	AmiID                              string   `json:"aws_ami_id"`
 	AwsCidrBlockAddr                   string   `json:"aws_cidr_block_addr"`
@@ -103,6 +104,7 @@ type HATfvars struct {
 	SshKeyFile                   string      `json:"ssh_key_file"`
 	SshPort                      string      `json:"ssh_port"`
 	SshUser                      string      `json:"ssh_user"`
+	AutomateDcToken              string      `json:"automate_dc_token"`
 	SSHGroupName                 string      `json:"ssh_group_name"`
 	HabitatUidGid                string      `json:"habitat_uid_gid"`
 	PostgresqlArchiveDiskFsPath  string      `json:"postgresql_archive_disk_fs_path"`
@@ -507,6 +509,10 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
 		sharedConfigToml.Automate.Config.RootCA = csRootCA
 	}
+
+	if csToken := getTokenFromCS(csConfigMap); len(csToken) > 0 {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateDcToken = csToken
+	}
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 
 	objectStorageConfig := getS3BackConfig(a2ConfigMap)
@@ -892,6 +898,9 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
 		sharedConfigToml.Automate.Config.RootCA = csRootCA
 	}
+	if csToken := getTokenFromCS(csConfigMap); len(csToken) > 0 {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateDcToken = csToken
+	}
 	if csPrivKey, csPubKey := getPrivateAndPublicKeyFromFE(csConfigMap); len(csPrivKey) > 0 && len(csPubKey) > 0 {
 		sharedConfigToml.ChefServer.Config.PrivateKey = csPrivKey
 		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
@@ -1009,6 +1018,7 @@ func getExistingHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigT
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
 	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(tfvarConfig.SSHGroupName)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
+	sharedConfigToml.Architecture.ConfigInitials.AutomateDcToken = strings.TrimSpace(tfvarConfig.AutomateDcToken)
 	sharedConfigToml.Automate.Config.Fqdn = strings.TrimSpace(tfvarConfig.AutomateFqdn)
 	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
 	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
@@ -1091,6 +1101,7 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
 	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(tfvarConfig.SSHGroupName)
+	sharedConfigToml.Architecture.ConfigInitials.AutomateDcToken = strings.TrimSpace(tfvarConfig.AutomateDcToken)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
 	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
 	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
@@ -1196,6 +1207,18 @@ func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
 		if ele.Global.V1.External != nil && ele.Global.V1.External.Automate != nil && ele.Global.V1.External.Automate.Ssl != nil && ele.Global.V1.External.Automate.Ssl.RootCert != nil {
 			return ele.GetGlobal().V1.External.Automate.Ssl.RootCert.Value
+		}
+	}
+	return ""
+}
+
+func getTokenFromCS(config map[string]*dc.AutomateConfig) string {
+	if config == nil {
+		return ""
+	}
+	for _, ele := range config {
+		if ele.Global.V1.External != nil && ele.Global.V1.External.Automate != nil && ele.Global.V1.External.Automate.Auth != nil && ele.Global.V1.External.Automate.Auth.Token != nil {
+			return ele.GetGlobal().V1.External.Automate.Auth.Token.Value
 		}
 	}
 	return ""
