@@ -45,13 +45,13 @@ func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, worke
 }
 
 func createRuleForSchedule() (*rrule.RRule, error) {
-	t := time.Now()
-	modifiedTime := time.Date(t.Year(), t.Month(), t.Day(), 4, 0, 0, 0, t.Location())
+	//t := time.Now()
+	//modifiedTime := time.Date(t.Year(), t.Month(), t.Day(), 4, 0, 0, 0, t.Location())
 
 	return rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.DAILY,
-		Interval: 1,
-		Dtstart:  modifiedTime,
+		Freq:     rrule.SECONDLY,
+		Interval: 60,
+		Dtstart:  time.Now(),
 	})
 
 }
