@@ -201,7 +201,7 @@ func TestCheckSshConnection(t *testing.T) {
 					Passed:        false,
 					SuccessMsg:    "",
 					ErrorMsg:      "SSH user is unaccessible for the node with IP: " + nodeIp,
-					ResolutionMsg: "Give SSH access to the user with the give key on the node: " + nodeIp,
+					ResolutionMsg: "Give SSH access to the user with the given key on the node: " + nodeIp,
 				},
 				{
 					Title:         FailureSudoPassword,
