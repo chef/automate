@@ -49,8 +49,8 @@ func createRuleForSchedule() (*rrule.RRule, error) {
 	modifiedTime := time.Date(t.Year(), t.Month(), t.Day(), 4, 0, 0, 0, t.Location())
 
 	return rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.SECONDLY,
-		Interval: 60,
+		Freq:     rrule.DAILY,
+		Interval: 1,
 		Dtstart:  modifiedTime,
 	})
 
