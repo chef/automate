@@ -96,6 +96,15 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
 
+    or
+
+    Generate the empty config and populate manually
+    ```bash
+    sudo -- sh -c "
+    chef-automate init-ha-config existing_infra
+    "
+    ```
+
 #####  Config Verify
 1. We verify the above config using the below command :
 
@@ -208,6 +217,15 @@ See the steps [here](#steps-to-run-on-bastion-host-machine) to run on Bastion to
     sudo chef-automate config gen config.toml
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
+
+    or
+
+    Generate the empty config and populate manually
+    ```bash
+    sudo -- sh -c "
+    chef-automate init-ha-config existing_infra
+    "
+    ```
 
 #####  Config Verify
 1. We verify the above config using the below command:
@@ -329,6 +347,15 @@ See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion
     sudo chef-automate config gen config.toml
     ```
     Click [here](/automate/ha_config_gen) to know more about generating config
+
+    or
+
+    Generate the empty config and populate manually
+    ```bash
+    sudo -- sh -c "
+    chef-automate init-ha-config existing_infra
+    "
+    ```
 
 #####  Config Verify
 1. We verify the above config using the below command :
