@@ -29,9 +29,9 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
 - For Backup with Managed Service, we have only one option: ' Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Get AWS user credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess` or attach IAM Role to the Bastion machine with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 - Preferred key type will be ed25519
 - Ensure your Linux has the `sysctl` utility available in all nodes.
+- For creating resources during provision, Bastion machine should have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. This can be achived by attaching IAM Role to the Bastion machine or by creating AWS user credentials (`aws_access_key_id` and `aws_secret_access_key`). Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 
 Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step is not required in case of IAM role is configured on Bastion Host:
 
