@@ -122,8 +122,8 @@ The first column in the table below represents the source of the connection. The
 
 |                 | Chef Automate        | Chef Infra Server    | PostgreSQL                                | OpenSearch                           | Bastion | Automate Load Balancer |
 | --------------- | -------------------- | -------------------- | ----------------------------------------- | ------------------------------------ | ------- | ------------- |
-| Chef Automate   |                      |                      | 7432                                      | 9200                                 |         |               |
-| Infra Server    |                      |                      | 7432                                      | 9200                                 |         | 443              |
+| Chef Automate   |                      |                      | 7432, 9631                                       | 9200, 9631                                  |         |               |
+| Infra Server    |                      |                      | 7432, 9631                                       | 9200, 9631                                  |         | 443              |
 | PostgreSQL      |                      |                      | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |               |
 | OpenSearch      |                      |                      |                                           | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |               |
 | Bastion         | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7432, 7799                | 22, 9631, 9638, 9200, 7799           |         | 22            |
@@ -188,8 +188,8 @@ The AWS deployment specific pre-requisites are as follows:
 
 ### Storage Space for Bastion
 
--   Operating System Root Volume (`/`) must be at least 40GB. Temporary space (`/var/tmp`) must be at least 5GB.
--   Separate Hab volume should be provisioned and mounted at `/hab` with at least 100GB free space.
+-   Operating System Root Volume (`/`) must be at least 40GB. Temporary space (`/var/tmp`) must be at least 10GB.
+-   Separate Hab volume should be provisioned and mounted at `/hab` with at least 200GB space.
 
 ### SSH User
 
