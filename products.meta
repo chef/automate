@@ -73,8 +73,9 @@
       "services": [
         "chef/backup-gateway",
         "chef/deployment-service",
+        "chef/cereal-service",
         "chef/license-control-service",
-        "chef/automate-load-balancer"
+        "chef/automate-load-balancer"     
       ],
       "packages": [
         "chef/automate-cli",
