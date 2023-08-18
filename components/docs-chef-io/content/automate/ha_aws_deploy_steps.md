@@ -25,7 +25,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - If you want to use Default VPC, we have to create public and private subnets, If subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
 - We recommend creating a new vpc. And Bastion should be in the same VPC.
-- Attach IAM role to the Bastion with `AmazonS3FullAccess`, `AdministratorAccess` privileges or get AWS user credeintials with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
+- Attach IAM role to the Bastion with `AmazonS3FullAccess`, `AdministratorAccess` privileges or get AWS user credentials with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 
 Set the AWS user credentials in `~/.aws/credentials` in Bastion Host:
 
