@@ -44,6 +44,15 @@ type SSHUser struct {
 type FileSystem struct {
 	MountLocation string `json:"mount_location"`
 }
+type GcpCloudStorage struct {
+	Endpoint    string `json:"endpoint"`
+	BucketName  string `json:"bucket_name"`
+	BasePath    string `json:"base_path"`
+	KeyFilePath string `json:"key_file_path"`
+	ProjectId   string `json:"project_id"`
+	Region      string `json:"region"`
+}
+
 type ObjectStorage struct {
 	Endpoint   string `json:"endpoint"`
 	BucketName string `json:"bucket_name"`
@@ -53,8 +62,9 @@ type ObjectStorage struct {
 	AWSRegion  string `json:"aws_region"`
 }
 type Backup struct {
-	FileSystem    *FileSystem    `json:"file_system"`
-	ObjectStorage *ObjectStorage `json:"object_storage"`
+	FileSystem      *FileSystem      `json:"file_system"`
+	ObjectStorage   *ObjectStorage   `json:"object_storage"`
+	GcpCloudStorage *GcpCloudStorage `json:"gcp_cloud_storage"`
 }
 
 type Certificate struct {
