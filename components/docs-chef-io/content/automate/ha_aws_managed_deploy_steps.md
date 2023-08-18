@@ -251,7 +251,7 @@ After successful deployment, proceed with following...
     instance_count = "0"
 [aws]
   [aws.config]
-    profile = "default"   #This should be commented incase if IAM role is attached
+    profile = "default"   # This should be commented incase if IAM role is attached
     region = "us-east-2"
     aws_vpc_id = "vpc12318h"
     private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
