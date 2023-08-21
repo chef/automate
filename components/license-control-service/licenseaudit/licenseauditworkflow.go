@@ -53,7 +53,7 @@ func createRuleForSchedule() (*rrule.RRule, error) {
 
 	return rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.DAILY,
-		Interval: 60,
+		Interval: 1,
 		Dtstart:  modifiedTime,
 	})
 
