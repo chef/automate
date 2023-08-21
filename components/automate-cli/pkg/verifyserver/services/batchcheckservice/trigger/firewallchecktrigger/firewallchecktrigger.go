@@ -80,24 +80,28 @@ func getRequestsForAutomateAsSource(config *models.Config) []models.FirewallRequ
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		// Dest postgres
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "7432",
-				DestinationServiceProtocol: "tcp",
+			for _, port := range frontendToPostgresqlPorts {
+				reqBody := models.FirewallRequest{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
+				}
+				reqBodies = append(reqBodies, reqBody)
 			}
-			reqBodies = append(reqBodies, reqBody)
 		}
 
+		//Dest Opensearch
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			//Dest Opensearch
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9200",
-				DestinationServiceProtocol: "tcp",
+			for _, port := range frontendToOpensearchPorts {
+				reqBody := models.FirewallRequest{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
+				}
+				reqBodies = append(reqBodies, reqBody)
 			}
-			reqBodies = append(reqBodies, reqBody)
 		}
 	}
 	return reqBodies
@@ -111,24 +115,29 @@ func getRequestsForChefServerAsSource(config *models.Config) []models.FirewallRe
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		// Dest postgres
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "7432",
-				DestinationServiceProtocol: "tcp",
+			for _, port := range frontendToPostgresqlPorts {
+				reqBody := models.FirewallRequest{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
+				}
+				reqBodies = append(reqBodies, reqBody)
 			}
-			reqBodies = append(reqBodies, reqBody)
+
 		}
 
 		// Dest opensearch
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9200",
-				DestinationServiceProtocol: "tcp",
+			for _, port := range frontendToOpensearchPorts {
+				reqBody := models.FirewallRequest{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
+				}
+				reqBodies = append(reqBodies, reqBody)
 			}
-			reqBodies = append(reqBodies, reqBody)
 		}
 
 	}
