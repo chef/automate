@@ -174,21 +174,27 @@ func (c *HaDeployConfig) validateAwsBackupConfig() error {
 
 func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage) error {
 	errorList := list.New()
-	if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(objectStorage.SecretKey, "secret_key"); err != nil {
-		errorList.PushBack(err)
-	}
 	if err := validateRequiredString(objectStorage.BucketName, "bucket_name"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateS3Endpoint(objectStorage.Endpoint); err != nil {
-		errorList.PushBack(err)
-	}
-	if objectStorage.Region != "" {
-		if err := validateS3AWSRegion(objectStorage.Region); err != nil {
+	if objectStorage.GcpServiceAccount != nil {
+		if err := c.verifyGcpStorage(objectStorage.GcpServiceAccount); err != nil {
 			errorList.PushBack(err)
+		}
+	} else {
+		if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
+			errorList.PushBack(err)
+		}
+		if err := validateRequiredString(objectStorage.SecretKey, "secret_key"); err != nil {
+			errorList.PushBack(err)
+		}
+		if err := validateS3Endpoint(objectStorage.Endpoint); err != nil {
+			errorList.PushBack(err)
+		}
+		if objectStorage.Region != "" {
+			if err := validateS3AWSRegion(objectStorage.Region); err != nil {
+				errorList.PushBack(err)
+			}
 		}
 	}
 	return getSingleErrorFromList(errorList)
@@ -713,5 +719,43 @@ func awsChefSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
+	return getSingleErrorFromList(errorList)
+}
+
+func (c *HaDeployConfig) verifyGcpStorage(gcp *GcpServiceAccount) error {
+	errorList := list.New()
+	if err := validateRequiredString(gcp.Type, "type"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.ProjectID, "project_id"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.PrivateKeyID, "private_key_id"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.PrivateKey, "private_key"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.TokenURI, "token_uri"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.ClientID, "client_id"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.ClientEmail, "client_email"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.AuthURI, "auth_uri"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.AuthProviderX509CertURL, "auth_provider_x509_cert_url"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.ClientX509CertURL, "client_x509_cert_url"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(gcp.UniverseDomain, "universe_domain"); err != nil {
+		errorList.PushBack(err)
+	}
 	return getSingleErrorFromList(errorList)
 }

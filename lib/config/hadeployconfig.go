@@ -19,6 +19,20 @@ type HaDeployConfig struct {
 	External      *ExternalSettings      `toml:"external,omitempty"`
 }
 
+type GcpServiceAccount struct {
+	Type                    string `toml:"type"`
+	ProjectID               string `toml:"project_id"`
+	PrivateKeyID            string `toml:"private_key_id"`
+	PrivateKey              string `toml:"private_key"`
+	ClientEmail             string `toml:"client_email"`
+	ClientID                string `toml:"client_id"`
+	AuthURI                 string `toml:"auth_uri"`
+	TokenURI                string `toml:"token_uri"`
+	AuthProviderX509CertURL string `toml:"auth_provider_x509_cert_url"`
+	ClientX509CertURL       string `toml:"client_x509_cert_url"`
+	UniverseDomain          string `toml:"universe_domain"`
+}
+
 type Architecture struct {
 	ExistingInfra *ConfigInitials `toml:"existing_infra,omitempty"`
 	Aws           *ConfigInitials `toml:"aws,omitempty"`
@@ -54,11 +68,12 @@ type CertByIP struct {
 }
 
 type ConfigObjectStorage struct {
-	BucketName string `toml:"bucket_name,omitempty"`
-	AccessKey  string `toml:"access_key,omitempty"`
-	SecretKey  string `toml:"secret_key,omitempty"`
-	Endpoint   string `toml:"endpoint,omitempty"`
-	Region     string `toml:"region,omitempty"`
+	BucketName        string             `toml:"bucket_name,omitempty"`
+	AccessKey         string             `toml:"access_key,omitempty"`
+	SecretKey         string             `toml:"secret_key,omitempty"`
+	Endpoint          string             `toml:"endpoint,omitempty"`
+	Region            string             `toml:"region,omitempty"`
+	GcpServiceAccount *GcpServiceAccount `toml:"gcp_service_account"`
 }
 
 type AutomateSettings struct {
