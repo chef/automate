@@ -5,6 +5,7 @@ import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SigninService } from 'app/services/signin/signin.service';
+import { LicenseUsageService } from 'app/services/license-usage/license-usage.service';
 
 
 @Component({
@@ -24,7 +25,8 @@ export class SigninComponent implements OnInit, OnDestroy {
     private router: Router,
     private session: ChefSessionService,
     private signinService: SigninService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private licenseUsageService: LicenseUsageService
   ) {
     this.route.queryParams
     .pipe(takeUntil(this.destroyed$))
@@ -44,6 +46,7 @@ export class SigninComponent implements OnInit, OnDestroy {
       this.setSession();
       localStorage.setItem('manual-upgrade-banner', 'true');
       this.router.navigateByUrl(this.path);
+      this.licenseUsageService.postAnalyticsUsageDataCall();
     }, (err) => {
       if (err.status === 200 && 'url' in err) {
         window.location.href = err.url;

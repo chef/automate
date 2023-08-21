@@ -11,7 +11,6 @@ import { GetUserPreferences } from './services/user-preferences/user-preferences
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
 import { isNull } from 'lodash';
-import { LicenseUsageService } from './services/license-usage/license-usage.service';
 
 @Component({
   selector: 'app-ui',
@@ -42,8 +41,7 @@ export class UIComponent implements OnInit, AfterViewChecked {
     private cdRef: ChangeDetectorRef,
     private appConfigService: AppConfigService,
     private chefSessionService: ChefSessionService,
-    private userPrefsService: UserPreferencesService,
-    private licenseUsageService: LicenseUsageService
+    private userPrefsService: UserPreferencesService
   ) {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
@@ -59,7 +57,6 @@ export class UIComponent implements OnInit, AfterViewChecked {
         this.layoutFacade.showFullPage();
       }
     });
-    this.licenseUsageService.postAnalyticsUsageDataCall();
   }
 
   ngAfterViewChecked() {
