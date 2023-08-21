@@ -95,7 +95,7 @@ func TestSystemResourceAPI(t *testing.T) {
 					{
 						Title:         "Temp free space check",
 						Passed:        true,
-						SuccessMsg:    fmt.Sprintf("/tmp should have free space >=%vGB or %v%% of total size of /hab", constants.TMP_FREE_DISK_IN_GB, constants.TMP_FREE_DISK_IN_PER*100),
+						SuccessMsg:    fmt.Sprintf("/var/tmp should have free space >=%vGB or %v%% of total size of /hab", constants.TMP_FREE_DISK_IN_GB, constants.TMP_FREE_DISK_IN_PER*100),
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
