@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"os/exec"
 	"strings"
@@ -498,30 +499,36 @@ func (s *serviceSet) Load() error {
 //   - Print table rows as TSV for easier processing, even though the columns
 //     won't align all the time.
 func (s *serviceSet) PrintTSV() error {
-	svc := &applications.Service{}
-	if len(s.services) >= 1 {
-		svc = s.services[0]
+	maxIDLength, maxGroupLength, maxReleaseLength, maxFqdnLength, maxApplicationLength, maxEnvironmentLength, maxStatusLabelLength := 0, 0, 0, 0, 0, 0, 0
+	for _, t := range s.services {
+		maxIDLength = int(math.Max(float64(maxIDLength), float64(len(t.Id))))
+		maxGroupLength = int(math.Max(float64(maxGroupLength), float64(len(t.Group))))
+		maxReleaseLength = int(math.Max(float64(maxReleaseLength), float64(len(t.Release))))
+		maxFqdnLength = int(math.Max(float64(maxFqdnLength), float64(len(t.Fqdn))))
+		maxApplicationLength = int(math.Max(float64(maxApplicationLength), float64(len(t.Application))))
+		maxEnvironmentLength = int(math.Max(float64(maxEnvironmentLength), float64(len(t.Environment))))
+		maxStatusLabelLength = int(math.Max(float64(maxStatusLabelLength), float64(len(s.statusLabelFor(t)))))
 	}
 
 	// calculate a format string with fixed width, right padded strings for each
 	// of the columns
 	fmtString := fmt.Sprintf("%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\n",
-		len(svc.Id),
-		len(svc.Group),
-		len(svc.Release),
-		len(svc.Fqdn),
-		len(svc.Application)+len(svc.Environment)+1,
-		len(s.statusLabelFor(svc)),
+		maxIDLength,
+		maxGroupLength,
+		maxReleaseLength,
+		maxFqdnLength,
+		maxApplicationLength+maxEnvironmentLength+1,
+		maxStatusLabelLength,
 	)
 
 	fmt.Printf(fmtString, "id", "svc.group", "release", "FQDN", "app:env", "status")
 	for _, svc := range s.services {
-		fmt.Printf("%s\t%s\t%s\t%s\t%s:%s\t%s\n",
+		fmt.Printf(fmtString,
 			svc.Id,
 			svc.Group,
 			svc.Release,
 			svc.Fqdn,
-			svc.Application, svc.Environment,
+			svc.Application+":"+svc.Environment,
 			s.statusLabelFor(svc),
 		)
 	}
