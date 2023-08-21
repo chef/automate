@@ -271,6 +271,10 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 }
 
 func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
+	if haConfig == nil {
+		return
+	}
+
 	objectStorageConfig := haConfig.GetObjectStorageConfig()
 	c.Backup = &Backup{
 		ObjectStorage: &ObjectStorage{
@@ -279,6 +283,19 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 			AccessKey:  objectStorageConfig.AccessKey,
 			SecretKey:  objectStorageConfig.SecretKey,
 			Endpoint:   objectStorageConfig.Endpoint,
+			GoogleServiceAccount: &GcpServiceAccount{
+				Type:                    objectStorageConfig.GcpServiceAccount.Type,
+				ProjectID:               objectStorageConfig.GcpServiceAccount.ProjectID,
+				PrivateKeyID:            objectStorageConfig.GcpServiceAccount.PrivateKeyID,
+				PrivateKey:              objectStorageConfig.GcpServiceAccount.PrivateKey,
+				ClientEmail:             objectStorageConfig.GcpServiceAccount.ClientEmail,
+				ClientID:                objectStorageConfig.GcpServiceAccount.ClientID,
+				AuthURI:                 objectStorageConfig.GcpServiceAccount.AuthURI,
+				TokenURI:                objectStorageConfig.GcpServiceAccount.TokenURI,
+				AuthProviderX509CertURL: objectStorageConfig.GcpServiceAccount.AuthProviderX509CertURL,
+				ClientX509CertURL:       objectStorageConfig.GcpServiceAccount.ClientX509CertURL,
+				UniverseDomain:          objectStorageConfig.GcpServiceAccount.UniverseDomain,
+			},
 		},
 	}
 }

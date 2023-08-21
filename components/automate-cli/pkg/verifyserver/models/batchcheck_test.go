@@ -2,11 +2,13 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
 	"github.com/chef/automate/lib/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -631,4 +633,56 @@ func TestPopulateWith(t *testing.T) {
 			// assert.Equal(t, tt.want, c, tt.name)
 		})
 	}
+}
+
+func TestPopulateObjectStorageConfig(t *testing.T) {
+	t.Run("NilConfig", func(t *testing.T) {
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(nil)
+		require.Empty(t, mockConfig)
+	})
+	t.Run("ValidConfig", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+					GcpServiceAccount: &config.GcpServiceAccount{
+						Type:                    "GcpServiceAccount.Type",
+						ProjectID:               "GcpServiceAccount.ProjectID",
+						PrivateKeyID:            "GcpServiceAccount.PrivateKeyID",
+						PrivateKey:              "GcpServiceAccount.PrivateKey",
+						ClientEmail:             "GcpServiceAccount.ClientEmail",
+						ClientID:                "GcpServiceAccount.ClientID",
+						AuthURI:                 "GcpServiceAccount.AuthURI",
+						TokenURI:                "GcpServiceAccount.TokenURI",
+						AuthProviderX509CertURL: "GcpServiceAccount.AuthProviderX509CertURL",
+						ClientX509CertURL:       "GcpServiceAccount.ClientX509CertURL",
+						UniverseDomain:          "GcpServiceAccount.UniverseDomain",
+					},
+				},
+			},
+		}
+
+		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
+
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.NotNil(t, mockConfig)
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.UniverseDomain, "GcpServiceAccount.UniverseDomain")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.ProjectID, "GcpServiceAccount.ProjectID")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.AWSRegion, "Somewhere")
+	})
 }
