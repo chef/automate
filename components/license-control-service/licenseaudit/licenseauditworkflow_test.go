@@ -338,7 +338,7 @@ func Test_getAppendedCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dateToBeAppended := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
-			tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended)
+			tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended, OutputFileName)
 			got := getAppendedCommand(tt.command)
 			assert.Equal(t, tt.want, got)
 		})

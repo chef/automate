@@ -37,7 +37,7 @@ func (e Execute) Execute(command string) (string, error) {
 
 	output := fmt.Sprintf("%s %s", outputBuffer.String(), errorBuffer.String())
 
-	e.log.Infof("Got the output from the license command as %s", output)
+	e.log.Debugf("Got the output from the license command %s as %s", command, output)
 
 	return outputBuffer.String(), nil
 }
