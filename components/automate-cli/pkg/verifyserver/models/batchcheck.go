@@ -44,27 +44,33 @@ type SSHUser struct {
 type FileSystem struct {
 	MountLocation string `json:"mount_location"`
 }
-type GcpCloudStorage struct {
-	Endpoint    string `json:"endpoint"`
-	BucketName  string `json:"bucket_name"`
-	BasePath    string `json:"base_path"`
-	KeyFilePath string `json:"key_file_path"`
-	ProjectId   string `json:"project_id"`
-	Region      string `json:"region"`
+
+type GcpServiceAccount struct {
+	Type                    string `json:"type"`
+	ProjectID               string `json:"project_id"`
+	PrivateKeyID            string `json:"private_key_id"`
+	PrivateKey              string `json:"private_key"`
+	ClientEmail             string `json:"client_email"`
+	ClientID                string `json:"client_id"`
+	AuthURI                 string `json:"auth_uri"`
+	TokenURI                string `json:"token_uri"`
+	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
+	ClientX509CertURL       string `json:"client_x509_cert_url"`
+	UniverseDomain          string `json:"universe_domain"`
 }
 
 type ObjectStorage struct {
-	Endpoint   string `json:"endpoint"`
-	BucketName string `json:"bucket_name"`
-	BasePath   string `json:"base_path"`
-	AccessKey  string `json:"access_key"`
-	SecretKey  string `json:"secret_key"`
-	AWSRegion  string `json:"aws_region"`
+	Endpoint             string             `json:"endpoint"`
+	BucketName           string             `json:"bucket_name"`
+	BasePath             string             `json:"base_path"`
+	AccessKey            string             `json:"access_key"`
+	SecretKey            string             `json:"secret_key"`
+	AWSRegion            string             `json:"aws_region"`
+	GoogleServiceAccount *GcpServiceAccount `json:"gcp_service_account"`
 }
 type Backup struct {
-	FileSystem      *FileSystem      `json:"file_system"`
-	ObjectStorage   *ObjectStorage   `json:"object_storage"`
-	GcpCloudStorage *GcpCloudStorage `json:"gcp_cloud_storage"`
+	FileSystem    *FileSystem    `json:"file_system"`
+	ObjectStorage *ObjectStorage `json:"object_storage"`
 }
 
 type Certificate struct {
