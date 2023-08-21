@@ -17,7 +17,10 @@ var (
 	WorkflowName         = cereal.NewWorkflowName("license-audit")
 	LicenseAuditTaskName = cereal.NewTaskName("license-audit-task")
 	ScheduleName         = "license-audit"
-	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s"
+	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s -o %s"
+	CleanCVSFilesCommand = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate clean"
+	OutputFileName       = "license-audit-report"
+	CleanReportFiles     = "rm -rf %s.*"
 )
 
 func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, workerCount int) error {
@@ -185,6 +188,9 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	log.Infof("License analytics output received is %s", output)
 
+	//If no error in executing the command we can remove the files
+	deleteFilesGenerated(t.ExecuteCommand)
+
 	return &job, nil
 }
 
@@ -196,7 +202,7 @@ func executeCommandforAudit(executeCommand ExecuteCommand, command string) (stri
 // getAppendedCommand gets the appended command with date
 func getAppendedCommand(commandToExecute string) string {
 	yesterdayDate := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
-	return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate)
+	return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate, OutputFileName)
 }
 
 func getWorkflowParametersAndEnqueTask(w cereal.WorkflowInstance) (AuditWorkflowParameters, error) {
@@ -216,4 +222,15 @@ func getWorkflowParametersAndEnqueTask(w cereal.WorkflowInstance) (AuditWorkflow
 	}
 
 	return workflowParams, nil
+}
+
+// deleteFilesGenerated deletes the files generated in license-audit
+func deleteFilesGenerated(executeCommand ExecuteCommand) {
+	commands := []string{CleanCVSFilesCommand, fmt.Sprintf(CleanReportFiles, OutputFileName)}
+	for _, command := range commands {
+		_, err := executeCommandforAudit(executeCommand, command)
+		if err != nil {
+			log.Errorf("Unable to delete the files with err %v", err)
+		}
+	}
 }
