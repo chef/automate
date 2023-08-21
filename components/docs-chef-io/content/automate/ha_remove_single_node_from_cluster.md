@@ -11,7 +11,11 @@ gh_repo = "automate"
     weight = 200
 +++
 
-## Remove Single Node From Cluster on OnPremises Deployment
+Chef Automate HA comes with five different types of deployment flows. This page tells you how to remove nodes from your Automate cluster. Refer to the [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment/) page to see how to add more nodes to your deployment processes.
+
+## Remove Single Node From Cluster on On-Premises Deployment
+
+In this section, we will see how to remove single nodes from cluster on the on-premises deployment for all the databases, i.e., Chef Managed, AWS Managed and Customer Managed Database.
 
 {{< warning >}}
 
@@ -22,28 +26,27 @@ gh_repo = "automate"
 
 {{< /warning >}}
 
-The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove.
-For example,
+The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove. For example,
 
-- If you want to remove the node of automate, you have to run the:
+- To remove the node of automate, run the following command:
 
     ```sh
     chef-automate node remove --automate-ip "<automate-ip-address>"
     ```
 
-- If you want to remove the node of the chef-server, you have to run the:
+- To remove the node of the chef-server, run the following command:
 
     ```sh
     chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
     ```
 
-- If you want to remove the node of OpenSearch, you have to run the:
+- To remove the node of OpenSearch, run the following command:
 
     ```sh
     chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
     ```
 
-- If you want to remove the node of PostgreSQL, you have to run:
+- To remove the node of PostgreSQL, run the following command:
 
     ```sh
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
@@ -63,11 +66,9 @@ Once the command executes, it will remove the supplied node from your HA setup. 
 
 {{< /note >}}
 
-
-
-
-
 ## Remove Single Node From Cluster on AWS Deployment
+
+In this section, we will see how to remove single nodes from the AWS deployment for AWS managed database.
 
 {{< warning >}}
 
@@ -79,25 +80,25 @@ Once the command executes, it will remove the supplied node from your HA setup. 
 
 The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
 
-- If you want to remove the node of automate, you have to run the:
+- To remove the node of automate, run the following command:
 
     ```sh
     chef-automate node remove --automate-ip "<automate-ip-address>"
     ```
 
-- If you want to remove the node of the chef-server, you have to run the:
+- To remove the node of the chef-server, run the following command:
 
     ```sh
     chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
     ```
 
-- If you want to remove the node of OpenSearch, you have to run the:
+- To remove the node of OpenSearch, run the following command:
 
     ```sh
     chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
     ```
 
-- If you want to remove the node of PostgreSQL, you have to run the:
+- To remove the node of PostgreSQL, run the following command:
 
     ```sh
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
