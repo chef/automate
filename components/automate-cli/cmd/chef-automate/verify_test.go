@@ -208,7 +208,7 @@ func TestRunVerifyCmd(t *testing.T) {
 			wantErr:    nil,
 		},
 		{
-			description: "bastion without automate-verify - success",
+			description: "bastion without automate-verify",
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 					if strings.Contains(url, "batch-check") {
@@ -259,7 +259,7 @@ func TestRunVerifyCmd(t *testing.T) {
 				},
 			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
-			wantErr:    nil,
+			wantErr:    errors.New("This might be due to not enabling the 7799 port"),
 		},
 		{
 			description: "Failed to get automate HA infra details",
@@ -379,6 +379,8 @@ func TestRunVerifyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
+			oldBuildTimeVal := version.BuildTime
+			version.BuildTime = "20230622174934"
 			ConvTfvarToJsonFunc = tt.ConvTfvarToJsonFunc
 			cw := majorupgrade_utils.NewCustomWriter()
 
@@ -402,6 +404,7 @@ func TestRunVerifyCmd(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+			version.BuildTime = oldBuildTimeVal
 		})
 	}
 }
