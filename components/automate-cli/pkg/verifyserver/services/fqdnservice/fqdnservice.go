@@ -19,7 +19,7 @@ import (
 )
 
 type IFqdnService interface {
-	CheckFqdnReachability(models.FqdnRequest, string) models.FqdnResponse
+	CheckFqdnReachability(models.FqdnRequest, string, time.Duration) models.FqdnResponse
 }
 
 type FqdnService struct {
@@ -111,35 +111,41 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 }
 
 // makeConcurrentCalls function is making 50 concurrent calls for checking node reachability.
-func (fq *FqdnService) MakeConcurrentCalls(url string, client *http.Client, setNodes map[string]int) error {
+func (fq *FqdnService) MakeConcurrentCalls(url string, client *http.Client, setNodes map[string]int, duration time.Duration) error {
 	fq.log.Debug("Making Concurrent Calls...")
 	fqdnResultChan := make(chan string)
 	minNumberOfCalls := 5 * len(setNodes)
-	for i := 0; i < minNumberOfCalls; i++ {
-		go func(fqdnResultChan chan string) {
-			res, err := client.Get(url)
-			if err != nil {
-				fq.log.Error(err.Error())
-				fqdnResultChan <- constants.CHAN_RESULT_ERROR_MESSAGE
-				return
+	timestamp := time.Now().Add(duration)
+	for time.Now().Before(timestamp) {
+		for i := 0; i < minNumberOfCalls; i++ {
+			go func(fqdnResultChan chan string) {
+				res, err := client.Get(url)
+				if err != nil {
+					fq.log.Error(err.Error())
+					fqdnResultChan <- constants.CHAN_RESULT_ERROR_MESSAGE
+					return
+				}
+				nodeIP := res.Header.Get(constants.SERVER_IP_HEADER_KEY)
+				fqdnResultChan <- nodeIP
+			}(fqdnResultChan)
+		}
+
+		for i := 0; i < minNumberOfCalls; i++ {
+			chanResult := <-fqdnResultChan
+			if chanResult == constants.CHAN_RESULT_ERROR_MESSAGE {
+				continue
 			}
-			nodeIP := res.Header.Get(constants.SERVER_IP_HEADER_KEY)
-			fqdnResultChan <- nodeIP
-		}(fqdnResultChan)
+			delete(setNodes, chanResult)
+			//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
+			if len(setNodes) == 0 {
+				fq.log.Debug("All nodes are reachable.")
+				return nil
+			}
+		}
+
+		time.Sleep(5 * time.Second)
 	}
 
-	for i := 0; i < minNumberOfCalls; i++ {
-		chanResult := <-fqdnResultChan
-		if chanResult == constants.CHAN_RESULT_ERROR_MESSAGE {
-			continue
-		}
-		delete(setNodes, chanResult)
-		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
-		if len(setNodes) == 0 {
-			fq.log.Debug("All nodes are reachable.")
-			return nil
-		}
-	}
 	return errors.New("nodes are not reachable")
 }
 
@@ -181,7 +187,7 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 }
 
 // nodeReachable function will check that our load balancer will correctly redirecting to all the nodes or not.
-func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, isAfterDeployment bool, port string) models.Checks {
+func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, isAfterDeployment bool, port string, duration time.Duration) models.Checks {
 	fq.log.Debug("Checking Node Reachability...")
 	setNodes, err := makeSet(reqNodes, isAfterDeployment)
 	if err != nil {
@@ -199,7 +205,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, i
 
 	client := fq.createClient(rootCert)
 
-	err = fq.MakeConcurrentCalls(url, client, setNodes)
+	err = fq.MakeConcurrentCalls(url, client, setNodes, duration)
 	if err != nil {
 		fq.log.Debug("All nodes are not reachable")
 		errorMessage := createErrorMessage(setNodes, reqNodes, isAfterDeployment)
@@ -246,7 +252,7 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 	}
 }
 
-func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string) models.FqdnResponse {
+func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string, duration time.Duration) models.FqdnResponse {
 	var response = models.FqdnResponse{}
 	var check models.Checks
 
@@ -268,7 +274,7 @@ func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string
 	response.Checks = append(response.Checks, check)
 
 	if fqdnReachabilityCheck {
-		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, req.IsAfterDeployment, port)
+		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, req.IsAfterDeployment, port, duration)
 	} else {
 		check = createCheck(constants.NODE_TITLE, false, "", fmt.Sprintf(constants.NODE_ERROR_MESSAGE, req.Nodes), constants.NODE_RESOLUTION_MESSAGE)
 	}
