@@ -1,5 +1,5 @@
 +++
-title = "Autoamte HA Config Generation"
+title = "Automate HA Config Generation"
 draft = false
 gh_repo = "automate"
 
@@ -15,12 +15,13 @@ gh_repo = "automate"
 {{< /warning >}}
 
 ## Command Usage
-    ```bash 
+
+    ```bash
     sudo -- sh -c "
     chef-automate config gen config.toml
     "
     ```
-    
+
 `config.toml` is the file where all the generated config will be saved at the end, you can choose to not provide this then the output will be shown to stdout.
 
 Refer the fields below to generate Chef Automate High Availability (HA) configuration using `chef-automate config gen` command
@@ -34,7 +35,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 -  `ssh port no` port to do ssh, default is 22 incase you have different port then provide the ssh port no
 -  `ssh key file path` ssh key file path, same will be used to ssh to cluster instances
 -  `Automate FQDN` automate FQDN name Example `chefautomate.example.com`.
--  `Automate FQDN ARN` for Aws deployment ARN name is requied for Automate FQDN domain.
+-  `Automate FQDN ARN` for Aws deployment ARN name is required for Automate FQDN domain.
 -  `Automate FQDN Root Certificate` ssl root certificate for Automate FQDN domain.
 -  `Automate Admin Password` Admin password to login to automate dashboard.
 -  `Chef Server FQDN` automate FQDN name Example `chefserver.example.com`.

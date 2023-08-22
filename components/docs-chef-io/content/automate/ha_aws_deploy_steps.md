@@ -1,13 +1,13 @@
 +++
-title = "AWS Deployment"
+title = "AWS Deployment with Chef Managed Database"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "AWS Deployment"
+    title = "AWS Deployment with Chef Managed Database"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_aws_deploy_steps.md AWS Deployment"
+    identifier = "automate/deploy_high_availability/deployment/ha_aws_deploy_steps.md AWS Deployment with Chef Managed Database"
     weight = 230
 +++
 
@@ -266,12 +266,6 @@ Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Post
     automate_ebs_volume_type = "gp3"
     lb_access_logs = "true"
 ```
-
-## Add more nodes In AWS Deployment post deployment
-
-
-## Remove Single Node From Cluster on AWS Deployment
-
 
 ## Uninstall Chef automate HA
 

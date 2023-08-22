@@ -1,13 +1,13 @@
 +++
-title = "AWS Managed Services Deployment"
+title = "AWS Deployment with AWS Managed Database"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "AWS Managed Services Deployment"
+    title = "AWS Deployment with AWS Managed Database"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_aws_managed_deploy_steps.md AWS Managed Services"
+    identifier = "automate/deploy_high_availability/deployment/ha_aws_managed_deploy_steps.md AWS Deployment with AWS Managed Database"
     weight = 240
 +++
 
@@ -291,6 +291,3 @@ After successful deployment, proceed with following...
 - Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`.
 - Provide `ami_id` for the region where the infra is created. Eg: `ami-0bb66b6ba59664870`.
 - Provide `certificate ARN` for both automate and Chef servers in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn`, respectively.
-
-## Add more nodes In AWS Deployment post deployment
-
