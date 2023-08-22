@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -36,6 +37,6 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "node_type should be automate or chef-infra-server, Please provide node_type.")
 	}
 
-	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT)
+	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT, time.Minute*1)
 	return c.JSON(response.BuildSuccessResponse(res))
 }

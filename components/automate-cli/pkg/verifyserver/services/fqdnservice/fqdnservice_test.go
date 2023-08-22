@@ -730,7 +730,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			res := fq.CheckFqdnReachability(e.ReqBody, e.Port)
+			res := fq.CheckFqdnReachability(e.ReqBody, e.Port, time.Second*2)
 			assert.Equal(t, e.ResponseBody, res)
 		})
 	}
@@ -744,6 +744,6 @@ func TestMakeConcurrentCalls(t *testing.T) {
 		Timeout:   2 * time.Second,
 	}
 	url := fmt.Sprintf("https://%v:6574", LOCALHOST2)
-	res := fq.MakeConcurrentCalls(url, client, make(map[string]int))
+	res := fq.MakeConcurrentCalls(url, client, make(map[string]int), time.Second*2)
 	assert.Equal(t, errors.New("nodes are not reachable"), res)
 }
