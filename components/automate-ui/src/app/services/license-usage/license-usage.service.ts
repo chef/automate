@@ -31,7 +31,7 @@ export class LicenseUsageService {
     private applicationStatsService: ApplicationStatsService,
     private configService: ConfigService,
     private http: HttpClient
-  ) { }
+  ) {}
 
   async postAnalyticsUsageDataCall() {
 
@@ -71,7 +71,7 @@ export class LicenseUsageService {
     if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
       this.totalService = applicationUsageStats['total_services'];
     }
-    
+
     this.sendData()
   }
 
@@ -100,8 +100,9 @@ export class LicenseUsageService {
         },
       }]
     };
-    console.log(data)
-    postAnalyticsUsageData(data)
+
+    if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined)
+      postAnalyticsUsageData(data)
   }
 
   private getCurrentDateTime() {
