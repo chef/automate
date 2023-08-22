@@ -53,9 +53,11 @@ export class LicenseUsageService {
 
       let start = new Date();
       start.setDate(start.getDate() - this.days_since_last_post);
+      start.setHours(0,0,0,0);
       this.periodStartDate = start.toISOString()
 
       let end = new Date();
+      end.setHours(11,59,0,0);
       end.setDate(end.getDate() - 1);
       this.periodEndDate = end.toISOString();
     }
@@ -69,7 +71,7 @@ export class LicenseUsageService {
     if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
       this.totalService = applicationUsageStats['total_services'];
     }
-
+    
     this.sendData()
   }
 
@@ -98,9 +100,7 @@ export class LicenseUsageService {
         },
       }]
     };
-
     console.log(data)
-
     postAnalyticsUsageData(data)
   }
 
