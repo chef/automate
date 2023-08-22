@@ -36,13 +36,13 @@ export class LicenseUsageService {
   async postAnalyticsUsageDataCall() {
 
     this.http.get<LicenseStatus>(`${env.gateway_url}/license/status`).subscribe(data => {
-      this.expiration = data.licensed_period.end
+      this.expiration = data.licensed_period.end;
     })
 
     this.configService.getConfig().subscribe(data => {
-      this.licenseId = data.licenseId,
-      this.customerId = data.customerId,
-      this.customerName = data.customerName
+      this.licenseId = data.licenseId;
+      this.customerId = data.customerId;
+      this.customerName = data.customerName;
     })
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
