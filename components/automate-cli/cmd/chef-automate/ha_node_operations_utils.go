@@ -750,21 +750,13 @@ func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
 func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	timestamp := time.Now().Format("20060102150405")
 	fmt.Println("====================================================================")
-	fmt.Println("sync Config to all nodes")
+	fmt.Println("sync Config to frontend nodes")
 	frontendPrefix := "frontend" + "_" + timestamp + "_"
 	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
 	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
-	backendPrefix := "opensearch" + "_" + timestamp + "_"
-	os := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, OPENSEARCH, "%s", backendPrefix+OPENSEARCH_TOML)
 	nodeObjects := []*NodeObject{
 		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, frontendPrefix, AUTOMATE),
 		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, frontendPrefix, CHEF_SERVER),
-	}
-	if !isManagedServicesOn() {
-		backendNodeObjects := []*NodeObject{
-			NewNodeObjectWithOutputFile(os, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + OPENSEARCH_TOML}, backendPrefix, OPENSEARCH),
-		}
-		nodeObjects = append(nodeObjects, backendNodeObjects...)
 	}
 	return nodeObjects
 }
@@ -777,11 +769,6 @@ func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix s
 		cmd.CmdInputs.Args = inputFiles
 	} else if service == OPENSEARCH {
 		cmd.CmdInputs.Args = inputFiles
-		if len(inputFiles) > 0 {
-			cmd.PreExec = prePatchForOsNodes
-			cmd.CmdInputs.InputFilesPrefix = inputFilesPrefix
-			cmd.CmdInputs.WaitTimeout = 300
-		}
 	} else {
 		cmd.CmdInputs.Args = inputFiles
 		// Patch only incase of frontends node
@@ -833,6 +820,7 @@ func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Automat
 	return nil
 }
 
+// prePatchForOsNodes is not being in used currently as it was meant for os-config sync
 func prePatchForOsNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := removeRestrictedKeysFromSrcFileOs(inputs.Args[0])
 	if err != nil {
@@ -844,6 +832,7 @@ func prePatchForOsNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInf
 	return nil
 }
 
+// removeRestrictedKeysFromSrcFileOs is not being in used currently as it was meant for os-config sync
 func removeRestrictedKeysFromSrcFileOs(srcString string) (string, error) {
 	tomlbyt, _ := fileutils.ReadFile(srcString) // nosemgrep
 	destString := string(tomlbyt)
