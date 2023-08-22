@@ -373,18 +373,20 @@ endpoint = ""
 # Eg: region = "us-west-1"
 region = ""
 # copy the attribute from the google service account json file
-[google_service_account]
-type = ""
-project_id = ""
-private_key_id = ""
-private_key =  ""
-client_email = ""
-client_id = ""
-auth_uri = ""
-token_uri = ""
-auth_provider_x509_cert_url = ""
-client_x509_cert_url = ""
-universe_domain = ""
+
+google_service_account_file = "/home/service.json"
+#[google_service_account]
+#type = ""
+#project_id = ""
+#private_key_id = ""
+#private_key =  ""
+#client_email = ""
+#client_id = ""
+#auth_uri = ""
+#token_uri = ""
+#auth_provider_x509_cert_url = ""
+#client_x509_cert_url = ""
+#universe_domain = ""
 
 # ============== EC2 Nodes Config ======================
 [automate.config]
