@@ -808,7 +808,7 @@ func newNodeTypeCmd(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []str
 	}
 }
 
-// prePatchForFrontendNodes parse frontend config before patch and remove cert related keys-values
+// prePatchForFrontendNodes parse frontend config before patch and remove cert related keys-values.
 func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := removeRestrictedKeysFromSrcFile(inputs.Args[0])
 	if err != nil {
