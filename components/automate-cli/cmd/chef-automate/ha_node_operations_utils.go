@@ -839,9 +839,20 @@ func prePatchForOsNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInf
 		return err
 	}
 
-	inputs.InputFiles = []string{srcPath}
+	//checking database configuration
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(inputs.Args, infra, GET_APPLIED_CONFIG, sshUtil)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	//Implementing the config if there is some change in the database configuration
+	isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
+	if isConfigChangedDatabase {
+		inputs.InputFiles = []string{srcPath}
+		return nil
+	}
+
+	return errors.New("No changes in existing config on opensearch and provided config")
 }
 
 func removeRestrictedKeysFromSrcFileOs(srcString string) (string, error) {

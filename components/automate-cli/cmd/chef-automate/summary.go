@@ -476,7 +476,12 @@ func (ss *Summary) getBEDefaultServiceDetails(output string) (string, string, st
 	}
 	memeberId := defaultServiceDetails["sys"].(map[string]interface{})["member_id"].(string)
 	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
-	servicePid := fmt.Sprintf("%d", int(defaultServiceDetails["process"].(map[string]interface{})["pid"].(float64)))
+	// issue here need to fix
+	pid := defaultServiceDetails["process"].(map[string]interface{})["pid"]
+	if pid == nil {
+		pid = 0
+	}
+	servicePid := fmt.Sprintf("%d", pid.(float64))
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
 	startingTime = float64(nowFunc().UTC().Unix()) - startingTime
 
