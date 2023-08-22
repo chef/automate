@@ -23,7 +23,7 @@ var (
 	CleanReportFiles     = "rm -rf %s.*"
 )
 
-func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, workerCount int) error {
+func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, workerCount int, endpointurl string, frequency string, interval int) error {
 	log.Info("Successfully starting license-audit-workflow")
 	err := cerealManager.RegisterWorkflowExecutor(WorkflowName, &LicenseAuditWorkflow{})
 	if err != nil {
@@ -32,13 +32,13 @@ func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, worke
 	}
 
 	log.Info("Successfully registered migration-workflow")
-	err = cerealManager.RegisterTaskExecutor(LicenseAuditTaskName, &LicenseAuditTask{ExecuteCommand: NewExecute(logger.NewLogrusStandardLogger()), Command: Command}, cereal.TaskExecutorOpts{Workers: workerCount})
+	err = cerealManager.RegisterTaskExecutor(LicenseAuditTaskName, &LicenseAuditTask{ExecuteCommand: NewExecute(logger.NewLogrusStandardLogger()), Command: Command, EndPointURl: endpointurl}, cereal.TaskExecutorOpts{Workers: workerCount})
 	if err != nil {
 		log.Errorf("Found error in RegisterTaskExecutor for license-audit %v", err)
 		return err
 	}
 
-	rule, err := createRuleForSchedule()
+	rule, err := createRuleForSchedule(frequency, interval)
 	if err != nil {
 		return errors.Wrapf(err, "Unable to create rule for schedule")
 	}
@@ -47,15 +47,29 @@ func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, worke
 
 }
 
-func createRuleForSchedule() (*rrule.RRule, error) {
+func createRuleForSchedule(frequency string, interval int) (*rrule.RRule, error) {
 	t := time.Now()
 	modifiedTime := time.Date(t.Year(), t.Month(), t.Day(), 4, 0, 0, 0, t.Location())
 
 	return rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.DAILY,
-		Interval: 1,
+		Freq:     getInterval(frequency),
+		Interval: interval,
 		Dtstart:  modifiedTime,
 	})
+
+}
+
+func getInterval(frequency string) rrule.Frequency {
+	var freq rrule.Frequency
+	if frequency == "SECOND" {
+		freq = rrule.SECONDLY
+	} else if frequency == "MINUTE" {
+		freq = rrule.MINUTELY
+	} else {
+		freq = rrule.DAILY
+	}
+
+	return freq
 
 }
 
@@ -94,6 +108,7 @@ type LicenseAuditWorkflow struct {
 type LicenseAuditTask struct {
 	Command        string
 	ExecuteCommand ExecuteCommand
+	EndPointURl    string
 }
 
 type AuditWorkflowParameters struct {
@@ -179,6 +194,8 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 		log.WithError(err).Error()
 		return nil, err
 	}
+
+	log.Info("Endpoint url we got is", t.EndPointURl)
 
 	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(t.Command))
 	if err != nil {
