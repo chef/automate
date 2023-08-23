@@ -9,6 +9,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { CallbackResponse, SigninService } from 'app/services/signin/signin.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { LicenseUsageService } from 'app/services/license-usage/license-usage.service';
 
 class ActivatedRouteMock {
   queryParams = new Observable(observer => {
@@ -53,7 +54,8 @@ describe('SigninComponent', () => {
         // Note: the [routerLink] in the template requires snapshot to exist
         { provide: ActivatedRoute, useClass: ActivatedRouteMock},
         { provide: ChefSessionService, useClass: MockChefSessionService },
-        { provide: SigninService, userClass: SignIn}
+        { provide: SigninService, userClass: SignIn},
+        { provide: LicenseUsageService, useValue: jasmine.createSpyObj('ClientRunsStatsService', ['postAnalyticsUsageDataCall', 'sendData']) }
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
