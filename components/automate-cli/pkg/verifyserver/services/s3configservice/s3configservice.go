@@ -1,6 +1,8 @@
 package s3configservice
 
 import (
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -30,6 +32,13 @@ func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) IS3Con
 
 func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.Checks {
 	ss.Req = req
+
+	// aws-sdk is expecting the endpoint url of S3 bucket to be in https://s3.REGION.amazonaws.com pattern
+	// https://s3.amazonaws.com by default belongs to us-east-1 region and if the bucket is in someother region, the check will not pass
+	// So manipulating the endpoint URL pattern for S3 (ONLY FOR AWS S3)
+	if strings.Contains(ss.Req.Endpoint, "://s3.amazonaws.com") {
+		ss.Req.Endpoint = strings.Replace(ss.Req.Endpoint, "s3.amazonaws.com", "s3."+ss.Req.Region+".amazonaws.com", 1)
+	}
 	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
 	if err != nil {
 		return ss.Response(constants.S3_CONNECTION_TITLE, "", errors.Wrap(err, constants.S3_CONNECTION_ERROR_MSG).Error(), constants.S3_CONNECTION_RESOLUTION_MSG, false)
