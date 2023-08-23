@@ -54,6 +54,8 @@ message ConfigRequest {
 				google.protobuf.BoolValue stream_download = 5;
 				google.protobuf.StringValue aws_access_id = 6;
 				google.protobuf.StringValue aws_secret_key = 7;
+				google.protobuf.StringValue storage_type   = 8;
+				google.protobuf.StringValue virtual_ip     = 9;
 			}
 
           }
