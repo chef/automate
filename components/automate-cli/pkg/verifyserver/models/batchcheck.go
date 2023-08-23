@@ -7,8 +7,14 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	AWS_S3            = "S3"
+	GCP_CLOUD_STORAGE = "GCP"
 )
 
 type BatchCheckRequest struct {
@@ -276,28 +282,37 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	}
 
 	objectStorageConfig := haConfig.GetObjectStorageConfig()
-	c.Backup = &Backup{
-		ObjectStorage: &ObjectStorage{
-			BucketName: objectStorageConfig.BucketName,
-			AWSRegion:  objectStorageConfig.Region,
-			AccessKey:  objectStorageConfig.AccessKey,
-			SecretKey:  objectStorageConfig.SecretKey,
-			Endpoint:   objectStorageConfig.Endpoint,
-			GoogleServiceAccount: &GcpServiceAccount{
-				Type:                    objectStorageConfig.GcpServiceAccount.Type,
-				ProjectID:               objectStorageConfig.GcpServiceAccount.ProjectID,
-				PrivateKeyID:            objectStorageConfig.GcpServiceAccount.PrivateKeyID,
-				PrivateKey:              objectStorageConfig.GcpServiceAccount.PrivateKey,
-				ClientEmail:             objectStorageConfig.GcpServiceAccount.ClientEmail,
-				ClientID:                objectStorageConfig.GcpServiceAccount.ClientID,
-				AuthURI:                 objectStorageConfig.GcpServiceAccount.AuthURI,
-				TokenURI:                objectStorageConfig.GcpServiceAccount.TokenURI,
-				AuthProviderX509CertURL: objectStorageConfig.GcpServiceAccount.AuthProviderX509CertURL,
-				ClientX509CertURL:       objectStorageConfig.GcpServiceAccount.ClientX509CertURL,
-				UniverseDomain:          objectStorageConfig.GcpServiceAccount.UniverseDomain,
+	if objectStorageConfig.Location == AWS_S3 {
+		c.Backup = &Backup{
+			ObjectStorage: &ObjectStorage{
+				BucketName: objectStorageConfig.BucketName,
+				AWSRegion:  objectStorageConfig.Region,
+				AccessKey:  objectStorageConfig.AccessKey,
+				SecretKey:  objectStorageConfig.SecretKey,
+				Endpoint:   objectStorageConfig.Endpoint,
 			},
-		},
+		}
+	} else if objectStorageConfig.Location == GCP_CLOUD_STORAGE {
+		c.Backup = &Backup{
+			ObjectStorage: &ObjectStorage{
+				BucketName: objectStorageConfig.BucketName,
+				GoogleServiceAccount: &GcpServiceAccount{
+					Type:                    objectStorageConfig.GcpServiceAccount.Type,
+					ProjectID:               objectStorageConfig.GcpServiceAccount.ProjectID,
+					PrivateKeyID:            objectStorageConfig.GcpServiceAccount.PrivateKeyID,
+					PrivateKey:              objectStorageConfig.GcpServiceAccount.PrivateKey,
+					ClientEmail:             objectStorageConfig.GcpServiceAccount.ClientEmail,
+					ClientID:                objectStorageConfig.GcpServiceAccount.ClientID,
+					AuthURI:                 objectStorageConfig.GcpServiceAccount.AuthURI,
+					TokenURI:                objectStorageConfig.GcpServiceAccount.TokenURI,
+					AuthProviderX509CertURL: objectStorageConfig.GcpServiceAccount.AuthProviderX509CertURL,
+					ClientX509CertURL:       objectStorageConfig.GcpServiceAccount.ClientX509CertURL,
+					UniverseDomain:          objectStorageConfig.GcpServiceAccount.UniverseDomain,
+				},
+			},
+		}
 	}
+
 }
 
 func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
