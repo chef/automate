@@ -191,3 +191,11 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     opensearch_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7"]
     postgresql_private_ips = ["192.0.0.8", "192.0.0.9", "192.0.0.10"]
 ```
+
+## Uninstall Chef Automate HA
+
+To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
+
+```bash
+    chef-automate cleanup --onprem-deployment
+```

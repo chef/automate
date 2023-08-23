@@ -144,3 +144,11 @@ After successful deployment, proceed with following:
       opensearch_root_cert = "-----BEGIN CERTIFICATE-----
       -----END CERTIFICATE-----"
 ```
+
+## Uninstall Chef Automate HA
+
+To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
+
+```bash
+    chef-automate cleanup --onprem-deployment
+```

@@ -17,9 +17,7 @@ gh_repo = "automate"
 
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services.
 
-## Install Chef Automate HA on AWS with Managed AWS Services
-
-### Prerequisites
+## Prerequisites
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC, you have to create a Public and Private Subnet if subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
@@ -70,7 +68,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
 
 {{< /warning >}}
 
-### Run these steps on Bastion Host Machine
+## Run these steps on Bastion Host Machine
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
@@ -90,7 +88,9 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    {{< note >}}
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
-##### Steps to generate config
+
+## Steps to Generate Config
+
 1. Generate config with relevant data using the below command:
 
     ```bash
@@ -98,13 +98,15 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     chef-automate config gen config.toml
     "
     ```
+
     Click [here](/automate/ha_config_gen) to know more about generating config
-    
+
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
 
-##### Steps to provision
+## Steps to Provision
+
 1. Continue with the deployment after generating the config:
 
     ```bash
@@ -117,19 +119,20 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
     "
     ```
 
-#####  Config Verify
+## Config Verify
+
 1. After successful provision, run verify config command:
 
     ```bash
     sudo chef-automate verify -c config.toml
     ```
-    
+
     To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
-    
-    Once the verification is succesfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
+    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
 
-##### Steps to deploy
+## Steps to deploy
+
 1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
 
     ```bash
@@ -138,8 +141,11 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    chef-automate deploy config.toml --airgap-bundle automate.aib
    "
    ```
-##### Verify Deployment
+
+## Verify Deployment
+
 1. Once the deployment is successful, we can verify deployment by checking status summary and info
+
   ```bash
    sudo -- sh -c "
    #After Deployment is done successfully. Check the status of Chef Automate HA services
@@ -150,7 +156,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
    "
   ```
 
-2. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
+1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
   If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
 
     - Create a file `a2.fqdn.toml`
@@ -192,12 +198,13 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-After successful deployment, proceed with following...
+After successful deployment, proceed with following:
+
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
    1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
-### Sample Config
+## Sample Config
 
 {{< note >}} Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS Postgresql, and Managed OpenSearch) {{< /note >}}
 
@@ -278,7 +285,7 @@ After successful deployment, proceed with following...
     lb_access_logs = "true"
 ```
 
-#### Minimum Changes required in the sample config
+## Minimum Changes required in the Sample Config
 
 - Provide `ssh_user` which has access to all the machines. E.g., `ec2-user`
 - Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `~/.ssh/user-key.pem`.

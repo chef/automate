@@ -20,14 +20,6 @@ Chef Automate HA comes with five different types of deployment flows. This page 
   habitat supervisor.
 - To remove an existing node, see [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster/) page.
 
-## Uninstall Chef Automate HA
-
-To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
-
-```bash
-    chef-automate cleanup --onprem-deployment
-```
-
 ## Troubleshooting
 
 ### Failure to Replace Nodes
