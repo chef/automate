@@ -256,17 +256,19 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 		return fmt.Errorf("error unmarshalling config TOML file: %w", err)
 	}
 	gcpServiceAccount := GcpServiceAccount{}
-	objectStorageConfig := c.GetObjectStorageConfig()
-	if objectStorageConfig.Location == "gcp" {
-		filepath, err := fileUtils.ReadFile(objectStorageConfig.GcpServiceFile)
-		if err != nil {
-			return fmt.Errorf("error reading Json file: %w", err)
+	if c.GetConfigInitials() != nil && c.GetConfigInitials().BackupConfig == "object_storage" {
+		objectStorageConfig := c.GetObjectStorageConfig()
+		if objectStorageConfig.Location == "gcs" {
+			filepath, err := fileUtils.ReadFile(objectStorageConfig.GcpServiceFile)
+			if err != nil {
+				return fmt.Errorf("error reading Json file: %w", err)
+			}
+			err = json.Unmarshal(filepath, &gcpServiceAccount)
+			if err != nil {
+				return fmt.Errorf("error unmarshalling Json file: %w", err)
+			}
+			c.ObjectStorage.Config.GcpServiceAccount = &gcpServiceAccount
 		}
-		err = json.Unmarshal(filepath, &gcpServiceAccount)
-		if err != nil {
-			return fmt.Errorf("error unmarshalling Json file: %w", err)
-		}
-		c.ObjectStorage.Config.GcpServiceAccount = &gcpServiceAccount
 	}
 	return nil
 }

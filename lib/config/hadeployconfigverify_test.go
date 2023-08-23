@@ -106,6 +106,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Valid Object Storage Configuration",
 			objectStorage: &ConfigObjectStorage{
+				Location:   "s3",
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				SecretKey:  "secret-key",
@@ -117,6 +118,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Bucket Name",
 			objectStorage: &ConfigObjectStorage{
+				Location:  "s3",
 				AccessKey: "access-key",
 				SecretKey: "secret-key",
 				Endpoint:  "https://example.com",
@@ -127,6 +129,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Access Key",
 			objectStorage: &ConfigObjectStorage{
+				Location:   "s3",
 				BucketName: "my-bucket",
 				SecretKey:  "secret-key",
 				Endpoint:   "https://example.com",
@@ -137,6 +140,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Secret Key",
 			objectStorage: &ConfigObjectStorage{
+				Location:   "s3",
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				Endpoint:   "https://example.com",
@@ -147,6 +151,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Endpoint",
 			objectStorage: &ConfigObjectStorage{
+				Location:   "s3",
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				SecretKey:  "secret-key",
@@ -157,6 +162,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Invalid Region",
 			objectStorage: &ConfigObjectStorage{
+				Location:   "s3",
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				SecretKey:  "secret-key",
@@ -164,6 +170,16 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Region:     "invalid-region",
 			},
 			expectedError: errors.New("invalid AWS region for S3"),
+		},
+		{
+			name: "Empty Type",
+			objectStorage: &ConfigObjectStorage{
+				Location: "gcs",
+				GcpServiceAccount: &GcpServiceAccount{
+					Type: "",
+				},
+			},
+			expectedError: errors.New("invalid or empty: bucket_name\ninvalid or empty: type\ninvalid or empty: project_id\ninvalid or empty: private_key_id\ninvalid or empty: private_key\ninvalid or empty: token_uri\ninvalid or empty: client_id\ninvalid or empty: client_email\ninvalid or empty: auth_uri\ninvalid or empty: auth_provider_x509_cert_url\ninvalid or empty: client_x509_cert_url\ninvalid or empty: universe_domain"),
 		},
 	}
 	for _, tc := range testCases {

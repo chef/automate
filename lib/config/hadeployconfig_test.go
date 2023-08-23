@@ -819,7 +819,107 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 			},
 			wantErr: false,
 			err:     nil,
-		}, {
+		},
+		{
+			name: "Parse OnPrem Config Gcs",
+			args: args{configFile: "./testdata/HaOnPremGcs.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					ExistingInfra: &ConfigInitials{
+						SSHUser:                     "",
+						SSHGroupName:                "",
+						SSHKeyFile:                  "",
+						SSHPort:                     "",
+						SecretsKeyFile:              "/hab/a2_deploy_workspace/secrets.key",
+						SecretsStoreFile:            "/hab/a2_deploy_workspace/secrets.json",
+						SudoPassword:                "",
+						LoggingMonitoringManagement: "",
+						Architecture:                "existing_nodes",
+						WorkspacePath:               "/hab/a2_deploy_workspace",
+						BackupMount:                 "automate_backups",
+						BackupConfig:                "object_storage",
+						S3BucketName:                "",
+						HabitatUIDGid:               "",
+					},
+				},
+				ObjectStorage: &ObjectStorage{
+					Config: &ConfigObjectStorage{
+						Location:       "gcs",
+						BucketName:     "test",
+						GcpServiceFile: "./testdata/gcsservicefile.json",
+						GcpServiceAccount: &GcpServiceAccount{
+							Type:                    "service_account",
+							ProjectID:               "dev",
+							PrivateKeyID:            "e123454a6668a89b970f703f",
+							PrivateKey:              "-----BEGIN PRIVATE KEY-----\nDANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCttcisSNZPEPu\ngtEdsm57ToPQuRffFSy+A7xLArAG6+9RK9A+WC8UNXRrs7BUy9k8kueDyoEbIaQn\nTZD3fR+nIYNplKAWxabEC8rSZI3QD/K2km4CfbozoxwCKTKijuAOfBypcyGmGz90\nhBM2Z8WSg0Wx/BNnvhob8waNk4FPK1JSERESc2NwcaHsSDQof2fBv2XMhuCbWGF1\nYsFtiu5If7rzuS8biRxzqxFcmmemQY4S1AAnp7jm9ofrrfHsxpFxB/uaHDBJsktn\nq8UkMkuwELCbMdiIPbQ5XCvoVcfaJ4ADocDD0aS7HXANq7/V2WLuKCLd6jG9SvOF\nHO2R3ZvrAgMBAAECggEABnhnYHaITa1R7W4mthRHDE00aJLWApg/wLqyVZt+Cq37\nsqrAaPw9DNUUejyY3xdYeOUvY05BUnmONdK19btrw1lfZAy1hE59ia6mWUAsBDnA\nBBOMT9+YHVkEuFHy3N+WIlCEN5huLprz5+4T6jhEa9Usd++20sta5gpv3zzxFZa0\nfLg8rHqKGcQ/FOq3Bftgrqb3s1/DJUIVGKSsPXOJG0P8NWO9U65SzrS5lkAQmCaU\nviPTzAnW4byr93yoYxz0uqZwv528wkb4SEQBB8ZbZ+bNwTxiMU5LXnsNN3ZwipAj\nogaP3RyL34Cfelkz21UTVne8HV4idVMr3Ct3Z4opOQKBgQD9snVtmoGFH2plYbyG\nrAtbxYOAiPioJHinioM0LN5+F9Yf5w1Zm44iVaOrRehpVgI9n20J4f4qiOaCzVrx\nrnsRCICsPAEIcn26V92rB63uGXYe5o9jQlAov9YqInfHmsts7GDVbjyCMQqQ2QdA\nnJfRgOhZZe6c75PFGtYphwgiiQKBgQDEe1E3Y5VfOaMK3YKGLy8PFH+7LJh2Qo3N\nXMPS0/c13cudSg43Fav52oJSgKqFo6VI/nKqatne0mOvBOkG7+Psqxe3TyugnSAQ\nWYjQJ/U31SIC05wVzuasOOFFKUvvfOJ0L17beEMcknZWu5YSqV2IlIcYz8n2Nz5z\nsBrm/Nq90wKBgGzkhqbO5L0hKOfvNZ6QhieT9cfcAu8ZCHjRaVOh1rZEwPHcmMxX\nioCORbwkO4fLFRciMQlG6XOUY2zNfDW0cLp07dX/w2m+ytyLDmh02WETqLHGwNEY\nC5QSE3juZn9Un/BW3ZF+yZYQOrrFjOlczYVtUU3eBLdz1feKd1ZH0WQRAoGBAJFm\nvPSjcl/09E5PHI+WjVm4jsoCN5WUrQGju5ril9g6Gbt9mUV0eT8+UCEj7I1XTDLX\nch3hUvgNdA2KMbSbhG2ZM8TJBv0mKhtPVurMFzFJPZEf7itJYPVkZnjbFcHWBnN6\nttTti6SyUnbe/TE0Ou6fE9bttoTJ3yKX2WDFEE9XAoGBAOmlcaptRw85VdpmFaAF\njupKJTxpae/FU9RAwM39v23/TX1sJRj6C+PHiNOOtdijCm8G/EqdBMaTNfTE7oE/\nL+SFWt9efp2fJyiptASfJGjPh17nNqflsJVyYyWHom8RWCF+VzSkJrybUVsfd6kO\nwcnSg/REVPBsKrWDUYQcCd7J\n-----END PRIVATE KEY-----\n",
+							ClientEmail:             "abc.gserviceaccount.com",
+							ClientID:                "1146674505608030",
+							AuthURI:                 "https://accounts.google.com/o/oauth2/auth",
+							TokenURI:                "https://oauth2.googleapis.com/token",
+							AuthProviderX509CertURL: "https://www.googleapis.com/oauth2/v1/certs",
+							ClientX509CertURL:       "https://www.googleapis.com/robot/v1/metadata/x509/test",
+							UniverseDomain:          "main",
+						},
+					},
+				},
+				Automate: &AutomateSettings{
+					Config: &ConfigAutomateSettings{
+						AdminPassword:     "",
+						Fqdn:              "https://chefautomate.example.com",
+						ConfigFile:        "automate.toml",
+						TeamsPort:         "",
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						FqdnRootCA:        "a2_cert",
+						PrivateKey:        "a2_pvt_key",
+						PublicKey:         "a2_public_key",
+						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "a2_pvt_key", PublicKey: "a2_public_key"}},
+					},
+				},
+				ChefServer: &ChefServerSettings{
+					Config: &ConfigChefServerSettings{
+						InstanceCount:     "two",
+						EnableCustomCerts: true,
+						PrivateKey:        "cs_pvt_key",
+						PublicKey:         "cs_public_key",
+						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "cs_pvt_key", PublicKey: "cs_public_key"}},
+					},
+				},
+				Opensearch: &OpensearchSettings{
+					Config: &ConfigOpensearchSettings{
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						RootCA:            "os_cert",
+						PrivateKey:        "os_pvt_key",
+						PublicKey:         "os_public_key",
+						AdminCert:         "",
+						AdminKey:          "os_admin_key",
+						CertsByIP:         &[]CertByIP{{IP: "", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
+					},
+				},
+				Postgresql: &PostgresqlSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						RootCA:            "pg_cert",
+						PrivateKey:        "pg_pvt_key",
+						PublicKey:         "pg_pvt_key",
+						CertsByIP:         &[]CertByIP{{IP: "0.0.1", PrivateKey: "pg_pvt_key", PublicKey: "pg_pvt_key"}},
+					},
+				},
+				ExistingInfra: &ExistingInfraSettings{
+					Config: &ConfigExistingInfraSettings{
+						AutomatePrivateIps:   []string{"1324.2534.1"},
+						ChefServerPrivateIps: []string{},
+						OpensearchPrivateIps: []string{},
+						PostgresqlPrivateIps: []string{},
+					},
+				},
+			},
+			wantErr: false,
+			err:     nil,
+		},
+		{
 			name:    "Parse OnPrem Config file not found",
 			args:    args{configFile: "./testdata/OnPremConfig.toml"},
 			want:    &HaDeployConfig{},
@@ -832,6 +932,46 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 			want:    &HaDeployConfig{},
 			wantErr: true,
 			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
+		},
+		{
+			name: "Parse OnPrem gcs file not found",
+			args: args{configFile: "./testdata/HaOnPremGcsFailed.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					ExistingInfra: &ConfigInitials{
+						BackupConfig: "object_storage",
+					},
+				},
+				ObjectStorage: &ObjectStorage{
+					Config: &ConfigObjectStorage{
+						Location:       "gcs",
+						BucketName:     "test",
+						GcpServiceFile: "./testdata/service.json",
+					},
+				},
+			},
+			wantErr: true,
+			err:     errors.New("error reading Json file: open ./testdata/service.json: no such file or directory"),
+		},
+		{
+			name: "Error unmarshalling json file",
+			args: args{configFile: "./testdata/UnmarshalErrorForGcs.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					ExistingInfra: &ConfigInitials{
+						BackupConfig: "object_storage",
+					},
+				},
+				ObjectStorage: &ObjectStorage{
+					Config: &ConfigObjectStorage{
+						Location:       "gcs",
+						BucketName:     "test",
+						GcpServiceFile: "./testdata/UnmarshalErrorForGcs.json",
+					},
+				},
+			},
+			wantErr: true,
+			err:     errors.New("error unmarshalling Json file: json: cannot unmarshal array into Go value of type config.GcpServiceAccount"),
 		},
 	}
 	for _, tt := range tests {

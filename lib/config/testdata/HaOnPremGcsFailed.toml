@@ -1,0 +1,11 @@
+[architecture.existing_infra]
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = "object_storage"
+
+# If backup_config = "object_storage" fill out [object_storage.config] as well 
+## Object storage similar to AWS S3 Bucket
+[object_storage.config]
+location = "gcs"
+bucket_name = "test"
+gcp_service_file = "./testdata/service.json"
+

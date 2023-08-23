@@ -178,7 +178,7 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 		errorList.PushBack(err)
 	}
 	if objectStorage.Location == "gcs" {
-		if err := c.verifyGcpStorage(objectStorage.GcpServiceAccount); err != nil {
+		if err := c.verifyGcsStorage(objectStorage.GcpServiceAccount); err != nil {
 			errorList.PushBack(err)
 		}
 	}
@@ -723,7 +723,7 @@ func awsChefSettings(aws *ConfigAwsSettings) error {
 	return getSingleErrorFromList(errorList)
 }
 
-func (c *HaDeployConfig) verifyGcpStorage(gcp *GcpServiceAccount) error {
+func (c *HaDeployConfig) verifyGcsStorage(gcp *GcpServiceAccount) error {
 	errorList := list.New()
 	if err := validateRequiredString(gcp.Type, "type"); err != nil {
 		errorList.PushBack(err)
