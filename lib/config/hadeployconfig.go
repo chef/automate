@@ -149,9 +149,9 @@ type ConfigAwsSettings struct {
 	ManagedOpensearchUsername     string   `toml:"managed_opensearch_username,omitempty"`
 	ManagedOpensearchUserPassword string   `toml:"managed_opensearch_user_password,omitempty"`
 	ManagedOpensearchCertificate  string   `toml:"managed_opensearch_certificate,omitempty"`
-	AwsOsSnapshotRoleArn          string   `toml:"aws_os_snapshot_role_arn,omitempty"`
-	OsSnapshotUserAccessKeyID     string   `toml:"os_snapshot_user_access_key_id,omitempty"`
-	OsSnapshotUserAccessKeySecret string   `toml:"os_snapshot_user_access_key_secret,omitempty"`
+	AwsOsSnapshotRoleArn          string   `toml:"aws_os_snapshot_role_arn"`
+	OsSnapshotUserAccessKeyID     string   `toml:"os_snapshot_user_access_key_id"`
+	OsSnapshotUserAccessKeySecret string   `toml:"os_snapshot_user_access_key_secret"`
 	ManagedRdsInstanceURL         string   `toml:"managed_rds_instance_url,omitempty"`
 	ManagedRdsSuperuserUsername   string   `toml:"managed_rds_superuser_username,omitempty"`
 	ManagedRdsSuperuserPassword   string   `toml:"managed_rds_superuser_password,omitempty"`
