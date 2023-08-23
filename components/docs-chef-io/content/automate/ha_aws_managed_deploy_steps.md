@@ -319,5 +319,5 @@ The commands require some arguments so that it can determine which types of node
 - If you want to add three nodes to the chef-server, you have to run the:
 
     ```sh
-        chef-automate node add --chef-server-count 3
+    chef-automate node add --chef-server-count 3
     ```

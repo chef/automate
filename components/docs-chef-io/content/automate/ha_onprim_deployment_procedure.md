@@ -23,8 +23,8 @@ This section will discuss deploying Chef Automate HA on-premise machines or on e
 
 - All VMs or Machines are up and running.
 - OS Root Volume (/) must be at least 40 GB.
-- TMP space (/var/tmp) must be at least 5GB.
-- Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
+- TMP space (/var/tmp) must be at least 10GB.
+- Separate Hab volume (/hab) provisioned at least 200 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
 - A Common user has access to all machines.
 - This common user should have sudo privileges.
 - This common user uses the same SSH Private Key file to access all machines.
