@@ -60,13 +60,15 @@ type GcpServiceAccount struct {
 }
 
 type ObjectStorage struct {
-	Endpoint             string             `json:"endpoint"`
-	BucketName           string             `json:"bucket_name"`
-	BasePath             string             `json:"base_path"`
-	AccessKey            string             `json:"access_key"`
-	SecretKey            string             `json:"secret_key"`
-	AWSRegion            string             `json:"aws_region"`
-	GoogleServiceAccount *GcpServiceAccount `json:"gcp_service_account"`
+	Location          string             `json:"location"`
+	Endpoint          string             `json:"endpoint"`
+	BucketName        string             `json:"bucket_name"`
+	BasePath          string             `json:"base_path"`
+	AccessKey         string             `json:"access_key"`
+	SecretKey         string             `json:"secret_key"`
+	AWSRegion         string             `json:"aws_region"`
+	GcpServiceFile    string             `json:"gcp_service_file"`
+	GcpServiceAccount *GcpServiceAccount `json:"gcp_service_account"`
 }
 type Backup struct {
 	FileSystem    *FileSystem    `json:"file_system"`
