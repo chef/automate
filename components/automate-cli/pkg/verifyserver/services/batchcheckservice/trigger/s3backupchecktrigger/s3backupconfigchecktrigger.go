@@ -33,7 +33,7 @@ func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTrigger
 		return s3ConfigSkippedResponse(config, constants.S3_BACKUP_CONFIG, constants.SKIP_BACKUP_TEST_MESSAGE_S3)
 	}
 
-	if !isObjectStorage(config ) {
+	if !isObjectStorage(config) {
 		return emptyResp(config, constants.S3_BACKUP_CONFIG)
 	}
 

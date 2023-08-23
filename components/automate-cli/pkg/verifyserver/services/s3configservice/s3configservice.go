@@ -30,7 +30,7 @@ func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) IS3Con
 
 func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.Checks {
 	ss.Req = req
-	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, "")
+	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
 	if err != nil {
 		return ss.Response(constants.S3_CONNECTION_TITLE, "", errors.Wrap(err, constants.S3_CONNECTION_ERROR_MSG).Error(), constants.S3_CONNECTION_RESOLUTION_MSG, false)
 	}
