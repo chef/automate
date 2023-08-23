@@ -325,6 +325,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	}
 }
 
+}
 func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
 	configInitials := haConfig.GetConfigInitials()
 	c.SSHUser.Username = configInitials.SSHUser
