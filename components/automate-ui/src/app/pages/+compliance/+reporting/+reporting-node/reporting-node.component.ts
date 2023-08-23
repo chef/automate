@@ -203,12 +203,18 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const state = this.openControls[key];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[key] = toggled;
+
+    // to fetch the past control details we need to pass the start and end time
+    const start_time = this.activeReport.end_time;
+    const end_time = moment(start_time).endOf('day').toISOString();
     if (toggled.open === true) {
       if (!this.reportIdArray.includes(key)) {
         this.reportIdArray.push(key);
         const payload = {
           report_id : this.activeReport.id,
           filters : [
+            {'type': 'start_time', 'values': [start_time]},
+            {'type': 'end_time', 'values': [end_time]},
             {'type': 'profile_id', 'values': [`${control.profile_id}`]},
             {'type': 'control', 'values': [`${control.id}`]}]
         };
