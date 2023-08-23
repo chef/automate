@@ -31,18 +31,18 @@ export class LicenseUsageService {
     private applicationStatsService: ApplicationStatsService,
     private configService: ConfigService,
     private http: HttpClient
-  ) { }
+  ) {}
 
   async postAnalyticsUsageDataCall() {
 
     this.http.get<LicenseStatus>(`${env.gateway_url}/license/status`).subscribe(data => {
-      this.expiration = data.licensed_period.end
+      this.expiration = data.licensed_period.end;
     })
 
     this.configService.getConfig().subscribe(data => {
-      this.licenseId = data.licenseId,
-      this.customerId = data.customerId,
-      this.customerName = data.customerName
+      this.licenseId = data.licenseId;
+      this.customerId = data.customerId;
+      this.customerName = data.customerName;
     })
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
@@ -53,9 +53,11 @@ export class LicenseUsageService {
 
       let start = new Date();
       start.setDate(start.getDate() - this.days_since_last_post);
+      start.setHours(0,0,0,0);
       this.periodStartDate = start.toISOString()
 
       let end = new Date();
+      end.setHours(11,59,0,0);
       end.setDate(end.getDate() - 1);
       this.periodEndDate = end.toISOString();
     }
@@ -99,9 +101,8 @@ export class LicenseUsageService {
       }]
     };
 
-    console.log(data)
-
-    postAnalyticsUsageData(data)
+    if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined)
+      postAnalyticsUsageData(data)
   }
 
   private getCurrentDateTime() {
