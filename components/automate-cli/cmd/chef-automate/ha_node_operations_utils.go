@@ -750,7 +750,7 @@ func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
 func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	timestamp := time.Now().Format("20060102150405")
 	fmt.Println("====================================================================")
-	fmt.Println("sync Config to frontend nodes")
+	fmt.Println("Syncing configs to frontend nodes")
 	frontendPrefix := "frontend" + "_" + timestamp + "_"
 	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
 	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
@@ -808,7 +808,7 @@ func newNodeTypeCmd(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []str
 	}
 }
 
-// prePatchForFrontendNodes parse frontend config before patch and remove cert related keys-values.
+// prePatchForFrontendNodes parse frontend config before patch and remove cert related keys-values
 func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := removeRestrictedKeysFromSrcFile(inputs.Args[0])
 	if err != nil {
@@ -820,7 +820,8 @@ func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Automat
 	return nil
 }
 
-// prePatchForOsNodes is not being in used currently as it was meant for os-config sync
+// prePatchForOsNodes 
+// Note: this func is not being in used currently as it was meant for os-config sync
 func prePatchForOsNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := removeRestrictedKeysFromSrcFileOs(inputs.Args[0])
 	if err != nil {
@@ -832,7 +833,6 @@ func prePatchForOsNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInf
 	return nil
 }
 
-// removeRestrictedKeysFromSrcFileOs is not being in used currently as it was meant for os-config sync
 func removeRestrictedKeysFromSrcFileOs(srcString string) (string, error) {
 	tomlbyt, _ := fileutils.ReadFile(srcString) // nosemgrep
 	destString := string(tomlbyt)
