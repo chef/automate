@@ -641,8 +641,18 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 		mockConfig.populateObjectStorageConfig(nil)
 		require.Empty(t, mockConfig)
 	})
-	t.Run("ValidConfig", func(t *testing.T) {
+	t.Run("ValidConfigS3", func(t *testing.T) {
 		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					Location:   AWS_S3,
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+				},
+			},
 			Architecture: &config.Architecture{
 				Aws: &config.ConfigInitials{
 					SSHUser: "ec2-user",
@@ -651,14 +661,26 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 					SSHUser: "ec2-user",
 				},
 			},
+		}
 
+		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
+
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.NotNil(t, mockConfig)
+		require.Equal(t, mockConfig.Backup.ObjectStorage.AWSRegion, "Somewhere")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.BucketName, "dummybucket")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.AccessKey, "access")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.SecretKey, "secret")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.Endpoint, "endpoint")
+	})
+
+	t.Run("ValidConfigGCS", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
 			ObjectStorage: &config.ObjectStorage{
 				Config: &config.ConfigObjectStorage{
+					Location:   GCP_CLOUD_STORAGE,
 					BucketName: "dummybucket",
-					AccessKey:  "access",
-					SecretKey:  "secret",
-					Endpoint:   "endpoint",
-					Region:     "Somewhere",
 					GcpServiceAccount: &config.GcpServiceAccount{
 						Type:                    "GcpServiceAccount.Type",
 						ProjectID:               "GcpServiceAccount.ProjectID",
@@ -674,6 +696,14 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 					},
 				},
 			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
 		}
 
 		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
@@ -681,8 +711,17 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 		mockConfig := &Config{}
 		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
 		require.NotNil(t, mockConfig)
-		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.UniverseDomain, "GcpServiceAccount.UniverseDomain")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.BucketName, "dummybucket")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.Type, "GcpServiceAccount.Type")
 		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.ProjectID, "GcpServiceAccount.ProjectID")
-		require.Equal(t, mockConfig.Backup.ObjectStorage.AWSRegion, "Somewhere")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.PrivateKeyID, "GcpServiceAccount.PrivateKeyID")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.PrivateKey, "GcpServiceAccount.PrivateKey")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.ClientEmail, "GcpServiceAccount.ClientEmail")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.ClientID, "GcpServiceAccount.ClientID")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.AuthURI, "GcpServiceAccount.AuthURI")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.TokenURI, "GcpServiceAccount.TokenURI")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.AuthProviderX509CertURL, "GcpServiceAccount.AuthProviderX509CertURL")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.ClientX509CertURL, "GcpServiceAccount.ClientX509CertURL")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccount.UniverseDomain, "GcpServiceAccount.UniverseDomain")
 	})
 }

@@ -14,7 +14,7 @@ import (
 
 const (
 	AWS_S3            = "S3"
-	GCP_CLOUD_STORAGE = "GCP"
+	GCP_CLOUD_STORAGE = "GCS"
 )
 
 type BatchCheckRequest struct {
