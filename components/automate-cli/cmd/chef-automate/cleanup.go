@@ -162,7 +162,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 
 				// 'cleanupScripts' contains array of scripts
 				// [Script to delete AWS reesources, Script to uninstall deployment workspace]
-				var cleanupScripts = []string{fmt.Sprintf(AWS_PROVISION, appendString), DEPLOYMENT_CLEANUP}
+				var cleanupScripts = []string{fmt.Sprintf(AWS_PROVISION, appendString)}
 
 				// Iteration 1: Removes AWS resource
 				// Iteration 2: Uninstall automate-ha-deployment
@@ -176,7 +176,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 						return err
 					}
 				}
-				writer.Success("Cleaning up completed.")
+				writer.Success("If cleanup completed successfully run the following command to remove/uninstall deployment workspace\n hab pkg uninstall chef/automate-ha-deployment\n")
 			}
 		}
 	} else {
