@@ -279,13 +279,13 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 
 func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	if haConfig == nil {
-		logrus.Errorf("haConfig cannot be nil")
+		logrus.Errorln("haConfig cannot be nil")
 		return
 	}
 
 	objectStorageConfig := haConfig.GetObjectStorageConfig()
 	if objectStorageConfig.Location == "" {
-		logrus.Errorf("object storage location cannot be empty")
+		logrus.Errorln("object storage location cannot be empty")
 		return
 	}
 
@@ -319,7 +319,6 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 			},
 		}
 	}
-
 }
 
 func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
