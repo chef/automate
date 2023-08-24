@@ -96,15 +96,9 @@ Run the following steps on Bastion Host Machine:
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
-    {{< note >}}
+    {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
 
-    You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
-
-    ```bash
-    chef-automate init-config-ha existing_infra
-    ```
-
-    {{< /note >}}
+    `chef-automate init-config-ha existing_infra`{{< /note >}}
 
 ## Steps to Provision
 
