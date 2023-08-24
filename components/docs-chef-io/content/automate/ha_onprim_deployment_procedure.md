@@ -97,6 +97,16 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
+    {{< note >}}
+
+    You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+
+    ```bash
+    chef-automate init-config-ha existing_infra
+    ```
+
+    {{< /note >}}
+
 ## Config Verify
 
 1. We verify the above config using the below command :

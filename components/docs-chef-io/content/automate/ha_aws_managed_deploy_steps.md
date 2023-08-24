@@ -101,6 +101,16 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
+    {{< note >}}
+
+    You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+
+    ```bash
+    chef-automate init-config-ha existing_infra
+    ```
+
+    {{< /note >}}
+
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
