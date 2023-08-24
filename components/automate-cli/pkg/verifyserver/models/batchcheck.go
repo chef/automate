@@ -323,7 +323,6 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 		logrus.Errorf("invalid location: %s", objectStorageConfig.Location)
 		return
 	}
-
 }
 
 func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
