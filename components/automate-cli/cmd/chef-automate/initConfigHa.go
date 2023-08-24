@@ -163,22 +163,8 @@ type ExistingInfraConfigInitialsToml struct {
 	HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
 	BackupConfig                string `toml:"backup_config,omitempty"`
 	AutomateDcToken             string `toml:"automate_dc_token,omitempty"`
-	ServiceAccount              string `toml:"service_account",omitempty`
 }
 
-type ServiceAccount struct {
-	Type                    string `json:"type"`
-	ProjectID               string `json:"project_id"`
-	PrivateKeyID            string `json:"private_key_id"`
-	PrivateKey              string `json:"private_key"`
-	ClientEmail             string `json:"client_email"`
-	ClientID                string `json:"client_id"`
-	AuthURI                 string `json:"auth_uri"`
-	TokenURI                string `json:"token_uri"`
-	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
-	ClientX509CertURL       string `json:"client_x509_cert_url"`
-	UniverseDomain          string `json:"universe_domain"`
-}
 type ExistingInfraAutomateToml struct {
 	Config ExistingInfraAutomateConfigToml `toml:"config"`
 }
@@ -329,20 +315,6 @@ type ObjectStorageConfigToml struct {
 	Region                   string `toml:"region"`
 	Location                 string `toml:"location"`
 	GoogleServiceAccountFile string `toml:"google_service_account_file"`
-}
-
-type GoogleServiceAccountJSON struct {
-	Type                    string `json:"type" toml:"type"`
-	ProjectID               string `json:"project_id" toml:"project_id"`
-	PrivateKeyID            string `json:"private_key_id" toml:"private_key_id"`
-	PrivateKey              string `json:"private_key" toml:"private_key"`
-	ClientEmail             string `json:"client_email" toml:"client_email"`
-	ClientID                string `json:"client_id" toml:"client_id"`
-	AuthURI                 string `json:"auth_uri" toml:"auth_uri"`
-	TokenURI                string `json:"token_uri" toml:"token_uri"`
-	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url" toml:"auth_provider_x509_cert_url"`
-	ClientX509CertURL       string `json:"client_x509_cert_url" toml:client_x509_cert_url"`
-	UniverseDomain          string `json:"universe_domain" toml:"universe_domain"`
 }
 
 func init() {

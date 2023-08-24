@@ -76,24 +76,6 @@ func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml) *config.HaD
 		},
 		ObjectStorage: &config.ObjectStorage{
 			Config: &config.ConfigObjectStorage{
-				AccessKey:  existingInfraConfigObjectStorageConfig.AccessKey,
-				BucketName: existingInfraConfigObjectStorageConfig.BucketName,
-				Endpoint:   existingInfraConfigObjectStorageConfig.Endpoint,
-				Region:     existingInfraConfigObjectStorageConfig.Region,
-				SecretKey:  existingInfraConfigObjectStorageConfig.SecretKey,
-				/*				GoogleServiceAccount: &config.ConfigObjectStorage.GoogleServiceAccountJSON{
-								Type:                    existingInfraConfigObjectStorageConfig.GoogleServiceAccount.Type,
-								ProjectID:               existingInfraConfigObjectStorageConfig.GoogleServiceAccount.ProjectID,
-								PrivateKeyID:            existingInfraConfigObjectStorageConfig.GoogleServiceAccount.PrivateKeyID,
-								PrivateKey:              existingInfraConfigObjectStorageConfig.GoogleServiceAccount.PrivateKey,
-								ClientEmail:             existingInfraConfigObjectStorageConfig.GoogleServiceAccount.ClientEmail,
-								ClientID:                existingInfraConfigObjectStorageConfig.GoogleServiceAccount.ClientID,
-								AuthURI:                 existingInfraConfigObjectStorageConfig.GoogleServiceAccount.AuthURI,
-								TokenURI:                existingInfraConfigObjectStorageConfig.GoogleServiceAccount.TokenURI,
-								AuthProviderX509CertURL: existingInfraConfigObjectStorageConfig.GoogleServiceAccount.AuthProviderX509CertURL,
-								ClientX509CertURL:       existingInfraConfigObjectStorageConfig.GoogleServiceAccount.ClientX509CertURL,
-								UniverseDomain:          existingInfraConfigObjectStorageConfig.GoogleServiceAccount.UniverseDomain,
-							},*/
 				AccessKey:                existingInfraConfigObjectStorageConfig.AccessKey,
 				BucketName:               existingInfraConfigObjectStorageConfig.BucketName,
 				Endpoint:                 existingInfraConfigObjectStorageConfig.Endpoint,
