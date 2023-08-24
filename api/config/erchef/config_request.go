@@ -79,6 +79,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Authz.PoolQueueMax = w.Int32(200)
 	c.V1.Sys.Authz.PoolQueueTimeout = w.Int32(2000)
 	c.V1.Sys.Authz.CleanupBatchSize = w.Int32(0)
+	c.V1.Sys.Authz.NodeLicense = w.Int32(12)
 
 	c.V1.Sys.Sql.Timeout = w.Int32(5000)
 	c.V1.Sys.Sql.PoolInitSize = w.Int32(10)
@@ -106,7 +107,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ibrowse.IbrowseMaxPipelineSize = w.Int32(1)
 	c.V1.Sys.Ibrowse.IbrowseMaxSessions = w.Int32(256)
-
+	c.V1.Sys.Ibrowse.EnableIbrowseTraces = w.Bool(false)
 	c.V1.Sys.Health.HealthPingTimeout = w.Int32(400)
 
 	return c

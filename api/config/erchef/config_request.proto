@@ -97,7 +97,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_max = 5;
 				google.protobuf.Int32Value pool_queue_timeout = 6;
 				google.protobuf.Int32Value cleanup_batch_size = 7;
-				
+				google.protobuf.Int32Value node_license = 8;
 			}
 
 			message Sql {
@@ -141,6 +141,7 @@ message ConfigRequest {
 			message IBrowse {
 				google.protobuf.Int32Value ibrowse_max_pipeline_size = 1;
 				google.protobuf.Int32Value ibrowse_max_sessions = 2;
+				google.protobuf.BoolValue enable_ibrowse_traces = 3;
 			}
 		}
 		message Service {}
