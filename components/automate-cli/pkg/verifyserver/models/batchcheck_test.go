@@ -641,6 +641,35 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 		mockConfig.populateObjectStorageConfig(nil)
 		require.Empty(t, mockConfig)
 	})
+
+	t.Run("Emptly location", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+				},
+			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+		}
+
+		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
+
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.NotNil(t, mockConfig)
+	})
+
 	t.Run("ValidConfigS3", func(t *testing.T) {
 		mockHaDeployConfig := &config.HaDeployConfig{
 			ObjectStorage: &config.ObjectStorage{
