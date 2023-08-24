@@ -756,6 +756,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				ObjectStorage: &ObjectStorage{
 					Config: &ConfigObjectStorage{
+						Location:   "s3",
 						BucketName: "test",
 						AccessKey:  "test_access_key",
 						SecretKey:  "test_secret_key",

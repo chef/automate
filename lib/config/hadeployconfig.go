@@ -268,6 +268,8 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 				return fmt.Errorf("error unmarshalling Json file: %w", err)
 			}
 			c.ObjectStorage.Config.GcpServiceAccount = &gcpServiceAccount
+		} else if objectStorageConfig.Location == "" {
+			c.ObjectStorage.Config.Location = "s3"
 		}
 	}
 	return nil
