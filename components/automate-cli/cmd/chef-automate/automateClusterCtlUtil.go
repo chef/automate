@@ -590,7 +590,5 @@ func writeHAConfigFiles(templateName string, data interface{}, state string) err
 		return err
 	}
 
-	// write gcp file if exist
-	//err := fileutils.WriteFile(AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE, config, 0600)
 	return fileutils.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600)
 }
