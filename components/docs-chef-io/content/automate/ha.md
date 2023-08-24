@@ -69,6 +69,8 @@ In this, we expect VM (Virtual machine) or Bare Metal machines (Physical machine
 
 After this, installation steps will Deploy Chef Automate, Chef Infra Server, Postgresql DB, and OpenSearch DB to the relevant VMs or Physical Machines as provided in Config.
 
+Please refer [Performace Bench marking](https://docs.chef.io/automate/ha_performance_benchmarks/#performance-benchmarks) for more info.
+
 ### Cloud Deployment using Amazon Web Services (AWS)
 
 The two-step deployment process is as shown below:

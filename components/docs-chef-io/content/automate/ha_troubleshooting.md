@@ -33,6 +33,11 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 To make the service healthy, ensure the chef server can curl the data collector endpoint from the chef server node.
 
+- If that did not work ,try making this curl request from chef-server node `curl -k --cacert /path/to/fqdn-rootca-pem-file https://<AUTOMATE_FQDN>` 
+- This curl request will verify the authenticity of the server's SSL certificate (FQDN RootCA) against Automate FQDN.
+- If the response gives any problem about cert then try giving valid FQDN RootCA.
+- If it could not make a curl request make sure you have attached NAT Gateway to your private subnets.
+
 ### Deployment doesn't exit Gracefully
 
 There are some cases in which deployment doesn't exit successfully.

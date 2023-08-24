@@ -27,7 +27,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - We recommend creating a new VPC. And Bastion should be in the same VPC.
 - Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_rds/) to know more.
 - Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
-- For Backup with Managed Service, we have only one option: ' Amazon S3`.
+- For Backup with Managed Service, we have only one option: `Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
 - Preferred key type will be ed25519
 - Ensure your Linux has the `sysctl` utility available in all nodes.
