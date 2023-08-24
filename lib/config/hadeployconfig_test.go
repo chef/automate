@@ -844,9 +844,9 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				ObjectStorage: &ObjectStorage{
 					Config: &ConfigObjectStorage{
-						Location:       "gcs",
-						BucketName:     "test",
-						GcpServiceFile: "./testdata/gcsservicefile.json",
+						Location:                 "gcs",
+						BucketName:               "test",
+						GoogleServiceAccountFile: "./testdata/gcsservicefile.json",
 						GcpServiceAccount: &GcpServiceAccount{
 							Type:                    "service_account",
 							ProjectID:               "dev",
@@ -944,9 +944,9 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				ObjectStorage: &ObjectStorage{
 					Config: &ConfigObjectStorage{
-						Location:       "gcs",
-						BucketName:     "test",
-						GcpServiceFile: "./testdata/service.json",
+						Location:                 "gcs",
+						BucketName:               "test",
+						GoogleServiceAccountFile: "./testdata/service.json",
 					},
 				},
 			},
@@ -964,9 +964,9 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				ObjectStorage: &ObjectStorage{
 					Config: &ConfigObjectStorage{
-						Location:       "gcs",
-						BucketName:     "test",
-						GcpServiceFile: "./testdata/UnmarshalErrorForGcs.json",
+						Location:                 "gcs",
+						BucketName:               "test",
+						GoogleServiceAccountFile: "./testdata/UnmarshalErrorForGcs.json",
 					},
 				},
 			},

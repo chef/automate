@@ -69,14 +69,14 @@ type CertByIP struct {
 }
 
 type ConfigObjectStorage struct {
-	Location          string             `toml:"location,omitempty"`
-	BucketName        string             `toml:"bucket_name,omitempty"`
-	AccessKey         string             `toml:"access_key,omitempty"`
-	SecretKey         string             `toml:"secret_key,omitempty"`
-	Endpoint          string             `toml:"endpoint,omitempty"`
-	Region            string             `toml:"region,omitempty"`
-	GcpServiceFile    string             `toml:"gcp_service_file,omitempty"`
-	GcpServiceAccount *GcpServiceAccount `toml:"gcp_service_account,omitempty"`
+	Location                 string             `toml:"location,omitempty"`
+	BucketName               string             `toml:"bucket_name,omitempty"`
+	AccessKey                string             `toml:"access_key,omitempty"`
+	SecretKey                string             `toml:"secret_key,omitempty"`
+	Endpoint                 string             `toml:"endpoint,omitempty"`
+	Region                   string             `toml:"region,omitempty"`
+	GoogleServiceAccountFile string             `toml:"google_service_account_file"`
+	GcpServiceAccount        *GcpServiceAccount `toml:"gcp_service_account,omitempty"`
 }
 
 type AutomateSettings struct {
@@ -259,7 +259,7 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 	if c.GetConfigInitials() != nil && c.GetConfigInitials().BackupConfig == "object_storage" {
 		objectStorageConfig := c.GetObjectStorageConfig()
 		if objectStorageConfig.Location == "gcs" {
-			filepath, err := fileUtils.ReadFile(objectStorageConfig.GcpServiceFile)
+			filepath, err := fileUtils.ReadFile(objectStorageConfig.GoogleServiceAccountFile)
 			if err != nil {
 				return fmt.Errorf("error reading Json file: %w", err)
 			}

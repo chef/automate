@@ -34,7 +34,7 @@ backup_config = "object_storage"
 [object_storage.config]
 location = "gcs"
 bucket_name = "test"
-gcp_service_file = "./testdata/gcsservicefile.json"
+google_service_account_file = "./testdata/gcsservicefile.json"
 
 # [Optional] Mention object_storage region if applicable
 # Eg: region = "us-west-1"
