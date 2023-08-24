@@ -46,7 +46,7 @@ func TestGetS3Connection(t *testing.T) {
 		},
 	})
 	services := cs.GetS3Connection(&models.S3ConfigRequest{
-		Endpoint:   "s3://example-s3.aws.region.com",
+		Endpoint:   "http://s3.amazonaws.com",
 		BucketName: "backups",
 		BasePath:   "automate",
 		AccessKey:  "VALID-ACCESS-KEY",
