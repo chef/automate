@@ -296,7 +296,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 		c.Backup = &Backup{
 			ObjectStorage: &ObjectStorage{
 				BucketName: objectStorageConfig.BucketName,
-				GoogleServiceAccount: &GcpServiceAccount{
+				GcpServiceAccount: &GcpServiceAccount{
 					Type:                    objectStorageConfig.GcpServiceAccount.Type,
 					ProjectID:               objectStorageConfig.GcpServiceAccount.ProjectID,
 					PrivateKeyID:            objectStorageConfig.GcpServiceAccount.PrivateKeyID,
