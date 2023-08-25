@@ -76,3 +76,7 @@ The two-step deployment process is as shown below:
 - Provisioning Infrastructure. (Optional, if already manually done)
 - Deployment of services on the provisioned infrastructure.
   - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
+
+## Performance (Benchmarking)
+
+Please refer to the [Performance Benchmarking document](/automate/ha_performance_benchmarks/) for the detailed performance benchmark numbers
