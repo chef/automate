@@ -26,6 +26,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Post("/external-opensearch", vs.Handler.ExternalOpensearch)
 	apiChecksGroup.Post("/firewall", vs.Handler.FirewallCheck)
 	apiChecksGroup.Post("/aws-opensearch-s3-bucket-access", vs.Handler.CheckOSBackupS3)
+	apiChecksGroup.Post("/gcp-cloud-storage-config", vs.Handler.GetGCPCloudStorageConfig)
 
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
