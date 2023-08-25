@@ -182,7 +182,7 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 			errorList.PushBack(err)
 		}
 	}
-	if objectStorage.Location == "s3" {
+	if objectStorage.Location == AWS_S3 {
 		if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
 			errorList.PushBack(err)
 		}
