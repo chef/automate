@@ -1,0 +1,142 @@
+# This is a Chef Automate on-prem HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+
+[architecture.existing_infra]
+## === INPUT NEEDED ===
+# Eg.: ssh_user = "ubuntu"
+ssh_user = ""
+
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = ""
+
+# private ssh key file path to access instances
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
+ssh_key_file = ""
+
+# custome ssh port no to connect instances, default will be 22
+# Eg.: ssh_port = "22"
+ssh_port = ""
+
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "existing_nodes"
+workspace_path = "/hab/a2_deploy_workspace"
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "automate_backups"
+
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = "object_storage"
+
+# If backup_config = "object_storage" fill out [object_storage.config] as well 
+## Object storage similar to AWS S3 Bucket
+[object_storage.config]
+location = "gcs"
+bucket_name = "test"
+google_service_account_file = "./testdata/gcsservicefile.json"
+
+# [Optional] Mention object_storage region if applicable
+# Eg: region = "us-west-1"
+region = ""
+## === ===
+
+# ============== EC2 Nodes Config ======================
+[automate.config]
+## === INPUT NEEDED ===
+
+# Password for Automate UI for 'admin' user.
+admin_password = ""
+
+
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = "https://chefautomate.example.com"
+
+# No. of Automate Frontend Machine or VM eg.: instance_count = "2"
+instance_count = ""
+
+## === ===
+
+
+# teams_port = ""
+config_file = "automate.toml"
+root_ca = "a2_cert"
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = true
+# Add Automate load balancer root-ca and keys
+private_key = "a2_pvt_key"
+public_key = "a2_public_key"
+[[automate.config.certs_by_ip]]
+ip = "127.0.0.1"
+private_key = "a2_pvt_key"
+public_key = "a2_public_key"
+
+[chef_server.config]
+## === INPUT NEEDED ===
+
+# No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
+instance_count = "two"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = true
+# Add Chef Server load balancer keys
+private_key = "cs_pvt_key"
+public_key = "cs_public_key"
+[[chef_server.config.certs_by_ip]]
+ip = "127.0.0.1"
+private_key = "cs_pvt_key"
+public_key = "cs_public_key"
+
+## === ===
+
+[opensearch.config]
+## === INPUT NEEDED ===
+
+# No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = ""
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = true
+# Add OpenSearch load balancer root-ca and keys
+root_ca = "os_cert"
+admin_key = "os_admin_key"
+admin_cert = ""
+private_key = "os_pvt_key"
+public_key = "os_public_key"
+[[opensearch.config.certs_by_ip]]
+ip = ""
+private_key = "os_pvt_key"
+public_key = "os_public_key"
+
+## === ===
+
+[postgresql.config]
+## === INPUT NEEDED ===
+
+# No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = ""
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = true
+# Add postgresql load balancer root-ca and keys
+root_ca = "pg_cert"
+private_key = "pg_pvt_key"
+public_key = "pg_pvt_key"
+[[postgresql.config.certs_by_ip]]
+ip = "0.0.1"
+private_key = "pg_pvt_key"
+public_key = "pg_pvt_key"
+
+## === ===
+
+[existing_infra.config]
+## === INPUT NEEDED ===
+
+# provide comma-seperated IP addresses of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No. of IP address should be the same as the No. of instance_count count mentioned above in
+# automate.config, chef_server.config, opensearch.config and postgresql.config
+automate_private_ips = ["1324.2534.1"]
+chef_server_private_ips = []
+opensearch_private_ips = []
+postgresql_private_ips = []
+## === ===
