@@ -1,11 +1,16 @@
 package gcpcloudstorageservice
 
 import (
+	"context"
+
+	"cloud.google.com/go/storage"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
+	"github.com/pkg/errors"
+	"google.golang.org/api/option"
 
 	"github.com/chef/automate/lib/logger"
 )
@@ -30,16 +35,21 @@ func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils gcputils.GCPUtils) 
 
 func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
-	// sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, "")
-	// if err != nil {
-	// 	return ss.Response(constants.S3_CONNECTION_TITLE, "", errors.Wrap(err, constants.S3_CONNECTION_ERROR_MSG).Error(), constants.S3_CONNECTION_RESOLUTION_MSG, false)
-	// }
-	// s3Client := ss.AwsUtils.New(sess)
-	// err = ss.ListBuckets(s3Client)
-	// if err != nil {
-	// 	return ss.Response(constants.S3_CONNECTION_TITLE, "", errors.Wrap(err, constants.S3_CONNECTION_ERROR_MSG).Error(), constants.S3_CONNECTION_RESOLUTION_MSG, false)
-	// }
-	return ss.Response(constants.S3_CONNECTION_TITLE, constants.S3_CONNECTION_SUCCESS_MSG, "", "", true)
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(ss.Req.GoogleServiceAccountFile))
+	if err != nil {
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+	}
+
+	defer client.Close()
+
+	bucket := client.Bucket(ss.Req.BucketName)
+	_, err = bucket.Attrs(ctx)
+	if err != nil {
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_NOT_FOUND).Error(), constants.GCP_BUCKET_NOT_FOUND_RESOLUTION_MSG, false)
+	}
+
+	return ss.Response(constants.GCP_CONNECTION_TITLE, constants.GCP_CONNECTION_SUCCESS_MSG, "", "", true)
 }
 
 func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigRequest) *models.Checks {
@@ -71,7 +81,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, constants.S3_BUCKET_ACCESS_SUCCESS_MSG, "", "", true)
 }
 
-func (ss *GCPConfigService) AwsConnection(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
+func (ss *GCPConfigService) GCPConnection(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
 	// sess, err := ss.AwsUtils.NewSessionWithOptions(endpoint, accessKey, secretKey, region)
 	// if err != nil {
 	// 	ss.Logger.Error("s3 config aws connection failed: ", err.Error())
