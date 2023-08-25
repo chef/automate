@@ -109,6 +109,15 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	}
 	time.Sleep(5 * time.Second)
 	close(executed)
+	if command == "deploy" && isSuccess {
+		writer.Println("\n")
+		writer.Println("===================================================================================================")
+		writer.Println("\n")
+		writer.Println("Once the deployment is successful, you can run following commands to verify the deployment")
+		writer.Println("To check the consolidated node health: chef-automate status summary ")
+		writer.Println("To check the service health on each node: chef-automate status ")
+		writer.Println("To verify configurations of the deployment: chef-automate verify ")
+	}
 	return err
 }
 
