@@ -196,7 +196,7 @@ After successful deployment, proceed with following:
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
    1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
-## Sample config
+## Sample Config
 
 {{< note >}}
 Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
@@ -274,7 +274,7 @@ Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Post
     lb_access_logs = "true"
 ```
 
-## Uninstall Chef automate HA
+## Uninstall Chef Automate HA
 
 {{< danger >}}
 

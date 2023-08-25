@@ -45,8 +45,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host, This step i
   echo "region=<AWS-REGION>" >> ~/.aws/credentials
   ```
 
-- Have SSH Key Pair ready in AWS so new VMs are created using that pair.\
-  Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
+- Have SSH Key Pair ready in AWS so new VMs are created using that pair. Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrases for Private Key authentication.
 - Make sure that the bastion machine should be in the same vpc as mentioned in `config.toml`; otherwise, we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.

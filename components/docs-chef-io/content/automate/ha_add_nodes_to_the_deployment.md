@@ -6,8 +6,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Add Nodes to the Deployment"
-    parent = "automate/deploy_high_availability/manage"
-    identifier = "automate/deploy_high_availability/manage/ha_add_nodes_to_the_deployment.md Add Nodes to the Deployment"
+    parent = "automate/deploy_high_availability/manage_ha_cluster"
+    identifier = "automate/deploy_high_availability/manage_ha_cluster/ha_add_nodes_to_the_deployment.md Add Nodes to the Deployment"
     weight = 200
 +++
 

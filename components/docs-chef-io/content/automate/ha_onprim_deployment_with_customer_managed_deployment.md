@@ -20,7 +20,6 @@ This section will discuss deploying Chef Automate HA on-premise machines with cu
 ## Prerequisites
 
 - Refer to the [On-premises Deployment with Chef Managed Database](/automate/ha_onprim_deployment_procedure/)​ page for the on-premises deployment specific prerequisites.
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites).
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 
 See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.

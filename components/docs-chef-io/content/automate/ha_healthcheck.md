@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Automate HA Commands"
-    parent = "automate/deploy_high_availability"
-    identifier = "automate/deploy_high_availability/ha_healthcheck.md Automate HA Commands"
-    weight = 90
+    parent = "automate/deploy_high_availability/manage_ha_cluster"
+    identifier = "automate/deploy_high_availability/manage_ha_cluster/ha_healthcheck.md Automate HA Commands"
+    weight = 240
 +++
 
 {{< warning >}}

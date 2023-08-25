@@ -6,9 +6,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Remove Single Node from Cluster"
-    parent = "automate/deploy_high_availability/manage"
-    identifier = "automate/deploy_high_availability/manage/ha_remove_single_node_from_cluster.md Remove Single Node from Cluster"
-    weight = 200
+    parent = "automate/deploy_high_availability/manage_ha_cluster"
+    identifier = "automate/deploy_high_availability/manage_ha_cluster/ha_remove_single_node_from_cluster.md Remove Single Node from Cluster"
+    weight = 210
 +++
 
 Chef Automate HA comes with five different types of deployment flows. This page tells you how to remove nodes from your Automate cluster. Refer to the [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment/) page to see how to add more nodes to your deployment processes.
