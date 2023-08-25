@@ -106,7 +106,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Valid Object Storage Configuration",
 			objectStorage: &ConfigObjectStorage{
-				Location:   "s3",
+				Location:   AWS_S3,
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				SecretKey:  "secret-key",
@@ -118,7 +118,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Bucket Name",
 			objectStorage: &ConfigObjectStorage{
-				Location:  "s3",
+				Location:  AWS_S3,
 				AccessKey: "access-key",
 				SecretKey: "secret-key",
 				Endpoint:  "https://example.com",
@@ -129,7 +129,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Access Key",
 			objectStorage: &ConfigObjectStorage{
-				Location:   "s3",
+				Location:   AWS_S3,
 				BucketName: "my-bucket",
 				SecretKey:  "secret-key",
 				Endpoint:   "https://example.com",
@@ -140,7 +140,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Secret Key",
 			objectStorage: &ConfigObjectStorage{
-				Location:   "s3",
+				Location:   AWS_S3,
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				Endpoint:   "https://example.com",
@@ -151,7 +151,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Missing Endpoint",
 			objectStorage: &ConfigObjectStorage{
-				Location:   "s3",
+				Location:   AWS_S3,
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				SecretKey:  "secret-key",
@@ -162,7 +162,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Invalid Region",
 			objectStorage: &ConfigObjectStorage{
-				Location:   "s3",
+				Location:   AWS_S3,
 				BucketName: "my-bucket",
 				AccessKey:  "access-key",
 				SecretKey:  "secret-key",
@@ -174,7 +174,7 @@ func TestVerifyObjectStorage(t *testing.T) {
 		{
 			name: "Empty Type",
 			objectStorage: &ConfigObjectStorage{
-				Location: "gcs",
+				Location: GCS_STORAGE,
 				GcpServiceAccount: &GcpServiceAccount{
 					Type: "",
 				},

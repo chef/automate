@@ -8,6 +8,11 @@ import (
 	ptoml "github.com/pelletier/go-toml"
 )
 
+const (
+	AWS_S3      = "s3"
+	GCS_STORAGE = "gcs"
+)
+
 type HaDeployConfig struct {
 	Architecture  *Architecture          `toml:"architecture,omitempty"`
 	ObjectStorage *ObjectStorage         `toml:"object_storage,omitempty"`
@@ -258,7 +263,7 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 	gcpServiceAccount := GcpServiceAccount{}
 	if c.GetConfigInitials() != nil && c.GetConfigInitials().BackupConfig == "object_storage" {
 		objectStorageConfig := c.GetObjectStorageConfig()
-		if objectStorageConfig.Location == "gcs" {
+		if objectStorageConfig.Location == GCS_STORAGE {
 			filepath, err := fileUtils.ReadFile(objectStorageConfig.GoogleServiceAccountFile)
 			if err != nil {
 				return fmt.Errorf("error reading Json file: %w", err)
@@ -269,7 +274,7 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 			}
 			c.ObjectStorage.Config.GcpServiceAccount = &gcpServiceAccount
 		} else if objectStorageConfig.Location == "" {
-			c.ObjectStorage.Config.Location = "s3"
+			c.ObjectStorage.Config.Location = AWS_S3
 		}
 	}
 	return nil

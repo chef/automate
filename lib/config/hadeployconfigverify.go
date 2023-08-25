@@ -177,12 +177,12 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 	if err := validateRequiredString(objectStorage.BucketName, "bucket_name"); err != nil {
 		errorList.PushBack(err)
 	}
-	if objectStorage.Location == "gcs" {
+	if objectStorage.Location == GCS_STORAGE {
 		if err := c.verifyGcsStorage(objectStorage.GcpServiceAccount); err != nil {
 			errorList.PushBack(err)
 		}
 	}
-	if objectStorage.Location == "s3" {
+	if objectStorage.Location == AWS_S3 {
 		if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
 			errorList.PushBack(err)
 		}
