@@ -529,6 +529,7 @@ var ProductMetadataJSON = `
       "type": "base",
       "services": [
         "chef/backup-gateway",
+        "chef/cereal-service",
         "chef/license-control-service",
         "chef/automate-load-balancer"
       ],

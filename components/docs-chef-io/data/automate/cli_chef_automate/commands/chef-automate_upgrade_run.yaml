@@ -33,6 +33,9 @@ options:
   default_value: "false"
   usage: Flag for skipping disk space check during upgrade
   compatible_with_options: Automate
+- name: skip-verify
+  default_value: "false"
+  usage: Flag for skipping config verification check
 - name: upgrade-airgap-bundles
   default_value: "false"
   usage: |

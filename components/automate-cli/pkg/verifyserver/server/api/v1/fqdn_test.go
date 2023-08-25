@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -19,7 +20,7 @@ import (
 
 func SetupMockFqdnService() fqdnservice.IFqdnService {
 	return &fqdnservice.MockFqdnService{
-		CheckFqdnReachabilityFunc: func(req models.FqdnRequest, port string) models.FqdnResponse {
+		CheckFqdnReachabilityFunc: func(req models.FqdnRequest, port string, duration time.Duration) models.FqdnResponse {
 			return models.FqdnResponse{
 				Passed: true,
 				Checks: []models.Checks{

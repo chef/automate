@@ -45,8 +45,8 @@ To add a servicenow notification for Chef Automate, follow the steps given below
 1. Enter a unique notification **name**.
 1. Select the **failure type** to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan. According to the failure type selected, enter the **Webhook URL** as shown below:
 
-    - For Chef Infra Client Run: https://devxxxxx.service-now.com/api/x_chef_incident/v1/client_run
-    - For Inspec Scan: https://devxxxxx.service-now.com/api/x_chef_incident/v1/inspec_scan
+    - For Chef Infra Client Run: https://devxxxxx.service-now.com/api/x_chef_incident/client_run
+    - For Inspec Scan: https://devxxxxx.service-now.com/api/x_chef_incident/inspec_scan
 
 1. Enter the **ServiceNow Username**.
 1. Enter the **ServiceNow Password**.

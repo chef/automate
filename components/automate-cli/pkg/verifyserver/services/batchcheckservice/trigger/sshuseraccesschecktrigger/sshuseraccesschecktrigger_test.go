@@ -439,7 +439,7 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 		assert.Equal(t, err.Error(), actualerr.Error())
 	})
 
-	t.Run("Permission is greater the 400", func(t *testing.T) {
+	t.Run("Permission is greater than 600", func(t *testing.T) {
 		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
@@ -449,7 +449,7 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 			},
 		}, "1234")
 		ip := "1.2.3.4"
-		expected, err := models.SShUserRequest{}, errors.New("Provide permission on the SSH key file as 400 (Read Only by Owner).")
+		expected, err := models.SShUserRequest{}, errors.New("Provide permission on the SSH key file as 400 (Read Only by Owner) or 600 (Read and Write by Owner).")
 		actual, actualerr := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
 		assert.Equal(t, expected, actual)
 		assert.Equal(t, err.Error(), actualerr.Error())
@@ -461,6 +461,21 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 			},
 			GetFilePermissionFunc: func(filePath string) (int64, error) {
 				return 400, nil
+			},
+		}, "1234")
+		ip := "1.2.3.4"
+		expected := GetSshRequest()
+		actual, _ := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("Reading was successfull with 600 permissions", func(t *testing.T) {
+		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 600, nil
 			},
 		}, "1234")
 		ip := "1.2.3.4"

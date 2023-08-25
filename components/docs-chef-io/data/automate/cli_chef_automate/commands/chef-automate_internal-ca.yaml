@@ -20,7 +20,7 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- info - Print information the root certificate for the internal certificate authority
+- info - Print information of the root certificate for the internal certificate authority
 - regenerate - Commands to regenerate certificates issued by the internal certificate
   authority
-supported_on: FrontEnd
+supported_on: Bastion

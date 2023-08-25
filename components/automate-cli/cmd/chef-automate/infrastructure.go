@@ -65,10 +65,12 @@ func preInfrastructureCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 	}
 	if isA2HARBFileExist() {
-		if err = RunCmdOnSingleAutomateNode(cmd, args); err != nil {
+		output, err := RunCmdOnSingleAutomateNode(cmd, args)
+		if err != nil {
 			return err
 		}
-		os.Exit(1)
+		writer.Print(output)
+		os.Exit(0)
 	}
 	return nil
 }

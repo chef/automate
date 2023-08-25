@@ -15,10 +15,11 @@ import (
 )
 
 const (
-	FAIL_MSG         = "prompt failed %v"
-	INVALID_INT      = "invalid int"
-	PARSE_INT_FAIL   = "parse int failed %v"
-	REGEX_CHECK_FAIL = "regex check failed (%v) "
+	FAIL_MSG                            = "prompt failed %v"
+	INVALID_INT                         = "invalid int"
+	PARSE_INT_FAIL                      = "parse int failed %v"
+	REGEX_CHECK_FAIL                    = "input value failed to matched with expected pattern (%v)"
+	REGEX_CHECK_FAIL_WITH_SAMPLE_STRING = "regex check failed. Sample Value: %v"
 )
 const esc = "\033["
 const moveDown = esc + "1B"

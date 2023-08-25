@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,7 +16,19 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
+
+const (
+	SHOW_COMMAND = "chef-automate applications show-svcs"
+)
+
+type IExecutor interface {
+	execCommand(string) (string, error)
+	runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error)
+}
+
+type Executor struct{}
 
 func init() {
 	appsSubcmd := newApplicationsRootSubcmd()
@@ -29,7 +44,7 @@ func newApplicationsRootSubcmd() *cobra.Command {
 		Use:   "applications COMMAND",
 		Short: "Manage applications observability features",
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 }
@@ -159,7 +174,7 @@ Display a list of the habitat services stored in the applications database.
 `,
 		RunE: runApplicationsShowSvcsCmd,
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
@@ -189,7 +204,7 @@ services database.
 `,
 		RunE: runApplicationsRemoveSvcsCmd,
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
@@ -262,7 +277,16 @@ func makeServicesReqWithFilters() *applications.ServicesReq {
 	return req
 }
 
-func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
+func showApplicationsHA(cmd *cobra.Command, args []string, e IExecutor) error {
+	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
+	if err != nil {
+		return err
+	}
+	writer.Print(output)
+	return nil
+}
+
+func showApplicationsStandalone() error {
 	s := &serviceSet{
 		applicationsServiceFilters: applicationsServiceFiltersFlags,
 	}
@@ -281,11 +305,79 @@ func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
-	if !applicationsServiceFiltersFlags.FilterApplied() && !removeSvcsFlags.all {
-		return errors.New("You must filter the services to be deleted or pass the --all flag to delete all services")
+func runApplicationsShowSvcsCmd(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		if err := showApplicationsHA(cmd, args, Executor{}); err != nil {
+			return err
+		}
+	} else {
+		if err := showApplicationsStandalone(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func showAndPrompt(cmd *cobra.Command, e IExecutor, w *cli.Writer) ([]string, bool, error) {
+	var splittedString []string
+	flags := GetEnabledFlags(cmd, map[string]int{"all": 1})
+	showCmd := SHOW_COMMAND + flags
+	output, err := e.execCommand(showCmd)
+	if err != nil {
+		return splittedString, false, err
+	}
+	splittedString = strings.Split(output, "\n")
+	// splittedString always contains 2 lines no matter services matches the criteria or not
+	// first line is table header and last line is empty line.
+	// >2 means it's containing the services which matches the criteria.
+	if len(splittedString) > 2 {
+		for i := 0; i < len(splittedString); i++ {
+			fmt.Println(splittedString[i])
+		}
+		prompt := fmt.Sprintf("The above %d services will be deleted. Do you wish to continue?", len(splittedString)-2)
+		proceed, err := w.Confirm(prompt)
+		if err != nil {
+			return splittedString, false, err
+		}
+		if !proceed {
+			return splittedString, false, nil
+		}
+	}
+	return splittedString, true, nil
+}
+
+func removeApplicationsHA(cmd *cobra.Command, args []string, e IExecutor, w *cli.Writer) error {
+	var splittedString []string
+	// If user is not passing -y flag, then first we need to show the list with given conditions and then
+	// give confirmation prompt
+	if !removeSvcsFlags.yes {
+		var proceed bool
+		var err error
+		splittedString, proceed, err = showAndPrompt(cmd, e, w)
+		if err != nil {
+			return err
+		}
+		if !proceed {
+			return nil
+		}
+	}
+	args = append(args, "-y")
+	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
+	if err != nil {
+		return err
+	}
+	// len(splittedString) == 2 means list is empty it's just containing table header and empty line which means we haven't
+	// got any services to remove
+	if removeSvcsFlags.yes || len(splittedString) == 2 {
+		writer.Println(output)
+	} else {
+		writer.Println(fmt.Sprintf("Removed %d services", len(splittedString)-2))
 	}
 
+	return nil
+}
+
+func removeApplicationsStandalone() error {
 	s := &serviceSet{
 		applicationsServiceFilters: applicationsServiceFiltersFlags,
 	}
@@ -324,6 +416,22 @@ func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
+	if !applicationsServiceFiltersFlags.FilterApplied() && !removeSvcsFlags.all {
+		return errors.New("You must filter the services to be deleted or pass the --all flag to delete all services")
+	}
+	if isA2HARBFileExist() {
+		if err := removeApplicationsHA(cmd, args, Executor{}, writer); err != nil {
+			return err
+		}
+	} else {
+		if err := removeApplicationsStandalone(); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -333,6 +441,18 @@ type serviceSet struct {
 	appsClient applications.ApplicationsServiceClient
 	services   []*applications.Service
 	ctx        context.Context
+}
+
+func (e Executor) execCommand(cmd string) (string, error) {
+	output, err := exec.Command("/bin/sh", "-c", cmd).Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
+func (e Executor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
+	return RunCmdOnSingleAutomateNode(cmd, args)
 }
 
 func (s *serviceSet) Connect() error {
@@ -379,30 +499,36 @@ func (s *serviceSet) Load() error {
 //   - Print table rows as TSV for easier processing, even though the columns
 //     won't align all the time.
 func (s *serviceSet) PrintTSV() error {
-	svc := &applications.Service{}
-	if len(s.services) >= 1 {
-		svc = s.services[0]
+	maxIDLength, maxGroupLength, maxReleaseLength, maxFqdnLength, maxApplicationLength, maxEnvironmentLength, maxStatusLabelLength := 0, 0, 0, 0, 0, 0, 0
+	for _, t := range s.services {
+		maxIDLength = int(math.Max(float64(maxIDLength), float64(len(t.Id))))
+		maxGroupLength = int(math.Max(float64(maxGroupLength), float64(len(t.Group))))
+		maxReleaseLength = int(math.Max(float64(maxReleaseLength), float64(len(t.Release))))
+		maxFqdnLength = int(math.Max(float64(maxFqdnLength), float64(len(t.Fqdn))))
+		maxApplicationLength = int(math.Max(float64(maxApplicationLength), float64(len(t.Application))))
+		maxEnvironmentLength = int(math.Max(float64(maxEnvironmentLength), float64(len(t.Environment))))
+		maxStatusLabelLength = int(math.Max(float64(maxStatusLabelLength), float64(len(s.statusLabelFor(t)))))
 	}
 
 	// calculate a format string with fixed width, right padded strings for each
 	// of the columns
 	fmtString := fmt.Sprintf("%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\n",
-		len(svc.Id),
-		len(svc.Group),
-		len(svc.Release),
-		len(svc.Fqdn),
-		len(svc.Application)+len(svc.Environment)+1,
-		len(s.statusLabelFor(svc)),
+		maxIDLength,
+		maxGroupLength,
+		maxReleaseLength,
+		maxFqdnLength,
+		maxApplicationLength+maxEnvironmentLength+1,
+		maxStatusLabelLength,
 	)
 
-	fmt.Fprintf(os.Stderr, fmtString, "id", "svc.group", "release", "FQDN", "app:env", "status")
+	fmt.Printf(fmtString, "id", "svc.group", "release", "FQDN", "app:env", "status")
 	for _, svc := range s.services {
-		fmt.Printf("%s\t%s\t%s\t%s\t%s:%s\t%s\n",
+		fmt.Printf(fmtString,
 			svc.Id,
 			svc.Group,
 			svc.Release,
 			svc.Fqdn,
-			svc.Application, svc.Environment,
+			svc.Application+":"+svc.Environment,
 			s.statusLabelFor(svc),
 		)
 	}

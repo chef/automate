@@ -23,9 +23,9 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - If you want to use Default VPC, we have to create public and private subnets, If subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
 - We recommend creating a new vpc. And Bastion should be in the same VPC.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, `AdministratorAccess`.
+- Attach IAM role to the Bastion with `AmazonS3FullAccess`, `AdministratorAccess` privileges or get AWS user credentials with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 
-    Set these in `~/.aws/credentials` in Bastion Host:
+Set the AWS user credentials in `~/.aws/credentials` in Bastion Host:
 
     ```bash
     sudo su -
@@ -93,7 +93,7 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     "
     ```
-
+    
     Click [here](/automate/ha_config_gen) to know more about generating config
 
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
@@ -113,6 +113,12 @@ Run the following steps on Bastion Host Machine:
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
     "
     ```
+    
+    {{< note >}}
+
+    Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**
+
+    {{< /note >}}
 
 ## Config Verify
 
@@ -124,11 +130,9 @@ Run the following steps on Bastion Host Machine:
 
     To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
-
 ## Steps to Deploy
 
-1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of a previous command to your DNS from DNS Provider**. After that, continue with the deployment process with the following.
+1. The following command will run the deployment.
 
     ```bash
     sudo -- sh -c "
@@ -245,7 +249,7 @@ Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Post
     instance_count = "3"
 [aws]
   [aws.config]
-    profile = "default"
+    profile = "default"  # This should be commented incase if IAM role is attached
     region = "us-east-2"
     aws_vpc_id = "vpc12318h"
     private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]

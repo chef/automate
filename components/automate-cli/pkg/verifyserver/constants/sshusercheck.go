@@ -9,7 +9,7 @@ const (
 	SUDO_PASSWORD_SUCCESS_MESSAGE               = "SSH user sudo password is valid for the node: "
 	SSH_USER_FAILURE_TITLE                      = "SSH user unaccessible"
 	SSH_USER_ERROR_MESSAGE                      = "SSH user is unaccessible for the node with IP: "
-	SSH_USER_RESOLUTION_MESSAGE                 = "Give SSH access to the user with the give key on the node: "
+	SSH_USER_RESOLUTION_MESSAGE                 = "Give SSH access to the user with the given key on the node: "
 	SUDO_PASSWORD_FAILURE_TITLE                 = "Sudo password invalid"
 	SUDO_PASSWORD_ERROR_MESSAGE                 = "SSH user sudo password is invalid for the node with IP: "
 	SUDO_PASSWORD_FAILURE_RESOLUTION_MESSAGE    = "Ensure you have provided the correct sudo password and the user has sudo access on the node: "

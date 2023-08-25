@@ -377,7 +377,8 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// Doing batch-check API call for remote nodes
 	resRemote, err := v.runVerifyServiceForRemote(*batchCheckConfig)
 	if err != nil {
-		return err
+		v.printResponse(batchCheckResults)
+		return status.New(status.VerifyChecksError, "Checks failed on Remote Nodes: "+err.Error())
 	}
 
 	if err := json.Unmarshal(resRemote, &batchCheckResultRemote); err != nil {
@@ -486,6 +487,14 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
 		if err != nil {
 			return nil, err
+		}
+
+		notReachableIps, err := v.getHostIPsWithNoLatestCLI(hostIPs)
+		if err != nil {
+			return nil, err
+		}
+		if len(notReachableIps) > 0 {
+			return nil, errors.New("Nodes " + strings.Join(notReachableIps, ", ") + " are not reachable. This might be due to not enabling the 7799 port")
 		}
 	}
 
@@ -626,6 +635,9 @@ func (v *verifyCmdFlow) getResultFromResponseBody(responseBody []byte) ([]byte, 
 		return nil, fmt.Errorf("failed to unmarshal response body: %v", err)
 	}
 
+	if responseBodyStruct.Error != nil {
+		return nil, responseBodyStruct.Error
+	}
 	var resultBytes []byte
 	var err error
 	if v.prettyPrint {

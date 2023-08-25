@@ -136,6 +136,7 @@ type AwsConfigInitialsToml struct {
 	BackupConfig                string `toml:"backup_config"`
 	S3BucketName                string `toml:"s3_bucketName"`
 	HabitatUIDGid               string `toml:"habitat_uid_gid"`
+	AutomateDcToken             string `toml:"automate_dc_token,omitempty"`
 }
 
 type ExistingInfraArchitectureToml struct {
@@ -161,6 +162,7 @@ type ExistingInfraConfigInitialsToml struct {
 	BackupMount                 string `toml:"backup_mount,omitempty"`
 	HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
 	BackupConfig                string `toml:"backup_config,omitempty"`
+	AutomateDcToken             string `toml:"automate_dc_token,omitempty"`
 }
 
 type ExistingInfraAutomateToml struct {
