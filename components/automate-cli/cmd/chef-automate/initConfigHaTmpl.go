@@ -359,10 +359,11 @@ backup_mount = "/mnt/automate_backups"
 
 # Eg.: backup_config = "object_storage" or "file_system"
 backup_config = ""
-
 # If backup_config = "object_storage" fill out [object_storage.config] as well 
 ## Object storage similar to AWS S3 Bucket
 [object_storage.config]
+# for gcs we need to provide the bucket name and service_account json file path
+service_account = ""
 bucket_name = ""
 access_key = ""
 secret_key = ""
