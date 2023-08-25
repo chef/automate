@@ -94,6 +94,13 @@ func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml) *config.HaD
 								ClientX509CertURL:       existingInfraConfigObjectStorageConfig.GoogleServiceAccount.ClientX509CertURL,
 								UniverseDomain:          existingInfraConfigObjectStorageConfig.GoogleServiceAccount.UniverseDomain,
 							},*/
+				AccessKey:                existingInfraConfigObjectStorageConfig.AccessKey,
+				BucketName:               existingInfraConfigObjectStorageConfig.BucketName,
+				Endpoint:                 existingInfraConfigObjectStorageConfig.Endpoint,
+				Region:                   existingInfraConfigObjectStorageConfig.Region,
+				SecretKey:                existingInfraConfigObjectStorageConfig.SecretKey,
+				Location:                 existingInfraConfigObjectStorageConfig.Location,
+				GoogleServiceAccountFile: existingInfraConfigObjectStorageConfig.GoogleServiceAccountFile,
 			},
 		},
 		Automate: &config.AutomateSettings{

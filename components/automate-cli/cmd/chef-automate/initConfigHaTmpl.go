@@ -363,6 +363,8 @@ backup_config = ""
 ## Object storage similar to AWS S3 Bucket
 [object_storage.config]
 # for gcs we need to provide the bucket name and service_account json file path
+google_service_account_file = ""
+location = "" 
 bucket_name = ""
 access_key = ""
 secret_key = ""

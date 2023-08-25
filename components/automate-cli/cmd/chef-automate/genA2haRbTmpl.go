@@ -117,6 +117,9 @@ object_storage do
   {{ if .ObjectStorage.Config.GoogleServiceAccountJSON }} auth_provider_x509_cert_url "{{ .ObjectStorage.Config.GoogleServiceAccountJSON.AuthProviderX509CertURL }}" {{else}} # auth_provider_x509_cert_url "{{ .ObjectStorage.Config.GoogleServiceAccountJSON.AuthProviderX509CertURL }}"
   {{ if .ObjectStorage.Config.GoogleServiceAccountJSON }} client_x509_cert_url "{{ .ObjectStorage.Config.GoogleServiceAccountJSON.ClientX509CertURL }}" {{else}} # client_x509_cert_url "{{ .ObjectStorage.Config.GoogleServiceAccountJSON.ClientX509CertURL }}"
   {{ if .ObjectStorage.Config.GoogleServiceAccountJSON }} universe_domain "{{ .ObjectStorage.Config.GoogleServiceAccountJSON.UniverseDomain }}" {{else}} # universe_domain "{{ .ObjectStorage.Config.GoogleServiceAccountJSON.UniverseDomain }}"
+  location "{{ .ObjectStorage.Config.Location }}"
+  # default value for google_service_account_file :  "/hab/a2_deploy_workspace/googleServiceAccount.json"
+  google_service_account_file "{{ .ObjectStorage.Config.GoogleServiceAccountFile }}"
   
 end
 
