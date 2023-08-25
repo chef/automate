@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -636,13 +635,12 @@ func TestPopulateWith(t *testing.T) {
 }
 
 func TestPopulateObjectStorageConfig(t *testing.T) {
-	t.Run("NilConfig", func(t *testing.T) {
+	t.Run("Nil Config", func(t *testing.T) {
 		mockConfig := &Config{}
 		mockConfig.populateObjectStorageConfig(nil)
 		require.Empty(t, mockConfig)
 	})
-
-	t.Run("Emptly location", func(t *testing.T) {
+	t.Run("Empty Location", func(t *testing.T) {
 		mockHaDeployConfig := &config.HaDeployConfig{
 			ObjectStorage: &config.ObjectStorage{
 				Config: &config.ConfigObjectStorage{
@@ -662,15 +660,37 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 				},
 			},
 		}
-
-		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
-
 		mockConfig := &Config{}
 		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
-		require.NotNil(t, mockConfig)
+		require.Empty(t, mockConfig)
+	})
+	t.Run("Not Supported Location", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					Location:   "Azure",
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+				},
+			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+		}
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.Empty(t, mockConfig)
 	})
 
-	t.Run("ValidConfigS3", func(t *testing.T) {
+	t.Run("Valid Config S3", func(t *testing.T) {
 		mockHaDeployConfig := &config.HaDeployConfig{
 			ObjectStorage: &config.ObjectStorage{
 				Config: &config.ConfigObjectStorage{
@@ -692,8 +712,6 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 			},
 		}
 
-		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
-
 		mockConfig := &Config{}
 		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
 		require.NotNil(t, mockConfig)
@@ -704,7 +722,7 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 		require.Equal(t, mockConfig.Backup.ObjectStorage.Endpoint, "endpoint")
 	})
 
-	t.Run("ValidConfigGCS", func(t *testing.T) {
+	t.Run("Valid Config GCS", func(t *testing.T) {
 		mockHaDeployConfig := &config.HaDeployConfig{
 			ObjectStorage: &config.ObjectStorage{
 				Config: &config.ConfigObjectStorage{
@@ -734,8 +752,6 @@ func TestPopulateObjectStorageConfig(t *testing.T) {
 				},
 			},
 		}
-
-		fmt.Printf("mockHaDeployConfig.IsExistingInfra(): %v\n", mockHaDeployConfig.IsExistingInfra())
 
 		mockConfig := &Config{}
 		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)

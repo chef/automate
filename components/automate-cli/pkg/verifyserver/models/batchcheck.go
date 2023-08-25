@@ -15,7 +15,7 @@ import (
 
 const (
 	AWS_S3            = "s3"
-	GCP_CLOUD_STORAGE = "gcp"
+	GCP_CLOUD_STORAGE = "gcs"
 )
 
 type BatchCheckRequest struct {
@@ -318,6 +318,9 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 				},
 			},
 		}
+	} else {
+		logrus.Errorf("For now we don't support location: %s", objectStorageConfig.Location)
+		return
 	}
 }
 
