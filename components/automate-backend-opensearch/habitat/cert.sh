@@ -8,27 +8,3 @@ echo $OPENSEARCH_NODE1_PEM
 echo $OPENSEARCH_NODE1_KEY_PEM
 
 
-cat <<EOF >> $basePath/default.toml
-# root pem cert that signed the two cert/key pairs below
-rootCA = """$OPENSEARCH_ROOT_CA_PEM"""
-EOF
- 
-cat <<EOF >> $basePath/default.toml
-# Certificate used for admin actions against https://9200
-admin_cert = """$OPENSEARCH_ADMIN_PEM"""
-EOF
- 
-cat <<EOF >> $basePath/default.toml
-# the private key associated with the above pem cert
-admin_key = """$OPENSEARCH_ADMIN_KEY_PEM"""
-EOF
- 
-cat <<EOF >> $basePath/default.toml
-# Certificate used for intracluster ssl on port 9300
-ssl_cert = """$OPENSEARCH_NODE1_PEM"""
-EOF
- 
-cat <<EOF >> $basePath/default.toml
-# the private key associated with the above pem cert
-ssl_key = """$OPENSEARCH_NODE1_KEY_PEM"""
-EOF

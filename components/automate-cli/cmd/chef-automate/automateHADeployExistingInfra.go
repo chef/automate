@@ -66,7 +66,7 @@ func (e *existingInfra) generateConfig(state string) error {
 	}
 	errList := e.validateConfigFields()
 	if errList != nil && errList.Len() > 0 {
-		//return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
+		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
 	err = e.addDNTocertConfig()
 	if err != nil {
@@ -529,6 +529,8 @@ func checkCertValid(keys []keydetails) *list.List {
 	}
 	return errorList
 }
+
+const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
 
 func checkGoogleServiceAccountJson(filePath string, errorList *list.List) *GoogleServiceAccount {
 	if len(strings.TrimSpace(filePath)) < 1 {
