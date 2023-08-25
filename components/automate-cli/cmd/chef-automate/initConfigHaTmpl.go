@@ -363,18 +363,28 @@ backup_config = ""
 ## Object storage similar to AWS S3 Bucket
 [object_storage.config]
 # for gcs we need to provide the bucket name and service_account json file path
-service_account = ""
 bucket_name = ""
 access_key = ""
 secret_key = ""
 # For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
 # Include protocol to the enpoint value. Eg: https://customdns1.com or http://customdns2.com
 endpoint = ""
-
 # [Optional] Mention object_storage region if applicable
 # Eg: region = "us-west-1"
 region = ""
-## === ===
+# copy the attribute from the google service account json file
+[google_service_account]
+type = ""
+project_id = ""
+private_key_id = ""
+private_key =  ""
+client_email = ""
+client_id = ""
+auth_uri = ""
+token_uri = ""
+auth_provider_x509_cert_url = ""
+client_x509_cert_url = ""
+universe_domain = ""
 
 # ============== EC2 Nodes Config ======================
 [automate.config]

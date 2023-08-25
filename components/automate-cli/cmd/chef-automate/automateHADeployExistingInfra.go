@@ -247,6 +247,24 @@ func (e *existingInfra) validateExternalDbFields() *list.List {
 	return errorList
 }
 
+func validateGoogleServiceAccountJson(config *GoogleServiceAccountJSON, errorList *list.List) {
+	if config != nil {
+		if len(strings.TrimSpace(config.Type)) < 1 ||
+			len(strings.TrimSpace(config.ProjectID)) < 1 ||
+			len(strings.TrimSpace(config.PrivateKeyID)) < 1 ||
+			len(strings.TrimSpace(config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(config.ClientEmail)) < 1 ||
+			len(strings.TrimSpace(config.ClientID)) < 1 ||
+			len(strings.TrimSpace(config.AuthURI)) < 1 ||
+			len(strings.TrimSpace(config.TokenURI)) < 1 ||
+			len(strings.TrimSpace(config.AuthProviderX509CertURL)) < 1 ||
+			len(strings.TrimSpace(config.ClientX509CertURL)) < 1 ||
+			len(strings.TrimSpace(config.UniverseDomain)) < 1 {
+			errorList.PushBack("some field are missing the service account json ")
+		}
+	}
+}
+
 func extractIPsFromCertsByIP(certsByIp []CertByIP) []string {
 	ips := []string{}
 	for _, el := range certsByIp {
