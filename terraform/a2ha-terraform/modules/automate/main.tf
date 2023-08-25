@@ -42,7 +42,9 @@ locals {
       s3_endpoint                        = var.s3_endpoint,
       bucket_name                        = var.bucket_name,
       access_key                         = var.access_key
+      google_service_account_file        = var.google_service_account_file
       secret_key                         = var.secret_key
+      location                           = var.var.location 
       infra                              = var.infra
       automate_root_ca                   = var.automate_root_ca
       automate_public_key                = contains(keys(var.automate_certs_by_ip), var.private_ips[n]) ? var.automate_certs_by_ip[element(var.private_ips, n)].public_key : var.automate_public_key
@@ -70,6 +72,32 @@ locals {
     tmp_path                        = var.tmp_path
     nfs_mount_path                  = var.nfs_mount_path
   })
+}
+
+# Below code is for the gcp, it should only execute when it is object_storage and location = gcp
+resource "null_resource" "copy_file" {
+  triggers = {
+    source_exists = fileexists("${var.google_service_account_file}")
+  }
+
+  provisioner "local-exec" {
+    command = "echo GCP Service Account File exists"
+    when    = triggers.source_exists
+  }
+
+  provisioner "file" {
+    when        = triggers.source_exists
+    source      = "${var.google_service_account_file}"
+    destination = "${var.tmp_path}/${var.google_service_account_file}"
+  }
+
+  connection {
+    user        = var.ssh_user
+    private_key = file(var.ssh_key_file)
+    host        = element(var.private_ips, count.index)
+    port        = var.ssh_port
+    script_path = "${var.tmp_path}/tf_inline_script_system_gcp.sh"
+  }
 }
 
 # special conditional resource if the server is a non-bootstrap

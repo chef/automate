@@ -260,3 +260,11 @@ variable "teams_port" {
 variable "tmp_path" {
   default = "/hab/var/automate-ha"
 }
+
+variable "location" {
+  default = ""
+}
+
+variable "google_service_account_file" {
+  default = ""
+}

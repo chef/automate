@@ -281,6 +281,8 @@ module "bootstrap_automate" {
   access_key                         = var.access_key
   secret_key                         = var.secret_key
   aws_region                         = var.region
+  location                           = var.location
+  google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
   depends_on                         = [module.airgap_bundle-frontend, module.habitat-frontend]
@@ -357,6 +359,8 @@ module "automate" {
   access_key                         = var.access_key
   secret_key                         = var.secret_key
   aws_region                         = var.region
+  location                           = var.location
+  google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
   depends_on                         = [module.bootstrap_automate]
@@ -429,6 +433,8 @@ module "chef_server" {
   access_key                         = var.access_key
   secret_key                         = var.secret_key
   aws_region                         = var.region
+  location                           = var.location
+  google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
   depends_on                         = [module.bootstrap_automate]
@@ -449,6 +455,8 @@ module "keystore_opensearch" {
   backup_config_s3                = var.backup_config_s3
   access_key                      = var.access_key
   secret_key                      = var.secret_key
+  location                           = var.location
+  google_service_account_file        = var.google_service_account_file
   tmp_path                        = var.tmp_path
   depends_on                      = [module.bootstrap_automate]
 }

@@ -189,8 +189,8 @@
 [teams.v1.sys.service]
   port = <%= overrides[:teams_port] %>
 <% end %>
-
-<% if overrides[:backup_config_s3] == "true" -%>
+### Below is only for S3
+<% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "s3" -%>
 [global.v1.external.opensearch.backup]
   enable = true
   location = "s3"
@@ -284,3 +284,27 @@
 
 [erchef.v1.sys.keygen]
   cache_size=10
+
+
+#<% # Read the contents of a file and assign it to a variable <%= overrides[:automate_dc_token] %>-->
+<% tmp_path = overrides[:tmp_path] %>
+<% google_service_account_file = overrides[:google_service_account_file] %>
+<% file_path = File.join(tmp_path, google_service_account_file) %>
+<% gcp_json_file_content = File.read(file_path) %>
+
+  ### Below is only for GCP 
+<% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "gcp" -%>
+[global.v1.external.opensearch.backup]
+  enable = true
+  location = "gcp"
+[global.v1.backups]
+  location = "gcp"
+[global.v1.backups.gcs.bucket]
+  name = "<%= overrides[:bucket_name] %>"
+  base_path = "elasticsearch"
+[global.v1.backups.gcs.credentials]
+  json = '''
+<%= gcp_json_file_content %>
+'''
+<% end %>
+
