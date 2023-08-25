@@ -15,13 +15,13 @@ output "automate_data_collector_token" {
 }
 
 output "to_check_consolidated_status" {
-   value = "chef-automate status summary"
+  value = "chef-automate status summary"
 }
 
 output "to_check_detail_status" {
-   value = "chef-automate status"
+  value = "chef-automate status"
 }
 
 output "to_post_deployment_verify" {
-   value = "chef-automate verify"
+  value = "chef-automate verify"
 }
