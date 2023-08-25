@@ -1,10 +1,16 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/chef/automate/lib/io/fileutils"
 	ptoml "github.com/pelletier/go-toml"
+)
+
+const (
+	AWS_S3      = "s3"
+	GCS_STORAGE = "gcs"
 )
 
 type HaDeployConfig struct {
@@ -17,6 +23,20 @@ type HaDeployConfig struct {
 	ExistingInfra *ExistingInfraSettings `toml:"existing_infra,omitempty"`
 	Aws           *AwsSettings           `toml:"aws,omitempty"`
 	External      *ExternalSettings      `toml:"external,omitempty"`
+}
+
+type GcpServiceAccount struct {
+	Type                    string `json:"type"`
+	ProjectID               string `json:"project_id"`
+	PrivateKeyID            string `json:"private_key_id"`
+	PrivateKey              string `json:"private_key"`
+	ClientEmail             string `json:"client_email"`
+	ClientID                string `json:"client_id"`
+	AuthURI                 string `json:"auth_uri"`
+	TokenURI                string `json:"token_uri"`
+	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
+	ClientX509CertURL       string `json:"client_x509_cert_url"`
+	UniverseDomain          string `json:"universe_domain"`
 }
 
 type Architecture struct {
@@ -54,11 +74,14 @@ type CertByIP struct {
 }
 
 type ConfigObjectStorage struct {
-	BucketName string `toml:"bucket_name,omitempty"`
-	AccessKey  string `toml:"access_key,omitempty"`
-	SecretKey  string `toml:"secret_key,omitempty"`
-	Endpoint   string `toml:"endpoint,omitempty"`
-	Region     string `toml:"region,omitempty"`
+	Location                 string             `toml:"location,omitempty"`
+	BucketName               string             `toml:"bucket_name,omitempty"`
+	AccessKey                string             `toml:"access_key,omitempty"`
+	SecretKey                string             `toml:"secret_key,omitempty"`
+	Endpoint                 string             `toml:"endpoint,omitempty"`
+	Region                   string             `toml:"region,omitempty"`
+	GoogleServiceAccountFile string             `toml:"google_service_account_file"`
+	GcpServiceAccount        *GcpServiceAccount `toml:"gcp_service_account,omitempty"`
 }
 
 type AutomateSettings struct {
@@ -236,6 +259,23 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 	err = ptoml.Unmarshal(templateBytes, c) // Pass pointer to c
 	if err != nil {
 		return fmt.Errorf("error unmarshalling config TOML file: %w", err)
+	}
+	gcpServiceAccount := GcpServiceAccount{}
+	if c.GetConfigInitials() != nil && c.GetConfigInitials().BackupConfig == "object_storage" {
+		objectStorageConfig := c.GetObjectStorageConfig()
+		if objectStorageConfig.Location == GCS_STORAGE {
+			filepath, err := fileUtils.ReadFile(objectStorageConfig.GoogleServiceAccountFile)
+			if err != nil {
+				return fmt.Errorf("error reading Json file: %w", err)
+			}
+			err = json.Unmarshal(filepath, &gcpServiceAccount)
+			if err != nil {
+				return fmt.Errorf("error unmarshalling Json file: %w", err)
+			}
+			c.ObjectStorage.Config.GcpServiceAccount = &gcpServiceAccount
+		} else if objectStorageConfig.Location == "" {
+			c.ObjectStorage.Config.Location = AWS_S3
+		}
 	}
 	return nil
 }
