@@ -198,22 +198,6 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 			}
 		}
 	}
-	if objectStorage.Location == AWS_S3 {
-		if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
-			errorList.PushBack(err)
-		}
-		if err := validateRequiredString(objectStorage.SecretKey, "secret_key"); err != nil {
-			errorList.PushBack(err)
-		}
-		if err := validateS3Endpoint(objectStorage.Endpoint); err != nil {
-			errorList.PushBack(err)
-		}
-		if objectStorage.Region != "" {
-			if err := validateS3AWSRegion(objectStorage.Region); err != nil {
-				errorList.PushBack(err)
-			}
-		}
-	}
 	return getSingleErrorFromList(errorList)
 }
 
