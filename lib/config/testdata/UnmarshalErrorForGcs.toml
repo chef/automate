@@ -1,0 +1,15 @@
+# This is a Chef Automate on-prem HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+
+[architecture.existing_infra]
+
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = "object_storage"
+
+# If backup_config = "object_storage" fill out [object_storage.config] as well 
+## Object storage similar to AWS S3 Bucket
+[object_storage.config]
+location = "gcs"
+bucket_name = "test"
+google_service_account_file = "./testdata/UnmarshalErrorForGcs.json"
