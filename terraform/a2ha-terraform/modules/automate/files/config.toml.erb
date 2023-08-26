@@ -304,7 +304,7 @@
   base_path = "elasticsearch"
 [global.v1.backups.gcs.credentials]
   json = '''
-<%=  File.read(File.join(overrides[:tmp_path], overrides[:google_service_account_file])) %>
+<%=  File.read(File.join(overrides[:tmp_path], "googleServiceAccount.json")) %>
 '''
 <% end %>
 
