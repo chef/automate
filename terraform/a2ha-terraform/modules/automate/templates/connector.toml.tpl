@@ -31,9 +31,8 @@
   chef_server_custom_certs_enabled = ${chef_server_custom_certs_enabled}
   postgresql_custom_certs_enabled = ${postgresql_custom_certs_enabled}
   opensearch_custom_certs_enabled = ${opensearch_custom_certs_enabled}
-  tmp_path = {tmp_path}
-  location = ${location}
-  google_service_account_file = ${google_service_account_file}
+  tmp_path = "${tmp_path}"
+  location = "${location}"
   
 [services]
   [services.opensearch]
