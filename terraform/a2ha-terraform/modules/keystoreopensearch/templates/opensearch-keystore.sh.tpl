@@ -12,7 +12,7 @@ export OS_ORIGIN_NAME
 OS_PKG_NAME=$(echo "${opensearch_pkg_ident}" | awk -F/ '{print $2}')
 export OS_PKG_NAME
 OS_SETUP_FILE="opensearch.keystore.done"
-GCS_SERVICE_ACCOUNT_JSON="googleServiceAccount.json"
+export GCS_SERVICE_ACCOUNT_JSON="googleServiceAccount.json"
 export OS_SETUP_FILE
 
 # 
@@ -78,7 +78,7 @@ if [ "${backup_config_s3}" == "true" && "${location}" == "gcp" ]; then
     echo $OPENSEARCH_PATH_CONF
     
     if [  -f ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON ]; then
-      sudo chown -RL hab:hab ${tmp_path}/${GCS_SERVICE_ACCOUNT_JSON}
+      sudo chown -RL hab:hab ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON
     fi
     hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force add-file gcs.client.default.credentials_file ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON
     hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list

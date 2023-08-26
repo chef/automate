@@ -44,7 +44,7 @@ locals {
       access_key                         = var.access_key,
       google_service_account_file        = var.google_service_account_file,
       secret_key                         = var.secret_key,
-      location                           = var.var.location, 
+      location                           = var.location, 
       infra                              = var.infra,
       automate_root_ca                   = var.automate_root_ca,
       automate_public_key                = contains(keys(var.automate_certs_by_ip), var.private_ips[n]) ? var.automate_certs_by_ip[element(var.private_ips, n)].public_key : var.automate_public_key
