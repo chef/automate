@@ -192,8 +192,6 @@ func (e *existingInfra) validateConfigFields() *list.List {
 			if gcpJsonFile != nil {
 				fmt.Println("no gcp config file ")
 			} else {
-				//fmt.Println("config -> ", c)
-				//fmt.Println("--------------")
 				if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
 					errorList.PushBack("Invalid or empty access_key")
 				}

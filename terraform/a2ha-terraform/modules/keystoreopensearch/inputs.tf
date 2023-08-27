@@ -51,3 +51,7 @@ variable "tmp_path" {
 variable "location" {
   default = ""
 }
+
+variable "google_service_account_file" {
+  default = ""
+}

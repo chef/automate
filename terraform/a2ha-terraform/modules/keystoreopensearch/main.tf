@@ -7,6 +7,7 @@ locals {
     listen_port                     = var.opensearch_listen_port
     tmp_path                        = var.tmp_path
     location                        = var.location
+    google_service_account_file     = var.google_service_account_file
   })
 }
 
