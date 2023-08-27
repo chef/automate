@@ -75,19 +75,19 @@ locals {
 }
 
 # Below code is for the gcp, it should only execute when it is object_storage and location = gcp
- resource "null_resource" "copy_file" {
+ #resource "null_resource" "copy_file" {
 
-  provisioner "local-exec" {
-    command = <<EOT
-if [ -f "${var.google_service_account_file}" ]; then
-  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/googleServiceAccount.json
-  echo "GCP Service Account File copied"
-else
-  echo "GCP Service Account File does not exist"
-fi
-EOT
-  }
-}
+ # provisioner "local-exec" {
+ #   command = <<EOT
+#if [ -f "${var.google_service_account_file}" ]; then
+#  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/googleServiceAccount.json
+#  echo "GCP Service Account File copied"
+#else
+#  echo "GCP Service Account File does not exist"
+#fi
+#EOT
+#  }
+#}
 
 # special conditional resource if the server is a non-bootstrap
 # the file resource is nice and will wait until the file appears
@@ -155,6 +155,17 @@ resource "null_resource" "automate" {
   provisioner "file" {
     content     = local.provision
     destination = "${var.tmp_path}/automate_provision.sh"
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+if [ -f "${var.google_service_account_file}" ]; then
+  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/googleServiceAccount.json
+  echo "GCP Service Account File copied"
+else
+  echo "GCP Service Account File does not exist"
+fi
+EOT
   }
 
   provisioner "remote-exec" {
