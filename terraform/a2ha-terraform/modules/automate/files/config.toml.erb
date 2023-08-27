@@ -285,13 +285,6 @@
 [erchef.v1.sys.keygen]
   cache_size=10
 
-
-#<% # Read the contents of a file and assign it to a variable <%= overrides[:automate_dc_token] %>-->
-#<% tmp_path = overrides[:tmp_path] %>
-#<% google_service_account_file = overrides[:google_service_account_file] %>
-#<% file_path = File.join(tmp_path, "googleServiceAccount.json") %>
-#<% gcp_json_file_content = File.read(file_path) %>
-
 ### Below is only for GCP 
 <% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "gcs" -%>
 [global.v1.external.opensearch.backup]
