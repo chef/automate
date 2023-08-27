@@ -12,42 +12,6 @@ locals {
 }
 
 
-#resource "null_resource" "copy_file" {
-#provisioner "local-exec" {
-#    command = <<EOT
-#if [ -f "${var.google_service_account_file}" ]; then
-#  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/googleServiceAccount.json
-#  echo "GCP Service Account File copied"
-#else
-#  echo "GCP Service Account File does not exist"
-#fi
-#EOT
-#  }
-#}
-#resource "null_resource" "copy_file" {
-#  triggers = {
-#    source_exists = fileexists("${var.google_service_account_file}")
-#  }
-#
-#  provisioner "local-exec" {
-#    command = "echo GCP Service Account File exists"
-#    when    = triggers.source_exists
-#  }
-#
-#  provisioner "file" {
-#    when        = triggers.source_exists
-#    source      = "${var.google_service_account_file}"
-#    destination = "${var.tmp_path}/${var.google_service_account_file}"
-#  }
-#
-#  connection {
-#    user        = var.ssh_user
-#    private_key = file(var.ssh_key_file)
-#    host        = element(var.private_ips, count.index)
-#    port        = var.ssh_port
-#    script_path = "${var.tmp_path}/tf_inline_script_system_gcp.sh"
-#  }
-#}
 
 resource "null_resource" "opensearch_keystore" {
   count = var.backup_config_s3 == "true" ? var.opensearch_instance_count : 0

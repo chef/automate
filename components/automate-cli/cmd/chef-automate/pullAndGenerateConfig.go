@@ -35,7 +35,6 @@ type ObjectStorageConfig struct {
 	endpoint   string
 	bucketName string
 	RoleArn    string
-	//GoogleServiceAccount *GoogleServiceAccountJSON
 }
 
 type HAAwsAutoTfvars struct {
