@@ -11,18 +11,18 @@ locals {
 }
 
 
-resource "null_resource" "copy_file" {
-provisioner "local-exec" {
-    command = <<EOT
-if [ -f "${var.google_service_account_file}" ]; then
-  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/googleServiceAccount.json
-  echo "GCP Service Account File copied"
-else
-  echo "GCP Service Account File does not exist"
-fi
-EOT
-  }
-}
+#resource "null_resource" "copy_file" {
+#provisioner "local-exec" {
+#    command = <<EOT
+#if [ -f "${var.google_service_account_file}" ]; then
+#  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/googleServiceAccount.json
+#  echo "GCP Service Account File copied"
+#else
+#  echo "GCP Service Account File does not exist"
+#fi
+#EOT
+#  }
+#}
 #resource "null_resource" "copy_file" {
 #  triggers = {
 #    source_exists = fileexists("${var.google_service_account_file}")
@@ -62,6 +62,17 @@ resource "null_resource" "opensearch_keystore" {
   provisioner "file" {
     destination = "${var.tmp_path}/opensearch-keystore.sh"
     content     = local.keystore
+  }
+
+ provisioner "local-exec" {
+    command = <<EOT
+if [ -f "${var.google_service_account_file}" ]; then
+  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[count.index]}:${var.tmp_path}/googleServiceAccount.json
+  echo "GCP Service Account File copied"
+else
+  echo "GCP Service Account File does not exist"
+fi
+EOT
   }
 
   provisioner "remote-exec" {

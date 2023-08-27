@@ -28,7 +28,7 @@ SERVICE_UP_TIME=$(hab svc status  | awk  '{print $5}' | tail -1)
 
 # If you get following error, ===> `[: : integer expression expected`
 # try `until [[ "$SERVICE_UP_TIME" -gt 30 ]]` instead of `until [ "$SERVICE_UP_TIME" -gt 30 ]`
-if [ "${backup_config_s3}" == "true" && "${location}" == "s3" ]; then
+if [ "${location}" == "s3" ]; then
 
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
   if [ ! -f ${tmp_path}/$OS_SETUP_FILE ]; then
@@ -57,7 +57,7 @@ if [ "${backup_config_s3}" == "true" && "${location}" == "s3" ]; then
   fi
 fi
 
-if [ "${backup_config_s3}" == "true" && "${location}" == "gcp" ]; then
+if [  "${location}" == "gcs" ]; then
 
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
   if [ ! -f ${tmp_path}/$OS_SETUP_FILE ]; then
@@ -80,11 +80,21 @@ if [ "${backup_config_s3}" == "true" && "${location}" == "gcp" ]; then
     if [  -f ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON ]; then
       sudo chown -RL hab:hab ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON
     fi
-    hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force add-file gcs.client.default.credentials_file ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON
+    echo "---------------1------------------"
+    hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file ${tmp_path}/$GCS_SERVICE_ACCOUNT_JSON
+    echo "--------------2-------------------"
     hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
+    echo "---------------3------------------"
+
     sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
+        echo "--------------4-------------------"
+
     hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
+        echo "---------------5------------------"
+
     curl -k -X POST --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty"
+        echo "--------------6-------------------"
+
     sudo touch ${tmp_path}/$OS_SETUP_FILE
   fi
 fi

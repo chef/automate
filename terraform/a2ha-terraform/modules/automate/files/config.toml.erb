@@ -297,6 +297,20 @@
 [global.v1.external.opensearch.backup]
   enable = true
   location = "gcs"
+[global.v1.external.opensearch.backup.gcs]
+  bucket = "<%= overrides[:bucket_name] %>"
+  # base_path (optional):  The path within the bucket where backups should be stored
+  # If base_path is not set, backups will be stored at the root of the bucket.
+  base_path = "elasticsearch"
+  ## GCS Bucket Settings:
+  # type = nearline
+  # access control = uniform
+  client = "default"
+  [global.v1.external.opensearch.auth]
+    scheme = "basic_auth"
+  [global.v1.external.opensearch.auth.basic_auth]
+  username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
+  password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
 [global.v1.backups]
   location = "gcs"
 [global.v1.backups.gcs.bucket]
