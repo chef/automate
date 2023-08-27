@@ -306,11 +306,6 @@
   # type = nearline
   # access control = uniform
   client = "default"
-  [global.v1.external.opensearch.auth]
-    scheme = "basic_auth"
-  [global.v1.external.opensearch.auth.basic_auth]
-  username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
-  password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
 [global.v1.backups]
   location = "gcs"
 [global.v1.backups.gcs.bucket]
