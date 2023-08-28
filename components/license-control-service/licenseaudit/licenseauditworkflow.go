@@ -65,6 +65,8 @@ func getInterval(frequency string) rrule.Frequency {
 		freq = rrule.SECONDLY
 	} else if frequency == "MINUTE" {
 		freq = rrule.MINUTELY
+	} else if frequency == "HOUR" {
+		freq = rrule.HOURLY
 	} else {
 		freq = rrule.DAILY
 	}
