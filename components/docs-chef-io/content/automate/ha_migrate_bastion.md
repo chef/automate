@@ -18,7 +18,7 @@ gh_repo = "automate"
 ## Pre-requisite:
 
 - Have a working HA cluster with Bastion 
-- New VM for a replacement Bastion with necessary hardware requirement for bastion (recommended to have same OS as the original bastion) - AWS Deployment Prerequisites 
+- New VM for a replacement Bastion with necessary hardware requirement for bastion (recommended to have same OS as the original bastion) - [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement)
 
  
 {{< note >}}
@@ -81,6 +81,7 @@ chmod 600 <ssh_key_file>
     ```
     ls -la /hab/cache/artifacts/*cli*
     ```
+    
     - For deployment package
 
     ```
