@@ -114,22 +114,6 @@ const (
 					"error_msg": "",
 					"resolution_msg": "",
 				  	"skipped": false
-				},
-				{
-					"title": "Check for reachability of service at destination port from the source node",
-					"passed": true,
-					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-					"error_msg": "",
-					"resolution_msg": "",
-				  	"skipped": false
-				},
-				{
-					"title": "Check for reachability of service at destination port from the source node",
-					"passed": true,
-					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-					"error_msg": "",
-					"resolution_msg": "",
-				  	"skipped": false
 				}
 			  ],
 			  "skipped": false
