@@ -365,7 +365,7 @@ backup_config = ""
 # for gcs we need to provide the bucket name and service_account json file path
 # google_service_account_file = "/home/user/MY-GOOGLE-ACCOUNT-SERVICE.json"
 google_service_account_file = ""
-# location = s3 or gcs or filesystem
+# location = s3 or gcs 
 location = "" 
 bucket_name = ""
 access_key = ""
