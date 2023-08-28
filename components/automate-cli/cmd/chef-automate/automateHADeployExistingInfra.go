@@ -182,15 +182,14 @@ func (e *existingInfra) validateConfigFields() *list.List {
 
 	if len(e.config.Architecture.ConfigInitials.BackupConfig) > 0 {
 		if e.config.Architecture.ConfigInitials.BackupConfig == "object_storage" {
-			//fmt.Println("file -> ", e.config.ObjectStorage.Config.GoogleServiceAccountFile)
 			// Bucket check is comman in AWS and GCP
 			if len(e.config.ObjectStorage.Config.BucketName) < 1 {
 				errorList.PushBack("Invalid or empty bucket_name")
 			}
-			// if gcpJsonFile file exist then it the gcp flow other wise aws flow
-			gcpJsonFile := checkGoogleServiceAccountJson(e.config.ObjectStorage.Config.GoogleServiceAccountFile, errorList)
-			if gcpJsonFile != nil {
-				fmt.Println("no gcp config file ")
+			// if gcsJsonFile file exist then it the gcp flow other wise other flow
+			gcsJsonFileTask := checkGoogleServiceAccountJson(e.config.ObjectStorage.Config.GoogleServiceAccountFile, errorList)
+			if gcsJsonFileTask != nil {
+				errorList.PushBack("Invalid or empty GCP file ")
 			} else {
 				if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
 					errorList.PushBack("Invalid or empty access_key")
@@ -258,25 +257,6 @@ func (e *existingInfra) validateExternalDbFields() *list.List {
 	return errorList
 }
 
-/*
-	func validateGoogleServiceAccountJson(config *GoogleServiceAccountJSON, errorList *list.List) {
-		if config != nil {
-			if len(strings.TrimSpace(config.Type)) < 1 ||
-				len(strings.TrimSpace(config.ProjectID)) < 1 ||
-				len(strings.TrimSpace(config.PrivateKeyID)) < 1 ||
-				len(strings.TrimSpace(config.PrivateKey)) < 1 ||
-				len(strings.TrimSpace(config.ClientEmail)) < 1 ||
-				len(strings.TrimSpace(config.ClientID)) < 1 ||
-				len(strings.TrimSpace(config.AuthURI)) < 1 ||
-				len(strings.TrimSpace(config.TokenURI)) < 1 ||
-				len(strings.TrimSpace(config.AuthProviderX509CertURL)) < 1 ||
-				len(strings.TrimSpace(config.ClientX509CertURL)) < 1 ||
-				len(strings.TrimSpace(config.UniverseDomain)) < 1 {
-				errorList.PushBack("some field are missing the service account json ")
-			}
-		}
-	}
-*/
 func extractIPsFromCertsByIP(certsByIp []CertByIP) []string {
 	ips := []string{}
 	for _, el := range certsByIp {
@@ -531,12 +511,12 @@ func checkCertValid(keys []keydetails) *list.List {
 
 const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
 
-func checkGoogleServiceAccountJson(filePath string, errorList *list.List) *GoogleServiceAccount {
+func checkGoogleServiceAccountJson(filePath string, errorList *list.List) error {
 	if len(strings.TrimSpace(filePath)) < 1 {
+		errorList.PushBack("File name is empty")
 		return nil
 	}
-	// Open the JSON file
-	//fmt.Println(filePath)
+	// Read the json file
 	file, err := os.Open(filePath)
 	if err != nil {
 		errorList.PushBack("Error opening file")
@@ -553,7 +533,6 @@ func checkGoogleServiceAccountJson(filePath string, errorList *list.List) *Googl
 		errorList.PushBack(err.Error())
 		return nil
 	}
-	fmt.Println("json", serviceAccount)
 	// Validate the required fields
 	if len(strings.TrimSpace(serviceAccount.Type)) < 1 {
 		errorList.PushBack("Invalid type")
@@ -598,23 +577,19 @@ func checkGoogleServiceAccountJson(filePath string, errorList *list.List) *Googl
 	if len(strings.TrimSpace(serviceAccount.UniverseDomain)) < 1 {
 		errorList.PushBack("Invalid universe_domain")
 	}
+	//fmt.Println("Service Account JSON is valid")
+	return writeGoogleserviceJsonFile(AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE, serviceAccount, errorList)
 
-	// Add more validation checks as needed
-
-	fmt.Println("Service Account JSON is valid")
-
-	writeGoogleserviceJsonFile(AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE, serviceAccount, errorList)
-	return &serviceAccount
 }
 
-func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAccount, errorList *list.List) {
+func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAccount, errorList *list.List) error {
 
 	// Check if the file already exists
 	if _, err := os.Stat(filePath); err == nil {
 		// Remove the existing file
 		if err := os.Remove(filePath); err != nil {
 			errorList.PushBack("Error removing existing file")
-			return
+			return err
 		}
 	}
 
@@ -622,7 +597,7 @@ func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAcc
 	file, err := os.Create(filePath)
 	if err != nil {
 		errorList.PushBack("Error while creating service account file")
-		return
+		return err
 	}
 	defer file.Close()
 
@@ -631,9 +606,9 @@ func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAcc
 	err = encoder.Encode(serviceAccount)
 	if err != nil {
 		errorList.PushBack("Error encoding service account JSON")
-		return
+		return err
 	}
-
-	fmt.Printf("Service Account JSON written to %s\n", filePath)
+	//fmt.Printf("Service Account JSON written to %s\n", filePath)
+	return nil
 
 }
