@@ -132,11 +132,13 @@ var existingInfraConfig = &ExistingInfraConfigToml{
 	},
 	ObjectStorage: ObjectStorageToml{
 		Config: ObjectStorageConfigToml{
-			AccessKey:  "existing-access-key",
-			BucketName: "existing-bucket",
-			Endpoint:   "existing-endpoint",
-			Region:     "existing-region",
-			SecretKey:  "existing-secret-key",
+			AccessKey:                "existing-access-key",
+			BucketName:               "existing-bucket",
+			Endpoint:                 "existing-endpoint",
+			Region:                   "existing-region",
+			SecretKey:                "existing-secret-key",
+			Location:                 "gcs",
+			GoogleServiceAccountFile: "googleServiceAccount.json",
 		},
 	},
 }
