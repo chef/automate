@@ -374,8 +374,6 @@ endpoint = ""
 # [Optional] Mention object_storage region if applicable
 # Eg: region = "us-west-1"
 region = ""
-# copy the attribute from the google service account json file
-google_service_account_file = "/home/service.json"
 
 # ============== EC2 Nodes Config ======================
 [automate.config]
