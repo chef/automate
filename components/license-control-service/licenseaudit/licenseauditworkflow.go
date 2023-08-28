@@ -17,7 +17,7 @@ var (
 	WorkflowName         = cereal.NewWorkflowName("license-audit")
 	LicenseAuditTaskName = cereal.NewTaskName("license-audit-task")
 	ScheduleName         = "license-audit"
-	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s -o %s"
+	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s -o %s -u %s"
 	CleanCVSFilesCommand = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate clean"
 	OutputFileName       = "license-audit-report"
 	CleanReportFiles     = "rm -rf %s.*"
@@ -197,7 +197,7 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	log.Info("Endpoint url we got is", t.EndPointURl)
 
-	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(t.Command))
+	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(t.Command, t.EndPointURl))
 	if err != nil {
 		log.Errorf("Failed to execute the command for audit with %v as error %s", err, output)
 		return nil, err
@@ -217,9 +217,9 @@ func executeCommandforAudit(executeCommand ExecuteCommand, command string) (stri
 }
 
 // getAppendedCommand gets the appended command with date
-func getAppendedCommand(commandToExecute string) string {
+func getAppendedCommand(commandToExecute string, url string) string {
 	yesterdayDate := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
-	return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate, OutputFileName)
+	return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate, OutputFileName, url)
 }
 
 func getWorkflowParametersAndEnqueTask(w cereal.WorkflowInstance) (AuditWorkflowParameters, error) {
