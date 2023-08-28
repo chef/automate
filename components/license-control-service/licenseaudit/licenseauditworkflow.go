@@ -195,8 +195,6 @@ func (t *LicenseAuditTask) Run(ctx context.Context, task cereal.Task) (interface
 		return nil, err
 	}
 
-	log.Info("Endpoint url we got is", t.EndPointURl)
-
 	output, err := executeCommandforAudit(t.ExecuteCommand, getAppendedCommand(t.Command, t.EndPointURl))
 	if err != nil {
 		log.Errorf("Failed to execute the command for audit with %v as error %s", err, output)
