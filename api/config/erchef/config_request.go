@@ -55,7 +55,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Api.S3BucketName = w.String("")
 	c.V1.Sys.Api.S3Enabled = w.Bool(false)
 	c.V1.Sys.Api.S3ExternalUrl = w.String("")
-	c.V1.Sys.Api.S3UrlExpiryWindowSizePercent = w.Int32(30)
+	c.V1.Sys.Api.S3UrlExpiryWindowSizePercent = w.Int32(100)
 	c.V1.Sys.Keygen.WorkerCount = w.Int32(2)
 	c.V1.Sys.Keygen.CacheSize = w.Int32(1000)
 	c.V1.Sys.Keygen.StartSize = w.Int32(2)
@@ -79,7 +79,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Authz.PoolQueueMax = w.Int32(200)
 	c.V1.Sys.Authz.PoolQueueTimeout = w.Int32(2000)
 	c.V1.Sys.Authz.CleanupBatchSize = w.Int32(0)
-	c.V1.Sys.Authz.NodeLicense = w.Int32(12)
+	c.V1.Sys.Authz.NodeLicense = w.Int32(999999)
 
 	c.V1.Sys.Sql.Timeout = w.Int32(5000)
 	c.V1.Sys.Sql.PoolInitSize = w.Int32(10)
