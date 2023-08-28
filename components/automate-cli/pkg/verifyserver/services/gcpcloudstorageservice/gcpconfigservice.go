@@ -6,13 +6,12 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/storage"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
 	"github.com/chef/automate/lib/logger"
@@ -62,14 +61,20 @@ func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRe
 
 func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
-	// S3 connection
+
+	// GCP connection
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(ss.Req.GoogleServiceAccountFile))
+	bx, err := json.Marshal(ss.Req.GcpServiceAccount)
+	if err != nil {
+		logrus.Errorf("error while marshling to binary: %v", err)
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+	}
+	client, err := storage.NewClient(ctx, option.WithCredentialsJSON(bx))
 	if err != nil {
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
 	}
 
-	// Upload data in s3 bucket
+	// Upload data in GCP bucket
 	fileName := "test.txt"
 	bucket := client.Bucket(ss.Req.BucketName)
 	uploadObject := bucket.Object(fileName)
@@ -83,62 +88,31 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 	}
 	fmt.Printf("Created and uploaded content to gs://%s/%s\n", ss.Req.BucketName, fileName)
 
-	// read/list data in s3 bucket
+	// read/list data in GCP bucket
+	query := &storage.Query{Prefix: "test"}
 
-	// delete data in s3 bucket
+	it := bucket.Objects(ctx, query)
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
 
-	return ss.Response(constants.GCP_BUCKET_ACCESS_TITLE, constants.GCP_BUCKET_ACCESS_SUCCESS_MSG, "", "", true)
-}
+		if err != nil {
+			logrus.Errorf("Error listing the objects")
+			return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+		}
 
-func (ss *GCPConfigService) GCPConnection(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
-	// sess, err := ss.AwsUtils.NewSessionWithOptions(endpoint, accessKey, secretKey, region)
-	// if err != nil {
-	// 	ss.Logger.Error("s3 config aws connection failed: ", err.Error())
-	// 	return nil, err
-	// }
-	// ss.Logger.Debug("s3 config aws connection success")
-	return nil, nil
-}
+		fmt.Println("The bucket", attrs.Name)
+	}
 
-func (ss *GCPConfigService) ListBuckets(s3Client *s3.S3) error {
-	// // list buckets in s3 to verify secrete and access key
-	// _, err := ss.AwsUtils.ListBuckets(s3Client)
-	// if err != nil {
-	// 	ss.Logger.Error("s3 config list bucket failed: ", err.Error())
-	// 	return err
-	// }
-	// ss.Logger.Debug("s3 config list object success")
-	return nil
-}
+	// Delete data in GCP bucket
+	if err := uploadObject.Delete(ctx); err != nil {
+		logrus.Errorf("Error deleting the objects")
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+	}
 
-func (ss *GCPConfigService) DeleteObjects(s3Client *s3.S3) error {
-	// _, err := ss.AwsUtils.DeleteObject(s3Client, ss.Req.BucketName, ss.Req.BasePath)
-	// if err != nil {
-	// 	ss.Logger.Error("s3 config delete object failed: ", err.Error())
-	// 	return err
-	// }
-	// ss.Logger.Debug("s3 config delete object success")
-	return nil
-}
-
-func (ss *GCPConfigService) ListObjects(s3Client *s3.S3) error {
-	// _, err := ss.AwsUtils.ListObjectsV2(s3Client, ss.Req.BucketName, ss.Req.BasePath)
-	// if err != nil {
-	// 	ss.Logger.Error("s3 config list object failed: ", err.Error())
-	// 	return err
-	// }
-	// ss.Logger.Debug("s3 config list object success")
-	return nil
-}
-
-func (ss *GCPConfigService) UploadObject(sess *session.Session) error {
-	// _, err := ss.AwsUtils.NewUploader(sess, ss.Req.BucketName, ss.Req.BasePath)
-	// if err != nil {
-	// 	ss.Logger.Error("s3 config upload object failed: ", err.Error())
-	// 	return err
-	// }
-	// ss.Logger.Debug("s3 config upload object success")
-	return nil
+	return ss.Response(constants.GCP_BUCKET_ACCESS_TITLE, constants.GCP_CONNECTION_SUCCESS_MSG, "", "", true)
 }
 
 func (ss *GCPConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) *models.Checks {
