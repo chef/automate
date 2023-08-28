@@ -131,3 +131,8 @@ func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUserCheckSer
 	h.SshUserCheckService = ssu
 	return h
 }
+
+func (h *Handler) AddGCSConfigService(ss gcpcloudstorageservice.GCPCloudStorageConfig) *Handler {
+	h.GCPConfigService = ss
+	return h
+}

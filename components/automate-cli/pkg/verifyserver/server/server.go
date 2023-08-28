@@ -7,6 +7,7 @@ import (
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/fqdnservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/gcpcloudstorageservice"
 
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
@@ -110,7 +111,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
 			), l, port)).
-		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, httputils.NewClient(l),systemresource.NewSystemResourceInfoImpl())).
+		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, httputils.NewClient(l), systemresource.NewSystemResourceInfoImpl())).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
 		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).
@@ -124,7 +125,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
 		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
-		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l)))
+		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l))).
+		AddGCSConfigService(gcpcloudstorageservice.NewGCPCloudStorageConfig(l))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

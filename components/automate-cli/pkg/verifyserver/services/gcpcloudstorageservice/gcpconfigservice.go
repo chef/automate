@@ -2,6 +2,7 @@ package gcpcloudstorageservice
 
 import (
 	"context"
+	"fmt"
 
 	"cloud.google.com/go/storage"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -26,16 +27,16 @@ type GCPConfigService struct {
 	GcpUtils gcputils.GCPUtils
 }
 
-func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils gcputils.GCPUtils) GCPCloudStorageConfig {
+func NewGCPCloudStorageConfig(logger logger.Logger) GCPCloudStorageConfig {
 	return &GCPConfigService{
-		Logger:   logger,
-		GcpUtils: gcpUtils,
+		Logger: logger,
 	}
 }
 
 func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
 	ctx := context.Background()
+	fmt.Printf("ss.Req.GoogleServiceAccountFile: %v\n", ss.Req.GoogleServiceAccountFile)
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(ss.Req.GoogleServiceAccountFile))
 	if err != nil {
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
@@ -53,31 +54,32 @@ func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRe
 }
 
 func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigRequest) *models.Checks {
-	// ss.Req = req
-	// // S3 connection
-	// sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
-	// if err != nil {
-	// 	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
-	// }
+	ss.Req = req
+	// S3 connection
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(ss.Req.GoogleServiceAccountFile))
+	if err != nil {
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+	}
 
-	// s3Client := ss.AwsUtils.New(sess)
-	// // upload data in s3 bucket
-	// err = ss.UploadObject(sess)
-	// if err != nil {
-	// 	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
-	// }
+	// Upload data in s3 bucket
+	fileName := "test.txt"
+	bucket := client.Bucket(ss.Req.BucketName)
+	uploadObject := bucket.Object(fileName)
 
-	// // read/list data in s3 bucket
-	// err = ss.ListObjects(s3Client)
-	// if err != nil {
-	// 	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
-	// }
+	wc := uploadObject.NewWriter(ctx)
+	if _, err := fmt.Fprintf(wc, "Heute ist ein schöner Tag."); err != nil {
+		return nil
+	}
+	if err := wc.Close(); err != nil {
+		return nil
+	}
+	fmt.Printf("Created and uploaded content to gs://%s/%s\n", ss.Req.BucketName, fileName)
 
-	// // delete data in s3 bucket
-	// err = ss.DeleteObjects(s3Client)
-	// if err != nil {
-	// 	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
-	// }
+	// read/list data in s3 bucket
+
+	// delete data in s3 bucket
+
 	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, constants.S3_BUCKET_ACCESS_SUCCESS_MSG, "", "", true)
 }
 
