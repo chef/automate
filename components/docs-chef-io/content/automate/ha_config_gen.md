@@ -35,7 +35,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 
 ## SSH User and Group
 
-- `ssh user name` user name to ssh to cluster instances.
+- `ssh user name` user name to ssh to cluster instances Example `~/.ssh/my-key.pem`.
 - `ssh group name` group name which is associated with ssh user.
 - `ssh port no` port to do ssh, default is 22 incase you have different port then provide the ssh port number.
 - `ssh key file path` ssh key file path, same will be used to ssh to cluster instances.
@@ -97,7 +97,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
   - `EBS volume size` it should be based on your load needs.
   - `EBS volume type` default is `gp3`, change based on your need.
   - `EBS volume IOPS` it should be based  on your load needs.
-  - `ssh key pair name` ssh key pair name on AWS.
+  - `ssh key pair name` ssh key pair name on AWS Example `my-key`.
   - `Region` AWS region to create cluster.
   - `AMI Id` AWS AMI Id for specific region to create cluster of particular AMI.
   - `AWS profile name`. AWS profile name configured in .aws/credentials, Skip this if the IAM role is configured on the bastion host.

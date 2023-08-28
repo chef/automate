@@ -92,11 +92,11 @@ Current Automate HA integrates with the following non-Chef tools:
 
 | Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space  |
 | ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
-| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
-| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /tmp=5% /root=20% |
+| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
 
 {{< note >}} For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. {{< /note >}}
 
