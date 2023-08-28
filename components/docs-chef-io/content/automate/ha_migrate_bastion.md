@@ -1,13 +1,13 @@
 +++
-title = "Upgrade Bastion OS"
+title = "Migrate Bastion to new Machine"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Upgrade Bastion OS"
+    title = "Migrate Bastion to new Machine"
     parent = "automate/deploy_high_availability/reference"
-    identifier = "automate/deploy_high_availability/reference/ha_migrate_bastion.md Upgrade Bastion OS"
+    identifier = "automate/deploy_high_availability/reference/ha_migrate_bastion.md Migrate Bastion to new Machine"
     weight = 200
 +++
 {{< warning >}}
@@ -25,29 +25,24 @@ gh_repo = "automate"
   The replacement bastion should also be in the same VPC. To avoid any surprises, it is suggested to have the VM in the same subnet as the original Bastion with a similar configuration.
 {{< /note >}}
 
-{{< note >}}
-  *RB: Replacement Bation - New bastion with updated OS
-  **OB: Original/Old Bastion 
-{{< /note >}}
+### Step-1: In Original/Old Bastion
 
-### Step-1: In **OB
-
-1. Copy the artifacts directory to the user directory of *RB
+1. Copy the artifacts directory to the user directory of the Replacement/New Bastion
 ```
 scp -i <ssh_key_file> -r /hab/cache/artifacts <USER>@<NEW_BASTION_PUBLIC/PRIVATE_IP>:/home/<USER>/
 ```
 
-2. Copy the  /hab/a2_deploy_workspace directory to the user directory of *RB
+2. Copy the  /hab/a2_deploy_workspace directory to the user directory of the Replacement/New Bastion
 ```
 scp -i <ssh_key_file> -r /hab/a2_deploy_workspace <USER>@<NEW_BASTION_PUBLIC/PRIVATE_IP>:/home/<USER>/
 ```
 
-3. Copy SSH_KEY_FILE used to connect to all frontend and backend nodes to the user directory of *RB
+3. Copy SSH_KEY_FILE used to connect to all frontend and backend nodes to the user directory of the Replacement/New Bastion
 ```
 scp -i <ssh_key_file> <ssh_key_file> <USER>@<NEW_BASTION_PUBLIC/PRIVATE_IP>:/home/<USER>/
 ```
 
-### Step-2: In *RB
+### Step-2: In Replacement/New Bastion
 1. Install hab
 
 ```
@@ -56,7 +51,7 @@ curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/
  
 #### Updating Permissions for files
 
-1. Give root permissions to the file inside artifacts and a2_deploy_workspace directory in the home directory of *RB machine
+1. Give root permissions to the file inside artifacts and a2_deploy_workspace directory in the home directory of the Replacement/New Bastion machine
 ```
 cd /home/<USER>/
 chown -RL root:root artifacts/*
@@ -69,9 +64,9 @@ mv -r artifacts/* /hab/cache/artifacts/
 mv -r a2_deploy_workspace/* /hab/a2_deploy_workspace/
 ```
 
-3. Place the ssh_user_key in the same directory as it was in the **OB machine
+3. Place the ssh_user_key in the same directory as it was in the Original/Old Bastion machine
 
-    Eg: If the key was is `~/.ssh/id_rsa`, then in *RB also place it in `~/.ssh/id_rsa`
+    Eg: If the key was is `~/.ssh/id_rsa`, then in the Replacement/New Bastion also place it in `~/.ssh/id_rsa`
 
 4. Give proper permission for the `ssh_key_file`
 ```
@@ -80,7 +75,7 @@ chmod 600 <ssh_key_file>
 
 #### Installing packages
 
-1. Identify the same CLI and Deployment package version used in *OB machine
+1. Identify the same CLI and Deployment package version used in the Original/Old Bastion machine
 
     - For CLI
     ```
@@ -93,7 +88,7 @@ chmod 600 <ssh_key_file>
     ```
 {{< note >}}
 - If there is more than one CLI package available, use the latest one
-- If there is more than one deployment package available, identify the version used in *OB machine and use the same version. Run ls -la /hab/ in *OB machine to find the version 
+- If there is more than one deployment package available, identify the version used in the Original/Old Bastion machine and use the same version. Run ls -la /hab/ in the Original/Old Bastion machine to find the version 
 {{< /note >}}
 
 2. Install CLI and add it to the `/bin`
@@ -108,6 +103,6 @@ hab pkg install -bf <path to .hart file for deployment>
 
 {{< note >}}
   - Verify if chef-automate commands are working
-  - Once the commands are verified, you can clean up the Old Bastion **OB 
+  - Once the commands are verified, you can clean up the Old Bastion Original/Old Bastion 
 {{< /note >}}
 
