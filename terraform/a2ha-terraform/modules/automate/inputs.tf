@@ -15,7 +15,7 @@ variable "automate_admin_username" {
 }
 
 variable "automate_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -86,7 +86,7 @@ variable "bucket_name" {
 }
 
 variable "chef_server_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
