@@ -70,6 +70,8 @@ do_install() {
   pwd
 
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
+  "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-gcs
+  
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*
 

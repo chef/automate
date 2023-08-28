@@ -359,21 +359,23 @@ backup_mount = "/mnt/automate_backups"
 
 # Eg.: backup_config = "object_storage" or "file_system"
 backup_config = ""
-
 # If backup_config = "object_storage" fill out [object_storage.config] as well 
 ## Object storage similar to AWS S3 Bucket
 [object_storage.config]
+# for gcs we need to provide the bucket name and service_account json file path
+# google_service_account_file = "/home/user/MY-GOOGLE-ACCOUNT-SERVICE.json"
+google_service_account_file = ""
+# location = s3 or gcs 
+location = "" 
 bucket_name = ""
 access_key = ""
 secret_key = ""
 # For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
 # Include protocol to the enpoint value. Eg: https://customdns1.com or http://customdns2.com
 endpoint = ""
-
 # [Optional] Mention object_storage region if applicable
 # Eg: region = "us-west-1"
 region = ""
-## === ===
 
 # ============== EC2 Nodes Config ======================
 [automate.config]

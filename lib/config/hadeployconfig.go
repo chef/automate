@@ -54,11 +54,13 @@ type CertByIP struct {
 }
 
 type ConfigObjectStorage struct {
-	BucketName string `toml:"bucket_name,omitempty"`
-	AccessKey  string `toml:"access_key,omitempty"`
-	SecretKey  string `toml:"secret_key,omitempty"`
-	Endpoint   string `toml:"endpoint,omitempty"`
-	Region     string `toml:"region,omitempty"`
+	BucketName               string `toml:"bucket_name,omitempty"`
+	AccessKey                string `toml:"access_key,omitempty"`
+	SecretKey                string `toml:"secret_key,omitempty"`
+	Endpoint                 string `toml:"endpoint,omitempty"`
+	Region                   string `toml:"region,omitempty"`
+	Location                 string `toml:"location,omitempty"`
+	GoogleServiceAccountFile string `toml:"google_service_account_file"`
 }
 
 type AutomateSettings struct {

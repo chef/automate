@@ -106,6 +106,10 @@ object_storage do
   secret_key "{{ .ObjectStorage.Config.SecretKey }}"
   endpoint "{{ .ObjectStorage.Config.Endpoint }}"
   region "{{ .ObjectStorage.Config.Region }}"
+  location "{{ .ObjectStorage.Config.Location }}"
+  # default value for google_service_account_file :  "/hab/a2_deploy_workspace/googleServiceAccount.json"
+  google_service_account_file "{{ .ObjectStorage.Config.GoogleServiceAccountFile }}"
+  
 end
 
 managed_aws do
