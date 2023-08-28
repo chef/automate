@@ -2,6 +2,7 @@ package gcpcloudstorageservice
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"cloud.google.com/go/storage"
@@ -11,6 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/api/option"
 
 	"github.com/chef/automate/lib/logger"
@@ -36,14 +38,19 @@ func NewGCPCloudStorageConfig(logger logger.Logger) GCPCloudStorageConfig {
 func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
 	ctx := context.Background()
-	fmt.Printf("ss.Req.GoogleServiceAccountFile: %v\n", ss.Req.GoogleServiceAccountFile)
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(ss.Req.GoogleServiceAccountFile))
+	bx, err := json.Marshal(ss.Req.GcpServiceAccount)
 	if err != nil {
+		logrus.Errorf("error while marshling to binary: %v", err)
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+	}
+
+	client, err := storage.NewClient(ctx, option.WithCredentialsJSON(bx))
+	if err != nil {
+		logrus.Errorf("error while creating a client: %v", err)
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
 	}
 
 	defer client.Close()
-
 	bucket := client.Bucket(ss.Req.BucketName)
 	_, err = bucket.Attrs(ctx)
 	if err != nil {
@@ -80,7 +87,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 
 	// delete data in s3 bucket
 
-	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, constants.S3_BUCKET_ACCESS_SUCCESS_MSG, "", "", true)
+	return ss.Response(constants.GCP_BUCKET_ACCESS_TITLE, constants.GCP_BUCKET_ACCESS_SUCCESS_MSG, "", "", true)
 }
 
 func (ss *GCPConfigService) GCPConnection(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
