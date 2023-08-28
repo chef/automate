@@ -17,7 +17,7 @@ func TestGetBastionChecks(t *testing.T) {
 
 func TestGetRemoteChecks(t *testing.T) {
 	resp := GetRemoteChecks()
-	assert.Equal(t, len(resp), 10)
+	assert.Equal(t, len(resp), 11)
 	assert.Contains(t, resp, SYSTEM_RESOURCES)
 	assert.Contains(t, resp, SOFTWARE_VERSIONS)
 	assert.Contains(t, resp, SYSTEM_USER)
@@ -28,6 +28,7 @@ func TestGetRemoteChecks(t *testing.T) {
 	assert.Contains(t, resp, AWS_OPENSEARCH_S3_BUCKET_ACCESS)
 	assert.Contains(t, resp, EXTERNAL_POSTGRESQL)
 	assert.Contains(t, resp, NFS_BACKUP_CONFIG)
+	assert.Contains(t, resp, GCP_BACKUP_CONFIG)
 }
 
 func TestGetCheckMessageByName(t *testing.T) {
@@ -94,6 +95,11 @@ func TestGetCheckMessageByName(t *testing.T) {
 	t.Run("Get NFS_BACKUP_CONFIG_MSG", func(t *testing.T) {
 		resp := GetCheckMessageByName(NFS_BACKUP_CONFIG)
 		assert.Equal(t, resp, NFS_BACKUP_CONFIG_MSG)
+	})
+
+	t.Run("Get GCP_BACKUP_CONFIG_MSG", func(t *testing.T) {
+		resp := GetCheckMessageByName(GCP_BACKUP_CONFIG)
+		assert.Equal(t, resp, GCP_BACKUP_CONFIG_MSG)
 	})
 
 	t.Run("Get Empty MSG", func(t *testing.T) {

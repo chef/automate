@@ -41,7 +41,7 @@ type Handler struct {
 	FirewallService              firewallservice.IFirewallService
 	ValidateCertificateService   certificatevalidation.IValidateCertificateService
 	SshUserCheckService          sshusercheckservice.SshUserCheckService
-	GCPConfigService             gcpcloudstorageservice.GCPCloudStorageConfig
+	GCPConfigService             gcpcloudstorageservice.IGCPCloudStorageConfig
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -132,7 +132,7 @@ func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUserCheckSer
 	return h
 }
 
-func (h *Handler) AddGCSConfigService(ss gcpcloudstorageservice.GCPCloudStorageConfig) *Handler {
+func (h *Handler) AddGCSConfigService(ss gcpcloudstorageservice.IGCPCloudStorageConfig) *Handler {
 	h.GCPConfigService = ss
 	return h
 }

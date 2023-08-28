@@ -478,6 +478,8 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 		return ss.checkTrigger.ExternalPostgresCheck
 	case constants.NFS_BACKUP_CONFIG:
 		return ss.checkTrigger.NfsBackupConfigCheck
+	case constants.GCP_BACKUP_CONFIG:
+		return ss.checkTrigger.GCPBackupConfigCheck
 	default:
 		return nil
 	}

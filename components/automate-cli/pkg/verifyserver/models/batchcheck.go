@@ -292,6 +292,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	if objectStorageConfig.Location == AWS_S3 {
 		c.Backup = &Backup{
 			ObjectStorage: &ObjectStorage{
+				Location:   objectStorageConfig.Location,
 				BucketName: objectStorageConfig.BucketName,
 				AWSRegion:  objectStorageConfig.Region,
 				AccessKey:  objectStorageConfig.AccessKey,
