@@ -1,5 +1,5 @@
 +++
-title = "Autoamte HA Config Generation"
+title = "Automate HA Config Generation"
 draft = false
 gh_repo = "automate"
 
