@@ -320,7 +320,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 			},
 		}
 	} else {
-		logrus.Errorf("Backup support for %s isn't available!", objectStorageConfig.Location)
+		logrus.Errorf("invalid location: %s", objectStorageConfig.Location)
 		return
 	}
 }
