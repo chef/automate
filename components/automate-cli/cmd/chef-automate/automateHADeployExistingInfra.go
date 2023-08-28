@@ -15,6 +15,8 @@ import (
 )
 
 const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
+const GCS = "gcs"
+const S3 = "s3"
 
 type existingInfra struct {
 	config     ExistingInfraConfigToml
@@ -189,9 +191,9 @@ func (e *existingInfra) validateConfigFields() *list.List {
 				errorList.PushBack("Invalid or empty bucket_name")
 			}
 			// if gcsJsonFile file exist then it the gcp flow other wise other flow
-			gcsJsonFileTask := checkGoogleServiceAccountJson(e.config.ObjectStorage.Config.GoogleServiceAccountFile, errorList)
-			if gcsJsonFileTask != nil {
-				errorList.PushBack("Invalid or empty GCP file ")
+			if e.config.ObjectStorage.Config.Location == GCS {
+				// TODO : as of today we are not handling the err from below func
+				_ = checkGoogleServiceAccountJson(e.config.ObjectStorage.Config.GoogleServiceAccountFile, errorList)
 			} else {
 				if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
 					errorList.PushBack("Invalid or empty access_key")
@@ -531,7 +533,7 @@ func checkGoogleServiceAccountJson(filePath string, errorList *list.List) error 
 	if err != nil {
 		fmt.Println("Error decoding JSON:", err.Error())
 		errorList.PushBack(err.Error())
-		return nil
+		return err
 	}
 	// Validate the required fields
 	if len(strings.TrimSpace(serviceAccount.Type)) < 1 {
