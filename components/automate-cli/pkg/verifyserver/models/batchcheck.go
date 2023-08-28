@@ -303,6 +303,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	} else if objectStorageConfig.Location == GCP_CLOUD_STORAGE {
 		c.Backup = &Backup{
 			ObjectStorage: &ObjectStorage{
+				Location:                 objectStorageConfig.Location,
 				BucketName:               objectStorageConfig.BucketName,
 				GoogleServiceAccountFile: objectStorageConfig.GoogleServiceAccountFile,
 				GcpServiceAccount: &GcpServiceAccount{
