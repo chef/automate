@@ -62,7 +62,7 @@ func ParseZapLevel(level string) zapcore.Level {
 		return zap.DebugLevel
 	case "info":
 		return zap.InfoLevel
-	case "warn":
+	case "warn", "warning":
 		return zap.WarnLevel
 	case "error":
 		return zap.ErrorLevel
