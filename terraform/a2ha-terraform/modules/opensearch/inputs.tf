@@ -33,6 +33,10 @@ variable "kibana_pkg_ident" {
   default = "chef/automate-ha-kibana"
 }
 
+variable "location" {
+  default = ""
+}
+
 variable "metricbeat_pkg_ident" {
   default = "chef/automate-ha-metricbeat"
 }
