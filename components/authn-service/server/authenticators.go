@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -44,37 +44,38 @@ var AuthenticatorsConfig = map[string]func() AuthenticatorConfig{
 func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (*api.AuthenticateResponse, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		log.Error("Unable to fetch metadata from the ctx")
+		s.logger.Error("Unable to fetch metadata from the ctx")
 		return nil, status.Errorf(codes.Unauthenticated, "no metadata")
 	}
-	log.Info("Starting authentication the request and received meta-data in the context ")
+	s.logger.Info("Starting authentication the request and received meta-data in the context ")
+
 	// TODO 2017/10/10 (sr): Refactor -- we're making up a request so we can use
 	// the authenticators' common interface: Authenticate(*http.Request).
 	// Either generalize that, or ditch the HTTP-based authentication all
 	// together.
 	req, err := reqFromMD(md)
 	if err != nil {
-		log.Error("Unable to fetch request from the meta data with error ", err.Error())
+		s.logger.Error(fmt.Sprintf("Unable to fetch request from the meta data with error: %s", err.Error()))
 		return nil, status.Errorf(codes.Internal, "failed to construct request: %v", err.Error())
 	}
 	requestor, err := s.authenticate(req)
 	if err != nil {
-		log.Errorf("Unable to fetch user from the context request with error: %s", err.Error())
+		s.logger.Error(fmt.Sprintf("Unable to fetch user from the context request with error: %s", err.Error()))
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
-	log.Info("Request received in meta-data for authenticating the user ", requestor)
+	s.logger.Info(fmt.Sprintf("Request received in meta-data for authenticating the user: %v ", requestor))
 	if user, ok := requestor.(authenticator.LocalUser); ok {
 		teams, err := s.fetchLocalTeams(ctx, user.UserID())
 		if err != nil {
-			log.Errorf("Unable to fetch team for the user: %s with error :%s", requestor, err.Error())
+			s.logger.Error(fmt.Sprintf("Unable to fetch team for the user: %v with error :%s", requestor, err.Error()))
 			return nil, status.Error(codes.Internal, err.Error())
 		}
-		log.Info("Teams fetched for the user ", user)
+		s.logger.Info(fmt.Sprintf("Teams fetched for the user %v", user))
 		user.AppendTeams(teams)
 	}
 
-	log.Info("Request received in meta-data for authenticating and the user authenticated ", requestor)
+	s.logger.Info(fmt.Sprintf("Request received in meta-data for authenticating and the user authenticated: %v ", requestor))
 	return &api.AuthenticateResponse{Subject: requestor.Subject(), Teams: requestor.Teams(), Requestor: requestor.Requestor()}, nil
 }
 
