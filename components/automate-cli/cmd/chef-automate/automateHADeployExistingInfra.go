@@ -14,6 +14,8 @@ import (
 	ptoml "github.com/pelletier/go-toml"
 )
 
+const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
+
 type existingInfra struct {
 	config     ExistingInfraConfigToml
 	configPath string
@@ -508,8 +510,6 @@ func checkCertValid(keys []keydetails) *list.List {
 	}
 	return errorList
 }
-
-const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
 
 func checkGoogleServiceAccountJson(filePath string, errorList *list.List) error {
 	if len(strings.TrimSpace(filePath)) < 1 {

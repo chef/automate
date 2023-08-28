@@ -110,6 +110,10 @@ variable "frontend_aib_dest_file" {
 variable "frontend_aib_local_file" {
 }
 
+variable "google_service_account_file" {
+  default = ""
+}
+
 variable "hab_sup_http_gateway_auth_token" {
 }
 
@@ -117,6 +121,10 @@ variable "habitat_info" {
 }
 
 variable "infra" {
+  default = ""
+}
+
+variable "location" {
   default = ""
 }
 
@@ -259,12 +267,4 @@ variable "teams_port" {
 
 variable "tmp_path" {
   default = "/hab/var/automate-ha"
-}
-
-variable "location" {
-  default = ""
-}
-
-variable "google_service_account_file" {
-  default = ""
 }

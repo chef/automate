@@ -6,6 +6,14 @@ variable "backup_config_s3" {
   default = "false"
 }
 
+variable "google_service_account_file" {
+  default = ""
+}
+
+variable "location" {
+  default = ""
+}
+
 variable "opensearch_instance_count" {
   default = 3
 }
@@ -46,12 +54,4 @@ variable "sudo_cmd" {
 
 variable "tmp_path" {
   default = "/hab/var/automate-ha"
-}
-
-variable "location" {
-  default = ""
-}
-
-variable "google_service_account_file" {
-  default = ""
 }

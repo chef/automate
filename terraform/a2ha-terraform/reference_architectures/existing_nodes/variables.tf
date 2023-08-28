@@ -60,8 +60,16 @@ variable "existing_postgresql_private_ips" {
   default = []
 }
 
+variable "google_service_account_file" {
+  default = ""
+}
+
 variable "infra" {
   default = "existing_infra"
+}
+
+variable "location" {
+  default = ""
 }
 
 variable "managed_opensearch_certificate" {
@@ -166,12 +174,4 @@ variable "ssh_group_name" {
 
 variable "sudo_cmd" {
   default = "sudo"
-}
-
-variable "location" {
-  default = ""
-}
-
-variable "google_service_account_file" {
-  default = ""
 }
