@@ -14,12 +14,14 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
 
 const GET_OS_PASSWORD = "sudo HAB_LICENSE=accept-no-persist hab pkg exec chef/automate-platform-tools secrets-helper show userconfig.os_password"
+const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
 
 type ConfigKeys struct {
 	rootCA     string
@@ -30,11 +32,13 @@ type ConfigKeys struct {
 }
 
 type ObjectStorageConfig struct {
-	accessKey  string
-	secrectKey string
-	endpoint   string
-	bucketName string
-	RoleArn    string
+	accessKey                    string
+	secrectKey                   string
+	endpoint                     string
+	bucketName                   string
+	RoleArn                      string
+	location                     string
+	gcsServiceAccountCredentials string
 }
 
 type HAAwsAutoTfvars struct {
@@ -343,6 +347,11 @@ func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s
 				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 &&
 				osBkpLocation == "fs" {
 				return fs, nil
+			} else if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Location != nil &&
+				ele.Global.V1.Backups.Location.Value == "gcs" &&
+				osBkpLocation == "gcs" {
+				return s3, nil
 			} else {
 				return "", errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
 			}
@@ -388,6 +397,20 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	csConfigMap, err := p.pullChefServerConfigs()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
+	}
+
+	gcsObjStorageConfig, err := getGcsBackupConfig(a2ConfigMap, fileutils.NewFileSystemUtils())
+	if err != nil {
+		return nil, status.New(status.ConfigError, err.Error())
+	}
+	if len(gcsObjStorageConfig.location) > 0 {
+		sharedConfigToml.ObjectStorage.Config.Location = gcsObjStorageConfig.location
+	}
+	if len(gcsObjStorageConfig.bucketName) > 0 {
+		sharedConfigToml.ObjectStorage.Config.BucketName = gcsObjStorageConfig.bucketName
+	}
+	if len(gcsObjStorageConfig.gcsServiceAccountCredentials) > 0 {
+		sharedConfigToml.ObjectStorage.Config.GoogleServiceAccountFile = AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE
 	}
 
 	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
@@ -516,6 +539,9 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 
 	objectStorageConfig := getS3BackConfig(a2ConfigMap)
+	if len(objectStorageConfig.location) > 0 {
+		sharedConfigToml.ObjectStorage.Config.Location = objectStorageConfig.location
+	}
 	if len(objectStorageConfig.accessKey) > 0 {
 		sharedConfigToml.ObjectStorage.Config.AccessKey = objectStorageConfig.accessKey
 	}
@@ -1365,6 +1391,9 @@ func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig 
 	objStoage := &ObjectStorageConfig{}
 	for _, ele := range config {
 		if ele.Global.V1.Backups != nil && ele.Global.V1.Backups.S3 != nil {
+			if len(strings.TrimSpace(ele.Global.V1.Backups.Location.Value)) > 0 {
+				objStoage.location = ele.Global.V1.Backups.Location.Value
+			}
 			if ele.Global.V1.Backups.S3.Credentials != nil {
 				objStoage.accessKey = ele.Global.V1.Backups.S3.Credentials.AccessKey.Value
 				objStoage.secrectKey = ele.Global.V1.Backups.S3.Credentials.SecretKey.Value
@@ -1377,4 +1406,33 @@ func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig 
 		}
 	}
 	return objStoage
+}
+
+func getGcsBackupConfig(a2ConfigMap map[string]*dc.AutomateConfig, fileUtils fileutils.FileUtils) (*ObjectStorageConfig, error) {
+	objStoage := new(ObjectStorageConfig)
+	for _, ele := range a2ConfigMap {
+		if ele.Global.V1 != nil &&
+			ele.Global.V1.Backups != nil &&
+			ele.Global.V1.Backups.Gcs != nil &&
+			ele.Global.V1.Backups.Location != nil {
+			if len(strings.TrimSpace(ele.Global.V1.Backups.Location.Value)) > 0 {
+				objStoage.location = ele.Global.V1.Backups.Location.Value
+			}
+			if ele.Global.V1.Backups.Gcs.Bucket != nil && len(strings.TrimSpace(ele.Global.V1.Backups.Gcs.Bucket.Name.Value)) > 0 {
+				objStoage.bucketName = ele.Global.V1.Backups.Gcs.Bucket.Name.Value
+			}
+			if ele.Global.V1.Backups.Gcs.Credentials != nil && len(strings.TrimSpace(ele.Global.V1.Backups.Gcs.Credentials.Json.Value)) > 0 {
+				objStoage.gcsServiceAccountCredentials = ele.Global.V1.Backups.Gcs.Credentials.Json.Value
+			}
+			break
+		}
+	}
+	// Update the /hab/a2_deploy_workspace/googleServiceAccount.json file (if required)
+	if len(objStoage.gcsServiceAccountCredentials) > 0 {
+		err := fileUtils.WriteFile(AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE, []byte(objStoage.gcsServiceAccountCredentials), 0644)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return objStoage, nil
 }

@@ -294,11 +294,13 @@ type ObjectStorageToml struct {
 }
 
 type ObjectStorageConfigToml struct {
-	BucketName string `toml:"bucket_name"`
-	AccessKey  string `toml:"access_key"`
-	SecretKey  string `toml:"secret_key"`
-	Endpoint   string `toml:"endpoint"`
-	Region     string `toml:"region"`
+	BucketName               string `toml:"bucket_name"`
+	AccessKey                string `toml:"access_key"`
+	SecretKey                string `toml:"secret_key"`
+	Endpoint                 string `toml:"endpoint"`
+	Region                   string `toml:"region"`
+	Location                 string `toml:"location"`
+	GoogleServiceAccountFile string `json:"google_service_account_file"`
 }
 
 func init() {
