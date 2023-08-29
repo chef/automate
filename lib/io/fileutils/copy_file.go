@@ -83,11 +83,3 @@ func CreateDestinationAndCopy(binarySrcPath, binaryDestPath string) error {
 	}
 	return CopyFile(binarySrcPath, binaryDestPath, Overwrite())
 }
-
-func CreateDestinationAndMove(binarySrcPath, binaryDestPath string) error {
-	if err := os.MkdirAll(filepath.Dir(binaryDestPath), 0755); err != nil {
-		return errors.Wrap(err, "Error creating destination folder")
-	}
-	defer os.Remove(binarySrcPath)
-	return CopyFile(binarySrcPath, binaryDestPath, Overwrite())
-}
