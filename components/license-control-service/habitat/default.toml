@@ -12,3 +12,9 @@ accept = false
 
 [telemetry]
 url = "https://telemetry.chef.io"
+
+[license_audit]
+url = "https://licensing.chef.co/usage"
+frequency= "DAILY"
+interval = 1
+

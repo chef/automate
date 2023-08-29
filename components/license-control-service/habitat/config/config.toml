@@ -10,6 +10,11 @@ opt_out_path = "{{pkg.svc_data_path}}/opt_out"
 url = "{{cfg.telemetry.url}}"
 opt_out = "{{cfg.telemetry.opt_out}}"
 
+[license_audit]
+url = "{{cfg.license_audit.url}}"
+frequency = "{{cfg.license_audit.frequency}}"
+interval = "{{cfg.license_audit.interval}}"
+
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
