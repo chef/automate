@@ -229,6 +229,11 @@ func runGenCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.FileAccessError, fmt.Sprint("Failed to write to file: ", outFile))
 		}
+		fmt.Println("\nConfig generated successfully!\n")
+		fmt.Println("Use cat " + outFile + " command to see if the file is created")
+		fmt.Println("After checking the config file, you can follow next steps:")
+		fmt.Println("\ta. If AWS Deployment then do provision infra then do deployment")
+		fmt.Println("\tb. If OnPremise Deployment then do deployment")
 	} else {
 		writer.Println("")
 		writer.Println(string(t))
