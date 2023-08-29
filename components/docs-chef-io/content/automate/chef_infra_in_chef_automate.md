@@ -60,7 +60,7 @@ The list of parameters are as follows:
 | opscode_erchef['strict_search_result_acls']     |FALSE                               | FALSE                                      |``` [erchef.V1.sys.api]```<br>```strict_search_result_acls= false```|
 |opscode_erchef['enable_ibrowse_traces']          |FALSE                                      |FALSE                                |```[erchef.v1.sys.ibrowse]```<br> ```enable_ibrowse_traces = false``` |
 |license['nodes']                                 |                                           |                                     |```[erchef.v1.sys.authz]```<br>  ```node_license =```              |
-|opscode_erchef['s3_url_expiry_window_size']      | 100 Percent                               |                                     |```[erchef.v1.sys.api]``` <br> ```s3_url_expiry_window_size_percent=55```|
+|opscode_erchef['s3_url_expiry_window_size']      | {100, percent}                            |                                     |```[erchef.v1.sys.api]``` <br> ```s3_url_expiry_window_size_percent=100```|
 | oc_chef_authz['http_queue_max']                 | 200                                       | 200                                 | ```[erchef.v1.sys.authz]```<br>```pool_queue_max=200```            |
 | oc_chef_authz['http_max_count']                 | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_max_size=100```             |
 | oc_chef_authz['http_init_count']                | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_init_size=100```            |
@@ -78,7 +78,7 @@ The list of parameters are as follows:
 | bookshelf['aws_secret_key']                    |                                       |                                 | ```[bookshelf.v1.sys.bookshelf]```<br>```aws_secret_key=""```      |
 | bookshelf['log_rotation']                        |{ 'file_maxbytes' => 104857600, 'num_to_keep' => 10 }|                  | ```[bookshelf.v1.sys.log]```<br> ```rotation_max_bytes =104857600```<br>```rotation_max_files =10```     |
 | bookshelf['storage_type']                       | sql                                       | sql                                 | ```[bookshelf.v1.sys.bookshelf]```<br> ```storage_type = "sql"```|
-|bookshelf['vip']                                 |127.0.0.1                                  |127.0.0.1                            |```[bookshelf.v1.sys.bookshelf]```<br> ```virtual_ip = 127.0.0.1```|
+|bookshelf['vip']                                 |127.0.0.1                                  |127.0.0.1                            |```[bookshelf.v1.sys.bookshelf]```<br> ```virtual_ip = "127.0.0.1"```|
 | oc_chef_wm['health_ping_timeout']               | 400                                       | 400                                 | ```[erchef.v1.sys.health]```<br>```health_ping_timeout=400```         |
 
 Click [here](https://docs.chef.io/server/config_rb_server_optional_settings/) for the detailed description of a above parameters.
