@@ -24,7 +24,7 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 #### Solution
 
-- First we can check if Automate UI. is opening via browser if it open’s then we can try to hit the curl request to the Automate FQDN from the chefserver node.
+- First we can check if Automate UI is opening via browser if it open’s then we can try to hit the curl request to the Automate FQDN from the chefserver node.
 `curl --cacert /path/to/fqdn-rootca-pem-file https://<AUTOMATE_FQDN>`
   -  The above request will verify the authenticity of the server's SSL certificate (FQDN RootCA) against Automate FQDN.
   -  In Case if it gives any error regarding RootCA provide the valid RootCA.
