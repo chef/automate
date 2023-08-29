@@ -12,11 +12,15 @@ var (
 	AWS        string = "aws"
 	DEPLOYMENT string = "deployment"
 
+	TERRAFORM_CMD   = "terraform"
+	AWS_DESTROY_DIR = "/hab/a2_deploy_workspace/terraform/destroy/aws/"
+	TERRAFORM_INIT  = "init"
+
 	AWS_PROVISION = `
 	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done
 	%s
 	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy  -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve;cd $i;done
-`
+	`
 
 	DEPLOYMENT_CLEANUP = `hab pkg uninstall chef/automate-ha-deployment`
 	DESTROY_S3_BUCKET  = `HAB_LICENSE=accept-no-persist hab pkg exec core/aws-cli aws s3 rm s3://%s --recursive; hab pkg exec core/aws-cli aws s3 rb s3://%s`
@@ -160,23 +164,29 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 				}
 				writer.Println("Cleaning up all AWS provisioned resources.")
 
-				// 'cleanupScripts' contains array of scripts
-				// [Script to delete AWS reesources, Script to uninstall deployment workspace]
-				var cleanupScripts = []string{fmt.Sprintf(AWS_PROVISION, appendString), DEPLOYMENT_CLEANUP}
-
-				// Iteration 1: Removes AWS resource
-				// Iteration 2: Uninstall automate-ha-deployment
-				for i := 0; i < len(cleanupScripts); i++ {
-					args := []string{
-						"-c",
-						cleanupScripts[i],
-					}
-					err = executeCommand("/bin/sh", args, "")
+				// Init terraform folder
+				err = executeCommand(TERRAFORM_CMD, []string{TERRAFORM_INIT}, AWS_DESTROY_DIR)
+				if err != nil {
+					writer.Error("Terraform init failed")
+					return err
+				}
+				// Modify tf state or remove bucket based in "--force" arg
+				writer.Printf("%v", len(appendString) > 0)
+				if len(appendString) > 0 {
+					err = executeCommand("/bin/sh", []string{"-c", appendString}, "")
 					if err != nil {
+						writer.Errorf(err.Error())
 						return err
 					}
 				}
-				writer.Success("Cleaning up completed.")
+
+				// Destroy AWS resources provisioned by terraform
+				err = executeCommand(TERRAFORM_CMD, []string{"destroy", "-auto-approve"}, AWS_DESTROY_DIR)
+				if err != nil {
+					writer.Errorf("error while destroying infra, %v", err)
+					return err
+				}
+				writer.Success("cleanup completed successfully. Run the following command to remove/uninstall deployment workspace\n hab pkg uninstall chef/automate-ha-deployment\n")
 			}
 		}
 	} else {
