@@ -207,7 +207,7 @@ func (css *CreateSystemdServiceImpl) Create() error {
 
 	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, BINARY_FILE_NAME)
 	css.Logger.Debugf("Full binary destination path %s", fullBinaryDestination)
-	err = css.SystemdCreateUtils.CreateDestinationAndCopy(currentBinaryPath, fullBinaryDestination)
+	err = css.SystemdCreateUtils.CreateDestinationAndMove(currentBinaryPath, fullBinaryDestination)
 	if err != nil {
 		return err
 	}

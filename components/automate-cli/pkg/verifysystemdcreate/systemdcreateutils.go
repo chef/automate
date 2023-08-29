@@ -14,6 +14,7 @@ type SystemdCreateUtils interface {
 	GetBinaryPath() (string, error)
 	SystemdRunning() error
 	CreateDestinationAndCopy(binarySrcPath, binaryDestPath string) error
+	CreateDestinationAndMove(binarySrcPath, binaryDestPath string) error
 	ExecuteShellCommand(name string, arg []string) error
 	GetEnv() string
 }
@@ -48,6 +49,10 @@ func (scu *SystemdCreateUtilsImpl) SystemdRunning() error {
 }
 func (scu *SystemdCreateUtilsImpl) CreateDestinationAndCopy(binarySrcPath, binaryDestPath string) error {
 	return fileutils.CreateDestinationAndCopy(binarySrcPath, binaryDestPath)
+}
+
+func (scu *SystemdCreateUtilsImpl) CreateDestinationAndMove(binarySrcPath, binaryDestPath string) error {
+	return fileutils.CreateDestinationAndMove(binarySrcPath, binaryDestPath)
 }
 
 func (scu *SystemdCreateUtilsImpl) ExecuteShellCommand(name string, arg []string) error {
