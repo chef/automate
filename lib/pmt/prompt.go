@@ -43,11 +43,14 @@ type Prompt interface {
 	InputWordDefault(label string, defaultVal string) (result string, err error)
 	InputWord(label string) (result string, err error)
 	InputStringRegex(label string, regexCheck string) (result string, err error)
+	InputStringRegexErrMsg(label string, regexCheck string, errMsg string) (result string, err error)
 	InputString(label string) (result string, err error)
 	InputStringRequired(label string) (result string, err error)
 	InputPassword(label string) (result string, err error)
 	InputPasswordRegex(label string, regexCheck string) (result string, err error)
+	InputPasswordRegexErrMsg(label string, regexCheck string, errMsg string) (result string, err error)
 	InputStringRegexDefault(label string, regexCheck string, defaultVal string) (result string, err error)
+	InputStringRegexDefaultErrMsg(label string, regexCheck string, defaultVal string, errMsg string) (result string, err error)
 	InputStringDefault(label string, defaultVal string) (result string, err error)
 	InputExistingFilePathDefault(label string, defaultVal string) (result string, err error)
 	InputExistingFilePath(label string) (result string, err error)
@@ -407,11 +410,11 @@ func (p *PromptImp) InputStringMinMax(label string, minlen int, maxlen int) (res
 	return promptRun(prompt, true)
 }
 
-func (p *PromptImp) InputStringRegex(label string, regexCheck string) (result string, err error) {
+func (p *PromptImp) InputStringRegexErrMsg(label string, regexCheck string, errMsg string) (result string, err error) {
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			return fmt.Errorf(REGEX_CHECK_FAIL, regexCheck)
+			return fmt.Errorf(errMsg)
 		}
 		return nil
 	}
@@ -426,11 +429,15 @@ func (p *PromptImp) InputStringRegex(label string, regexCheck string) (result st
 	return promptRun(prompt, true)
 }
 
-func (p *PromptImp) InputStringRegexDefault(label string, regexCheck string, defaultVal string) (result string, err error) {
+func (p *PromptImp) InputStringRegex(label string, regexCheck string) (result string, err error) {
+	return p.InputStringRegexErrMsg(label, regexCheck, fmt.Sprintf(REGEX_CHECK_FAIL, regexCheck))
+}
+
+func (p *PromptImp) InputStringRegexDefaultErrMsg(label string, regexCheck string, defaultVal string, errMsg string) (result string, err error) {
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			return fmt.Errorf(REGEX_CHECK_FAIL, regexCheck)
+			return fmt.Errorf(errMsg)
 		}
 		return nil
 	}
@@ -444,6 +451,10 @@ func (p *PromptImp) InputStringRegexDefault(label string, regexCheck string, def
 	}
 
 	return promptRun(prompt, true)
+}
+
+func (p *PromptImp) InputStringRegexDefault(label string, regexCheck string, defaultVal string) (result string, err error) {
+	return p.InputStringRegexDefaultErrMsg(label, regexCheck, defaultVal, fmt.Sprintf(REGEX_CHECK_FAIL, regexCheck))
 }
 
 func (p *PromptImp) InputStringRequired(label string) (result string, err error) {
@@ -500,11 +511,12 @@ func (p *PromptImp) InputString(label string) (result string, err error) {
 
 	return promptRun(prompt, true)
 }
-func (p *PromptImp) InputPasswordRegex(label string, regexCheck string) (result string, err error) {
+
+func (p *PromptImp) InputPasswordRegexErrMsg(label string, regexCheck string, errMsg string) (result string, err error) {
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			return fmt.Errorf(REGEX_CHECK_FAIL, regexCheck)
+			return fmt.Errorf(errMsg)
 		}
 		return nil
 	}
@@ -519,6 +531,11 @@ func (p *PromptImp) InputPasswordRegex(label string, regexCheck string) (result 
 
 	return promptRun(prompt, false)
 }
+
+func (p *PromptImp) InputPasswordRegex(label string, regexCheck string) (result string, err error) {
+	return p.InputPasswordRegexErrMsg(label, regexCheck, fmt.Sprintf(REGEX_CHECK_FAIL, regexCheck))
+}
+
 func (p *PromptImp) InputPassword(label string) (result string, err error) {
 	prompt := promptui.Prompt{
 		Label:  label,
