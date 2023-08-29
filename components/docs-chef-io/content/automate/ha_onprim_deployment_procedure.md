@@ -21,8 +21,15 @@ This section will discuss deploying Chef Automate HA on-premise machines with ch
 
 - All VMs or Machines are up and running.
 - OS Root Volume (/) must be at least 40 GB.
-- TMP space (/var/tmp) must be at least 5GB.
-- Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
+- TMP space (/var/tmp) must be at least 10GB.
+- Separate Hab volume (`/hab`) provisioned at least 200 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
+  -  The installation of Automate HA requires the existence of the `/hab` directory, which is used to store various binaries and files. 
+  -  You have two options for setting up the `/hab` directory: you can either create it within the `/root` volume, or you can mount it as an external directory.
+  -  When choosing to create the `/hab` directory inside the /root volume, it's recommended to allocate a minimum of 200 GB of space.
+  -  This accounts for the required 200 GB for `/hab` as well as the space needed for the operating system.
+  -  If you decide to use an external mount for `/hab`, ensure that at least 200GB is provisioned.
+  -  Adjust the size based on your data retention policy if necessary.
+  -  When you did external mount for `/hab`, make sure to provide Read and Write permissions for SSH User.
 - A Common user has access to all machines.
 - This common user should have sudo privileges.
 - This common user uses the same SSH Private Key file to access all machines.
