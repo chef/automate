@@ -2,7 +2,6 @@ package gcpcloudstorageservice
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"google.golang.org/api/iterator"
@@ -11,6 +10,7 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -25,11 +25,6 @@ type GCPConfigService struct {
 	Logger   logger.Logger
 	Req      *models.GCPCloudStorageConfigRequest
 	GCPUtils GCPUtils
-}
-
-func NewGCPCloudStorageConfig(logger logger.Logger) GCPCloudStorageConfig {
-	return &GCPConfigService{
-		Logger:   logger,
 		GCPUtils: NewGCPUtils(logger),
 	}
 }
