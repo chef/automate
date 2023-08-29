@@ -76,7 +76,7 @@ The list of parameters are as follows:
 | bookshelf['stream_download']                    | TRUE                                      | TRUE                                | ```[bookshelf.v1.sys.bookshelf]```<br>```stream_download=true```      |
 | bookshelf['aws_access_id']                    |                                       |                                 | ```[bookshelf.v1.sys.bookshelf]```<br>```aws_access_id=""```      |
 | bookshelf['aws_secret_key']                    |                                       |                                 | ```[bookshelf.v1.sys.bookshelf]```<br>```aws_secret_key=""```      |
-| bookshelf['log_rotation']                        |{ 'file_maxbytes' => 104857600, 'num_to_keep' => 10 }|                  | ```[bookshelf.v1.sys.log]```<br> ```rotation_max_bytes =104857600```<br>```rotation_max_files =10```     |
+| bookshelf['log_rotation']                        | 'file_maxbytes':  104857600, 'num_to_keep': 10 |  'file_maxbytes':  104857600, 'num_to_keep': 10 | ```[bookshelf.v1.sys.log]```<br> ```rotation_max_bytes =104857600```<br>```rotation_max_files =10```     |
 | bookshelf['storage_type']                       | sql                                       | sql                                 | ```[bookshelf.v1.sys.bookshelf]```<br> ```storage_type = "sql"```|
 |bookshelf['vip']                                 |127.0.0.1                                  |127.0.0.1                            |```[bookshelf.v1.sys.bookshelf]```<br> ```virtual_ip = "127.0.0.1"```|
 | oc_chef_wm['health_ping_timeout']               | 400                                       | 400                                 | ```[erchef.v1.sys.health]```<br>```health_ping_timeout=400```         |
