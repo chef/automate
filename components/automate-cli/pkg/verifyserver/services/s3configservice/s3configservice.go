@@ -37,7 +37,7 @@ func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.
 	// https://s3.amazonaws.com by default belongs to us-east-1 region and if the bucket is in someother region, the check will not pass
 	// So manipulating the endpoint URL pattern for S3 (ONLY FOR AWS S3)
 	if strings.Contains(ss.Req.Endpoint, "://s3.amazonaws.com") {
-		ss.Req.Endpoint = strings.Replace(ss.Req.Endpoint, "s3.amazonaws.com", "s3."+ss.Req.Region+".amazonaws.com", 1)
+		ss.Req.Endpoint = strings.Replace(ss.Req.Endpoint, ss.Req.Endpoint, "", 1)
 	}
 	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
 	if err != nil {
