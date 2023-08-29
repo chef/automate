@@ -8,13 +8,11 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-
-	"github.com/chef/automate/lib/logger"
 )
 
 type GCPCloudStorageConfig interface {
@@ -23,9 +21,8 @@ type GCPCloudStorageConfig interface {
 }
 
 type GCPConfigService struct {
-	Logger   logger.Logger
-	Req      *models.GCPCloudStorageConfigRequest
-	GcpUtils gcputils.GCPUtils
+	Logger logger.Logger
+	Req    *models.GCPCloudStorageConfigRequest
 }
 
 func NewGCPCloudStorageConfig(logger logger.Logger) GCPCloudStorageConfig {
