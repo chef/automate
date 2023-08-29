@@ -116,8 +116,11 @@ export class LicenseUsageService {
         }
       }],
       "source": "Automate",
-      "scannedOn": "0.1.0"
+      "scannerVersion": "0.1.0",
+      "scannedOn": this.getCurrentDateTime()
     };
+
+    console.log(data)
 
     if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined)
       postAnalyticsUsageData(data)
