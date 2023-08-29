@@ -7,8 +7,15 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	AWS_S3            = "s3"
+	GCP_CLOUD_STORAGE = "gcs"
 )
 
 type BatchCheckRequest struct {
@@ -271,15 +278,50 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 }
 
 func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
+	if haConfig == nil {
+		logrus.Errorln("haConfig cannot be nil")
+		return
+	}
+
 	objectStorageConfig := haConfig.GetObjectStorageConfig()
-	c.Backup = &Backup{
-		ObjectStorage: &ObjectStorage{
-			BucketName: objectStorageConfig.BucketName,
-			AWSRegion:  objectStorageConfig.Region,
-			AccessKey:  objectStorageConfig.AccessKey,
-			SecretKey:  objectStorageConfig.SecretKey,
-			Endpoint:   objectStorageConfig.Endpoint,
-		},
+	if objectStorageConfig.Location == "" {
+		logrus.Errorln("object storage location cannot be empty")
+		return
+	}
+
+	if objectStorageConfig.Location == AWS_S3 {
+		c.Backup = &Backup{
+			ObjectStorage: &ObjectStorage{
+				BucketName: objectStorageConfig.BucketName,
+				AWSRegion:  objectStorageConfig.Region,
+				AccessKey:  objectStorageConfig.AccessKey,
+				SecretKey:  objectStorageConfig.SecretKey,
+				Endpoint:   objectStorageConfig.Endpoint,
+			},
+		}
+	} else if objectStorageConfig.Location == GCP_CLOUD_STORAGE {
+		c.Backup = &Backup{
+			ObjectStorage: &ObjectStorage{
+				BucketName:               objectStorageConfig.BucketName,
+				GoogleServiceAccountFile: objectStorageConfig.GoogleServiceAccountFile,
+				GcpServiceAccount: &GcpServiceAccount{
+					Type:                    objectStorageConfig.GcpServiceAccount.Type,
+					ProjectID:               objectStorageConfig.GcpServiceAccount.ProjectID,
+					PrivateKeyID:            objectStorageConfig.GcpServiceAccount.PrivateKeyID,
+					PrivateKey:              objectStorageConfig.GcpServiceAccount.PrivateKey,
+					ClientEmail:             objectStorageConfig.GcpServiceAccount.ClientEmail,
+					ClientID:                objectStorageConfig.GcpServiceAccount.ClientID,
+					AuthURI:                 objectStorageConfig.GcpServiceAccount.AuthURI,
+					TokenURI:                objectStorageConfig.GcpServiceAccount.TokenURI,
+					AuthProviderX509CertURL: objectStorageConfig.GcpServiceAccount.AuthProviderX509CertURL,
+					ClientX509CertURL:       objectStorageConfig.GcpServiceAccount.ClientX509CertURL,
+					UniverseDomain:          objectStorageConfig.GcpServiceAccount.UniverseDomain,
+				},
+			},
+		}
+	} else {
+		logrus.Errorf("invalid location: %s", objectStorageConfig.Location)
+		return
 	}
 }
 
