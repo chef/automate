@@ -32,5 +32,6 @@ export const environment = {
   visibility_url: '/api/v0/visibility',
   license_id: '00000000-0000-0000-0000-000000000000',
   install_id: '00000000-0000-0000-0000-000000000000',
-  use_default_session: false
+  use_default_session: false,
+  remote_library_url: "https://d2tfjgtznim348.cloudfront.net/remoteclient.js"
 };

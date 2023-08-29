@@ -24,6 +24,9 @@ export class LicenseUsageService {
   private days_since_last_post;
   private periodStartDate;
   private periodEndDate;
+  private deploymentId;
+  private deploymentType;
+  private productVersion;
 
   constructor(
     private complianceStatsService: ComplianceStatsService,
@@ -39,7 +42,13 @@ export class LicenseUsageService {
       this.expiration = data.licensed_period.end;
     })
 
+    this.http.get(`${env.gateway_url}/version`).subscribe(data => {
+      this.productVersion = data['build_timestamp'];
+    })
+
     this.configService.getConfig().subscribe(data => {
+      this.deploymentId = data.deploymentId;
+      this.deploymentType = data.deploymentType;
       this.licenseId = data.licenseId;
       this.customerId = data.customerId;
       this.customerName = data.customerName;
@@ -81,7 +90,14 @@ export class LicenseUsageService {
       "customerId": this.customerId,
       "expiration": this.expiration,
       "customerName": this.customerName,
+      "metaData": {
+        "Automate": {
+             "instanceId":this.deploymentId,
+             "deploymentType":this.deploymentType,
+        }
+      },
       "periods": [{
+        "version": this.productVersion,
         "date": this.getCurrentDateTime(),
         "period": {
           "start": this.periodStartDate,
@@ -97,8 +113,10 @@ export class LicenseUsageService {
           "service": {
             "targets": this.totalService
           }
-        },
-      }]
+        }
+      }],
+      "source": "Automate",
+      "scannedOn": "0.1.0"
     };
 
     if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined)

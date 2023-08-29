@@ -26,5 +26,6 @@ export const environment = {
     data_feed_url: '/api/v0/datafeed',
     license_id: '00000000-0000-0000-0000-111111111111',
     install_id: '00000000-0000-0000-0000-111111111111',
-    use_default_session: true
+    use_default_session: true,
+    remote_library_url: "https://d2tfjgtznim348.cloudfront.net/remoteclient.js"
 };
