@@ -54,6 +54,8 @@ message StatusResponse {
 	google.protobuf.Timestamp configured_at = 2;
 	DateRange licensed_period = 3;
 	string customer_name = 4;
+  string deployment_id=5;
+  string deployment_type=6;
 }
 
 message DateRange {

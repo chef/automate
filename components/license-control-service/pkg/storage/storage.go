@@ -298,7 +298,7 @@ func isHA() bool {
 	return true
 }
 
-//StoreDeployment stores the deployment info in the DB
+// StoreDeployment stores the deployment info in the DB
 func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
 	deploymentType := 0
 	if isHA() {
@@ -339,7 +339,10 @@ func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
 }
 
 func (m *MemBackend) GetDeployment(context.Context) (Deployment, error) {
-	return Deployment{}, nil
+	return Deployment{
+		ID:   "deployment-id",
+		Type: "automate-test",
+	}, nil
 }
 
 type Deployment struct {
@@ -349,7 +352,7 @@ type Deployment struct {
 	Type      string
 }
 
-//GetDeployment: fetches the deployment data
+// GetDeployment: fetches the deployment data
 func (p *PGBackend) GetDeployment(ctx context.Context) (Deployment, error) {
 	var d Deployment
 	err := p.db.QueryRowContext(ctx,
