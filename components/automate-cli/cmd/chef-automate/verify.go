@@ -610,7 +610,7 @@ func (v *verifyCmdFlow) copyCLIOnRemoteNodes(destFileName string, sshConfig sshu
 // Starts automate-verify service on remote nodes
 func (v *verifyCmdFlow) startServiceOnRemoteNodes(destFileName string, sshConfig sshutils.SSHConfig, hostIPs []string) error {
 	v.Writer.Println("Creating automate-verify service on Other Nodes")
-	cmd := fmt.Sprintf("sudo /tmp/%s verify systemd-service create", destFileName)
+	cmd := fmt.Sprintf("sudo /home/%s/%s verify systemd-service create", sshConfig.SshUser, destFileName)
 	excuteResults := v.SSHUtil.ExecuteConcurrently(sshConfig, cmd, hostIPs)
 	isError := false
 	for _, result := range excuteResults {
