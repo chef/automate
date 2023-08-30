@@ -28,7 +28,6 @@ export class LicenseUsageService {
   private deploymentType;
   private productVersion;
   private payload;
-  private isLibraryLoaded = false;
 
   constructor(
     private complianceStatsService: ComplianceStatsService,
@@ -120,18 +119,22 @@ export class LicenseUsageService {
       "scannerVersion": "0.1.0",
       "scannedOn": this.getCurrentDateTime()
     };
-
-    if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined && this.isLibraryLoaded) {
-      postAnalyticsUsageData(data)
-    } else {
-      this.payload = data;
+    this.payload = data;
+    try {
+      if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined) {
+        postAnalyticsUsageData(this.payload)
+      } 
+    } catch(error){
+      console.log("First attempt to push data failed");
     }
   }
 
-  registerRemoteClientLoad() {
-    this.isLibraryLoaded = true;
+  // pushData function called from app component
+  pushData(){
     if(this.payload){
-      this.sendData();
+      if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined) {
+        postAnalyticsUsageData(this.payload)
+      } 
     }
   }
 

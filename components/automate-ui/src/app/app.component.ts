@@ -12,7 +12,7 @@ export class AppComponent {
   constructor(private licenseUsageService : LicenseUsageService) {
     this.library_url = environment.remote_library_url;
     this.loadScript(this.library_url, () => {
-      this.licenseUsageService.registerRemoteClientLoad()
+      this.licenseUsageService.pushData()
     });
   }
 
