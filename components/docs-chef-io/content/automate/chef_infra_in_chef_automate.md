@@ -59,7 +59,6 @@ The list of parameters are as follows:
 | opscode_erchef['s3_external_url']             |                                      |                                            | ```[erchef.v1.sys.api]```<br>```s3_external_url="url"```         |
 | opscode_erchef['strict_search_result_acls']     |FALSE                               | FALSE                                      |``` [erchef.V1.sys.api]```<br>```strict_search_result_acls= false```|
 |opscode_erchef['enable_ibrowse_traces']          |FALSE                                      |FALSE                                |```[erchef.v1.sys.ibrowse]```<br> ```enable_ibrowse_traces = false``` |
-|license['nodes']                                 |                                           |                                     |```[erchef.v1.sys.authz]```<br>  ```node_license =```              |
 |opscode_erchef['s3_url_expiry_window_size']      | {100, percent}                            |                                     |```[erchef.v1.sys.api]``` <br> ```s3_url_expiry_window_size_percent=100```|
 | oc_chef_authz['http_queue_max']                 | 200                                       | 200                                 | ```[erchef.v1.sys.authz]```<br>```pool_queue_max=200```            |
 | oc_chef_authz['http_max_count']                 | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_max_size=100```             |
