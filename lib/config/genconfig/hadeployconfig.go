@@ -15,7 +15,7 @@ const (
 	AWS_S3                        = "AWS S3"
 	MINIO                         = "Minio"
 	OBJECT_STORE                  = "Object Store"
-	GOOGLE_BUCKET                 = "Google Storage Bucket"
+	GOOGLE_BUCKET                 = "Google Cloud Storage Bucket"
 	FILE_SYSTEM                   = "File System"
 	NFS                           = "NFS"
 	EFS                           = "EFS"
@@ -1073,7 +1073,7 @@ func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (er
 		c.Config.ObjectStorage.Config.Location = "gcs"
 		jsonFile, err0 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
 		if err0 != nil {
-			return
+			return err0
 		}
 		c.Config.ObjectStorage.Config.GoogleServiceAccountFile = jsonFile
 
