@@ -1071,9 +1071,9 @@ func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (er
 	c.Config.InitObjectStorage().InitConfig().BucketName = bucketName
 	if backupOption == GOOGLE_BUCKET {
 		c.Config.ObjectStorage.Config.Location = "gcs"
-		jsonFile, err0 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
-		if err0 != nil {
-			return err0
+		jsonFile, err1 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
+		if err1 != nil {
+			return err1
 		}
 		c.Config.ObjectStorage.Config.GoogleServiceAccountFile = jsonFile
 
