@@ -14,7 +14,7 @@ import (
 
 type GCPUtils interface {
 	NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
-	DeleteObject(ctx context.Context, bucket *storage.BucketHandle, fileName string) error
+	DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error
 	ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error
 	ListBuckets(gcpClient *storage.Client) (*models.Checks, error)
 	NewUploader(ctx context.Context, obj *storage.ObjectHandle) (*models.Checks, error)
@@ -44,11 +44,8 @@ func (au *GCPUtilsImpl) NewUploader(ctx context.Context, uploadObject *storage.O
 	return nil, nil
 }
 
-func (au *GCPUtilsImpl) DeleteObject(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
-	if err := uploadObject.Delete(ctx); err != nil {
-		return err
-	}
-	return nil
+func (au *GCPUtilsImpl) DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error {
+	return obj.Delete(ctx)
 }
 
 func (au *GCPUtilsImpl) ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {

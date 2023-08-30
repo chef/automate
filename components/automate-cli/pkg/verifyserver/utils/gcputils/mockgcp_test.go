@@ -56,17 +56,13 @@ func TestMockGCPUtils_ListBuckets(t *testing.T) {
 // 	assert.NoError(t, err)
 // }
 
-func TestMockGCPUtils_ListObjectsV2(t *testing.T) {
+func TestMockGCPUtils_ListObjects(t *testing.T) {
 	mock := &gcputils.MockGCPUtils{
-		ListObjectsV2Func: func(gcpClient *storage.Client, BucketName string) (*models.Checks, error) {
-			return &models.Checks{}, nil
+		ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+			return nil
 		},
 	}
-
-	gcpClient := &storage.Client{} // Create a mock client
-	result, err := mock.ListObjectsV2(gcpClient, "")
-
-	assert.NotNil(t, result)
+	err := mock.ListObjects(context.Background(), nil, nil)
 	assert.NoError(t, err)
 }
 

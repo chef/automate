@@ -16,13 +16,13 @@ import (
 // 	assert.NoError(t, err)
 // }
 
-func TestListObjectsV2(t *testing.T) {
-	au := gcputils.NewGCPUtils()
-	client, err := storage.NewClient(context.Background())
-	res, err := au.ListObjectsV2(client, "")
-	assert.NoError(t, err)
-	assert.Nil(t, res)
-}
+// func TestListObjectsV2(t *testing.T) {
+// 	au := gcputils.NewGCPUtils()
+// 	client, err := storage.NewClient(context.Background())
+// 	res, err := au.ListObjectsV2(client, "")
+// 	assert.NoError(t, err)
+// 	assert.Nil(t, res)
+// }
 
 func TestListBuckets(t *testing.T) {
 	au := gcputils.NewGCPUtils()
