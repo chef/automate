@@ -11,42 +11,17 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/api/option"
 )
 
 var (
-	gcpConnectionTitle                  = "GCP connection test"
-	gcpConnectionErrorMsg               = "Machine is not able to connect with GCP using the provided credentials: "
-	gcpConnectionResolutionMsg          = "Provide the correct GCP url or access or secret keys"
-	gcpConnectionSuccessMsg             = "Machine is able to connect with GCP using the provided credentials"
-	gcpBucketAccessTitle                = "GCP bucket access test"
-	gcpBucketAccessErrorMsg             = "Machine is not able to access the GCP bucket using the provided access key and secret key"
-	gcpBucketAccessResolutionMsg        = "Provide the necessary access to the GCP bucket"
-	gcpBucketAccessSuccessMsg           = "Machine is able to access the GCP bucket using the provided access key and secret key"
-	successMessagegcpConfig             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with GCP using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":true,\"success_msg\":\"Machine is able to access the GCP bucket using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}]}}"
-	failureMessagegcpConfig             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with GCP using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct GCP url or access or secret keys\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the GCP bucket using the provided credentials\",\"resolution_msg\":\"Please check if the provided GCP bucket exists or not. If it exists then provide the correct credentials.\",\"skipped\":false}]}}"
-	bucketAccessfailureMessagegcpConfig = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with GCP using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the GCP bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the GCP bucket\",\"skipped\":false}]}}"
-	errorBodyParsergcp                  = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
-	reqBodygcp                          = `{
-		"location": "gcs",
-		"endpoint": "endpoint",
-		"bucket_name": "a2-backup-restore-test",
-		"gcp_service_account": {
-			"type": "service_account",
-			"project_id": "automate-backup-unit-testing",
-			"private_key_id": "oiwehfi8wibkewckjsd8w4r789346t394",
-			"private_key": "-----BEGIN PRIVATE KEY-----dflkvdlkfndfkndfk-----END PRIVATE KEY-----\n",
-			"client_email": "email@automate-backup-unit-testing.iam.gserviceaccount.com",
-			"client_id": "65464654684864353165486",
-			"auth_uri": "https://accounts.google.com",
-			"token_uri": "https://accounts.google.com",
-			"auth_provider_x509_cert_url": "https://accounts.google.com",
-			"client_x509_cert_url": "https://accounts.google.com",
-			"universe_domain": "https://accounts.google.com"
-		}
-	}`
+	gcpConnectionTitle        = "GCP connection test"
+	gcpConnectionErrorMsg     = "Machine is not able to connect with GCP using the provided credentials: "
+	gcpConnectionSuccessMsg   = "Machine is able to connect with GCP using the provided credentials"
+	gcpBucketAccessSuccessMsg = "Machine is able to connect with GCP using the provided credentials"
 )
 
-func TestGetS3Connection(t *testing.T) {
+func TestGetGCPConnection(t *testing.T) {
 	t.Run("No bucket exists", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
 		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
@@ -110,7 +85,7 @@ func TestGetS3Connection(t *testing.T) {
 		assert.Equal(t, gcpConnectionSuccessMsg, services.SuccessMsg)
 	})
 
-	t.Run("error", func(t *testing.T) {
+	t.Run("gcp connection error", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
 		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
@@ -141,108 +116,135 @@ func TestGetS3Connection(t *testing.T) {
 		assert.Equal(t, gcpConnectionErrorMsg, services.ErrorMsg)
 	})
 }
-// func TestGetS3ConnectionSuccess(t *testing.T) {
-//     t.Run("success", func(t *testing.T) {
-//         log, _ := logger.NewLogger("text", "debug")
-//         cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
-//             NewSessionWithOptionsFunc: func(ctx context.Context, bx []byte) (*storage.Client, error) {
-                
-//             },
-//             NewUploaderFunc: func(ctx context.Context, bucket *storage.BucketHandle, file string) (*models.Checks, error) {
-//                 return &models.Checks{}, nil
-//             },
-//             BucketHandleFunc: func(gcpClient *storage.Client, bucket string) *storage.BucketHandle {
-//                 return &storage.BucketHandle{}
-//             },
-//             ListObjectsV2Func: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
-//                 return nil
-//             },
-//             DeleteObjectFunc: func(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
-//                 return nil
-//             },
-//         })
-//         services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
-//             BucketName: "backups",
-//         })
 
-//         assert.Equal(t, gcpBucketAccessSuccessMsg, services.SuccessMsg)
-//     })
+func TestGetBucketAccess(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		log, _ := logger.NewLogger("text", "debug")
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+				return storage.NewClient(ctx, option.WithoutAuthentication())
+			},
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
+				return &models.Checks{}, nil
+			},
+			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
+				return nil
+			},
+			ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+				return nil
+			},
+			DeleteObjectFunc: func(ctx context.Context, obj *storage.ObjectHandle) error {
+				return nil
+			},
+		})
+		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+			BucketName: "backups",
+		})
 
-//     t.Run("error for upload", func(t *testing.T) {
-//         log, _ := logger.NewLogger("text", "debug")
-//         cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
-//             NewSessionWithOptionsFunc: func(ctx context.Context, bx []byte) (*storage.Client, error) {
-//                 return storage.NewClient(ctx, option.WithoutAuthentication())
-//             },
-//             NewUploaderFunc: func(ctx context.Context, bucket *storage.BucketHandle, file string) (*models.Checks, error) {
-//                 return &models.Checks{}, errors.New("error")
-//             },
-//             BucketHandleFunc: func(gcpClient *storage.Client, bucket string) *storage.BucketHandle {
-//                 return &storage.BucketHandle{}
-//             },
-//             ListObjectsV2Func: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
-//                 return nil
-//             },
-//             DeleteObjectFunc: func(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
-//                 return nil
-//             },
-//         })
-//         services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
-//             BucketName: "backups",
-//         })
+		assert.Equal(t, gcpBucketAccessSuccessMsg, services.SuccessMsg)
+	})
 
-//         assert.Equal(t, false, services.Passed)
-//     })
+	t.Run("error for upload", func(t *testing.T) {
+		log, _ := logger.NewLogger("text", "debug")
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+				return storage.NewClient(ctx, option.WithoutAuthentication())
+			},
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
+				return &models.Checks{}, errors.New("error")
+			},
+			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
+				return nil
+			},
+			ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+				return nil
+			},
+			DeleteObjectFunc: func(ctx context.Context, obj *storage.ObjectHandle) error {
+				return nil
+			},
+		})
+		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+			BucketName: "backups",
+		})
 
-//     t.Run("error for list", func(t *testing.T) {
-//         log, _ := logger.NewLogger("text", "debug")
-//         cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
-//             NewSessionWithOptionsFunc: func(ctx context.Context, bx []byte) (*storage.Client, error) {
-//                 return storage.NewClient(ctx, option.WithoutAuthentication())
-//             },
-//             NewUploaderFunc: func(ctx context.Context, bucket *storage.BucketHandle, file string) (*models.Checks, error) {
-//                 return &models.Checks{}, nil
-//             },
-//             BucketHandleFunc: func(gcpClient *storage.Client, bucket string) *storage.BucketHandle {
-//                 return &storage.BucketHandle{}
-//             },
-//             ListObjectsV2Func: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
-//                 return errors.New("error")
-//             },
-//             DeleteObjectFunc: func(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
-//                 return nil
-//             },
-//         })
-//         services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
-//             BucketName: "backups",
-//         })
+		assert.Equal(t, false, services.Passed)
+	})
 
-//         assert.Equal(t, false, services.Passed)
-//     })
+	t.Run("error for list", func(t *testing.T) {
+		log, _ := logger.NewLogger("text", "debug")
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+				return storage.NewClient(ctx, option.WithoutAuthentication())
+			},
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
+				return &models.Checks{}, nil
+			},
+			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
+				return errors.New("bucket handler error")
+			},
+			ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+				return errors.New("error")
+			},
+			DeleteObjectFunc: func(ctx context.Context, obj *storage.ObjectHandle) error {
+				return nil
+			},
+		})
+		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+			BucketName: "backups",
+		})
 
-//     t.Run("error for delete", func(t *testing.T) {
-//         log, _ := logger.NewLogger("text", "debug")
-//         cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
-//             NewSessionWithOptionsFunc: func(ctx context.Context, bx []byte) (*storage.Client, error) {
-//                 return &storage.Client{}, nil
-//             },
-//             NewUploaderFunc: func(ctx context.Context, bucket *storage.BucketHandle, file string) (*models.Checks, error) {
-//                 return &models.Checks{}, nil
-//             },
-//             BucketHandleFunc: func(gcpClient *storage.Client, bucket string) *storage.BucketHandle {
-//                 return &storage.BucketHandle{}
-//             },
-//             ListObjectsV2Func: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
-//                 return nil
-//             },
-//             DeleteObjectFunc: func(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
-//                 return errors.New("error")
-//             },
-//         })
-//         services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
-//             BucketName: "backups",
-//         })
+		assert.Equal(t, false, services.Passed)
+	})
 
-//         assert.Equal(t, false, services.Passed)
-//     })
-// }
+	t.Run("error for delete", func(t *testing.T) {
+		log, _ := logger.NewLogger("text", "debug")
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+				return &storage.Client{}, nil
+			},
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
+				return &models.Checks{}, nil
+			},
+			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
+				return nil
+			},
+			ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+				return nil
+			},
+			DeleteObjectFunc: func(ctx context.Context, obj *storage.ObjectHandle) error {
+				return errors.New("error")
+			},
+		})
+		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+			BucketName: "backups",
+		})
+
+		assert.Equal(t, false, services.Passed)
+	})
+
+	t.Run("gcp connection error", func(t *testing.T) {
+		log, _ := logger.NewLogger("text", "debug")
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+				return &storage.Client{}, errors.New("")
+			},
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
+				return &models.Checks{}, nil
+			},
+			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
+				return nil
+			},
+			ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+				return nil
+			},
+			DeleteObjectFunc: func(ctx context.Context, obj *storage.ObjectHandle) error {
+				return errors.New("error")
+			},
+		})
+		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+			BucketName: "backups",
+		})
+
+		assert.Equal(t, false, services.Passed)
+	})
+}
