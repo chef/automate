@@ -13,6 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var filePrefix = "gcp_check_test_"
+
 type GCPCloudStorageConfig interface {
 	GetGCPConnection(*models.GCPCloudStorageConfigRequest) *models.Checks
 	GetBucketAccess(*models.GCPCloudStorageConfigRequest) *models.Checks
@@ -61,7 +63,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 
 	// Upload data in GCP bucket
 	uniqueID := uuid.New().String()
-	fileName := "test_" + uniqueID + ".txt"
+	fileName := filePrefix + uniqueID + ".txt"
 	bucket := client.Bucket(ss.Req.BucketName)
 	obj := bucket.Object(fileName)
 	if err := ss.UploadObject(ctx, obj); err != nil {
@@ -101,7 +103,7 @@ func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.Objec
 }
 
 func (ss *GCPConfigService) ListObjects(ctx context.Context, client *storage.Client, bucket *storage.BucketHandle) error {
-	query := &storage.Query{Prefix: "test_"}
+	query := &storage.Query{Prefix: filePrefix}
 	err := ss.GCPUtils.ListObjects(ctx, bucket, query)
 	if err != nil {
 		return err

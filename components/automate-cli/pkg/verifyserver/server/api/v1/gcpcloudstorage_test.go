@@ -28,25 +28,6 @@ var (
 	successMessagegcpConfig             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with GCP using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":true,\"success_msg\":\"Machine is able to access the GCP bucket using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}]}}"
 	failureMessagegcpConfig             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with GCP using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct GCP url or access or secret keys\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the GCP bucket using the provided credentials\",\"resolution_msg\":\"Please check if the provided GCP bucket exists or not. If it exists then provide the correct credentials.\",\"skipped\":false}]}}"
 	bucketAccessfailureMessagegcpConfig = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with GCP using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the GCP bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the GCP bucket\",\"skipped\":false}]}}"
-	errorBodyParsergcp                  = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
-	reqBodygcp                          = `{
-		"location": "gcs",
-		"endpoint": "endpoint",
-		"bucket_name": "a2-backup-restore-test",
-		"gcp_service_account": {
-			"type": "service_account",
-			"project_id": "automate-backup-unit-testing",
-			"private_key_id": "oiwehfi8wibkewckjsd 8w4r789346t394",
-			"private_key": "-----BEGIN PRIVATE KEY-----dflkvdlkfndfkndfk-----END PRIVATE KEY-----\n",
-			"client_email": "email@automate-backup-unit-testing.iam.gserviceaccount.com",
-			"client_id": "65464654684864353165486",
-			"auth_uri": "https://accounts.google.com",
-			"token_uri": "https://accounts.google.com",
-			"auth_provider_x509_cert_url": "https://accounts.google.com",
-			"client_x509_cert_url": "https://accounts.google.com",
-			"universe_domain": "https://accounts.google.com"
-		}
-	}`
 )
 
 func SetupMockgcpConfigService(mockGCPConnectionModel, mockGCPBucketAccessModel models.Checks) gcpcloudstorageservice.GCPCloudStorageConfig {
