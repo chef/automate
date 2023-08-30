@@ -76,7 +76,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 	}
 
 	// Delete data in GCP bucket
-	if err := obj.Delete(ctx); err != nil {
+	if err := ss.DeleteObject(ctx, obj); err != nil {
 		logrus.Errorf("Error deleting the objects")
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
 	}
@@ -109,9 +109,8 @@ func (ss *GCPConfigService) ListObjects(ctx context.Context, client *storage.Cli
 	return nil
 }
 
-func (ss *GCPConfigService) DeleteObject(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
-	query := &storage.Query{Prefix: "test_"}
-	err := ss.GCPUtils.DeleteObject(ctx, bucket, fileName)
+func (ss *GCPConfigService) DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error {
+	err := ss.GCPUtils.DeleteObject(ctx, obj)
 	if err != nil {
 		return err
 	}
