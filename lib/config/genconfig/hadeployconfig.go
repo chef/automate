@@ -15,6 +15,7 @@ const (
 	AWS_S3                        = "AWS S3"
 	MINIO                         = "Minio"
 	OBJECT_STORE                  = "Object Store"
+	GOOGLE_BUCKET                 = "Google Storage Bucket"
 	FILE_SYSTEM                   = "File System"
 	NFS                           = "NFS"
 	EFS                           = "EFS"
@@ -1032,8 +1033,7 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 	isBackupNeeded, err := c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitExistingInfra().BackupMount = "/mnt/automate_backups"
-
-		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, FILE_SYSTEM, NFS, EFS)
+		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET, FILE_SYSTEM, NFS, EFS)
 		if err1 != nil {
 			return err1
 		}
@@ -1064,17 +1064,12 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 
 func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (err error) {
 
-	_, locationType, err := c.Prompt.Select("Choose type of Type of Object Storage", string(LOCATION_TYPE_ON_AWS), string(LOCATION_TYPE_ON_GCP))
-	if err != nil {
-		return
-	}
-
 	bucketName, err := c.Prompt.InputStringRegex("Bucket name", BUCKET_NAME_REGEX)
 	if err != nil {
 		return
 	}
 	c.Config.InitObjectStorage().InitConfig().BucketName = bucketName
-	if locationType == "gcs" {
+	if backupOption == GOOGLE_BUCKET {
 		c.Config.ObjectStorage.Config.Location = "gcs"
 		jsonFile, err0 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
 		if err0 != nil {
