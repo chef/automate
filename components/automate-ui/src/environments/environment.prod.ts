@@ -33,5 +33,5 @@ export const environment = {
   license_id: '00000000-0000-0000-0000-000000000000',
   install_id: '00000000-0000-0000-0000-000000000000',
   use_default_session: false,
-  remote_library_url: "https://d2tfjgtznim348.cloudfront.net/remoteclient.js"
+  remote_library_url: "https://services.chef.io/usage/v1/js-client/remoteclient.js"
 };

@@ -27,5 +27,5 @@ export const environment = {
     license_id: '00000000-0000-0000-0000-111111111111',
     install_id: '00000000-0000-0000-0000-111111111111',
     use_default_session: true,
-    remote_library_url: "https://d2tfjgtznim348.cloudfront.net/remoteclient.js"
+    remote_library_url: "https://licensing-acceptance.chef.co/usage/remoteclient.js"
 };
