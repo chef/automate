@@ -216,6 +216,16 @@ Attempting to sign in with an unsupported IdP-supported SAML login causes the `u
 
 To remedy this error, fall back to the standard SP-initiated login mode.
 
+### Error: No attribute with name
+
+This error occurs in case of Azure AD where groups attribute is included use below values in config patch
+
+`
+email_attr = "emailaddress"
+username_attr = "username"
+groups_attr = "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups"
+`
+
 Chef Automate uses the [Dex](https://github.com/dexidp/dex) library to support SAML integrations. Dex does not support IdP-initiated SAML logins with of these IdPs.
 This means that Chef Automate also cannot support IdP-initiated SAML logins with the IdPs:
 
