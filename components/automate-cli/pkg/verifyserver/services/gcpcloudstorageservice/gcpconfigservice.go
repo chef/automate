@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/iterator"
@@ -35,7 +36,7 @@ func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils gcputils.GCPUtils) 
 func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
 	ctx := context.Background()
-	client, err := ss.GcpConnection(ctx, ss.Req.GoogleServiceAccountFile)
+	client, err := ss.GcpConnection(ctx, ss.Req.GcpServiceAccount)
 	if err != nil {
 		logrus.Errorf("error while creating a client: %v", err)
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
@@ -54,16 +55,18 @@ func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRe
 func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
 	ctx := context.Background()
-	client, err := ss.GcpConnection(ctx, ss.Req.GoogleServiceAccountFile)
+	client, err := ss.GcpConnection(ctx, ss.Req.GcpServiceAccount)
 	if err != nil {
 		logrus.Errorf("error while creating a client: %v", err)
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
 	}
 
 	// Upload data in GCP bucket
-	fileName := "test"
+	uniqueID := uuid.New().String()
+	fileName := "test_" + uniqueID + ".txt"
 	bucket := client.Bucket(ss.Req.BucketName)
-	if err := ss.UploadObject(ctx, bucket, fileName); err != nil {
+	obj := bucket.Object(fileName)
+	if err := ss.UploadObject(ctx, obj); err != nil {
 		logrus.Errorf("Error uploading the objects")
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
 	}
@@ -75,7 +78,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 	}
 
 	// Delete data in GCP bucket
-	if err := bucket.Delete(ctx); err != nil {
+	if err := obj.Delete(ctx); err != nil {
 		logrus.Errorf("Error deleting the objects")
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
 	}
@@ -83,12 +86,12 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 	return ss.Response(constants.GCP_BUCKET_ACCESS_TITLE, constants.GCP_CONNECTION_SUCCESS_MSG, "", "", true)
 }
 
-func (ss *GCPConfigService) GcpConnection(ctx context.Context, filePath string) (*storage.Client, error) {
-	return ss.GCPUtils.NewSessionWithOptions(ctx, filePath)
+func (ss *GCPConfigService) GcpConnection(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+	return ss.GCPUtils.NewSessionWithOptions(ctx, gsa)
 }
 
-func (ss *GCPConfigService) UploadObject(ctx context.Context, bucket *storage.BucketHandle, file string) error {
-	_, err := ss.GCPUtils.NewUploader(ctx, bucket, file)
+func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.ObjectHandle) error {
+	_, err := ss.GCPUtils.NewUploader(ctx, obj)
 	if err != nil {
 		return err
 	}
