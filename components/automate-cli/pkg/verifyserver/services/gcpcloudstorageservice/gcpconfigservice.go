@@ -2,7 +2,6 @@ package gcpcloudstorageservice
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"

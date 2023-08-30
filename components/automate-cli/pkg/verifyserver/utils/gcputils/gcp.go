@@ -7,15 +7,18 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
 type GCPUtils interface {
 	NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
-	DeleteObject(gcpClient *storage.Client, BucketName, BasePath string) (*models.Checks, error)
-	ListObjectsV2(gcpClient *storage.Client, BucketName string) (*models.Checks, error)
+	DeleteObject(ctx context.Context, bucket *storage.BucketHandle, fileName string) error
+	ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error
 	ListBuckets(gcpClient *storage.Client) (*models.Checks, error)
 	NewUploader(ctx context.Context, obj *storage.ObjectHandle) (*models.Checks, error)
+	BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error
 }
 
 func NewGCPUtils() GCPUtils {
@@ -41,14 +44,39 @@ func (au *GCPUtilsImpl) NewUploader(ctx context.Context, uploadObject *storage.O
 	return nil, nil
 }
 
-func (au *GCPUtilsImpl) DeleteObject(gcpClient *storage.Client, BucketName, BasePath string) (*models.Checks, error) {
-	return nil, nil
+func (au *GCPUtilsImpl) DeleteObject(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
+	if err := uploadObject.Delete(ctx); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (au *GCPUtilsImpl) ListObjectsV2(gcpClient *storage.Client, BucketName string) (*models.Checks, error) {
-	return nil, nil
+func (au *GCPUtilsImpl) ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+	it := bucket.Objects(ctx, query)
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+
+		if err != nil {
+			logrus.Errorf("Error listing the objects")
+			return err
+		}
+
+		fmt.Println("The bucket", attrs.Name)
+	}
+	return nil
 }
 
 func (au *GCPUtilsImpl) ListBuckets(gcpClient *storage.Client) (*models.Checks, error) {
 	return nil, nil
+}
+
+func (au *GCPUtilsImpl) BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error {
+	_, err := bucket.Attrs(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
