@@ -15,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var filePrefix = "gcp_check_test_"
+
 type GCPCloudStorageConfig interface {
 	GetGCPConnection(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks
 	GetBucketAccess(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks
