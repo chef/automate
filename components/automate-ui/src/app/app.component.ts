@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { environment } from "../environments/environment"
+import { LicenseUsageService } from './services/license-usage/license-usage.service';
 
 @Component({
   selector: 'app-root',
@@ -8,9 +9,11 @@ import { environment } from "../environments/environment"
 export class AppComponent {
   library_url: string;
   
-  constructor() {
+  constructor(private licenseUsageService : LicenseUsageService) {
     this.library_url = environment.remote_library_url;
-    this.loadScript(this.library_url, function (){});
+    this.loadScript(this.library_url, () => {
+      this.licenseUsageService.registerRemoteClientLoad()
+    });
   }
 
   loadScript(path, callback) {

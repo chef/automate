@@ -27,6 +27,8 @@ export class LicenseUsageService {
   private deploymentId;
   private deploymentType;
   private productVersion;
+  private payload;
+  private isLibraryLoaded = false;
 
   constructor(
     private complianceStatsService: ComplianceStatsService,
@@ -80,7 +82,6 @@ export class LicenseUsageService {
     if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
       this.totalService = applicationUsageStats['total_services'];
     }
-
     this.sendData()
   }
 
@@ -120,10 +121,18 @@ export class LicenseUsageService {
       "scannedOn": this.getCurrentDateTime()
     };
 
-    console.log(data)
-
-    if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined)
+    if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined && this.isLibraryLoaded) {
       postAnalyticsUsageData(data)
+    } else {
+      this.payload = data;
+    }
+  }
+
+  registerRemoteClientLoad() {
+    this.isLibraryLoaded = true;
+    if(this.payload){
+      this.sendData();
+    }
   }
 
   private getCurrentDateTime() {
