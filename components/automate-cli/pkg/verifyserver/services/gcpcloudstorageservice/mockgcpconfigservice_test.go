@@ -11,7 +11,6 @@ import (
 func TestMockGCPCloudStorageConfig_GetGCPConnection(t *testing.T) {
 	mock := &gcpcloudstorageservice.MockGCPCloudStorageConfig{
 		GetGCPConnectionFunc: func(req *models.GCPCloudStorageConfigRequest) *models.Checks {
-			// Return your desired mock response here
 			return &models.Checks{ /* Fill with mock data */ }
 		},
 	}
@@ -19,14 +18,12 @@ func TestMockGCPCloudStorageConfig_GetGCPConnection(t *testing.T) {
 	req := &models.GCPCloudStorageConfigRequest{ /* Fill with required data */ }
 	result := mock.GetGCPConnection(req)
 
-	// Assert the result here
 	assert.NotNil(t, result)
 }
 
 func TestMockGCPCloudStorageConfig_GetBucketAccess(t *testing.T) {
 	mock := &gcpcloudstorageservice.MockGCPCloudStorageConfig{
 		GetBucketAccessFunc: func(req *models.GCPCloudStorageConfigRequest) *models.Checks {
-			// Return your desired mock response here
 			return &models.Checks{ /* Fill with mock data */ }
 		},
 	}
@@ -34,6 +31,5 @@ func TestMockGCPCloudStorageConfig_GetBucketAccess(t *testing.T) {
 	req := &models.GCPCloudStorageConfigRequest{ /* Fill with required data */ }
 	result := mock.GetBucketAccess(req)
 
-	// Assert the result here
 	assert.NotNil(t, result)
 }

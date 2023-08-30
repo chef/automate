@@ -26,36 +26,6 @@ func TestMockGCPUtils_NewSessionWithOptions(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestMockGCPUtils_ListBuckets(t *testing.T) {
-	mock := &gcputils.MockGCPUtils{
-		ListBucketsFunc: func(gcpClient *storage.Client) (*models.Checks, error) {
-			// Return your desired mock response here
-			return &models.Checks{}, nil
-		},
-	}
-
-	gcpClient := &storage.Client{} // Create a mock client
-	result, err := mock.ListBuckets(gcpClient)
-
-	assert.NotNil(t, result)
-	assert.NoError(t, err)
-}
-
-// func TestMockGCPUtils_DeleteObject(t *testing.T) {
-// 	mock := &gcputils.MockGCPUtils{
-// 		DeleteObjectFunc: func(gcpClient *storage.Client, BucketName string, BasePath string) (*models.Checks, error) {
-// 			// Return your desired mock response here
-// 			return &models.Checks{}, nil
-// 		},
-// 	}
-
-// 	gcpClient := &storage.Client{} // Create a mock client
-// 	result, err := mock.DeleteObject(gcpClient, "", "")
-
-// 	assert.NotNil(t, result)
-// 	assert.NoError(t, err)
-// }
-
 func TestMockGCPUtils_ListObjects(t *testing.T) {
 	mock := &gcputils.MockGCPUtils{
 		ListObjectsFunc: func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
@@ -73,8 +43,6 @@ func TestMockGCPUtils_NewUploader(t *testing.T) {
 		},
 	}
 
-	// gcpClient := &storage.Client{}
-	// bucket := gcpClient.Bucket("")
 	result, err := mock.NewUploader(context.Background(), nil)
 
 	assert.NotNil(t, result)

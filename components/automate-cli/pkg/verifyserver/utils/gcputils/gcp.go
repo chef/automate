@@ -16,7 +16,6 @@ type GCPUtils interface {
 	NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
 	DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error
 	ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error
-	ListBuckets(gcpClient *storage.Client) (*models.Checks, error)
 	NewUploader(ctx context.Context, obj *storage.ObjectHandle) (*models.Checks, error)
 	BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error
 }
@@ -64,10 +63,6 @@ func (au *GCPUtilsImpl) ListObjects(ctx context.Context, bucket *storage.BucketH
 		fmt.Println("The bucket", attrs.Name)
 	}
 	return nil
-}
-
-func (au *GCPUtilsImpl) ListBuckets(gcpClient *storage.Client) (*models.Checks, error) {
-	return nil, nil
 }
 
 func (au *GCPUtilsImpl) BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error {

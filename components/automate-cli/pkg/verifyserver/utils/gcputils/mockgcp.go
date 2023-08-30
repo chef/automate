@@ -9,7 +9,6 @@ import (
 
 type MockGCPUtils struct {
 	NewSessionWithOptionsFunc func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
-	ListBucketsFunc           func(gcpClient *storage.Client) (*models.Checks, error)
 	DeleteObjectFunc          func(ctx context.Context, obj *storage.ObjectHandle) error
 	ListObjectsFunc           func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error
 	NewUploaderFunc           func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error)
@@ -18,10 +17,6 @@ type MockGCPUtils struct {
 
 func (mau *MockGCPUtils) NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 	return mau.NewSessionWithOptionsFunc(ctx, gsa)
-}
-
-func (mau *MockGCPUtils) ListBuckets(gcpClient *storage.Client) (*models.Checks, error) {
-	return mau.ListBucketsFunc(gcpClient)
 }
 
 func (mau *MockGCPUtils) DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error {
