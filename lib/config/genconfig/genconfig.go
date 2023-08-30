@@ -20,6 +20,11 @@ const (
 	DEPLOY_TYPE_AWS        DeployType = "AWS"
 )
 
+const (
+	LOCATION_TYPE_ON_GCP DeployType = "gcs"
+	LOCATION_TYPE_ON_AWS DeployType = "s3"
+)
+
 type ConfigType string
 
 const (

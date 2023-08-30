@@ -1064,19 +1064,37 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 
 func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (err error) {
 
+<<<<<<< HEAD
 	bucketName, err := c.Prompt.InputStringRegexErrMsg("Bucket name", BUCKET_NAME_REGEX, ERR_MSG_BUCKET)
+=======
+	_, locationType, err := c.Prompt.Select("Choose type of Type of Object Storage", string(LOCATION_TYPE_ON_AWS), string(LOCATION_TYPE_ON_GCP))
+	if err != nil {
+		return
+	}
+
+	bucketName, err := c.Prompt.InputStringRegex("Bucket name", BUCKET_NAME_REGEX)
+>>>>>>> fc1f5bd6a (update the config gen changes)
 	if err != nil {
 		return
 	}
 	c.Config.InitObjectStorage().InitConfig().BucketName = bucketName
+<<<<<<< HEAD
 
 	if backupOption == AWS_S3 {
 		accessKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX, ERR_MSG_AWS_ACCESS_KEY_ID)
 		if err1 != nil {
 			return err1
+=======
+	if locationType == "gcs" {
+		c.Config.ObjectStorage.Config.Location = "gcs"
+		jsonFile, err0 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
+		if err0 != nil {
+			return
+>>>>>>> fc1f5bd6a (update the config gen changes)
 		}
-		c.Config.ObjectStorage.Config.AccessKey = accessKey
+		c.Config.ObjectStorage.Config.GoogleServiceAccountFile = jsonFile
 
+<<<<<<< HEAD
 		secretKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX, ERR_MSG_AWS_ACCESS_KEY_SECRET)
 		if err1 != nil {
 			return err1
@@ -1107,6 +1125,49 @@ func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (er
 			return err1
 		}
 		c.Config.ObjectStorage.Config.Endpoint = bucketEndpoint
+=======
+	} else {
+
+		c.Config.ObjectStorage.Config.Location = "s3"
+		if backupOption == AWS_S3 {
+			accessKey, err1 := c.Prompt.InputStringRegex("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.AccessKey = accessKey
+
+			secretKey, err1 := c.Prompt.InputStringRegex("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.SecretKey = secretKey
+			c.Config.ObjectStorage.Config.Endpoint = "https://s3.amazonaws.com"
+
+			awsRegions := AwsRegionsImpFactory(c.Prompt)
+			bucketRegion, err1 := awsRegions.Choose("AWS Region of bucket")
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.Region = bucketRegion
+		} else {
+			accessKey, err1 := c.Prompt.InputStringRegex("Access Key ID for bucket", ACCESS_KEY_ID_REGEX)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.AccessKey = accessKey
+
+			secretKey, err1 := c.Prompt.InputStringRegex("Access Key Secret for bucket", ACCESS_KEY_SECRET_REGEX)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.SecretKey = secretKey
+			bucketEndpoint, err1 := c.Prompt.InputStringRegex("Endpoint for bucket", ENDPOINT_URL)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.Endpoint = bucketEndpoint
+		}
+>>>>>>> fc1f5bd6a (update the config gen changes)
 	}
 	return
 }
