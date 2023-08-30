@@ -60,7 +60,7 @@ type ConfigObjectStorage struct {
 	Endpoint                 string `toml:"endpoint,omitempty"`
 	Region                   string `toml:"region,omitempty"`
 	Location                 string `toml:"location,omitempty"`
-	GoogleServiceAccountFile string `toml:"google_service_account_file"`
+	GoogleServiceAccountFile string `toml:"google_service_account_file,omitempty"`
 }
 
 type AutomateSettings struct {

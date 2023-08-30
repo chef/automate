@@ -1039,7 +1039,7 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 		}
 		backupConfig := ""
 		switch backupOption {
-		case AWS_S3, MINIO, OBJECT_STORE:
+		case AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET:
 			backupConfig = "object_storage"
 		case FILE_SYSTEM, NFS, EFS:
 			backupConfig = "file_system"
