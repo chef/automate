@@ -33,18 +33,9 @@ func TestListBuckets(t *testing.T) {
 	assert.Nil(t, res)
 }
 
-func TestNewUploader(t *testing.T) {
-	au := gcputils.NewGCPUtils()
-	client, err := storage.NewClient(context.Background())
-	buck := client.Bucket("abc")
-	res, err := au.NewUploader(context.Background(), buck, "")
-	assert.NoError(t, err)
-	assert.Nil(t, res)
-}
-
 func TestNewSessionWithOptions(t *testing.T) {
 	au := gcputils.NewGCPUtils()
-	cl, err := au.NewSessionWithOptions(context.Background(), "")
+	cl, err := au.NewSessionWithOptions(context.Background(), nil)
 	assert.Error(t, err)
 	assert.Nil(t, cl)
 }

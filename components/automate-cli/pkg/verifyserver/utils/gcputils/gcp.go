@@ -2,6 +2,7 @@ package gcputils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"cloud.google.com/go/storage"
@@ -9,28 +10,27 @@ import (
 	"google.golang.org/api/option"
 )
 
-type GCPUtilsImpl struct {
-}
-
 type GCPUtils interface {
-	NewSessionWithOptions(ctx context.Context, filePath string) (*storage.Client, error)
+	NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
 	DeleteObject(gcpClient *storage.Client, BucketName, BasePath string) (*models.Checks, error)
 	ListObjectsV2(gcpClient *storage.Client, BucketName string) (*models.Checks, error)
 	ListBuckets(gcpClient *storage.Client) (*models.Checks, error)
-	NewUploader(ctx context.Context, bucket *storage.BucketHandle, file string) (*models.Checks, error)
+	NewUploader(ctx context.Context, obj *storage.ObjectHandle) (*models.Checks, error)
 }
 
 func NewGCPUtils() GCPUtils {
 	return &GCPUtilsImpl{}
 }
 
-func (au *GCPUtilsImpl) NewSessionWithOptions(ctx context.Context, filePath string) (*storage.Client, error) {
-	return storage.NewClient(ctx, option.WithCredentialsFile(filePath))
+type GCPUtilsImpl struct {
 }
 
-func (au *GCPUtilsImpl) NewUploader(ctx context.Context, bucket *storage.BucketHandle, file string) (*models.Checks, error) {
-	uploadObject := bucket.Object(file)
+func (au *GCPUtilsImpl) NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+	bx, _ := json.Marshal(gsa)
+	return storage.NewClient(ctx, option.WithCredentialsJSON(bx))
+}
 
+func (au *GCPUtilsImpl) NewUploader(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
 	wc := uploadObject.NewWriter(ctx)
 	if _, err := fmt.Fprintf(wc, "Heute ist ein schöner Tag."); err != nil {
 		return nil, err
