@@ -15,6 +15,7 @@ const (
 	AWS_S3                        = "AWS S3"
 	MINIO                         = "Minio"
 	OBJECT_STORE                  = "Object Store"
+	GOOGLE_BUCKET                 = "Google Cloud Storage Bucket"
 	FILE_SYSTEM                   = "File System"
 	NFS                           = "NFS"
 	EFS                           = "EFS"
@@ -1032,14 +1033,13 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 	isBackupNeeded, err := c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitExistingInfra().BackupMount = "/mnt/automate_backups"
-
-		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, FILE_SYSTEM, NFS, EFS)
+		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET, FILE_SYSTEM, NFS, EFS)
 		if err1 != nil {
 			return err1
 		}
 		backupConfig := ""
 		switch backupOption {
-		case AWS_S3, MINIO, OBJECT_STORE:
+		case AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET:
 			backupConfig = "object_storage"
 		case FILE_SYSTEM, NFS, EFS:
 			backupConfig = "file_system"
@@ -1069,44 +1069,55 @@ func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (er
 		return
 	}
 	c.Config.InitObjectStorage().InitConfig().BucketName = bucketName
-
-	if backupOption == AWS_S3 {
-		accessKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX, ERR_MSG_AWS_ACCESS_KEY_ID)
+	if backupOption == GOOGLE_BUCKET {
+		c.Config.ObjectStorage.Config.Location = "gcs"
+		jsonFile, err1 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
 		if err1 != nil {
 			return err1
 		}
-		c.Config.ObjectStorage.Config.AccessKey = accessKey
+		c.Config.ObjectStorage.Config.GoogleServiceAccountFile = jsonFile
 
-		secretKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX, ERR_MSG_AWS_ACCESS_KEY_SECRET)
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.SecretKey = secretKey
-		c.Config.ObjectStorage.Config.Endpoint = "https://s3.amazonaws.com"
-
-		awsRegions := AwsRegionsImpFactory(c.Prompt)
-		bucketRegion, err1 := awsRegions.Choose("AWS Region of bucket")
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.Region = bucketRegion
 	} else {
-		accessKey, err1 := c.Prompt.InputStringRegexErrMsg("Access Key ID for bucket", ACCESS_KEY_ID_REGEX, ERR_MSG_ACCESS_KEY)
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.AccessKey = accessKey
 
-		secretKey, err1 := c.Prompt.InputStringRegexErrMsg("Access Key Secret for bucket", ACCESS_KEY_SECRET_REGEX, ERR_MSG_ACCESS_KEY)
-		if err1 != nil {
-			return err1
+		c.Config.ObjectStorage.Config.Location = "s3"
+		if backupOption == AWS_S3 {
+			accessKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX, ERR_MSG_AWS_ACCESS_KEY_ID)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.AccessKey = accessKey
+
+			secretKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX, ERR_MSG_AWS_ACCESS_KEY_SECRET)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.SecretKey = secretKey
+			c.Config.ObjectStorage.Config.Endpoint = "https://s3.amazonaws.com"
+
+			awsRegions := AwsRegionsImpFactory(c.Prompt)
+			bucketRegion, err1 := awsRegions.Choose("AWS Region of bucket")
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.Region = bucketRegion
+		} else {
+			accessKey, err1 := c.Prompt.InputStringRegexErrMsg("Access Key ID for bucket", ACCESS_KEY_ID_REGEX, ERR_MSG_ACCESS_KEY)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.AccessKey = accessKey
+
+			secretKey, err1 := c.Prompt.InputStringRegexErrMsg("Access Key Secret for bucket", ACCESS_KEY_SECRET_REGEX, ERR_MSG_ACCESS_KEY)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.SecretKey = secretKey
+			bucketEndpoint, err1 := c.Prompt.InputStringRegexErrMsg("Endpoint for bucket", ENDPOINT_URL, ERR_MSG_BUCKET_ENDPOINT)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.Endpoint = bucketEndpoint
 		}
-		c.Config.ObjectStorage.Config.SecretKey = secretKey
-		bucketEndpoint, err1 := c.Prompt.InputStringRegexErrMsg("Endpoint for bucket", ENDPOINT_URL, ERR_MSG_BUCKET_ENDPOINT)
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.Endpoint = bucketEndpoint
 	}
 	return
 }
