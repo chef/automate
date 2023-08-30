@@ -2,7 +2,6 @@ package gcpcloudstorageservice
 
 import (
 	"context"
-	"fmt"
 
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -12,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/api/iterator"
 )
 
 type GCPCloudStorageConfig interface {
@@ -44,7 +42,7 @@ func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRe
 
 	defer client.Close()
 	bucket := client.Bucket(ss.Req.BucketName)
-	_, err = bucket.Attrs(ctx)
+	err = ss.BucketAttributes(ctx, bucket)
 	if err != nil {
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_NOT_FOUND).Error(), constants.GCP_BUCKET_NOT_FOUND_RESOLUTION_MSG, false)
 	}
@@ -90,6 +88,10 @@ func (ss *GCPConfigService) GcpConnection(ctx context.Context, gsa *models.GcpSe
 	return ss.GCPUtils.NewSessionWithOptions(ctx, gsa)
 }
 
+func (ss *GCPConfigService) BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error {
+	return ss.GCPUtils.BucketAttributes(ctx, bucket)
+}
+
 func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.ObjectHandle) error {
 	_, err := ss.GCPUtils.NewUploader(ctx, obj)
 	if err != nil {
@@ -99,21 +101,19 @@ func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.Objec
 }
 
 func (ss *GCPConfigService) ListObjects(ctx context.Context, client *storage.Client, bucket *storage.BucketHandle) error {
-	query := &storage.Query{Prefix: "test"}
+	query := &storage.Query{Prefix: "test_"}
+	err := ss.GCPUtils.ListObjects(ctx, bucket, query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-	it := bucket.Objects(ctx, query)
-	for {
-		attrs, err := it.Next()
-		if err == iterator.Done {
-			break
-		}
-
-		if err != nil {
-			logrus.Errorf("Error listing the objects")
-			return err
-		}
-
-		fmt.Println("The bucket", attrs.Name)
+func (ss *GCPConfigService) DeleteObject(ctx context.Context, bucket *storage.BucketHandle, fileName string) error {
+	query := &storage.Query{Prefix: "test_"}
+	err := ss.GCPUtils.DeleteObject(ctx, bucket, fileName)
+	if err != nil {
+		return err
 	}
 	return nil
 }
