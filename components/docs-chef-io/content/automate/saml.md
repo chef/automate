@@ -234,7 +234,7 @@ This error occurs in the case of Azure AD where the group's attribute is include
 Use below values in config patch
 
 
-`email_attr = "emailaddress" \n`
-`username_attr = "username" \n`
+`email_attr = "emailaddress"`
+`username_attr = "username"`
 `groups_attr = "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups"`
 `
