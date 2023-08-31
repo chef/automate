@@ -41,7 +41,7 @@ This page includes commands that you can execute for the Chef Automate cluster p
 ```
 
 
-- To get the status of the cluster, run the command from bastion node. 
+- To get the status of the cluster, run the command from bastion node.
 
 ```cmd
   chef-automate status 
@@ -49,32 +49,34 @@ This page includes commands that you can execute for the Chef Automate cluster p
 
 - Check the service status on frontend nodes (Automate), ssh to the frontend node.
  ```cmd 
-  chef-automate ssh --hostname a2
-  chef-automate status
+  chef-automate status --automate
+  chef-automate status --a2 
 ```
 
 - Check the service status on frontend nodes (Chef Infra Server), ssh to the frontend node.
  ```cmd 
-  chef-automate ssh --hostname cs
-  chef-automate status
+  chef-automate status --chef_server
+  chef-automate status --cs
 ```
 
 - Check the service status on backend nodes (Postgres nodes), ssh to the backend node.
  ```cmd 
-  chef-automate ssh --hostname pg
-  hab svc status
+  chef-automate status --postgresql
+  chef-automate status -pg
 ```
 
 - Check the service status on backend nodes (Opensearch nodes), ssh to the backend node.
 ```cmd 
-  chef-automate ssh --hostname os
-  hab svc status
+  chef-automate status --opensearch
+  chef-automate status --os
 ```
 
 - Patch a config to the Front end nodes 
   - add the config to the location `/hab/a2_deploy_workspace/config/<automate.toml>`
 ``` cmd
-  chef-automate config patch /hab/a2_deploy_workspace/config/automate.toml
+  chef-automate config patch config.automate.toml --automate 
+  chef-automate config patch config.chef_server.toml --chef_server 
+  
 ```
 
 - Collect the Gatherlogs for Automate HA cluster,run the command from bastion node.  
