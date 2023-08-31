@@ -14,7 +14,7 @@ accept = false
 url = "https://telemetry.chef.io"
 
 [license_audit]
-url = "https://licensing.chef.co/usage"
+url = ""
 frequency= "DAILY"
 interval = 1
 

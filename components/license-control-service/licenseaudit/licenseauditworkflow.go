@@ -17,7 +17,7 @@ var (
 	WorkflowName         = cereal.NewWorkflowName("license-audit")
 	LicenseAuditTaskName = cereal.NewTaskName("license-audit-task")
 	ScheduleName         = "license-audit"
-	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s -o %s -u %s"
+	Command              = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate -s %s -e %s -o %s"
 	CleanCVSFilesCommand = "HAB_LICENSE=accept-no-persist hab pkg exec chef/license-audit license-audit report automate clean"
 	OutputFileName       = "license-audit-report"
 	CleanReportFiles     = "rm -rf %s.*"
@@ -219,6 +219,10 @@ func executeCommandforAudit(executeCommand ExecuteCommand, command string) (stri
 // getAppendedCommand gets the appended command with date
 func getAppendedCommand(commandToExecute string, url string) string {
 	yesterdayDate := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
+	if url == "" {
+		return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate, OutputFileName)
+	}
+	commandToExecute = commandToExecute + " -u %s"
 	return fmt.Sprintf(commandToExecute, yesterdayDate, yesterdayDate, OutputFileName, url)
 }
 
