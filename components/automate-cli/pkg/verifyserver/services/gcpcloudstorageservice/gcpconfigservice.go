@@ -12,11 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var filePrefix = "gcp_check_test_"
-
 type GCPCloudStorageConfig interface {
-	GetGCPConnection(*models.GCPCloudStorageConfigRequest) *models.Checks
-	GetBucketAccess(*models.GCPCloudStorageConfigRequest) *models.Checks
+	GetGCPConnection(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks
+	GetBucketAccess(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks
 }
 
 type GCPConfigService struct {
@@ -32,9 +30,8 @@ func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils GCPUtils) GCPCloudS
 	}
 }
 
-func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRequest) *models.Checks {
+func (ss *GCPConfigService) GetGCPConnection(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
-	ctx := context.Background()
 	client, err := ss.GcpConnection(ctx, ss.Req.GcpServiceAccount)
 	if err != nil {
 		logrus.Errorf("error while creating a client: %v", err)
@@ -51,9 +48,8 @@ func (ss *GCPConfigService) GetGCPConnection(req *models.GCPCloudStorageConfigRe
 	return ss.Response(constants.GCP_CONNECTION_TITLE, constants.GCP_CONNECTION_SUCCESS_MSG, "", "", true)
 }
 
-func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigRequest) *models.Checks {
+func (ss *GCPConfigService) GetBucketAccess(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
-	ctx := context.Background()
 	client, err := ss.GcpConnection(ctx, ss.Req.GcpServiceAccount)
 	if err != nil {
 		logrus.Errorf("error while creating a client: %v", err)
@@ -62,7 +58,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 
 	// Upload data in GCP bucket
 	uniqueID := uuid.New().String()
-	fileName := filePrefix + uniqueID + ".txt"
+	fileName := constants.GCP_CHECK_FILE_PREFIX + uniqueID + ".txt"
 	bucket := client.Bucket(ss.Req.BucketName)
 	obj := bucket.Object(fileName)
 
@@ -103,7 +99,7 @@ func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.Objec
 }
 
 func (ss *GCPConfigService) ListObjects(ctx context.Context, client *storage.Client, bucket *storage.BucketHandle) error {
-	query := &storage.Query{Prefix: filePrefix}
+	query := &storage.Query{Prefix: constants.GCP_CHECK_FILE_PREFIX}
 	err := ss.GCPUtils.ListObjects(ctx, bucket, query)
 	if err != nil {
 		return err

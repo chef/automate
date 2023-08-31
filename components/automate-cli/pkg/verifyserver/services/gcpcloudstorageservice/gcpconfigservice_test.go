@@ -31,7 +31,7 @@ func TestGetGCPConnection(t *testing.T) {
 				return errors.New("error")
 			},
 		})
-		services := cs.GetGCPConnection(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetGCPConnection(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName:               "backups",
 			GoogleServiceAccountFile: "dummy_file.json",
 			GcpServiceAccount: &models.GcpServiceAccount{
@@ -63,7 +63,7 @@ func TestGetGCPConnection(t *testing.T) {
 				return nil
 			},
 		})
-		services := cs.GetGCPConnection(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetGCPConnection(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName:               "backups",
 			GoogleServiceAccountFile: "dummy_file.json",
 			GcpServiceAccount: &models.GcpServiceAccount{
@@ -94,7 +94,7 @@ func TestGetGCPConnection(t *testing.T) {
 				return nil
 			},
 		})
-		services := cs.GetGCPConnection(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetGCPConnection(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName:               "backups",
 			GoogleServiceAccountFile: "dummy_file.json",
 			GcpServiceAccount: &models.GcpServiceAccount{
@@ -136,7 +136,7 @@ func TestGetBucketAccess(t *testing.T) {
 				return nil
 			},
 		})
-		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetBucketAccess(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName: "backups",
 		})
 
@@ -162,7 +162,7 @@ func TestGetBucketAccess(t *testing.T) {
 				return nil
 			},
 		})
-		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetBucketAccess(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName: "backups",
 		})
 
@@ -188,7 +188,7 @@ func TestGetBucketAccess(t *testing.T) {
 				return nil
 			},
 		})
-		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetBucketAccess(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName: "backups",
 		})
 
@@ -214,7 +214,7 @@ func TestGetBucketAccess(t *testing.T) {
 				return errors.New("error")
 			},
 		})
-		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetBucketAccess(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName: "backups",
 		})
 
@@ -240,7 +240,7 @@ func TestGetBucketAccess(t *testing.T) {
 				return errors.New("error")
 			},
 		})
-		services := cs.GetBucketAccess(&models.GCPCloudStorageConfigRequest{
+		services := cs.GetBucketAccess(context.Background(), &models.GCPCloudStorageConfigRequest{
 			BucketName: "backups",
 		})
 

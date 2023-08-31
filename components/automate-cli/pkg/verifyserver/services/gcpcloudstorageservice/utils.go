@@ -20,7 +20,7 @@ type GCPUtils interface {
 	BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error
 }
 
-func NewGCPUtils() GCPUtils {
+func NewGCPUtils() *GCPUtilsImpl {
 	return &GCPUtilsImpl{}
 }
 

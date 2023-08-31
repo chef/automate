@@ -11,3 +11,7 @@ const (
 	GCP_BUCKET_ACCESS_ERROR_MSG         = "Machine is not able to access the GCS bucket using the provided credentials"
 	GCP_BUCKET_ACCESS_RESOLUTION_MSG    = "Please check if the provided GCS bucket exists or not. If it exists then provide the correct credentials."
 )
+
+const (
+	GCP_CHECK_FILE_PREFIX = "gcp_check_test_"
+)

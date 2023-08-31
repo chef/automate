@@ -1,6 +1,7 @@
 package v1_test
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http/httptest"
 	"strings"
@@ -32,10 +33,10 @@ var (
 
 func SetupMockgcpConfigService(mockGCPConnectionModel, mockGCPBucketAccessModel models.Checks) gcpcloudstorageservice.GCPCloudStorageConfig {
 	return &gcpcloudstorageservice.MockGCPCloudStorageConfig{
-		GetGCPConnectionFunc: func(*models.GCPCloudStorageConfigRequest) *models.Checks {
+		GetGCPConnectionFunc: func(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks {
 			return &mockGCPConnectionModel
 		},
-		GetBucketAccessFunc: func(*models.GCPCloudStorageConfigRequest) *models.Checks {
+		GetBucketAccessFunc: func(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks {
 			return &mockGCPBucketAccessModel
 		},
 	}

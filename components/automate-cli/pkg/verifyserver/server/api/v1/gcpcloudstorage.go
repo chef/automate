@@ -17,9 +17,9 @@ func (h *Handler) GetGCPCloudStorageConfig(c *fiber.Ctx) error {
 		h.Logger.Error(fmt.Errorf(errString))
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
-	gcpConnection := h.GCPConfigService.GetGCPConnection(gcpConfigRequest)
+	gcpConnection := h.GCPConfigService.GetGCPConnection(c.Context(), gcpConfigRequest)
 	if gcpConnection.Passed {
-		bucketAccess = h.GCPConfigService.GetBucketAccess(gcpConfigRequest)
+		bucketAccess = h.GCPConfigService.GetBucketAccess(c.Context(), gcpConfigRequest)
 	} else {
 		bucketAccess = &models.Checks{
 			Title:         constants.GCP_BUCKET_ACCESS_TITLE,
