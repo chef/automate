@@ -23,15 +23,17 @@ See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-b
 
 1. Generate config using the below command:
 
-    ```bash
-    sudo chef-automate config gen config.toml
-    ```
+```bash
+sudo chef-automate config gen config.toml
+```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+Click [here](/automate/ha_config_gen) to know more about generating config.
 
-    {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+You can also view the [Sample Config](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services).
 
-    `chef-automate init-config-ha existing_infra`{{< /note >}}
+{{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+
+`chef-automate init-config-ha existing_infra`{{< /note >}}
 
 ## Config Verify
 
@@ -77,6 +79,18 @@ After successful deployment, proceed with following:
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
    1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+
+## Backup/Restore
+
+A shared file system is always required to create OpenSearch snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. To know more about the backup and restore configuration, see On-Premise Deployment using [Filesystem](/automate/ha_backup_restore_file_system) or using [Object Storage](/automate/ha_backup_restore_object_storage).
+
+## Add/Remove Nodes
+
+The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
+
+## Patch Configs
+
+The bastion server can patch new configurations in all nodes. To know more see [Patch Configuration](/automate/ha_config/#patch-configuration) section.
 
 ## Sample Config to setup On-Premise Deployment with AWS Managed Services
 
