@@ -10,7 +10,12 @@ export class AppComponent {
   library_url: string;
 
   constructor(private licenseUsageService: LicenseUsageService) {
-    this.library_url = environment.remote_library_url;
+    if (localStorage.getItem('build-mode') === 'acceptance') {
+      this.library_url = environment.remote_library_url_acceptance;
+    } else {
+      this.library_url = environment.remote_library_url;
+    }
+
     this.loadScript(this.library_url, () => {
       this.licenseUsageService.postData();
     });

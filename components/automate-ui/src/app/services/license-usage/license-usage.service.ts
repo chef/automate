@@ -30,19 +30,10 @@ export class LicenseUsageService {
   private payload;
   private retryPostDataInterval;
 
-  private isLicenseIdLoaded = false;
-  private isCustomerIdLoaded = false;
-  private isCustomerNameLoaded = false;
-  private isTotalNodesLoaded = false;
-  private isTotalScansLoaded = false;
-  private isTotalServiceLoaded = false;
   private isExpirationLoaded = false;
-  private isDaysSinceLasPostLoaded = false;
-  private isPeriodStartDateLoaded = false;
-  private isPeriodEndDateLoaded = false;
-  private isDeploymentIdLoaded = false;
-  private isDeploymentTypeLoaded = false;
   private isProductVersionLoaded = false;
+  private isConfigDataLoaded = false;
+  private isSummaryDataLoaded = false;
 
   constructor(
     private complianceStatsService: ComplianceStatsService,
@@ -71,16 +62,18 @@ export class LicenseUsageService {
       this.customerId = data.customerId;
       this.customerName = data.customerName;
 
-      this.isDeploymentIdLoaded = true;
-      this.isDeploymentTypeLoaded = true;
-      this.isLicenseIdLoaded = true;
-      this.isCustomerIdLoaded = true;
-      this.isCustomerNameLoaded = true;
+      this.isConfigDataLoaded = true;
     });
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
     this.totalNodes = complianceUsageStats['node_cnt'];
     this.daysSinceLasPost = complianceUsageStats['days_since_last_post'];
+
+    const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
+    this.totalScans = nodeUsageStats['node_cnt'];
+
+    const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
+    this.totalService = applicationUsageStats['total_services'];
 
     const start = new Date();
     start.setDate(start.getDate() - this.daysSinceLasPost);
@@ -92,18 +85,7 @@ export class LicenseUsageService {
     end.setDate(end.getDate() - 1);
     this.periodEndDate = end.toISOString();
 
-    this.isTotalNodesLoaded = true;
-    this.isDaysSinceLasPostLoaded = true;
-    this.isPeriodStartDateLoaded = true;
-    this.isPeriodEndDateLoaded = true;
-
-    const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
-    this.totalScans = nodeUsageStats['node_cnt'];
-    this.isTotalScansLoaded = true;
-
-    const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
-    this.totalService = applicationUsageStats['total_services'];
-    this.isTotalServiceLoaded = true;
+    this.isSummaryDataLoaded = true;
   }
 
   constructPayload() {
@@ -159,11 +141,8 @@ export class LicenseUsageService {
   }
 
   private isAllDataLoaded() {
-    return ( this.isLicenseIdLoaded && this.isCustomerIdLoaded && this.isExpirationLoaded
-      && this.isTotalNodesLoaded && this.isTotalScansLoaded && this.isDaysSinceLasPostLoaded
-      && this.isPeriodStartDateLoaded && this.isPeriodEndDateLoaded && this.isDeploymentIdLoaded
-      && this.isTotalServiceLoaded && this.isDeploymentTypeLoaded && this.isCustomerNameLoaded
-      && this.isProductVersionLoaded );
+    return (this.isExpirationLoaded && this.isProductVersionLoaded
+      && this.isConfigDataLoaded && this.isSummaryDataLoaded);
   }
 
   private getCurrentDateTime() {
