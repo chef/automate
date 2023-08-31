@@ -456,10 +456,9 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     this.arrayOfNodesTree = [];
     this.selected = [];
     for (const expandValue of expandedList) {
-      
       // set the default environment if policy group is present
-      if (this.InfraNode.policy_group !== "") {
-        li = "_default"
+      if (this.InfraNode.policy_group !== '') {
+        li = '_default';
       }
 
       if (expandValue.id === li) {
