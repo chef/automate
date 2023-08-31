@@ -259,7 +259,7 @@ Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Post
 
 {{< /danger >}}
 
-To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
+To uninstall Chef Automate HA instances after successful deployment, run the below command in your bastion host. This will delete the AWS resources that are created during provision-infra.
 
 ```bash
 chef-automate cleanup --aws-deployment --force
@@ -269,4 +269,10 @@ OR
 
 ```bash
 chef-automate cleanup --aws-deployment
+```
+
+Following the `cleanup` command the following command can be used to remove the deployment workspace in the Bastion machine. This will also remove the logs file inside the workspace.
+
+```bash
+hab pkg uninstall chef/automate-ha-deployment
 ```
