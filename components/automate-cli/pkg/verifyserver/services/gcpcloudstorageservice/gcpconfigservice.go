@@ -9,7 +9,6 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
