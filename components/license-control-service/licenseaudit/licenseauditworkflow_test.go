@@ -329,7 +329,7 @@ func Test_getAppendedCommand(t *testing.T) {
 	}{
 		{
 			name:    "Checking the output of the string",
-			command: "%s %s %s %s",
+			command: "%s %s %s",
 			url:     "test",
 		},
 		{
@@ -337,12 +337,24 @@ func Test_getAppendedCommand(t *testing.T) {
 			command: Command,
 			url:     "acceptance_url",
 		},
+		{
+			name:    "Getting license command with url blank",
+			command: Command,
+			url:     "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dateToBeAppended := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
-			tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended, OutputFileName, tt.url)
+
 			got := getAppendedCommand(tt.command, tt.url)
+
+			if tt.url == "" {
+				tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended, OutputFileName)
+			} else {
+				tt.command = tt.command + " -u %s"
+				tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended, OutputFileName, tt.url)
+			}
 			assert.Equal(t, tt.want, got)
 		})
 	}
