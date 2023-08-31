@@ -6,7 +6,6 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -23,10 +22,10 @@ type GCPCloudStorageConfig interface {
 type GCPConfigService struct {
 	Logger   logger.Logger
 	Req      *models.GCPCloudStorageConfigRequest
-	GCPUtils gcputils.GCPUtils
+	GCPUtils GCPUtils
 }
 
-func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils gcputils.GCPUtils) GCPCloudStorageConfig {
+func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils GCPUtils) GCPCloudStorageConfig {
 	return &GCPConfigService{
 		Logger:   logger,
 		GCPUtils: gcpUtils,
@@ -66,6 +65,7 @@ func (ss *GCPConfigService) GetBucketAccess(req *models.GCPCloudStorageConfigReq
 	fileName := filePrefix + uniqueID + ".txt"
 	bucket := client.Bucket(ss.Req.BucketName)
 	obj := bucket.Object(fileName)
+
 	if err := ss.UploadObject(ctx, obj); err != nil {
 		logrus.Errorf("Error uploading the objects")
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
@@ -95,7 +95,7 @@ func (ss *GCPConfigService) BucketAttributes(ctx context.Context, bucket *storag
 }
 
 func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.ObjectHandle) error {
-	_, err := ss.GCPUtils.NewUploader(ctx, obj)
+	err := ss.GCPUtils.NewUploader(ctx, obj)
 	if err != nil {
 		return err
 	}
@@ -114,6 +114,7 @@ func (ss *GCPConfigService) ListObjects(ctx context.Context, client *storage.Cli
 func (ss *GCPConfigService) DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error {
 	err := ss.GCPUtils.DeleteObject(ctx, obj)
 	if err != nil {
+		logrus.Errorf("ERROR DELETE: %+v", err)
 		return err
 	}
 	return nil

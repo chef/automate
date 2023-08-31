@@ -43,7 +43,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -127,7 +126,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
 		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
 		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l))).
-		AddGCSConfigService(gcpcloudstorageservice.NewGCPCloudStorageConfig(l, gcputils.NewGCPUtils()))
+		AddGCSConfigService(gcpcloudstorageservice.NewGCPCloudStorageConfig(l, gcpcloudstorageservice.NewGCPUtils()))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

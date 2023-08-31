@@ -8,23 +8,22 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/gcpcloudstorageservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/gcputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/option"
 )
 
 var (
-	gcpConnectionTitle        = "GCP connection test"
-	gcpConnectionErrorMsg     = "Machine is not able to connect with GCP using the provided credentials: "
-	gcpConnectionSuccessMsg   = "Machine is able to connect with GCP using the provided credentials"
-	gcpBucketAccessSuccessMsg = "Machine is able to connect with GCP using the provided credentials"
+	gcpConnectionTitle        = "GCS connection test"
+	gcpConnectionErrorMsg     = "Machine is not able to connect with GCS using the provided credentials: "
+	gcpConnectionSuccessMsg   = "Machine is able to connect with GCS using the provided credentials"
+	gcpBucketAccessSuccessMsg = "Machine is able to connect with GCS using the provided credentials"
 )
 
 func TestGetGCPConnection(t *testing.T) {
 	t.Run("No bucket exists", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return &storage.Client{}, nil
 			},
@@ -50,13 +49,13 @@ func TestGetGCPConnection(t *testing.T) {
 			},
 		})
 
-		assert.Contains(t, services.ErrorMsg, "Cannot find the Bucket in GCP cloud storage")
-		assert.Equal(t, services.ResolutionMsg, "Create a bucket in GCP cloud storage")
+		assert.Contains(t, services.ErrorMsg, "Cannot find the Bucket in GCS cloud storage")
+		assert.Equal(t, services.ResolutionMsg, "Create a bucket in GCS cloud storage")
 	})
 
 	t.Run("success", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return &storage.Client{}, nil
 			},
@@ -85,9 +84,9 @@ func TestGetGCPConnection(t *testing.T) {
 		assert.Equal(t, gcpConnectionSuccessMsg, services.SuccessMsg)
 	})
 
-	t.Run("gcp connection error", func(t *testing.T) {
+	t.Run("GCS connection error", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return &storage.Client{}, errors.New("")
 			},
@@ -120,12 +119,12 @@ func TestGetGCPConnection(t *testing.T) {
 func TestGetBucketAccess(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return storage.NewClient(ctx, option.WithoutAuthentication())
 			},
-			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
-				return &models.Checks{}, nil
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) error {
+				return nil
 			},
 			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
 				return nil
@@ -146,12 +145,12 @@ func TestGetBucketAccess(t *testing.T) {
 
 	t.Run("error for upload", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return storage.NewClient(ctx, option.WithoutAuthentication())
 			},
-			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
-				return &models.Checks{}, errors.New("error")
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) error {
+				return errors.New("error")
 			},
 			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
 				return nil
@@ -172,12 +171,12 @@ func TestGetBucketAccess(t *testing.T) {
 
 	t.Run("error for list", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return storage.NewClient(ctx, option.WithoutAuthentication())
 			},
-			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
-				return &models.Checks{}, nil
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) error {
+				return nil
 			},
 			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
 				return errors.New("bucket handler error")
@@ -198,12 +197,12 @@ func TestGetBucketAccess(t *testing.T) {
 
 	t.Run("error for delete", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return &storage.Client{}, nil
 			},
-			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
-				return &models.Checks{}, nil
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) error {
+				return nil
 			},
 			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
 				return nil
@@ -224,12 +223,12 @@ func TestGetBucketAccess(t *testing.T) {
 
 	t.Run("gcp connection error", func(t *testing.T) {
 		log, _ := logger.NewLogger("text", "debug")
-		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcputils.MockGCPUtils{
+		cs := gcpcloudstorageservice.NewGCPCloudStorageConfig(log, &gcpcloudstorageservice.MockGCPUtils{
 			NewSessionWithOptionsFunc: func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
 				return &storage.Client{}, errors.New("")
 			},
-			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
-				return &models.Checks{}, nil
+			NewUploaderFunc: func(ctx context.Context, uploadObject *storage.ObjectHandle) error {
+				return nil
 			},
 			BucketAttributesFunc: func(ctx context.Context, bucket *storage.BucketHandle) error {
 				return nil

@@ -1,4 +1,4 @@
-package gcputils
+package gcpcloudstorageservice
 
 import (
 	"context"
@@ -11,7 +11,7 @@ type MockGCPUtils struct {
 	NewSessionWithOptionsFunc func(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
 	DeleteObjectFunc          func(ctx context.Context, obj *storage.ObjectHandle) error
 	ListObjectsFunc           func(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error
-	NewUploaderFunc           func(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error)
+	NewUploaderFunc           func(ctx context.Context, uploadObject *storage.ObjectHandle) error
 	BucketAttributesFunc      func(ctx context.Context, bucket *storage.BucketHandle) error
 }
 
@@ -27,7 +27,7 @@ func (mau *MockGCPUtils) ListObjects(ctx context.Context, bucket *storage.Bucket
 	return mau.ListObjectsFunc(ctx, bucket, query)
 }
 
-func (mau *MockGCPUtils) NewUploader(ctx context.Context, uploadObject *storage.ObjectHandle) (*models.Checks, error) {
+func (mau *MockGCPUtils) NewUploader(ctx context.Context, uploadObject *storage.ObjectHandle) error {
 	return mau.NewUploaderFunc(ctx, uploadObject)
 }
 
