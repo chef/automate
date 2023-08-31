@@ -5,9 +5,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Troubleshooting"
-    parent = "automate/deploy_high_availability/troubleshooting"
-    identifier = "automate/deploy_high_availability/troubleshooting/ha_troubleshooting.md Troubleshooting"
-    weight = 200
+    parent = "automate/deploy_high_availability"
+    identifier = "automate/deploy_high_availability/ha_troubleshooting.md Troubleshooting"
+    weight = 132
 +++
 
 {{< warning >}}
@@ -20,7 +20,20 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ### Post Automate HA deployment if the chef-server service is in a critical state
 
-- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
+![ChefServer critical Error](/images/automate/chef-server-critical-error.png)
+
+#### Solution
+
+- First we can check if Automate UI is opening via browser if it open’s then we can try to hit the curl request to the Automate FQDN from the chefserver node.
+`curl --cacert /path/to/fqdn-rootca-pem-file https://<AUTOMATE_FQDN>`
+  -  The above request will verify the authenticity of the server's SSL certificate (FQDN RootCA) against Automate FQDN.
+  -  In Case if it gives any error regarding RootCA provide the valid RootCA.
+-  If it could not make a curl request make sure you have attached NAT Gateway to your private subnets.
+-  The above curl request will work in case if ssl is terminating at load balancer.
+-  In case of ssl is not terminating at the LB, we need to patch the certificate to the Automate via [cert-rotate command](/automate/ha_cert_rotation/#rotate-using-cert-rotate-command).
+-  The above steps required the `private-key`, `public-key` and `root-ca`.
+
+- If the above steps did not work, Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
 
 - If getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint.
 - ssh to the Automate HA Chef Infra Server and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.

@@ -22,7 +22,7 @@ gh_repo = "automate"
 
 ## Migration with FileSystem Backup Locally
 
-Follow the steps below when migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
+Follow the steps below when migrating to On-Premises or AWS HA deployment **(but not for AWS with managed services)**.
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
@@ -40,33 +40,31 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. Go to the backup location mentioned in Automate config, but if you haven't specified the location go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
+
+1. Copy the backup folder to boostrapped Automate node of Automate HA using the following command:
 
     ```bash
-    tar -cvf backup.tar.gz <backup_id>/ automate-elasticsearch-data/ .tmp/
+    scp -i </path/to/key> -r </path/to/backup-file> <user>@<host>:/home/<user>
     ```
 
-1. Transfer the `tar` bundle to one of the Chef Automate nodes of Automate HA using the following command:
-
-    ```bash
-    scp -i </path/to/key> </path/to/backup-file> <user>@<host>:/home/<user>
-    ```
-
-1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
+1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
     scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
     ```
 
-1. Go to Bastion and:
+1. If your Chef Automate HA does not have file system backup configured already then try this step:
+
+    Go to Bastion and:
+
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [path]
-      repo = "/mnt/automate_backups"
+      repo = "</path/to/automate_backups>/opensearch"
     ```
 
-    The following command will patch the configuration in all the OpenSearch nodes.
+    The following command will patch the configuration in all the OpenSearch nodes, run this command from bastion.
 
     ```bash
     chef-automate config patch --opensearch <path to os_config.toml>
@@ -79,24 +77,18 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         enable = true
         location = "fs"
     [global.v1.external.opensearch.backup.fs]
-        path = "/mnt/automate_backups"
+        path = "</path/to/automate_backups>/opensearch"
     [global.v1.backups.filesystem]
-        path = "/mnt/automate_backups"
+        path = "</path/to/automate_backups>/backups"
     ```
 
-    The following command will patch the configuration in all the Frontend nodes:
+    The following command will patch the configuration in all the Frontend nodes, run this command on bastion:
 
     ```bash
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Go to the Chef Automate node of Automate HA cluster, where we copied the `tar` file. Unzip the bundle using the following:
-
-    ```bash
-    tar -xf backup.tar.gz -C /mnt/automate_backups
-    ```
-
-1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the boostrapped Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -120,13 +112,13 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the instances except where you saved the `.tar` file on frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend nodes except boostraped automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
     ```
 
-1. Restore in Chef-Automate HA using the following command:
+1. Restore in Chef-Automate HA using the following command in boostraped automate node :
 
     ```bash
     chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
@@ -141,24 +133,26 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 
 ## Migration with FileSystem Backup via Volume Mount
 
-Follow the steps below when migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
+Follow the steps below when migrating to On-Premises or AWS HA deployment **(but not for AWS with managed services)**.
 
 1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:
     - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
-    - In HA, we are mounting that EFS volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
+    - In HA, we are mounting that EFS volume at `</path/to/automate_backups>` for example `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
 
     Make sure that the location has permission for the hab user.
 
-1. Go to Bastion and:
+1. If your Chef Automate HA does not have file system backup configured already then try this step:
+
+    Go to Bastion and:
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [path]
-      repo = "/mnt/automate_backups"
+      repo = "/path/to/automate_backups/opensearch"
     ```
 
-    The following command will patch the configuration in all the OpenSearch nodes.
+    The following command will patch the configuration in all the OpenSearch nodes, run this command from bastion.
 
     ```bash
     chef-automate config patch --opensearch <Path to os_config.toml>
@@ -171,12 +165,12 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         enable = true
         location = "fs"
     [global.v1.external.opensearch.backup.fs]
-        path = "/mnt/automate_backups"
+        path = "/path/to/automate_backups/opensearch"
     [global.v1.backups.filesystem]
-        path = "/mnt/automate_backups"
+        path = "/path/to/automate_backups/backups"
     ```
 
-    The following command will patch the configuration in all the Frontend nodes:
+    The following command will patch the configuration in all the Frontend nodes, run this command on bastion:
 
     ```bash
     chef-automate config patch --fe <Path to automate.toml>
@@ -198,7 +192,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the boostrapped Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -253,7 +247,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 
 For AWS managed services, map the snapshot role to the OpenSearch dashboard. It is necessary to [enable backup and restore in OpenSearch](automate/managed_services/#enabling-opensearch-backup-restore).
 
-1. Patch the following configuration in Standalone Chef Automate for creating the backup in the S3.
+1. If the standalone Automate is not configured with S3 backup configurations then patch the following configuration in Standalone Chef Automate for creating the backup in the S3.
 
     ```bash
     [global.v1.backups]
@@ -300,7 +294,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
+1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
     scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
@@ -310,7 +304,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 
     {{< note >}} Use the same bucket for restore, which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /note >}}
 
-    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
+    - Patch the below S3 backup configuration, ignore this step if Automate HA already has S3 backup configuration. Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [global.v1]
@@ -363,13 +357,13 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
             secret_key = "<Your Secret Key>"
     ```
 
-    The following command will patch the configuration in all the Frontend nodes:
+    The following command will patch the configuration in all the Frontend nodes, run this command on bastion:
 
     ```bash
     chef-automate config patch --frontend automate.toml
     ```
 
-1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the boostrapped Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -393,7 +387,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the frontend instances except where you saved the `current_config.toml` file on Chef Automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend nodes except where you saved the `current_config.toml` file on Chef Automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop

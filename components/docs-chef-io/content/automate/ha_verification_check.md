@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Config Verify"
-    identifier = "automate/deploy_high_availability/reference/ha_verification_check.md Config Verify"
-    parent = "automate/deploy_high_availability/reference"
-    weight = 250
+    identifier = "automate/deploy_high_availability/manage_ha_cluster/ha_verification_check.md Config Verify"
+    parent = "automate/deploy_high_availability/manage_ha_cluster"
+    weight = 230
 +++
 
 {{< warning >}}
