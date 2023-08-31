@@ -66,11 +66,11 @@ export class LicenseUsageService {
     });
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
-    this.totalNodes = complianceUsageStats['node_cnt'];
+    this.totalScans = complianceUsageStats['node_cnt'];
     this.daysSinceLasPost = complianceUsageStats['days_since_last_post'];
 
     const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
-    this.totalScans = nodeUsageStats['node_cnt'];
+    this.totalNodes = nodeUsageStats['node_cnt'];
 
     const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
     this.totalService = applicationUsageStats['total_services'];
