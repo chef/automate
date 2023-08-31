@@ -219,6 +219,7 @@ import {
 } from './page-components/data-feed-table/data-feed-table.component';
 import { SigninService } from './services/signin/signin.service';
 import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-banner/manual-upgrade-banner.component';
+import { LicenseUsageService } from './services/license-usage/license-usage.service';
 
 
 @NgModule({
@@ -373,6 +374,7 @@ import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-b
     NodeNoRunIdResolverService,
     NodeDetailsService,
     NodeRunsService,
+    LicenseUsageService,
     PolicyRequests,
     ProductDeployedService,
     ProfileRequests,

@@ -26,5 +26,7 @@ export const environment = {
     data_feed_url: '/api/v0/datafeed',
     license_id: '00000000-0000-0000-0000-111111111111',
     install_id: '00000000-0000-0000-0000-111111111111',
-    use_default_session: true
+    use_default_session: true,
+    remote_library_url: 'https://licensing-acceptance.chef.co/usage/v1/remoteclient.js',
+    remote_library_url_acceptance: 'https://licensing-acceptance.chef.co/usage/v1/remoteclient.js'
 };

@@ -61,11 +61,10 @@ describe('ResourceItemComponent', () => {
   });
 
   describe('#showModal()', () => {
-
     it('calls the node-details event service', () => {
       spyOn(eventService, 'showModal');
-      component.showModal('resourceId');
-      expect(eventService.showModal).toHaveBeenCalledWith(true, 'resourceId');
+      component.showModal();
+      expect(eventService.showModal).toHaveBeenCalledWith(true);
     });
   });
 
