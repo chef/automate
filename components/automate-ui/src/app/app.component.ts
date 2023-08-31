@@ -10,7 +10,7 @@ export class AppComponent {
   library_url: string;
 
   constructor(private licenseUsageService: LicenseUsageService) {
-    if (localStorage.getItem('build-mode') === 'acceptance') {
+    if (localStorage.getItem('env') === 'acceptance') {
       this.library_url = environment.remote_library_url_acceptance;
     } else {
       this.library_url = environment.remote_library_url;
