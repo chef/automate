@@ -15,43 +15,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-This section will discuss deploying Chef Automate HA on-premise machines with chef managed database. The steps are as follows:
-
-## Prerequisites
-
-- All VMs or Machines are up and running.
-- OS Root Volume (/) must be at least 40 GB.
-- TMP space (/var/tmp) must be at least 10GB.
-- Separate Hab volume (`/hab`) provisioned at least 200 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
-  -  The installation of Automate HA requires the existence of the `/hab` directory, which is used to store various binaries and files. 
-  -  You have two options for setting up the `/hab` directory: you can either create it within the `/root` volume, or you can mount it as an external directory.
-  -  When choosing to create the `/hab` directory inside the /root volume, it's recommended to allocate a minimum of 200 GB of space.
-  -  This accounts for the required 200 GB for `/hab` as well as the space needed for the operating system.
-  -  If you decide to use an external mount for `/hab`, ensure that at least 200GB is provisioned.
-  -  Adjust the size based on your data retention policy if necessary.
-  -  When you did external mount for `/hab`, make sure to provide Read and Write permissions for SSH User.
-- A Common user has access to all machines.
-- This common user should have sudo privileges.
-- This common user uses the same SSH Private Key file to access all machines.
-- Key-based SSH for the provisioning user for all the machines for HA-Deployment.
-- We do not support passphrases for Private Key authentication.
-- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
-- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_on_premises_deployment_prerequisites/#firewall-checks).
-- Make sure your Linux has the `sysctl` utility available in all Machines.
-- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
-- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
-- Certificates are created and added for the chefautomate.example.com, and `chefinfraserver.example.com` in the Load Balancers.
-- If DNS is not used, add the records to `/etc/hosts` in all the machines, including Bastion:
-
-```bash
-sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
-```
-
-- If the instance is **RedHat**, set SElinux config `enforcing` to `permissive` in all the nodes. SSH to each node, then run:
-
-```bash
-sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
-```
+This section will discuss deploying Chef Automate HA on-premise machines with chef managed database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 
@@ -103,7 +67,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     ```
 
     Click [here](/automate/ha_config_gen) to know more about generating config
-    
+
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
 
     `chef-automate init-config-ha existing_infra`{{< /note >}}

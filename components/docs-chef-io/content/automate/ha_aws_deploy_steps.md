@@ -15,36 +15,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud.
-
-## Prerequisites
-
-- Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC, we have to create public and private subnets, If subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
-- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
-- We recommend creating a new vpc. And Bastion should be in the same VPC.
-- Attach IAM role to the Bastion with `AmazonS3FullAccess`, `AdministratorAccess` privileges or get AWS user credentials with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
-
-Set the AWS user credentials in `~/.aws/credentials` in Bastion Host:
-
-    ```bash
-    sudo su -
-    ```
-
-    ```bash
-    mkdir -p ~/.aws
-    echo "[default]" >>  ~/.aws/credentials
-    echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
-    echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
-    echo "region=<AWS-REGION>" >> ~/.aws/credentials
-    ```
-
-- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`. Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
-- Have SSH Key Pair ready in AWS so new VMs are created using that pair. Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-- We do not support passphrases for Private Key authentication.
-- Preferred key type will be ed25519
-- Ensure your Linux has the `sysctl` utility available in all nodes.
+Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud. Please see the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 
@@ -94,7 +65,7 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     "
     ```
-    
+
     Click [here](/automate/ha_config_gen) to know more about generating config
 
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
@@ -114,7 +85,7 @@ Run the following steps on Bastion Host Machine:
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
     "
     ```
-    
+
     {{< note >}}
 
     Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of the previous command to your DNS from DNS Provider**

@@ -15,17 +15,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-This section will discuss deploying Chef Automate HA on-premise machines with AWS Managed Database. The steps are as follows:
-
-## Prerequisites
-
-- Refer to the [On-premises Deployment with Chef Managed Database](/automate/ha_onprim_deployment_procedure/)​ page for the on-premises deployment specific prerequisites.
-- This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
-- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
-- Set up AWS OpenSearch 1.3. Click [here](/automate/create_amazon_opensearch/) to know more.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
-- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
+This section will discuss deploying Chef Automate HA on-premise machines with AWS Managed Database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 

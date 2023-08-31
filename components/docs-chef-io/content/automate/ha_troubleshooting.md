@@ -5,9 +5,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Troubleshooting"
-    parent = "automate/deploy_high_availability/troubleshooting"
-    identifier = "automate/deploy_high_availability/troubleshooting/ha_troubleshooting.md Troubleshooting"
-    weight = 200
+    parent = "automate/deploy_high_availability"
+    identifier = "automate/deploy_high_availability/ha_troubleshooting.md Troubleshooting"
+    weight = 127
 +++
 
 {{< warning >}}

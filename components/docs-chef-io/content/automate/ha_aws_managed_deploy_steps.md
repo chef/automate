@@ -15,49 +15,7 @@ gh_repo = "automate"
  {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services.
-
-## Prerequisites
-
-- Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC, you have to create a Public and Private Subnet if subnets are unavailable. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support a dedicated subnet for each AZ.
-- We recommend creating a new VPC. And Bastion should be in the same VPC.
-- Set up AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_rds/) to know more.
-- Set up AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
-- For Backup with Managed Service, we have only one option: `Amazon S3`.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Preferred key type will be ed25519
-- Ensure your Linux has the `sysctl` utility available in all nodes.
-- Attach IAM role to the Bastion with `AmazonS3FullAccess`, `AdministratorAccess` privileges or get AWS user credentials with the same privileges. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
-
-Set the AWS user credentials in `~/.aws/credentials` in Bastion Host:
-
-  ```bash
-  sudo su -
-  ```
-
-  ```bash
-  mkdir -p ~/.aws
-  echo "[default]" >>  ~/.aws/credentials
-  echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
-  echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
-  echo "region=<AWS-REGION>" >> ~/.aws/credentials
-  ```
-
-- Have SSH Key Pair ready in AWS so new VMs are created using that pair. Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-- We do not support passphrases for Private Key authentication.
-- Make sure that the bastion machine should be in the same vpc as mentioned in `config.toml`; otherwise, we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
-- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
-- Create the below attributes by following [this document.](/automate/managed_services/#enabling-opensearch-backup-restore)
-  - `aws_os_snapshot_role_arn`
-  - `os_snapshot_user_access_key_id`
-  - `os_snapshot_user_access_key_secret`
-
-  Add this to your `config.toml`
-
-- If you choose `backup_config` as `s3`, provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exists, it is directly used for backup configuration, and if it doesn't exist, then the deployment process will create `s3_bucketName`.
-- We recommended using `backup_config` to be set to `s3` at the time of deployment.
+Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services. Please see the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 
@@ -128,7 +86,7 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 {{< /note >}}
 
-##  Config Verify
+## Config Verify
 
 1. After successful provision, run verify config command:
 
@@ -142,12 +100,12 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 ## Steps to deploy
 
-    ```bash
-    sudo -- sh -c "
-   #Run deploy command to deploy `automate.aib` with set `config.toml`
-   chef-automate deploy config.toml --airgap-bundle automate.aib
-   "
-   ```
+```bash
+sudo -- sh -c "
+#Run deploy command to deploy `automate.aib` with set `config.toml`
+chef-automate deploy config.toml --airgap-bundle automate.aib
+"
+```
 
 ## Verify Deployment
 
