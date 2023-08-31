@@ -1,5 +1,5 @@
 +++
-title = "Autoamte HA Config Generation"
+title = "Automate HA Config Generation"
 draft = false
 gh_repo = "automate"
 
@@ -32,7 +32,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 -  `ssh user name` user name to ssh to cluster instances 
 -  `ssh group name` group name which is associated with ssh user
 -  `ssh port no` port to do ssh, default is 22 incase you have different port then provide the ssh port no
--  `ssh key file path` ssh key file path, same will be used to ssh to cluster instances
+-  `ssh key file path` ssh key file path, same will be used to ssh to cluster instances, Example `~/.ssh/my-key.pem`.
 -  `Automate FQDN` automate FQDN name Example `chefautomate.example.com`.
 -  `Automate FQDN ARN` for Aws deployment ARN name is requied for Automate FQDN domain.
 -  `Automate FQDN Root Certificate` ssl root certificate for Automate FQDN domain.
@@ -69,7 +69,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
   -  `EBS volume size` it should be based on your load needs.
   -  `EBS volume type` default is `gp3`, change based on your need
   -  `EBS volume IOPS` it should be based  on your load needs.
-  -  `ssh key pair name` ssh key pair name on AWS
+  -  `ssh key pair name` ssh key pair name on AWS, Example `my-key`.
   -  `Region` AWS region to create cluster
   -  `AMI Id` AWS AMI Id for specific region to create cluster of particular AMI
   -  `AWS profile name`. AWS profile name configured in .aws/credentials, Skip this if the IAM role is configured on the bastion host
@@ -79,7 +79,7 @@ In Case of AWS managed or Customer managed databases below fields will be requir
 -  `Opensearch domain url` For AWS managed provide domain url without port and protocol Example: `opensearch.example.com`, and for customer managed opensearch provide domain url along with port Example `opensearch.example.com:9200`
 -  `Opensearch user name`, username to login to opensearch
 -  `Opensearch user passwords` password to login to opensearch
--  `Opensearch root-ca` SSL root certifiates to connect with opensearch, In Case of AWS managed databases we have option to use default aws certificates - - If using default certificates then no need to provide root certificates.
+-  `Opensearch root-ca` SSL root certifiates to connect with opensearch, In Case of AWS managed databases we have option to use default aws certificates - If using default certificates then no need to provide root certificates.
    -  `Postgresql URL and port` Postgresql url along with port Example: `postgresql.example.com:5432`
    -  `PostgreSQL super username` master username to login to postgresql
    -  `PostgreSQL super user password` master password to login to postgresql
@@ -96,4 +96,3 @@ In Case of AWS managed or Customer managed databases below fields will be requir
     - `Endpoint` for object storage provide endpoint of object storage
     - `Region` for S3 provide region
     - `Mount path` in case of file system/efs backup provide mount path of backup directory.
-    - 
