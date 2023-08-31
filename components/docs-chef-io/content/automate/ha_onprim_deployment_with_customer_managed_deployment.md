@@ -27,7 +27,9 @@ See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-b
     sudo chef-automate config gen config.toml
     ```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+    Click [here](/automate/ha_config_gen) to know more about generating config.
+
+    You can also view the [Sample Config](#sample-config-to-setup-on-premises-deployment-with-self-managed-services).
 
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
 
@@ -78,7 +80,19 @@ After successful deployment, proceed with following:
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
    1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
 
-## Sample Sonfig to setup On-Premises Deployment with Self Managed Services
+## Backup/Restore
+
+A shared file system is always required to create OpenSearch snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. To know more about the backup and restore configuration, see On-Premise Deployment using [Filesystem](/automate/ha_backup_restore_file_system) or using [Object Storage](/automate/ha_backup_restore_object_storage).
+
+## Add/Remove Nodes
+
+The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
+
+## Patch Configs
+
+The bastion server can patch new configurations in all nodes. To know more see [Patch Configuration](/automate/ha_config/#patch-configuration) section.
+
+## Sample Config to setup On-Premises Deployment with Self Managed Services
 
 ```config
 [architecture]
