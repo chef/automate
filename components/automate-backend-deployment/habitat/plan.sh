@@ -25,7 +25,7 @@ pkg_deps=(
   core/busybox-static
   chef/automate-ha-cluster-ctl
 )
- 
+
 
 pkg_build_deps=(
   core/gcc

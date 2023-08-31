@@ -1,13 +1,13 @@
 +++
-title = "On-premise Deployment with Chef Managed Database​"
+title = "On-premise Deployment with Chef Managed Database"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-premise Deployment with Chef Managed Database​"
+    title = "On-premise Deployment with Chef Managed Database"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-premise Deployment with Chef Managed Database​"
+    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-premise Deployment with Chef Managed Database"
     weight = 200
 +++
 
