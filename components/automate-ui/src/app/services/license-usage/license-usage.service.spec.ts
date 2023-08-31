@@ -133,21 +133,12 @@ describe('LicenseUsageService', () => {
       expect(service['licenseId']).toBe('00000000-0000-0000-0000-111111111111');
       expect(service['customerId']).toBe('cust1');
       expect(service['customerName']).toBe('test');
-      expect(service['isDeploymentIdLoaded']).toBe(true);
-      expect(service['isDeploymentTypeLoaded']).toBe(true);
-      expect(service['isLicenseIdLoaded']).toBe(true);
-      expect(service['isCustomerIdLoaded']).toBe(true);
-      expect(service['isCustomerNameLoaded']).toBe(true);
+      expect(service['isConfigDataLoaded']).toBe(true);
       expect(service['totalNodes']).toBe(10);
       expect(service['daysSinceLasPost']).toBe(2);
-      expect(service['isTotalNodesLoaded']).toBe(true);
-      expect(service['isDaysSinceLasPostLoaded']).toBe(true);
-      expect(service['isPeriodStartDateLoaded']).toBe(true);
-      expect(service['isPeriodEndDateLoaded']).toBe(true);
       expect(service['totalScans']).toBe(10);
-      expect(service['isTotalScansLoaded']).toBe(true);
       expect(service['totalService']).toBe(10);
-      expect(service['isTotalServiceLoaded']).toBe(true);
+      expect(service['isSummaryDataLoaded']).toBe(true);
     }));
 
   });
@@ -200,19 +191,10 @@ describe('LicenseUsageService', () => {
     });
 
     it('should return true', () => {
-      service['isLicenseIdLoaded'] = true;
-      service['isCustomerIdLoaded'] = true;
       service['isExpirationLoaded'] = true;
-      service['isTotalNodesLoaded'] = true;
-      service['isTotalScansLoaded'] = true;
-      service['isDaysSinceLasPostLoaded'] = true;
-      service['isPeriodStartDateLoaded'] = true;
-      service['isPeriodEndDateLoaded'] = true;
-      service['isDeploymentIdLoaded'] = true;
-      service['isTotalServiceLoaded'] = true;
-      service['isDeploymentTypeLoaded'] = true;
-      service['isCustomerNameLoaded'] = true;
       service['isProductVersionLoaded'] = true;
+      service['isConfigDataLoaded'] = true;
+      service['isSummaryDataLoaded'] = true;
       const output = service['isAllDataLoaded']();
       expect(output).toBe(true);
     });

@@ -55,7 +55,16 @@ describe('SigninComponent', () => {
         { provide: ActivatedRoute, useClass: ActivatedRouteMock},
         { provide: ChefSessionService, useClass: MockChefSessionService },
         { provide: SigninService, userClass: SignIn},
-        { provide: LicenseUsageService, useValue: jasmine.createSpyObj('ClientRunsStatsService', ['postAnalyticsUsageDataCall', 'sendData']) }
+        {
+          provide: LicenseUsageService,
+          useValue: jasmine.createSpyObj('ClientRunsStatsService', [
+            'postAnalyticsUsageDataCall',
+            'constructPayload',
+            'postData',
+            'isAllDataLoaded',
+            'getCurrentDateTime'
+          ])
+        }
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
