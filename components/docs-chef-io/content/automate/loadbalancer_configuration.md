@@ -17,7 +17,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-This guide will show you how to configure a load balancer for Chef Automate and Chef Infra Server. Below are some examples of load balancer setups.
+This is the sample guide will show you how to configure a load balancer for Chef Automate and Chef Infra Server. For more details check with expert in your organization.
 
 ## Load Balancer Setup Examples
 

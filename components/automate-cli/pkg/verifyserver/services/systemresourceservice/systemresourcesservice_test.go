@@ -155,8 +155,8 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 
 	testCasesTmpSpaceCheck := []testCase{
 		{
-			testCaseDescription: "Checking free disk in /tmp",
-			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
+			testCaseDescription: "Checking free disk in /var/tmp",
+			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/var/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 					return disk.UsageStat{
@@ -170,8 +170,8 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 			},
 		},
 		{
-			testCaseDescription: "Checking free disk in /tmp",
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", fmt.Sprintf(constants.ERROR_MSG, "/tmp", float64(9)), fmt.Sprintf(constants.SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100)),
+			testCaseDescription: "Checking free disk in /var/tmp",
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", fmt.Sprintf(constants.ERROR_MSG, "/var/tmp", float64(9)), fmt.Sprintf(constants.SUCCESS_MSG, "/var/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 					return disk.UsageStat{
@@ -185,8 +185,8 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 			},
 		},
 		{
-			testCaseDescription: "Checking free disk in /tmp",
-			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
+			testCaseDescription: "Checking free disk in /var/tmp",
+			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/var/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 					return disk.UsageStat{
@@ -200,8 +200,8 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 			},
 		},
 		{
-			testCaseDescription: "Checking free disk in /tmp",
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", fmt.Sprintf(constants.ERROR_MSG, "/tmp", float64(14)), fmt.Sprintf(constants.SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100)),
+			testCaseDescription: "Checking free disk in /var/tmp",
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", fmt.Sprintf(constants.ERROR_MSG, "/var/tmp", float64(14)), fmt.Sprintf(constants.SUCCESS_MSG, "/var/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
 					return disk.UsageStat{
@@ -215,7 +215,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 			},
 		},
 		{
-			testCaseDescription: "Checking free disk in /tmp | error",
+			testCaseDescription: "Checking free disk in /var/tmp | error",
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", "error occured while fetching tmp disk space", constants.RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -232,7 +232,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			srv.SystemResourceInfo = testCase.mockSystemResource
 			srv.Fileutils = testCase.mockFileUtils
-			respGet := srv.CheckFreeDiskSpaceOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
+			respGet := srv.CheckFreeDiskSpaceOfDir("/var/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
 			assert.Equal(t, testCase.respWant, respGet)
 		})
 	}
@@ -604,7 +604,7 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 		*srv.GetChecksModel(true, constants.CPU_SPEED_CHECK_TITLE, fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED), "", ""),
 		*srv.GetChecksModel(true, constants.MEMORY_SIZE_CHECK_TITLE, fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY), "", ""),
 		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_A2), "", ""),
-		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
+		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/var/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
 		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "/(root volume)"), fmt.Sprintf(constants.SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100), "", ""),
 	}
 

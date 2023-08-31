@@ -4,7 +4,6 @@ hab pkg binlink chef/inspec -f
 hab pkg binlink core/terraform -f
 hab pkg binlink core/jq-static -f
 hab pkg binlink chef/automate-ha-cluster-ctl -f
-
 NEW_WORKSPACE="{{pkg.path}}/workspace"
 
 display_upgrade_help() {
@@ -145,6 +144,13 @@ EOF
     echo "Copying previous 'automate-cluster-ctl' config to new workspace" >> $LOGGER
     cp $OLD_WORKSPACE/config.toml $NEW_WORKSPACE/config.toml
     echo "Copied previous 'automate-cluster-ctl' config to new workspace" >> $LOGGER
+  fi
+
+  if [[ -f $OLD_WORKSPACE/googleServiceAccount.json ]]; then
+    echo "Copying previous 'automate-cluster-ctl' gcp to new workspace"
+    echo "Copying previous 'automate-cluster-ctl' gcp to new workspace" >> $LOGGER
+    cp $OLD_WORKSPACE/googleServiceAccount.json $NEW_WORKSPACE/googleServiceAccount.json
+    echo "Copied previous 'automate-cluster-ctl' gcp to new workspace" >> $LOGGER
   fi
 
   if [[ -f $OLD_WORKSPACE/a2ha.rb ]]; then

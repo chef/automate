@@ -324,22 +324,25 @@ func Test_getAppendedCommand(t *testing.T) {
 	tests := []struct {
 		name    string
 		command string
+		url     string
 		want    string
 	}{
 		{
 			name:    "Checking the output of the string",
-			command: "%s %s",
+			command: "%s %s %s %s",
+			url:     "test",
 		},
 		{
 			name:    "Getting license command",
 			command: Command,
+			url:     "acceptance_url",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dateToBeAppended := time.Now().AddDate(0, 0, -1).UTC().Format("2006-01-02")
-			tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended, OutputFileName)
-			got := getAppendedCommand(tt.command)
+			tt.want = fmt.Sprintf(tt.command, dateToBeAppended, dateToBeAppended, OutputFileName, tt.url)
+			got := getAppendedCommand(tt.command, tt.url)
 			assert.Equal(t, tt.want, got)
 		})
 	}

@@ -81,6 +81,7 @@ func TestAppliedLicense(t *testing.T) {
 		assert.NotEqual(t, len(res.Policy.Rules), 0, "Policy should include >= 1 Rules")
 	})
 	t.Run("Status(0 with a valid license applied)", func(t *testing.T) {
+
 		startTime := time.Now()
 		licenseIDMatcher := regexp.MustCompile(`^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$`)
 
@@ -125,6 +126,9 @@ func TestAppliedLicense(t *testing.T) {
 			t, (res.LicensedPeriod.Start.GetSeconds() < res.LicensedPeriod.End.GetSeconds()),
 			"Licensed period start date should come before end date",
 		)
+
+		assert.Equal(t, "deployment-id", res.DeploymentId)
+		assert.Equal(t, "automate-test", res.DeploymentType)
 	})
 }
 

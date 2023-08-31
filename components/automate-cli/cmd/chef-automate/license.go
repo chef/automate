@@ -138,7 +138,8 @@ var licenseInfoFmt = `
 Licensed to:     %s
 License ID:      %s
 Expiration Date: %s
-
+Deployment ID:   %s
+Deployment Type: %s
 `
 
 var startTimeFormat = "start time of the report in yyyy-mm-dd format"
@@ -187,7 +188,7 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 		writer.Printf(licenseInfoFmt,
 			response.CustomerName,
 			response.LicenseId,
-			time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339))
+			time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339), response.DeploymentId, response.DeploymentType)
 
 		// Add notice if license is expired
 		if time.Now().Unix() > response.ExpirationDate.GetSeconds() {

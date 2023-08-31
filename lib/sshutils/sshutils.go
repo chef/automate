@@ -266,7 +266,7 @@ func (s *SSHUtilImpl) ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostI
 
 func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool) error {
 	cmd := "scp"
-	args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, sshConfig.SshUser + "@" + sshConfig.HostIP + ":/tmp/" + destFileName}
+	args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, fmt.Sprintf("%s@%s:/home/%s/%s", sshConfig.SshUser, sshConfig.HostIP, sshConfig.SshUser, destFileName)}
 	if err := s.Exec.Run(cmd, command.Args(args...)); err != nil {
 		s.logger.Errorf("Failed to copy file %s to remote with error: %v\n", srcFilePath, err)
 		if srcFilePath == "/usr/bin/chef-automate" {
@@ -314,7 +314,7 @@ func (s *SSHUtilImpl) CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFileP
 		if result.Error != nil {
 			s.logger.Error("Remote copying failed on node : " + result.HostIP + " with error:\n" + result.Error.Error() + "\n")
 		} else {
-			s.logger.Debugf("Remote copying of file %s is completed on node at %s:/tmp/%s\n", srcFilePath, result.HostIP, destFileName)
+			s.logger.Debugf("Remote copying of file %s is completed on node at %s:/home/%s/%s\n", srcFilePath, result.HostIP, sshConfig.SshUser, destFileName)
 		}
 
 		results = append(results, result)

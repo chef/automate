@@ -50,7 +50,7 @@ func (srs *SystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType 
 	habFreeSpaceCheck := srs.CheckHabFreeSpace(nodeType, deploymentState)
 	srsResponse.Checks = append(srsResponse.Checks, *habFreeSpaceCheck)
 
-	tmpFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
+	tmpFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/var/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
 	srsResponse.Checks = append(srsResponse.Checks, *tmpFreeSpaceCheck)
 
 	rootFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")

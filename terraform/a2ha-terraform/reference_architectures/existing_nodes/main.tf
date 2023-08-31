@@ -259,7 +259,7 @@ module "bootstrap_automate" {
   backend_aib_dest_file              = var.backend_aib_dest_file
   backend_aib_local_file             = var.backend_aib_local_file
   frontend_aib_dest_file             = var.frontend_aib_dest_file
-  frontend_aib_local_file            = var.frontend_aib_local_file  
+  frontend_aib_local_file            = var.frontend_aib_local_file
   habitat_info                       = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token    = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port             = var.opensearch_listen_port
@@ -281,6 +281,8 @@ module "bootstrap_automate" {
   access_key                         = var.access_key
   secret_key                         = var.secret_key
   aws_region                         = var.region
+  location                           = var.location
+  google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
   depends_on                         = [module.airgap_bundle-frontend, module.habitat-frontend]
@@ -326,7 +328,7 @@ module "automate" {
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.automate_instance_count - 1
-  automate_role                      = "automate"            
+  automate_role                      = "automate"
   cluster_id                         = random_id.cluster_id.hex
   backend_aib_dest_file              = var.backend_aib_dest_file
   frontend_aib_dest_file             = var.frontend_aib_dest_file
@@ -344,22 +346,24 @@ module "automate" {
     1,
     length(var.existing_automate_private_ips),
   )
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_port                           = var.ssh_port
-  ssh_user_sudo_password             = local.fe_sudo_password
-  sudo_cmd                           = var.sudo_cmd
-  teams_port                         = var.teams_port
-  backup_config_s3                   = var.backup_config_s3
-  backup_config_efs                  = var.backup_config_efs
-  s3_endpoint                        = var.s3_endpoint
-  bucket_name                        = var.bucket_name
-  access_key                         = var.access_key
-  secret_key                         = var.secret_key
-  aws_region                         = var.region
-  infra                              = var.infra
-  nfs_mount_path                     = var.nfs_mount_path
-  depends_on                         = [module.bootstrap_automate]
+  ssh_key_file                = var.ssh_key_file
+  ssh_user                    = var.ssh_user
+  ssh_port                    = var.ssh_port
+  ssh_user_sudo_password      = local.fe_sudo_password
+  sudo_cmd                    = var.sudo_cmd
+  teams_port                  = var.teams_port
+  backup_config_s3            = var.backup_config_s3
+  backup_config_efs           = var.backup_config_efs
+  s3_endpoint                 = var.s3_endpoint
+  bucket_name                 = var.bucket_name
+  access_key                  = var.access_key
+  secret_key                  = var.secret_key
+  aws_region                  = var.region
+  location                    = var.location
+  google_service_account_file = var.google_service_account_file
+  infra                       = var.infra
+  nfs_mount_path              = var.nfs_mount_path
+  depends_on                  = [module.bootstrap_automate]
 }
 
 module "chef_server" {
@@ -429,26 +433,30 @@ module "chef_server" {
   access_key                         = var.access_key
   secret_key                         = var.secret_key
   aws_region                         = var.region
+  location                           = var.location
+  google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
   depends_on                         = [module.bootstrap_automate]
 }
 
 module "keystore_opensearch" {
-  source                          = "./modules/keystoreopensearch"
-  count                           = var.setup_managed_services ? 0 : 1
-  opensearch_instance_count       = var.opensearch_instance_count
-  opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_pkg_ident            = var.opensearch_pkg_ident
-  private_ips                     = var.existing_opensearch_private_ips
-  ssh_key_file                    = var.ssh_key_file
-  ssh_user                        = var.ssh_user
-  ssh_port                        = var.ssh_port
-  ssh_user_sudo_password          = local.be_sudo_password
-  sudo_cmd                        = var.sudo_cmd
-  backup_config_s3                = var.backup_config_s3
-  access_key                      = var.access_key
-  secret_key                      = var.secret_key
-  tmp_path                        = var.tmp_path
-  depends_on                      = [module.bootstrap_automate]
+  source                      = "./modules/keystoreopensearch"
+  count                       = var.setup_managed_services ? 0 : 1
+  opensearch_instance_count   = var.opensearch_instance_count
+  opensearch_listen_port      = var.opensearch_listen_port
+  opensearch_pkg_ident        = var.opensearch_pkg_ident
+  private_ips                 = var.existing_opensearch_private_ips
+  ssh_key_file                = var.ssh_key_file
+  ssh_user                    = var.ssh_user
+  ssh_port                    = var.ssh_port
+  ssh_user_sudo_password      = local.be_sudo_password
+  sudo_cmd                    = var.sudo_cmd
+  backup_config_s3            = var.backup_config_s3
+  access_key                  = var.access_key
+  secret_key                  = var.secret_key
+  location                    = var.location
+  google_service_account_file = var.google_service_account_file
+  tmp_path                    = var.tmp_path
+  depends_on                  = [module.bootstrap_automate]
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	shared "github.com/chef/automate/api/config/shared"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -1060,6 +1062,36 @@ func TestDetermineBkpConfig(t *testing.T) {
 			expectedResult: "",
 			expectedErr:    errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup"),
 		},
+		{
+			name: "When backup has gcs and os has gcs",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config1": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "gcs",
+										},
+									},
+								},
+							},
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "gcs",
+								},
+							},
+						},
+					},
+				},
+			},
+			currConfig:     "current_config",
+			s3:             "s3_backup",
+			fs:             "fs_backup",
+			expectedResult: "s3_backup",
+			expectedErr:    nil,
+		},
 	}
 
 	for _, tc := range tests {
@@ -1069,6 +1101,100 @@ func TestDetermineBkpConfig(t *testing.T) {
 				assert.Equal(t, tc.expectedErr, err)
 			} else {
 				assert.Equal(t, tc.expectedResult, result)
+			}
+		})
+	}
+}
+
+func TestGetGcsBackupConfig(t *testing.T) {
+	mockFSUtil := &fileutils.MockFileSystemUtils{
+		WriteFileFunc: func(filepath string, data []byte, perm os.FileMode) error {
+			return nil
+		},
+	}
+	tests := []struct {
+		name         string
+		a2ConfigMap  map[string]*dc.AutomateConfig
+		fileUtils    fileutils.FileUtils
+		expectedErr  error
+		expectedResp *ObjectStorageConfig
+	}{
+		{
+			name: "GCS Bucket is used and able to update googleServiceAccount.json file - Success",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "gcs",
+								},
+								Gcs: &shared.Backups_GCS{
+									Bucket: &shared.Backups_GCS_Bucket{
+										Name: &wrapperspb.StringValue{
+											Value: "gcs_bucket",
+										},
+									},
+									Credentials: &shared.Backups_GCS_GCPCredentials{
+										Json: &wrapperspb.StringValue{
+											Value: "Credentials",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			fileUtils:   mockFSUtil,
+			expectedErr: nil,
+			expectedResp: &ObjectStorageConfig{
+				location:                     "gcs",
+				bucketName:                   "gcs_bucket",
+				gcsServiceAccountCredentials: "Credentials",
+			},
+		},
+		{
+			name: "GCS Bucket is used but not able to update googleServiceAccount.json file - Failure",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "gcs",
+								},
+								Gcs: &shared.Backups_GCS{
+									Bucket: &shared.Backups_GCS_Bucket{
+										Name: &wrapperspb.StringValue{
+											Value: "gcs_bucket",
+										},
+									},
+									Credentials: &shared.Backups_GCS_GCPCredentials{
+										Json: &wrapperspb.StringValue{
+											Value: "Credentials",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			fileUtils:    fileutils.NewFileSystemUtils(),
+			expectedErr:  errors.New(""),
+			expectedResp: nil,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			resp, err := getGcsBackupConfig(tc.a2ConfigMap, tc.fileUtils)
+			if tc.expectedErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedResp, resp)
 			}
 		})
 	}

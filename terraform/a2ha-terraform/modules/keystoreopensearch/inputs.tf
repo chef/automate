@@ -6,6 +6,14 @@ variable "backup_config_s3" {
   default = "false"
 }
 
+variable "google_service_account_file" {
+  default = ""
+}
+
+variable "location" {
+  default = ""
+}
+
 variable "opensearch_instance_count" {
   default = 3
 }

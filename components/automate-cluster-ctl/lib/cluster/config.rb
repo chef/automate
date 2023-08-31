@@ -122,6 +122,8 @@ module AutomateCluster
       default :secret_key, ""
       default :endpoint, ""
       default :region, ""
+      default :location,""
+      default :google_service_account_file,"" 
     end
 
     #Only applies to External Database Configuration

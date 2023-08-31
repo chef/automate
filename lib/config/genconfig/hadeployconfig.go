@@ -11,13 +11,21 @@ import (
 )
 
 const (
-	PROMPT_NODE_IP = "%v. Node IP address"
-	AWS_S3         = "AWS S3"
-	MINIO          = "Minio"
-	OBJECT_STORE   = "Object Store"
-	FILE_SYSTEM    = "File System"
-	NFS            = "NFS"
-	EFS            = "EFS"
+	PROMPT_NODE_IP                = "%v. Node IP address"
+	AWS_S3                        = "AWS S3"
+	MINIO                         = "Minio"
+	OBJECT_STORE                  = "Object Store"
+	GOOGLE_BUCKET                 = "Google Cloud Storage Bucket"
+	FILE_SYSTEM                   = "File System"
+	NFS                           = "NFS"
+	EFS                           = "EFS"
+	ERR_MSG_BUCKET                = "Please provide valid Bucket Name, like: automate-backup"
+	ERR_MSG_AWS_ACCESS_KEY_ID     = "Please provide valid AWS Access Key ID of 20 Capital Letters or Numbers"
+	ERR_MSG_AWS_ACCESS_KEY_SECRET = "Please provide valid AWS Access Key Secret of 40 alpha numeric characters"
+	ERR_MSG_ACCESS_KEY            = "Please provide valid Access Key ID with Alpha numeric characters"
+	ERR_MSG_IP                    = "Please provide valid IP Address, like: 192.168.1.1"
+	ERR_MSG_BUCKET_ENDPOINT       = "Please provide a valid Bucket Endpoint URL, like: https://my-object-store.example.com"
+	ERR_MSG_DIR_LOC               = "Please provide a valid Directory Location on local linux filesystem, like: /mnt/automate_backups"
 )
 
 type HaDeployConfigGen struct {
@@ -256,7 +264,7 @@ func (c *HaDeployConfigGen) GetExternalOsType() (dbType string) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalPostgresqlInstanceUrl() (err error) {
-	pgUrl, err := c.Prompt.InputStringRegex(c.GetExternalPgType()+" [Eg: pgdomain.com:5432]", URL_REQUIRED_PORT_REGEX)
+	pgUrl, err := c.Prompt.InputStringRegexErrMsg(c.GetExternalPgType()+" [Eg: pgdomain.com:5432]", URL_REQUIRED_PORT_REGEX, ERR_MSG_PG_URL)
 	if err != nil {
 		return
 	}
@@ -346,7 +354,7 @@ func (c *HaDeployConfigGen) PromptExternalOpenSearchDomainName() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptExternalOpenSearchDomainUrl() (err error) {
-	domainUrl, err := c.Prompt.InputStringRegex(c.GetExternalOsType()+" Domain URL [Eg: chef-opensearch.myosdomain.com]", URL_OPTIONAL_PORT_REGEX)
+	domainUrl, err := c.Prompt.InputStringRegexErrMsg(c.GetExternalOsType()+" Domain URL [Eg: chef-opensearch.myosdomain.com]", URL_OPTIONAL_PORT_REGEX, ERR_MSG_OS_URL)
 	if err != nil {
 		return
 	}
@@ -467,7 +475,8 @@ func (c *HaDeployConfigGen) PromptAutomate() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptAutomateAdminPassword() (err error) {
-	adminPass, err := c.Prompt.InputPasswordRegex("Automate Dashboard Admin User Password", AUTOMATE_ADMIN_PASSWORD_REGEX)
+	adminPass, err := c.Prompt.InputPasswordRegexErrMsg("Automate Dashboard Admin User Password", AUTOMATE_ADMIN_PASSWORD_REGEX,
+		ERR_MSG_AUTOMATE_PASS)
 	if err != nil {
 		return
 	}
@@ -769,7 +778,7 @@ func (c *HaDeployConfigGen) PromptPostgresqlPubPriCerts(hasCustomCerts, hasCusto
 }
 
 func (c *HaDeployConfigGen) PromptNodeIp(msg string) (ip string, err error) {
-	ip, err = c.Prompt.InputStringRegex(msg, IP_REGEX)
+	ip, err = c.Prompt.InputStringRegexErrMsg(msg, IP_REGEX, ERR_MSG_IP)
 	if err != nil {
 		return
 	}
@@ -892,7 +901,7 @@ func (c *HaDeployConfigGen) PromptAutomateCerts(hasCustomCerts, hasCustomCertsPe
 }
 
 func (c *HaDeployConfigGen) PromptChefInfraServerFqdn() (err error) {
-	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN [Eg: my-infraserver-domain.com]", FQDN_REGEX)
+	chefInfraServerFqdn, err := c.Prompt.InputStringRegexErrMsg("Chef Infra Server FQDN [Eg: my-infraserver-domain.com]", FQDN_REGEX, ERR_MSG_INFRA_FQDN)
 	if err != nil {
 		return
 	}
@@ -921,7 +930,7 @@ func (c *HaDeployConfigGen) PromptChefInfraServerFqdnRootCa() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptAutomateFqdn() (err error) {
-	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN [Eg: my-automate-domain.com]", FQDN_REGEX)
+	automateFqdn, err := c.Prompt.InputStringRegexErrMsg("Automate FQDN [Eg: my-automate-domain.com]", FQDN_REGEX, ERR_MSG_AUTOMATE_FQDN)
 	if err != nil {
 		return
 	}
@@ -950,7 +959,7 @@ func (c *HaDeployConfigGen) PromptAutomateFqdnRootCa() (err error) {
 }
 
 func (c *HaDeployConfigGen) PromptSshUser() (sshUser string, err error) {
-	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX)
+	sshUser, err = c.Prompt.InputStringRegexErrMsg("SSH User Name", LINUX_USER_REGEX, ERR_MSG_SSH_USER)
 	if err != nil {
 		return
 	}
@@ -960,7 +969,7 @@ func (c *HaDeployConfigGen) PromptSshUser() (sshUser string, err error) {
 }
 
 func (c *HaDeployConfigGen) PromptSshGroup(sshUser string) (err error) {
-	sshGroup, err := c.Prompt.InputStringRegexDefault("SSH Group", LINUX_USER_REGEX, sshUser)
+	sshGroup, err := c.Prompt.InputStringRegexDefaultErrMsg("SSH Group", LINUX_USER_REGEX, sshUser, ERR_MSG_SSH_GROUP)
 	if err != nil {
 		return
 	}
@@ -1024,14 +1033,13 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 	isBackupNeeded, err := c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitExistingInfra().BackupMount = "/mnt/automate_backups"
-
-		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, FILE_SYSTEM, NFS, EFS)
+		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET, FILE_SYSTEM, NFS, EFS)
 		if err1 != nil {
 			return err1
 		}
 		backupConfig := ""
 		switch backupOption {
-		case AWS_S3, MINIO, OBJECT_STORE:
+		case AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET:
 			backupConfig = "object_storage"
 		case FILE_SYSTEM, NFS, EFS:
 			backupConfig = "file_system"
@@ -1044,7 +1052,7 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 				return err1
 			}
 		} else if backupConfig == "file_system" {
-			backupMountLoc, err1 := c.Prompt.InputStringRegexDefault("Backup Mount Location", DIR_PATH_REGEX, "/mnt/automate_backups")
+			backupMountLoc, err1 := c.Prompt.InputStringRegexDefaultErrMsg("Backup Mount Location", DIR_PATH_REGEX, "/mnt/automate_backups", ERR_MSG_DIR_LOC)
 			if err1 != nil {
 				return err1
 			}
@@ -1056,49 +1064,60 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 
 func (c *HaDeployConfigGen) PromptObjectStorageSettings(backupOption string) (err error) {
 
-	bucketName, err := c.Prompt.InputStringRegex("Bucket name", BUCKET_NAME_REGEX)
+	bucketName, err := c.Prompt.InputStringRegexErrMsg("Bucket name", BUCKET_NAME_REGEX, ERR_MSG_BUCKET)
 	if err != nil {
 		return
 	}
 	c.Config.InitObjectStorage().InitConfig().BucketName = bucketName
-
-	if backupOption == AWS_S3 {
-		accessKey, err1 := c.Prompt.InputStringRegex("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX)
+	if backupOption == GOOGLE_BUCKET {
+		c.Config.ObjectStorage.Config.Location = "gcs"
+		jsonFile, err1 := c.Prompt.InputExistingFilePath("Provide the google service account json file path")
 		if err1 != nil {
 			return err1
 		}
-		c.Config.ObjectStorage.Config.AccessKey = accessKey
+		c.Config.ObjectStorage.Config.GoogleServiceAccountFile = jsonFile
 
-		secretKey, err1 := c.Prompt.InputStringRegex("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX)
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.SecretKey = secretKey
-		c.Config.ObjectStorage.Config.Endpoint = "https://s3.amazonaws.com"
-
-		awsRegions := AwsRegionsImpFactory(c.Prompt)
-		bucketRegion, err1 := awsRegions.Choose("AWS Region of bucket")
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.Region = bucketRegion
 	} else {
-		accessKey, err1 := c.Prompt.InputStringRegex("Access Key ID for bucket", ACCESS_KEY_ID_REGEX)
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.AccessKey = accessKey
 
-		secretKey, err1 := c.Prompt.InputStringRegex("Access Key Secret for bucket", ACCESS_KEY_SECRET_REGEX)
-		if err1 != nil {
-			return err1
+		c.Config.ObjectStorage.Config.Location = "s3"
+		if backupOption == AWS_S3 {
+			accessKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key ID for bucket", AWS_ACCESS_KEY_ID_REGEX, ERR_MSG_AWS_ACCESS_KEY_ID)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.AccessKey = accessKey
+
+			secretKey, err1 := c.Prompt.InputStringRegexErrMsg("AWS Access Key Secret for bucket", AWS_ACCESS_KEY_SECRET_REGEX, ERR_MSG_AWS_ACCESS_KEY_SECRET)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.SecretKey = secretKey
+			c.Config.ObjectStorage.Config.Endpoint = "https://s3.amazonaws.com"
+
+			awsRegions := AwsRegionsImpFactory(c.Prompt)
+			bucketRegion, err1 := awsRegions.Choose("AWS Region of bucket")
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.Region = bucketRegion
+		} else {
+			accessKey, err1 := c.Prompt.InputStringRegexErrMsg("Access Key ID for bucket", ACCESS_KEY_ID_REGEX, ERR_MSG_ACCESS_KEY)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.AccessKey = accessKey
+
+			secretKey, err1 := c.Prompt.InputStringRegexErrMsg("Access Key Secret for bucket", ACCESS_KEY_SECRET_REGEX, ERR_MSG_ACCESS_KEY)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.SecretKey = secretKey
+			bucketEndpoint, err1 := c.Prompt.InputStringRegexErrMsg("Endpoint for bucket", ENDPOINT_URL, ERR_MSG_BUCKET_ENDPOINT)
+			if err1 != nil {
+				return err1
+			}
+			c.Config.ObjectStorage.Config.Endpoint = bucketEndpoint
 		}
-		c.Config.ObjectStorage.Config.SecretKey = secretKey
-		bucketEndpoint, err1 := c.Prompt.InputStringRegex("Endpoint for bucket", ENDPOINT_URL)
-		if err1 != nil {
-			return err1
-		}
-		c.Config.ObjectStorage.Config.Endpoint = bucketEndpoint
 	}
 	return
 }

@@ -79,7 +79,7 @@ func StartGRPC(ctx context.Context, config *Config) error {
 		return errors.Wrap(err, "could not create cereal manager")
 	}
 
-	err = licenseaudit.InitCerealManager(context.TODO(), cerealManager, 1)
+	err = licenseaudit.InitCerealManager(context.TODO(), cerealManager, 1, config.LicenseAudit.Url, config.LicenseAudit.Frequency,config.LicenseAudit.Interval)
 	if err != nil {
 		return errors.Wrap(err, "could not create cereal manager")
 	}

@@ -1,6 +1,8 @@
 package genconfig
 
 import (
+	"fmt"
+
 	"github.com/chef/automate/lib/pmt"
 )
 
@@ -16,6 +18,11 @@ type DeployType string
 const (
 	DEPLOY_TYPE_ON_PREMISE DeployType = "On-Premise"
 	DEPLOY_TYPE_AWS        DeployType = "AWS"
+)
+
+const (
+	LOCATION_TYPE_ON_GCP DeployType = "gcs"
+	LOCATION_TYPE_ON_AWS DeployType = "s3"
 )
 
 type ConfigType string
@@ -46,6 +53,15 @@ func GenConfigImpFactory(p pmt.Prompt) *GenConfigImp {
 }
 
 func (g *GenConfigImp) GenConfigWithPrompts() (err error) {
+	fmt.Println("### Welcome to Config Generation Tool ###")
+	fmt.Println("We will ask you various info based on your choices, like:")
+	fmt.Println("\ta. Topology Details")
+	fmt.Println("\tb. SSH Details")
+	fmt.Println("\tc. Infrastructre Details")
+	fmt.Println("\td. Databases Details")
+	fmt.Println("\te. Certificates")
+	fmt.Println("\tf. Backup Details")
+	fmt.Println("\nBegin the flow below:")
 	return g.TopologyFlow()
 }
 

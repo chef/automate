@@ -3,7 +3,7 @@ variable "access_key" {
 }
 
 variable "automate_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -24,7 +24,7 @@ variable "bucket_name" {
 }
 
 variable "chef_server_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -60,8 +60,16 @@ variable "existing_postgresql_private_ips" {
   default = []
 }
 
+variable "google_service_account_file" {
+  default = ""
+}
+
 variable "infra" {
   default = "existing_infra"
+}
+
+variable "location" {
+  default = ""
 }
 
 variable "managed_opensearch_certificate" {
@@ -109,7 +117,7 @@ variable "managed_rds_superuser_username" {
 }
 
 variable "opensearch_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -125,7 +133,7 @@ variable "os_snapshot_user_access_key_secret" {
 }
 
 variable "postgresql_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 

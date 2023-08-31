@@ -189,8 +189,8 @@
 [teams.v1.sys.service]
   port = <%= overrides[:teams_port] %>
 <% end %>
-
-<% if overrides[:backup_config_s3] == "true" -%>
+### Below is only for S3
+<% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "s3" -%>
 [global.v1.external.opensearch.backup]
   enable = true
   location = "s3"
@@ -284,3 +284,29 @@
 
 [erchef.v1.sys.keygen]
   cache_size=10
+
+### Below is only for GCP 
+<% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "gcs" -%>
+[global.v1.external.opensearch.backup]
+  enable = true
+  location = "gcs"
+[global.v1.external.opensearch.backup.gcs]
+  bucket = "<%= overrides[:bucket_name] %>"
+  # base_path (optional):  The path within the bucket where backups should be stored
+  # If base_path is not set, backups will be stored at the root of the bucket.
+  base_path = "elasticsearch"
+  ## GCS Bucket Settings:
+  # type = nearline
+  # access control = uniform
+  client = "default"
+[global.v1.backups]
+  location = "gcs"
+[global.v1.backups.gcs.bucket]
+  name = "<%= overrides[:bucket_name] %>"
+  base_path = "elasticsearch"
+[global.v1.backups.gcs.credentials]
+  json = '''
+<%=  File.read(File.join(overrides[:tmp_path], "googleServiceAccount.json")) %>
+'''
+<% end %>
+

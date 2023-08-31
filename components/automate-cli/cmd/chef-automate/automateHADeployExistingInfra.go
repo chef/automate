@@ -2,15 +2,21 @@ package main
 
 import (
 	"container/list"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 )
+
+const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
+const GCS = "gcs"
+const S3 = "s3"
 
 type existingInfra struct {
 	config     ExistingInfraConfigToml
@@ -180,18 +186,26 @@ func (e *existingInfra) validateConfigFields() *list.List {
 
 	if len(e.config.Architecture.ConfigInitials.BackupConfig) > 0 {
 		if e.config.Architecture.ConfigInitials.BackupConfig == "object_storage" {
-			if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
-				errorList.PushBack("Invalid or empty access_key")
-			}
-			if len(e.config.ObjectStorage.Config.SecretKey) < 1 {
-				errorList.PushBack("Invalid or empty secret_key")
-			}
+			// Bucket check is comman in AWS and GCP
 			if len(e.config.ObjectStorage.Config.BucketName) < 1 {
 				errorList.PushBack("Invalid or empty bucket_name")
 			}
-			if len(e.config.ObjectStorage.Config.Endpoint) < 1 {
-				errorList.PushBack("Invalid or empty endpoint")
+			// if gcsJsonFile file exist then it the gcp flow other wise other flow
+			if e.config.ObjectStorage.Config.Location == GCS {
+				// TODO : as of today we are not handling the err from below func
+				_ = checkGoogleServiceAccountJson(e.config.ObjectStorage.Config.GoogleServiceAccountFile, errorList)
+			} else {
+				if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
+					errorList.PushBack("Invalid or empty access_key")
+				}
+				if len(e.config.ObjectStorage.Config.SecretKey) < 1 {
+					errorList.PushBack("Invalid or empty secret_key")
+				}
+				if len(e.config.ObjectStorage.Config.Endpoint) < 1 {
+					errorList.PushBack("Invalid or empty endpoint")
+				}
 			}
+
 		} else if e.config.Architecture.ConfigInitials.BackupConfig == "file_system" {
 			if len(e.config.Architecture.ConfigInitials.BackupMount) < 1 {
 				errorList.PushBack("Invalid or empty access_key")
@@ -497,4 +511,106 @@ func checkCertValid(keys []keydetails) *list.List {
 		}
 	}
 	return errorList
+}
+
+func checkGoogleServiceAccountJson(filePath string, errorList *list.List) error {
+	if len(strings.TrimSpace(filePath)) < 1 {
+		errorList.PushBack("File name is empty")
+		return nil
+	}
+	// Read the json file
+	file, err := os.Open(filePath)
+	if err != nil {
+		errorList.PushBack("Error opening file")
+		return nil
+	}
+	defer file.Close()
+
+	// Decode the JSON data
+	var serviceAccount GoogleServiceAccount
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&serviceAccount)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err.Error())
+		errorList.PushBack(err.Error())
+		return err
+	}
+	// Validate the required fields
+	if len(strings.TrimSpace(serviceAccount.Type)) < 1 {
+		errorList.PushBack("Invalid type")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.ProjectID)) < 1 {
+		errorList.PushBack("Invalid project_id")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.PrivateKeyID)) < 1 {
+		errorList.PushBack("Invalid private_key_id")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.PrivateKey)) < 1 {
+		errorList.PushBack("Invalid private_key")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.ClientEmail)) < 1 {
+		errorList.PushBack("Invalid client_email")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.ClientID)) < 1 {
+		errorList.PushBack("Invalid client_id")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.AuthURI)) < 1 {
+		errorList.PushBack("Invalid auth_url")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.TokenURI)) < 1 {
+		errorList.PushBack("Invalid token_uri")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.AuthProviderX509CertURL)) < 1 {
+		errorList.PushBack("Invalid auth_provider_x509_cert_url")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.ClientX509CertURL)) < 1 {
+		errorList.PushBack("Invalid client_x509_cert_url")
+	}
+
+	if len(strings.TrimSpace(serviceAccount.UniverseDomain)) < 1 {
+		errorList.PushBack("Invalid universe_domain")
+	}
+	//fmt.Println("Service Account JSON is valid")
+	return writeGoogleserviceJsonFile(AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE, serviceAccount, errorList)
+
+}
+
+func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAccount, errorList *list.List) error {
+
+	// Check if the file already exists
+	if _, err := os.Stat(filePath); err == nil {
+		// Remove the existing file
+		if err := os.Remove(filePath); err != nil {
+			errorList.PushBack("Error removing existing file")
+			return err
+		}
+	}
+
+	// Create the JSON file
+	file, err := os.Create(filePath)
+	if err != nil {
+		errorList.PushBack("Error while creating service account file")
+		return err
+	}
+	defer file.Close()
+
+	// Encode and write the ServiceAccount struct as JSON
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(serviceAccount)
+	if err != nil {
+		errorList.PushBack("Error encoding service account JSON")
+		return err
+	}
+	//fmt.Printf("Service Account JSON written to %s\n", filePath)
+	return nil
+
 }

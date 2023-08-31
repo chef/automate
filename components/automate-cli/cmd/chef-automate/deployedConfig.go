@@ -76,11 +76,13 @@ func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml) *config.HaD
 		},
 		ObjectStorage: &config.ObjectStorage{
 			Config: &config.ConfigObjectStorage{
-				AccessKey:  existingInfraConfigObjectStorageConfig.AccessKey,
-				BucketName: existingInfraConfigObjectStorageConfig.BucketName,
-				Endpoint:   existingInfraConfigObjectStorageConfig.Endpoint,
-				Region:     existingInfraConfigObjectStorageConfig.Region,
-				SecretKey:  existingInfraConfigObjectStorageConfig.SecretKey,
+				AccessKey:                existingInfraConfigObjectStorageConfig.AccessKey,
+				BucketName:               existingInfraConfigObjectStorageConfig.BucketName,
+				Endpoint:                 existingInfraConfigObjectStorageConfig.Endpoint,
+				Region:                   existingInfraConfigObjectStorageConfig.Region,
+				SecretKey:                existingInfraConfigObjectStorageConfig.SecretKey,
+				Location:                 existingInfraConfigObjectStorageConfig.Location,
+				GoogleServiceAccountFile: existingInfraConfigObjectStorageConfig.GoogleServiceAccountFile,
 			},
 		},
 		Automate: &config.AutomateSettings{

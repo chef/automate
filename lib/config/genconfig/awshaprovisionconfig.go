@@ -22,7 +22,7 @@ const (
 	URL_OPTIONAL_PORT_REGEX            = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](:{1}[0-9]{1,5})?$"
 	FQDN_REGEX                         = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"
 	URL_REQUIRED_PORT_REGEX            = "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]:{1}[0-9]{1,5}$"
-	LINUX_USER_REGEX                   = "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30})$"
+	LINUX_USER_REGEX                   = "^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" //"^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30})$"
 	DIR_PATH_REGEX                     = "^\\/$|(\\/[a-zA-Z_0-9-]+)+$"
 	BUCKET_NAME_REGEX                  = "^[a-zA-Z0-9_-]+$"
 	AWS_ACCESS_KEY_ID_REGEX            = "^[A-Z0-9]{20}$"
@@ -52,6 +52,16 @@ const (
 	ROOTCA                             = "Root CA"
 	TOKEN_URLS                         = "http://169.254.169.254/latest/api/token"
 	METADATA_URLS                      = "http://169.254.169.254/latest/meta-data/iam/info"
+	ERR_MSG_AWS_INSTANCE_TYPE          = "Please provide a valid AWS Instance Type, like: m5.large"
+	ERR_MSG_EBS_VOL_TYPE               = "Please provide valid AWS EBS Volume Type"
+	ERR_MSG_AUTOMATE_PASS              = "Please provide a password which is of min. length 8 char and max. length of 35"
+	ERR_MSG_SSH_USER                   = "Please provide valid pattern Linux User Name, like: ubuntu, root"
+	ERR_MSG_SSH_GROUP                  = "Please provide valid pattern Linux Group Name, like: ubuntu, root"
+	ERR_MSG_CIDR                       = "Please provide valid CIDR value like: 172.31.64.0, ensure to give large set of IP possible set."
+	ERR_MSG_PG_URL                     = "Please provide valid pattern of PostgreSQL URL with Port No."
+	ERR_MSG_OS_URL                     = "Please provide valid OpenSearch URL, like: chef-opensearch.myosdomain.com"
+	ERR_MSG_AUTOMATE_FQDN              = "Please provide valid FQDN pattern for Automate Domain, like: my-automate-domain.com"
+	ERR_MSG_INFRA_FQDN                 = "Please provide valid URL pattern for Chef Infra Server FQDN, like: my-infraserver-domain.com"
 )
 
 type AwsHaProvisionConfig struct {
@@ -272,7 +282,8 @@ func getIAMRoleName(respByte []byte) (IAMRoleName string) {
 }
 
 func (c *AwsHaProvisionConfig) PromptCidrBlockAddr() (err error) {
-	ciderBlockAddr, err := c.Prompt.InputStringRegex("AWS CIDR Block Address [Eg: 10.0.16.0]", IP_REGEX)
+	ciderBlockAddr, err := c.Prompt.InputStringRegexErrMsg("AWS CIDR Block Address [Eg: 172.31.64.0]", IP_REGEX,
+		ERR_MSG_CIDR)
 	if err != nil {
 		return
 	}
@@ -435,7 +446,8 @@ func (c *AwsHaProvisionConfig) PromptAwsManagedPostgresql() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPgUrl() (err error) {
-	pgUrl, err := c.Prompt.InputStringRegex("AWS Managed RDS PostgreSQL [Eg: pgdomain.com:5432]", URL_REQUIRED_PORT_REGEX)
+	pgUrl, err := c.Prompt.InputStringRegexErrMsg("AWS Managed RDS PostgreSQL [Eg: pgdomain.com:5432]", URL_REQUIRED_PORT_REGEX,
+		ERR_MSG_PG_URL)
 	if err != nil {
 		return
 	}
@@ -560,7 +572,8 @@ func (c *AwsHaProvisionConfig) PromptOsDomainName() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOsDomainUrl() (err error) {
-	osDomainUrl, err := c.Prompt.InputStringRegex("AWS Managed OpenSearch Domain URL [Eg: chef-opensearch.myosdomain.com]", URL_OPTIONAL_PORT_REGEX)
+	osDomainUrl, err := c.Prompt.InputStringRegexErrMsg("AWS Managed OpenSearch Domain URL [Eg: chef-opensearch.myosdomain.com]", URL_OPTIONAL_PORT_REGEX,
+		ERR_MSG_OS_URL)
 	if err != nil {
 		return
 	}
@@ -825,7 +838,8 @@ func (c *AwsHaProvisionConfig) DefaultAutomateConfigValues() {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateFqdn() (err error) {
-	automateFqdn, err := c.Prompt.InputStringRegex("Automate FQDN [Eg: my-automate-domain.com]", FQDN_REGEX)
+	automateFqdn, err := c.Prompt.InputStringRegexErrMsg("Automate FQDN [Eg: my-automate-domain.com]", FQDN_REGEX,
+		ERR_MSG_AUTOMATE_FQDN)
 	if err != nil {
 		return
 	}
@@ -915,7 +929,8 @@ func (c *AwsHaProvisionConfig) PromptAutomateNodes() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateAdminPassword() (err error) {
-	adminPass, err := c.Prompt.InputPasswordRegex("Automate Dashboard Admin User Password", AUTOMATE_ADMIN_PASSWORD_REGEX)
+	adminPass, err := c.Prompt.InputPasswordRegexErrMsg("Automate Dashboard Admin User Password", AUTOMATE_ADMIN_PASSWORD_REGEX,
+		ERR_MSG_AUTOMATE_PASS)
 	if err != nil {
 		return
 	}
@@ -924,7 +939,8 @@ func (c *AwsHaProvisionConfig) PromptAutomateAdminPassword() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Automate [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, "m5.large")
+	instanceType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS Instance type for Automate [min. reg.: m5.large]",
+		AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT, ERR_MSG_AWS_INSTANCE_TYPE)
 	if err != nil {
 		return
 	}
@@ -933,7 +949,8 @@ func (c *AwsHaProvisionConfig) PromptAutomateInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerFqdn() (err error) {
-	chefInfraServerFqdn, err := c.Prompt.InputStringRegex("Chef Infra Server FQDN [Eg: my-infraserver-domain.com]", FQDN_REGEX)
+	chefInfraServerFqdn, err := c.Prompt.InputStringRegexErrMsg("Chef Infra Server FQDN [Eg: my-infraserver-domain.com]", FQDN_REGEX,
+		ERR_MSG_INFRA_FQDN)
 	if err != nil {
 		return
 	}
@@ -995,7 +1012,8 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerNodes() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for Chef Infra Server [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS Instance type for Chef Infra Server [min. reg.: m5.large]",
+		AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT, ERR_MSG_AWS_INSTANCE_TYPE)
 	if err != nil {
 		return
 	}
@@ -1004,7 +1022,8 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPostgresqlInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for PostgreSQL [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS Instance type for PostgreSQL [min. reg.: m5.large]",
+		AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT, ERR_MSG_AWS_INSTANCE_TYPE)
 	if err != nil {
 		return
 	}
@@ -1013,7 +1032,8 @@ func (c *AwsHaProvisionConfig) PromptPostgresqlInstanceType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOpenSearchInstanceType() (err error) {
-	instanceType, err := c.Prompt.InputStringRegexDefault("AWS Instance type for OpenSearch [min. reg.: m5.large]", AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT)
+	instanceType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS Instance type for OpenSearch [min. reg.: m5.large]",
+		AWS_MACHINE_TYPE_REGEX, AWS_MACHINE_TYPE_REGEX_DEFAULT, ERR_MSG_AWS_INSTANCE_TYPE)
 	if err != nil {
 		return
 	}
@@ -1178,7 +1198,8 @@ func (c *AwsHaProvisionConfig) PromptOpenSearchVolIops() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptAutomateVolType() (err error) {
-	volType, err := c.Prompt.InputStringRegexDefault("AWS EBS Volume Type for Automate", AWS_VOL_TYPE_REGEX, "gp3")
+	volType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS EBS Volume Type for Automate", AWS_VOL_TYPE_REGEX, "gp3",
+		ERR_MSG_EBS_VOL_TYPE)
 	if err != nil {
 		return
 	}
@@ -1187,7 +1208,8 @@ func (c *AwsHaProvisionConfig) PromptAutomateVolType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptChefInfraServerVolType() (err error) {
-	volType, err := c.Prompt.InputStringRegexDefault("AWS EBS Volume IOPS for Chef Infra Server", AWS_VOL_TYPE_REGEX, "gp3")
+	volType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS EBS Volume IOPS for Chef Infra Server", AWS_VOL_TYPE_REGEX, "gp3",
+		ERR_MSG_EBS_VOL_TYPE)
 	if err != nil {
 		return
 	}
@@ -1196,7 +1218,8 @@ func (c *AwsHaProvisionConfig) PromptChefInfraServerVolType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPostgresqlVolType() (err error) {
-	volType, err := c.Prompt.InputStringRegexDefault("AWS EBS Volume IOPS for PostgreSQL", AWS_VOL_TYPE_REGEX, "gp3")
+	volType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS EBS Volume IOPS for PostgreSQL", AWS_VOL_TYPE_REGEX, "gp3",
+		ERR_MSG_EBS_VOL_TYPE)
 	if err != nil {
 		return
 	}
@@ -1205,7 +1228,8 @@ func (c *AwsHaProvisionConfig) PromptPostgresqlVolType() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptOpenSearchVolType() (err error) {
-	volType, err := c.Prompt.InputStringRegexDefault("AWS EBS Volume IOPS for OpenSearch", AWS_VOL_TYPE_REGEX, "gp3")
+	volType, err := c.Prompt.InputStringRegexDefaultErrMsg("AWS EBS Volume IOPS for OpenSearch", AWS_VOL_TYPE_REGEX, "gp3",
+		ERR_MSG_EBS_VOL_TYPE)
 	if err != nil {
 		return
 	}
@@ -1288,7 +1312,7 @@ func (c *AwsHaProvisionConfig) PromptSsh() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptSshUser() (sshUser string, err error) {
-	sshUser, err = c.Prompt.InputStringRegex("SSH User Name", LINUX_USER_REGEX)
+	sshUser, err = c.Prompt.InputStringRegexErrMsg("SSH User Name", LINUX_USER_REGEX, ERR_MSG_SSH_USER)
 	if err != nil {
 		return
 	}
@@ -1298,7 +1322,7 @@ func (c *AwsHaProvisionConfig) PromptSshUser() (sshUser string, err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptSshGroup(sshUser string) (err error) {
-	sshGroup, err := c.Prompt.InputStringRegexDefault("SSH Group", LINUX_USER_REGEX, sshUser)
+	sshGroup, err := c.Prompt.InputStringRegexDefaultErrMsg("SSH Group", LINUX_USER_REGEX, sshUser, ERR_MSG_SSH_GROUP)
 	if err != nil {
 		return
 	}

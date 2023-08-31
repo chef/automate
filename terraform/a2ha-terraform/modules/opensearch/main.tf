@@ -8,7 +8,7 @@ locals {
       private_ips                     = join(", ", formatlist("\"%s\"", var.private_ips)),
       nodes_list                      = join(", ", formatlist("\"%s\"", var.private_ips))
       tmp_path                        = var.tmp_path
-      backup_config                   = var.backup_config_s3 == "true" ? "s3" : var.backup_config_efs == "true" ? "efs" : ""
+      backup_config                   = var.backup_config_s3 == "true" ? var.location == "s3" ? "s3" : "gcs" : var.backup_config_efs == "true" ? "efs" : ""
       protocol                        = length(split("://", var.s3_endpoint)) > 1 ? split("://", var.s3_endpoint)[0] : "https"
       endpoint                        = length(split("://", var.s3_endpoint)) > 1 ? split("://", var.s3_endpoint)[1] : length(split("://", var.s3_endpoint)) == 1 ? split("://", var.s3_endpoint)[0] : "s3.amazonaws.com"
       nfs_mount_path                  = var.nfs_mount_path

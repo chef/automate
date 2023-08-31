@@ -400,6 +400,9 @@ message LicenseStatusResponse {
 	string license_id    = 2;
 	string customer_name = 3;
 	google.protobuf.Timestamp expiration_date = 4;
+	string deployment_id=5;
+	string deployment_type=6;
+
 }
 
 message LicenseApplyRequest {

@@ -15,7 +15,7 @@ variable "automate_admin_username" {
 }
 
 variable "automate_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -86,7 +86,7 @@ variable "bucket_name" {
 }
 
 variable "chef_server_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -110,6 +110,10 @@ variable "frontend_aib_dest_file" {
 variable "frontend_aib_local_file" {
 }
 
+variable "google_service_account_file" {
+  default = ""
+}
+
 variable "hab_sup_http_gateway_auth_token" {
 }
 
@@ -117,6 +121,10 @@ variable "habitat_info" {
 }
 
 variable "infra" {
+  default = ""
+}
+
+variable "location" {
   default = ""
 }
 

@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -229,6 +230,15 @@ func runGenCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.FileAccessError, fmt.Sprint("Failed to write to file: ", outFile))
 		}
+		fmt.Println("\nConfig generated successfully!")
+		fmt.Println("\nUse cat " + outFile + " command to see if the file is created")
+		fmt.Println("After checking the config file, you can follow next steps:")
+		fmt.Println("\ta. For AWS deployment, Provision the infra with " +
+			color.New(color.Bold).Add(color.Italic).Sprint("`chef-automate provision-infra`") +
+			" command and then proceed to deployment with " +
+			color.New(color.Bold).Add(color.Italic).Sprint("`chef-automate deploy`") + " command")
+		fmt.Println("\tb. For On-premise deployment, Proceed to deployment with " + color.New(color.Bold).Add(color.Italic).Sprint("`chef-automate deploy`") + " command")
+		fmt.Println("Refer to `https://docs.chef.io/automate/cli/` for more information on related flags")
 	} else {
 		writer.Println("")
 		writer.Println(string(t))

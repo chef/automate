@@ -41,10 +41,12 @@ locals {
       nfs_mount_path                     = var.nfs_mount_path,
       s3_endpoint                        = var.s3_endpoint,
       bucket_name                        = var.bucket_name,
-      access_key                         = var.access_key
-      secret_key                         = var.secret_key
-      infra                              = var.infra
-      automate_root_ca                   = var.automate_root_ca
+      access_key                         = var.access_key,
+      google_service_account_file        = var.google_service_account_file,
+      secret_key                         = var.secret_key,
+      location                           = var.location,
+      infra                              = var.infra,
+      automate_root_ca                   = var.automate_root_ca,
       automate_public_key                = contains(keys(var.automate_certs_by_ip), var.private_ips[n]) ? var.automate_certs_by_ip[element(var.private_ips, n)].public_key : var.automate_public_key
       automate_private_key               = contains(keys(var.automate_certs_by_ip), var.private_ips[n]) ? var.automate_certs_by_ip[element(var.private_ips, n)].private_key : var.automate_private_key
       chef_server_public_key             = contains(keys(var.chef_server_certs_by_ip), var.private_ips[n]) ? var.chef_server_certs_by_ip[element(var.private_ips, n)].public_key : var.chef_server_public_key
@@ -138,6 +140,19 @@ resource "null_resource" "automate" {
   provisioner "file" {
     content     = local.provision
     destination = "${var.tmp_path}/automate_provision.sh"
+  }
+
+  # Below code is for the gcp, it should only execute when it is object_storage and location = gcp
+
+  provisioner "local-exec" {
+    command = <<EOT
+if [ -f "${var.google_service_account_file}" ]; then
+  scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.google_service_account_file} ${var.ssh_user}@${var.private_ips[count.index]}:${var.tmp_path}/googleServiceAccount.json
+  echo "GCP Service Account File copied"
+else
+  echo "GCP Service Account File does not exist"
+fi
+EOT
   }
 
   provisioner "remote-exec" {
