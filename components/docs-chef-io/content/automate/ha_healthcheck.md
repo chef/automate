@@ -53,35 +53,29 @@ This page includes commands that can be executed for the Chef Automate cluster p
     chef-automate status 
   ```
 
-- Check the service status on frontend nodes (Automate), ssh to the frontend node.
-
-```cmd
-    chef-automate ssh --hostname a2
-    chef-automate status
+- To check the service status on Automate nodes.
+ ```cmd 
+  chef-automate status --automate
+  chef-automate status --a2 
 ```
 
-- Check the service status on frontend nodes (Chef Infra Server), ssh to the frontend node.
-
-```cmd
-    chef-automate ssh --hostname cs
-    chef-automate status
+- To check the service status on Chef Infra Server nodes.
+ ```cmd 
+  chef-automate status --chef_server
+  chef-automate status --cs
 ```
 
-- Check the service status on backend nodes (Postgres nodes), ssh to the backend node.
-  
-```cmd
-   chef-automate ssh --hostname pg
-   hab svc status
+- To check the service status on Postgres nodes.
+ ```cmd 
+  chef-automate status --postgresql
+  chef-automate status -pg
 ```
 
-- Check the service status on backend nodes (Opensearch nodes), ssh to the backend node.
-  
-```cmd
-    chef-automate ssh --hostname os
-    hab svc status
+- To check the service status on Opensearch nodes.
+```cmd 
+  chef-automate status --opensearch
+  chef-automate status --os
 ```
-
-
 
 - Patch a config to the Front end nodes (Automate)
   - create a config file `automate.toml`
