@@ -7,7 +7,7 @@ import { ClientRunsStatsService } from '../telemetry/client-runs-stats/client-ru
 import { ApplicationStatsService } from '../telemetry/application-stats/application-stats.service';
 import { ConfigService } from '../config/config.service';
 
-(window as any).postAnalyticsUsageData = function(){};
+(window as any).postAnalyticsUsageData = function () { };
 
 describe('LicenseUsageService', () => {
   let service: LicenseUsageService;
@@ -24,34 +24,40 @@ describe('LicenseUsageService', () => {
     customerName: 'test',
     maxNodes: 0,
     deploymentId: '00000000-0000-0000-0000-111111111111',
-    deploymentType: ''
+    deploymentType: 'test'
   };
   const sampleGetComplianceStats = {
     days_since_last_post: 2,
     node_cnt: 10
-  }
+  };
   const sampleGetClientRunsStats = {
     days_since_last_post: 2,
     node_cnt: 10
-  }
+  };
   const sampleGetApplicationStats = {
     days_since_last_post: 2,
     total_services: 10
-  }
+  };
 
 
   beforeEach(() => {
-    let configServiceSpyObj = jasmine.createSpyObj('ConfigService', {
+    const configServiceSpyObj = jasmine.createSpyObj('ConfigService', {
       'getConfig': new BehaviorSubject(sampleGetConfig)
     });
-    let complianceStatsServiceSpyObj = jasmine.createSpyObj('ComplianceStatsService', {
-      'getComplianceStats': new Promise((resolve)=> {resolve(sampleGetComplianceStats)})
+    const complianceStatsServiceSpyObj = jasmine.createSpyObj('ComplianceStatsService', {
+      'getComplianceStats': new Promise((resolve) => {
+        resolve(sampleGetComplianceStats);
+      })
     });
-    let clientRunsStatsServiceSpyObj = jasmine.createSpyObj('ClientRunsStatsService', {
-      'getClientRunsStats': new Promise((resolve)=> {resolve(sampleGetClientRunsStats)})
+    const clientRunsStatsServiceSpyObj = jasmine.createSpyObj('ClientRunsStatsService', {
+      'getClientRunsStats': new Promise((resolve) => {
+        resolve(sampleGetClientRunsStats);
+      })
     });
-    let applicationStatsServiceSpyObj = jasmine.createSpyObj('ApplicationStatsService', {
-      'getApplicationStats': new Promise((resolve)=> {resolve(sampleGetApplicationStats)})
+    const applicationStatsServiceSpyObj = jasmine.createSpyObj('ApplicationStatsService', {
+      'getApplicationStats': new Promise((resolve) => {
+        resolve(sampleGetApplicationStats);
+      })
     });
     TestBed.configureTestingModule({
       imports: [
@@ -59,19 +65,19 @@ describe('LicenseUsageService', () => {
       ],
       providers: [
         LicenseUsageService,
-        { 
+        {
           provide: ComplianceStatsService,
           useValue: complianceStatsServiceSpyObj
         },
-        { 
+        {
           provide: ClientRunsStatsService,
           useValue: clientRunsStatsServiceSpyObj
         },
-        { 
+        {
           provide: ApplicationStatsService,
           useValue: applicationStatsServiceSpyObj
         },
-        { 
+        {
           provide: ConfigService,
           useValue: configServiceSpyObj
         }
@@ -79,9 +85,12 @@ describe('LicenseUsageService', () => {
     });
     service = TestBed.inject(LicenseUsageService);
     configServiceSpy = TestBed.inject(ConfigService) as jasmine.SpyObj<ConfigService>;
-    complianceStatsServiceSpy = TestBed.inject(ComplianceStatsService) as jasmine.SpyObj<ComplianceStatsService>;
-    clientRunsStatsServiceSpy = TestBed.inject(ClientRunsStatsService) as jasmine.SpyObj<ClientRunsStatsService>;
-    applicationStatsServiceSpy = TestBed.inject(ApplicationStatsService) as jasmine.SpyObj<ApplicationStatsService>;
+    complianceStatsServiceSpy =
+      TestBed.inject(ComplianceStatsService) as jasmine.SpyObj<ComplianceStatsService>;
+    clientRunsStatsServiceSpy =
+      TestBed.inject(ClientRunsStatsService) as jasmine.SpyObj<ClientRunsStatsService>;
+    applicationStatsServiceSpy =
+      TestBed.inject(ApplicationStatsService) as jasmine.SpyObj<ApplicationStatsService>;
   });
 
 
@@ -116,42 +125,105 @@ describe('LicenseUsageService', () => {
       expect(applicationStatsServiceSpy.getApplicationStats).toHaveBeenCalledTimes(1);
     }));
 
-    it('should call sendData', fakeAsync(() => {
-      spyOn(service, 'sendData');
-      service.postAnalyticsUsageDataCall()
-      tick();
-      expect(service.sendData).toHaveBeenCalledTimes(1);
-    }));
-
     it('should assign values received from service', fakeAsync(() => {
       service.postAnalyticsUsageDataCall();
       tick();
+      expect(service['deploymentId']).toBe('00000000-0000-0000-0000-111111111111');
+      expect(service['deploymentType']).toBe('test');
       expect(service['licenseId']).toBe('00000000-0000-0000-0000-111111111111');
       expect(service['customerId']).toBe('cust1');
       expect(service['customerName']).toBe('test');
+      expect(service['isDeploymentIdLoaded']).toBe(true);
+      expect(service['isDeploymentTypeLoaded']).toBe(true);
+      expect(service['isLicenseIdLoaded']).toBe(true);
+      expect(service['isCustomerIdLoaded']).toBe(true);
+      expect(service['isCustomerNameLoaded']).toBe(true);
       expect(service['totalNodes']).toBe(10);
-      expect(service['days_since_last_post']).toBe(2);
+      expect(service['daysSinceLasPost']).toBe(2);
+      expect(service['isTotalNodesLoaded']).toBe(true);
+      expect(service['isDaysSinceLasPostLoaded']).toBe(true);
+      expect(service['isPeriodStartDateLoaded']).toBe(true);
+      expect(service['isPeriodEndDateLoaded']).toBe(true);
       expect(service['totalScans']).toBe(10);
+      expect(service['isTotalScansLoaded']).toBe(true);
       expect(service['totalService']).toBe(10);
+      expect(service['isTotalServiceLoaded']).toBe(true);
     }));
 
   });
 
 
-  describe('sendData', () => {
-    
+  describe('constructPayload', () => {
+
     it('should return undefined', () => {
-      let output = service.sendData();
+      const output = service.constructPayload();
       expect(output).toBe(undefined);
+    });
+
+    it('should assign object to payload', () => {
+      const output = service.constructPayload();
+      expect(output).toBe(undefined);
+      expect(typeof service['payload']).toBe('object');
+    });
+
+  });
+
+
+  describe('postData', () => {
+
+    it('should call constructPayload', () => {
+      const handleSpy = spyOn(LicenseUsageService.prototype as any, 'isAllDataLoaded');
+      handleSpy.and.callFake(() => {
+        return true;
+      });
+      spyOn(service, 'constructPayload');
+      const output = service.postData();
+      expect(output).toBe(undefined);
+      expect(service.constructPayload).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call setInterval', fakeAsync(() => {
+      spyOn(window, 'setInterval');
+      service.postData();
+      tick();
+      expect(window.setInterval).toHaveBeenCalledTimes(1);
+    }));
+
+  });
+
+
+  describe('isAllDataLoaded', () => {
+
+    it('should return false', () => {
+      const output = service['isAllDataLoaded']();
+      expect(output).toBe(false);
+    });
+
+    it('should return true', () => {
+      service['isLicenseIdLoaded'] = true;
+      service['isCustomerIdLoaded'] = true;
+      service['isExpirationLoaded'] = true;
+      service['isTotalNodesLoaded'] = true;
+      service['isTotalScansLoaded'] = true;
+      service['isDaysSinceLasPostLoaded'] = true;
+      service['isPeriodStartDateLoaded'] = true;
+      service['isPeriodEndDateLoaded'] = true;
+      service['isDeploymentIdLoaded'] = true;
+      service['isTotalServiceLoaded'] = true;
+      service['isDeploymentTypeLoaded'] = true;
+      service['isCustomerNameLoaded'] = true;
+      service['isProductVersionLoaded'] = true;
+      const output = service['isAllDataLoaded']();
+      expect(output).toBe(true);
     });
 
   });
 
 
   describe('getCurrentDateTime', () => {
-    
+
     it('should return a string', () => {
-      let output = service['getCurrentDateTime']();
+      const output = service['getCurrentDateTime']();
       expect(typeof output).toBe('string');
     });
 
