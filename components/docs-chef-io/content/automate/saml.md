@@ -235,8 +235,10 @@ Use below values in config patch
 
 
 ```toml
+ca_contents = "<your ca contents>"
+sso_url = "<your SAML SSO URL>"
 email_attr = "emailaddress"
 username_attr = "username"
 groups_attr = "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups"
-
+entity_issuer = "<your entity issuer>"
 ```
