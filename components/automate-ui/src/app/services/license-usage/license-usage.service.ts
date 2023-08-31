@@ -57,12 +57,12 @@ export class LicenseUsageService {
     this.http.get<LicenseStatus>(`${env.gateway_url}/license/status`).subscribe(data => {
       this.expiration = data.licensed_period.end;
       this.isExpirationLoaded = true;
-    })
+    });
 
     this.http.get(`${env.gateway_url}/version`).subscribe(data => {
       this.productVersion = data['build_timestamp'];
       this.isProductVersionLoaded = true;
-    })
+    });
 
     this.configService.getConfig().subscribe(data => {
       this.deploymentId = data.deploymentId;
@@ -76,19 +76,19 @@ export class LicenseUsageService {
       this.isLicenseIdLoaded = true;
       this.isCustomerIdLoaded = true;
       this.isCustomerNameLoaded = true;
-    })
+    });
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
-    this.totalNodes = complianceUsageStats['node_cnt']
+    this.totalNodes = complianceUsageStats['node_cnt'];
     this.daysSinceLasPost = complianceUsageStats['days_since_last_post'];
 
-    let start = new Date();
+    const start = new Date();
     start.setDate(start.getDate() - this.daysSinceLasPost);
-    start.setHours(0,0,0,0);
-    this.periodStartDate = start.toISOString()
+    start.setHours(0, 0, 0, 0);
+    this.periodStartDate = start.toISOString();
 
-    let end = new Date();
-    end.setHours(11,59,0,0);
+    const end = new Date();
+    end.setHours(11, 59, 0, 0);
     end.setDate(end.getDate() - 1);
     this.periodEndDate = end.toISOString();
 
@@ -96,7 +96,6 @@ export class LicenseUsageService {
     this.isDaysSinceLasPostLoaded = true;
     this.isPeriodStartDateLoaded = true;
     this.isPeriodEndDateLoaded = true;
-
 
     const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
     this.totalScans = nodeUsageStats['node_cnt'];
@@ -109,50 +108,50 @@ export class LicenseUsageService {
 
   constructPayload() {
     const data = {
-      "license_id": this.licenseId,
-      "customerId": this.customerId,
-      "expiration": this.expiration,
-      "customerName": this.customerName,
-      "metaData": {
-        "Automate": {
-             "instanceId":this.deploymentId,
-             "deploymentType":this.deploymentType,
+      'license_id': this.licenseId,
+      'customerId': this.customerId,
+      'expiration': this.expiration,
+      'customerName': this.customerName,
+      'metaData': {
+        'Automate': {
+             'instanceId': this.deploymentId,
+             'deploymentType': this.deploymentType
         }
       },
-      "periods": [{
-        "version": this.productVersion,
-        "date": this.getCurrentDateTime(),
-        "period": {
-          "start": this.periodStartDate,
-          "end": this.periodEndDate
+      'periods': [{
+        'version': this.productVersion,
+        'date': this.getCurrentDateTime(),
+        'period': {
+          'start': this.periodStartDate,
+          'end': this.periodEndDate
         },
-        "summary": {
-          "nodes": {
-            "total": this.totalNodes
+        'summary': {
+          'nodes': {
+            'total': this.totalNodes
           },
-          "scans": {
-            "targets": this.totalScans,
+          'scans': {
+            'targets': this.totalScans
           },
-          "service": {
-            "targets": this.totalService
+          'service': {
+            'targets': this.totalService
           }
         }
       }],
-      "source": "Automate",
-      "scannerVersion": "0.1.0",
-      "scannedOn": this.getCurrentDateTime()
+      'source': 'Automate',
+      'scannerVersion': '0.1.0',
+      'scannedOn': this.getCurrentDateTime()
     };
     this.payload = data;
   }
 
   postData() {
     clearInterval(this.retryPostDataInterval);
-    if(this.isAllDataLoaded()) {
-      this.constructPayload()
-      if(postAnalyticsUsageData != null || postAnalyticsUsageData != undefined) {
-        postAnalyticsUsageData(this.payload)
+    if (this.isAllDataLoaded()) {
+      this.constructPayload();
+      if ( postAnalyticsUsageData !== null || postAnalyticsUsageData !== undefined ) {
+        postAnalyticsUsageData(this.payload);
       }
-    }else {
+    } else {
       this.retryPostDataInterval = setInterval(() => {
         this.postData();
       }, 2000);
@@ -160,11 +159,11 @@ export class LicenseUsageService {
   }
 
   private isAllDataLoaded() {
-    return (this.isLicenseIdLoaded && this.isCustomerIdLoaded && this.isExpirationLoaded 
+    return ( this.isLicenseIdLoaded && this.isCustomerIdLoaded && this.isExpirationLoaded
       && this.isTotalNodesLoaded && this.isTotalScansLoaded && this.isDaysSinceLasPostLoaded
       && this.isPeriodStartDateLoaded && this.isPeriodEndDateLoaded && this.isDeploymentIdLoaded
-      && this.isTotalServiceLoaded && this.isDeploymentTypeLoaded && this.isCustomerNameLoaded 
-      && this.isProductVersionLoaded);
+      && this.isTotalServiceLoaded && this.isDeploymentTypeLoaded && this.isCustomerNameLoaded
+      && this.isProductVersionLoaded );
   }
 
   private getCurrentDateTime() {

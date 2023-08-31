@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { environment } from "../environments/environment"
+import { environment } from '../environments/environment';
 import { LicenseUsageService } from './services/license-usage/license-usage.service';
 
 @Component({
@@ -8,16 +8,16 @@ import { LicenseUsageService } from './services/license-usage/license-usage.serv
 })
 export class AppComponent {
   library_url: string;
-  
-  constructor(private licenseUsageService : LicenseUsageService) {
+
+  constructor(private licenseUsageService: LicenseUsageService) {
     this.library_url = environment.remote_library_url;
     this.loadScript(this.library_url, () => {
-      this.licenseUsageService.postData()
+      this.licenseUsageService.postData();
     });
   }
 
   loadScript(path, callback) {
-    const scriptTag = document.createElement("script");
+    const scriptTag = document.createElement('script');
     scriptTag.src = path;
     scriptTag.onload = callback;
     document.body.appendChild(scriptTag);
