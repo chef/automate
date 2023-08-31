@@ -7,7 +7,7 @@ gh_repo = "automate"
     title = "Troubleshooting"
     parent = "automate/deploy_high_availability"
     identifier = "automate/deploy_high_availability/ha_troubleshooting.md Troubleshooting"
-    weight = 127
+    weight = 132
 +++
 
 {{< warning >}}

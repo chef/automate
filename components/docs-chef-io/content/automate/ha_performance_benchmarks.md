@@ -6,9 +6,9 @@ draft = false
 [menu]
   [menu.automate]
     title = "Performance Benchmarks"
-    identifier = "automate/deploy_high_availability/troubleshooting/ha_performance_benchmarks.md Performance Benchmarks"
-    parent = "automate/deploy_high_availability/troubleshooting"
-    weight = 10
+    identifier = "automate/deploy_high_availability/ha_performance_benchmarks.md Performance Benchmarks"
+    parent = "automate/deploy_high_availability"
+    weight = 127
 +++
 
 ## Overview
