@@ -11,17 +11,17 @@ gh_repo = "automate"
     weight = 85
 +++
 
-This page will discuss the integration of Supermarket with Automate HA setup. The page will guide you to register an existing private Supermarket with [on-premises deployment](/automate/ha_onprim_deployment_procedure/) of Automate HA.
+This page will discuss the integration of Supermarket with Automate HA setup. The page will guide you to register an existing private Supermarket with Automate HA.
 
 Before starting this page, refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/) page with Automate for basic understanding.
 
 ## Register Supermarket with Automate HA
 
-The overall steps to register an existing private instance of Supermarket with Automate HA is same as the steps to register it with [Standalone](/automate/supermarket_integration_with_automate/#register-supermarket-with-automate-embedded-chef-identity) Automate. The only difference is in the way we patch the `.toml` file in Automate HA.
+The overall steps to register an existing private instance of Supermarket with Automate HA are the same as the steps to register it with [Standalone](/automate/supermarket_integration_with_automate/#register-supermarket-with-automate-embedded-chef-identity) Automate. The only difference is in the way we patch the `.toml` file in Automate HA.
 
-Follow the steps to register supermarket with Automate HA:
+Follow the steps to register the supermarket with Automate HA:
 
-1. Register your existing supermarket with [Automate embedded Chef identity](/automate/supermarket_integration_with_automate/#register-supermarket-with-automate-embedded-chef-identity).
+1. Register your existing supermarket with the [Automate embedded Chef identity](/automate/supermarket_integration_with_automate/#register-supermarket-with-automate-embedded-chef-identity).
 
 1. Now, patch the configuration on all the frontend nodes from the Bastion node using the command below:
 
@@ -30,7 +30,7 @@ Follow the steps to register supermarket with Automate HA:
     chef-automate config patch ocid-apps.toml -f
     ```
 
-    Once the patch is completed, the new application should be registered with OC-ID as part of Automate embedded chef-server.
+    Once the patch is completed, the new application should be registered with OC-ID as part of the Automate embedded chef-server.
 
 1. You can get the details of the registered applications from the bastion node by running the following command:
 
@@ -42,6 +42,6 @@ Follow the steps to register supermarket with Automate HA:
 
     {{< figure src="/images/automate/ha_output_ocid_app.png" alt="OC-ID Application Output">}}
 
-1. The configuration of supermarket in Chef Automate HA can be done in the same way as Standalone Automate. Refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/#supermarket-configuration) page to view the configuration steps.
+1. The configuration of the supermarket in Chef Automate HA can be done in the same way as Standalone Automate. Refer to the [Supermarket Integration](/automate/supermarket_integration_with_automate/#supermarket-configuration) page to view the configuration steps.
 
 Refer to the [Configuration](/automate/configuration/#encrypt-cookies-with-custom-secret-key-in-oc-id-service) page, to check the optional settings for integration of private Supermarket in Chef Automate.
