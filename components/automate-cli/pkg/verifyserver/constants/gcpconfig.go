@@ -10,8 +10,12 @@ const (
 	GCP_BUCKET_ACCESS_TITLE             = "GCS bucket access test"
 	GCP_BUCKET_ACCESS_ERROR_MSG         = "Machine is not able to access the GCS bucket using the provided credentials"
 	GCP_BUCKET_ACCESS_RESOLUTION_MSG    = "Please check if the provided GCS bucket exists or not. If it exists then provide the correct credentials."
-)
+	GCP_BUCKET_UPLOAD_ERROR_MSG         = "Unable to upload the object to given bucket"
+	GCP_BUCKET_UPLOAD_RESOLUTION_MSG    = "Please check if the valid permissions given to upload the object to the bucket"
+	GCP_BUCKET_LIST_ERROR_MSG           = "Unable to list the objects in given bucket"
+	GCP_BUCKET_LIST_RESOLUTION_MSG      = "Please check if the valid permissions given to list the objects in the bucket"
+	GCP_BUCKET_DELETE_ERROR_MSG         = "Unable to delete the object from the given bucket"
+	GCP_BUCKET_DELETE_RESOLUTION_MSG    = "Please check if the valid permissions given to delete the object in the bucket"
 
-const (
 	GCP_CHECK_FILE_PREFIX = "gcp_check_test_"
 )

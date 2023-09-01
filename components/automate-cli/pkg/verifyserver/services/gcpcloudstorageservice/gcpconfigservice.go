@@ -2,6 +2,11 @@ package gcpcloudstorageservice
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+
+	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -23,16 +28,16 @@ type GCPConfigService struct {
 	GCPUtils GCPUtils
 }
 
-func NewGCPCloudStorageConfig(logger logger.Logger, gcpUtils GCPUtils) GCPCloudStorageConfig {
+func NewGCPCloudStorageConfig(logger logger.Logger) GCPCloudStorageConfig {
 	return &GCPConfigService{
 		Logger:   logger,
-		GCPUtils: gcpUtils,
+		GCPUtils: NewGCPUtils(),
 	}
 }
 
 func (ss *GCPConfigService) GetGCPConnection(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
-	client, err := ss.GcpConnection(ctx, ss.Req.GcpServiceAccount)
+	client, err := ss.GCPUtils.NewSessionWithOptions(ctx, ss.Req.GcpServiceAccount)
 	if err != nil {
 		logrus.Errorf("error while creating a client: %v", err)
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
@@ -40,7 +45,7 @@ func (ss *GCPConfigService) GetGCPConnection(ctx context.Context, req *models.GC
 
 	defer client.Close()
 	bucket := client.Bucket(ss.Req.BucketName)
-	err = ss.BucketAttributes(ctx, bucket)
+	err = ss.GCPUtils.BucketAttributes(ctx, bucket)
 	if err != nil {
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_NOT_FOUND).Error(), constants.GCP_BUCKET_NOT_FOUND_RESOLUTION_MSG, false)
 	}
@@ -50,7 +55,7 @@ func (ss *GCPConfigService) GetGCPConnection(ctx context.Context, req *models.GC
 
 func (ss *GCPConfigService) GetBucketAccess(ctx context.Context, req *models.GCPCloudStorageConfigRequest) *models.Checks {
 	ss.Req = req
-	client, err := ss.GcpConnection(ctx, ss.Req.GcpServiceAccount)
+	client, err := ss.GCPUtils.NewSessionWithOptions(ctx, ss.Req.GcpServiceAccount)
 	if err != nil {
 		logrus.Errorf("error while creating a client: %v", err)
 		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
@@ -61,59 +66,25 @@ func (ss *GCPConfigService) GetBucketAccess(ctx context.Context, req *models.GCP
 	fileName := constants.GCP_CHECK_FILE_PREFIX + uniqueID + ".txt"
 	bucket := client.Bucket(ss.Req.BucketName)
 	obj := bucket.Object(fileName)
-
-	if err := ss.UploadObject(ctx, obj); err != nil {
+	if err := ss.GCPUtils.NewUploader(ctx, obj); err != nil {
 		logrus.Errorf("Error uploading the objects")
-		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_UPLOAD_ERROR_MSG).Error(), constants.GCP_BUCKET_UPLOAD_RESOLUTION_MSG, false)
 	}
 
 	// read/list data in GCP bucket
-	if err := ss.ListObjects(ctx, client, bucket); err != nil {
+	query := &storage.Query{Prefix: constants.GCP_CHECK_FILE_PREFIX}
+	if err := ss.GCPUtils.ListObjects(ctx, bucket, query); err != nil {
 		logrus.Errorf("Error listing the objects")
-		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_LIST_ERROR_MSG).Error(), constants.GCP_BUCKET_LIST_RESOLUTION_MSG, false)
 	}
 
 	// Delete data in GCP bucket
-	if err := ss.DeleteObject(ctx, obj); err != nil {
+	if err := ss.GCPUtils.DeleteObject(ctx, obj); err != nil {
 		logrus.Errorf("Error deleting the objects")
-		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_CONNECTION_ERROR_MSG).Error(), constants.GCP_CONNECTION_RESOLUTION_MSG, false)
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_DELETE_ERROR_MSG).Error(), constants.GCP_BUCKET_DELETE_RESOLUTION_MSG, false)
 	}
 
 	return ss.Response(constants.GCP_BUCKET_ACCESS_TITLE, constants.GCP_CONNECTION_SUCCESS_MSG, "", "", true)
-}
-
-func (ss *GCPConfigService) GcpConnection(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
-	return ss.GCPUtils.NewSessionWithOptions(ctx, gsa)
-}
-
-func (ss *GCPConfigService) BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error {
-	return ss.GCPUtils.BucketAttributes(ctx, bucket)
-}
-
-func (ss *GCPConfigService) UploadObject(ctx context.Context, obj *storage.ObjectHandle) error {
-	err := ss.GCPUtils.NewUploader(ctx, obj)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ss *GCPConfigService) ListObjects(ctx context.Context, client *storage.Client, bucket *storage.BucketHandle) error {
-	query := &storage.Query{Prefix: constants.GCP_CHECK_FILE_PREFIX}
-	err := ss.GCPUtils.ListObjects(ctx, bucket, query)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ss *GCPConfigService) DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error {
-	err := ss.GCPUtils.DeleteObject(ctx, obj)
-	if err != nil {
-		logrus.Errorf("ERROR DELETE: %+v", err)
-		return err
-	}
-	return nil
 }
 
 func (ss *GCPConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) *models.Checks {
@@ -124,4 +95,56 @@ func (ss *GCPConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg 
 		ErrorMsg:      ErrorMsg,
 		ResolutionMsg: ResolutionMsg,
 	}
+}
+
+type GCPUtils interface {
+	NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error)
+	DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error
+	ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error
+	NewUploader(ctx context.Context, obj *storage.ObjectHandle) error
+	BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error
+}
+
+func NewGCPUtils() *GCPUtilsImpl {
+	return &GCPUtilsImpl{}
+}
+
+type GCPUtilsImpl struct {
+}
+
+func (au *GCPUtilsImpl) NewSessionWithOptions(ctx context.Context, gsa *models.GcpServiceAccount) (*storage.Client, error) {
+	bx, _ := json.Marshal(gsa)
+	return storage.NewClient(ctx, option.WithCredentialsJSON(bx))
+}
+
+func (au *GCPUtilsImpl) NewUploader(ctx context.Context, uploadObject *storage.ObjectHandle) error {
+	wc := uploadObject.NewWriter(ctx)
+	_, err := fmt.Fprintf(wc, "test message")
+	if err != nil {
+		return err
+	}
+	return wc.Close()
+}
+
+func (au *GCPUtilsImpl) DeleteObject(ctx context.Context, obj *storage.ObjectHandle) error {
+	return obj.Delete(ctx)
+}
+
+func (au *GCPUtilsImpl) ListObjects(ctx context.Context, bucket *storage.BucketHandle, query *storage.Query) error {
+	it := bucket.Objects(ctx, query)
+	for attrs, err := it.Next(); err != iterator.Done; attrs, err = it.Next() {
+		if err != nil {
+			logrus.Errorf("Error listing the objects")
+			return err
+		}
+		fmt.Println("The bucket", attrs.Name)
+	}
+	return nil
+}
+
+func (au *GCPUtilsImpl) BucketAttributes(ctx context.Context, bucket *storage.BucketHandle) error {
+	if _, err := bucket.Attrs(ctx); err != nil {
+		return err
+	}
+	return nil
 }
