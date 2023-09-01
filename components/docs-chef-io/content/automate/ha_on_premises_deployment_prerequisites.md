@@ -79,6 +79,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 - Refer to [Performance Benchmarks](/automate/ha_performance_benchmarks) for more details on the hardware requirements.
 - Make sure the hardware requirement is not less than the recommended [Minimum Hardware Requirement](/automate/ha_on_premises_deployment_prerequisites/#minimum-hardware-requirement)
+- Contact your network manager setting up above per-requisites
 
 {{< /note >}}
 
@@ -149,6 +150,7 @@ Generate the certificates using recommended tools and supported algorithms and v
 
 
 To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
+
 
 ## Deployment Specific Pre-requisites
 
