@@ -200,6 +200,7 @@ The AWS deployment specific pre-requisites are as follows:
 -   The user's SSH key should be generated using algorithm `ed25519` without a passphrase.
 -   This SSH user should be a local Linux user on the Bastion machine.
 -   This SSH user should have sudo privileges on the Bastion machine.
+-   SSH user should have write permission in nodes.
 -   Use the SSH user to access all machines using the same SSH private key.
 
 ### Cluster Setup

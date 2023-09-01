@@ -178,6 +178,7 @@ The on-premises deployment specific pre-requisites are as follows:
 - The user's SSH key should be generated using algorithms `ed25519` and `RSA(2048)` without a passphrase.
 - This SSH user should be a local Linux user on all the machines.
 - This SSH user should have sudo privileges on all the machines.
+- SSH user should have write permission in nodes.
 - The SSH user should access all machines using the same SSH private key.
 
 ### Cluster Setup
