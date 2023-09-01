@@ -21,7 +21,7 @@ const routes: Routes = [
       {
         path: 'jobs',
         component: JobsListComponent,
-        canActivate : [MfeSessionService],
+        canActivate : [MfeSessionService]
       },
       {
         path: 'nodes',
