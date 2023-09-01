@@ -20,7 +20,3 @@ const (
 
 	GCP_CHECK_FILE_PREFIX = "gcp_check_test_"
 )
-
-const (
-	GCP_CHECK_FILE_PREFIX = "gcp_check_test_"
-)

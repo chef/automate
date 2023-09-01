@@ -126,7 +126,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
 		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
 		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l))).
-		AddGCSConfigService(gcpcloudstorageservice.NewGCPCloudStorageConfig(l, gcpcloudstorageservice.NewGCPUtils()))
+		AddGCSConfigService(gcpcloudstorageservice.NewGCPCloudStorageConfig(l))
+
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
