@@ -220,6 +220,7 @@ import {
 import { SigninService } from './services/signin/signin.service';
 import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-banner/manual-upgrade-banner.component';
 import { LicenseUsageService } from './services/license-usage/license-usage.service';
+import { MfeSessionService } from './services/mfe-session/mfe-session.service';
 
 
 @NgModule({
@@ -366,6 +367,7 @@ import { LicenseUsageService } from './services/license-usage/license-usage.serv
     LocalStorageService,
     ManagerRequests,
     MetadataService,
+    MfeSessionService,
     NodesRequests,
     NodeRunlistRequests,
     NotificationRuleRequests,
