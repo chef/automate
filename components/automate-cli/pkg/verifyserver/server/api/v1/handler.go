@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/fqdnservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/gcpcloudstorageservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/mockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
@@ -40,6 +41,7 @@ type Handler struct {
 	FirewallService              firewallservice.IFirewallService
 	ValidateCertificateService   certificatevalidation.IValidateCertificateService
 	SshUserCheckService          sshusercheckservice.SshUserCheckService
+	GCPConfigService             gcpcloudstorageservice.GCPCloudStorageConfig
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -127,5 +129,10 @@ func (h *Handler) AddCertificateValidation(vc certificatevalidation.IValidateCer
 
 func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUserCheckService) *Handler {
 	h.SshUserCheckService = ssu
+	return h
+}
+
+func (h *Handler) AddGCSConfigService(ss gcpcloudstorageservice.GCPCloudStorageConfig) *Handler {
+	h.GCPConfigService = ss
 	return h
 }
