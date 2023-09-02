@@ -139,7 +139,7 @@ func TestGetGCPConnection(t *testing.T) {
 		})
 
 		assert.Contains(t, services.ErrorMsg, constants.GCP_BUCKET_NOT_FOUND)
-		assert.Equal(t, services.ResolutionMsg, constants.GCP_BUCKET_NOT_FOUND_RESOLUTION_MSG)
+		assert.Equal(t, services.ResolutionMsg, constants.GCP_CONNECTION_RESOLUTION_GENERAL_MSG)
 	})
 
 	t.Run("success", func(t *testing.T) {

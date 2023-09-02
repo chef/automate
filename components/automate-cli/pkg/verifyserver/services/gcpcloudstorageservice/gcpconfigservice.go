@@ -46,7 +46,7 @@ func (ss *GCPConfigService) GetGCPConnection(ctx context.Context, req *models.GC
 	bucket := client.Bucket(ss.Req.BucketName)
 	err = ss.GCPUtils.BucketAttributes(ctx, bucket)
 	if err != nil {
-		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_NOT_FOUND).Error(), constants.GCP_BUCKET_NOT_FOUND_RESOLUTION_MSG, false)
+		return ss.Response(constants.GCP_CONNECTION_TITLE, "", errors.Wrap(err, constants.GCP_BUCKET_NOT_FOUND).Error(), constants.GCP_CONNECTION_RESOLUTION_GENERAL_MSG, false)
 	}
 
 	return ss.Response(constants.GCP_CONNECTION_TITLE, constants.GCP_CONNECTION_SUCCESS_MSG, "", "", true)
