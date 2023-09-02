@@ -20,6 +20,7 @@ const (
 	PORT_REACHABLE_API_PATH                  = "/api/v1/checks/port-reachable"
 	EXTERNAL_OPENSEARCH_API_PATH             = "/api/v1/checks/external-opensearch"
 	EXTERNAL_POSTGRESQL_API_PATH             = "/api/v1/checks/external-postgresql"
+	GCP_CLOUD_STORAGE_CONFIG_API_PATH        = "/api/v1/checks/gcp-cloud-storage-config"
 	STATUS_API_PATH                          = "/status"
 	START_MOCK_SERVER                        = "/api/v1/start/mock-server"
 	STOP_MOCK_SERVER                         = "/api/v1/stop/mock-server"
