@@ -709,7 +709,7 @@ func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(ips []string,
 	isError := false
 	for _, result := range copyResults {
 		if result.Error != nil {
-			c.writer.Errorf("Remote copying automate-verify CLI failed on node : %s with error: %v\n", result.HostIP, result.Error)
+			c.writer.Errorf("Copying to remote failed on node : %s with error: %v\n", result.HostIP, result.Error)
 			isError = true
 		}
 	}

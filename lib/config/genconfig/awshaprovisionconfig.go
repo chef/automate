@@ -314,7 +314,7 @@ func (c *AwsHaProvisionConfig) PromptPrivateSubnet() (err error) {
 }
 
 func (c *AwsHaProvisionConfig) PromptPublicSubnet() (err error) {
-	hasPublicSubnets, err := c.Prompt.Confirm("Create Public Subnets", "yes", "no")
+	hasPublicSubnets, err := c.Prompt.Confirm("Provide Public Subnets", "yes", "no")
 	if err != nil {
 		return
 	}
