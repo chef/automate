@@ -2119,7 +2119,7 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -2148,7 +2148,7 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -2185,7 +2185,7 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -2222,7 +2222,7 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -2259,7 +2259,7 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",

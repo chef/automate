@@ -30,4 +30,6 @@ const (
 	POSTGRESQL_TOML     = "postgresql.config.toml"
 	OPENSEARCH_TOML     = "opensearch.config.toml"
 	OCID_SHOW_APP       = "oc-id-show-app"
+	HOME_DIR            = "/home"
+	TMP_DIR             = "/tmp"
 )

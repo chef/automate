@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -587,12 +588,13 @@ func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckReque
 
 // Copies CLI binary to remote nodes
 func (v *verifyCmdFlow) copyCLIOnRemoteNodes(destFileName string, sshConfig sshutils.SSHConfig, hostIPs []string) error {
+	destDir := filepath.Join(HOME_DIR, sshConfig.SshUser)
 	v.Writer.Println("Copying automate-verify CLI to Other Nodes")
 	currentBinaryPath, err := v.SystemdCreateUtils.GetBinaryPath()
 	if err != nil {
 		return err
 	}
-	copyResults := v.SSHUtil.CopyFileToRemoteConcurrently(sshConfig, currentBinaryPath, destFileName, false, hostIPs)
+	copyResults := v.SSHUtil.CopyFileToRemoteConcurrently(sshConfig, currentBinaryPath, destFileName, destDir, false, hostIPs)
 	isError := false
 	for _, result := range copyResults {
 		if result.Error != nil {

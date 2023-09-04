@@ -41,8 +41,8 @@ type SSHUtilImpl struct {
 type SSHUtil interface {
 	Execute(sshConfig SSHConfig, cmd string) (string, error)
 	ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostIPs []string) []Result
-	CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool) error
-	CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []Result
+	CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool) error
+	CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result
 }
 
 type Result struct {
@@ -264,9 +264,9 @@ func (s *SSHUtilImpl) ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostI
 	return results
 }
 
-func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool) error {
+func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool) error {
 	cmd := "scp"
-	args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, fmt.Sprintf("%s@%s:/home/%s/%s", sshConfig.SshUser, sshConfig.HostIP, sshConfig.SshUser, destFileName)}
+	args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, fmt.Sprintf("%s@%s:%s/%s", sshConfig.SshUser, sshConfig.HostIP, destDir, destFileName)}
 	if err := s.Exec.Run(cmd, command.Args(args...)); err != nil {
 		s.logger.Errorf("Failed to copy file %s to remote with error: %v\n", srcFilePath, err)
 		if srcFilePath == "/usr/bin/chef-automate" {
@@ -285,7 +285,7 @@ func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, 
 	return nil
 }
 
-func (s *SSHUtilImpl) CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []Result {
+func (s *SSHUtilImpl) CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result {
 	resultChan := make(chan Result, len(hostIPs))
 
 	for _, hostIP := range hostIPs {
@@ -295,7 +295,7 @@ func (s *SSHUtilImpl) CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFileP
 		go func(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, resultChan chan Result) {
 			rc := Result{sshConfig.HostIP, "", nil}
 
-			err := s.CopyFileToRemote(sshConfig, srcFilePath, destFileName, removeFile)
+			err := s.CopyFileToRemote(sshConfig, srcFilePath, destFileName, destDir, removeFile)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
