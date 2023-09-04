@@ -8,9 +8,6 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
-	"google.golang.org/api/iterator"
-	"google.golang.org/api/option"
-
 	"cloud.google.com/go/storage"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -28,6 +25,11 @@ type GCPConfigService struct {
 	Logger   logger.Logger
 	Req      *models.GCPCloudStorageConfigRequest
 	GCPUtils GCPUtils
+}
+
+func NewGCPCloudStorageConfig(logger logger.Logger) GCPCloudStorageConfig {
+	return &GCPConfigService{
+		Logger:   logger,
 		GCPUtils: NewGCPUtils(logger),
 	}
 }
