@@ -81,7 +81,7 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -134,7 +134,7 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -186,7 +186,7 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -240,7 +240,7 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -297,7 +297,7 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -354,7 +354,7 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -585,7 +585,7 @@ func newMockVerifyCmdFlow(mockHttputils *httputils.MockHTTPClient, cw *majorupgr
 				},
 			}
 		},
-		CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+		CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 			return []sshutils.Result{
 				{
 					HostIP: "",

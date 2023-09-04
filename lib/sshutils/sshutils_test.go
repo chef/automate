@@ -31,8 +31,10 @@ const (
 	sessionCreationFailedError = "Session creation failed"
 	srcFilePath                = "/some/file/path"
 	destFileName               = "abc.txt"
+	destDir                    = "/home/ubuntu"
 	remoteCopyError            = "error while copying file to remote"
 	outputWithError            = "some error output"
+	HOME_DIR                   = "/Hom"
 )
 
 var sshConfig = sshutils.SSHConfig{
@@ -489,6 +491,7 @@ func TestCopyFileToRemote(t *testing.T) {
 		exec         command.Executor
 		srcFilePath  string
 		destFileName string
+		destDir      string
 		removeFile   bool
 		wantErr      error
 	}{
@@ -502,6 +505,7 @@ func TestCopyFileToRemote(t *testing.T) {
 			},
 			srcFilePath:  srcFilePath,
 			destFileName: destFileName,
+			destDir:      filepath.Join(HOME_DIR, sshConfig.SshUser),
 			removeFile:   false,
 			wantErr:      nil,
 		},
@@ -552,7 +556,7 @@ func TestCopyFileToRemote(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshUtil.Exec = tt.exec
-			err := sshUtil.CopyFileToRemote(tt.sshConfig, tt.srcFilePath, tt.destFileName, tt.removeFile)
+			err := sshUtil.CopyFileToRemote(tt.sshConfig, tt.srcFilePath, tt.destFileName, tt.destDir, tt.removeFile)
 			assert.Equal(t, err, tt.wantErr)
 		})
 	}
@@ -568,6 +572,7 @@ func TestCopyFileToRemoteConcurrently(t *testing.T) {
 		exec         command.Executor
 		srcFilePath  string
 		destFileName string
+		destDir      string
 		removeFile   bool
 		hostIPs      []string
 		wantErr      error
@@ -582,6 +587,7 @@ func TestCopyFileToRemoteConcurrently(t *testing.T) {
 			},
 			srcFilePath:  srcFilePath,
 			destFileName: destFileName,
+			destDir:      destDir,
 			removeFile:   false,
 			hostIPs:      []string{nodeIp1, nodeIp2, nodeIp3},
 			wantErr:      nil,
@@ -596,6 +602,7 @@ func TestCopyFileToRemoteConcurrently(t *testing.T) {
 			},
 			srcFilePath:  srcFilePath,
 			destFileName: destFileName,
+			destDir:      destDir,
 			removeFile:   false,
 			hostIPs:      []string{nodeIp1, nodeIp2, nodeIp3},
 			wantErr:      errors.New(remoteCopyError),
@@ -605,7 +612,7 @@ func TestCopyFileToRemoteConcurrently(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshUtil.Exec = tt.exec
-			results := sshUtil.CopyFileToRemoteConcurrently(tt.sshConfig, tt.srcFilePath, tt.destFileName, tt.removeFile, tt.hostIPs)
+			results := sshUtil.CopyFileToRemoteConcurrently(tt.sshConfig, tt.srcFilePath, tt.destFileName, tt.destDir, tt.removeFile, tt.hostIPs)
 			for _, result := range results {
 				if tt.wantErr != nil {
 					assert.ErrorContains(t, result.Error, tt.wantErr.Error())
