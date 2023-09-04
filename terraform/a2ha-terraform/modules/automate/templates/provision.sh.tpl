@@ -32,8 +32,8 @@ check_selinux() {
 
             # Change GRUB to Permissive
             sed -i 's/selinux=1/selinux=0/' /etc/default/grub
-            update-grub
-            echo "GRUB configuration updated to Permissive."
+            # update-grub
+            # echo "GRUB configuration updated to Permissive."
         # fi
 
         # SELinux not found in grub (Disabled or Permissive)
