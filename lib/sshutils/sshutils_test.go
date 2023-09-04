@@ -34,7 +34,7 @@ const (
 	destDir                    = "/home/ubuntu"
 	remoteCopyError            = "error while copying file to remote"
 	outputWithError            = "some error output"
-	HOME_DIR                   = "/Hom"
+	HOME_DIR                   = "/home"
 )
 
 var sshConfig = sshutils.SSHConfig{
