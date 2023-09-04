@@ -148,7 +148,7 @@ func executeConfigVerifyAndPromptConfirmationOnError(configFile string) error {
 	if err != nil {
 		fsu := fileutils.NewFileSystemUtils()
 		p := pmt.PromptFactory(os.Stdin, os.Stdout, fsu)
-		ok, err := p.Confirm("Config verification failed. Do you still wan to continue?", "yes", "no")
+		ok, err := p.Confirm("Config verification failed. Do you still want to continue?", "yes", "no")
 		if err != nil {
 			return status.Wrap(err, status.PromptFailed, err.Error())
 		}
