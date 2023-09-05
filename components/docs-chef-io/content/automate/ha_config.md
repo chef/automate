@@ -14,6 +14,10 @@ gh_repo = "automate"
 +++
 
 {{< note >}}
+{{% automate/ha-warn %}}
+{{< /note >}}
+
+{{< note >}}
 
 - All the nodes will apply the Frontend patch/set wherever the Postgresql and OpenSearch changes will be used to only one cluster node.
 - After patching/setting any configuration, certain services will restart. The time required for your services to regain stability may vary depending on the amount of data stored in your system.

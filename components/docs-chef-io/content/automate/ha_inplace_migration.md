@@ -12,9 +12,9 @@ identifier = "automate/deploy_high_availability/migration/ha_inplace_migration.m
 weight = 200
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 {{< warning >}}
 

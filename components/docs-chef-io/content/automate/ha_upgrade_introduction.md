@@ -12,9 +12,9 @@ gh_repo = "automate"
     weight = 70
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 Steps to upgrade the Chef Automate HA are as shown below:
 

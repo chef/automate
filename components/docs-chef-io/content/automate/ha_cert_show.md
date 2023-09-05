@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 200
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 Certificates can be viewed for different services using below commands.
 

@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 230
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate for your domain.
 

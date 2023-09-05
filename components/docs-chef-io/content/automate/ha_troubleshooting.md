@@ -10,9 +10,9 @@ gh_repo = "automate"
     weight = 132
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) functionality and the steps to resolve them.
 
