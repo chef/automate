@@ -305,7 +305,7 @@
   location = "gcs"
 [global.v1.backups.gcs.bucket]
   name = "<%= overrides[:bucket_name] %>"
-  base_path = "elasticsearch"
+  base_path = "automate"
 [global.v1.backups.gcs.credentials]
   json = '''
 <%=  File.read(File.join(overrides[:tmp_path], "googleServiceAccount.json")) %>
