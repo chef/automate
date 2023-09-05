@@ -37,7 +37,7 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.Ch
 			trigger.SkippedTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.SKIP_OS_BUCKET_TEST_SELF_MANAGED_MESSAGE),
 		}
 	}
-	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {
+	if isEmptyExternalOS(config.ExternalOS) && isObjectStorage(config.Backup) {
 		return []models.CheckTriggerResponse{
 			trigger.ErrTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.OBJECT_STORAGE_MISSING),
 		}
