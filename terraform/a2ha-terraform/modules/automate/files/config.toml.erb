@@ -189,7 +189,7 @@
 [teams.v1.sys.service]
   port = <%= overrides[:teams_port] %>
 <% end %>
-### Below is only for S3
+### Below is only for S3 and for onprem 
 <% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "s3" -%>
 [global.v1.external.opensearch.backup]
   enable = true
@@ -253,6 +253,7 @@
   base_path = "automate"
 <% end %>
 
+
 <% if overrides[:backup_config_efs] == "true" -%>
 [global.v1.external.opensearch.backup]
   enable = true
@@ -284,7 +285,8 @@
 
 [erchef.v1.sys.keygen]
   cache_size=10
-
+  
+##### GCP 
 ### Below is only for GCP 
 <% if overrides[:backup_config_s3] == "true"  && overrides[:location] == "gcs" -%>
 [global.v1.external.opensearch.backup]
@@ -303,10 +305,67 @@
   location = "gcs"
 [global.v1.backups.gcs.bucket]
   name = "<%= overrides[:bucket_name] %>"
-  base_path = "elasticsearch"
+  base_path = "automate"
 [global.v1.backups.gcs.credentials]
   json = '''
 <%=  File.read(File.join(overrides[:tmp_path], "googleServiceAccount.json")) %>
 '''
+<% end %>
+########################
+
+### Below is only for AWS infra value will be deployment for aws and infra = "existing_infra" in onprem 
+<% if overrides[:backup_config_s3] == "true"  && overrides[:infra] == "deployment" -%>
+[global.v1.external.opensearch.backup]
+  enable = true
+  location = "s3"
+[global.v1.external.opensearch.backup.s3]
+  # bucket (required): The name of the bucket
+  bucket = "<%= overrides[:bucket_name] %>"
+
+  # base_path (optional):  The path within the bucket where backups should be stored
+  # If base_path is not set, backups will be stored at the root of the bucket.
+  base_path = "elasticsearch"
+
+  # name of an s3 client configuration you create in your elasticsearch.yml
+  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
+  # for full documentation on how to configure client settings on your
+  # Elasticsearch nodes
+  client = "default"
+
+[global.v1.external.opensearch.backup.s3.settings]
+  region = "<%= overrides[:aws_region] %>"
+  role_arn = "<%= services[:opensearch][:aws_os_snapshot_role_arn] %>"
+  ## The meaning of these settings is documented in the S3 Repository Plugin
+  ## documentation. See the following links:
+  ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
+
+  ## Backup repo settings
+  # compress = false
+  # server_side_encryption = false
+  # buffer_size = "100mb"
+  # canned_acl = "private"
+  # storage_class = "standard"
+  ## Snapshot settings
+  # max_snapshot_bytes_per_sec = "40mb"
+  # max_restore_bytes_per_sec = "40mb"
+  # chunk_size = "null"
+  ## S3 client settings
+  # read_timeout = "50s"
+  # max_retries = 3
+  # use_throttle_retries = true
+  # protocol = "https"
+
+[global.v1.backups]
+  location = "s3"
+  [global.v1.backups.s3.bucket]
+  # name (required): The name of the bucket
+  name = "<%= overrides[:bucket_name] %>"
+
+  # endpoint (required): The endpoint for the region the bucket lives in.
+  endpoint = "<%= overrides[:s3_endpoint] %>"
+
+  # base_path (optional):  The path within the bucket where backups should be stored
+  # If base_path is not set, backups will be stored at the root of the bucket.
+  base_path = "automate"  
 <% end %>
 
