@@ -87,7 +87,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 - Refer to [Performance Benchmarks](/automate/ha_performance_benchmarks) for more details on the hardware requirements.
 - Make sure the hardware requirement in not lesser than the recommended [Minimum Hardware Requirement](/automate/ha_aws_deployment_prerequisites/#minimum-hardware-requirement)
-- Contact your network manager setting up above per-requisites
+- Contact your network manager to set up the above pre-requisites.
 
 {{< /note >}}
 
@@ -172,7 +172,7 @@ The AWS deployment specific pre-requisites are as follows:
 -   Three private and three public subnets in a VPC (1 subnet for each AZ) are needed. As of now, only dedicated subnets for each AZ are supported.
 -   It is recommended to create a new VPC.
 -   Bastion must be in the same VPC for deployment.
--   It is recomended to use subnet ids over CIDR, CIDR will only work if VPC have sufficent range available to create new subnets.
+-   It is recommended to use subnet IDs over CIDR, CIDR will only work if VPC has sufficient range available to create new subnets.
 -   **In AWS Managed Services:**
     -   Setup [AWS RDS PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
     -   Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
