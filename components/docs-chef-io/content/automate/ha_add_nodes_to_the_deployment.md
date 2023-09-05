@@ -13,6 +13,13 @@ gh_repo = "automate"
 
 Chef Automate HA comes with five different types of deployment flows. This page tells you how to add more nodes to your deployment processes.
 
+{{< note >}}
+
+- **If the SELinux config is enabled**, make sure to set it to Permissive (Usually in case of RHEL SELinux is enabled). If the config is `enforced` automate node will throw error, and verify flow will fail.
+- For AWS infrastructure, the same is handled internally during deployment
+
+{{< /note >}}
+
 ## Add more Nodes to the OnPremises Deployments
 
 In this section, we will see how to add more nodes to the on-premises deployment for all the databases, i.e., Chef Managed, AWS Managed and Customer Managed Database.
@@ -127,6 +134,7 @@ Once the command executes, it will add the supplied nodes to your automated setu
 
 - If you have patched some external config to any existing services, apply the same on the new nodes. For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
 - The new node will be configured with the certificates already configured in your HA setup.
+
 {{< /note >}}
 
 {{< warning >}}
