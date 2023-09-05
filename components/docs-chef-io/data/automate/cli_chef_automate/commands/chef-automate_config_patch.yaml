@@ -55,7 +55,7 @@ options:
   usage: Patch toml configuration to the postgresql node
   compatible_with_options: AutomateHA
 - name: wait-timeout
-  default_value: "180"
+  default_value: "600"
   usage: |
     This flag sets the operation timeout duration (in seconds) for each individual node during the config patch process
   compatible_with_options: AutomateHA

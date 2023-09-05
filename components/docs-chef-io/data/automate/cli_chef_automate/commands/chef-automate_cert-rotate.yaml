@@ -49,7 +49,7 @@ options:
 - name: root-ca
   usage: RootCA certificate
 - name: wait-timeout
-  default_value: "180"
+  default_value: "600"
   usage: |
     This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process
 inherited_options:
