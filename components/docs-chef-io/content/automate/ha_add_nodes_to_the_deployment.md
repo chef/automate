@@ -77,9 +77,9 @@ For example, if you have patched any external configurations like SAML or LDAP o
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-## Add more Nodes In AWS Deployment with AWS Managed Database
+## Add more Nodes In AWS Deployment with Chef Managed Database
 
-In this section, we will see how to add more nodes to the AWS deployment for AWS managed database.
+In this section, we will see how to add more nodes to the AWS deployment for Chef managed database.
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
 
@@ -133,9 +133,9 @@ Once the command executes, it will add the supplied nodes to your automated setu
 Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
 {{< /warning >}}
 
-## Add more nodes In AWS Deployment with Chef Managed Database
+## Add more nodes In AWS Deployment with AWS Managed Database
 
-In this section, we will see how to add more nodes to the AWS deployment for Chef managed database.
+In this section, we will see how to add more nodes to the AWS deployment for AWS managed database.
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
 
@@ -148,5 +148,5 @@ The commands require some arguments so that it can determine which types of node
 - To add three nodes to the chef-server, run the following command:
 
     ```sh
-        chef-automate node add --chef-server-count 3
+    chef-automate node add --chef-server-count 3
     ```
