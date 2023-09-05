@@ -703,6 +703,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 
 // copyAndExecuteConcurrently will copy the toml file to each required nodes concurrently and then execute the set of commands.
 func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(ips []string, sshConfig sshutils.SSHConfig, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
+	ips = uniqueIps(ips)
 	sshConfig.Timeout = flagsObj.timeout
 	copyResults := c.sshUtil.CopyFileToRemoteConcurrently(sshConfig, fileName, remoteService+timestamp, TMP_DIR, false, ips)
 	isError := false
@@ -1137,4 +1138,16 @@ func (c *certRotateFlow) getMerger(fileName string, timestamp string, remoteType
 	}
 
 	return tomlFile, nil
+}
+
+func uniqueIps(ips []string) []string {
+	var uniqueIps []string
+	mp := make(map[string]bool)
+	for _, ip := range ips {
+		mp[ip] = true
+	}
+	for ip := range mp {
+		uniqueIps = append(uniqueIps, ip)
+	}
+	return uniqueIps
 }
