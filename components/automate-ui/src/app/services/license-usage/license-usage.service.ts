@@ -90,14 +90,14 @@ export class LicenseUsageService {
 
   constructPayload() {
     const data = {
-      'license_id': this.licenseId,
+      'licenseId': this.licenseId,
       'customerId': this.customerId,
       'expiration': this.expiration,
       'customerName': this.customerName,
-      'metaData': {
+      'metadata': {
         'Automate': {
-             'instanceId': this.deploymentId,
-             'deploymentType': this.deploymentType
+          'instanceId': this.deploymentId,
+          'deploymentType': this.deploymentType
         }
       },
       'periods': [{
@@ -109,13 +109,13 @@ export class LicenseUsageService {
         },
         'summary': {
           'nodes': {
-            'total': this.totalNodes
+            'total': parseInt(this.totalNodes, 10)
           },
           'scans': {
-            'targets': this.totalScans
+            'targets': parseInt(this.totalScans, 10)
           },
-          'service': {
-            'targets': this.totalService
+          'services': {
+            'targets': parseInt(this.totalService, 10)
           }
         }
       }],
