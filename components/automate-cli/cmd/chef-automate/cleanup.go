@@ -171,7 +171,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 					return err
 				}
 				// Modify tf state or remove bucket based in "--force" arg
-				writer.Printf("%v", len(appendString) > 0)
+				// writer.Printf("%v", len(appendString) > 0)
 				if len(appendString) > 0 {
 					err = executeCommand("/bin/sh", []string{"-c", appendString}, "")
 					if err != nil {

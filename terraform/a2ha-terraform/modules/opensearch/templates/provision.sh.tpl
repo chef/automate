@@ -2,6 +2,54 @@
 
 set -Eeuo pipefail
 
+# Function to check SELinux status and mode
+check_selinux() {
+    # Check if /etc/selinux exists (common to RHEL, CentOS, Fedora)
+    if [ -e /etc/selinux/config ]; then
+        echo "SELinux configuration file found."
+
+        # Check for SELinux status and mode
+        selinux_status=$(getenforce)
+        selinux_mode=$(awk -F= '/^SELINUX=/ {print $2}' /etc/selinux/config)
+
+        echo "SELinux Status: $selinux_status"
+        echo "SELinux Mode: $selinux_mode"
+
+        # If SELinux is enabled (Enforcing), set it to Permissive
+        if [ "$selinux_status" == "Enforcing" ]; then
+            echo "SELinux is currently in Enforcing mode. Changing to Permissive..."
+            setenforce Permissive
+            echo "SELinux mode set to Permissive."
+        fi
+
+    # Check if /etc/selinux does not exist (common to Debian, Ubuntu)
+    elif [ -e /etc/default/grub ]; then
+        echo "SELinux configuration file not found."
+
+        # Check if "selinux=1" is present in grub (Enforcing)
+        if grep -q "selinux=1" /etc/default/grub; then
+            echo "SELinux is enabled (Enforcing) in GRUB."
+
+            # Change GRUB to Permissive
+            sed -i 's/selinux=1/selinux=0/' /etc/default/grub
+            # update-grub
+            # echo "GRUB configuration updated to Permissive."
+        # fi
+
+        # SELinux not found in grub (Disabled or Permissive)
+        else
+            echo "SELinux is not found or is already disabled in GRUB."
+        fi
+
+    # SELinux configuration file not found (SUSE, Amazon Linux, etc.)
+    else
+        echo "SELinux configuration file not found."
+    fi
+}
+
+# Check SELinux
+check_selinux
+
 umask 0022
 
 export HAB_NONINTERACTIVE=true
