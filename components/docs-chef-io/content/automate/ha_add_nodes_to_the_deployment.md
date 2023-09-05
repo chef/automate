@@ -13,12 +13,12 @@ gh_repo = "automate"
 
 Chef Automate HA comes with five different types of deployment flows. This page tells you how to add more nodes to your deployment processes.
 
-{{< node >}}
+{{< note >}}
 
 - **If the SELinux config is enabled**, make sure to set it to Permissive (Usually in case of RHEL SELinux is enabled). If the config is `enforced` automate node will throw error, and verify flow will fail.
 - For AWS infrastructure, the same is handled internally during deployment
 
-{{< /node >}}
+{{< /note >}}
 
 ## Add more Nodes to the OnPremises Deployments
 
