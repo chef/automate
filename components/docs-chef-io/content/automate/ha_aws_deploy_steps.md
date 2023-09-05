@@ -70,7 +70,7 @@ Run the following steps on Bastion Host Machine:
 
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
 
-    `chef-automate init-config-ha existing_infra`{{< /note >}}
+    `chef-automate init-config-ha aws`{{< /note >}}
 
 ## Steps to Provision
 

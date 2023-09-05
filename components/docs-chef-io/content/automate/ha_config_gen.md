@@ -35,10 +35,10 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 
 ## SSH User and Group
 
-- `ssh user name` user name to ssh to cluster instances Example `~/.ssh/my-key.pem`.
+- `ssh user name` user name to ssh to cluster instances.
 - `ssh group name` group name which is associated with ssh user.
 - `ssh port no` port to do ssh, default is 22 incase you have different port then provide the ssh port number.
-- `ssh key file path` ssh key file path, same will be used to ssh to cluster instances.
+- `ssh key file path` ssh key file path, same will be used to ssh to cluster instances Example `~/.ssh/my-key.pem`.
 
 ## Automate Load Balancer FQDN
 
