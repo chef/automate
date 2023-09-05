@@ -292,6 +292,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	if objectStorageConfig.Location == AWS_S3 {
 		c.Backup = &Backup{
 			ObjectStorage: &ObjectStorage{
+				Location:   objectStorageConfig.Location,
 				BucketName: objectStorageConfig.BucketName,
 				AWSRegion:  objectStorageConfig.Region,
 				AccessKey:  objectStorageConfig.AccessKey,
@@ -302,6 +303,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 	} else if objectStorageConfig.Location == GCP_CLOUD_STORAGE {
 		c.Backup = &Backup{
 			ObjectStorage: &ObjectStorage{
+				Location:                 objectStorageConfig.Location,
 				BucketName:               objectStorageConfig.BucketName,
 				GoogleServiceAccountFile: objectStorageConfig.GoogleServiceAccountFile,
 				GcpServiceAccount: &GcpServiceAccount{

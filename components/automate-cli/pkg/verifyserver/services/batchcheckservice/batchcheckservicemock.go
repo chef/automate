@@ -406,3 +406,29 @@ func SetupMockSystemUserCheck() trigger.ICheck {
 		},
 	}
 }
+
+type MockGCPBackupConfigCheck struct {
+	GCPBackupConfigCheckFunc  func(config *models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockGCPBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	return mss.GCPBackupConfigCheckFunc(config)
+}
+
+func (mss *MockGCPBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
+}
+
+func SetupMockGCPBackupConfigCheck() trigger.ICheck {
+	return &MockGCPBackupConfigCheck{
+		GCPBackupConfigCheckFunc: func(config *models.Config) []models.CheckTriggerResponse {
+			m := []models.CheckTriggerResponse{}
+			return m
+		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
+	}
+}
