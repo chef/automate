@@ -88,8 +88,7 @@ For Centos or Redhat :
       # Here, we have taken an example DNS: chefautomate.example.com
       server_name chefautomate.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
-      # If you want to use letsencript certificates, you can use the certBot
-      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # If you want to use letsencript certificates, you can use the certBot, This URL have reference instructions https://certbot.eff.org/instructions
       ssl_certificate /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefautomate.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -126,8 +125,7 @@ For Centos or Redhat :
       # Here, we have taken an example DNS: chefinfraserver.example.com
       server_name chefinfraserver.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
-      # If you want to use letsencript certificates, you can use the certBot
-      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # If you want to use letsencript certificates, you can use the certBot, This URL have reference instructions https://certbot.eff.org/instructions
       ssl_certificate /etc/letsencrypt/live/chefinfraserver.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -304,8 +302,7 @@ For Centos or Redhat :
       # Here, we have taken an example DNS: chefautomate.example.com
       server_name chefautomate.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
-      # If you want to use letsencript certificates, you can use the certBot
-      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # If you want to use letsencript certificates, you can use the certBot, This URL have reference instructions https://certbot.eff.org/instructions
       ssl_certificate /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefautomate.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -361,8 +358,7 @@ For Centos or Redhat :
       # Here, we have taken an example DNS: chefinfraserver.example.com
       server_name chefinfraserver.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
-      # If you want to use letsencript certificates, you can use the certBot
-      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # If you want to use letsencript certificates, you can use the certBot, This URL have reference instructions https://certbot.eff.org/instructions
       ssl_certificate /etc/letsencrypt/live/chefinfraserver.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
