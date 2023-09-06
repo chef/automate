@@ -49,13 +49,13 @@ See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-b
 
 ## Steps to Deploy
 
-Continue with the deployment after generating the config. The deployment command will run the verify command internally
+The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during depoly command use `--skip-verify` flag
 
 ```bash
   chef-automate deploy config.toml --airgap-bundle automate.aib
 ```
 
-If we want to skip verficiation in the deployment command we can use `--skip-verify` flag
+To skip verficiation in the deploy command, use `--skip-verify` flag
 ```bash
   chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
 ```
