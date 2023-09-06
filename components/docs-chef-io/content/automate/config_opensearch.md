@@ -361,8 +361,8 @@ To increase max heap size:
 maxHeapsize = "2g"
 ```
 
-- Run the patch command `chef-automate config patch log.toml --os` to apply the patch.
+- Run the patch command `chef-automate config patch heap.toml --os` to apply the patch.
 
 ### Centralized Logs
 
-Take a tour of the main page to know about [Centralized logs]((/automate/centralizing_log/)).
+Take a tour of the main page to know about [Centralized logs](/automate/centralizing_log/).

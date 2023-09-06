@@ -178,11 +178,11 @@ To increase the log level to DEBUG1:
 - Create a log.toml file with the below contents on bastion:
 
 ```toml
-log_level = "DEBUG1"
+log_level = "DEBUG"
 ```
 
 - Run the patch command `chef-automate config patch log.toml --pg` to apply the patch.
 
 ### Centralized Logs
 
-Take a tour of the main page to know about [Centralized logs]((/automate/centralizing_log/)).
+Take a tour of the main page to know about [Centralized logs](/automate/centralizing_log/).
