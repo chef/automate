@@ -22,6 +22,12 @@ Chef Automate HA comes with five different types of deployment flows. This page 
 
 {{< /warning >}}
 
+{{< note >}}
+
+- The flags like `opensearch-ips` and `postgresql-ips` are only applicable for the Chef Managed Database cluster
+
+{{< /note >}}
+
 ## Remove Single Node From Cluster on On-Premises Deployment
 
 In this section, we will see how to remove single nodes from cluster on the on-premises deployment for all the databases, i.e., Chef Managed, AWS Managed and Customer Managed Database.
