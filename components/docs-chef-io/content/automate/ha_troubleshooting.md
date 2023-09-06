@@ -110,42 +110,6 @@ Execute the following command to grant permission to the user.
 sudo chef-automate backup fix-repo-permissions <path>
 ```
 
-### Issue: Longer Time in Executing Command ./scripts/credentials set ssl
-
-The `./scripts/credentials set ssl` command stuck, and could not locate the HAB license.
-
-#### Solution
-
-Press *ctrl + c*, export the HAB license and execute the `./scripts/credentials set ssl` command.
-
-### Issue: Deployment Fails Repeatedly Due to Unhealthy Status
-
-The deployment repeatedly fails due to unhealthy status when you execute the command `./chef-automate deploy config.toml`.
-
-![Deployment Error](/images/automate/ha_faq_deployfail.png)
-
-#### Solution
-
-Follow the steps to fix the above issue:
-
-- SSH into all frontends (Chef Automate HA and Chef Server)
-- Remove the */hab* directory from all frontend nodes.
-- Remove all the files from the */var/tmp* folder of all frontend nodes.
-
-```bash
-rm -rf hab && cd /var/tmp && rm -rf
-sudo kill -9 $(sudo lsof -t -i:9631)
-sudo kill -9 $(sudo lsof -t -i:9638)
-```
-
-- Execute the *terraform destroy* command to remove the deployment.
-
-```bash
-for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy;cd $i;done
-```
-
-- Re-run the deployment command: `./chef-automate deploy config.toml`.
-
 ### Issue: bootstrap.abb scp Error
 
 While trying to deploy Chef Automate HA multiple times on the same infrastructure, the *bootstrap.abb* file is not created again as a state entry from past deployment blocks the creation.
