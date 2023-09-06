@@ -52,16 +52,14 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 1. Generate config with relevant data using the below command:
 
     ```bash
-    sudo -- sh -c "
     chef-automate config gen config.toml
-    "
     ```
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
 
-    `chef-automate init-config-ha aws`{{< /note >}}
+    chef-automate init-config-ha aws{{< /note >}}
 
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
@@ -72,13 +70,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 1. Continue with the deployment after generating the config:
 
     ```bash
-    #Run commands as sudo.
-    sudo -- sh -c "
-    #Print data in the config
-    cat config.toml
-    #Run provision command to deploy `automate.aib` with set `config.toml`
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
-    "
     ```
 
 {{< note >}}
@@ -101,13 +93,13 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 ## Steps to deploy
 
-1. The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during depoly command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during deploy command use `--skip-verify` flag
 
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
-   To skip verficiation in the deploy command, use `--skip-verify` flag
+   To skip verification in the deploy command, use `--skip-verify` flag
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
@@ -184,7 +176,7 @@ After successful deployment, proceed with following:
 
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Sample Config
 

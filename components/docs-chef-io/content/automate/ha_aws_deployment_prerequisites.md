@@ -245,7 +245,7 @@ Things to keep in mind while upgrading are:
 ## Disaster Recovery
 
 Chef Automate HA supports disaster recovery in active/passive mode. The primary cluster will be in active mode, and the disaster recovery cluster will be in passive mode.
-Active/Active Disaster Recovery is not supported right now as we do not support streaming of data across clusters and automatic failover switching of clusters.
+Active/Active Disaster Recovery is not supported right now as we do not support streaming of data across clusters and automatic fail over switching of clusters.
 
 The requirements for disaster recovery setup (Active/Passive) are:
 

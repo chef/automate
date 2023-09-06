@@ -14,8 +14,8 @@ The Chef Infra Server stores cookbooks, the policies that are applied to nodes, 
 
 {{< note >}}
 
-- If you are swtiching for exsiting cookbooks,there will be some data loss. You will not be able to download or upload the exisiting cookbooks after adding config.
-- This is stictly recommended to add the config at the time of setting up infra server.
+- If you are swtiching for existing cookbooks, there will be some data loss. You will not be able to download or upload the existing cookbooks after adding config.
+- This is strictly recommended to add the config at the time of setting up infra server.
 
 {{< /note >}}
 

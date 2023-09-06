@@ -48,11 +48,11 @@ This service provides policy information to the rest of the system derived from 
 
 ### AuthZ Service
 
-This service provides the API to determine which actions a requestor is allowed to take on in Chef Automate.
+This service provides the API to determine which actions a requester is allowed to take on in Chef Automate.
 
 ### AuthN Service
 
-This service provides the API to verify a requestor is allowed to interact with Chef Automate.
+This service provides the API to verify a requester is allowed to interact with Chef Automate.
 
 ### Teams Service
 

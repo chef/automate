@@ -13,16 +13,22 @@ gh_repo = "automate"
 
 Chef Automate HA comes with five different types of deployment flows. This page tells you how to add more nodes to your deployment processes.
 
+{{< warning >}}
+
+- **If the SELinux config is enabled**, make sure to set it to `Permissive` (Usually in the case of RHEL, SELinux is enabled). If the config is `enforced`, the Automate node will throw error, and the verify flow will fail.
+- During deployment, the same will be handled internally
+
+{{< /warning >}}
+
 {{< note >}}
 
-- **If the SELinux config is enabled**, make sure to set it to `Permissive` (Usually in case of RHEL SELinux is enabled). If the config is `enforced` automate node will throw error, and verify flow will fail.
-- During deployment the same will be handled internally
+- The flags like `opensearch-ips` and `postgresql-ips` are only applicable for the Chef Managed Database cluster
 
 {{< /note >}}
 
 ## Add more Nodes to the OnPremises Deployments
 
-In this section, we will see how to add more nodes to the on-premises deployment for all the databases, i.e., Chef Managed, AWS Managed and Customer Managed Database.
+In this section, we will see how to add more nodes to the on-premises deployment for all the databases, i.e., Chef Managed, AWS Managed, and Customer Managed Database.
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
 
@@ -39,6 +45,8 @@ For example,
     ```sh
     chef-automate node add --chef-server-ips 10.1.2.23,10.0.1.42
     ```
+
+
 
 - To add nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, run the following command:
 
@@ -68,21 +76,19 @@ You can mix and match different services to add nodes across various services.
 
 {{< note >}}
 
-- For **Minimum node cluster**, as the backend services(OpenSearch and PostgresQL)are running in same machine, to add node make sure to add both services in same command
+- For the **Minimum node cluster**, as the backend services (OpenSearch and PostgreSQL) are running in the same machine, to add a node make sure to add both services in the same command
 Eg: `chef-automate node add --postgresql-ips 10.0.1.42 --opensearch-ips 10.0.1.42`
-Notice, both OpenSearch and PostgresQL IPs are same
-- Similarly for fronend services(Automate and Chef Server) ,add both services in same command with same IPs
+Notice, both OpenSearch and PostgreSQL IPs are same
+- Similarly for frontend services (Automate and Chef Server), add both services in the same command with the same IPs
 Eg: `chef-automate node add --automate-ips 10.0.1.52 --chef-server-ips 10.0.1.52`
 {{< /note >}}
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
 
-- Make sure to update your loadbalancer configuration with the IP address of the new node. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
+- Make sure to update your load-balancer configuration with the IP address of the new node. For reference, check the [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
 {{< note >}}
 
-- If you have patched some external config to any existing services, then apply the same on the new nodes.
-For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
 - The new node will be configured with the certificates already configured in your HA setup.
 - If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
 - If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
@@ -95,7 +101,7 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 
 ## Add more Nodes In AWS Deployment with Chef Managed Database
 
-In this section, we will see how to add more nodes to the AWS deployment for Chef managed database.
+In this section, we will see how to add more nodes to the AWS deployment for the Chef managed database.
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
 
@@ -141,18 +147,21 @@ Once the command executes, it will add the supplied nodes to your automated setu
 
 {{< note >}}
 
-- If you have patched some external config to any existing services, apply the same on the new nodes. For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
-- The new node will be configured with the certificates already configured in your HA setup.
+- The new node will be configured with the certificates that are already configured in your HA setup.
+- If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
+- If you want to change the certificates for the new nodes, you can manually run the chef-automate cert-rotate [options] command.
 
 {{< /note >}}
 
 {{< warning >}}
+
 Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
+
 {{< /warning >}}
 
 ## Add more nodes In AWS Deployment with AWS Managed Database
 
-In this section, we will see how to add more nodes to the AWS deployment for AWS managed database.
+This section will show how to add more nodes to the AWS deployment for the AWS managed database.
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. When you run the command, it needs the count of the nodes you want to add as an argument. For example,
 

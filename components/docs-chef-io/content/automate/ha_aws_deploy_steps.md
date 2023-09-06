@@ -62,29 +62,21 @@ Run the following steps on Bastion Host Machine:
 1. Generate config with relevant data using the below command:
 
     ```bash
-    sudo -- sh -c "
     chef-automate config gen config.toml
-    "
     ```
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
     {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
 
-    `chef-automate init-config-ha aws`{{< /note >}}
+    chef-automate init-config-ha aws{{< /note >}}
 
 ## Steps to Provision
 
 1. Continue with the provisioning of the infra after generating the config:
 
     ```bash
-    #Run commands as sudo.
-    sudo -- sh -c "
-    #Print data in the config
-    cat config.toml
-    #Run provision command to deploy `automate.aib` with set `config.toml`
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
-    "
     ```
 
     {{< note >}}
@@ -105,24 +97,19 @@ Run the following steps on Bastion Host Machine:
 
 ## Steps to Deploy
 
-1. The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during depoly command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
 
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
-   To skip verficiation in the deploy command, use `--skip-verify` flag
+   To skip verification in the deploy command, use `--skip-verify` flag
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
 ## Verify Deployment
 
-1. Once the deployment is successful, Get the consolidate status of the cluster
-
-    ```bash
-     chef-automate status summary
-    ```
 1. Once the deployment is successful, Get the consolidate status of the cluster
 
     ```bash
@@ -147,7 +134,7 @@ Run the following steps on Bastion Host Machine:
      chef-automate info
     ```
 
-1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`. If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
+1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`. If you want to change the FQDN URL from the load balancer URL to some other FQDN URL, then use the below template.
 
 - Create a file `a2.fqdn.toml`
 
@@ -187,7 +174,7 @@ After successful deployment, proceed with following:
 
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Sample Config
 

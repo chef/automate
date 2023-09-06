@@ -36,7 +36,7 @@ In the above approach, there will be two identical clusters
 
 The primary cluster will be active and regular backups will be performed using `chef-automate backup create`. At the same time, the disaster recovery cluster will be restoring the latest backup data using `chef-automate backup restore`.
 
-When the primary cluster fails, accomplish the failover by updating DNS records to the DR cluster Load balancer.
+When the primary cluster fails, accomplish the fail-over by updating DNS records to the DR cluster Load balancer.
 
 ### Caveat with the above approach
 

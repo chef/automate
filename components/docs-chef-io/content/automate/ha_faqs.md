@@ -21,31 +21,31 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 ## Frequently Asked Questions
 
 ### How to check logs For automate nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+- To view the logs please do ssh to the respective node by running the command from bastion node 
 `./chef-automate ssh --hostname a2`
 
-- choose the Instace based on the output. To view the logs run the command 
+- choose the instance based on the output. To view the logs run the command 
 `journalctl --follow --unit chef-automate` 
 
 ### How to check logs For Chef Infra Server nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+- To view the logs please do ssh to the respective node by running the command from bastion node 
 `./chef-automate ssh --hostname cs`
 
-- choose the Instace based on the output. To view the logs run the command 
+- choose the instance based on the output. To view the logs run the command 
 `journalctl --follow --unit chef-automate` 
 
 ### How to check logs For Postgres nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+- To view the logs please do ssh to the respective node by running the command from bastion node 
 `./chef-automate ssh --hostname pg`
 
-- choose the Instace based on the output. To view the logs run the command 
+- choose the instance based on the output. To view the logs run the command 
 `journalctl --follow --unit hab-sup` 
 
 ### How to check logs For Opensearch nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+- To view the logs please do ssh to the respective node by running the command from bastion node 
 `./chef-automate ssh --hostname os`
 
-- choose the Instace based on the output. To view the logs run the command 
+- choose the instance based on the output. To view the logs run the command 
 `journalctl --follow --unit hab-sup` 
 
 ### How to Pass the custom config for the Frontend node (Automate / ChefInfraServer)?
@@ -121,7 +121,7 @@ Set *log-level* debug using the command `chef-automate debug set-log-level deplo
 
 ### How to perform infrastructure cleanup for AutomateHA nodes
 
-Execute the following commands from bastion host as per your deployment to perfom infrastructure cleanup
+Execute the following commands from bastion host as per your deployment to perform infrastructure cleanup
 
 for AWS deployment
 ```bash
@@ -141,7 +141,7 @@ This section includes commands that you can execute for the Chef Automate cluste
 
 ### Log Check Commands
 
-The Chef Automate frontend and backend nodes service logs are available via `journalctl` from each node. You can identify the service by the name in the generated output preceding with the logline.
+The Chef Automate frontend and backend nodes service logs are available via `journalctl` from each node. You can identify the service by the name in the generated output preceding with the log line.
 
 - Execute the following command, `journalctl --follow --unit hab-sup`, to view the backend logs related to all hab services.
 

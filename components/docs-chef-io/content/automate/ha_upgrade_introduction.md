@@ -47,7 +47,7 @@ Steps to upgrade the Chef Automate HA are as shown below:
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends
   ```
 
-- To upgrade full Chef Automate HA System run this command from Bation Host: 
+- To upgrade full Chef Automate HA System run this command from Bastion Host: 
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib
   ```
@@ -68,10 +68,10 @@ Steps to upgrade the Chef Automate HA are as shown below:
     chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends --auto-approve
   ```
 
-Upgrade will also check for new version of bastion workspace, if new version is available, it will promt for a confirmation for workspace upgrade before upgrading the Frontend or backend nodes, 
+Upgrade will also check for new version of bastion workspace, if new version is available, it will prompt for a confirmation for workspace upgrade before upgrading the Frontend or backend nodes, 
 
 In case of yes, it will do workspace upgrade and no will skip this.
-We can also pass a flag in upgade command to avoid prompt for workspace upgrade. 
+We can also pass a flag in upgrade command to avoid prompt for workspace upgrade. 
 
   ```bash
    chef-automate upgrade run --airgap-bundle latest.aib --auto-approve --workspace-upgrade yes

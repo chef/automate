@@ -26,7 +26,6 @@ Follow the steps to register the supermarket with Automate HA:
 1. Now, patch the configuration on all the frontend nodes from the Bastion node using the command below:
 
     ```bash
-    // Frontend Nodes
     chef-automate config patch ocid-apps.toml -f
     ```
 
