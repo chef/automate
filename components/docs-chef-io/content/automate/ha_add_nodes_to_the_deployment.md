@@ -68,7 +68,7 @@ You can mix and match different services to add nodes across various services.
 
 {{< note >}}
 
-- For **Minimum node cluster**, as the backend services(OpenSearch and PostgresQL)are running in same maching, to add node make sure to add both services in same command
+- For **Minimum node cluster**, as the backend services(OpenSearch and PostgresQL)are running in same machine, to add node make sure to add both services in same command
 Eg: `chef-automate node add --postgresql-ips 10.0.1.42 --opensearch-ips 10.0.1.42`
 Notice, both OpenSearch and PostgresQL IPs are same
 - Similarly for fronend services(Automate and Chef Server) ,add both services in same command with same IPs
