@@ -820,7 +820,7 @@ func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Automat
 	return nil
 }
 
-// prePatchForOsNodes 
+// prePatchForOsNodes
 // Note: this func is not being in used currently as it was meant for os-config sync
 func prePatchForOsNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := removeRestrictedKeysFromSrcFileOs(inputs.Args[0])
