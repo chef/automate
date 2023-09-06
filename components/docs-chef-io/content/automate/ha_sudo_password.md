@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 This page explains enabling the `sudo password` for the Chef Automate High Availability (HA) deployment.
 
-If you have configured the sudo password for the user, you need to create an environment variable **sudo_password** and set the password as the variable's value. Example: `export sudo_password=YOUR_SUDO_PASSWORD`. One done, run all sudo commands with the `sudo -E` or `--preserve-env` option. Example: `sudo -E chef-automate iam version`. This is required for the chef-automate CLI to run the commands with sudo privileges.
+If you have configured the sudo password for the user, you need to create an environment variable **sudo_password** and set the password as the variable's value. Example: `export sudo_password=YOUR_SUDO_PASSWORD`. Once its done, run all sudo commands with the `sudo -E` or `--preserve-env` option. Example: `sudo -E chef-automate iam version`. This is required for the chef-automate CLI to run the commands with sudo privileges.
 
 ## Steps to Enable Sudo Password
 

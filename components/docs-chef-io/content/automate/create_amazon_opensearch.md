@@ -16,7 +16,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-You can follow the AWS documentation directly for detailed steps on [how to create an Amazon OpenSearch Cluster](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html).
+You can follow the AWS documentation directly for detailed steps on [how to create an Amazon OpenSearch Cluster](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html).
 
 Below is our guide on the steps required to create an Amazon OpenSearch cluster. This guide will walk you through creating an Amazon OpenSearch cluster and retrieving the necessary connection details, including the hostname, username, and password.
 
@@ -39,14 +39,14 @@ Before proceeding, make sure you have the following prerequisites in place:
 
 ## Step 3: Create a New Amazon OpenSearch 1.3 Cluster
 
-1. Click the **Create a new domain** button in the Amazon OpenSearch Service dashboard.
-1. Enter a new **Domain name** for your OpenSearch cluster
-1. In **Domain creation method**, select **Standard create**
+1. Click on **Create a new domain** button in the Amazon OpenSearch Service dashboard.
+1. Enter a new **Domain name** for your OpenSearch cluster.
+1. In **Domain creation method**, select **Standard create**.
 1. Choose the appropriate deployment configuration, such as development or production, based on your requirements.
 1. Under the **Engine options** section, select **1.3** as the version for your cluster.
 1. In the **Networks** section, provide the following information:
-   - **VPC**: Select the VPC in which you have your automate cluster
-   - **Subnets**: Select all three private subnets available in your VPC
+   - **VPC**: Select the VPC in which you have your automate cluster.
+   - **Subnets**: Select all three private subnets available in your VPC.
    - **Security groups**: Select a security block with incoming access from your VPC CIDR range.
 1. In **Fine-grained access control**,
    - Enable **Fine-grained access control**

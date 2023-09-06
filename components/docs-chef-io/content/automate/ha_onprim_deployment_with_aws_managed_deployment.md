@@ -17,6 +17,12 @@ gh_repo = "automate"
 
 This section will discuss deploying Chef Automate HA on-premise machines with AWS Managed Database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
+{{< warning >}}
+
+- If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
+
+{{< /warning >}}
+
 See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
 ## Steps to Generate Config
