@@ -12,9 +12,9 @@ gh_repo = "automate"
     weight = 250
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 A node is any physical, virtual, or cloud device configured and maintained by an instance of Chef Infra Client.
 Bootstrapping installs Chef Infra Client on a target system,

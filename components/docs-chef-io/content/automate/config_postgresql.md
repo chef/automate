@@ -11,9 +11,9 @@ gh_repo = "automate"
     weight = 220
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 ## Configurations
 

@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 210
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 Custom certificates can be added during deployment for different services.
 

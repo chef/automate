@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 230
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 **High Availability (HA)** is designed to avoid loss of service by reducing or managing failures and minimizing unscheduled downtime (when your system or network is not available for use or is unresponsive) that happens due to power outages or failure of a component. In this page, we will see how to reduce the possibility of errors and improve your overall CLI experience to deploy Automate HA. We will discuss the deployment of Automate HA by automatically checking verification tests in different Automate HA deployment workflows.
 

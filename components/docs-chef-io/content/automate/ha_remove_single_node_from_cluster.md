@@ -11,6 +11,10 @@ gh_repo = "automate"
     weight = 210
 +++
 
+{{< note >}}
+{{% automate/ha-warn %}}
+{{< /note >}}
+
 Chef Automate HA comes with five different types of deployment flows. This page tells you how to remove nodes from your Automate cluster. Refer to the [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment/) page to see how to add more nodes to your deployment processes.
 
 {{< warning >}}

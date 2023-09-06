@@ -10,9 +10,9 @@ gh_repo = "automate"
     weight = 210
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 This page explains enabling the `sudo password` for the Chef Automate High Availability (HA) deployment.
 

@@ -12,9 +12,9 @@ gh_repo = "automate"
     weight = 200
 +++
 
-{{< warning >}}
+{{< note >}}
 {{% automate/ha-warn %}}
-{{< /warning >}}
+{{< /note >}}
 
 ## Setup Disaster Recovery Cluster For OnPrem Deployment
 
