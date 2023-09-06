@@ -16,7 +16,9 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-A node is any physical, virtual, or cloud device configured and maintained by an instance of Chef Infra Client. Bootstrapping installs Chef Infra Client on a target system so it can run as a client and sets the node up to communicate with a Chef Infra Server.
+A node is any physical, virtual, or cloud device configured and maintained by an instance of Chef Infra Client.
+Bootstrapping installs Chef Infra Client on a target system,
+so it can run as a client and sets the node up to communicate with a Chef Infra Server.
 
 To bootstrap a node, run `knife bootstrap` in the workstation.
 
@@ -92,7 +94,7 @@ wget https://packages.chef.io/files/stable/chef-workstation/21.7.524/ubuntu/20.0
 dpkg -i chef-workstation_21.7.524-1_amd64.deb
 ```
 
-- Verify the installation using following command:
+- Verify the installation using the following command:
 
 ```bash
 chef -v
@@ -155,7 +157,7 @@ aws_profile = 'default'
 use_sudo = true
 ```
 
-- If you an error while doing bootstrapping 
+- If you have an error while doing bootstrapping 
 
 ```automate-cs-nginx.default(O): 2022/10/21 08:53:02 [error] 5742#0: *2490 upstream SSL certificate verify 
 error: (20:unable to get local issuer certificate) while SSL handshaking to upstream, client: 127.0.0.1, server: , 
