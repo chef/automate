@@ -99,12 +99,34 @@ You can also view the [Sample Config](#sample-config).
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
-1. Verify the deployment by checking status summary
+## Verify Deployment
+
+1. Once the deployment is successful, Get the consolidate status of the cluster
 
     ```bash
      chef-automate status summary
+    ```
+1. Once the deployment is successful, Get the consolidate status of the cluster
+
+    ```bash
+     chef-automate status summary
+    ```
+
+1.  Get the service status from each node
+
+    ```bash
      chef-automate status
-     chef-automate verify
+    ```
+
+1. Post Deployment, you can run the verification as command  
+
+    ```bash
+     chef-automate verfiy
+    ```
+
+1. Get the  cluster Info
+
+    ```bash
      chef-automate info
     ```
 

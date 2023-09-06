@@ -113,14 +113,29 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 ## Verify Deployment
 
-1. Once the deployment is successful, we can verify deployment by checking status summary and info
+1. Once the deployment is successful, Get the consolidate status of the cluster
 
-   ```bash
-    chef-automate status summary
-    chef-automate status
-    chef-automate verify
-    chef-automate info
-   ```
+    ```bash
+     chef-automate status summary
+    ```
+
+1.  Get the service status from each node
+
+    ```bash
+     chef-automate status
+    ```
+
+1. Post Deployment, you can run the verification as command  
+
+    ```bash
+     chef-automate verfiy
+    ```
+
+1. Get the  cluster Info
+
+    ```bash
+     chef-automate info
+    ```
 
 1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
   If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.

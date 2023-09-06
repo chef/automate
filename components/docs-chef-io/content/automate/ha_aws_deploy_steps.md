@@ -117,12 +117,32 @@ Run the following steps on Bastion Host Machine:
 
 ## Verify Deployment
 
-1. Once the deployment is successful, we can verify deployment by checking status summary and info
+1. Once the deployment is successful, Get the consolidate status of the cluster
 
     ```bash
      chef-automate status summary
+    ```
+1. Once the deployment is successful, Get the consolidate status of the cluster
+
+    ```bash
+     chef-automate status summary
+    ```
+
+1.  Get the service status from each node
+
+    ```bash
      chef-automate status
-     chef-automate verify
+    ```
+
+1. Post Deployment, you can run the verification as command  
+
+    ```bash
+     chef-automate verfiy
+    ```
+
+1. Get the  cluster Info
+
+    ```bash
      chef-automate info
     ```
 
