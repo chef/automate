@@ -15,8 +15,8 @@ Chef Automate HA comes with five different types of deployment flows. This page 
 
 {{< note >}}
 
-- **If the SELinux config is enabled**, make sure to set it to Permissive (Usually in case of RHEL SELinux is enabled). If the config is `enforced` automate node will throw error, and verify flow will fail.
-- For AWS infrastructure, the same is handled internally during deployment
+- **If the SELinux config is enabled**, make sure to set it to `Permissive` (Usually in case of RHEL SELinux is enabled). If the config is `enforced` automate node will throw error, and verify flow will fail.
+- During deployment the same will be handled internally
 
 {{< /note >}}
 
