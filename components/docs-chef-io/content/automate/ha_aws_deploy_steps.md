@@ -104,17 +104,15 @@ Run the following steps on Bastion Host Machine:
 
 ## Steps to Deploy
 
-1. The following command will run the deployment.
+1. The following command will run the deployment. The deployment command will run the verify command internally
 
     ```bash
-    sudo -- sh -c "
-    #Run deploy command to deploy `automate.aib` with set `config.toml`
-    chef-automate deploy config.toml --airgap-bundle automate.aib
-    #After Deployment is done successfully. Check the status of Chef Automate HA services
-    chef-automate status summary
-    #Check Chef Automate HA deployment information using the following command
-    chef-automate info
-    "
+     chef-automate deploy config.toml --airgap-bundle automate.aib
+    ```
+
+   If we want to skip verficiation in the deployment command we can use `--skip-verify` flag
+    ```bash
+     chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
 ## Verify Deployment
@@ -122,12 +120,10 @@ Run the following steps on Bastion Host Machine:
 1. Once the deployment is successful, we can verify deployment by checking status summary and info
 
     ```bash
-    sudo -- sh -c "
-    #After Deployment is done successfully. Check the status of Chef Automate HA services
-    chef-automate status summary
-    #Check Chef Automate HA deployment information using the following command
-    chef-automate info
-    "
+     chef-automate status summary
+     chef-automate status
+     chef-automate verify
+     chef-automate info
     ```
 
 1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`. If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.

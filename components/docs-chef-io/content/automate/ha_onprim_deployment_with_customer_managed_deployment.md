@@ -49,16 +49,15 @@ See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-b
 
 ## Steps to Deploy
 
-Continue with the deployment after generating the config:
+Continue with the deployment after generating the config. The deployment command will run the verify command internally
 
 ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Verify the data in the config
-   cat config.toml
-   #Run deploy command to deploy `automate.aib` with set `config.toml`
-   chef-automate deploy config.toml --airgap-bundle automate.aib
-   "
+  chef-automate deploy config.toml --airgap-bundle automate.aib
+```
+
+If we want to skip verficiation in the deployment command we can use `--skip-verify` flag
+```bash
+  chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
 ```
 
 ## Verify Deployment
@@ -66,10 +65,10 @@ Continue with the deployment after generating the config:
 Verify the deployment by checking status summary:
 
 ```bash
-    sudo -- sh -c "
-    #After Deployment is done successfully. Check the status of Chef Automate HA services
-    chef-automate status summary
-    "
+  chef-automate status summary
+  chef-automate status
+  chef-automate verify
+  chef-automate info
 ```
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
