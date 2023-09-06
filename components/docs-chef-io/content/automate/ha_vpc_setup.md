@@ -55,7 +55,7 @@ The default limit to create a VPC in a region is *5*. However, if the VPCs used 
 
 {{< note >}}
 
-You require a minimum of three node clusters for ElaticSearcg and Postgres-sql instances.
+You require a minimum of three node clusters for ElaticSearch and PostgreSQL instances.
 
 {{< /note >}}
 

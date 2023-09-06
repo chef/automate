@@ -16,7 +16,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-You can follow the AWS documentation directly for detailed steps on [how to create an Amazon RDS PostgreSQL Instance](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html).
+You can follow the AWS documentation directly for detailed steps on [how to create an Amazon RDS PostgreSQL Instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html).
 
 Below is our guide on the steps required to create an Amazon RDS PostgreSQL instance. This guide will walk you through creating an Amazon RDS PostgreSQL instance and retrieving the necessary connection details, including the hostname, port, username, and password.
 
@@ -39,7 +39,7 @@ Before proceeding, make sure you have the following prerequisites in place:
 
 ## Step 3: Create a New Amazon RDS PostgreSQL Instance
 
-1. Click the **Create database** button in the Amazon RDS dashboard.
+1. Click on **Create database** button in the Amazon RDS dashboard.
 1. On the **Choose a database creation method** page, select the **Standard Create** option.
 1. Under the **Engine options** section, select **PostgreSQL** as the database engine.
 1. Choose **PostgreSQL 13.5-R1**.
@@ -69,10 +69,10 @@ Before proceeding, make sure you have the following prerequisites in place:
 1. Go to the Amazon RDS dashboard.
 1. Find and select your newly created PostgreSQL instance from the list.
 1. In the instance details view, navigate to the **Connectivity & security** tab.
-1. Open the Security Group under **VPC security groups**
-1. Under **Inbound Rules**, edit and select **Type** as **PostgreSQL**
-1. Select **Source** as **custom** and give appropriate cidr block for your VPC
-1. Click **Save Rules**
+1. Open the Security Group under **VPC security groups**.
+1. Under **Inbound Rules**, edit and select **Type** as **PostgreSQL**.
+1. Select **Source** as **custom** and give appropriate cidr block for your VPC.
+1. Click on **Save Rules**.
 
 ## Step 6: Retrieve Connection Details
 

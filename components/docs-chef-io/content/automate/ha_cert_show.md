@@ -17,7 +17,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Certificates can be viwed for different services using below commands.
+Certificates can be viewed for different services using below commands.
 
 ## Viewing certificates of all services
 

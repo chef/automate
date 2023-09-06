@@ -119,7 +119,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
 
 
-### How to perform infrastructure cleanup for on-premises nodes
+### How to perform infrastructure cleanup for AutomateHA nodes
 
 Execute the following commands from bastion host as per your deployment to perfom infrastructure cleanup
 
