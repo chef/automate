@@ -180,7 +180,7 @@ or
 ```bash
 chef-automate config patch path/to/opensearch-config.toml -o
 ```
-#or
+or
 ```bash
 chef-automate config patch path/to/opensearch-config.toml --os
 ```
