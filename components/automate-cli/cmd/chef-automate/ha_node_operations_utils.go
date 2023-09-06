@@ -538,7 +538,6 @@ func modifyConfigForNewNodeCertByIp(instanceCount int, existingPrivateIPs []stri
 				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
 			}
 			*certsIp = append(*certsIp, c)
-			fmt.Println("New IP: ", c.IP)
 		}
 	}
 	return nil
