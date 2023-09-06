@@ -100,26 +100,42 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 ## Steps to deploy
 
-```bash
-sudo -- sh -c "
-#Run deploy command to deploy `automate.aib` with set `config.toml`
-chef-automate deploy config.toml --airgap-bundle automate.aib
-"
-```
+1. The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during depoly command use `--skip-verify` flag
+
+    ```bash
+     chef-automate deploy config.toml --airgap-bundle automate.aib
+    ```
+
+   To skip verficiation in the deploy command, use `--skip-verify` flag
+    ```bash
+     chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
+    ```
 
 ## Verify Deployment
 
-1. Once the deployment is successful, we can verify deployment by checking status summary and info
+1. Once the deployment is successful, Get the consolidate status of the cluster
 
-  ```bash
-   sudo -- sh -c "
-   #After Deployment is done successfully. Check the status of Chef Automate HA services
-   chef-automate status summary
+    ```bash
+     chef-automate status summary
+    ```
 
-   #Check Chef Automate HA deployment information using the following command
-   chef-automate info
-   "
-  ```
+1.  Get the service status from each node
+
+    ```bash
+     chef-automate status
+    ```
+
+1. Post Deployment, you can run the verification command  
+
+    ```bash
+     chef-automate verfiy
+    ```
+
+1. Get the  cluster Info
+
+    ```bash
+     chef-automate info
+    ```
 
 1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
   If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.

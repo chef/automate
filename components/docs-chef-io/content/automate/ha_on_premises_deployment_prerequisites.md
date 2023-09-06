@@ -63,7 +63,7 @@ Current Automate HA supports integration with the following Chef tools:
 - Chef Infra Client: 17.0.242+
 - Chef Habitat: 0.81+
 
-We do not support **Chef Manage** and **Supermarket** integration in the ongoing Automate version.
+We do not support **Chef Manage** integration in the ongoing Automate version.
 
 ### External Supported Softwares
 

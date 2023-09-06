@@ -88,26 +88,46 @@ You can also view the [Sample Config](#sample-config).
 
 ## Steps to Deploy
 
-1. Continue with the deployment after generating the config:
+1. The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during depoly command use `--skip-verify` flag
 
     ```bash
-    #Run commands as sudo.
-    sudo -- sh -c "
-    #Print data in the config
-    cat config.toml
-    #Run deploy command to deploy `automate.aib` with set `config.toml`
     chef-automate deploy config.toml --airgap-bundle automate.aib
-    "
     ```
 
-1. Verify the deployment by checking status summary
+   To skip verficiation in the deploy command, use `--skip-verify` flag
+    ```bash
+     chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
+    ```
+
+## Verify Deployment
+
+1. Once the deployment is successful, Get the consolidate status of the cluster
 
     ```bash
-    #Run commands as sudo.
-    sudo -- sh -c "
-    #After Deployment is done successfully. Check the status of Chef Automate HA services
-    chef-automate status summary
-    "
+     chef-automate status summary
+    ```
+1. Once the deployment is successful, Get the consolidate status of the cluster
+
+    ```bash
+     chef-automate status summary
+    ```
+
+1.  Get the service status from each node
+
+    ```bash
+     chef-automate status
+    ```
+
+1. Post Deployment, you can run the verification command  
+
+    ```bash
+     chef-automate verfiy
+    ```
+
+1. Get the  cluster Info
+
+    ```bash
+     chef-automate info
     ```
 
     Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
