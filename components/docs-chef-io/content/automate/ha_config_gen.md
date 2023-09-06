@@ -17,9 +17,7 @@ gh_repo = "automate"
 ## Command Usage
 
 ```bash
-sudo -- sh -c "
-chef-automate config gen config.toml
-"
+ chef-automate config gen config.toml
 ```
 
 `config.toml` is the file where all the generated config will be saved at the end, you can choose to not provide this then the output will be shown to stdout.
