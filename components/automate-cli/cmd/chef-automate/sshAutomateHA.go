@@ -279,12 +279,12 @@ func getAutomateHAInfraDetailHelper(infraConfigFilePath string) (*AutomateHAInfr
 
 func FileContainingAutomateHAInfraDetails() (string, error) {
 
-	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
-		return automateHATerraformDestroyOutputFile, nil
-	}
-
 	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
 		return automateHATerraformOutputFile, nil
+	}
+
+	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
+		return automateHATerraformDestroyOutputFile, nil
 	}
 
 	return "", errors.New("Automate Ha infra confile file not exist")
