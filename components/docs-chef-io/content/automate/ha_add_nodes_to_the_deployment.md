@@ -66,6 +66,15 @@ You can mix and match different services to add nodes across various services.
     chef-automate node add --automate-ips 10.1.2.23 --chef-server-ips 10.1.0.36,10.0.1.233  --postgresql-ips 10.0.1.42,10.0.1.54
     ```
 
+{{< note >}}
+
+- For **Minimum node cluster**, as the backend services(OpenSearch and PostgresQL)are running in same maching, to add node make sure to add both services in same command
+Eg: `chef-automate node add --postgresql-ips 10.0.1.42 --opensearch-ips 10.0.1.42`
+Notice, both OpenSearch and PostgresQL IPs are same
+- Similarly for fronend services(Automate and Chef Server) ,add both services in same command with same IPs
+Eg: `chef-automate node add --automate-ips 10.0.1.52 --chef-server-ips 10.0.1.52`
+{{< /note >}}
+
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
 
 - Make sure to update your loadbalancer configuration with the IP address of the new node. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
