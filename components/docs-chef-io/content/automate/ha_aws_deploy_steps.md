@@ -62,9 +62,7 @@ Run the following steps on Bastion Host Machine:
 1. Generate config with relevant data using the below command:
 
     ```bash
-    sudo -- sh -c "
     chef-automate config gen config.toml
-    "
     ```
 
     Click [here](/automate/ha_config_gen) to know more about generating config
@@ -78,13 +76,7 @@ Run the following steps on Bastion Host Machine:
 1. Continue with the provisioning of the infra after generating the config:
 
     ```bash
-    #Run commands as sudo.
-    sudo -- sh -c "
-    #Print data in the config
-    cat config.toml
-    #Run provision command to deploy `automate.aib` with set `config.toml`
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
-    "
     ```
 
     {{< note >}}
