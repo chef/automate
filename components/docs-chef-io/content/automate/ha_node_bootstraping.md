@@ -38,43 +38,43 @@ The Chef Infra Client installer puts everything into a unique directory (/opt/ch
 
 1. ssh in chef_server instance.
 
-`sudo chef-automate ssh --hostname chef_server`
+    `sudo chef-automate ssh --hostname chef_server`
 
 1. Ensure all the front-end instances are up and running.
 
-`sudo chef-automate status`
+    `sudo chef-automate status`
 
 1. Create a User.
 
-Syntax:
+    Syntax:
 
-```bash
-sudo chef-server-ctl user-create <username> <First Name> <Last Name> <Email ID> <password> -f <path and file name to store user's pem file>
-```
+    ```bash
+    sudo chef-server-ctl user-create <username> <First Name> <Last Name> <Email ID> <password> -f <path and file name to store user's pem file>
+    ```
 
-For Example:
+    For Example:
 
-```bash
-sudo chef-server-ctl user-create johndoe John Doe john.doe@example.com John@123 -f ./johndoe.pem
-```
+    ```bash
+    sudo chef-server-ctl user-create johndoe John Doe john.doe@example.com John@123 -f ./johndoe.pem
+    ```
 
-Created users can be listed using `sudo chef-server-ctl user-list`
+    Created users can be listed using `sudo chef-server-ctl user-list`
 
 1. Create an organization.
 
-Syntax:
+    Syntax:
 
-```bash
-sudo chef-server-ctl org-create <org name> '<org display name>' --association_user <username> -f <path and file name to store org's pem file>
-```
+    ```bash
+    sudo chef-server-ctl org-create <org name> '<org display name>' --association_user <username> -f <path and file name to store org's pem file>
+    ```
 
-For Example:
+    For Example:
 
-```bash
-sudo chef-server-ctl org-create new_org 'New Organization' --association_user johndoe -f ./new_org.pem
-```
+    ```bash
+    sudo chef-server-ctl org-create new_org 'New Organization' --association_user johndoe -f ./new_org.pem
+    ```
 
-Created organization can be listed using `sudo chef-server-ctl org-list`
+    Created organization can be listed using `sudo chef-server-ctl org-list`
 
 1. Copy the `pem` files and save them to a safe location.
 
@@ -82,67 +82,67 @@ Created organization can be listed using `sudo chef-server-ctl org-list`
 
 1. To set up the workstation on your machine, follow the steps given below:
 
-- Install the latest version of chef Workstation on the ubuntu system.
+    - Install the latest version of chef Workstation on the ubuntu system.
 
-```bash
-wget https://packages.chef.io/files/stable/chef-workstation/21.7.524/ubuntu/20.04/chef-workstation_21.7.524-1_amd64.deb
-```
+    ```bash
+    wget https://packages.chef.io/files/stable/chef-workstation/21.7.524/ubuntu/20.04/chef-workstation_21.7.524-1_amd64.deb
+    ```
 
-- To install the same:
+    - To install the same:
 
-```bash
-dpkg -i chef-workstation_21.7.524-1_amd64.deb
-```
+    ```bash
+    dpkg -i chef-workstation_21.7.524-1_amd64.deb
+    ```
 
-- Verify the installation using the following command:
+    - Verify the installation using the following command:
 
-```bash
-chef -v
-```
+    ```bash
+    chef -v
+    ```
 
-Click [here](https://docs.chef.io/workstation/install_workstation/) for any additional information.
+    Click [here](https://docs.chef.io/workstation/install_workstation/) for any additional information.
 
-1. Generate chef-repo using `chef generate repo chef-repo`. Click [here]https://docs.chef.io/workstation/getting_started/ to know more.
+    1. Generate chef-repo using `chef generate repo chef-repo`. Click [here]https://docs.chef.io/workstation/getting_started/ to know more.
 
-1. Paste `pem` files of user and organization inside `/root/.chef/`. For example: `Eg.: /root/.chef/johndoe.pem , /root/.chef/new_org.pem`
+    1. Paste `pem` files of user and organization inside `/root/.chef/`. For example: `Eg.: /root/.chef/johndoe.pem , /root/.chef/new_org.pem`
 
-1. Paste ssh key of node which you want to bootstrap inside `/root/.ssh/<ssh_key_of_node>`.
+    1. Paste ssh key of node which you want to bootstrap inside `/root/.ssh/<ssh_key_of_node>`.
 
-1. Edit Credentials file `vi /root/.chef/credentials` or run `knife configure` to configure the credentials.
+    1. Edit Credentials file `vi /root/.chef/credentials` or run `knife configure` to configure the credentials.
 
-1. Provide the name of user-created in chef_server, correct path of pem file of user and chef server URL (or associated DNS), and organization name.
+    1. Provide the name of user-created in chef_server, correct path of pem file of user and chef server URL (or associated DNS), and organization name.
 
-Once configured, `/root/.chef/credentials` will look like as shown below:
+    Once configured, `/root/.chef/credentials` will look like as shown below:
 
-```bash
-  [default]
-  client_name = "<name_of_user>"
-  client_key = "/root/.chef/<pem_file_of_user>"
-  chef_server_url = "https://demo-server.saas.chef.io/organizations/<name_of_organization>/"
-```
+    ```bash
+      [default]
+      client_name = "<name_of_user>"
+      client_key = "/root/.chef/<pem_file_of_user>"
+      chef_server_url = "https://demo-server.saas.chef.io/organizations/<name_of_organization>/"
+    ```
 
 1. Run the following command:
 
-```bash
-knife ssl fetch
-knife ssl check
-```
+    ```bash
+    knife ssl fetch
+    knife ssl check
+    ```
 
-{{< note >}} `knife ssl check` might throw certificate error in which case, configuration can be done using DNS attached to Chef Server URL {{< /note >}}
+    {{< note >}} `knife ssl check` might throw certificate error in which case, configuration can be done using DNS attached to Chef Server URL {{< /note >}}
 
-The above command will fetch certificate details, save them to the trusted_cert folder in **/root/.chef/**, and verify the same.
+    The above command will fetch certificate details, save them to the trusted_cert folder in **/root/.chef/**, and verify the same.
 
 1. Run the bootstrap command.
 
-`knife bootstrap <Public_ip> -i ~/<pem_file_of_node> -U ubuntu -N <name_of_node> --sudo`
+    `knife bootstrap <Public_ip> -i ~/<pem_file_of_node> -U ubuntu -N <name_of_node> --sudo`
 
-- **Public IP:** IP address of the node which we are bootstrapping.
+    - **Public IP:** IP address of the node which we are bootstrapping.
 
-- **pem_file_of_node:** `pem` file of node which we have saved at `/root/.ssh/<pem_file_of_node>`.
+    - **pem_file_of_node:** `pem` file of node which we have saved at `/root/.ssh/<pem_file_of_node>`.
 
-- **name_of_node:** You can provide any name to your node.
+    - **name_of_node:** You can provide any name to your node.
 
-For example: `knife bootstrap 3.124.**.** -i ~/.ssh/rsa.pem -U ubuntu -N johndoe`
+    For example: `knife bootstrap 3.124.**.** -i ~/.ssh/rsa.pem -U ubuntu -N johndoe`
 
 ## Troubleshoot
 
