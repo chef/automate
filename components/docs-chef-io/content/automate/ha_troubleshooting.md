@@ -27,43 +27,27 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 - First we can check if Automate UI is opening via browser if it open's then we can try to hit the curl request to the Automate FQDN from the chefserver node.
 `curl --cacert /path/to/fqdn-rootca-pem-file https://<AUTOMATE_FQDN>`
   -  The above request will verify the authenticity of the server's SSL certificate (FQDN RootCA) against Automate FQDN.
-  -  In Case if it gives any error regarding RootCA provide the valid RootCA.
--  If it could not make a curl request make sure you have attached NAT Gateway to your private subnets.
+  -  In case if it gives any error, then we have make sure that the `RootCA` is valid or not.
 -  The above curl request will work in case if ssl is terminating at load balancer.
--  In case of ssl is not terminating at the LB, we need to patch the certificate to the Automate via [cert-rotate command](/automate/ha_cert_rotation/#rotate-using-cert-rotate-command).
+-  In case of ssl is not terminating at the Load Balancer, we need to patch the certificate to the Automate via [cert-rotate command](/automate/ha_cert_rotation/#rotate-using-cert-rotate-command).
 -  The above steps required the `private-key`, `public-key` and `root-ca`.
-
 - If the above steps did not work, Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
-
 - If getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint.
-- ssh to the Automate HA Chef Infra Server and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.
-
-```cmd
-  export endpoint="AUTOMATE LB URL"
-  export token="GET_THIS_TOKEN_FROM_CHEF_SERVER_CONFIG"
-  curl -H "api-token:$token" https://$endpoint/api/v0/events/data-collector -k
-```
 
 To make the service healthy, ensure the chef server can curl the data collector endpoint from the chef server node.
 
-### Deployment doesn't exit Gracefully
-
-There are some cases in which deployment doesn't exit successfully.
-
 ### Issue: Database Accessed by Other Users
-
-The restore command fails when other users or services access the nodes' databases. This happens when the restore service tries to drop the database when some services are still running and are referring to the database.
 
 ```bash
 Level=error msg="Failed to restore services" backup_id=20210914082922 error="failed to import database dump from automate-cs-oc-erchef/pg_data/automate-cs-oc-erchef.fc: error dropping database \"automate-cs-oc-erchef\": pg: database \"automate-cs-oc-erchef\" is being accessed by other users" restore_id=20210914130646
 ```
+The restore command fails when other users or services access the nodes' databases. This happens when the restore service tries to drop the database when some services are still running and are referring to the database.
 
 #### Solution
 
-- Stop the frontend and backend services.
-- Perform the following steps on all frontend and backend nodes:
-  - SSH into the frontend node and execute the `chef-automate status` command.
-  - SSH into the backend node and execute the `hab svc status` command.
+- Stop the services on all the frontend `chef-automate stop` .
+
+Stopping the service on all frontend node will able to drop the database while running the restore command. 
 
 ### Issue: Cached Artifact not found in Offline Mode
 
@@ -88,7 +72,7 @@ chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patc
 
 ### Issue: Existing Architecture does not Match the Requested
 
-The existing architecture does not match the requested issue when you have made AWS provisioning. Again, you are trying to run the `automate-cluster-ctl provision` command.
+The existing architecture does not match the requested issue when you have made AWS provisioning. Again, you are trying to run the `chef-automate provision config.toml --airgap-bundle automate.aib` command.
 
 #### Solution
 
@@ -107,11 +91,12 @@ BackupRestoreError: Unable to restore backup: Listing backups failed: RequestErr
 
 #### Solution
 
-Ensure that the access key, secret key, and endpoints are correct. If you are using on-premises S3 for backup and facing issues with restore, attach the `s3-endpoint` with the `s3 restore` command. For example:
+Ensure that the access key, secret key, and endpoints are correct. If you are using on-premises S3 (replica of s3) for backup and facing issues with restore, attach the `s3-endpoint` with the `chef-automate backup restore` command. For example:
 
 ```bash
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "https://s3.amazonaws.com"
 ```
+In the above command we need to update `--s3-access-key`, `--s3-secret-key` and `--s3-endpoint` 
 
 ### Issue: HAB Access Error
 
