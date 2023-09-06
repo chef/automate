@@ -55,13 +55,13 @@ See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-b
 
 ## Steps to Deploy
 
-The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during depoly command use `--skip-verify` flag
+The following command will run the deployment. The deploy command will run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
 
 ```bash
   chef-automate deploy config.toml --airgap-bundle automate.aib
 ```
 
-To skip verficiation in the deploy command, use `--skip-verify` flag
+To skip verification in the deploy command, use `--skip-verify` flag
 ```bash
   chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
 ```
@@ -98,7 +98,7 @@ After successful deployment, proceed with following:
 
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstraping.
+   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Backup/Restore
 

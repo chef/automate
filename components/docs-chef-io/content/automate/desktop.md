@@ -57,7 +57,7 @@ The time period options are "Last 3 Days," "Last 7 Days," and "Last 14 Days".
 
 ### Time Since Last Check-in
 
-The _Time since Last Check-in_ display shows a count of desktops with an `unknown` status for defined timefames.
+The _Time since Last Check-in_ display shows a count of desktops with an `unknown` status for defined timeframes.
 Selecting a row will reveal a Filtered Desktop List of desktops for the selected timeframe.
 
 ### Top 10 Errors

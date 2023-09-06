@@ -41,7 +41,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
         ```
 
 
-1. Copy the backup folder to boostrapped Automate node of Automate HA using the following command:
+1. Copy the backup folder to bootstrapped Automate node of Automate HA using the following command:
 
     ```bash
     scp -i </path/to/key> -r </path/to/backup-file> <user>@<host>:/home/<user>
@@ -88,7 +88,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Run the following command on the boostrapped Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the bootstrapped Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -112,13 +112,13 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the frontend nodes except boostraped automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend nodes except boostrap automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
     ```
 
-1. Restore in Chef-Automate HA using the following command in boostraped automate node :
+1. Restore in Chef-Automate HA using the following command in boostrap automate node :
 
     ```bash
     chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
@@ -192,7 +192,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. Run the following command on the boostrapped Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the bootstrapped Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -302,7 +302,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 
 1. Go to Bastion:
 
-    {{< note >}} Use the same bucket for restore, which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /note >}}
+    {{< note >}} Use the same bucket for restore, which was used in the standalone automate while creating the backup. Configure the same base path in Automate HA you gave in Standalone Automate. {{< /note >}}
 
     - Patch the below S3 backup configuration, ignore this step if Automate HA already has S3 backup configuration. Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
@@ -363,7 +363,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     chef-automate config patch --frontend automate.toml
     ```
 
-1. Run the following command on the boostrapped Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the bootstrapped Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml

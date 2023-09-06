@@ -77,7 +77,7 @@ Eg: `chef-automate node add --automate-ips 10.0.1.52 --chef-server-ips 10.0.1.52
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
 
-- Make sure to update your load-balancer configuration with the IP address of the new node. For reference, check the [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
+- Make sure to update your load balancer configuration with the IP address of the new node. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
 {{< note >}}
 

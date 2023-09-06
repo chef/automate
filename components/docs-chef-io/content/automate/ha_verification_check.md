@@ -25,7 +25,7 @@ Before you start, take a quick tour of our prerequisite pages for [On-Premises](
 
 ## Configuration
 
-Failures occuring during the deployment of Automate HA might result to clear up everything and the start the whole process once again. To avoid this, the verify CLI has been introduced. You can run the CLI either pre or post deployment. The pre deployment CLI command is as follows:
+Failures occurring during the deployment of Automate HA might result to clear up everything and the start the whole process once again. To avoid this, the verify CLI has been introduced. You can run the CLI either pre or post deployment. The pre deployment CLI command is as follows:
 
 ```bash
 chef-automate verify --config config.toml

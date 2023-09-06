@@ -79,7 +79,7 @@ Selecting a Service Group in a row populates the right-hand sidebar with informa
 To filter the individual services in the side bar by their health status, select one of the health status buttons at the top of the sidebar.
 
 The individual service rows sort by their level of criticality, from the "most critical" status to the "least critical" status - "critical", "warning", "unknown", and "OK" respectively.
-Individual disconnected services display a broken chain icon with a note of when the last received health check ocurred.
+Individual disconnected services display a broken chain icon with a note of when the last received health check occurred.
 The most critical issues appear at the top of the list, allowing you to determine the next steps for remediation.
 
 ## Filtering Results

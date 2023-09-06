@@ -146,7 +146,7 @@ For example: `knife bootstrap 3.124.**.** -i ~/.ssh/rsa.pem -U ubuntu -N johndoe
 
 - If `knife bootstrap` throws permission denied or cannot create directory error, add the following configuration in `/root/.chef/credentials` and then run the bootstrap command as shown in _Step No. 8_.
 
-**Resoultion** 
+**Resolution** 
 
 ```bash
 [default.knife]
@@ -155,7 +155,7 @@ aws_profile = 'default'
 use_sudo = true
 ```
 
-- If you an error while doing bootstraping 
+- If you an error while doing bootstrapping 
 
 ```automate-cs-nginx.default(O): 2022/10/21 08:53:02 [error] 5742#0: *2490 upstream SSL certificate verify 
 error: (20:unable to get local issuer certificate) while SSL handshaking to upstream, client: 127.0.0.1, server: , 
@@ -164,7 +164,7 @@ upstream: "https://<MP-AUTOMATE-FQDN>:443/data-collector/v0/",
 host: "<MY-HOSTNAME>"
 ```
 
-**Resoultion** 
+**Resolution** 
 
 - patch the below config in chef-server.
 

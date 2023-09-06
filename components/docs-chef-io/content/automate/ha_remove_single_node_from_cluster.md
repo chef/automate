@@ -54,7 +54,7 @@ The command requires some arguments to determine which types of nodes you want t
 
 Once the command executes, it will remove the supplied node from your HA setup. The changes might take a while.
 
-- Make sure to remove the IP address of the deleted node from your loadbalancer configuration. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
+- Make sure to remove the IP address of the deleted node from your load balancer configuration. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
 {{< note >}}
 

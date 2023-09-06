@@ -22,7 +22,7 @@ Thus, HA is designed to avoid loss of service by reducing or managing failures a
 
 ## Chef Automate High Availability (HA)
 
-The Chef Automate HA equates to reliability, efficiency, and productivity, built on **Redundancy** and **Failover**. It aids in addressing significant issues like service failure and zone failure.
+The Chef Automate HA equates to reliability, efficiency, and productivity, built on **Redundancy** and **Fail-over**. It aids in addressing significant issues like service failure and zone failure.
 
 ## Chef Automate HA Architecture
 

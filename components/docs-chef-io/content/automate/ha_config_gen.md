@@ -51,7 +51,7 @@ Refer the fields below to generate Chef Automate High Availability (HA) configur
 ## Chef Server Load Balancer FQDN
 
 - `Chef Server FQDN` automate FQDN name Example `chefserver.example.com`.
-- `Chef Server FQDN ARN` for Aws deployment ARN name is required for Chef Serversss FQDN domain.
+- `Chef Server FQDN ARN` for Aws deployment ARN name is required for Chef Servers FQDN domain.
 - `Chef Server FQDN Root Certificate` ssl root certificate for Chef Server FQDN domain.
 
 ## Number of Nodes in Automate HA Cluster

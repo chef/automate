@@ -117,7 +117,7 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
       [global.v1.backups.s3.credentials]
         access_key = "<Your Access Key>"
-        secret_key = "<Your Seecret Key>"
+        secret_key = "<Your Secret Key>"
     ```
 
 - Execute the command given below to trigger the deployment.
@@ -153,7 +153,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 {{< note >}}
 
 - If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
-- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a diffrent bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
+- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a different bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
 
 {{< /note >}}
 
@@ -166,7 +166,7 @@ While running the restore command, If it prompts any error follow the steps give
 - If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
 - Now, check the status of Automate node and then try running the restore command from bastion.
 
-For **Disaster Recovery or AMI upgarde**, while running the restore in secondary cluster which is in different region follow the steps given below.
+For **Disaster Recovery or AMI upgrade**, while running the restore in secondary cluster which is in different region follow the steps given below.
 
 - Make a curl request in any opensearch node`curl -XGET https://localhost:9200/_snapshot?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k`
 - Check the curl request response if the region is not matching with the primary cluster follow the below steps:

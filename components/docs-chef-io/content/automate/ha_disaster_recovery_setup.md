@@ -36,13 +36,13 @@ In the above approach, there will be 2 identical clusters
 
 The primary cluster will be active and regular backups will be performed using `chef-automate backup create`. At the same time, the disaster recovery cluster will be restoring the latest backup data using `chef-automate backup restore`.
 
-When a failure of the primary cluster occurs, failover can be accomplished through updating DNS records to the DR cluster, alternatively, many commercial load balancers can be configured to handle routing traffic to a DR cluster in the event of a failure.
+When a failure of the primary cluster occurs, fail-over can be accomplished through updating DNS records to the DR cluster, alternatively, many commercial load balancers can be configured to handle routing traffic to a DR cluster in the event of a failure.
 
 ### Caveat with the above approach
 
 - Running two parallel clusters can be expensive.
 - The amount of data loss will depend on how frequently backups are performed in the Primary cluster.
-- Changing DNS records from the Primary loadbalancer to the Disaster Recovery loadbalancer can take time to propagate through the network.
+- Changing DNS records from the Primary load balancer to the Disaster Recovery load balancer can take time to propagate through the network.
 
 ### Steps to setup the Production and Disaster Recovery Cluster
 
