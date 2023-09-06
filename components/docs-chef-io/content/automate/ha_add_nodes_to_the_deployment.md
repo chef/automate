@@ -13,10 +13,16 @@ gh_repo = "automate"
 
 Chef Automate HA comes with five different types of deployment flows. This page tells you how to add more nodes to your deployment processes.
 
-{{< note >}}
+{{< warning >}}
 
 - **If the SELinux config is enabled**, make sure to set it to `Permissive` (Usually in the case of RHEL, SELinux is enabled). If the config is `enforced`, the Automate node will throw error, and the verify flow will fail.
 - During deployment, the same will be handled internally
+
+{{< /warning >}}
+
+{{< note >}}
+
+- The flags like `opensearch-ips` and `postgresql-ips` are only applicable for the Chef Managed Database cluster
 
 {{< /note >}}
 
@@ -39,6 +45,8 @@ For example,
     ```sh
     chef-automate node add --chef-server-ips 10.1.2.23,10.0.1.42
     ```
+
+
 
 - To add nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, run the following command:
 
@@ -77,12 +85,10 @@ Eg: `chef-automate node add --automate-ips 10.0.1.52 --chef-server-ips 10.0.1.52
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
 
-- Make sure to update your load balancer configuration with the IP address of the new node. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
+- Make sure to update your load-balancer configuration with the IP address of the new node. For reference, check the [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
 {{< note >}}
 
-- If you have patched some external config to any existing services, then apply the same on the new nodes.
-For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in the Automate nodes, make sure to patch those configurations on the new Automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
 - The new node will be configured with the certificates already configured in your HA setup.
 - If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
 - If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
@@ -141,13 +147,16 @@ Once the command executes, it will add the supplied nodes to your automated setu
 
 {{< note >}}
 
-- If you have patched some external config to any existing services, apply the same on the new nodes. For example, if you have patched any external configurations like SAML or LDAP or any other done manually post-deployment in the Automate nodes, make sure to patch those configurations on the new Automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
-- The new node will be configured with the certificates already configured in your HA setup.
+- The new node will be configured with the certificates that are already configured in your HA setup.
+- If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
+- If you want to change the certificates for the new nodes, you can manually run the chef-automate cert-rotate [options] command.
 
 {{< /note >}}
 
 {{< warning >}}
+
 Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
+
 {{< /warning >}}
 
 ## Add more nodes In AWS Deployment with AWS Managed Database
