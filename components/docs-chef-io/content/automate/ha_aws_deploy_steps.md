@@ -123,11 +123,6 @@ Run the following steps on Bastion Host Machine:
     ```bash
      chef-automate status summary
     ```
-1. Once the deployment is successful, Get the consolidate status of the cluster
-
-    ```bash
-     chef-automate status summary
-    ```
 
 1.  Get the service status from each node
 

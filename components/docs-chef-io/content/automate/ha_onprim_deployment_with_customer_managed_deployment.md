@@ -73,11 +73,6 @@ To skip verficiation in the deploy command, use `--skip-verify` flag
     ```bash
      chef-automate status summary
     ```
-1. Once the deployment is successful, Get the consolidate status of the cluster
-
-    ```bash
-     chef-automate status summary
-    ```
 
 1.  Get the service status from each node
 
