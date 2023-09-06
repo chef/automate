@@ -79,7 +79,7 @@ To skip verficiation in the deploy command, use `--skip-verify` flag
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification as command  
+1. Post Deployment, you can run the verification command  
 
     ```bash
      chef-automate verfiy
@@ -90,7 +90,7 @@ To skip verficiation in the deploy command, use `--skip-verify` flag
     ```bash
      chef-automate info
     ```
-    
+
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
 After successful deployment, proceed with following:

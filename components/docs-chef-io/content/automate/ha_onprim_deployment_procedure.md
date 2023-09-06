@@ -118,7 +118,7 @@ You can also view the [Sample Config](#sample-config).
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification as command  
+1. Post Deployment, you can run the verification command  
 
     ```bash
      chef-automate verfiy

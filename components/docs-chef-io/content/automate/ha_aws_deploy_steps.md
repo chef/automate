@@ -134,7 +134,7 @@ Run the following steps on Bastion Host Machine:
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification as command  
+1. Post Deployment, you can run the verification command  
 
     ```bash
      chef-automate verfiy

@@ -125,7 +125,7 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification as command  
+1. Post Deployment, you can run the verification command  
 
     ```bash
      chef-automate verfiy
