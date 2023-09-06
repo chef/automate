@@ -52,9 +52,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 1. Generate config with relevant data using the below command:
 
     ```bash
-    sudo -- sh -c "
     chef-automate config gen config.toml
-    "
     ```
 
     Click [here](/automate/ha_config_gen) to know more about generating config
@@ -72,13 +70,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 1. Continue with the deployment after generating the config:
 
     ```bash
-    #Run commands as sudo.
-    sudo -- sh -c "
-    #Print data in the config
-    cat config.toml
-    #Run provision command to deploy `automate.aib` with set `config.toml`
     chef-automate provision-infra config.toml --airgap-bundle automate.aib
-    "
     ```
 
 {{< note >}}
