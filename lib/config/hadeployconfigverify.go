@@ -19,7 +19,7 @@ func (c *HaDeployConfig) Verify() error {
 
 	// Validate ExistingInfra (on prem)
 	if c.IsExistingInfra() {
-		if c.ObjectStorage.Config.Location == GCS_STORAGE {
+		if c.ObjectStorage != nil && c.ObjectStorage.Config.Location == GCS_STORAGE {
 			err := c.readGCSConfigFile(c.ObjectStorage.Config)
 			if err != nil {
 				return err
