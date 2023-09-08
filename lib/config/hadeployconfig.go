@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -259,23 +258,6 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 	err = ptoml.Unmarshal(templateBytes, c) // Pass pointer to c
 	if err != nil {
 		return fmt.Errorf("error unmarshalling config TOML file: %w", err)
-	}
-	gcpServiceAccount := GcpServiceAccount{}
-	if c.GetConfigInitials() != nil && c.GetConfigInitials().BackupConfig == "object_storage" {
-		objectStorageConfig := c.GetObjectStorageConfig()
-		if objectStorageConfig.Location == GCS_STORAGE {
-			filepath, err := fileUtils.ReadFile(objectStorageConfig.GoogleServiceAccountFile)
-			if err != nil {
-				return fmt.Errorf("error reading Json file: %w", err)
-			}
-			err = json.Unmarshal(filepath, &gcpServiceAccount)
-			if err != nil {
-				return fmt.Errorf("error unmarshalling Json file: %w", err)
-			}
-			c.ObjectStorage.Config.GcpServiceAccount = &gcpServiceAccount
-		} else if objectStorageConfig.Location == "" {
-			c.ObjectStorage.Config.Location = AWS_S3
-		}
 	}
 	return nil
 }

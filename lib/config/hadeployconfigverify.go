@@ -2,10 +2,15 @@ package config
 
 import (
 	"container/list"
+	"encoding/json"
 	"errors"
+	"fmt"
+
+	"github.com/chef/automate/lib/io/fileutils"
 )
 
 func (c *HaDeployConfig) Verify() error {
+
 	errorList := list.New()
 
 	if !c.IsValidHaDeployConfig() {
@@ -14,6 +19,12 @@ func (c *HaDeployConfig) Verify() error {
 
 	// Validate ExistingInfra (on prem)
 	if c.IsExistingInfra() {
+		if c.ObjectStorage.Config.Location == GCS_STORAGE {
+			err := c.readGCSConfigFile(c.ObjectStorage.Config)
+			if err != nil {
+				return err
+			}
+		}
 		if err := c.verifyExistingInfra(); err != nil {
 			errorList.PushBack(err)
 		}
@@ -759,4 +770,20 @@ func (c *HaDeployConfig) verifyGcsStorage(gcp *GcpServiceAccount) error {
 		errorList.PushBack(err)
 	}
 	return getSingleErrorFromList(errorList)
+}
+
+func (c *HaDeployConfig) readGCSConfigFile(cfg *ConfigObjectStorage) error {
+	fileUtils := &fileutils.FileSystemUtils{}
+	gcpServiceAccount := GcpServiceAccount{}
+	filepath, err := fileUtils.ReadFile(cfg.GoogleServiceAccountFile)
+	if err != nil {
+		return fmt.Errorf("error reading Json file: %w", err)
+	}
+	err = json.Unmarshal(filepath, &gcpServiceAccount)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling Json file: %w", err)
+	}
+	cfg.GcpServiceAccount = &gcpServiceAccount
+	return nil
+
 }
