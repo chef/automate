@@ -83,6 +83,41 @@ func TestParseAndVerify(t *testing.T) {
 			wantErr: true,
 			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
 		},
+		{
+			name: "Parse OnPrem Config file not found",
+			args: args{configFile: "./testdata/OnPremConfig.toml"},
+
+			wantErr: true,
+			err:     errors.New("error reading config TOML file: open ./testdata/OnPremConfig.toml: no such file or directory"),
+		},
+		{
+			name: "Error unmarshalling toml file",
+			args: args{configFile: "./testdata/UnmarshalErr.toml"},
+
+			wantErr: true,
+			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
+		},
+		{
+			name: "Parse OnPrem gcs file not found",
+			args: args{configFile: "./testdata/HaOnPremGcsFailed.toml"},
+
+			wantErr: true,
+			err:     errors.New("error reading Json file: open ./testdata/service.json: no such file or directory"),
+		},
+		{
+			name: "Error unmarshalling json file",
+			args: args{configFile: "./testdata/UnmarshalErrorForGcs.toml"},
+
+			wantErr: true,
+			err:     errors.New("error unmarshalling Json file: json: cannot unmarshal array into Go value of type config.GcpServiceAccount"),
+		},
+		{
+			name: "Success",
+			args: args{configFile: "./testdata/HaOnPremGcs.toml"},
+
+			wantErr: true,
+			err:     errors.New("invalid or empty: ssh_user\ninvalid or empty: ssh_key_file\nautomate private ip 1324.2534.1is not valid\ninvalid or empty: chef_server_private_ips\ninvalid or empty: opensearch_private_ips\ninvalid or empty: postgresql_private_ips\nurl should not include the protocol (http:// or https://): automate fqdn\nempty value: automate instance_count\ninvalid value 'automate.toml' for field 'config_file'. Expected values are: configs/automate.toml\ninvalid format. Failed to decode root_ca for automate\ninvalid format. Failed to decode private_key for automate\ninvalid format. Failed to decode public_key for automate\ninvalid format. Failed to decode private_key for automate ip\ninvalid format. Failed to decode public_key for automate ip\ninvalid value 'chef server instance_count' for field 'two'\ninvalid format. Failed to decode private_key for chef-infra-server\ninvalid format. Failed to decode public_key for chef-infra-server\ninvalid format. Failed to decode private_key for chef server ip\ninvalid format. Failed to decode public_key for chef server ip\nempty value: opensearch instance_count\nopensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nopensearch ip public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false\nempty value: postgresql instance_count\ninvalid format. Failed to decode root_ca for postgresql\ninvalid format. Failed to decode private_key for postgresql\ninvalid format. Failed to decode public_key for postgresql\npostgresql ip 0.0.1 for certs is not valid\ninvalid format. Failed to decode private_key for postgresql ip\ninvalid format. Failed to decode public_key for postgresql ip"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
