@@ -116,7 +116,7 @@ You can also view the [Sample Config](#sample-config).
 1. Post Deployment, you can run the verification command  
 
     ```bash
-     chef-automate verfiy
+     chef-automate verify
     ```
 
 1. Get the  cluster Info

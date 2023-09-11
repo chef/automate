@@ -264,6 +264,6 @@ To know more about the on-premises deployment disaster recovery, visit our [Disa
 
 ## Backup and Restore
 
-In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_object_storage/) for taking backup.
+In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO/Google-Cloud-Storage)**](/automate/ha_backup_restore_object_storage/) for taking backup.
 
 Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).

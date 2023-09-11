@@ -83,7 +83,7 @@ To skip verification in the deploy command, use `--skip-verify` flag
 1. Post Deployment, you can run the verification command  
 
     ```bash
-     chef-automate verfiy
+     chef-automate verify
     ```
 
 1. Get the  cluster Info
