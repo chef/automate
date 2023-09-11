@@ -129,9 +129,11 @@ In Case of AWS managed or Customer managed databases below fields will be requir
 ## Backup
 
 - If configuring backup at the time of deployment the  we many need following fields:
-  - `Bucket name` for object storage or AWS S3 type of backup provide bucket name, for AWS deployment bucket will be created if not exist in AWS.
+  - `Bucket name` for object storage or Google Cloud Storage bucket name in google cloud platform or AWS S3 type of backup provide bucket name or , for AWS deployment bucket will be created if not exist in AWS.
   - `Access Key` S3 access key.
   - `Secret Key` S3 secret key.
   - `Endpoint` for object storage provide endpoint of object storage.
   - `Region` for S3 provide region.
   - `Mount path` in case of file system/efs backup provide mount path of backup directory.
+  - `location` For On-Premise deployment in case of any object storage other than Google Cloud Storage, provide `s3` as value or in case of Google Cloud Storage, provide `gcs` as value.
+  - `google service account file` in case of Google Cloud Storage provide the credentials file path Example: `/path/to/file/test.json`.
