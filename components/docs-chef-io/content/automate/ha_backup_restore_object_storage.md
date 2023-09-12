@@ -26,18 +26,16 @@ gh_repo = "automate"
 
 ## Overview
 
-This section provides the pre-backup configuration required to back up the data on the Object Storage System. The supported Object storage could be of two types:
+This section provides the backup configuration required to backup the data on the Object Storage System. The supported Object storage could be of two types:
   - S3 (AWS S3, Minio, Non-AWS S3)
   - GCS
-
-The value of location varies based on the type of Object Storage, that is, `location="s3"` incase of S3 storage that includes AWS S3, Minio and Non-AWS S3, and `location="gcs"` incase of Google Cloud Storage bucket.
 
 
 
 ### Configuration in OpenSearch Node 
 
 #### For _Minio_, _Non-AWS S3_, _AWS S3_
-For the Object storages like _Minio_, _Non-AWS S3_, _AWS S3_, the following are the steps to set a secret key and access key of the bucket on the OpenSearch nodes:
+For the Object storages like _Minio_, _Non-AWS S3_, _AWS S3_, the following are the pre-configuration steps to set a secret key and access key of the bucket on the OpenSearch nodes:
 
 1. Log in to **all** the OpenSearch nodes and execute the following commands one after another.
 
@@ -49,7 +47,7 @@ For the Object storages like _Minio_, _Non-AWS S3_, _AWS S3_, the following are 
 
 
 #### For _GCS_
-For GCP Object Storage, the following are the steps to set access to the GCS bucket on the OpenSearch nodes:
+For GCP Object Storage, the following are the pre-configuration steps to set access to the GCS bucket on the OpenSearch nodes:
 
 1. Log in to **all** the OpenSearch nodes and execute the following commands.
 
@@ -132,9 +130,11 @@ This will update the configuration in the Opensearch node.
 
 {{< note >}}
 
-Make sure all the frontend nodes and OpenSearch have access to the object storage.
+- Make sure all the frontend nodes and OpenSearch have access to the object storage.
+- The value of location varies based on the type of Object Storage, that is, `location="s3"` incase of S3 storage that includes AWS S3, Minio and Non-AWS S3, and `location="gcs"` incase of Google Cloud Storage bucket.
 
 {{< /note >}}
+
 
 Once done with the OpenSearch setup, add the following `automate.toml` file and patch the updated config to all frontend nodes. In the file, modify the values listed below:
 
