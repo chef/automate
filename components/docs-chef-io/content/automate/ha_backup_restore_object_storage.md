@@ -266,7 +266,7 @@ Once done with the OpenSearch setup, add the following `automate.toml` file and 
     chef-automate backup create
     ```
 
-<!-- TODO: Restore command for gcp staorage -->
+
 #### Restoring the Backed-up Data from Object Storage
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
