@@ -401,15 +401,18 @@ func printStatusErrorOutput(cmdResult *CmdResult, remoteService string, writer *
 		isOutputError = true
 		writer.Failf("Output for Host IP %s : \n%s", cmdResult.HostIP, cmdResult.Output+"\n")
 		writer.Success("Command is executed on " + remoteService + " node : " + cmdResult.HostIP + "\n")
+		fmt.Printf("\n cmd output for Host IP %s : %s",cmdResult.HostIP,cmdResult.Output)
 	}
 
 	if strings.Contains(cmdResult.Output, "DeploymentServiceUnreachableError") {
 		isOutputError = true
 		writer.Failf(CMD_FAIL_MSG, remoteService, cmdResult.HostIP, cmdResult.Output)
+		fmt.Printf("\n cmd output for Host IP %s : %s",cmdResult.HostIP,cmdResult.Output)
 	}
 
 	if !isOutputError {
 		writer.Failf(CMD_FAIL_MSG, remoteService, cmdResult.HostIP, cmdResult.Error.Error())
+		fmt.Printf("\n cmd output for Host IP %s : %s",cmdResult.HostIP,cmdResult.Output)
 	}
 }
 
@@ -417,6 +420,7 @@ func getValueFromChannel(statusCmdResults chan StatusCmdResult, printStatusOutpu
 	for i := 0; i < 4; i++ {
 		cmdResult := <-statusCmdResults
 		if cmdResult.err != nil {
+			fmt.Printf("for node %v error while getting the channel value : %s",i,cmdResult.err)
 			return cmdResult.err
 		} else {
 			if cmdResult.writer != nil {
