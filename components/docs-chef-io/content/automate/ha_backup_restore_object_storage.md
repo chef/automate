@@ -131,7 +131,7 @@ This will update the configuration in the Opensearch node.
 {{< note >}}
 
 - Make sure all the frontend nodes and OpenSearch have access to the object storage.
-- The value of location varies based on the type of Object Storage, that is, `location="s3"` incase of S3 storage that includes AWS S3, Minio and Non-AWS S3, and `location="gcs"` incase of Google Cloud Storage bucket.
+- The value of `location` varies based on the type of Object Storage, that is, `location="s3"` incase of S3 storage that includes AWS S3, Minio and Non-AWS S3, and `location="gcs"` incase of Google Cloud Storage bucket.
 
 {{< /note >}}
 
@@ -293,9 +293,9 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - Check the status of the Automate HA Cluster from the Bastion nodes by executing the `chef-automate status` command.
 
-- For S3, execute the following command from the Bastion to restore `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- For **S3**, execute the following command from the Bastion to restore `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
-- For GCS, execute the following command from the Bastion to restore `chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --gcs-credentials-path "path/to/googleServiceAccount.json/file"`.
+- For **GCS**, execute the following command from the Bastion to restore `chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --gcs-credentials-path "path/to/googleServiceAccount.json/file"`.
 
 - In the case of Airgapped Environment, Execute this restore command from the Bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --skip-preflight --airgap-bundle </path/to/bundle>`.
 
