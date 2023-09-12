@@ -2,11 +2,13 @@ package v1_test
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -29,6 +31,24 @@ var (
 	successMessagegcpConfig             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with GCP using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":true,\"success_msg\":\"Machine is able to access the GCP bucket using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}]}}"
 	failureMessagegcpConfig             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with GCP using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct GCP url or access or secret keys\",\"skipped\":false}]}}"
 	bucketAccessfailureMessagegcpConfig = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"GCP connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with GCP using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"GCP bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the GCP bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the GCP bucket\",\"skipped\":false}]}}"
+
+	reqBodyGCS = `{
+		"location": "gcs",
+		"bucket_name": "backup-test",
+		"gcp_service_account": {
+			"type": "svc_account",
+			"project_id": "backup-testing",
+			"private_key_id": "lksdhksbdjkcbdsjhcds",
+			"private_key": "-----BEGIN PRIVATE KEY----------END PRIVATE KEY-----\n",
+			"client_email": "--testing..com",
+			"client_id": "dfv",
+			"auth_uri": "https://",
+			"token_uri": "https://",
+			"auth_provider_x509_cert_url": "https://",
+			"client_x509_cert_url": "https://",
+			"universe_domain": "google"
+		}
+	}`
 )
 
 func SetupMockgcpConfigService(mockGCPConnectionModel, mockGCPBucketAccessModel models.Checks) gcpcloudstorageservice.GCPCloudStorageConfig {
@@ -87,7 +107,7 @@ func TestGetGCPCloudStorageConfig(t *testing.T) {
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			body:         reqBody,
+			body:         reqBodyGCS,
 			expectedBody: successMessagegcpConfig,
 		},
 		{
@@ -107,7 +127,7 @@ func TestGetGCPCloudStorageConfig(t *testing.T) {
 				ErrorMsg:      gcpBucketAccessErrorMsg,
 				ResolutionMsg: gcpBucketAccessResolutionMsg,
 			},
-			body:         reqBody,
+			body:         reqBodyGCS,
 			expectedBody: failureMessagegcpConfig,
 		},
 		{
@@ -127,7 +147,7 @@ func TestGetGCPCloudStorageConfig(t *testing.T) {
 				ErrorMsg:      gcpBucketAccessErrorMsg,
 				ResolutionMsg: gcpBucketAccessResolutionMsg,
 			},
-			body:         reqBody,
+			body:         reqBodyGCS,
 			expectedBody: bucketAccessfailureMessagegcpConfig,
 		},
 		{
@@ -172,4 +192,218 @@ func TestGetGCPCloudStorageConfig(t *testing.T) {
 
 		})
 	}
+}
+
+func TestCredentialsCheck(t *testing.T) {
+	t.Run("type not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				ProjectID: "project-id",
+			},
+		}
+
+		// Test missing type
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_TYPE_MISSING_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_TYPE_MISSING)
+	})
+
+	t.Run("project_id not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type: "svc-scc",
+			},
+		}
+
+		// Test missing type
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_PROJECT_ID_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_PROJECT_ID)
+	})
+
+	t.Run("private_key_id not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:      "svc-scc",
+				ProjectID: "new-id",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_PRIVATE_KEY_ID_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_PRIVATE_KEY_ID)
+	})
+
+	t.Run("private_key not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:         "svc-scc",
+				ProjectID:    "new-id",
+				PrivateKeyID: "key-id",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_PRIVATE_KEY_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_PRIVATE_KEY)
+	})
+
+	t.Run("client_email not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:         "svc-scc",
+				ProjectID:    "new-id",
+				PrivateKeyID: "key-id",
+				PrivateKey:   "-----BEGIN PRIVATE KEY-----",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_CLIENT_EMAIL_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_CLIENT_EMAIL)
+	})
+
+	t.Run("client_id not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:         "svc-scc",
+				ProjectID:    "new-id",
+				PrivateKeyID: "key-id",
+				PrivateKey:   "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:  "newclient",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_CLIENT_ID_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_CLIENT_ID)
+	})
+
+	t.Run("auth_uri not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:         "svc-scc",
+				ProjectID:    "new-id",
+				PrivateKeyID: "key-id",
+				PrivateKey:   "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:  "newclient",
+				ClientID:     "new client id",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_AUTH_URI_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_AUTH_URI)
+	})
+
+	t.Run("token_uri not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:         "svc-scc",
+				ProjectID:    "new-id",
+				PrivateKeyID: "key-id",
+				PrivateKey:   "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:  "newclient",
+				ClientID:     "new client id",
+				AuthURI:      "auth.auth",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_TOKEN_URI_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_TOKEN_URI)
+	})
+
+	t.Run("auth_provider_x509_cert_url not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:         "svc-scc",
+				ProjectID:    "new-id",
+				PrivateKeyID: "key-id",
+				PrivateKey:   "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:  "newclient",
+				ClientID:     "new client id",
+				AuthURI:      "auth.auth",
+				TokenURI:     "new token",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_AUTH_PROVIDER_x509_CERT_URL_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_AUTH_PROVIDER_x509_CERT_URL)
+	})
+
+	t.Run("client_x509_cert_url not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:                    "svc-scc",
+				ProjectID:               "new-id",
+				PrivateKeyID:            "key-id",
+				PrivateKey:              "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:             "newclient",
+				ClientID:                "new client id",
+				AuthURI:                 "auth.auth",
+				TokenURI:                "new token",
+				AuthProviderX509CertURL: "https://",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_CLIENT_x509_CERT_URL_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_CLIENT_x509_CERT_URL)
+	})
+
+	t.Run("universe_domain not available", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:                    "svc-scc",
+				ProjectID:               "new-id",
+				PrivateKeyID:            "key-id",
+				PrivateKey:              "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:             "newclient",
+				ClientID:                "new client id",
+				AuthURI:                 "auth.auth",
+				TokenURI:                "new token",
+				AuthProviderX509CertURL: "https://",
+				ClientX509CertURL:       "https://",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, constants.GCS_UNIVERSAL_DOMAIN_RESOLUTION)
+		assert.Equal(t, err.Error(), constants.GCS_UNIVERSAL_DOMAIN)
+	})
+
+	t.Run("no error", func(t *testing.T) {
+		cred := &models.GCPCloudStorageConfigRequest{
+			GcpServiceAccount: &models.GcpServiceAccount{
+				Type:                    "svc-scc",
+				ProjectID:               "new-id",
+				PrivateKeyID:            "key-id",
+				PrivateKey:              "-----BEGIN PRIVATE KEY-----",
+				ClientEmail:             "newclient",
+				ClientID:                "new client id",
+				AuthURI:                 "auth.auth",
+				TokenURI:                "new token",
+				AuthProviderX509CertURL: "https://",
+				ClientX509CertURL:       "https://",
+				UniverseDomain:          "google.com",
+			},
+		}
+
+		result, err := v1.CredentialsCheck(cred)
+		assert.Equal(t, result, "")
+		assert.NoError(t, err)
+	})
+}
+
+func TestCredCheckErr(t *testing.T) {
+	// Test error case
+	err := errors.New("error message")
+	result := v1.CredCheckErr("resolution message", err)
+	assert.Equal(t, len(result), 1)
+	assert.Equal(t, result[0].Title, constants.GCP_CONNECTION_TITLE)
+	assert.Equal(t, result[0].Passed, false)
+	assert.Equal(t, result[0].ErrorMsg, err.Error())
+	assert.Equal(t, result[0].ResolutionMsg, "resolution message")
 }
