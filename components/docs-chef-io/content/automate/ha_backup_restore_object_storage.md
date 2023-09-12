@@ -266,14 +266,16 @@ Once done with the OpenSearch setup, add the following `automate.toml` file and 
     chef-automate backup create
     ```
 
-<!-- TODO: Restor command for gcp staorage -->
+<!-- TODO: Restore command for gcp staorage -->
 #### Restoring the Backed-up Data from Object Storage
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
 
 - Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
 
-- Execute the restore command from bastion`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- For S3, execute the following command from bastion to restore `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+
+- For GCS, execute the following command from bastion to restore `chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --gcs-credentials-path "path/to/googleServiceAccount.json/file"`.
 
 - In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --skip-preflight --airgap-bundle </path/to/bundle>`.
 
