@@ -38,6 +38,20 @@ Additionally, this topology requires two load balancers and 2 DNS entries with c
 
 We recommend using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server. External Standalone Infra Server will violate this high availability requirement.
 
+## Provisioning
+
+To Deploy On-Premises Infra we need to provision the resources which are required, Provisioning can be done using following types of infrastructures:
+
+**Existing infrastructure**
+
+**Existing Cloud infrastructure**
+- AWS
+- Google Cloud Platform
+
+Using above infrastructure types make sure you have following resources created:
+- All Vm's should be up and running with minimum count as in this [table](/automate/ha_on_premises_deployment_prerequisites/#chef-automate-architecture)
+- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+- In On-premises deployment of Automate HA, we support Network File System (NFS) or Object Storage (S3/MinIO/Google Cloud Storage) for taking backup.
 ## Software Requirements
 
 The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:

@@ -25,6 +25,13 @@ This section will discuss deploying Chef Automate HA on-premise machines with ch
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 {{< /warning >}}
 
+## Provisioning
+
+- Provisioning all the resources are needed before performing steps to run on Bastion Host Machine.
+- Make sure you have all resources either on Existing Infrastructure or on Existing cloud Infrastructure(AWS/Google Cloud Storage) which is mentioned in [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/)
+- Make sure you have setup vm's as per your requirement.
+- Configure load balancer for both automate and chefserver.
+
 ## Steps to run on Bastion Host Machine
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
