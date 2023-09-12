@@ -45,7 +45,8 @@ For the Object storages like _Minio_, _Non-AWS S3_, _AWS S3_, the following are 
 - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
 - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
 - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
-- `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+- `curl https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem` (Command to load the above setting)
+
 
 #### For _GCS_
 For GCP Object Storage, the following are the steps to set access to the GCS bucket on the OpenSearch nodes:
@@ -57,7 +58,7 @@ For GCP Object Storage, the following are the steps to set access to the GCS buc
 - `chown -RL hab:hab $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
 - `hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
 - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
-- `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+- `curl https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem` (Command to load the above setting)
 
 The final output after running the above curl command on all nodes is given below:
 
