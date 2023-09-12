@@ -11,7 +11,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	"github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/httputils"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/reporting"
 	"github.com/chef/automate/lib/sshutils"
@@ -201,7 +200,7 @@ func TestRunVerifyCmd(t *testing.T) {
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
-				PopulateHaCommonConfig: func(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error) {
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 					return &config.HaDeployConfig{}, nil
 				},
 			},
@@ -255,7 +254,7 @@ func TestRunVerifyCmd(t *testing.T) {
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
-				PopulateHaCommonConfig: func(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error) {
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 					return &config.HaDeployConfig{}, nil
 				},
 			},
@@ -312,7 +311,7 @@ func TestRunVerifyCmd(t *testing.T) {
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
 					return nil, errors.New("Unable to get automate HA infra details")
 				},
-				PopulateHaCommonConfig: func(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error) {
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 					return &config.HaDeployConfig{}, nil
 				},
 			},
@@ -369,7 +368,7 @@ func TestRunVerifyCmd(t *testing.T) {
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
-				PopulateHaCommonConfig: func(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error) {
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 					return nil, errors.New("Failed to populate HA common config")
 				},
 			},
@@ -600,7 +599,7 @@ func newMockVerifyCmdFlow(mockHttputils *httputils.MockHTTPClient, cw *majorupgr
 		getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
 			return &AutomateHAInfraDetails{}, nil
 		},
-		PopulateHaCommonConfig: func(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error) {
+		PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 			return &config.HaDeployConfig{}, nil
 		},
 	}

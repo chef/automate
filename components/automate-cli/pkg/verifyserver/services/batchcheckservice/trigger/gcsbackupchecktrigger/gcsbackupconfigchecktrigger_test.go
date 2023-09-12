@@ -173,11 +173,20 @@ const (
 		  "skip_message":"- Backup configuration not set to object_storage/gcs"
 		}
 	  }`
-	bucketName             = "test"
-	accountServiceFilepath = "/test/account.json"
-	typeAccount            = "servicefile"
-	projectID              = "dev-project"
-	location               = "gcs"
+	bucketName              = "test"
+	accountServiceFilepath  = "./testdata/account.json"
+	location                = "gcs"
+	typeS                   = "service_account"
+	projectId               = "dev"
+	privateKeyId            = "e123454a6668a89b970f703f"
+	privateKey              = "certificate"
+	clientEmail             = "abc.gserviceaccount.com"
+	clientId                = "1146674505608030"
+	authUri                 = "https://accounts.google.com/o/oauth2/auth"
+	tokenUri                = "https://oauth2.googleapis.com/token"
+	authProviderx509CertUrl = "https://www.googleapis.com/oauth2/v1/certs"
+	clientx509CertUrl       = "https://www.googleapis.com/robot/v1/metadata/x509/test"
+	universeDomain          = "main"
 )
 
 func getRequest() models.GCPCloudStorageConfigRequest {
@@ -185,8 +194,17 @@ func getRequest() models.GCPCloudStorageConfigRequest {
 		BucketName:               bucketName,
 		GoogleServiceAccountFile: accountServiceFilepath,
 		GcpServiceAccount: &models.GcpServiceAccount{
-			Type:      typeAccount,
-			ProjectID: projectID,
+			Type:                    typeS,
+			ProjectID:               projectId,
+			PrivateKeyID:            privateKeyId,
+			PrivateKey:              privateKey,
+			ClientEmail:             clientEmail,
+			ClientID:                clientId,
+			AuthURI:                 authUri,
+			TokenURI:                tokenUri,
+			AuthProviderX509CertURL: authProviderx509CertUrl,
+			ClientX509CertURL:       clientx509CertUrl,
+			UniverseDomain:          universeDomain,
 		},
 	}
 }
@@ -220,10 +238,6 @@ func TestGCPBackupConfigCheck_Run(t *testing.T) {
 							Location:                 location,
 							BucketName:               bucketName,
 							GoogleServiceAccountFile: accountServiceFilepath,
-							GcpServiceAccount: &models.GcpServiceAccount{
-								Type:      typeAccount,
-								ProjectID: projectID,
-							},
 						},
 					},
 				},
@@ -245,10 +259,6 @@ func TestGCPBackupConfigCheck_Run(t *testing.T) {
 							Location:                 location,
 							BucketName:               bucketName,
 							GoogleServiceAccountFile: accountServiceFilepath,
-							GcpServiceAccount: &models.GcpServiceAccount{
-								Type:      typeAccount,
-								ProjectID: projectID,
-							},
 						},
 					},
 				},
@@ -270,10 +280,6 @@ func TestGCPBackupConfigCheck_Run(t *testing.T) {
 							Location:                 location,
 							BucketName:               bucketName,
 							GoogleServiceAccountFile: accountServiceFilepath,
-							GcpServiceAccount: &models.GcpServiceAccount{
-								Type:      typeAccount,
-								ProjectID: projectID,
-							},
 						},
 					},
 				},
@@ -297,16 +303,54 @@ func TestGCPBackupConfigCheck_Run(t *testing.T) {
 							Location:                 location,
 							BucketName:               bucketName,
 							GoogleServiceAccountFile: accountServiceFilepath,
-							GcpServiceAccount: &models.GcpServiceAccount{
-								Type:      typeAccount,
-								ProjectID: projectID,
-							},
 						},
 					},
 				},
 			},
 			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
 			response:               "context deadline exceeded",
+		},
+		{
+			name:           "Parsing Error",
+			isPassed:       false,
+			isError:        true,
+			httpStatusCode: http.StatusBadRequest,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 2,
+					},
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: "service.json",
+						},
+					},
+				},
+			},
+			response: "Json File is empty or Incorrect Json File",
+		},
+		{
+			name:           "Parsing Empty",
+			isPassed:       false,
+			isError:        true,
+			httpStatusCode: http.StatusBadRequest,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 2,
+					},
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: "./testdata/service.json",
+						},
+					},
+				},
+			},
+			response: "Json File is empty or Incorrect Json File",
 		},
 	}
 	for _, tt := range tests {

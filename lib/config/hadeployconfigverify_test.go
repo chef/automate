@@ -83,6 +83,27 @@ func TestParseAndVerify(t *testing.T) {
 			wantErr: true,
 			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
 		},
+		{
+			name: "Parse OnPrem Config file not found",
+			args: args{configFile: "./testdata/OnPremConfig.toml"},
+
+			wantErr: true,
+			err:     errors.New("error reading config TOML file: open ./testdata/OnPremConfig.toml: no such file or directory"),
+		},
+		{
+			name: "Error unmarshalling toml file",
+			args: args{configFile: "./testdata/UnmarshalErr.toml"},
+
+			wantErr: true,
+			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
+		},
+		{
+			name: "Success for gcs",
+			args: args{configFile: "./testdata/HaOnPremGcs.toml"},
+
+			wantErr: false,
+			err:     nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -172,22 +193,29 @@ func TestVerifyObjectStorage(t *testing.T) {
 			expectedError: errors.New("invalid AWS region for S3"),
 		},
 		{
-			name: "Empty Type",
+			name: "Empty Bucket",
 			objectStorage: &ConfigObjectStorage{
-				Location: GCS_STORAGE,
-				GcpServiceAccount: &GcpServiceAccount{
-					Type: "",
-				},
+				Location:                 GCS_STORAGE,
+				GoogleServiceAccountFile: "./testdata/gcsservicefile.json",
 			},
-			expectedError: errors.New("invalid or empty: bucket_name\ninvalid or empty: type\ninvalid or empty: project_id\ninvalid or empty: private_key_id\ninvalid or empty: private_key\ninvalid or empty: token_uri\ninvalid or empty: client_id\ninvalid or empty: client_email\ninvalid or empty: auth_uri\ninvalid or empty: auth_provider_x509_cert_url\ninvalid or empty: client_x509_cert_url\ninvalid or empty: universe_domain"),
+			expectedError: errors.New("invalid or empty: bucket_name"),
+		},
+		{
+			name: "Empty ServiceFile",
+			objectStorage: &ConfigObjectStorage{
+				Location:                 GCS_STORAGE,
+				BucketName:               "bucket",
+				GoogleServiceAccountFile: "./testdata/servicefile.json",
+			},
+			expectedError: errors.New("invalid google_service_account_file: ./testdata/servicefile.json no such file or directory"),
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			c := &HaDeployConfig{} // Initialize HaDeployConfig instance
 			err := c.verifyObjectStorage(tc.objectStorage)
-			if err == nil && tc.expectedError != nil {
-				t.Errorf("Expected error: %v, but got: %v", tc.expectedError, err)
+			if err != nil && tc.expectedError != nil {
+				assert.EqualErrorf(t, err, tc.expectedError.Error(), "")
 			}
 		})
 	}
