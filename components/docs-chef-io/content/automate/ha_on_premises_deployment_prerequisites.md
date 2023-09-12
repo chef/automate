@@ -38,6 +38,17 @@ Additionally, this topology requires two load balancers and 2 DNS entries with c
 
 We recommend using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server. External Standalone Infra Server will violate this high availability requirement.
 
+## Provisioning
+
+To Deploy On-Premises Infra user needs to provision the resources manually that are required. Provisioning can be done on the following types of infrastructures:
+- Existing infrastructure
+- Existing Cloud infrastructure
+    - AWS
+    - Google Cloud Platform
+      - Using above infrastructure types make sure you have following resources created:
+      - All Vm's should be up and running with minimum count as in this [table](/automate/ha_on_premises_deployment_prerequisites/#chef-automate-architecture)
+      - Load Balancers should be configured for both Automate and ChefServer [Chef Automate HA Architecture](/automate/ha/) as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+  - In On-premises deployment of Automate HA, we support Network File System (NFS) or Object Storage (S3/MinIO/Google Cloud Storage) for taking backup.
 ## Software Requirements
 
 The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:
@@ -85,13 +96,13 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ### Minimum Hardware Requirement
 
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | GCP Machine Type | Additional Space      |
-| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ---------------- | -----------------     |
-| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space  |
+| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
+| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
 
 {{< note >}}
 For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
@@ -264,6 +275,6 @@ To know more about the on-premises deployment disaster recovery, visit our [Disa
 
 ## Backup and Restore
 
-In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_object_storage/) for taking backup.
+In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO/Google-Cloud-Storage)**](/automate/ha_backup_restore_object_storage/) for taking backup.
 
 Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
