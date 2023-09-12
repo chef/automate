@@ -114,7 +114,7 @@ In Case of AWS managed or Customer managed databases below fields will be requir
 
 ### PostgreSQL
 
-- `Postgresql URL and port` Postgresql url along with port Example: `postgresql.example.com:5432`.
+- `PostgreSQL URL and port` Postgresql url along with port Example: `postgresql.example.com:5432`.
 - `PostgreSQL super username` master username to login to postgresql.
 - `PostgreSQL super user password` master password to login to postgresql.
 - `PostgreSQL database username` database username to login to postgresql.
@@ -128,12 +128,12 @@ In Case of AWS managed or Customer managed databases below fields will be requir
 
 ## Backup
 
-- If configuring backup at the time of deployment the  we many need following fields:
-  - `Bucket name` for object storage or Google Cloud Storage bucket name in google cloud platform or AWS S3 type of backup provide bucket name or , for AWS deployment bucket will be created if not exist in AWS.
+- If backup is to be configured at the time of deployment then user need to provide value to the following fields/prompts:
+  - `Bucket name` Object storage bucket name in google cloud platform or AWS S3 type of backup provide bucket name or , for AWS deployment bucket will be created if not exist in AWS.
   - `Access Key` S3 access key.
   - `Secret Key` S3 secret key.
-  - `Endpoint` for object storage provide endpoint of object storage.
-  - `Region` for S3 provide region.
-  - `Mount path` in case of file system/efs backup provide mount path of backup directory.
-  - `location` For On-Premise deployment in case of any object storage other than Google Cloud Storage, provide `s3` as value or in case of Google Cloud Storage, provide `gcs` as value.
-  - `google service account file` in case of Google Cloud Storage provide the credentials file path Example: `/path/to/file/test.json`.
+  - `Endpoint` Endpoint of object storage.
+  - `Region` S3 Bucket region.
+  - `Mount path` In case of file system/efs backup, provide the mount path of backup directory.
+  - `Location` For On-Premise deployment in case of any object storage other than Google Cloud Storage, provide `s3` as value or in case of Google Cloud Storage, provide `gcs` as value.
+  - `Google Service Account File` In case of Google Cloud Storage provide the credentials file path Example: `/path/to/file/test.json`.

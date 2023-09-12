@@ -40,18 +40,15 @@ We recommend using Chef Infra Server managed by Automate HA to have high availab
 
 ## Provisioning
 
-To Deploy On-Premises Infra we need to provision the resources which are required, Provisioning can be done using following types of infrastructures:
-
-**Existing infrastructure**
-
-**Existing Cloud infrastructure**
-- AWS
-- Google Cloud Platform
-
-Using above infrastructure types make sure you have following resources created:
-- All Vm's should be up and running with minimum count as in this [table](/automate/ha_on_premises_deployment_prerequisites/#chef-automate-architecture)
-- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
-- In On-premises deployment of Automate HA, we support Network File System (NFS) or Object Storage (S3/MinIO/Google Cloud Storage) for taking backup.
+To Deploy On-Premises Infra user needs to provision the resources manually that are required. Provisioning can be done on the following types of infrastructures:
+- Existing infrastructure
+- Existing Cloud infrastructure
+    - AWS
+    - Google Cloud Platform
+      - Using above infrastructure types make sure you have following resources created:
+      - All Vm's should be up and running with minimum count as in this [table](/automate/ha_on_premises_deployment_prerequisites/#chef-automate-architecture)
+      - Load Balancers should be configured for both Automate and ChefServer [Chef Automate HA Architecture](/automate/ha/) as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+  - In On-premises deployment of Automate HA, we support Network File System (NFS) or Object Storage (S3/MinIO/Google Cloud Storage) for taking backup.
 ## Software Requirements
 
 The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:
