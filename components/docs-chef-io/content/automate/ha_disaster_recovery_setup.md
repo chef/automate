@@ -24,7 +24,7 @@ Typically these two clusters should be located in different data centers or clou
 ### Requirements
 
 1. Two identical clusters located in different data centers or cloud provider regions
-1. Network accessible storage (NAS), object store (S3), available in both data centers/regions
+1. Network accessible storage (NAS), object store (S3,Minio,Google Cloud Storage), available in both data centers/regions
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
 In the above approach, there will be 2 identical clusters
@@ -133,16 +133,27 @@ Configure backups for both clusters using either [file system](/automate/ha_back
 
         - In the Disaster Recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
 
+        For **S3/Minio** execute the following command from the Boostrapped Automate node to restore:
         ```cmd
         id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore /mnt/automate_backups/backups/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
         ```
+        For **GCS** execute the following command from the Boostrapped Automate node to restore:
 
-        Sample cron for restoring backup saved in object storage (S3) looks like this:
-
+        ```cmd
+        id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
+        sudo chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --gcs-credentials-path "path/to/googleServiceAccount.json/file"`
+        ```
+        Sample cron for restoring backup saved in object storage (S3/Minio) looks like this:
         ```cmd
         id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
+        ```
+        Sample cron for restoring backup saved in object storage (GCS) looks like this:
+        ```cmd
+        id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
+        sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --gcs-credentials-path "path/to/googleServiceAccount.json/file"
+        ```
         ```
 
 

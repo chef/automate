@@ -20,6 +20,16 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Frequently Asked Questions
 
+### What are different ways to provision an on-premise deployment?
+- There are two types of infrastructure to provision on-premise deployment as follows:
+   -  Existing Infrastructure
+   -  Existing Cloud Infrastructure
+      -  AWS
+      -  Google Cloud Platform
+
+### What are different types of backup available for deployment on GCP platform?
+- Google Cloud Storage(GCS) and File System(FS) type backup is supported for deployment on GCP platform
+
 ### How to check logs For automate nodes?
 - To view the logs please do ssh to the respective node by running the command from bastion node 
 `./chef-automate ssh --hostname a2`
