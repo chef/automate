@@ -2,11 +2,7 @@ package config
 
 import (
 	"container/list"
-	"encoding/json"
 	"errors"
-	"fmt"
-
-	"github.com/chef/automate/lib/io/fileutils"
 )
 
 func (c *HaDeployConfig) Verify() error {
@@ -19,12 +15,6 @@ func (c *HaDeployConfig) Verify() error {
 
 	// Validate ExistingInfra (on prem)
 	if c.IsExistingInfra() {
-		if c.ObjectStorage != nil && c.ObjectStorage.Config.Location == GCS_STORAGE {
-			err := c.readGCSConfigFile(c.ObjectStorage.Config)
-			if err != nil {
-				return err
-			}
-		}
 		if err := c.verifyExistingInfra(); err != nil {
 			errorList.PushBack(err)
 		}
@@ -189,7 +179,7 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 		errorList.PushBack(err)
 	}
 	if objectStorage.Location == GCS_STORAGE {
-		if err := c.verifyGcsStorage(objectStorage.GcpServiceAccount); err != nil {
+		if err := validateRequiredPathField(objectStorage.GoogleServiceAccountFile, "google_service_account_file"); err != nil {
 			errorList.PushBack(err)
 		}
 	}
@@ -732,58 +722,4 @@ func awsChefSettings(aws *ConfigAwsSettings) error {
 	}
 
 	return getSingleErrorFromList(errorList)
-}
-
-func (c *HaDeployConfig) verifyGcsStorage(gcp *GcpServiceAccount) error {
-	errorList := list.New()
-	if err := validateRequiredString(gcp.Type, "type"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.ProjectID, "project_id"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.PrivateKeyID, "private_key_id"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.PrivateKey, "private_key"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.TokenURI, "token_uri"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.ClientID, "client_id"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.ClientEmail, "client_email"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.AuthURI, "auth_uri"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.AuthProviderX509CertURL, "auth_provider_x509_cert_url"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.ClientX509CertURL, "client_x509_cert_url"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredString(gcp.UniverseDomain, "universe_domain"); err != nil {
-		errorList.PushBack(err)
-	}
-	return getSingleErrorFromList(errorList)
-}
-
-func (c *HaDeployConfig) readGCSConfigFile(cfg *ConfigObjectStorage) error {
-	fileUtils := &fileutils.FileSystemUtils{}
-	gcpServiceAccount := GcpServiceAccount{}
-	filepath, err := fileUtils.ReadFile(cfg.GoogleServiceAccountFile)
-	if err != nil {
-		return fmt.Errorf("error reading Json file: %w", err)
-	}
-	err = json.Unmarshal(filepath, &gcpServiceAccount)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling Json file: %w", err)
-	}
-	cfg.GcpServiceAccount = &gcpServiceAccount
-	return nil
-
 }

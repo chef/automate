@@ -1,17 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/chef/automate/lib/config"
-	"github.com/chef/automate/lib/io/fileutils"
 )
 
 var GetModeOfDeployment func() string = getModeOfDeployment
 
-func PopulateHaCommonConfig(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error) {
+func PopulateHaCommonConfig(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 	modeOfDeployment := GetModeOfDeployment()
 	if modeOfDeployment == EXISTING_INFRA_MODE {
 		existingInfraConfig, err := configPuller.fetchInfraConfig()
@@ -19,7 +16,7 @@ func PopulateHaCommonConfig(configPuller PullConfigs, fileUtils fileutils.FileUt
 			return nil, err
 		}
 		if existingInfraConfig != nil {
-			return CopyExistingInfra(existingInfraConfig, fileUtils)
+			return CopyExistingInfra(existingInfraConfig), nil
 		}
 	} else if modeOfDeployment == AWS_MODE {
 		awsConfig, err := configPuller.fetchAwsConfig()
@@ -47,7 +44,7 @@ func CopyCertsByIP(haDeploy *[]config.CertByIP, existing []CertByIP) {
 	}
 }
 
-func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml, fileUtils fileutils.FileUtils) (*config.HaDeployConfig, error) {
+func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 
 	existingInfraConfigConfigInitials := existingInfraConfig.Architecture.ConfigInitials
 	existingInfraConfigObjectStorageConfig := existingInfraConfig.ObjectStorage.Config
@@ -188,13 +185,7 @@ func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml, fileUtils f
 		CopyCertsByIP(haDeployConfig.Opensearch.Config.CertsByIP, existingInfraOpensearchSettings.CertsByIP)
 	}
 
-	if existingInfraConfigObjectStorageConfig.Location == "gcs" {
-		if err := readGCSConfigFile(haDeployConfig.ObjectStorage.Config, fileUtils); err != nil {
-			return nil, err
-		}
-	}
-
-	return haDeployConfig, nil
+	return haDeployConfig
 }
 
 func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
@@ -340,18 +331,4 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	}
 
 	return haDeployConfig
-}
-
-func readGCSConfigFile(cfg *config.ConfigObjectStorage, fileUtils fileutils.FileUtils) error {
-	gcpServiceAccount := config.GcpServiceAccount{}
-	filepath, err := fileUtils.ReadFile(cfg.GoogleServiceAccountFile)
-	if err != nil {
-		return fmt.Errorf("error reading Json file: %w", err)
-	}
-	err = json.Unmarshal(filepath, &gcpServiceAccount)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling Json file: %w", err)
-	}
-	cfg.GcpServiceAccount = &gcpServiceAccount
-	return nil
 }

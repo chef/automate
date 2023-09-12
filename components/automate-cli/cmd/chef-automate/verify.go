@@ -20,7 +20,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/httputils"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/reporting"
@@ -76,7 +75,7 @@ type verifyCmdFlow struct {
 
 type verifyCmdDeps struct {
 	getAutomateHAInfraDetails func() (*AutomateHAInfraDetails, error)
-	PopulateHaCommonConfig    func(configPuller PullConfigs, fileUtils fileutils.FileUtils) (haDeployConfig *config.HaDeployConfig, err error)
+	PopulateHaCommonConfig    func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error)
 }
 
 func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService verifysystemdcreate.CreateSystemdService, systemdCreateUtils verifysystemdcreate.SystemdCreateUtils, config *config.HaDeployConfig, sshutil sshutils.SSHUtil, writer *cli.Writer, deps *verifyCmdDeps) *verifyCmdFlow {
@@ -282,7 +281,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
 
-		config, err := v.deps.PopulateHaCommonConfig(configPuller, fileutils.NewFileSystemUtils())
+		config, err := v.deps.PopulateHaCommonConfig(configPuller)
 		if err != nil {
 			return status.New(status.ConfigVerifyError, err.Error())
 		}

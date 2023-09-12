@@ -306,19 +306,6 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 				Location:                 objectStorageConfig.Location,
 				BucketName:               objectStorageConfig.BucketName,
 				GoogleServiceAccountFile: objectStorageConfig.GoogleServiceAccountFile,
-				GcpServiceAccount: &GcpServiceAccount{
-					Type:                    objectStorageConfig.GcpServiceAccount.Type,
-					ProjectID:               objectStorageConfig.GcpServiceAccount.ProjectID,
-					PrivateKeyID:            objectStorageConfig.GcpServiceAccount.PrivateKeyID,
-					PrivateKey:              objectStorageConfig.GcpServiceAccount.PrivateKey,
-					ClientEmail:             objectStorageConfig.GcpServiceAccount.ClientEmail,
-					ClientID:                objectStorageConfig.GcpServiceAccount.ClientID,
-					AuthURI:                 objectStorageConfig.GcpServiceAccount.AuthURI,
-					TokenURI:                objectStorageConfig.GcpServiceAccount.TokenURI,
-					AuthProviderX509CertURL: objectStorageConfig.GcpServiceAccount.AuthProviderX509CertURL,
-					ClientX509CertURL:       objectStorageConfig.GcpServiceAccount.ClientX509CertURL,
-					UniverseDomain:          objectStorageConfig.GcpServiceAccount.UniverseDomain,
-				},
 			},
 		}
 	} else {

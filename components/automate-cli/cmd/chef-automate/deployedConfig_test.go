@@ -5,38 +5,9 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/lib/config"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
-
-var gcsAccountFileOutput = `{
-	"type": "service_account",
-	"project_id": "automate-backup-testing",
-	"private_key_id": "7b1e77b442708f7af",
-	"private_key": "ABCD",
-	"client_email": "abcd@test.com",
-	"client_id": "1234",
-	"auth_uri": "https://accounts.google.com/o/oauth2/auth",
-	"token_uri": "https://oauth2.googleapis.com/token",
-	"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-	"client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/a2-buildkite%40automate-backup-testing.iam.gserviceaccount.com",
-	"universe_domain": "googleapis.com"
-  }`
-
-var googleServiceAccountResp = &config.GcpServiceAccount{
-	Type:                    "service_account",
-	ProjectID:               "automate-backup-testing",
-	PrivateKeyID:            "7b1e77b442708f7af",
-	PrivateKey:              "ABCD",
-	ClientEmail:             "abcd@test.com",
-	ClientID:                "1234",
-	AuthURI:                 "https://accounts.google.com/o/oauth2/auth",
-	TokenURI:                "https://oauth2.googleapis.com/token",
-	AuthProviderX509CertURL: "https://www.googleapis.com/oauth2/v1/certs",
-	ClientX509CertURL:       "https://www.googleapis.com/robot/v1/metadata/x509/a2-buildkite%40automate-backup-testing.iam.gserviceaccount.com",
-	UniverseDomain:          "googleapis.com",
-}
 
 var existingInfraConfig = &ExistingInfraConfigToml{
 	Architecture: ExistingInfraArchitectureToml{
@@ -466,11 +437,7 @@ func TestPopulateHaCommonConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			GetModeOfDeployment = tt.getModeOfDeployment
-			haDeployConfig, err := PopulateHaCommonConfig(tt.mockPullConfigs, &fileutils.MockFileSystemUtils{
-				ReadFileFunc: func(filepath string) ([]byte, error) {
-					return []byte(gcsAccountFileOutput), nil
-				},
-			})
+			haDeployConfig, err := PopulateHaCommonConfig(tt.mockPullConfigs)
 			if tt.wantErr {
 				assert.Nil(t, haDeployConfig)
 				assert.Error(t, err)
@@ -523,13 +490,7 @@ func TestCopyCertsByIP(t *testing.T) {
 
 func TestCopyExistingInfra(t *testing.T) {
 
-	mockFSUtil := &fileutils.MockFileSystemUtils{
-		ReadFileFunc: func(filepath string) ([]byte, error) {
-			return []byte(gcsAccountFileOutput), nil
-		},
-	}
-	haDeployConfig, err := CopyExistingInfra(existingInfraConfig, mockFSUtil)
-	assert.NoError(t, err)
+	haDeployConfig := CopyExistingInfra(existingInfraConfig)
 	assert.Equal(t, "existing-ssh-user", haDeployConfig.Architecture.ExistingInfra.SSHUser)
 	assert.Equal(t, "existing-architecture", haDeployConfig.Architecture.ExistingInfra.Architecture)
 	assert.Equal(t, "object_storage", haDeployConfig.Architecture.ExistingInfra.BackupConfig)
@@ -619,7 +580,6 @@ func TestCopyExistingInfra(t *testing.T) {
 	assert.Equal(t, "gcs", haDeployConfig.ObjectStorage.Config.Location)
 	assert.Equal(t, "googleServiceAccount.json", haDeployConfig.ObjectStorage.Config.GoogleServiceAccountFile)
 
-	assert.Equal(t, googleServiceAccountResp, haDeployConfig.ObjectStorage.Config.GcpServiceAccount)
 }
 
 func TestCopyAws(t *testing.T) {

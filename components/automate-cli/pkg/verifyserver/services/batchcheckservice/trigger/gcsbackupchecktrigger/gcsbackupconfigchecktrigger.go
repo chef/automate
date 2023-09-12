@@ -1,12 +1,15 @@
 package gcsbackupchecktrigger
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -36,7 +39,10 @@ func (svc *GcsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 	if !isGcsStorage(config) {
 		return emptyResp(config, constants.GCP_BACKUP_CONFIG)
 	}
-
+	err := readGCSConfigFile(config)
+	if err != nil {
+		return errorResp(config, constants.GCP_BACKUP_CONFIG, err)
+	}
 	req := getGCSCheckRequest(config.Backup.ObjectStorage)
 	return runCheckForGCSConfig(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
 }
@@ -113,7 +119,7 @@ func getGCSCheckRequest(object *models.ObjectStorage) models.GCPCloudStorageConf
 
 func isGcsStorage(config *models.Config) bool {
 	backup := config.Backup
-	return backup.ObjectStorage.BucketName != ""
+	return backup.ObjectStorage.BucketName != "" || backup.ObjectStorage.GoogleServiceAccountFile != ""
 }
 
 func emptyResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
@@ -123,4 +129,29 @@ func emptyResp(config *models.Config, checktype string) []models.CheckTriggerRes
 	}
 
 	return resps
+}
+
+func errorResp(config *models.Config, checktype string, err error) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, trigger.ErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "Json File is empty or Incorrect Json File"))
+	}
+
+	return resps
+}
+
+func readGCSConfigFile(config *models.Config) error {
+	fileUtils := &fileutils.FileSystemUtils{}
+	gcpServiceAccount := config.Backup.ObjectStorage.GcpServiceAccount
+	filepath, err := fileUtils.ReadFile(config.Backup.ObjectStorage.GoogleServiceAccountFile)
+	if err != nil {
+		return fmt.Errorf("error reading Json file: %w", err)
+	}
+	err = json.Unmarshal(filepath, &gcpServiceAccount)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling Json file: %w", err)
+	}
+	config.Backup.ObjectStorage.GcpServiceAccount = gcpServiceAccount
+	return nil
+
 }

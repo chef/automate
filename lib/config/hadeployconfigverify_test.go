@@ -98,25 +98,11 @@ func TestParseAndVerify(t *testing.T) {
 			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
 		},
 		{
-			name: "Parse OnPrem gcs file not found",
-			args: args{configFile: "./testdata/HaOnPremGcsFailed.toml"},
-
-			wantErr: true,
-			err:     errors.New("error reading Json file: open ./testdata/service.json: no such file or directory"),
-		},
-		{
-			name: "Error unmarshalling json file",
-			args: args{configFile: "./testdata/UnmarshalErrorForGcs.toml"},
-
-			wantErr: true,
-			err:     errors.New("error unmarshalling Json file: json: cannot unmarshal array into Go value of type config.GcpServiceAccount"),
-		},
-		{
-			name: "Success",
+			name: "Success for gcs",
 			args: args{configFile: "./testdata/HaOnPremGcs.toml"},
 
-			wantErr: true,
-			err:     errors.New("invalid or empty: ssh_user\ninvalid or empty: ssh_key_file\nautomate private ip 1324.2534.1is not valid\ninvalid or empty: chef_server_private_ips\ninvalid or empty: opensearch_private_ips\ninvalid or empty: postgresql_private_ips\nurl should not include the protocol (http:// or https://): automate fqdn\nempty value: automate instance_count\ninvalid value 'automate.toml' for field 'config_file'. Expected values are: configs/automate.toml\ninvalid format. Failed to decode root_ca for automate\ninvalid format. Failed to decode private_key for automate\ninvalid format. Failed to decode public_key for automate\ninvalid format. Failed to decode private_key for automate ip\ninvalid format. Failed to decode public_key for automate ip\ninvalid value 'chef server instance_count' for field 'two'\ninvalid format. Failed to decode private_key for chef-infra-server\ninvalid format. Failed to decode public_key for chef-infra-server\ninvalid format. Failed to decode private_key for chef server ip\ninvalid format. Failed to decode public_key for chef server ip\nempty value: opensearch instance_count\nopensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nopensearch ip public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false\nempty value: postgresql instance_count\ninvalid format. Failed to decode root_ca for postgresql\ninvalid format. Failed to decode private_key for postgresql\ninvalid format. Failed to decode public_key for postgresql\npostgresql ip 0.0.1 for certs is not valid\ninvalid format. Failed to decode private_key for postgresql ip\ninvalid format. Failed to decode public_key for postgresql ip"),
+			wantErr: false,
+			err:     nil,
 		},
 	}
 	for _, tt := range tests {
@@ -207,22 +193,29 @@ func TestVerifyObjectStorage(t *testing.T) {
 			expectedError: errors.New("invalid AWS region for S3"),
 		},
 		{
-			name: "Empty Type",
+			name: "Empty Bucket",
 			objectStorage: &ConfigObjectStorage{
-				Location: GCS_STORAGE,
-				GcpServiceAccount: &GcpServiceAccount{
-					Type: "",
-				},
+				Location:                 GCS_STORAGE,
+				GoogleServiceAccountFile: "./testdata/gcsservicefile.json",
 			},
-			expectedError: errors.New("invalid or empty: bucket_name\ninvalid or empty: type\ninvalid or empty: project_id\ninvalid or empty: private_key_id\ninvalid or empty: private_key\ninvalid or empty: token_uri\ninvalid or empty: client_id\ninvalid or empty: client_email\ninvalid or empty: auth_uri\ninvalid or empty: auth_provider_x509_cert_url\ninvalid or empty: client_x509_cert_url\ninvalid or empty: universe_domain"),
+			expectedError: errors.New("invalid or empty: bucket_name"),
+		},
+		{
+			name: "Empty ServiceFile",
+			objectStorage: &ConfigObjectStorage{
+				Location:                 GCS_STORAGE,
+				BucketName:               "bucket",
+				GoogleServiceAccountFile: "./testdata/servicefile.json",
+			},
+			expectedError: errors.New("invalid google_service_account_file: ./testdata/servicefile.json no such file or directory"),
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			c := &HaDeployConfig{} // Initialize HaDeployConfig instance
 			err := c.verifyObjectStorage(tc.objectStorage)
-			if err == nil && tc.expectedError != nil {
-				t.Errorf("Expected error: %v, but got: %v", tc.expectedError, err)
+			if err != nil && tc.expectedError != nil {
+				assert.EqualErrorf(t, err, tc.expectedError.Error(), "")
 			}
 		})
 	}
