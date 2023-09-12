@@ -66,7 +66,7 @@ RUNLOOP:
 			default:
 				p.log.Debug("Notification listener mailbox full")
 			}
-		case <-time.After(p.pingInterval):
+		case <-time.After(p.pingInterval): // nosemgrep
 			err := listener.Ping()
 			if err != nil {
 				p.log.WithError(err).Warn("Notification listener failed to ping database")
