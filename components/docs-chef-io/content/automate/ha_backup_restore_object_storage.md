@@ -53,7 +53,7 @@ This section provides the pre-backup configuration required to back up the data 
 1. Log in to **all** the OpenSearch nodes and follow the steps on all the OpenSearch nodes.
 
 - `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
-- `export GCS_SERVICE_ACCOUNT_JSON_FILE_PATH="/path/to/googleServiceAccount.json"` (Provide the file path of your googleServiceAccount.json file. Note that the content of this json file should looks like the snippet depicted [here](!))
+- `export GCS_SERVICE_ACCOUNT_JSON_FILE_PATH="/path/to/googleServiceAccount.json"` (Provide the file path of your googleServiceAccount.json file. Note that the content of this json file should looks like the snippet depicted [here](#structure-of-google-service-account-json-file))
 - `chown -RL hab:hab $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
 - `hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
 - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
