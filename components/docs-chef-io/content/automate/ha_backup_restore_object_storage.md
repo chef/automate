@@ -53,8 +53,9 @@ This section provides the pre-backup configuration required to back up the data 
 1. Log in to **all** the OpenSearch nodes and follow the steps on all the OpenSearch nodes.
 
 - `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
-- `export GCS_SERVICE_ACCOUNT_FILE_PATH="/path/to/googleServiceAccount.json"` (Provide the file path of your googleServiceAccount.json file)
-- `hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON`
+- `export GCS_SERVICE_ACCOUNT_JSON_FILE_PATH="/path/to/googleServiceAccount.json"` (Provide the file path of your googleServiceAccount.json file. Note that the content of this json file should looks like the snippet depicted [here](!))
+- `chown -RL hab:hab $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
+- `hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
 - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
 - `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
@@ -255,6 +256,24 @@ Once done with the OpenSearch setup, add the following `automate.toml` file and 
     ```sh
     ./chef-automate config patch --frontend /path/to/automate.toml
     ```
+
+#### Structure of Google Service Account JSON file
+
+  ```json
+  {
+    "type": "service_account",
+    "project_id": "chef-automate-ha",
+    "private_key_id": "7b1e77baec247a22a9b3****************f",
+    "private_key": "<PRIVATE KEY>",
+    "client_email": "myemail@chef.iam.gserviceaccount.com",
+    "client_id": "1******************1",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/myemail@chef.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  ```
 
 ## Backup and Restore Commands
 
