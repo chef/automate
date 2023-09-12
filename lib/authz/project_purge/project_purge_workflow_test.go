@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/cerealtest"
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +22,7 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 	workflowParams := DomainProjectPurgeWorkflowParameters{
 		ProjectID: testProjectID,
 	}
-	executor := NewWorkflowExecutorForDomainService(svcName)
+	executor := NewWorkflowExecutorForDomainService(svcName, logger.NewTestLogger())
 
 	t.Run("when startPurgeProjectTaskName completes", func(t *testing.T) {
 		curPayload := DomainProjectPurgeWorkflowPayload{}

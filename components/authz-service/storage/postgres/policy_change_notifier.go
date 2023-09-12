@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/lib/logger"
 )
 
 type policyChangeNotifier struct {
 	conninfo             string
+	log                  logger.Logger
 	minReconnectInterval time.Duration
 	maxReconnectInterval time.Duration
 	pingInterval         time.Duration
@@ -19,7 +20,7 @@ type policyChangeNotifier struct {
 	shutdown             func()
 }
 
-func newPolicyChangeNotifier(ctx context.Context, conninfo string) (storage.PolicyChangeNotifier, error) {
+func newPolicyChangeNotifier(ctx context.Context, conninfo string, log logger.Logger) (storage.PolicyChangeNotifier, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	p := &policyChangeNotifier{
 		conninfo:             conninfo,
@@ -28,6 +29,7 @@ func newPolicyChangeNotifier(ctx context.Context, conninfo string) (storage.Poli
 		pingInterval:         10 * time.Second,
 		notificationChan:     make(chan storage.PolicyChangeNotification, 1),
 		shutdown:             cancel,
+		log:                  log,
 	}
 	listener := pq.NewListener(p.conninfo, p.minReconnectInterval, p.maxReconnectInterval, nil)
 	err := listener.Listen("policychange")
@@ -49,7 +51,6 @@ func (p *policyChangeNotifier) Close() error {
 }
 
 func (p *policyChangeNotifier) run(ctx context.Context, listener *pq.Listener) {
-
 RUNLOOP:
 	for {
 		select {
@@ -61,18 +62,18 @@ RUNLOOP:
 			}
 			select {
 			case p.notificationChan <- storage.PolicyChangeNotification{}:
-				logrus.Info("Accepted notification from postgres")
+				p.log.Info("Accepted notification from postgres")
 			default:
-				logrus.Debug("Notification listener mailbox full")
+				p.log.Debug("Notification listener mailbox full")
 			}
 		case <-time.After(p.pingInterval):
 			err := listener.Ping()
 			if err != nil {
-				logrus.WithError(err).Warn("Notification listener failed to ping database")
+				p.log.WithError(err).Warn("Notification listener failed to ping database")
 			}
 		}
 	}
 	if err := listener.Close(); err != nil {
-		logrus.WithError(err).Warn("Failed to close notification listener")
+		p.log.WithError(err).Warn("Failed to close notification listener")
 	}
 }

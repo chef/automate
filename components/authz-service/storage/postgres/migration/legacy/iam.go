@@ -16,7 +16,7 @@ import (
 
 // MigrateToV2 inserts needed IAM v2 resources into the db and
 // migrates any valid v1 policies
-func MigrateToV2(ctx context.Context, db *sql.DB, shouldMigrateV1Policies bool) error {
+func MigrateToV2(ctx context.Context, db *sql.DB, shouldMigrateV1Policies bool, l logger.Logger) error {
 	for _, role := range defaultRoles() {
 		if err := createRole(ctx, db, &role); err != nil {
 			return errors.Wrapf(err,
@@ -32,7 +32,7 @@ func MigrateToV2(ctx context.Context, db *sql.DB, shouldMigrateV1Policies bool) 
 	}
 
 	if shouldMigrateV1Policies {
-		err := migrateV1Policies(ctx, db)
+		err := migrateV1Policies(ctx, db, l)
 		if err != nil {
 			return errors.Wrapf(err, "migrate v1 policies")
 		}
@@ -50,12 +50,7 @@ This is because this migration is run at a single point in time as part of the s
 upgrades. So this code need to be compatible with a specific schema version that never changes.
 */
 
-func migrateV1Policies(ctx context.Context, db *sql.DB) error {
-	l, err := logger.NewLogger("text", "info")
-	if err != nil {
-		return errors.Wrap(err, "could not initialize logger")
-	}
-
+func migrateV1Policies(ctx context.Context, db *sql.DB, l logger.Logger) error {
 	pols, err := listPoliciesWithSubjects(ctx, db)
 	if err != nil {
 		return errors.Wrap(err, "list v1 policies")
