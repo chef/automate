@@ -28,9 +28,8 @@ This section will discuss deploying Chef Automate HA on-premise machines with ch
 ## Provisioning
 
 - Provisioning all the resources are needed before performing steps to run on Bastion Host Machine.
-- Make sure you have all resources either on Existing Infrastructure or on Existing cloud Infrastructure(AWS/Google Cloud Storage) as mentioned in [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/)
-- Make sure you have setup Vm's as per your requirement.
-- Configure load balancer for both Automate and ChefServer.
+- Make sure you have all resources either on Existing Infrastructure or on Existing cloud Infrastructure(AWS/Google Cloud Platform).
+- If you have provisioned in Google cloud Platform make sure you have provisioned these [resources](automate/ha_on_premises_deployment_prerequisites/#provisioning).
 
 ## Steps to run on Bastion Host Machine
 

@@ -245,7 +245,7 @@ Active/Active Disaster Recovery is not supported right now as we do not support 
 The requirements for disaster recovery setup (Active/Passive) are:
 
 - Two identical clusters located in different data centers or cloud provider regions.
-- Network Attached Storage (NAS) or Object Store (S3) should be available in both data centers/regions.
+- Network Attached Storage (NAS) or Object Store (S3/Minio/Google cloud storage) should be available in both data centers/regions.
 - Set up scheduled jobs to run backup and restore commands on both clusters. We recommend using **cron** to schedule the jobs.
 
 To know more about the on-premises deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.

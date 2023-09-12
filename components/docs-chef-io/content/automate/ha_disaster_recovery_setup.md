@@ -144,12 +144,12 @@ Configure backups for both clusters using either [file system](/automate/ha_back
         id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --gcs-credentials-path "path/to/googleServiceAccount.json/file"`
         ```
-        Sample cron for restoring backup saved in object storage (S3/Minio) looks like this:
+        Sample cron for restoring backup saved in object storage **(S3/Minio)** looks like this:
         ```cmd
         id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
         ```
-        Sample cron for restoring backup saved in object storage (GCS) looks like this:
+        Sample cron for restoring backup saved in object storage **(GCS)** looks like this:
         ```cmd
         id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --gcs-credentials-path "path/to/googleServiceAccount.json/file"
