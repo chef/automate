@@ -7,7 +7,7 @@ import * as Sniffr from 'sniffr';
 
 import { ChefSessionService } from '../chef-session/chef-session.service';
 import { ConfigService } from '../config/config.service';
-import { CookieService } from 'ngx-cookie';
+// import { CookieService } from 'ngx-cookie';
 import { MetadataService } from '../metadata/metadata.service';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
@@ -26,6 +26,8 @@ export interface TelemetryData {
   identifier?: string;
   properties?: Object;
 }
+
+declare let pendo: any;
 
 @Injectable()
 export class TelemetryService {
@@ -58,11 +60,13 @@ export class TelemetryService {
   private  telemetryCheckboxObservable = new Subject<boolean>();
   private isSkipNotification = false;
   private deploymentType: string;
+  private licenseExpirationDate: string;
+  deploymentId: string;
 
   constructor(private httpClient: HttpClient,
     private configService: ConfigService,
     router: Router,
-    private cookieService: CookieService,
+    // private cookieService: CookieService,
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
     private store: Store<NgrxStateAtom>,
@@ -79,6 +83,14 @@ export class TelemetryService {
       }
     });
 
+    // if(pendo) {
+    //   pendo.initialize({
+    //     visitor: {
+    //       id: 'Automate anonymous user'
+    //     }
+    //   })
+    // }
+
     this.configService.getConfig().pipe(
       filter(config => config.telemetryEnabled),
       map((config) => {
@@ -90,12 +102,14 @@ export class TelemetryService {
         this.customerName = config.customerName;
         this.licenseId = config.licenseId || configService.defaultLicenseId;
         this.maxNodes = config.maxNodes;
-        this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
+        // this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
         this.instanceId = config.deploymentId || configService.defaultDeployId;
         this.deploymentType = config.deploymentType;
+        this.deploymentId = config.deploymentId;
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
+        this.initialisePendo();
         this.initiateTelemetry(trackingOperations);
       });
   }
@@ -107,6 +121,7 @@ export class TelemetryService {
   setUserTelemetryPreference(isOptedIn: boolean): void {
     if (isOptedIn === true) {
       this.engageTelemetry(this.trackingOperations);
+      this.initialisePendo();
     }
     this.chefSessionService.storeTelemetryPreference(isOptedIn);
   }
@@ -197,14 +212,73 @@ export class TelemetryService {
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
-          console.log(`Error retrieving Segment API key: ${status}/${message}`);
+          console.log(`Error retrieving Segment API key : ${status}/${message}`);
           if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesFailure(message));
           }
         });
   }
 
+  setLicenseExpirationDate(license: string): void {
+    this.licenseExpirationDate = license;
+  }
+
+  async initialisePendo() {
+    
+    if(!this.licenseExpirationDate) {
+      setTimeout(() => { this.initialisePendo() }, 1000);
+      return;
+    }
+    console.log('initialisePendo');
+    try {
+      const isPendoInitialisedForAutomate = sessionStorage.getItem('isPendoInitialisedForAutomate') == 'true';
+      if(pendo && this.chefSessionService.telemetry_enabled && !isPendoInitialisedForAutomate) {
+        const pendoToken = {
+          visitor: {
+            id: this.chefSessionService.uuid,
+            userName: this.chefSessionService.username,
+            fullName: this.chefSessionService.fullname,
+            telemetryPref: this.chefSessionService.telemetry_enabled,
+            isLocalUser: this.chefSessionService.isLocalUser,
+            group: this.chefSessionService.groups,
+            connector: this.chefSessionService.connector
+          },
+          account: {
+            id: this.customerId,
+            name: this.customerName,
+            instanceId: this.instanceId,
+            deploymentType: this.deploymentType,
+            deploymentId: this.deploymentId,
+            automateVersion: this.buildVersion,
+            licenseId: this.licenseId,
+            licenseType: this.licenseType,
+            licenseExpirationDate: this.licenseExpirationDate
+          }
+        }
+        pendo.initialize(pendoToken);
+        sessionStorage.setItem('isPendoInitialisedForAutomate', 'true');
+        localStorage.setItem('pendoToken', JSON.stringify(pendoToken));
+      }
+    } catch(e) {
+      console.log('Unable to initialise Pendo ', e);
+    }
+    
+  }
+
+  trackPendo(event?: string, properties?: any) {
+    try {
+      if(pendo) {
+        pendo.track(event, properties);
+      }
+    }catch(e) {
+      console.log('Unable to send track events to Pendo ', e);
+    }
+  }
+
   track(event?: string, properties?: any) {
+    if(pendo) {
+      this.trackPendo(event, properties);
+    }
     this.trackingOperations.next({
       operation: 'track',
       identifier: event,

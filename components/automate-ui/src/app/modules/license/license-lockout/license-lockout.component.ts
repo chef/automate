@@ -15,6 +15,7 @@ import {
 } from 'app/entities/license/license.model';
 import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/license.model';
 import { SessionStorageService } from 'app/services/storage/sessionstorage.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-license-lockout',
@@ -86,6 +87,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
     public licenseFacade: LicenseFacadeService,
     private chefSessionService: ChefSessionService,
     private sessionStorage: SessionStorageService,
+    private telemetryService: TelemetryService,
     public fb: FormBuilder
   ) {
     this.trialForm = fb.group({
@@ -235,5 +237,6 @@ export class LicenseLockoutComponent implements AfterViewInit {
 
   private setExpirationDate(license: LicenseStatus): void {
     this.expirationDate = parsedExpirationDate(license);
+    this.telemetryService.setLicenseExpirationDate(this.expirationDate);
   }
 }
