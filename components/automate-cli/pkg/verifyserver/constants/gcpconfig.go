@@ -20,3 +20,30 @@ const (
 
 	GCP_CHECK_FILE_PREFIX = "gcp_check_test_"
 )
+
+const (
+	GCS_TYPE_MISSING                = "'type' field is missing in gcs service account file"
+	GCS_PROJECT_ID                  = "'project_id' field is missing in gcs service account file"
+	GCS_PRIVATE_KEY_ID              = "'private_key_id' field is missing in gcs service account file"
+	GCS_PRIVATE_KEY                 = "'private_key' field is missing in gcs service account file"
+	GCS_CLIENT_EMAIL                = "'client_email' field is missing in gcs service account file"
+	GCS_CLIENT_ID                   = "'client_id' field is missing in gcs service account file"
+	GCS_AUTH_URI                    = "'auth_uri' field is missing in gcs service account file"
+	GCS_TOKEN_URI                   = "'token_uri' field is missing in gcs service account file"
+	GCS_AUTH_PROVIDER_x509_CERT_URL = "'auth_provider_x509_cert_url' field is missing in gcs service account file"
+	GCS_CLIENT_x509_CERT_URL        = "'client_x509_cert_url' field is missing in gcs service account file"
+	GCS_UNIVERSAL_DOMAIN            = "'universe_domain' field is missing in gcs service account file"
+
+	// Resolutions
+	GCS_TYPE_MISSING_RESOLUTION                = "Provide 'type' in gcs service account file"
+	GCS_PROJECT_ID_RESOLUTION                  = "Provide 'project_id' in gcs service account file"
+	GCS_PRIVATE_KEY_ID_RESOLUTION              = "Provide 'private_key_id' in gcs service account file"
+	GCS_PRIVATE_KEY_RESOLUTION                 = "Provide 'private_key' in gcs service account file"
+	GCS_CLIENT_EMAIL_RESOLUTION                = "Provide 'client_email' in gcs service account file"
+	GCS_CLIENT_ID_RESOLUTION                   = "Provide 'client_id' in gcs service account file"
+	GCS_AUTH_URI_RESOLUTION                    = "Provide 'auth_uri' in gcs service account file"
+	GCS_TOKEN_URI_RESOLUTION                   = "Provide 'token_uri' in gcs service account file"
+	GCS_AUTH_PROVIDER_x509_CERT_URL_RESOLUTION = "Provide 'auth_provider_x509_cert_url' in gcs service account file"
+	GCS_CLIENT_x509_CERT_URL_RESOLUTION        = "Provide 'client_x509_cert_url' in gcs service account file"
+	GCS_UNIVERSAL_DOMAIN_RESOLUTION            = "Provide 'universe_domain' in gcs service account file"
+)
