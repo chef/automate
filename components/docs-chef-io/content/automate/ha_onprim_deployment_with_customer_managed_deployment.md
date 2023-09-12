@@ -23,7 +23,9 @@ This section will discuss deploying Chef Automate HA on-premise machines with cu
 
 {{< /warning >}}
 
-See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+- Before proceeding with deployment steps make sure to provision ,Click here to know more [details](automate/ha_onprim_deployment_procedure/#provisioning).
+
+- See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
 ## Steps to Generate Config
 
