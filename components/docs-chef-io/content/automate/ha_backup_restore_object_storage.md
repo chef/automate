@@ -19,28 +19,46 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- If the user chooses `backup_config` as `object_storage` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
-- Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
+- If the user chooses `backup_config` as `object_storage` or `file_system` in `config.toml`, backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
+- Encrypted S3 bucket is supported with only Amazon S3 managed keys (SSE-S3).
 
 {{< /note >}}
 
 ## Overview
 
-This section provides the pre-backup configuration required to back up the data on Object Storage System (Other than AWS S3) like Minio, Non-AWS S3. The steps to set a secret key using commands are given below:
+This section provides the backup configuration required to backup the data on the Object Storage System. The supported Object storage could be of two types:
+  - S3 (AWS S3, Minio, Non-AWS S3)
+  - GCS
 
-### Configuration in OpenSearch Node
 
-This section provides the pre-backup configuration required to back up the data on Object Storage Systems like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
-1. Log in to all the OpenSearch nodes and follow the steps on all the OpenSearch nodes.
+### Configuration in OpenSearch Node 
+
+#### For _Minio_, _Non-AWS S3_, _AWS S3_
+For the Object storages like _Minio_, _Non-AWS S3_, _AWS S3_, the following are the pre-configuration steps to set a secret key and access key of the bucket on the OpenSearch nodes:
+
+1. Log in to **all** the OpenSearch nodes and execute the following commands one after another.
 
 - `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
 - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
 - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
 - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
-- `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+- `curl https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem` (Command to load the above setting)
 
-The final output after running the curl command on all nodes is given below:
+
+#### For _GCS_
+For GCP Object Storage, the following are the pre-configuration steps to set access to the GCS bucket on the OpenSearch nodes:
+
+1. Log in to **all** the OpenSearch nodes and execute the following commands.
+
+- `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
+- `export GCS_SERVICE_ACCOUNT_JSON_FILE_PATH="/path/to/googleServiceAccount.json"` (Provide the file path of your googleServiceAccount.json file. Note that the content of this json file should look like the snippet depicted [here](#structure-of-google-service-account-json-file))
+- `chown -RL hab:hab $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
+- `hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH`
+- `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+- `curl https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem` (Command to load the above setting)
+
+The final output after running the above curl command on all nodes is given below:
 
 ```json
 {
@@ -64,11 +82,11 @@ The final output after running the curl command on all nodes is given below:
 }
 ```
 
-#### Configuration for Opensearch Node from Provision Host
+#### Configuration for OpenSearch Node from Bastion Host (only for S3)
 
 1. To override the existing default endpoint:
 
-- Create an `.toml` file on **the provisioning server** using the following command:
+- Create a `.toml` file on **the provisioning server** using the following command:
 
     ```bash
     touch os_config.toml
@@ -93,34 +111,36 @@ The final output after running the curl command on all nodes is given below:
     chef-automate config patch --opensearch os_config.toml
     ```
 
-This will update the configuration in Opensearch node.
+This will update the configuration in the Opensearch node.
 
 #### Healthcheck commands
 
-- Following command can be run in the OpenSearch node
+- The following command can be run from the OpenSearch node
 
     ```sh
     hab svc status (check whether OpenSearch service is up or not)
 
-    curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices are green or not)
+    curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin (Another way to check is to check whether all the indices are green or not)
 
     # Watch for a message about OpenSearch going from RED to GREEN
     `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
     ```
 
-#### Configuration for Automate Node from Provision Host
+### Configuration for Automate Node from Bastion Host
 
 {{< note >}}
 
-Make sure all the frontend nodes and OpenSearch have access to the object storage.
+- Make sure all the frontend nodes and OpenSearch have access to the object storage.
+- The value of `location` varies based on the type of Object Storage, that is, `location="s3"` in case of S3 storage that includes AWS S3, Minio and Non-AWS S3, and `location="gcs"` in case of Google Cloud Storage bucket.
 
 {{< /note >}}
+
 
 Once done with the OpenSearch setup, add the following `automate.toml` file and patch the updated config to all frontend nodes. In the file, modify the values listed below:
 
 1. Create .toml file by `vi automate.toml`
 
-2. Refer to the content for the `automate.toml` file below:
+2. Refer to the content for the `automate.toml` file below for S3:
 
     ```sh
     [global.v1]
@@ -184,42 +204,100 @@ Once done with the OpenSearch setup, add the following `automate.toml` file and 
         secret_key = "<Your Secret Key>"
     ```
 
-3. Execute the command given below to trigger the deployment.
+3. Refer to the content for the `automate.toml` file below for GCS:
+
+
+    ```sh
+    [global.v1]
+      [global.v1.external.opensearch.backup]
+        enable = true
+        location = "gcs" 
+
+      [global.v1.external.opensearch.backup.gcs]
+
+        # bucket (required): The name of the bucket
+        bucket = "bucket-name"
+
+        # base_path (optional): The path within the bucket where backups should be stored
+        # If base_path is not set, backups will be stored at the root of the bucket.
+        base_path = "opensearch"
+        client = "default"
+
+      [global.v1.backups]
+        location = "gcs"
+
+      [global.v1.backups.gcs.bucket]
+        # name (required): The name of the bucket
+        name = "bucket-name"
+
+        endpoint = "<Your Object Storage URL>"
+
+        # base_path (optional): The path within the bucket where backups should be stored
+        # If base_path is not set, backups will be stored at the root of the bucket.
+        base_path = "automate"
+
+      [global.v1.backups.gcs.credentials]
+        json = '''{
+          "type": "service_account",
+          "project_id": "chef-automate-ha",
+          "private_key_id": "7b1e77baec247a22a9b3****************f",
+          "private_key": "<PRIVATE KEY>",
+          "client_email": "myemail@chef.iam.gserviceaccount.com",
+          "client_id": "1******************1",
+          "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+          "token_uri": "https://oauth2.googleapis.com/token",
+          "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+          "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/myemail@chef.iam.gserviceaccount.com",
+          "universe_domain": "googleapis.com"
+        }'''
+    ```
+
+4. Execute the command given below to trigger the deployment.
 
     ```sh
     ./chef-automate config patch --frontend /path/to/automate.toml
     ```
 
+#### Structure of Google Service Account JSON file
+
+  ```json
+  {
+    "type": "service_account",
+    "project_id": "chef-automate-ha",
+    "private_key_id": "7b1e77baec247a22a9b3****************f",
+    "private_key": "<PRIVATE KEY>",
+    "client_email": "myemail@chef.iam.gserviceaccount.com",
+    "client_id": "1******************1",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/myemail@chef.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  ```
+
 ## Backup and Restore Commands
 
 ### Backup
 
-- To create the backup, by running the backup command from bastion. The backup command is as shown below:
+- To create the backup, run the backup command from Bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
     ```
 
-<!-- ### Restore
-
-This section includes the procedure to restore backed-up data of the Chef Automate High Availability (HA) using File System.
-
-The restore operation restores all the data while the backup is going on. The restore operation stops will the ongoing backup procedure. Let's understand the whole process by a scenario:
-
--   Create a automate _UserA_ and generate an API token named _Token1_ for _UserA_.
--   Create a backup, and let's assume the back id to be _20220708044530_.
--   Create a new user _UserB_ and a respective API token named _Token2_.
--   Now, suppose you want to restore data in the same automate cluster. In that case, the data will only be stored for _UserA_ with its token as the backup bundle only contains the _UserA_, and the _UserB_ is not available in the backup bundle. -->
 
 #### Restoring the Backed-up Data from Object Storage
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
 
-- Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
+- Check the status of the Automate HA Cluster from the Bastion nodes by executing the `chef-automate status` command.
 
-- Execute the restore command from bastion`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- For **S3**, execute the following command from the Bastion to restore `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
-- In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --skip-preflight --airgap-bundle </path/to/bundle>`.
+- For **GCS**, execute the following command from the Bastion to restore `chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --gcs-credentials-path "path/to/googleServiceAccount.json/file"`.
+
+- In the case of Airgapped Environment, Execute this restore command from the Bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --skip-preflight --airgap-bundle </path/to/bundle>`.
 
 {{< note >}}
 
@@ -233,6 +311,6 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 While running the restore command, If it prompts any error follow the steps given below.
 
 - Check the chef-automate status in Automate node by running `chef-automate status`.
-- Also check the hab svc status in automate node by running `hab svc status`.
-- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
-- Now, check the status of Automate node and then try running the restore command from bastion.
+- Also check the hab svc status in the Automate node by running `hab svc status`.
+- If the deployment services are not healthy then reload it using `hab svc load chef/deployment-service`.
+- Now, check the status of the Automate node and then try running the restore command from Bastion.

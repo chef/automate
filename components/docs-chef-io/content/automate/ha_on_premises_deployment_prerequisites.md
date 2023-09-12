@@ -24,7 +24,7 @@ Before installing Chef Automate HA in On-premises deployment mode, ensure you ha
 
 ## Chef Automate Architecture
 
-We recommend using 11 node cluster for standard Automate HA on-premises deployment, as detailed in the table below:
+We recommend using 11 nodes cluster for standard Automate HA on-premises deployment, as detailed in the table below:
 
 | Service Type      | Count |
 |-------------------|-------|
@@ -36,11 +36,25 @@ We recommend using 11 node cluster for standard Automate HA on-premises deployme
 
 Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
 
-We recommend using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server. External Standalone Infra Server will violate this high availability requirement.
+We recommend
+using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server.
+External Standalone Infra Server will violate this high-availability requirement.
+
+## Provisioning
+
+To Deploy On-Premises Infra user needs to provision the resources manually that are required. Provisioning can be done on the following types of infrastructures:
+- Existing infrastructure
+- Existing Cloud infrastructure
+    - AWS
+    - Google Cloud Platform
+      - Using above infrastructure types, make sure you have the following resources created:
+      - All Vm's should be up and running with minimum count as in this [table](/automate/ha_on_premises_deployment_prerequisites/#chef-automate-architecture)
+      - Load Balancers should be configured for both Automate and ChefServer [Chef Automate HA Architecture](/automate/ha/) as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+  - In On-premises deployment of Automate HA, we support File System (FS) or Object Storage (S3/MinIO/Google Cloud Storage) for taking backup.
 
 ## Software Requirements
 
-The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:
+The software requirements of the nodes in the cluster and the other external Chef and non-Chef tools are discussed below:
 
 ### Node Software Requirements
 
@@ -65,7 +79,7 @@ Current Automate HA supports integration with the following Chef tools:
 
 We do not support **Chef Manage** integration in the ongoing Automate version.
 
-### External Supported Softwares
+### External Supported Software
 
 Current Automate HA integrates with the following non-Chef tools:
 
@@ -85,13 +99,13 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ### Minimum Hardware Requirement
 
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space  |
-| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
-| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
-| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | GCP Machine Type | Additional Space      |
+| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ---------------- | -----------------     |
+| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
+| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
 
 {{< note >}}
 For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
@@ -146,7 +160,7 @@ Generate the certificates using recommended tools and supported algorithms and v
 
 - OpenSSL: 1.0.2zb-fips
 - OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
-- Certificate Format: X509 V3(PEM format) ,Private key is in PKCS8 format
+- Certificate Format: X509 V3(PEM format), Private key is in PKCS8 format
 
 
 To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
@@ -233,7 +247,7 @@ Active/Active Disaster Recovery is not supported right now as we do not support 
 The requirements for disaster recovery setup (Active/Passive) are:
 
 - Two identical clusters located in different data centers or cloud provider regions.
-- Network Attached Storage (NAS) or Object Store (S3) should be available in both data centers/regions.
+- Network Attached Storage (NAS) or Object Store (S3/Minio/Google cloud storage) should be available in both data centers/regions.
 - Set up scheduled jobs to run backup and restore commands on both clusters. We recommend using **cron** to schedule the jobs.
 
 To know more about the on-premises deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
@@ -264,6 +278,6 @@ To know more about the on-premises deployment disaster recovery, visit our [Disa
 
 ## Backup and Restore
 
-In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO/Google-Cloud-Storage)**](/automate/ha_backup_restore_object_storage/) for taking backup.
+In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO/Google Cloud Storage)**](/automate/ha_backup_restore_object_storage/) for taking backup.
 
-Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
+Encrypted S3 bucket is supported with only Amazon S3 managed keys (SSE-S3).

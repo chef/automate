@@ -15,7 +15,9 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /note >}}
 
-This section will discuss deploying Chef Automate HA on-premise machines with chef managed database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
+This section will discuss deploying Chef Automate HA on-premise machines with a chef-managed database.
+Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page
+and move ahead with the following sections of this page.
 
 {{< warning >}}
 
@@ -24,6 +26,12 @@ This section will discuss deploying Chef Automate HA on-premise machines with ch
 - If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 {{< /warning >}}
+
+## Provisioning
+
+- Provisioning all the resources are needed before performing steps to run on Bastion Host Machine.
+- Make sure you have all resources either on Existing Infrastructure or on Existing cloud Infrastructure(AWS/Google Cloud Platform).
+- If you have provisioned in Google cloud Platform, make sure you have provisioned these [resources](automate/ha_on_premises_deployment_prerequisites/#provisioning).
 
 ## Steps to run on Bastion Host Machine
 
@@ -70,38 +78,38 @@ Click [here](/automate/ha_config_gen) to know more about generating config.
 
 You can also view the [Sample Config](#sample-config).
 
-{{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+{{< note >}} You can also generate config template for existing infrastructure using the following command:
 
 `chef-automate init-config-ha existing_infra`{{< /note >}}
 
 ## Config Verify
 
-1. We verify the above config using the below command :
+1. Verify the above config using the below command:
 
     ```bash
     sudo chef-automate verify -c config.toml
     ```
 
-    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    To know more about config verify, check [Config Verify Documentation](/automate/ha_verification_check/).
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+    Once the verification is completed successfully, proceed with the deployment. In case of failure, fix the issue and and verify it by re-running the verify command.
 
 ## Steps to Deploy
 
-1. The following command will run the deployment. The deploy command will run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
+1. The following command will run the deployment. The deployment command will run the verify command internally.
 
     ```bash
     chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
-   To skip verification in the deploy command, use `--skip-verify` flag
+   To skip verification during deployment, use `--skip-verify` flag
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
 ## Verify Deployment
 
-1. Once the deployment is successful, Get the consolidate status of the cluster
+1. Once the deployment is successful, get the consolidated status of the cluster
 
     ```bash
      chef-automate status summary
@@ -119,7 +127,7 @@ You can also view the [Sample Config](#sample-config).
      chef-automate verify
     ```
 
-1. Get the  cluster Info
+1. Get the cluster Info
 
     ```bash
      chef-automate info
@@ -129,7 +137,7 @@ You can also view the [Sample Config](#sample-config).
     After successful deployment, proceed with following...
       1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
       1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-      1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+      1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Backup/Restore
 
@@ -137,7 +145,7 @@ A shared file system is always required to create OpenSearch snapshots. To regis
 
 ## Add/Remove Nodes
 
-The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
+The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know, more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
 
 ## Patch Configs
 
@@ -147,7 +155,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
 
 {{< note >}}
 
-- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch).
+- Assuming 10+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch).
 - The following config will, by default, leave the backup configuration empty.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
 
@@ -158,7 +166,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_key_file = "/home/ec2-user/my-key.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
