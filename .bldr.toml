@@ -29,6 +29,7 @@ paths = [
   "components/pg-sidecar-service/*",
   "lib/grpc/*",
   "lib/io/*",
+  "lib/logger/*",
   "lib/platform/config/*",
   "lib/platform/sys/*",
   "lib/proc/*",
@@ -38,7 +39,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*"
+  "lib/version/*",
 ]
 
 [backup-gateway]
