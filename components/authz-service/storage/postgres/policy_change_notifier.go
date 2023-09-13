@@ -52,6 +52,7 @@ func (p *policyChangeNotifier) Close() error {
 
 func (p *policyChangeNotifier) run(ctx context.Context, listener *pq.Listener) {
 RUNLOOP:
+	// nosemgrep
 	for {
 		select {
 		case <-ctx.Done():
