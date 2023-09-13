@@ -116,8 +116,8 @@ github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHG
 github.com/ansrivas/fiberprometheus/v2 v2.6.0 h1:QUaaKxil/N5IM1R19k6jsmFEJMfa4O3qtnDkiF+zxUc=
 github.com/ansrivas/fiberprometheus/v2 v2.6.0/go.mod h1:hivZjKkqX04PPbMZNi9iGB0AQ90iN6RmKERiX1TdgTA=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
-github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7 h1:Fv9bK1Q+ly/ROk4aJsVMeuIwPel4bEnD8EPiI91nZMg=
-github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7/go.mod h1:cp2SuWMxlEZw2r+iP2GNCdIi4C1qmUzdZFSVb+bacwQ=
+github.com/apache/thrift v0.13.0 h1:5hryIiq9gtn+MiLVn0wP37kb/uTeRZgN08WoCsAhIhI=
+github.com/apache/thrift v0.13.0/go.mod h1:cp2SuWMxlEZw2r+iP2GNCdIi4C1qmUzdZFSVb+bacwQ=
 github.com/apoydence/onpar v0.0.0-20190519213022-ee068f8ea4d1 h1:vToH0A6ByBaoM/A/4AwxgHKFgzcufNcYQfDcp60uW3M=
 github.com/apoydence/onpar v0.0.0-20190519213022-ee068f8ea4d1/go.mod h1:maauOJD0kdDqIz4xmkunipFVbBoTM6pFSy0kkWBcIUY=
 github.com/apparentlymart/go-dump v0.0.0-20180507223929-23540a00eaa3/go.mod h1:oL81AME2rN47vu18xqj1S1jPIPuN7afo62yKTNn3XMM=
