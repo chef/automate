@@ -1,4 +1,4 @@
-package s3backupchecktrigger
+package gcsbackupchecktrigger
 
 import (
 	"encoding/json"
@@ -15,23 +15,23 @@ import (
 )
 
 const (
-	s3BackupConfigCheckResponseFromOneNodeSuccess = `{
+	GCPBackupConfigCheckResponseFromOneNodeSuccess = `{
 		"status": "SUCCESS",
 		"node_type": "automate",
 		"result": {
 		  "passed": true,
 		  "checks": [
 			{
-			  "title": "S3 connection test",
+			  "title": "GCP connection test",
 			  "passed": true,
-			  "success_msg": "Machine is able to connect with S3 using the provided access key and secret key",
+			  "success_msg": "Machine is able to connect with GCP using the provided access key and secret key",
 			  "error_msg": "",
 			  "resolution_msg": ""
 			},
 			{
-			  "title": "S3 bucket access test",
+			  "title": "GCP bucket access test",
 			  "passed": true,
-			  "success_msg": "Machine is able to access the S3 bucket using the provided access key and secret key",
+			  "success_msg": "Machine is able to access the GCP bucket using the provided access key and secret key",
 			  "error_msg": "",
 			  "resolution_msg": ""
 			}
@@ -39,7 +39,7 @@ const (
 		}
 	  }`
 
-	s3BackupCheckResponseExpectedSuccess = `[
+	GCPBackupCheckResponseExpectedSuccess = `[
 	{
 		"status": "SUCCESS",
 		"node_type": "automate",
@@ -47,16 +47,16 @@ const (
 		  "passed": true,
 		  "checks": [
 			{
-			  "title": "S3 connection test",
+			  "title": "GCP connection test",
 			  "passed": true,
-			  "success_msg": "Machine is able to connect with S3 using the provided access key and secret key",
+			  "success_msg": "Machine is able to connect with GCP using the provided access key and secret key",
 			  "error_msg": "",
 			  "resolution_msg": ""
 			},
 			{
-			  "title": "S3 bucket access test",
+			  "title": "GCP bucket access test",
 			  "passed": true,
-			  "success_msg": "Machine is able to access the S3 bucket using the provided access key and secret key",
+			  "success_msg": "Machine is able to access the GCP bucket using the provided access key and secret key",
 			  "error_msg": "",
 			  "resolution_msg": ""
 			}
@@ -69,16 +69,16 @@ const (
 		  "passed": true,
 		  "checks": [
 			{
-			  "title": "S3 connection test",
+			  "title": "GCP connection test",
 			  "passed": true,
-			  "success_msg": "Machine is able to connect with S3 using the provided access key and secret key",
+			  "success_msg": "Machine is able to connect with GCP using the provided access key and secret key",
 			  "error_msg": "",
 			  "resolution_msg": ""
 			},
 			{
-			  "title": "S3 bucket access test",
+			  "title": "GCP bucket access test",
 			  "passed": true,
-			  "success_msg": "Machine is able to access the S3 bucket using the provided access key and secret key",
+			  "success_msg": "Machine is able to access the GCP bucket using the provided access key and secret key",
 			  "error_msg": "",
 			  "resolution_msg": ""
 			}
@@ -87,32 +87,32 @@ const (
 	  }
 	]
 	`
-	s3BackupCheckResponseFailure = `
+	GCPBackupCheckResponseFailure = `
 	{
 		"status": "SUCCESS",
 		"result": {
 		  "passed": false,
 		  "checks": [
 			{
-			  "title": "S3 connection test",
+			  "title": "GCP connection test",
 			  "passed": false,
 			  "success_msg": "",
-			  "error_msg": "Machine is not able to connect with S3 using the provided access key and secret key",
-			  "resolution_msg": "Provide the correct S3 url or access or secret keys"
+			  "error_msg": "Machine is not able to connect with GCP using the provided access key and secret key",
+			  "resolution_msg": "Provide the correct GCP url or access or secret keys"
 			},
 			{
-			  "title": "S3 bucket access test",
+			  "title": "GCP bucket access test",
 			  "passed": false,
 			  "success_msg": "",
-			  "error_msg": "Machine is not able to access the S3 bucket using the provided access key and secret key",
-			  "resolution_msg": "Provide the necessary access to the S3 bucket"
+			  "error_msg": "Machine is not able to access the GCP bucket using the provided access key and secret key",
+			  "resolution_msg": "Provide the necessary access to the GCP bucket"
 			}
 		  ]
 		}
 	  }
 	  `
 
-	s3BackupCheckResponseFailureExpected = `[
+	GCPBackupCheckResponseFailureExpected = `[
 	{
 		"status": "SUCCESS",
 		"node_type" :"automate",
@@ -120,18 +120,18 @@ const (
 		  "passed": false,
 		  "checks": [
 			{
-			  "title": "S3 connection test",
+			  "title": "GCP connection test",
 			  "passed": false,
 			  "success_msg": "",
-			  "error_msg": "Machine is not able to connect with S3 using the provided access key and secret key",
-			  "resolution_msg": "Provide the correct S3 url or access or secret keys"
+			  "error_msg": "Machine is not able to connect with GCP using the provided access key and secret key",
+			  "resolution_msg": "Provide the correct GCP url or access or secret keys"
 			},
 			{
-			  "title": "S3 bucket access test",
+			  "title": "GCP bucket access test",
 			  "passed": false,
 			  "success_msg": "",
-			  "error_msg": "Machine is not able to access the S3 bucket using the provided access key and secret key",
-			  "resolution_msg": "Provide the necessary access to the S3 bucket"
+			  "error_msg": "Machine is not able to access the GCP bucket using the provided access key and secret key",
+			  "resolution_msg": "Provide the necessary access to the GCP bucket"
 			}
 		  ]
 		}
@@ -143,45 +143,73 @@ const (
 		  "passed": false,
 		  "checks": [
 			{
-			  "title": "S3 connection test",
+			  "title": "GCP connection test",
 			  "passed": false,
 			  "success_msg": "",
-			  "error_msg": "Machine is not able to connect with S3 using the provided access key and secret key",
-			  "resolution_msg": "Provide the correct S3 url or access or secret keys"
+			  "error_msg": "Machine is not able to connect with GCP using the provided access key and secret key",
+			  "resolution_msg": "Provide the correct GCP url or access or secret keys"
 			},
 			{
-			  "title": "S3 bucket access test",
+			  "title": "GCP bucket access test",
 			  "passed": false,
 			  "success_msg": "",
-			  "error_msg": "Machine is not able to access the S3 bucket using the provided access key and secret key",
-			  "resolution_msg": "Provide the necessary access to the S3 bucket"
+			  "error_msg": "Machine is not able to access the GCP bucket using the provided access key and secret key",
+			  "resolution_msg": "Provide the necessary access to the GCP bucket"
 			}
 		  ]
 		}
 	  }
 	  ]
 	  `
-	endPoint   = "//s3-url-test.com"
-	basePath   = "s3.url.test"
-	BucketName = "test"
-	accessKey  = "test-access-key"
-	secretKey  = "test-secret-key"
-	awsRegion  = "region"
-	location   = "s3"
+	GCPBackupConfigCheckResponseSkipped = `{
+		"status": "",
+		"node_type": "automate",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{}
+		  ]
+		  "Skipped": true,
+		  "skip_message":"- Backup configuration not set to object_storage/gcs"
+		}
+	  }`
+	bucketName              = "test"
+	accountServiceFilepath  = "./testdata/account.json"
+	location                = "gcs"
+	typeS                   = "service_account"
+	projectId               = "dev"
+	privateKeyId            = "e123454a6668a89b970f703f"
+	privateKey              = "certificate"
+	clientEmail             = "abc.gserviceaccount.com"
+	clientId                = "1146674505608030"
+	authUri                 = "https://accounts.google.com/o/oauth2/auth"
+	tokenUri                = "https://oauth2.googleapis.com/token"
+	authProviderx509CertUrl = "https://www.googleapis.com/oauth2/v1/certs"
+	clientx509CertUrl       = "https://www.googleapis.com/robot/v1/metadata/x509/test"
+	universeDomain          = "main"
 )
 
-func getRequest() models.S3ConfigRequest {
-	return models.S3ConfigRequest{
-		Endpoint:   endPoint,
-		BucketName: BucketName,
-		BasePath:   basePath,
-		AccessKey:  accessKey,
-		SecretKey:  secretKey,
-		Region:     awsRegion,
+func getRequest() models.GCPCloudStorageConfigRequest {
+	return models.GCPCloudStorageConfigRequest{
+		BucketName:               bucketName,
+		GoogleServiceAccountFile: accountServiceFilepath,
+		GcpServiceAccount: &models.GcpServiceAccount{
+			Type:                    typeS,
+			ProjectID:               projectId,
+			PrivateKeyID:            privateKeyId,
+			PrivateKey:              privateKey,
+			ClientEmail:             clientEmail,
+			ClientID:                clientId,
+			AuthURI:                 authUri,
+			TokenURI:                tokenUri,
+			AuthProviderX509CertURL: authProviderx509CertUrl,
+			ClientX509CertURL:       clientx509CertUrl,
+			UniverseDomain:          universeDomain,
+		},
 	}
 }
 
-func TestS3BackupConfigCheck_Run(t *testing.T) {
+func TestGCPBackupConfigCheck_Run(t *testing.T) {
 	type args struct {
 		config *models.Config
 	}
@@ -196,7 +224,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 		requiredStatusResponse string
 	}{
 		{
-			name:           "All the s3 checks passed",
+			name:           "All the GCP checks passed",
 			isPassed:       true,
 			isError:        false,
 			httpStatusCode: http.StatusOK,
@@ -207,21 +235,17 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Location:   location,
-							Endpoint:   endPoint,
-							BucketName: BucketName,
-							BasePath:   basePath,
-							AccessKey:  accessKey,
-							SecretKey:  secretKey,
-							AWSRegion:  awsRegion,
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: accountServiceFilepath,
 						},
 					},
 				},
 			},
-			response: s3BackupCheckResponseExpectedSuccess,
+			response: GCPBackupCheckResponseExpectedSuccess,
 		},
 		{
-			name:           "All the s3 checks failed",
+			name:           "All the GCP checks failed",
 			isPassed:       false,
 			isError:        false,
 			httpStatusCode: http.StatusOK,
@@ -232,18 +256,14 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Location:   location,
-							Endpoint:   endPoint,
-							BucketName: BucketName,
-							BasePath:   basePath,
-							AccessKey:  accessKey,
-							SecretKey:  secretKey,
-							AWSRegion:  awsRegion,
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: accountServiceFilepath,
 						},
 					},
 				},
 			},
-			response: s3BackupCheckResponseFailureExpected,
+			response: GCPBackupCheckResponseFailureExpected,
 		},
 		{
 			name:           "Internal Server Error",
@@ -257,12 +277,9 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Location:   location,
-							BucketName: BucketName,
-							BasePath:   basePath,
-							AccessKey:  accessKey,
-							SecretKey:  secretKey,
-							AWSRegion:  awsRegion,
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: accountServiceFilepath,
 						},
 					},
 				},
@@ -283,19 +300,57 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Location:   location,
-							Endpoint:   endPoint,
-							BucketName: BucketName,
-							BasePath:   basePath,
-							AccessKey:  accessKey,
-							SecretKey:  secretKey,
-							AWSRegion:  "ap-south",
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: accountServiceFilepath,
 						},
 					},
 				},
 			},
 			requiredStatusResponse: `{"error":{"code":504,"message":"context deadline exceeded"}}`,
 			response:               "context deadline exceeded",
+		},
+		{
+			name:           "Parsing Error",
+			isPassed:       false,
+			isError:        true,
+			httpStatusCode: http.StatusBadRequest,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 2,
+					},
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: "service.json",
+						},
+					},
+				},
+			},
+			response: "Json File is empty or Incorrect Json File",
+		},
+		{
+			name:           "Parsing Empty",
+			isPassed:       false,
+			isError:        true,
+			httpStatusCode: http.StatusBadRequest,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 2,
+					},
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
+							Location:                 location,
+							BucketName:               bucketName,
+							GoogleServiceAccountFile: "./testdata/service.json",
+						},
+					},
+				},
+			},
+			response: "Json File is empty or Incorrect Json File",
 		},
 	}
 	for _, tt := range tests {
@@ -304,7 +359,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed, tt.requiredStatusResponse)
 			defer server.Close()
 
-			svc := NewS3BackupConfigCheck(
+			svc := NewGcsBackupConfigCheck(
 				logger.NewLogrusStandardLogger(),
 				port,
 			)
@@ -332,9 +387,9 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 	}
 }
 
-func TestRunS3BackupCheck(t *testing.T) {
+func TestRunGCPBackupCheck(t *testing.T) {
 	t.Run("NIl Hardware", func(t *testing.T) {
-		svc := NewS3BackupConfigCheck(
+		svc := NewGcsBackupConfigCheck(
 			logger.NewLogrusStandardLogger(),
 			"8081",
 		)
@@ -347,14 +402,14 @@ func TestRunS3BackupCheck(t *testing.T) {
 		assert.Len(t, got, 1)
 		assert.Equal(t, "-", got[0].Host)
 		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.Equal(t, constants.GCP_BACKUP_CONFIG, got[0].CheckType)
 		assert.True(t, got[0].Result.Skipped)
 		assert.Equal(t, constants.SKIP_MISSING_HARDWARE_MESSAGE, got[0].Result.SkipMessage)
 
 	})
 
 	t.Run("Empty Object storage", func(t *testing.T) {
-		svc := NewS3BackupConfigCheck(
+		svc := NewGcsBackupConfigCheck(
 			logger.NewLogrusStandardLogger(),
 			"8081",
 		)
@@ -365,7 +420,7 @@ func TestRunS3BackupCheck(t *testing.T) {
 			},
 			Backup: &models.Backup{
 				ObjectStorage: &models.ObjectStorage{
-					Location: "s3",
+					Location: "gcs",
 				},
 			},
 		}
@@ -375,10 +430,34 @@ func TestRunS3BackupCheck(t *testing.T) {
 		assert.Len(t, got, 1)
 		assert.Equal(t, constants.LOCALHOST, got[0].Host)
 		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.Equal(t, constants.GCP_BACKUP_CONFIG, got[0].CheckType)
 		assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
-		assert.Equal(t, constants.S3_BACKUP_MISSING, got[0].Result.Error.Message)
+		assert.Equal(t, constants.GCS_BACKUP_MISSING, got[0].Result.Error.Message)
 		assert.False(t, got[0].Result.Skipped)
+	})
+
+	t.Run("Empty", func(t *testing.T) {
+		svc := NewGcsBackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{constants.LOCALHOST},
+			},
+			Backup: &models.Backup{
+				ObjectStorage: &models.ObjectStorage{
+					Location: "",
+				},
+			},
+		}
+
+		got := svc.Run(config)
+		want := &models.ApiResult{
+			SkipMessage: "- Backup configuration not set to object_storage/gcs",
+		}
+		assert.Equal(t, got[0].Result.SkipMessage, want.SkipMessage)
 	})
 }
 
@@ -386,7 +465,7 @@ func TestRunS3BackupCheck(t *testing.T) {
 func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requiredStatusResponse string) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var got models.S3ConfigRequest
+			var got models.GCPCloudStorageConfigRequest
 			req := r.Body
 			reader, _ := io.ReadAll(req)
 			json.Unmarshal(reader, &got)
@@ -394,14 +473,14 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requ
 			wantReq := getRequest()
 
 			assert.NotNil(t, got)
-			assert.Equal(t, wantReq, got)
-			if r.URL.Path == constants.S3_BACKUP_CHECK_API_PATH {
+			assert.Equal(t, got, wantReq)
+			if r.URL.Path == constants.GCP_CLOUD_STORAGE_CONFIG_API_PATH {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(s3BackupConfigCheckResponseFromOneNodeSuccess))
+					w.Write([]byte(GCPBackupConfigCheckResponseFromOneNodeSuccess))
 				} else {
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(s3BackupCheckResponseFailure))
+					w.Write([]byte(GCPBackupCheckResponseFailure))
 				}
 			}
 		}))
@@ -430,13 +509,13 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool, requ
 }
 
 func TestGetPortsForMockServer(t *testing.T) {
-	fwc := NewS3BackupConfigCheck(logger.NewLogrusStandardLogger(), "1234")
+	fwc := NewGcsBackupConfigCheck(logger.NewLogrusStandardLogger(), "1234")
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))
 }
 
-func TestS3ConfigSkippedResponse(t *testing.T) {
+func TestGCPConfigSkippedResponse(t *testing.T) {
 	type args struct {
 		config    *models.Config
 		checkType string
@@ -457,28 +536,28 @@ func TestS3ConfigSkippedResponse(t *testing.T) {
 						ChefInfraServerNodeIps:   []string{constants.LOCALHOST},
 					},
 				},
-				checkType: "s3-backup-config",
+				checkType: "GCP-backup-config",
 			},
 			want: []models.CheckTriggerResponse{
 				{
 					NodeType:  "automate",
-					CheckType: "s3-backup-config",
+					CheckType: "GCP-backup-config",
 					Result: models.ApiResult{
 						Passed:      false,
 						Skipped:     true,
-						Check:       "s3-backup-config",
-						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_S3,
+						Check:       "GCP-backup-config",
+						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_GCS,
 					},
 					Host: constants.LOCALHOST,
 				},
 				{
 					NodeType:  "chef-infra-server",
-					CheckType: "s3-backup-config",
+					CheckType: "GCP-backup-config",
 					Result: models.ApiResult{
 						Passed:      false,
 						Skipped:     true,
-						Check:       "s3-backup-config",
-						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_S3,
+						Check:       "GCP-backup-config",
+						SkipMessage: constants.SKIP_BACKUP_TEST_MESSAGE_GCS,
 					},
 					Host: constants.LOCALHOST,
 				},
@@ -487,7 +566,7 @@ func TestS3ConfigSkippedResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := s3ConfigSkippedResponse(tt.args.config, tt.args.checkType, constants.SKIP_BACKUP_TEST_MESSAGE_S3)
+			got := GcsConfigSkippedResponse(tt.args.config, tt.args.checkType, constants.SKIP_BACKUP_TEST_MESSAGE_GCS)
 			assert.Equal(t, tt.want, got)
 		})
 	}

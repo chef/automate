@@ -730,6 +730,7 @@ func TestBatchCheckService(t *testing.T) {
 				SetupMockSoftwareVersionCheck(),
 				SetupMockSystemResourceCheck(),
 				SetupMockSystemUserCheck(),
+				SetupMockGCPBackupConfigCheck(),
 			), logger.NewTestLogger(), "1234")
 
 			ss.httpRequestClient = SetupMockHttpRequestClient(test.statusApiResponse, test.statusApiError, test.shouldStartMockServerOnSomeNodesOnly)
@@ -747,6 +748,7 @@ func TestBatchCheckService(t *testing.T) {
 				constants.SYSTEM_RESOURCES,
 				constants.SYSTEM_USER,
 				constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+				constants.GCP_BACKUP_CONFIG,
 			}
 
 			if len(test.checksToExecute) > 0 {
@@ -1010,6 +1012,7 @@ func getBatchCheckServiceInstance() *BatchCheckService {
 		SetupMockSoftwareVersionCheck(),
 		SetupMockSystemResourceCheck(),
 		SetupMockSystemUserCheck(),
+		SetupMockGCPBackupConfigCheck(),
 	), logger.NewTestLogger(), "1234")
 }
 
@@ -1176,6 +1179,7 @@ func TestBastionBatchChecks(t *testing.T) {
 		SetupMockSoftwareVersionCheck(),
 		SetupMockSystemResourceCheck(),
 		SetupMockSystemUserCheck(),
+		SetupMockGCPBackupConfigCheck(),
 	), logger.NewTestLogger(), "1234")
 
 	checksToExecute := []string{

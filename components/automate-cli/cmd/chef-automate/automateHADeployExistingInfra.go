@@ -14,7 +14,6 @@ import (
 	ptoml "github.com/pelletier/go-toml"
 )
 
-const AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE = "/hab/a2_deploy_workspace/googleServiceAccount.json"
 const GCS = "gcs"
 const S3 = "s3"
 

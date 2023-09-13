@@ -1,0 +1,121 @@
+# This is a Chef Automate on-prem HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+
+[architecture.existing_infra]
+## === INPUT NEEDED ===
+# Eg.: ssh_user = "ubuntu"
+ssh_user = "ubuntu"
+
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = "ubuntu"
+
+# private ssh key file path to access instances
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
+ssh_key_file = "./testdata/.ssh/A2HA.pem"
+
+# custome ssh port no to connect instances, default will be 22
+# Eg.: ssh_port = "22"
+ssh_port = "22"
+
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "existing_nodes"
+workspace_path = "/hab/a2_deploy_workspace"
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "automate_backups"
+
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = "object_storage"
+
+# If backup_config = "object_storage" fill out [object_storage.config] as well 
+## Object storage similar to AWS S3 Bucket
+[object_storage.config]
+location = "gcs"
+bucket_name = "test"
+google_service_account_file = "./testdata/gcsservicefile.json"
+
+# [Optional] Mention object_storage region if applicable
+# Eg: region = "us-west-1"
+region = ""
+## === ===
+
+# ============== EC2 Nodes Config ======================
+[automate.config]
+## === INPUT NEEDED ===
+
+# Password for Automate UI for 'admin' user.
+admin_password = "chefautomate"
+
+
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = "chefautomate.example.com"
+
+# No. of Automate Frontend Machine or VM eg.: instance_count = "2"
+instance_count = "2"
+
+## === ===
+
+
+# teams_port = ""
+config_file = "configs/automate.toml"
+root_ca = ""
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+# Add Automate load balancer root-ca and keys
+private_key = "a2_pvt_key"
+public_key = ""
+[[automate.config.certs_by_ip]]
+ip = "127.0.0.1"
+private_key = "a2_pvt_key"
+public_key = ""
+
+[chef_server.config]
+## === INPUT NEEDED ===
+
+# No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
+instance_count = "2"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+# Add Chef Server load balancer keys
+private_key = ""
+public_key = ""
+
+
+## === ===
+
+[opensearch.config]
+## === INPUT NEEDED ===
+
+# No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = "3"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+
+## === ===
+
+[postgresql.config]
+## === INPUT NEEDED ===
+
+# No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = "3"
+
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
+
+## === ===
+
+[existing_infra.config]
+## === INPUT NEEDED ===
+
+# provide comma-seperated IP addresses of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No. of IP address should be the same as the No. of instance_count count mentioned above in
+# automate.config, chef_server.config, opensearch.config and postgresql.config
+automate_private_ips = ["120.0.0.1","120.0.0.2"]
+chef_server_private_ips = ["120.0.0.3","120.0.0.4"]
+opensearch_private_ips = ["120.0.1.1","120.0.1.2","120.0.1.3"]
+postgresql_private_ips = ["120.0.1.4","120.0.1.5","120.0.1.6"]
+## === ===

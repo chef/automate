@@ -11,6 +11,7 @@ const SYSTEM_RESOURCES = "system-resources"
 const SOFTWARE_VERSIONS = "software-versions"
 const SYSTEM_USER = "system-user"
 const S3_BACKUP_CONFIG = "s3-backup-config"
+const GCP_BACKUP_CONFIG = "gcp-backup-config"
 const FQDN = "fqdn"
 const FIREWALL = "firewall"
 const EXTERNAL_OPENSEARCH = "external-opensearch"
@@ -26,6 +27,7 @@ const (
 	SOFTWARE_VERSIONS_MSG               = "Software Versions Check"
 	SYSTEM_USER_MSG                     = "System User Check"
 	S3_BACKUP_CONFIG_MSG                = "S3 Backup Config Check"
+	GCP_BACKUP_CONFIG_MSG               = "GCP Backup Config Check"
 	FQDN_MSG                            = "FQDN Check"
 	FIREWALL_MSG                        = "Firewall Check"
 	EXTERNAL_OPENSEARCH_MSG             = "External OpenSearch Check"
@@ -106,6 +108,11 @@ var checkMap map[string]models.CheckAndType = map[string]models.CheckAndType{
 		CheckType: REMOTE_CHECK,
 		CheckName: NFS_BACKUP_CONFIG,
 		CheckMsg:  NFS_BACKUP_CONFIG_MSG,
+	},
+	GCP_BACKUP_CONFIG: {
+		CheckType: REMOTE_CHECK,
+		CheckName: GCP_BACKUP_CONFIG,
+		CheckMsg:  GCP_BACKUP_CONFIG_MSG,
 	},
 }
 

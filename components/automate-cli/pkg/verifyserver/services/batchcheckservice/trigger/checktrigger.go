@@ -18,13 +18,14 @@ type CheckTrigger struct {
 	SoftwareVersionCheck          ICheck
 	SystemResourceCheck           ICheck
 	SystemUserCheck               ICheck
+	GCPBackupConfigCheck          ICheck
 }
 type ICheck interface {
 	Run(config *models.Config) []models.CheckTriggerResponse
 	GetPortsForMockServer() map[string]map[string][]int
 }
 
-func NewCheckTrigger(hrc, sshC, cert, eop, epc, fc, fqdn, nfs, os3, s3b, svc, src, suc ICheck) CheckTrigger {
+func NewCheckTrigger(hrc, sshC, cert, eop, epc, fc, fqdn, nfs, os3, s3b, svc, src, suc, gcpb ICheck) CheckTrigger {
 	return CheckTrigger{
 		HardwareResourceCountCheck:    hrc,
 		SshUserAccessCheck:            sshC,
@@ -39,5 +40,6 @@ func NewCheckTrigger(hrc, sshC, cert, eop, epc, fc, fqdn, nfs, os3, s3b, svc, sr
 		SoftwareVersionCheck:          svc,
 		SystemResourceCheck:           src,
 		SystemUserCheck:               suc,
+		GCPBackupConfigCheck:          gcpb,
 	}
 }

@@ -132,11 +132,13 @@ var existingInfraConfig = &ExistingInfraConfigToml{
 	},
 	ObjectStorage: ObjectStorageToml{
 		Config: ObjectStorageConfigToml{
-			AccessKey:  "existing-access-key",
-			BucketName: "existing-bucket",
-			Endpoint:   "existing-endpoint",
-			Region:     "existing-region",
-			SecretKey:  "existing-secret-key",
+			AccessKey:                "existing-access-key",
+			BucketName:               "existing-bucket",
+			Endpoint:                 "existing-endpoint",
+			Region:                   "existing-region",
+			SecretKey:                "existing-secret-key",
+			Location:                 "gcs",
+			GoogleServiceAccountFile: "googleServiceAccount.json",
 		},
 	},
 }
@@ -489,7 +491,6 @@ func TestCopyCertsByIP(t *testing.T) {
 func TestCopyExistingInfra(t *testing.T) {
 
 	haDeployConfig := CopyExistingInfra(existingInfraConfig)
-
 	assert.Equal(t, "existing-ssh-user", haDeployConfig.Architecture.ExistingInfra.SSHUser)
 	assert.Equal(t, "existing-architecture", haDeployConfig.Architecture.ExistingInfra.Architecture)
 	assert.Equal(t, "object_storage", haDeployConfig.Architecture.ExistingInfra.BackupConfig)
@@ -576,6 +577,8 @@ func TestCopyExistingInfra(t *testing.T) {
 	assert.Equal(t, "existing-endpoint", haDeployConfig.ObjectStorage.Config.Endpoint)
 	assert.Equal(t, "existing-region", haDeployConfig.ObjectStorage.Config.Region)
 	assert.Equal(t, "existing-secret-key", haDeployConfig.ObjectStorage.Config.SecretKey)
+	assert.Equal(t, "gcs", haDeployConfig.ObjectStorage.Config.Location)
+	assert.Equal(t, "googleServiceAccount.json", haDeployConfig.ObjectStorage.Config.GoogleServiceAccountFile)
 
 }
 

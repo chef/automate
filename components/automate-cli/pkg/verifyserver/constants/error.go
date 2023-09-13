@@ -8,6 +8,7 @@ const (
 	MISSING_CERTIFICATE    = "Certificate is missing"
 	MOUNT_LOCATION_MISSING = "MountLocation is missing"
 	S3_BACKUP_MISSING      = "S3 backup detail is missing"
+	GCS_BACKUP_MISSING     = "GCS backup detail is missing"
 	OBJECT_STORAGE_MISSING = "Object storage detail or OS detail is missing"
 	PG_DETAILS_MISSING     = "PG configuration is missing"
 	OS_DETAILS_MISSING     = "OS configuration is missing"

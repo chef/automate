@@ -120,7 +120,7 @@ require github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirec
 
 require (
 	cloud.google.com/go v0.65.0 // indirect
-	cloud.google.com/go/storage v1.10.0 // indirect
+	cloud.google.com/go/storage v1.10.0
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect

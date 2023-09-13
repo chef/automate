@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/lib/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -631,4 +632,119 @@ func TestPopulateWith(t *testing.T) {
 			// assert.Equal(t, tt.want, c, tt.name)
 		})
 	}
+}
+
+func TestPopulateObjectStorageConfig(t *testing.T) {
+	t.Run("Nil Config", func(t *testing.T) {
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(nil)
+		require.Empty(t, mockConfig)
+	})
+	t.Run("Empty Location", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+				},
+			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+		}
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.Empty(t, mockConfig)
+	})
+	t.Run("Not Supported Location", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					Location:   "Azure",
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+				},
+			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+		}
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.Empty(t, mockConfig)
+	})
+
+	t.Run("Valid Config S3", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					Location:   AWS_S3,
+					BucketName: "dummybucket",
+					AccessKey:  "access",
+					SecretKey:  "secret",
+					Endpoint:   "endpoint",
+					Region:     "Somewhere",
+				},
+			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+		}
+
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.NotNil(t, mockConfig)
+		require.Equal(t, mockConfig.Backup.ObjectStorage.AWSRegion, "Somewhere")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.BucketName, "dummybucket")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.AccessKey, "access")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.SecretKey, "secret")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.Endpoint, "endpoint")
+	})
+
+	t.Run("Valid Config GCS", func(t *testing.T) {
+		mockHaDeployConfig := &config.HaDeployConfig{
+			ObjectStorage: &config.ObjectStorage{
+				Config: &config.ConfigObjectStorage{
+					Location:                 GCP_CLOUD_STORAGE,
+					BucketName:               "dummybucket",
+					GoogleServiceAccountFile: "./testdata/servicefile",
+				},
+			},
+			Architecture: &config.Architecture{
+				Aws: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+				ExistingInfra: &config.ConfigInitials{
+					SSHUser: "ec2-user",
+				},
+			},
+		}
+
+		mockConfig := &Config{}
+		mockConfig.populateObjectStorageConfig(mockHaDeployConfig)
+		require.NotNil(t, mockConfig)
+		require.Equal(t, mockConfig.Backup.ObjectStorage.BucketName, "dummybucket")
+		require.Equal(t, mockConfig.Backup.ObjectStorage.GoogleServiceAccountFile, "./testdata/servicefile")
+	})
 }

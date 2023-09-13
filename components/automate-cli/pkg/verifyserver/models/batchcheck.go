@@ -7,8 +7,15 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	AWS_S3            = "s3"
+	GCP_CLOUD_STORAGE = "gcs"
 )
 
 type BatchCheckRequest struct {
@@ -44,13 +51,31 @@ type SSHUser struct {
 type FileSystem struct {
 	MountLocation string `json:"mount_location"`
 }
+
+type GcpServiceAccount struct {
+	Type                    string `json:"type"`
+	ProjectID               string `json:"project_id"`
+	PrivateKeyID            string `json:"private_key_id"`
+	PrivateKey              string `json:"private_key"`
+	ClientEmail             string `json:"client_email"`
+	ClientID                string `json:"client_id"`
+	AuthURI                 string `json:"auth_uri"`
+	TokenURI                string `json:"token_uri"`
+	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
+	ClientX509CertURL       string `json:"client_x509_cert_url"`
+	UniverseDomain          string `json:"universe_domain"`
+}
+
 type ObjectStorage struct {
-	Endpoint   string `json:"endpoint"`
-	BucketName string `json:"bucket_name"`
-	BasePath   string `json:"base_path"`
-	AccessKey  string `json:"access_key"`
-	SecretKey  string `json:"secret_key"`
-	AWSRegion  string `json:"aws_region"`
+	Location                 string             `json:"location"`
+	Endpoint                 string             `json:"endpoint"`
+	BucketName               string             `json:"bucket_name"`
+	BasePath                 string             `json:"base_path"`
+	AccessKey                string             `json:"access_key"`
+	SecretKey                string             `json:"secret_key"`
+	AWSRegion                string             `json:"aws_region"`
+	GoogleServiceAccountFile string             `json:"google_service_account_file"`
+	GcpServiceAccount        *GcpServiceAccount `json:"gcp_service_account"`
 }
 type Backup struct {
 	FileSystem    *FileSystem    `json:"file_system"`
@@ -253,15 +278,39 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 }
 
 func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
+	if haConfig == nil {
+		logrus.Errorln("haConfig cannot be nil")
+		return
+	}
+
 	objectStorageConfig := haConfig.GetObjectStorageConfig()
-	c.Backup = &Backup{
-		ObjectStorage: &ObjectStorage{
-			BucketName: objectStorageConfig.BucketName,
-			AWSRegion:  objectStorageConfig.Region,
-			AccessKey:  objectStorageConfig.AccessKey,
-			SecretKey:  objectStorageConfig.SecretKey,
-			Endpoint:   objectStorageConfig.Endpoint,
-		},
+	if objectStorageConfig.Location == "" {
+		logrus.Errorln("object storage location cannot be empty")
+		return
+	}
+
+	if objectStorageConfig.Location == AWS_S3 {
+		c.Backup = &Backup{
+			ObjectStorage: &ObjectStorage{
+				Location:   objectStorageConfig.Location,
+				BucketName: objectStorageConfig.BucketName,
+				AWSRegion:  objectStorageConfig.Region,
+				AccessKey:  objectStorageConfig.AccessKey,
+				SecretKey:  objectStorageConfig.SecretKey,
+				Endpoint:   objectStorageConfig.Endpoint,
+			},
+		}
+	} else if objectStorageConfig.Location == GCP_CLOUD_STORAGE {
+		c.Backup = &Backup{
+			ObjectStorage: &ObjectStorage{
+				Location:                 objectStorageConfig.Location,
+				BucketName:               objectStorageConfig.BucketName,
+				GoogleServiceAccountFile: objectStorageConfig.GoogleServiceAccountFile,
+			},
+		}
+	} else {
+		logrus.Errorf("invalid location: %s", objectStorageConfig.Location)
+		return
 	}
 }
 

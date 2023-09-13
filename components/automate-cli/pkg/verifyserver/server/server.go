@@ -7,6 +7,7 @@ import (
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/fqdnservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/gcpcloudstorageservice"
 
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
@@ -16,6 +17,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/externalpostgresqlchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/fqdnchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/gcsbackupchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/nfsmountbackupchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/opensearchs3bucketaccesschecktrigger"
@@ -109,8 +111,9 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
+				gcsbackupchecktrigger.NewGcsBackupConfigCheck(l, port),
 			), l, port)).
-		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, httputils.NewClient(l),systemresource.NewSystemResourceInfoImpl())).
+		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, httputils.NewClient(l), systemresource.NewSystemResourceInfoImpl())).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
 		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).
@@ -124,7 +127,9 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
 		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
-		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l)))
+		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l))).
+		AddGCSConfigService(gcpcloudstorageservice.NewGCPCloudStorageConfig(l))
+
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
