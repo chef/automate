@@ -12,6 +12,7 @@ var ServiceName = "user-settings-service"
 type UserSettings struct {
 	Service          `mapstructure:"service"`
 	Postgres         `mapstructure:"postgres"`
+	Log              `mapstructure:"log"`
 	*certs.TLSConfig `mapstructure:"tls"`
 	storageClient    storage.Client
 }
@@ -21,7 +22,11 @@ type Service struct {
 	Host        string `mapstructure:"host"`
 	Port        int    `mapstructure:"port"`
 	MetricsPort int    `mapstructure:"metrics_port"`
-	LogLevel    string `mapstructure:"log_level"`
+}
+
+type Log struct {
+	Level  string `mapstructure:"level"`
+	Fromat string `mapstructure:"format"`
 }
 
 type Postgres struct {
@@ -43,18 +48,18 @@ func (s *UserSettings) GetStorage() storage.Client {
 }
 
 // SetLogLevel sets the log level for the service
-func (s *Service) SetLogLevel() {
-	if s.LogLevel == "" {
+func (s *Log) SetLogLevel() {
+	if s.Level == "" {
 		return
 	}
 
 	log.WithFields(log.Fields{
-		"level": s.LogLevel,
+		"level": s.Level,
 	}).Info("Setting log level")
 
-	level, err := log.ParseLevel(s.LogLevel)
+	level, err := log.ParseLevel(s.Level)
 	if err != nil {
-		log.WithField("level", s.LogLevel).WithError(err).Error("Using default level 'info'")
+		log.WithField("level", s.Level).WithError(err).Error("Using default level 'info'")
 		return
 	}
 

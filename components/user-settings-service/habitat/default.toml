@@ -5,6 +5,10 @@ accept = false
 host = "localhost"
 port = 10107
 
+[log]
+format = "json"
+level = "info"
+
 [storage]
 database = "chef_user_settings_service"
 user = "user_settings"

@@ -25,7 +25,8 @@ var serveCmd = &cobra.Command{
 				"error": err.Error(),
 			}).Fatal("Failed to load config")
 		}
-		conf.Service.SetLogLevel()
+		conf.Log.SetLogLevel()
+		fmt.Println("Calling SetLogLvl")
 		svcCerts, err := conf.ReadCerts()
 		if err != nil {
 			log.WithFields(log.Fields{
