@@ -175,6 +175,13 @@ func (c *HaDeployConfig) validateAwsBackupConfig() error {
 
 func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage) error {
 	errorList := list.New()
+
+	if c.IsExternalDb() && c.External.Database.Type == "aws" {
+		if err := validateRequiredString(objectStorage.Location, "location", "s3"); err != nil {
+			return err
+		}
+	}
+
 	if err := validateRequiredString(objectStorage.BucketName, "bucket_name"); err != nil {
 		errorList.PushBack(err)
 	}

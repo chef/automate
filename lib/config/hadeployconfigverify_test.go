@@ -120,9 +120,10 @@ func TestParseAndVerify(t *testing.T) {
 
 func TestVerifyObjectStorage(t *testing.T) {
 	testCases := []struct {
-		name          string
-		objectStorage *ConfigObjectStorage
-		expectedError error
+		name           string
+		objectStorage  *ConfigObjectStorage
+		haDeployConfig *HaDeployConfig
+		expectedError  error
 	}{
 		{
 			name: "Valid Object Storage Configuration",
@@ -134,7 +135,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Endpoint:   "https://example.com",
 				Region:     "us-east-1",
 			},
-			expectedError: nil,
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  nil,
 		},
 		{
 			name: "Missing Bucket Name",
@@ -145,7 +147,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Endpoint:  "https://example.com",
 				Region:    "us-east-1",
 			},
-			expectedError: errors.New("invalid or empty: bucket_name"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid or empty: bucket_name"),
 		},
 		{
 			name: "Missing Access Key",
@@ -156,7 +159,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Endpoint:   "https://example.com",
 				Region:     "us-east-1",
 			},
-			expectedError: errors.New("invalid or empty: access_key"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid or empty: access_key"),
 		},
 		{
 			name: "Missing Secret Key",
@@ -167,7 +171,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Endpoint:   "https://example.com",
 				Region:     "us-east-1",
 			},
-			expectedError: errors.New("invalid or empty: secret_key"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid or empty: secret_key"),
 		},
 		{
 			name: "Missing Endpoint",
@@ -178,7 +183,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				SecretKey:  "secret-key",
 				Region:     "us-east-1",
 			},
-			expectedError: errors.New("invalid or empty: endpoint"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid or empty: endpoint"),
 		},
 		{
 			name: "Invalid Region",
@@ -190,7 +196,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Endpoint:   "https://example.com",
 				Region:     "invalid-region",
 			},
-			expectedError: errors.New("invalid AWS region for S3"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid AWS region for S3"),
 		},
 		{
 			name: "Empty Bucket",
@@ -198,7 +205,8 @@ func TestVerifyObjectStorage(t *testing.T) {
 				Location:                 GCS_STORAGE,
 				GoogleServiceAccountFile: "./testdata/gcsservicefile.json",
 			},
-			expectedError: errors.New("invalid or empty: bucket_name"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid or empty: bucket_name"),
 		},
 		{
 			name: "Empty ServiceFile",
@@ -207,13 +215,30 @@ func TestVerifyObjectStorage(t *testing.T) {
 				BucketName:               "bucket",
 				GoogleServiceAccountFile: "./testdata/servicefile.json",
 			},
-			expectedError: errors.New("invalid google_service_account_file: ./testdata/servicefile.json no such file or directory"),
+			haDeployConfig: &HaDeployConfig{},
+			expectedError:  errors.New("invalid google_service_account_file: ./testdata/servicefile.json no such file or directory"),
+		},
+		{
+			name: "Error For haDeployConfigDatabase",
+			objectStorage: &ConfigObjectStorage{
+				Location:                 GCS_STORAGE,
+				BucketName:               "bucket",
+				GoogleServiceAccountFile: "./testdata/servicefile.json",
+			},
+			haDeployConfig: &HaDeployConfig{
+				External: &ExternalSettings{
+					Database: &ExternalDBSettings{
+						Type: "aws",
+					},
+				},
+			},
+			expectedError: errors.New("invalid value 'gcs' for field 'location'. Expected values are: s3"),
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			c := &HaDeployConfig{} // Initialize HaDeployConfig instance
-			err := c.verifyObjectStorage(tc.objectStorage)
+			// Initialize HaDeployConfig instance
+			err := tc.haDeployConfig.verifyObjectStorage(tc.objectStorage)
 			if err != nil && tc.expectedError != nil {
 				assert.EqualErrorf(t, err, tc.expectedError.Error(), "")
 			}
