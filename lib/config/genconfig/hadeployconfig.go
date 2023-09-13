@@ -1030,14 +1030,30 @@ func (c *HaDeployConfigGen) DefaultExistingInfraValues() {
 }
 
 func (c *HaDeployConfigGen) PromptBackup() (err error) {
-	isBackupNeeded, err := c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
+	var isBackupNeeded bool
+	if c.Config.External == nil || c.Config.External.Database.Type != "self-managed" {
+		isBackupNeeded, err = c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
+	}
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitExistingInfra().BackupMount = "/mnt/automate_backups"
-		_, backupOption, err1 := c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET, FILE_SYSTEM, NFS, EFS)
-		if err1 != nil {
-			return err1
-		}
+		c.Config.InitExternal().InitDatabase()
 		backupConfig := ""
+		backupOption := ""
+		var err1 error
+		if c.Config.External != nil && c.Config.External.Database.Type == "aws" {
+			_, backupOption, err1 = c.Prompt.Select("Choose backup option", AWS_S3)
+			if err1 != nil {
+				return err1
+			}
+		}
+
+		if c.Config.External == nil || c.Config.External.Database.Type != "aws" {
+			_, backupOption, err1 = c.Prompt.Select("Choose backup option", AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET, FILE_SYSTEM, NFS, EFS)
+			if err1 != nil {
+				return err1
+			}
+		}
+
 		switch backupOption {
 		case AWS_S3, MINIO, OBJECT_STORE, GOOGLE_BUCKET:
 			backupConfig = "object_storage"
