@@ -176,7 +176,7 @@ func (c *HaDeployConfig) validateAwsBackupConfig() error {
 func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage) error {
 	errorList := list.New()
 
-	if c.IsExternalDb() && c.External.Database.Type == "aws" {
+	if c.IsExternalDb() {
 		if err := validateRequiredString(objectStorage.Location, "location", "s3"); err != nil {
 			return err
 		}
@@ -191,19 +191,8 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 		}
 	}
 	if objectStorage.Location == AWS_S3 {
-		if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
+		if err := verifyS3(objectStorage); err != nil {
 			errorList.PushBack(err)
-		}
-		if err := validateRequiredString(objectStorage.SecretKey, "secret_key"); err != nil {
-			errorList.PushBack(err)
-		}
-		if err := validateS3Endpoint(objectStorage.Endpoint); err != nil {
-			errorList.PushBack(err)
-		}
-		if objectStorage.Region != "" {
-			if err := validateS3AWSRegion(objectStorage.Region); err != nil {
-				errorList.PushBack(err)
-			}
 		}
 	}
 	return getSingleErrorFromList(errorList)
@@ -728,5 +717,24 @@ func awsChefSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
+	return getSingleErrorFromList(errorList)
+}
+
+func verifyS3(objectStorage *ConfigObjectStorage) error {
+	errorList := list.New()
+	if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateRequiredString(objectStorage.SecretKey, "secret_key"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateS3Endpoint(objectStorage.Endpoint); err != nil {
+		errorList.PushBack(err)
+	}
+	if objectStorage.Region != "" {
+		if err := validateS3AWSRegion(objectStorage.Region); err != nil {
+			errorList.PushBack(err)
+		}
+	}
 	return getSingleErrorFromList(errorList)
 }
