@@ -129,7 +129,7 @@ In Case of AWS managed or Customer managed databases below fields will be requir
 ## Backup
 
 - If backup is to be configured at the time of deployment then user need to provide value to the following fields/prompts:
-  - `Bucket name` Object storage bucket name in google cloud platform or AWS S3 type of backup provide bucket name or , for AWS deployment bucket will be created if not exist in AWS.
+  - `Bucket name` Object storage bucket name.In case of AWS deployment bucket will be created if not exist in AWS.
   - `Access Key` S3 access key.
   - `Secret Key` S3 secret key.
   - `Endpoint` Endpoint of object storage.
