@@ -30,6 +30,7 @@ Navigate to _Users_ in the **Settings** tab. Select the **Create User** button, 
 
 ![Add Local User](/images/automate/admin-tab-users-list.png)
 
+Please attach the policy to the new users before their first login, and refer to it [Attached policies]({{< relref "policies.md#adding-members-to-policies" >}}).
 ### Changing Display Names
 
 Navigate to _Users_ in the **Settings** tab and locate the user who needs their display name changed. Navigate to their user page, provide a new display name, and select the **Save** button.
