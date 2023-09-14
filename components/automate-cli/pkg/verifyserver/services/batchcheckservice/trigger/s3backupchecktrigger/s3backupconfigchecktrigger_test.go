@@ -162,7 +162,7 @@ const (
 	  ]
 	  `
 	endPoint   = "//s3-url-test.com"
-	basePath   = "s3.url.test"
+	basePath   = "automate"
 	BucketName = "test"
 	accessKey  = "test-access-key"
 	secretKey  = "test-secret-key"
@@ -207,10 +207,9 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Location:   location,
+							Location:   "",
 							Endpoint:   endPoint,
 							BucketName: BucketName,
-							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
 							AWSRegion:  awsRegion,
@@ -232,7 +231,6 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
-							Location:   location,
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -353,6 +351,29 @@ func TestRunS3BackupCheck(t *testing.T) {
 
 	})
 
+	t.Run("NIl Backup", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{constants.LOCALHOST},
+			},
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, "127.0.0.1", got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+		assert.Equal(t, constants.SKIP_BACKUP_TEST_MESSAGE_S3, got[0].Result.SkipMessage)
+
+	})
+
 	t.Run("Empty Object storage", func(t *testing.T) {
 		svc := NewS3BackupConfigCheck(
 			logger.NewLogrusStandardLogger(),
@@ -364,8 +385,35 @@ func TestRunS3BackupCheck(t *testing.T) {
 				AutomateNodeIps:   []string{constants.LOCALHOST},
 			},
 			Backup: &models.Backup{
+				ObjectStorage: &models.ObjectStorage{},
+			},
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, constants.LOCALHOST, got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+		assert.Equal(t, constants.S3_BACKUP_MISSING, got[0].Result.Error.Message)
+		assert.False(t, got[0].Result.Skipped)
+	})
+	t.Run("Empty Bucket Access Key", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{constants.LOCALHOST},
+			},
+			Profile: "default",
+			Backup: &models.Backup{
 				ObjectStorage: &models.ObjectStorage{
-					Location: "s3",
+					BucketName: BucketName,
+					AccessKey:  accessKey,
 				},
 			},
 		}
