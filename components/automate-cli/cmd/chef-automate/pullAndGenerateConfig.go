@@ -561,11 +561,8 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
 	}
 
-	root_ca, fqdn, err := getChefServerFqdnAndLBRootCA(EXISTING_INFRA_MODE)
-	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server FQDN and LB_ROOT_CA")
-	}
-	sharedConfigToml.ChefServer.Config.RootCA, sharedConfigToml.ChefServer.Config.Fqdn = root_ca, fqdn
+	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
+	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
 
 	return sharedConfigToml, nil
 }
@@ -681,21 +678,13 @@ func setExternalPGDetails(instanceUrl, superUserName, superUserPassword, dBUserN
 	}
 }
 
-func getChefServerFqdnAndLBRootCA(deploymentType string) (string, string, error) {
-	if deploymentType == EXISTING_INFRA_MODE {
-		ExistingInfraConfig, err := getExistingInfraConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
-		if err != nil {
-			return "", "", err
+func getChefServerFqdnAndLBRootCA(config map[string]*dc.AutomateConfig) (string, string) {
+	for _, ele := range config {
+		if ele.Global != nil && ele.Global.V1 != nil && ele.Global.V1.ChefServer != nil && len(strings.TrimSpace(ele.Global.V1.ChefServer.Fqdn.Value)) > 0 && len(strings.TrimSpace(ele.Global.V1.ChefServer.RootCa.Value)) > 0 {
+			return ele.Global.V1.ChefServer.Fqdn.Value, ele.Global.V1.ChefServer.RootCa.Value
 		}
-		return ExistingInfraConfig.ChefServer.Config.RootCA, ExistingInfraConfig.ChefServer.Config.Fqdn, nil
-	} else if deploymentType == AWS_MODE {
-		AWSConfig, err := getAwsConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
-		if err != nil {
-			return "", "", err
-		}
-		return AWSConfig.ChefServer.Config.RootCA, AWSConfig.ChefServer.Config.Fqdn, nil
 	}
-	return "", "", errors.New("deployment type unknown")
+	return "", ""
 }
 
 func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []CertByIP {
@@ -947,11 +936,8 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		sharedConfigToml.Aws.Config.OsUserAccessKeySecret = objStorageConfig.secrectKey
 	}
 
-	root_ca, fqdn, err := getChefServerFqdnAndLBRootCA(AWS_MODE)
-	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server FQDN and LB_ROOT_CA")
-	}
-	sharedConfigToml.ChefServer.Config.RootCA, sharedConfigToml.ChefServer.Config.Fqdn = root_ca, fqdn
+	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
+	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
 
 	return sharedConfigToml, nil
 }
