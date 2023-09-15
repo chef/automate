@@ -211,7 +211,7 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 	if err := validateNumberField(automateSettings.InstanceCount, "automate instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredString(automateSettings.ConfigFile, "config_file", "configs/automate.toml"); err != nil {
+	if err := validateRequiredString(automateSettings.ConfigFile, "config_file"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validatePort(automateSettings.TeamsPort, "teams_port", false); err != nil {
