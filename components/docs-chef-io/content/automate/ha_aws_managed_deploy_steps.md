@@ -195,7 +195,7 @@ After successful deployment, proceed with following:
   [architecture.aws]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_key_file = "/home/ec2-user/my-key.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -262,7 +262,7 @@ After successful deployment, proceed with following:
 ## Minimum Changes required in the Sample Config
 
 - Provide `ssh_user` which has access to all the machines. E.g., `ec2-user`
-- Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `~/.ssh/user-key.pem`.
+- Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `/home/ec2-user/user-key.pem`.
 - Provide `region` Eg: `ap-southeast-2`.
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`.
 - Provide `private_custom_subnets` and `public_custom_subnets`.
@@ -272,3 +272,30 @@ After successful deployment, proceed with following:
 - Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`.
 - Provide `ami_id` for the region where the infra is created. Eg: `ami-0bb66b6ba59664870`.
 - Provide `certificate ARN` for both automate and Chef servers in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn`, respectively.
+
+## Uninstall Chef Automate HA
+
+{{< danger >}}
+
+- Running the clean-up command will remove all AWS resources created by the `provision-infra` command
+- Adding the `--force` flag will remove Object Storage if it is created by provision-infra`.
+
+{{< /danger >}}
+
+To uninstall Chef Automate HA instances after successful deployment, run the below command in your bastion host. This will delete the AWS resources that are created during provision-infra.
+
+```bash
+chef-automate cleanup --aws-deployment --force
+```
+
+OR
+
+```bash
+chef-automate cleanup --aws-deployment
+```
+
+Following the `cleanup` command the following command can be used to remove the deployment workspace in the Bastion machine. This will also remove the logs file inside the workspace.
+
+```bash
+hab pkg uninstall chef/automate-ha-deployment
+```

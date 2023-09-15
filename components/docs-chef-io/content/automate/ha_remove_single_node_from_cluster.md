@@ -28,7 +28,7 @@ Chef Automate HA comes with five different types of deployment flows. This page 
 
 {{< note >}}
 
-- The flags like `opensearch-ips` and `postgresql-ips` are only applicable for the Chef Managed Database cluster
+- The flags like `opensearch-ip` and `postgresql-ip` are only applicable for the Chef Managed Database cluster
 
 {{< /note >}}
 
@@ -78,7 +78,7 @@ Once the command executes, it will remove the particular node from your HA setup
 
 ## Remove Single Node From Cluster on AWS Deployment
 
-In this section, we will see how to remove single nodes from the AWS deployment for AWS managed database.
+In this section, we will see how to remove single nodes from the AWS deployment.
 
 The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
 
