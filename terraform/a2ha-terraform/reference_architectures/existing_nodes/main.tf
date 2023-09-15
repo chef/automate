@@ -458,5 +458,5 @@ module "keystore_opensearch" {
   location                    = var.location
   google_service_account_file = var.google_service_account_file
   tmp_path                    = var.tmp_path
-  depends_on                  = [module.bootstrap_automate]
+  depends_on                  = [module.bootstrap_automate, module.opensearch]
 }
