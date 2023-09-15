@@ -1041,6 +1041,10 @@ func getExistingHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigT
 	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(tfvarConfig.HabitatUidGid)
 	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
 	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
+	if len(strings.TrimSpace(tfvarConfig.SshPort)) == 0 {
+		sharedConfigToml.Architecture.ConfigInitials.SSHPort = "22"
+	}
+
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
 	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(tfvarConfig.SSHGroupName)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
@@ -1125,6 +1129,9 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = strings.TrimSpace(awsAutoTfvarConfig.Architecture)
 	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
 	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
+	if len(strings.TrimSpace(tfvarConfig.SshPort)) == 0 {
+		sharedConfigToml.Architecture.ConfigInitials.SSHPort = "22"
+	}
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
 	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(tfvarConfig.SSHGroupName)
 	sharedConfigToml.Architecture.ConfigInitials.AutomateDcToken = strings.TrimSpace(tfvarConfig.AutomateDcToken)
