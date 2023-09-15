@@ -78,9 +78,9 @@ Once the command executes, it will remove the particular node from your HA setup
 
 ## Remove Single Node From Cluster on AWS Deployment
 
-In this section, we will see how to remove single nodes from the AWS deployment.
+In this section, we will see how to remove single node from the AWS deployment.
 
-The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
+The command requires some arguments to determine which types of node you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
 
 - To remove Automate node, run the following command:
 
