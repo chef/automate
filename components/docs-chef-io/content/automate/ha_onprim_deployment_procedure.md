@@ -27,7 +27,7 @@ This section will discuss deploying Chef Automate HA on-premise machines with ch
 
 ## Provisioning
 
-- Provisioning all the resources are needed before performing steps to run on Bastion Host Machine.
+- Provisioning all the resources are needed before performing the steps to run on Bastion Host Machine.
 - Make sure you have all resources either on Existing Infrastructure or on Existing cloud Infrastructure(AWS/Google Cloud Platform).
 - If you have provisioned in Google cloud Platform make sure you have provisioned these [resources](automate/ha_on_premises_deployment_prerequisites/#provisioning).
 
@@ -94,7 +94,7 @@ You can also view the [Sample Config](#sample-config).
 
 ## Steps to Deploy
 
-1. The following command will run the deployment. The deploy command will run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
 
     ```bash
     chef-automate deploy config.toml --airgap-bundle automate.aib
@@ -125,7 +125,7 @@ You can also view the [Sample Config](#sample-config).
      chef-automate verify
     ```
 
-1. Get the  cluster Info
+1. Get the cluster Info
 
     ```bash
      chef-automate info

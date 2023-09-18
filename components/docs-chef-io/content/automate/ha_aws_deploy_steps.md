@@ -275,7 +275,7 @@ OR
 chef-automate cleanup --aws-deployment
 ```
 
-Following the `cleanup` command the following command can be used to remove the deployment workspace in the Bastion machine. This will also remove the logs file inside the workspace.
+After the `cleanup` command, the following command can be used to remove the deployment workspace in the Bastion machine. This will also remove the logs file inside the workspace.
 
 ```bash
 hab pkg uninstall chef/automate-ha-deployment

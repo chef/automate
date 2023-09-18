@@ -57,7 +57,7 @@ This section will discuss deploying Chef Automate HA on-premise machines with cu
 
 ## Steps to Deploy
 
-The following command will run the deployment. The deploy command will run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
+The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
 
 ```bash
   chef-automate deploy config.toml --airgap-bundle automate.aib

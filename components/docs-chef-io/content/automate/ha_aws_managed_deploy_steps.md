@@ -93,7 +93,7 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 ## Steps to deploy
 
-1. The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during deploy command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip verification process during deploy command use `--skip-verify` flag
 
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib

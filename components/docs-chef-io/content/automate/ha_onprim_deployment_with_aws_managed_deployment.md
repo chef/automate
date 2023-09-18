@@ -23,7 +23,7 @@ This section will discuss deploying Chef Automate HA on-premise machines with AW
 
 {{< /warning >}}
 
-- Before proceeding with deployment steps make sure to provision ,Click here to know more [details](automate/ha_onprim_deployment_procedure/#provisioning).
+- Before proceeding with the deployment steps make sure to provision ,Click here to know more [details](automate/ha_onprim_deployment_procedure/#provisioning).
 
 - See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
@@ -57,7 +57,7 @@ You can also view the [Sample Config](#sample-config-to-setup-on-premise-deploym
 
 ## Steps to Deploy
 
-The following command will run the deployment. The deploy command will run the verify command internally, to skip verification process during deploy command use `--skip-verify` flag
+The following command will run the deployment. The deploy command will first run the verify command internally, to skip verification process during deploy command use `--skip-verify` flag
 
 ```bash
  chef-automate deploy config.toml --airgap-bundle automate.aib
