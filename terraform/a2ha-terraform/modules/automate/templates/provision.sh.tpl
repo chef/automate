@@ -245,7 +245,9 @@ export timestamp
 [ -e "/etc/chef-automate/config.toml" ] && cp -f /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$timestamp
 mv ${tmp_path}/automate_conf.toml /etc/chef-automate/config.toml
 chmod 0600 /etc/chef-automate/config.toml*
-rm ${automate_custom_config}
+if [ -e  ${automate_custom_config} ]; then
+  rm ${automate_custom_config}
+fi
 
 # Test if this is a non-bootstrap Automate or chef_api only install, else it's a bootstrap install
 if [[ "${automate_role}" != "bootstrap_automate" ]]; then
