@@ -204,7 +204,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
     postgresql_private_ips = ["192.0.0.8", "192.0.0.9", "192.0.0.10"]
 ```
 
-## Sample Config For 5 Nodes cluster
+## Sample Config For 5 Nodes Cluster
 
 {{< note >}}
 
