@@ -76,7 +76,7 @@ sudo chef-automate config gen config.toml
 
 Click [here](/automate/ha_config_gen) to know more about generating config.
 
-You can also view the [Sample Config](#sample-config). You can also view the [Sample Config](#Sample-Config-For-5-Nodes-cluster).
+You can also view the [Sample Config](#sample-config). You can also view the [Sample Config For 5 Node Cluster](#Sample-config-for-5-nodes-cluster).
 
 {{< note >}} You can also generate config template for existing infrastructure using the following command:
 
