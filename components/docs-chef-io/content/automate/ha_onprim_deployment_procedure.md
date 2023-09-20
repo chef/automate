@@ -76,7 +76,7 @@ sudo chef-automate config gen config.toml
 
 Click [here](/automate/ha_config_gen) to know more about generating config.
 
-You can also view the [Sample Config](#sample-config).
+You can also view the [Sample Config](#sample-config). You can also view the [Sample Config](#Sample-Config-For-5-Nodes-cluster).
 
 {{< note >}} You can also generate config template for existing infrastructure using the following command:
 
@@ -202,6 +202,60 @@ The bastion server can patch new configurations in all nodes. To know more see [
     chef_server_private_ips = ["192.0.0.3", "192.0.0.4"]
     opensearch_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7"]
     postgresql_private_ips = ["192.0.0.8", "192.0.0.9", "192.0.0.10"]
+```
+
+## Sample Config For 5 Nodes cluster
+
+{{< note >}}
+
+- Assuming 5+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch).
+- For the Frontend nodes you can use the same IP in automate and chefserver.
+- For the Backend nodes you can use the same IP in postgresql and opensearch.
+- To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
+
+{{< /note >}}
+
+```config
+[architecture]
+  [architecture.existing_infra]
+    ssh_user = "ec2-user"
+    ssh_group_name = "ec2-user"
+    ssh_key_file = "/home/ec2-user/my-key.pem"
+    ssh_port = "22"
+    secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+    secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+    architecture = "existing_nodes"
+    workspace_path = "/hab/a2_deploy_workspace"
+    backup_mount = "/mnt/automate_backups"
+    backup_config = "file_system"
+[automate]
+  [automate.config]
+    admin_password = "Progress@123"
+    fqdn = "chefautomate.example.com"
+    config_file = "configs/automate.toml"
+    root_ca = "-----BEGIN CERTIFICATE-----
+    <Certificates>
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+[chef_server]
+  [chef_server.config]
+    fqdn = "chefinfraserver.example.com"
+    lb_root_ca = "-----BEGIN CERTIFICATE-----
+    <Certificates>
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+[opensearch]
+  [opensearch.config]
+    instance_count = "3"
+[postgresql]
+  [postgresql.config]
+    instance_count = "3"
+[existing_infra]
+  [existing_infra.config]
+    automate_private_ips = ["192.0.0.1", "192.0.0.2"]
+    chef_server_private_ips = ["192.0.0.1", "192.0.0.2]
+    opensearch_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7"]
+    postgresql_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7]
 ```
 
 ## Uninstall Chef Automate HA
