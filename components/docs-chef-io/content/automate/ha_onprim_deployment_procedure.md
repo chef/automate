@@ -148,7 +148,7 @@ A shared file system is always required to create OpenSearch snapshots. To regis
 
 ## Add/Remove Nodes
 
-The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know, more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
+The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know more, see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
 
 ## Patch Configs
 
@@ -158,7 +158,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
 
 {{< note >}}
 
-- Assuming 10+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch).
+- Assuming 10+1 nodes (1 bastion, 2 for Chef Automate, 2 for Chef Infra Server, 3 for PostgreSQL, 3 for OpenSearch).
 - The following config will, by default, leave the backup configuration empty.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
 
@@ -211,7 +211,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
 
 {{< note >}}
 
-- Assuming 5+1 nodes (1 bastion, 2 for Automate UI and Chef-server, 3 for Postgresql and OpenSearch).
+- Assuming 5+1 nodes (1 bastion, 2 for Chef Automate and Chef Infra Server, 3 for PostgreSQL and OpenSearch).
 - For the Frontend nodes you can use the same IP in automate and chefserver.
 - For the Backend nodes you can use the same IP in postgresql and opensearch.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
