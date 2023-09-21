@@ -23,7 +23,7 @@ Set these two clusters in different data centers or cloud provider regions.
 ## Requirements
 
 1. Two identical clusters located in different data centers or cloud provider regions
-1. Network accessible storage (NAS), object store (S3, MinIO, Google Cloud Storage), available in both data centers/regions
+1. Network accessible storage (NAS), object store (S3,Minio,Google Cloud Storage), available in both data centers/regions
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
 In the above approach, there will be 2 identical clusters
@@ -43,13 +43,13 @@ When a failure of the primary cluster occurs, fail-over can be accomplished thro
 - The amount of data loss will depend on how frequently backups are performed in the primary cluster.
 - Changing DNS records from the primary load balancer to the disaster recovery load balancer can take time to propagate through the network.
 
-## Set up the production and disaster recovery cluster
+### Steps to set up the Production and Disaster Recovery Cluster
 
 1. Deploy the primary cluster following the deployment instructions by [clicking here](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host).
 
 1. Deploy the disaster recovery cluster into a different data center and region using the same steps as the primary cluster.
 
-1. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_file_system/) or [object storage](/automate/ha_backup_restore_object_storage/).
+1. Do the backup configuration as explained in a backup section for [file system](/automate/ha_backup_restore_file_system/) or [object storage](/automate/ha_backup_restore_object_storage/).
 
 {{< note >}}
 
@@ -74,13 +74,13 @@ Configure backups for both clusters using either [file system](/automate/ha_back
     - Copy `bootstrap.abb` to all Automate and Chef Infra frontend nodes in the disaster recovery cluster.
 
     {{< note >}}
-    - Suggested frequency of backup and restore jobs is one hour. Be sure to monitor backup times to ensure they can be completed in the available time.
+    - The Suggested frequency of backup and restore jobs is one hour. Be sure to monitor backup times to ensure they can be completed in the available time.
     - Make sure the Restore cron always restores the latest backed-up data.
     - A cron job is a Linux command used to schedule a job that is executed periodically.
     {{< /note >}}
 
-    - To clean the data from the backed up storage, either schedule a cron or delete it manually.
-        - To prune all but a certain number of the most recent backups manually, parse the output of chef-automate backup list and
+    - To clean the data from the backed-up storage, either schedule a cron or delete it manually.
+        - To prune all but a certain number of the most recent backups manually, parse the output of chef-automate backup list and 
         apply the command chef-automate backup delete.
         For example:
 
@@ -106,7 +106,7 @@ Configure backups for both clusters using either [file system](/automate/ha_back
 
     - Make sure both backup and restore cron are aligned.
 
-    - Run the following command in one of the Automate nodes to get the IDs of all the backup:
+    - Run the following command in one of the Automate nodes to get the IDs of all the backups:
 
     ```sh
     chef-automate backup list
@@ -134,14 +134,13 @@ Configure backups for both clusters using either [file system](/automate/ha_back
 
         - In the disaster recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
 
-        For **S3/MinIO** execute the following command from the Boostrapped Automate node to restore:
+        For **S3/MinIO** execute the following command from the Bootstrapped Automate node to restore:
 
         ```sh
         id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore /mnt/automate_backups/backups/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
         ```
-
-        For **GCS** execute the following command from the Boostrapped Automate node to restore:
+        For **GCS** execute the following command from the Bootstrapped Automate node to restore:
 
         ```sh
         id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
@@ -154,7 +153,7 @@ Configure backups for both clusters using either [file system](/automate/ha_back
         id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
         ```
-
+        
         Sample cron for restoring backup saved in object storage **(GCS)** looks like this:
 
         ```sh

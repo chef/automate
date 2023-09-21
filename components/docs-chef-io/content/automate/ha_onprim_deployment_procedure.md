@@ -63,6 +63,7 @@ Make sure you have all resources either on existing infrastructure or on existin
     cp -f chef-automate /usr/bin/chef-automate
     "
     ```
+    {{< /note >}}
 
 ## Generate Chef Automate configuration file
 
@@ -74,7 +75,7 @@ Make sure you have all resources either on existing infrastructure or on existin
 
 Click [here](/automate/ha_config_gen) to know more about generating config.
 
-You can also view the [Sample Config](#sample-config).
+You can also view the [Sample Config](#sample-config). You can also view the [Sample Config For 5 Node Cluster](#sample-config-for-5-nodes-cluster).
 
 {{< note >}}
 
@@ -92,9 +93,9 @@ You can also generate a configuration file using the `init-config` subcommand.
     sudo chef-automate verify -c config.toml
     ```
 
-    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    To know more about config verify, check [Config Verify Documentation](/automate/ha_verification_check/).
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+    Once the verification is completed successfully, proceed with the deployment. In case of failure, fix the issue and and verify it by re-running the verify command.
 
 ## Steps to Deploy
 
@@ -104,14 +105,14 @@ You can also generate a configuration file using the `init-config` subcommand.
     chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
-   To skip verification in the deploy command, use `--skip-verify` flag
+   To skip verification during deployment, use `--skip-verify` flag
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
 ## Verify Deployment
 
-1. Once the deployment is successful, Get the consolidate status of the cluster
+1. Once the deployment is successful, get the consolidated status of the cluster
 
     ```bash
      chef-automate status summary
@@ -139,7 +140,7 @@ You can also generate a configuration file using the `init-config` subcommand.
     After successful deployment, proceed with following...
       1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
       1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-      1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+      1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Backup/Restore
 
@@ -147,7 +148,7 @@ A shared file system is always required to create OpenSearch snapshots. To regis
 
 ## Add/Remove Nodes
 
-The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
+The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know, more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
 
 ## Patch Configs
 
@@ -157,7 +158,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
 
 {{< note >}}
 
-- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch).
+- Assuming 10+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch).
 - The following config will, by default, leave the backup configuration empty.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
 
@@ -204,6 +205,60 @@ The bastion server can patch new configurations in all nodes. To know more see [
     chef_server_private_ips = ["192.0.0.3", "192.0.0.4"]
     opensearch_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7"]
     postgresql_private_ips = ["192.0.0.8", "192.0.0.9", "192.0.0.10"]
+```
+
+## Sample Config For 5 Nodes Cluster
+
+{{< note >}}
+
+- Assuming 5+1 nodes (1 bastion, 2 for Automate UI and Chef-server, 3 for Postgresql and OpenSearch).
+- For the Frontend nodes you can use the same IP in automate and chefserver.
+- For the Backend nodes you can use the same IP in postgresql and opensearch.
+- To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
+
+{{< /note >}}
+
+```config
+[architecture]
+  [architecture.existing_infra]
+    ssh_user = "ec2-user"
+    ssh_group_name = "ec2-user"
+    ssh_key_file = "/home/ec2-user/my-key.pem"
+    ssh_port = "22"
+    secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+    secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+    architecture = "existing_nodes"
+    workspace_path = "/hab/a2_deploy_workspace"
+    backup_mount = "/mnt/automate_backups"
+    backup_config = "file_system"
+[automate]
+  [automate.config]
+    admin_password = "Progress@123"
+    fqdn = "chefautomate.example.com"
+    config_file = "configs/automate.toml"
+    root_ca = "-----BEGIN CERTIFICATE-----
+    <Certificates>
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+[chef_server]
+  [chef_server.config]
+    fqdn = "chefinfraserver.example.com"
+    lb_root_ca = "-----BEGIN CERTIFICATE-----
+    <Certificates>
+    -----END CERTIFICATE-----"
+    instance_count = "2"
+[opensearch]
+  [opensearch.config]
+    instance_count = "3"
+[postgresql]
+  [postgresql.config]
+    instance_count = "3"
+[existing_infra]
+  [existing_infra.config]
+    automate_private_ips = ["192.0.0.1", "192.0.0.2"]
+    chef_server_private_ips = ["192.0.0.1", "192.0.0.2]
+    opensearch_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7"]
+    postgresql_private_ips = ["192.0.0.5", "192.0.0.6", "192.0.0.7]
 ```
 
 ## Uninstall Chef Automate HA

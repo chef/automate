@@ -15,7 +15,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /note >}}
 
-This section will discuss deploying Chef Automate HA on-premise machines with customer managed database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
+This section will discuss deploying Chef Automate HA on-premise machines with a customer-managed database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 
@@ -55,9 +55,9 @@ If SELinux is enabled, deployment with configure it to `permissive` (Usually in 
     sudo chef-automate verify -c config.toml
     ```
 
-    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+    Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
 
 ## Steps to Deploy
 
@@ -101,11 +101,11 @@ chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-After successful deployment, proceed with following:
+After successful deployment, proceed with the following:
 
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+   1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Backup/Restore
 
