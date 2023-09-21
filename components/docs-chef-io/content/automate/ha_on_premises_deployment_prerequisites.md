@@ -17,14 +17,16 @@ automate = "On-Premises Prerequisites"
 {{< /note >}}
 
 {{< warning >}}
-The below prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
+
+The following  prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
+
 {{< /warning >}}
 
-Before installing Chef Automate HA in On-premises deployment mode, ensure you have taken a quick tour of this prerequisite page.
+Before installing Chef Automate HA in on-premises deployment mode, ensure you have taken a quick tour of this prerequisite page.
 
 ## Chef Automate Architecture
 
-We recommend using 11 node cluster for standard Automate HA on-premises deployment, as detailed in the table below:
+Chef recommends using an 11 node cluster for a standard Chef Automate HA on-premises deployment, as detailed in the table below:
 
 | Service Type      | Count |
 |-------------------|-------|
@@ -34,25 +36,17 @@ We recommend using 11 node cluster for standard Automate HA on-premises deployme
 | OpenSearch DB     | 3     |
 | Bastion Machine   | 1     |
 
-Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
+This topology requires two load balancers and two DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
 
-We recommend using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server. External Standalone Infra Server will violate this high availability requirement.
+Chef Automate HA requires a [high availability Chef Infra Server](/server/install_server_ha/) deployment; it does not support a standalone Chef Infra Server deployment.
 
-## Provisioning
+You can deploy a Chef Automate high availability cluster on AWS or Google Cloud Platform (GCP) VMs.
 
-To Deploy On-Premises Infra user needs to provision the resources manually that are required. Provisioning can be done on the following types of infrastructures:
-- Existing infrastructure
-- Existing Cloud infrastructure
-    - AWS
-    - Google Cloud Platform
-      - Using above infrastructure types make sure you have following resources created:
-      - All Vm's should be up and running with minimum count as in this [table](/automate/ha_on_premises_deployment_prerequisites/#chef-automate-architecture)
-      - Load Balancers should be configured for both Automate and ChefServer [Chef Automate HA Architecture](/automate/ha/) as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
-  - In On-premises deployment of Automate HA, we support File System (FS) or Object Storage (S3/MinIO/Google Cloud Storage) for taking backup.
+On-prem deployments of Chef Automate HA supports making backups on file system (FS) or object storage (S3/MinIO/Google Cloud Storage).
 
 ## Software Requirements
 
-The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:
+The software requirements for nodes in the cluster and for other external Chef and non-Chef tools are discussed below.
 
 ### Node Software Requirements
 
@@ -245,7 +239,7 @@ Active/Active Disaster Recovery is not supported right now as we do not support 
 The requirements for disaster recovery setup (Active/Passive) are:
 
 - Two identical clusters located in different data centers or cloud provider regions.
-- Network Attached Storage (NAS) or Object Store (S3/Minio/Google cloud storage) should be available in both data centers/regions.
+- Network Attached Storage (NAS) or Object Store (S3/MinIO/Google cloud storage) should be available in both data centers/regions.
 - Set up scheduled jobs to run backup and restore commands on both clusters. We recommend using **cron** to schedule the jobs.
 
 To know more about the on-premises deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
@@ -276,6 +270,6 @@ To know more about the on-premises deployment disaster recovery, visit our [Disa
 
 ## Backup and Restore
 
-In On-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO/Google Cloud Storage)**](/automate/ha_backup_restore_object_storage/) for taking backup.
+In on-premises deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO/Google Cloud Storage)**](/automate/ha_backup_restore_object_storage/) for taking backup.
 
-Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
+Encrypted S3 buckets are only supported with Amazon S3 managed keys (SSE-S3).

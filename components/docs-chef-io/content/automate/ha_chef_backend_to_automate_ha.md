@@ -44,19 +44,19 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
 1. Execute the below command to install Habitat:
 
-    ```cmd
+    ```sh
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
     ```
 
 2. Execute the below command to install the habitat package for `knife-ec-backup`
 
-    ```cmd
+    ```sh
         hab pkg install chef/knife-ec-backup
     ```
 
 3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc.
 
-    ```cmd
+    ```sh
         hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
     ```
 
@@ -67,13 +67,13 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
     - `node-threshold NUM_DAYS` is the maximum number of days since the last checking before a node is considered stale.
     For Example:
 
-    ```cmd
+    ```sh
         hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
     ```
 
 4. Execute the below command to initiate a backup of your Chef Server data.
 
-    ```cmd
+    ```sh
         hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server url>
     ```
 
@@ -84,7 +84,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
     For example:
 
-    ```cmd
+    ```sh
         hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s https://chef.io`.
     ```
 
@@ -96,7 +96,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
 5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
 
-    ```cmd
+    ```sh
         scp -i /path/to/key /path/to/backup-file user@host:/home/user
     ```
 
@@ -117,13 +117,13 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 - Execute the below command to install the habitat package for `knife-ec-backup`
 
-    ```cmd
+    ```sh
     hab pkg install chef/knife-ec-backup
     ```
 
 - Execute the below command to restore the backup.
 
-    ```cmd
+    ```sh
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
     hab pkg exec chef/knife-ec-backup knife ec restore <path/to/directory/backup_file> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
@@ -133,7 +133,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 - Download the validation script using below
 
-    ```cmd
+    ```sh
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
     ```
 
@@ -145,14 +145,14 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 - Execute the below command to get the counts of objects
 
-  ```cmd
+  ```sh
       bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
   ```
 
 - Repeat the above commands for the new server to get the counts
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
-    ```cmd
+    ```sh
         diff old_server_file new_server_file
     ```
 
@@ -171,7 +171,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 - To validate the In-place migration, run the validation script before starting the backup and restore.
 
-```cmd
+```sh
     curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
 ```
 
@@ -190,32 +190,32 @@ Where:
 1. [Backup the existing chef server data](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
 2. ssh to all the backend nodes of chef-backend and run
 
-    ```cmd
+    ```sh
         chef-backend-ctl stop
     ```
 
 3. ssh to all frontend nodes of chef-backend and run
 
-    ```cmd
+    ```sh
         chef-server-ctl stop
     ```
 
 4. Create one bastion machine under the same network space.
-5. ssh to bastion machine and download chef-automate cli and extract the downloaded zip file
+5. ssh to bastion machine and download chef-automate CLI and extract the downloaded zip file
 
-    ```cmd
+    ```sh
         https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
     ```
 
 6. Create an airgap bundle using the command
 
-    ```cmd
+    ```sh
         ./chef-automate airgap bundle create
     ```
 
 7. Generate the `config.toml` file using the following command:
 
-    ```cmd
+    ```sh
         ./chef-automate init-config-ha existing_infra
     ```
 
@@ -227,7 +227,7 @@ Where:
     - Ensure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
     - Sample configuration; please modify according to your needs.
 
-    ```cmd
+    ```sh
     [architecture.existing_infra]
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -276,7 +276,7 @@ Where:
 
 9. Deploy using the following command:
 
-    ```cmd
+    ```sh
     ./chef-automate deploy config.toml --airgap-bundle <airgapped bundle name>
     ```
 

@@ -18,7 +18,7 @@ gh_repo = "automate"
 
 Steps to upgrade the Chef Automate HA are as shown below:
 
-- Download the latest cli 
+- Download the latest CLI 
   ```bash
    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
    ```
@@ -126,7 +126,7 @@ We can also pass a flag in upgrade command to avoid prompt for workspace upgrade
 
     - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes) by running the following command:
 
-    ```cmd
+    ```sh
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
@@ -160,7 +160,7 @@ We can also pass a flag in upgrade command to avoid prompt for workspace upgrade
 
         - On New cluster, use the following restore command to restore the backup of Primary Cluster from bastion.
 
-        ```cmd
+        ```sh
         sudo chef-automate backup restore s3://<s3-bucket-name>/<path-to-backup>/<backup-id>/ --patch-config /path/to/current_config.toml --airgap-bundle /path/to/airgap-bundle --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
 
         ```

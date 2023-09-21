@@ -1,11 +1,11 @@
 +++
-title = "On-premise Deployment with Customer Managed Database"
+title = "On-Prem Deployment with Customer Managed Database"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-premise Deployment with Customer Managed Database"
+    title = "On-Prem Deployment with Customer Managed Database"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_with_customer_managed_deployment.md On-premise Deployment with Customer Managed Database"
     weight = 220
@@ -19,17 +19,17 @@ This section will discuss deploying Chef Automate HA on-premise machines with cu
 
 {{< warning >}}
 
-- If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
+If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 
 {{< /warning >}}
 
 - Before proceeding with deployment steps make sure to provision ,Click here to know more [details](automate/ha_onprim_deployment_procedure/#provisioning).
 
-- See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+- See the steps [here](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host) to run on bastion host to download the latest Automate CLI and Airgapped Bundle.
 
-## Steps to Generate Config
+## Generate Chef Automate config
 
-1. Generate config using the below command:
+1. Generate the configuration file.
 
     ```bash
     sudo chef-automate config gen config.toml
@@ -39,13 +39,17 @@ This section will discuss deploying Chef Automate HA on-premise machines with cu
 
     You can also view the [Sample Config](#sample-config-to-setup-on-premises-deployment-with-self-managed-services).
 
-    {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+    {{< note spaces=4 >}}
 
-    `chef-automate init-config-ha existing_infra`{{< /note >}}
+    You can also generate config using the `init-config-ha` subcommand and to generate init config for existing infrastructure.
 
-## Config Verify
+    `chef-automate init-config-ha existing_infra`
 
-1. We verify the above config using the below command :
+    {{< /note >}}
+
+## Verify
+
+1. Verify the configuration file.
 
     ```bash
     sudo chef-automate verify -c config.toml
@@ -57,38 +61,39 @@ This section will discuss deploying Chef Automate HA on-premise machines with cu
 
 ## Steps to Deploy
 
-The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
+The following command will run the deployment.
 
 ```bash
-  chef-automate deploy config.toml --airgap-bundle automate.aib
+chef-automate deploy config.toml --airgap-bundle automate.aib
 ```
 
 To skip verification in the deploy command, use `--skip-verify` flag
+
 ```bash
-  chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
+chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
 ```
 
 ## Verify Deployment
 
-1. Once the deployment is successful, Get the consolidate status of the cluster
+1. Once the deployment is successful, get the consolidate status of the cluster.
 
     ```bash
      chef-automate status summary
     ```
 
-1.  Get the service status from each node
+1. Get the service status from each node.
 
     ```bash
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification command  
+1. Run the verification command.
 
     ```bash
      chef-automate verify
     ```
 
-1. Get the  cluster Info
+1. Get the cluster information.
 
     ```bash
      chef-automate info
@@ -114,14 +119,14 @@ The Chef Automate commands require some arguments so that it can determine which
 
 The bastion server can patch new configurations in all nodes. To know more see [Patch Configuration](/automate/ha_config/#patch-configuration) section.
 
-## Sample Config to setup On-Premises Deployment with Self Managed Services
+## sample config to set up on-premises deployment with self managed services
 
-```config
+```toml
 [architecture]
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_key_file = "/home/ec2-user/KEY_FILENAME.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -184,5 +189,5 @@ The bastion server can patch new configurations in all nodes. To know more see [
 To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
 
 ```bash
-    chef-automate cleanup --onprem-deployment
+chef-automate cleanup --onprem-deployment
 ```

@@ -19,7 +19,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 {{< warning >}}
 
-- PLEASE DO NOT MODIFY THE WORKSPACE PATH; it should always be "/hab/a2_deploy_workspace"
+- Do not modify the workspace path. It should always be `/hab/a2_deploy_workspace`
 - We currently don't support AD managed users in nodes. We only support local Linux users.
 - If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
@@ -43,8 +43,10 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    "
    ```
 
-   {{< note >}}
+   {{< note spaces=3 >}}
+
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
+
    {{< /note >}}
 
 ## Steps to Generate Config
@@ -57,9 +59,13 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
-    {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+    {{< note spaces=4 >}}
 
-    chef-automate init-config-ha aws{{< /note >}}
+    You can also generate a configuration file using the `init-config` subcommand. The command is as shown below:
+
+    chef-automate init-config-ha aws
+
+    {{< /note >}}
 
     {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
@@ -118,7 +124,7 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification command  
+1. Post Deployment, you can run the verification command
 
     ```bash
      chef-automate verfiy
@@ -180,22 +186,26 @@ After successful deployment, proceed with following:
 
 ## Sample Config
 
-{{< note >}} Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS Postgresql, and Managed OpenSearch) {{< /note >}}
+{{< note >}}
+
+Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, Managed RDS Postgresql, and Managed OpenSearch) 
+
+{{< /note >}}
 
 {{< note >}}
 
-- User only needs to create/set up **the bastion node**, a **user** with IAM role of Admin access and the s3 bucket access attached to it.
-- The following config will create an s3 bucket for backup.
+- User only needs to create/set up **the bastion node**, a **user** with IAM role of Admin access and the S3 bucket access attached to it.
+- The following config will create an S3 bucket for backup.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
 
 {{< /note >}}
 
-```config
+```toml
 [architecture]
   [architecture.aws]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_key_file = "/home/ec2-user/KEY_FILENAME.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -203,7 +213,7 @@ After successful deployment, proceed with following:
     workspace_path = "/hab/a2_deploy_workspace"
     backup_mount = "/mnt/automate_backups"
     backup_config = "s3"
-    s3_bucketName = "My-Bucket-Name"
+    s3_bucketName = "BUCKET_NAME"
 [automate]
   [automate.config]
     admin_password = "test@343423"
@@ -272,3 +282,31 @@ After successful deployment, proceed with following:
 - Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`.
 - Provide `ami_id` for the region where the infra is created. Eg: `ami-0bb66b6ba59664870`.
 - Provide `certificate ARN` for both automate and Chef servers in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn`, respectively.
+
+## Uninstall Chef Automate HA
+
+{{< danger >}}
+
+The `cleanup` command will remove all AWS resources created by the `provision-infra` command
+
+Adding the `--force` flag will remove object storage if it was created with the `provision-infra` command.
+
+{{< /danger >}}
+
+To uninstall Chef Automate HA instances after successful deployment, run the below command in your bastion host. This will delete the AWS resources that are created during provision-infra.
+
+```bash
+chef-automate cleanup --aws-deployment --force
+```
+
+OR
+
+```bash
+chef-automate cleanup --aws-deployment
+```
+
+Following the `cleanup` command the following command can be used to remove the deployment workspace in the Bastion machine. This will also remove the logs file inside the workspace.
+
+```bash
+hab pkg uninstall chef/automate-ha-deployment
+```

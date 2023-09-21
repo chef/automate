@@ -1,11 +1,11 @@
 +++
-title = "On-premise Deployment with AWS Managed Database"
+title = "On-Prem Deployment with AWS Managed Database"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-premise Deployment with AWS Managed Database"
+    title = "On-Prem Deployment with AWS Managed Database"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_with_aws_managed_deployment.md On-premise Deployment with AWS Managed Database"
     weight = 210
@@ -25,9 +25,9 @@ This section will discuss deploying Chef Automate HA on-premise machines with AW
 
 - Before proceeding with the deployment steps make sure to provision ,Click here to know more [details](automate/ha_onprim_deployment_procedure/#provisioning).
 
-- See the steps [here](/automate/ha_onprim_deployment_procedure/#steps-to-run-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+- See the steps [here](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host) to run on bastion host to download the latest Automate CLI and Airgapped Bundle.
 
-## Steps to Generate Config
+## Generate configuration file
 
 1. Generate config using the below command:
 
@@ -39,11 +39,11 @@ Click [here](/automate/ha_config_gen) to know more about generating config.
 
 You can also view the [Sample Config](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services).
 
-{{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+{{< note >}} You can also generate a configuration file using the `init-config` subcommand. The command is as shown below:
 
 `chef-automate init-config-ha existing_infra`{{< /note >}}
 
-## Config Verify
+## Verify Configuration file
 
 1. We verify the above config using the below command:
 
@@ -116,12 +116,12 @@ The bastion server can patch new configurations in all nodes. To know more see [
 
 ## Sample Config to setup On-Premise Deployment with AWS Managed Services
 
-```config
+```toml
 [architecture]
   [architecture.existing_infra]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_key_file = "/home/ec2-user/KEY_FILENAME.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
@@ -185,5 +185,5 @@ The bastion server can patch new configurations in all nodes. To know more see [
 To uninstall Chef Automate HA instances after unsuccessful deployment, run the below command in your bastion host.
 
 ```bash
-    chef-automate cleanup --onprem-deployment
+chef-automate cleanup --onprem-deployment
 ```

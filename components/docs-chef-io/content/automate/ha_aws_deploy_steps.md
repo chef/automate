@@ -19,7 +19,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 {{< warning >}}
 
-- PLEASE DO NOT MODIFY THE WORKSPACE PATH. It should always be "/hab/a2_deploy_workspace".
+- Do not modify the workspace path. It should always be `/hab/a2_deploy_workspace`.
 - We currently don't support AD managed users in nodes. We only support local Linux users.
 - If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
@@ -55,11 +55,15 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
-    {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
+    {{< note spaces=4 >}}
+
+    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
+
+    {{< /note >}}
 
 ## Steps to Generate Config
 
-1. Generate config with relevant data using the below command:
+1. Generate a configuration file with relevant data.
 
     ```bash
     chef-automate config gen config.toml
@@ -67,9 +71,13 @@ Run the following steps on Bastion Host Machine:
 
     Click [here](/automate/ha_config_gen) to know more about generating config
 
-    {{< note >}} You can also generate config using **init config** and then generate init config for existing infrastructure. The command is as shown below:
+    {{< note spaces=4 >}}
 
-    chef-automate init-config-ha aws{{< /note >}}
+    You can also generate a configuration file using the `init-config` subcommand.
+
+    chef-automate init-config-ha aws
+
+    {{< /note >}}
 
 ## Steps to Provision
 
@@ -122,10 +130,10 @@ Run the following steps on Bastion Host Machine:
      chef-automate status
     ```
 
-1. Post Deployment, you can run the verification command  
+1. Post Deployment, you can run the verification command
 
     ```bash
-     chef-automate verfiy
+     chef-automate verify
     ```
 
 1. Get the  cluster Info
@@ -179,23 +187,25 @@ After successful deployment, proceed with following:
 ## Sample Config
 
 {{< note >}}
-Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
+
+Assuming 10+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
+
 {{< /note >}}
 
 {{< note >}}
 
-- User only needs to create/set up **the bastion node** with the IAM role of Admin access and s3 bucket access attached.
-- The following config will create an s3 bucket for backup.
+- User only needs to create/set up **the bastion node** with the IAM role of Admin access and S3 bucket access attached.
+- The following config will create an S3 bucket for backup.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`
 
 {{< /note >}}
 
-```config
+```toml
 [architecture]
   [architecture.aws]
     ssh_user = "ec2-user"
     ssh_group_name = "ec2-user"
-    ssh_key_file = "~/.ssh/my-key.pem"
+    ssh_key_file = "/home/ec2-user/KEY_FILENAME.pem"
     ssh_port = "22"
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
     secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"

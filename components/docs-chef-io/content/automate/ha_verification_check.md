@@ -48,7 +48,7 @@ Once the verify command is triggered, following checks will be triggered:
 - System User (All Nodes)
 - External OpenSearch Database
 - External PostgreSQL Database
-- S3/Minio Backup Config (If Required)
+- S3/MinIO Backup Config (If Required)
 - NFS Backup Config (If Required)
 - FQDN with Load Balancer Reachability
 - Firewall Ports

@@ -112,7 +112,7 @@ Configure the OpenSearch `path.repo` attribute.
 
 - Run the backup command from bastion as shown below to create a backup:
 
-    ```cmd
+    ```sh
     chef-automate backup create
     ```
 
@@ -132,9 +132,4 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 ## Troubleshooting
 
-While running the restore command, If it prompts any error follow the steps given below.
-
-- check the chef-automate status in Automate node by running `chef-automate status`.
-- Also check the hab svc status in automate node by running `hab svc status`.
-- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
-- Now, check the status of Automate node and then try running the restore command from bastion.
+{{< readfile file = "content/automate/reusable/md/restore_troubleshooting.md" >}}

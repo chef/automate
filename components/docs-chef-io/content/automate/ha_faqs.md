@@ -143,8 +143,6 @@ for on premises deployment
 chef-automate cleanup --onprem-deployment
 ```
 
-
-
 ## HA Health Check Commands
 
 This section includes commands that you can execute for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. It is highly recommended to run these commands on a test cluster before using them in a production environment.

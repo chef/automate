@@ -47,7 +47,7 @@ Currently, the data feed has two types of integrations:
   * ELK
   * Custom
 * Storage Integration
-  * Minio
+  * MinIO
   * Amazon S3
 
 {{< figure src="/images/automate/choose-a-data-feed-integration.png" alt="Choose a Data Feed Integration">}}
@@ -189,9 +189,9 @@ You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instanc
 
 Create a data feed using a storage integration.
 
-### Minio
+### MinIO
 
-To create a data feed select **Minio** from **Settings > Data Feed > New Integration**.
+To create a data feed select **MinIO** from **Settings > Data Feed > New Integration**.
 
 1. **Data Feed Name**: A unique name for this notification.
 1. **Endpoint**: The endpoint for the data feed integration, including any specific port details.
@@ -199,18 +199,18 @@ To create a data feed select **Minio** from **Settings > Data Feed > New Integra
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
-{{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using Minio Integration">}}
+{{< figure src="/images/automate/data-feed-instance-using-MinIO-integration.png" alt="Data Feed Instance using MinIO Integration">}}
 
-#### Edit a Minio Data Feed Instance
+#### Edit a MinIO Data Feed Instance
 
-To edit a Data Feed instance of Minio Integration:
+To edit a Data Feed instance of MinIO Integration:
 
 1. Select the data feed instance name to open its detail page.
 1. Edit the Data Feed **Name**, **End Point**, or the **Bucket**.
 1. Select the **Test Data Feed** button to test the Endpoint.
 1. Select **Save** to save your changes.
 
-{{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Minio Integration">}}
+{{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using MinIO Integration">}}
 
 You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 

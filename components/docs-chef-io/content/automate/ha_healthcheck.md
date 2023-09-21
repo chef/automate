@@ -22,25 +22,25 @@ This page includes commands that can be executed for the Chef Automate cluster p
 
 - Get the Automate HA cluster Information 
   
-   ```cmd
+   ```sh
    chef-automate info 
    ```
 
 - Post Deployment, run the smoke test cases on Automate HA cluster and run the command from the bastion node.
   
-   ```cmd
+   ```sh
    chef-automate test --full 
    ```
 
 - Validate the cluster but skip "chef-automate diagnostic run" when performing the smoke tests
   
-  ```cmd
+  ```sh
    chef-automate test  
   ```
 
 - Run the smoke test on specific cluster 
   
-  ```cmd
+  ```sh
    chef-automate test automate
    chef-automate test chef_server
    chef-automate test opensearch
@@ -49,30 +49,30 @@ This page includes commands that can be executed for the Chef Automate cluster p
 
 - To get the status of the cluster, run the command from the bastion node.
   
-  ```cmd
+  ```sh
    chef-automate status 
   ```
 
 - To check the service status on Automate nodes.
- ```cmd 
+ ```sh 
  chef-automate status --automate
  chef-automate status --a2 
 ```
 
 - To check the service status on Chef Infra Server nodes.
- ```cmd 
+ ```sh 
  chef-automate status --chef_server
  chef-automate status --cs
 ```
 
 - To check the service status on Postgres nodes.
- ```cmd 
+ ```sh 
  chef-automate status --postgresql
  chef-automate status -pg
 ```
 
 - To check the service status on Opensearch nodes.
-```cmd 
+```sh 
  chef-automate status --opensearch
  chef-automate status --os
 ```
@@ -134,21 +134,21 @@ sorthands for --postgresql is --pg and -p
 - Collect the Gatherlogs for Automate HA cluster, and run the command from the bastion node.  
   - logs are collected at `/var/tmp`
 
-```cmd
+```sh
  chef-automate gather-logs
 ```
 
 - View the active Habitat gossiped toml config for any locally loaded service:
   - ssh to the backend opensearch nodes `chef-automate ssh --hostname os`
 
-```cmd
+```sh
  source /hab/sup/default/SystemdEnvironmentFile.sh
  automate-backend-ctl show --svc=automate-ha-opensearch
 ```
 
 - ssh to the backend postgres nodes `chef-automate ssh --hostname pg`
 
-```cmd
+```sh
  source /hab/sup/default/SystemdEnvironmentFile.sh
  automate-backend-ctl show --svc=automate-ha-postgresql
 ```

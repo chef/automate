@@ -1,5 +1,5 @@
 +++
-title = "On-Premise Deployment using Filesystem"
+title = "On-Prem Deployment using Filesystem"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
     [menu.automate]
-        title = "On-Premise Deployment using Filesystem"
+        title = "On-Prem Deployment using Filesystem"
         identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore File System"
         parent = "automate/deploy_high_availability/backup_and_restore"
         weight = 210
@@ -116,17 +116,17 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
     chef-automate config patch --fe automate.toml
     ```
 
-## Backup and Restore commands
+## Backup and Restore
 
 ### Backup
 
-- To create the backup, by running the backup command from bastion. The backup command is as shown below:
+To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
-    ```cmd
-    chef-automate backup create
-    ```
+```sh
+chef-automate backup create
+```
 
-### Restoring the Backed-up Data From the file system
+### Restore
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
@@ -140,11 +140,6 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 {{< /note >}}
 
-## Troubleshooting
+#### Troubleshooting
 
-While running the restore command, If it prompts any error follow the steps given below.
-
-- Check the chef-automate status in Automate node by running `chef-automate status`.
-- Also check the hab svc status in automate node by running `hab svc status`.
-- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
-- Now, check the status of Automate node and then try running the restore command from bastion.
+{{< readfile file = "content/automate/reusable/md/restore_troubleshooting.md" >}}
