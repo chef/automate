@@ -63,10 +63,9 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 
 
-### How to Add more nodes In AWS Deployment, post-deployment. 
-The commands require some arguments
-so that it can determine which types of nodes you want to add to your HA setup from your bastion host.
-It needs the count of the nodes you want to add as argument when you run the command.
+### How to Add more nodes In AWS Deployment, post deployment.
+The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
+
 For example,
 
 - if you want to add 2 nodes to automate, you have to run:
@@ -111,12 +110,8 @@ Once the command executes, it will add the supplied number of nodes to your auto
 
 {{< note >}}
 
-- If you have patched some external config to any of the existing services,
-  then make sure you apply the same on the new nodes as well.
-For example, if you have patched any external configurations like SAML or LDAP,
-  or any other done manually post-deployment in Automate nodes,
-  make sure to patch those configurations on the new Automate nodes.
-  The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+- If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
+For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
 - The new node will be configured with the certificates which were already configured in your HA setup.
 
 {{< /note >}}

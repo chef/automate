@@ -114,7 +114,7 @@ The Chef Automate commands require some arguments so that it can determine which
 
 The bastion server can patch new configurations in all nodes. To know more see [Patch Configuration](/automate/ha_config/#patch-configuration) section.
 
-## Sample Config to set up On-Premise Deployment with AWS Managed Services
+## Sample Config to setup On-Premise Deployment with AWS Managed Services
 
 ```toml
 [architecture]

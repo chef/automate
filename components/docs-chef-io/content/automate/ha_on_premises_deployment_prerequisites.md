@@ -71,7 +71,7 @@ Current Automate HA supports integration with the following Chef tools:
 
 We do not support **Chef Manage** integration in the ongoing Automate version.
 
-### External Supported Software
+### External Supported Softwares
 
 Current Automate HA integrates with the following non-Chef tools:
 
@@ -152,7 +152,7 @@ Generate the certificates using recommended tools and supported algorithms and v
 
 - OpenSSL: 1.0.2zb-fips
 - OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
-- Certificate Format: X509 V3(PEM format), Private key is in PKCS8 format
+- Certificate Format: X509 V3(PEM format) ,Private key is in PKCS8 format
 
 
 To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.

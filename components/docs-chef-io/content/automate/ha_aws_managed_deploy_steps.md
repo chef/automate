@@ -272,7 +272,7 @@ Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, 
 ## Minimum Changes required in the Sample Config
 
 - Provide `ssh_user` which has access to all the machines. E.g., `ec2-user`
-- Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `/home/ec2-user/user-key.pem`.
+- Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `~/.ssh/user-key.pem`.
 - Provide `region` Eg: `ap-southeast-2`.
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`.
 - Provide `private_custom_subnets` and `public_custom_subnets`.
