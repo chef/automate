@@ -93,9 +93,9 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
     sudo chef-automate verify -c config.toml
     ```
 
-    To know more about config verify you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure please fix the issue and re-run the verify command.
+    Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
 
 ## Steps to deploy
 
@@ -105,14 +105,14 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
      chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
-   To skip verification in the deploy command, use `--skip-verify` flag
+   To skip verification in the deployment command, use `--skip-verify` flag
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
 ## Verify Deployment
 
-1. Once the deployment is successful, Get the consolidate status of the cluster
+1. Once the deployment is successful, Get the consolidated status of the cluster
 
     ```bash
      chef-automate status summary
@@ -130,14 +130,14 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
      chef-automate verfiy
     ```
 
-1. Get the  cluster Info
+1. Get the cluster Info
 
     ```bash
      chef-automate info
     ```
 
-1. After the deployment is completed. To view the automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
-  If you want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use the below template.
+1. After the deployment is completed. To view the Automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
+  If you want to change the FQDN URL from the load balancer URL to some other FQDN URL, then use the below template.
 
     - Create a file `a2.fqdn.toml`
 
@@ -178,11 +178,11 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-After successful deployment, proceed with following:
+After successful deployment, proceed with the following:
 
    1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
    1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping,  Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+   1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
 
 ## Sample Config
 
