@@ -48,7 +48,7 @@ Once the verify command is triggered, following checks will be triggered:
 - System User (All Nodes)
 - External OpenSearch Database
 - External PostgreSQL Database
-- S3/Minio Backup Config (If Required)
+- S3/MinIO Backup Config (If Required)
 - NFS Backup Config (If Required)
 - FQDN with Load Balancer Reachability
 - Firewall Ports
@@ -67,7 +67,7 @@ It's always better to know the critical scenarios of a deployment process before
 
 ## Reports
 
-Once you run the verify command, it checks all the test cases defined. After it executes, you will see the full report of how many reports succeeded and how may failed. The report comes in a table structure with five columns, **NO.**, **IDENTIFIER**, **PARAMETER**, **STATUS**, and **MESSAGE**. The MESSAGE column shows the pointers to resolve for the parameters which have failed.
+Once you run the verify command, it checks all the test cases defined. After it executes, you will see the full report of how many reports succeeded and how may failed. The report comes in a table structure with five columns, **NO**, **IDENTIFIER**, **PARAMETER**, **STATUS**, and **MESSAGE**. The MESSAGE column shows the pointers to resolve for the parameters which have failed.
 
 An example of a checks performed are shown in the below image:
 

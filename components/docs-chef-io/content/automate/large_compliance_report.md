@@ -25,7 +25,7 @@ The following change in architecture enables Automate to ingest reports larger t
 
 ![LCR Architecture](/images/automate/lcr_architecture.jpg)
 
-Automate with the configuration to allow ingestion of an extensive compliance report and allow the data to be sent to the OpenSearch data and in an externally deployed Minio Service. Automate in the configuration expects that a Minio Server is running externally to Automate ecosystem, which Automate can connect and transact to.
+Automate with the configuration to allow ingestion of an extensive compliance report and allow the data to be sent to the OpenSearch data and in an externally deployed MinIO Service. Automate in the configuration expects that a MinIO Server is running externally to Automate ecosystem, which Automate can connect and transact to.
 
 Automate with the configuration will enable Automate to:
 
@@ -53,9 +53,9 @@ Here is a benchmark test summary report run on
 
 ## Prerequisites
 
-{{< note >}} Automate installation does not include Minio server. {{< /note >}}
+{{< note >}} Automate installation does not include MinIO server. {{< /note >}}
 
-- An external Minio server needs to be set up and available to connect
+- An external MinIO server needs to be set up and available to connect
 
 ### MinIO
 
@@ -73,7 +73,7 @@ To enable Automate to ingest Large Compliance reports:
 
 ```toml
 [global.v1.external.minio]
-    ##Do not add the protocol(http or https) for minio server end point. ex. mydomain.com:1234
+    ##Do not add the protocol(http or https) for MinIO server endpoint. ex. mydomain.com:1234
     endpoint = "<minio server end point>:<port>"
     root_user = "<username>"
     root_password = "<password>"
@@ -105,7 +105,7 @@ To enable Automate to ingest Large Compliance reports:
 
 {{< warning >}}  The below configuration is not tested to determine benchmark numbers. We recommend doing benchmark testing before considering the approach. {{< /warning >}}
 
-Automate can connect to AWS S3 for extensive compliance reports if you reuse the Minio Configuration in the following manner:
+Automate can connect to AWS S3 for extensive compliance reports if you reuse the MinIO Configuration in the following manner:
 
 ```toml
 [global.v1.external.minio]

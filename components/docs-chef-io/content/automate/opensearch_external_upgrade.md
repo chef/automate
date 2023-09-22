@@ -101,7 +101,7 @@ For example:
 
 ## Steps To Migrate from External Elasticsearch to External OpenSearch
 
-Please refer the documententation for the Elasticsearch migration to OpenSearch.
+Please refer the documentation for the Elasticsearch migration to OpenSearch.
 
 [OpenSearch's documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
 

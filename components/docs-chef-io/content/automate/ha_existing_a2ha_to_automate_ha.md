@@ -57,7 +57,7 @@ done
 
 1. Run the following commands from any automate instance in A2HA Cluster.
 
-    ```cmd
+    ```sh
     sudo chef-automate backup create
     sudo chef-automate bootstrap bundle create bootstrap.abb
     ```
@@ -148,7 +148,7 @@ done
 
 1. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
 
-    ```cmd
+    ```sh
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 2. Stop the Service in all the frontend nodes with the below command.
@@ -159,7 +159,7 @@ done
 
 3. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
 
-    ```cmd
+    ```sh
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 

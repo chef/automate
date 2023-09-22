@@ -1,5 +1,5 @@
 +++
-title = "HA OpenSearch Node Config"
+title = "High Availability OpenSearch Node Configuration"
 draft = false
 gh_repo = "automate"
 
@@ -15,9 +15,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /note >}}
 
-## Configurations
-
-The OpenSearch node in Automate HA provides various configuration options that is patched to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
+The OpenSearch node in Chef Automate HA provides various configuration options that is patched to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
 
 The detailed document about how these individual properties affect the system is at [Official OpenSearch docs](https://opensearch.org/docs/1.3/)
 
@@ -25,7 +23,7 @@ Patch the below configuration to OpenSearch nodes. Please add the values you wan
 
 Certainly! Here's an explanation of each section in the OpenSearch TOML configuration file:
 
-### Action
+## Action
 
 ```toml
 [action]
@@ -34,7 +32,7 @@ destructive_requires_name = "true"
 
 - This section configures action settings. Setting `destructive_requires_name` to `true` means that destructive actions, such as deleting indices or templates, require an explicit name to prevent accidental deletions.
 
-### Bootstrap
+## Bootstrap
 
 ```toml
 [bootstrap]
@@ -43,7 +41,7 @@ memory_lock = false
 
 Disables swapping (along with memlock). Swapping can dramatically decrease performance and stability, so you should ensure it is disabled on production clusters.
 
-### Cluster
+## Cluster
 
 ```toml
 [cluster]
@@ -55,7 +53,7 @@ max_shards_per_node= "2000"
 - It sets the name of the OpenSearch cluster to "opensearch".
 - We can use these settings to set the `max_shards_per_node` value for OpenSearch. The default value is 2000.
 
-### Discovery
+## Discovery
 
 ```toml
 [discovery]
@@ -67,7 +65,7 @@ ping_unicast_hosts = ["Os Node IP 1", "Os Node IP 2"]
 - Set `ping_unicast_hosts` to pass an initial list of hosts to perform discovery when a new node start. The default list of hosts is ["127.0.0.1", "[::1]"]
 - Set `minimum_master_nodes` to prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
 
-### Gateway
+## Gateway
 
 ```toml
 [gateway]
@@ -76,7 +74,7 @@ recover_after_nodes = ""
 
 Set `recover_after_nodes` to block initial recovery after a full cluster restart until N nodes start.
 
-### Logger
+## Logger
 
 ```toml
 [logger]
@@ -85,7 +83,7 @@ level = "info"
 
 This section configures logger settings. Allowed levels are trace, debug, info, warn, error, and fatal.
 
-### Node
+## Node
 
 ```toml
 [node]
@@ -96,7 +94,7 @@ name = ""
 - Use `max_local_storage_nodes` to disable starting multiple nodes on a single system:
 - Use a descriptive name for the node by setting the `name` field
 
-### OpenSearch Auth
+## OpenSearch Auth
 
 ```toml
 [opensearch_auth]
@@ -107,7 +105,7 @@ hashed_password = "<your-hashed-password>"
 
 This section configures OpenSearch authentication settings. It sets the admin username and password and provides a hashed version of the password.
 
-### Path
+## Path
 
 ```toml
 [path]
@@ -120,7 +118,7 @@ repo = ""
 - Use `logs` to set the path to your log files
 - Use `repo` to register the snapshot repository using OpenSearch. It is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the path.repo setting on all master and data nodes.
 
-### Plugin Security
+## Plugin Security
 
 ```toml
 [plugins.security]
@@ -133,7 +131,7 @@ nodes_dn = "- <Common Name of Public Key>"
 
 This section configures security plugin settings. It allows the default initialization of the security index, and unsafe demo certificates, checks snapshot and restore write privileges, enables snapshot and restore privileges, and specifies the nodes' distinguished names (DNs).
 
-### Plugin Security Audit
+## Plugin Security Audit
 
 ```toml
 [plugins.security.audit]
@@ -142,7 +140,7 @@ type = "internal_opensearch"
 
 This section configures security audit settings. It specifies the type of audit logging as "internal_opensearch".
 
-### Plugin Security Authcz
+## Plugin Security Authcz
 
 ```toml
 [plugins.security.authcz]
@@ -151,7 +149,7 @@ admin_dn = "- <Common Name of Admin Public Key>"
 
 This section specifies the distinguished name (DN) of the admin user.
 
-### Plugin Security Restapi
+## Plugin Security Restapi
 
 ```toml
 [plugins.security.restapi]
@@ -160,7 +158,7 @@ roles_enabled = "[\"all_access\", \"security_rest_api_access\"]"
 
 This section configures security REST API settings. It enables certain roles, such as "all_access" and "security_rest_api_access".
 
-### Plugin Security SSL HTTP
+## Plugin Security SSL HTTP
 
 ```toml
 [plugins.security.ssl.http]
@@ -172,7 +170,7 @@ pemtrustedcas_filepath = "certificates/root-ca.pem"
 
 This section configures SSL/TLS settings for HTTP. It enables SSL/TLS, specifying the certificate's file paths, private key, and trusted CA certificates.
 
-### Plugin Security SSL Transport
+## Plugin Security SSL Transport
 
 ```toml
 [plugins.security.ssl.transport]
@@ -185,7 +183,7 @@ resolve_hostname = false
 
 This section configures SSL/TLS settings for transport layer communication. It disables hostname verification, specifies the file paths for the certificate, private key, and trusted CA certificates, and disables hostname resolution.
 
-### Plugin Security System Indices
+## Plugin Security System Indices
 
 ```toml
 [plugins.security.system_indices]
@@ -197,7 +195,7 @@ opendistro-anomaly-checkpoints\", \".opendistro-anomaly-detection-state\", \".op
 
 This section configures system indices for the security plugin. It specifies the system indices that are enabled for various functionalities.
 
-### Runtime
+## Runtime
 
 ```toml
 [runtime]
@@ -213,7 +211,7 @@ minHeapsize = "2g"
 
 This section configures runtime settings. It specifies various Java runtime options and heap sizes.
 
-### S3 Client Default
+## S3 Client Default
 
 ```toml
 [s3.client.default]
@@ -226,7 +224,7 @@ use_throttle_retries = true
 
 This section configures the default S3 client settings. It specifies the S3 endpoint, the maximum number of retries, the protocol (HTTPS), the read timeout, and whether to use throttle retries.
 
-### TLS
+## TLS
 
 ```toml
 [tls]
@@ -239,7 +237,7 @@ ssl_key = "Enter Private Key----"
 
 This section configures TLS settings. It specifies the file paths for the admin certificate, admin private key, root CA certificate, SSL certificate, and SSL private key.
 
-### Full config for OpenSearch node
+## Full config for OpenSearch node
 
 ```toml
 [action]
@@ -350,7 +348,7 @@ ssl_key = "Enter Private Key----"
 port = 9300
 ```
 
-#### Example
+### Example
 
 To increase max heap size:
 
@@ -363,6 +361,6 @@ maxHeapsize = "2g"
 
 - Run the patch command `chef-automate config patch heap.toml --os` to apply the patch.
 
-### Centralized Logs
+## Centralized Logs
 
 Take a tour of the main page to know about [Centralized logs](/automate/centralizing_log/).

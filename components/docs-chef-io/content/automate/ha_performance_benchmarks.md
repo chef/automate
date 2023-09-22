@@ -2,6 +2,7 @@
 title = "Performance Benchmarks"
 date = 2023-07-10T21:33:17-08:00
 draft = false
+gh_repo = "automate"
 
 [menu]
   [menu.automate]

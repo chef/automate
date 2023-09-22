@@ -20,11 +20,11 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ### Post Automate HA deployment if the chef-server service is in a critical state
 
-![ChefServer critical Error](/images/automate/chef-server-critical-error.png)
+![Chef Infra Server critical Error](/images/automate/chef-server-critical-error.png)
 
 #### Solution
 
-- First we can check if Automate UI is opening via browser if it open's then we can try to hit the curl request to the Automate FQDN from the chefserver node.
+- First we can check if Automate UI is opening via browser if it open's then we can try to hit the curl request to the Automate FQDN from the Chef Infra Server node.
 `curl --cacert /path/to/fqdn-rootca-pem-file https://<AUTOMATE_FQDN>`
   -  The above request will verify the authenticity of the server's SSL certificate (FQDN RootCA) against Automate FQDN.
   -  In case if it gives any error, then we have make sure that the `RootCA` is valid or not.
@@ -164,19 +164,19 @@ Go to any Automate Node in HA:
 
 - Run the following command to get all the snapshots:
 
-```cmd
+```sh
 curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty
 ```
 
 - One by One, delete all the snapshots using the below command:
 
-```cmd
+```sh
 curl -k -X DELETE -s http://localhost:10144/_snapshot/<snapshot_name>
 ```
 
 Example:
 
-```cmd
+```sh
 curl -k -X DELETE -s http://localhost:10144/_snapshot/chef-automate-es6-event-feed-service
 ```
 

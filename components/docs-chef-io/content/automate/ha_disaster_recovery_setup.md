@@ -1,12 +1,11 @@
 +++
-title = "Disaster Recovery Setup"
-
+title = "Set Up On-Prem Deployment Disaster Recovery"
 draft = false
-
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
-    title = "Disaster Recovery On Prem"
+    title = "Disaster Recovery On-Prem"
     parent = "automate/deploy_high_availability/disaster_recovery"
     identifier = "automate/deploy_high_availability/ha_disaster_recovery_setup.md Disaster Recovery"
     weight = 200
@@ -16,21 +15,21 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /note >}}
 
-## Setup Disaster Recovery Cluster For OnPrem Deployment
+Recovery Point Objective (RPO) is the maximum acceptable amount of time since the last data recovery point.
+If an RPO of 1 to 24 hours is acceptable, then Chef recommends using a typical backup and restore strategy for your disaster recovery plan.
 
-Recovery Point Objective (RPO) is the maximum acceptable amount of time since the last data recovery point, if an RPO of 1 to 24 hours is acceptable then using a typical backup and restore strategy for your disaster recovery plan is recommended.
-Typically these two clusters should be located in different data centers or cloud provider regions.
+Set these two clusters in different data centers or cloud provider regions.
 
-### Requirements
+## Requirements
 
 1. Two identical clusters located in different data centers or cloud provider regions
-1. Network accessible storage (NAS), object store (S3), available in both data centers/regions
+1. Network accessible storage (NAS), object store (S3,MinIO,Google Cloud Storage), available in both data centers/regions
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
 In the above approach, there will be 2 identical clusters
 
-- Primary Cluster (or Production Cluster)
-- Disaster Recovery Cluster
+- primary cluster (or production cluster)
+- disaster recovery cluster
 
 ![Disaster Recovery Setup with 2 Identical Clusters](/images/automate/DR-2-cluster.png)
 
@@ -41,22 +40,24 @@ When a failure of the primary cluster occurs, fail-over can be accomplished thro
 ### Caveat with the above approach
 
 - Running two parallel clusters can be expensive.
-- The amount of data loss will depend on how frequently backups are performed in the Primary cluster.
-- Changing DNS records from the Primary load balancer to the Disaster Recovery load balancer can take time to propagate through the network.
+- The amount of data loss will depend on how frequently backups are performed in the primary cluster.
+- Changing DNS records from the primary load balancer to the disaster recovery load balancer can take time to propagate through the network.
 
-### Steps to setup the Production and Disaster Recovery Cluster
+### Set up the production and disaster recovery cluster
 
-1. Deploy the Primary cluster following the deployment instructions by [clicking here](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine).
+1. Deploy the primary cluster following the deployment instructions by [clicking here](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host).
 
-1. Deploy the Disaster Recovery cluster into a different data center/region using the same steps as the Primary cluster
+1. Deploy the disaster recovery cluster into a different data center and region using the same steps as the primary cluster.
 
 1. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_file_system/) or [object storage](/automate/ha_backup_restore_object_storage/).
 
 {{< note >}}
+
 Configure backups for both clusters using either [file system](/automate/ha_backup_restore_file_system/) or [object storage](/automate/ha_backup_restore_object_storage/).
+
 {{< /note >}}
 
-1. On Primary Cluster
+1. On the primary cluster
 
     - From one of the Chef Automate nodes, configure a cronjob to run the `chef-automate backup` command at a regular interval. The sample cron for backup looks like:
 
@@ -70,7 +71,7 @@ Configure backups for both clusters using either [file system](/automate/ha_back
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    - Copy `bootstrap.abb` to all Automate and Chef Infra frontend nodes in the Disaster Recovery cluster.
+    - Copy `bootstrap.abb` to all Automate and Chef Infra frontend nodes in the disaster recovery cluster.
 
     {{< note >}}
     - Suggested frequency of backup and restore jobs is one hour. Be sure to monitor backup times to ensure they can be completed in the available time.
@@ -78,7 +79,7 @@ Configure backups for both clusters using either [file system](/automate/ha_back
     - A cron job is a Linux command used to schedule a job that is executed periodically.
     {{< /note >}}
 
-    - To clean the data from the backed up storage, either schedule a cron or delete it manually.
+    - To clean the data from the backed-up storage, either schedule a cron or delete it manually.
         - To prune all but a certain number of the most recent backups manually, parse the output of chef-automate backup list and 
         apply the command chef-automate backup delete.
         For example:
@@ -87,15 +88,15 @@ Configure backups for both clusters using either [file system](/automate/ha_back
         export KEEP=10; export HAB_LICENSE=accept-no-persist; chef-automate backup list --result-json backup.json > /dev/null && hab pkg exec core/jq-static jq "[.result.backups[].id] | sort | reverse | .[]" -rM backup.json | tail -n +$(($KEEP+1)) | xargs -L1 -i chef-automate backup delete --yes {}
         ```
 
-1. On Disaster Recovery Cluster
+1. On disaster recovery cluster
 
-    - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes) by running the following command:
+    - Install `bootstrap.abb` on all the frontend nodes (Chef-server and Automate nodes) by running the following command:
 
-    ```cmd
+    ```sh
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-    - We don't recommend creating backups from the Disaster Recovery cluster unless it has become the active cluster and receiving traffic from the clients/nodes.
+    - We don't recommend creating backups from the disaster recovery cluster unless it has become the active cluster and receiving traffic from the clients/nodes.
 
     - Stop all the services on all Automate and Chef Infra frontend nodes using the following command:
 
@@ -105,7 +106,7 @@ Configure backups for both clusters using either [file system](/automate/ha_back
 
     - Make sure both backup and restore cron are aligned.
 
-    - Run the following command in one of the Automate nodes to get the IDs of all the backup:
+    - Run the following command in one of the Automate nodes to get the IDs of all the backups:
 
     ```sh
     chef-automate backup list
@@ -131,22 +132,38 @@ Configure backups for both clusters using either [file system](/automate/ha_back
             password = "admin"
         ```
 
-        - In the Disaster Recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
+        - In the disaster recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
 
-        ```cmd
+        For **S3/MinIO** execute the following command from the Bootstrapped Automate node to restore:
+
+        ```sh
         id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore /mnt/automate_backups/backups/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
         ```
+        
+        For **GCS** execute the following command from the Bootstrapped Automate node to restore:
 
-        Sample cron for restoring backup saved in object storage (S3) looks like this:
+        ```sh
+        id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
+        sudo chef-automate backup restore gs://bucket_name/path/to/backups/BACKUP_ID --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --gcs-credentials-path "path/to/googleServiceAccount.json"`
+        ```
 
-        ```cmd
+        Sample cron for restoring backup saved in object storage **(S3/MinIO)** looks like this:
+
+        ```sh
         id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
         ```
+        
+        Sample cron for restoring backup saved in object storage **(GCS)** looks like this:
+
+        ```sh
+        id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
+        sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --gcs-credentials-path "path/to/googleServiceAccount.json"
+        ```
 
 
-### Switch to Disaster Recovery Cluster
+### Switch to disaster recovery cluster
 
 Steps to switch to the disaster recovery cluster are as follows:
 
@@ -157,6 +174,6 @@ Steps to switch to the disaster recovery cluster are as follows:
     systemctl start chef-automate
     ```
 
-- Update the Automate FQDN DNS entry to resolve to the Disaster Recovery load balancer.
-- The Disaster Recovery cluster will be the primary cluster, it may take some time for DNS changes to fully propagate.
+- Update the Automate FQDN DNS entry to resolve to the disaster recovery load balancer.
+- The disaster recovery cluster will be the primary cluster, it may take some time for DNS changes to fully propagate.
 - Setup backup cron to start taking backups of the now active cluster.

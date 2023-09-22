@@ -128,17 +128,17 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 {{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 
-## Backup and Restore Commands
+## Backup and Restore
 
 ### Backup
 
 - To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
-    ```cmd
+    ```sh
     chef-automate backup create
     ```
 
-#### Restoring the Backed-up Data from Object Storage
+### Restore
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External AWS S3, follow the steps given below:
 
@@ -157,14 +157,9 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 {{< /note >}}
 
-## Troubleshooting
+#### Troubleshooting
 
-While running the restore command, If it prompts any error follow the steps given below.
-
-- Check the chef-automate status in Automate node by running `chef-automate status`.
-- Also check the hab svc status in automate node by running `hab svc status`.
-- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
-- Now, check the status of Automate node and then try running the restore command from bastion.
+{{< readfile file = "content/automate/reusable/md/restore_troubleshooting.md" >}}
 
 For **Disaster Recovery or AMI upgrade**, while running the restore in secondary cluster which is in different region follow the steps given below.
 
@@ -173,14 +168,14 @@ For **Disaster Recovery or AMI upgrade**, while running the restore in secondary
 
 1. Modify the region in FrontEnd nodes by patching the below configs with command, `chef-automate config patch <file-name>.toml --fe`
 
-    ```cmd
+    ```sh
     [global.v1.external.opensearch.backup.s3.settings]
                   region = "<FIRST-CLUSTER-REGION>"
     ```
 
 2. Make a PUT request in an Opensearch node by running this script:
 
-    ```cmd
+    ```sh
     indices=(
     chef-automate-es6-automate-cs-oc-erchef
     chef-automate-es6-compliance-service

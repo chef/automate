@@ -25,7 +25,7 @@ Before installing Chef automate HA in AWS deployment mode, ensure you have taken
 We recommend using 11 node cluster for standard Automate HA AWS deployment, as detailed in the table below:
 
 | Service Type      | Count |
-| ----------------- | ----- |
+|-------------------|-------|
 | Chef Automate     | 2     |
 | Chef Infra Server | 2     |
 | PostgreSQL DB     | 3     |
@@ -38,30 +38,30 @@ We recommend using Chef Infra Server managed by Automate HA to have high availab
 
 ## Software Requirements
 
-The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:
+The software requirements of the nodes in the cluster and other external Chef and non-Chef tools are discussed below:
 
 ### Node Software Requirements
 
 The operating system and the supported version for different nodes in AWS deployment of Automate HA are mentioned below:
 
 | Operating Systems                    | Supported Version                                                                                                                                                                                                                                         |
-| :----------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|:-------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Red Hat Enterprise Linux (64 Bit OS) | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
 | Ubuntu (64 Bit OS)                   | 16.04.x, 18.04.x, 20.04.x                                                                                                                                                                                                                                 |
 | Centos (64 Bit OS)                   | 7                                                                                                                                                                                                                                                         |
 | Amazon Linux 2 (64 Bit OS)           | 2 (kernel 5.10)                                                                                                                                                                                                                                           |
-| SUSE Linux Enterprise Server         | 12.5                                                                                                                                                        
-                                                                                              |
+| SUSE Linux Enterprise Server         | 12.5                                                                                              |
 
 Please provide AMI Id as per above list of supported operating systems.
+
 ### Minimum Supported Chef Tool Versions
 
 Current Automate HA supports integration with the following Chef tools:
 
--   Chef Infra Server version: 14.0.58+
--   Chef Inspec version: 4.3.2+
--   Chef Infra Client: 17.0.242+
--   Chef Habitat: 0.81+
+- Chef Infra Server version: 14.0.58+
+- Chef Inspec version: 4.3.2+
+- Chef Infra Client: 17.0.242+
+- Chef Habitat: 0.81+
 
 We do not support **Chef Manage** integration in the ongoing Automate version.
 
@@ -93,8 +93,8 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ### Minimum Hardware Requirement
 
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space  |
-| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ----------------- |
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space      |
+|-------------------|-------|------|-----|--------------------|------------------|-----------------------|
 | Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
 | Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
 | PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | /var/tmp=5% /root=20% |
@@ -114,7 +114,7 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 **Ports for Bastion before deployment**
 
 | Port No. | Outgoing to | Incoming from |
-| -------- | ----------- | ------------- |
+|----------|-------------|---------------|
 | 22       | Subnet      | All           |
 | 80       |             | Internet      |
 | 443      |             | Internet      |
@@ -123,22 +123,22 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
-|                 | Chef Automate        | Chef Infra Server    | PostgreSQL                                | OpenSearch                           | Bastion | Automate Load Balancer |
-| --------------- | -------------------- | -------------------- | ----------------------------------------- | ------------------------------------ | ------- | ------------- |
-| Chef Automate   |                      |                      | 7432, 9631                                       | 9200, 9631                                  |         |               |
-| Infra Server    |                      |                      | 7432, 9631                                       | 9200, 9631                                  |         | 443              |
-| PostgreSQL      |                      |                      | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |               |
-| OpenSearch      |                      |                      |                                           | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |               |
-| Bastion         | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7432, 7799                | 22, 9631, 9638, 9200, 7799           |         | 22            |
-| Automate Load Balancer   | 443, 80              | 443, 80              |                                           |                                      |         |               |
-| Internet Access |                      |                      |                                           |                                      | 80, 443 |               |
+|                        | Chef Automate        | Chef Infra Server    | PostgreSQL                                | OpenSearch                           | Bastion | Automate Load Balancer |
+|------------------------|----------------------|----------------------|-------------------------------------------|--------------------------------------|---------|------------------------|
+| Chef Automate          |                      |                      | 7432, 9631                                | 9200, 9631                           |         |                        |
+| Infra Server           |                      |                      | 7432, 9631                                | 9200, 9631                           |         | 443                    |
+| PostgreSQL             |                      |                      | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |                        |
+| OpenSearch             |                      |                      |                                           | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |                        |
+| Bastion                | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7432, 7799                | 22, 9631, 9638, 9200, 7799           |         | 22                     |
+| Automate Load Balancer | 443, 80              | 443, 80              |                                           |                                      |         |                        |
+| Internet Access        |                      |                      |                                           |                                      | 80, 443 |                        |
 
 {{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
 
 **Port usage definitions**
 
 | Protocol | Port Number | Usage                                                     |
-| -------- | ----------- | --------------------------------------------------------- |
+|----------|-------------|-----------------------------------------------------------|
 | TCP      | 22          | SSH to configure services                                 |
 | TCP      | 9631        | Habitat HTTP API                                          |
 | TCP      | 443         | Allow Users to reach UI / API                             |
@@ -264,12 +264,12 @@ To know more about the AWS deployment disaster recovery, visit our [Disaster Rec
 -   Automate HA will always have Chef Automate and Chef Infra Server running in the cluster.
 -   Chef Manage or Private Chef Supermarket customers should not migrate to Automate HA.
 
-| Existing System   | Supported Setup Type                                                                           | Minimum Eligible System Version      | Maximum Eligible System Version      | Pre-requisite Before Migration                                                                                                                                                                                                                                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chef Automate     | [Standalone](/automate/install/)                                                               | Automate 2020XXXXXX                  |                                      | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0.                                                                                                                                                                 |
-| Chef Backend      | [Chef Backend Cluster](/server/install_server_ha/)                                             | Backend 2.X and Infra Server 14.X    | Chef Infra Server 15.4.0             | Chef Backend using PostgreSQL storage for Cookbooks should only migrate to Automate HA.                                                                                                                                                                                                     |
-| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX                  | Chef Infra Server 15.4.0             | Chef Infra Server using PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
-| A2HA              | PS Lead A2HA On-Premise Deployment                                                             | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node.                                                                                 |
+| Existing System   | Supported Setup Type                                                                           | Minimum Eligible System Version      | Maximum Eligible System Version      | Pre-requisite Before Migration                                                                                                                                                                              |
+|-------------------|------------------------------------------------------------------------------------------------|--------------------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Chef Automate     | [Standalone](/automate/install/)                                                               | Automate 2020XXXXXX                  |                                      | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0.                                                                                 |
+| Chef Backend      | [Chef Backend Cluster](/server/install_server_ha/)                                             | Backend 2.X and Infra Server 14.X    | Chef Infra Server 15.4.0             | Chef Backend using PostgreSQL storage for Cookbooks should only migrate to Automate HA.                                                                                                                     |
+| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX                  | Chef Infra Server 15.4.0             | Chef Infra Server using PostgreSQL storage for Cookbooks should only migrate to Automate HA.                                                                                                                |
+| A2HA              | PS Lead A2HA On-Premise Deployment                                                             | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
 {{< note >}}
 

@@ -57,7 +57,7 @@ Please upgrade to latest date pattern version number.
   ```sh
   ./chef-automate airgap bundle create --version 20220329091442
   ```
-  - Copy the bundle file `automate-20220329091442.aib` and latest downloaded cli `chef-automate` to the airgapped machine running Chef Automate.
+  - Copy the bundle file `automate-20220329091442.aib` and latest downloaded CLI `chef-automate` to the airgapped machine running Chef Automate.
 - On the airgapped machine running Chef Automate
   - Upgrade Automate with bundle
   ```sh

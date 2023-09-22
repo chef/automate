@@ -22,13 +22,13 @@ Chef Automate HA comes with five different types of deployment flows. This page 
 - We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for reference.
 - Removal of nodes for PostgreSQL or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete PostgreSQL or OpenSearch nodes.
 - Below process can be done for `chef-server` and `automate`.
-- Only one node can be removed simultaneously, irrespective of node type.
+- Only one node can be removed simultaneously, irrespective of a node type.
 
 {{< /warning >}}
 
 {{< note >}}
 
-- The flags like `opensearch-ips` and `postgresql-ips` are only applicable for the Chef Managed Database cluster
+- The flags like `opensearch-ip` and `postgresql-ip` are only applicable for the Chef Managed Database cluster
 
 {{< /note >}}
 
@@ -78,9 +78,9 @@ Once the command executes, it will remove the particular node from your HA setup
 
 ## Remove Single Node From Cluster on AWS Deployment
 
-In this section, we will see how to remove single nodes from the AWS deployment for AWS managed database.
+In this section, we will see how to remove single nodes from the AWS deployment.
 
-The command requires some arguments to determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
+The command requires some arguments to determine the type of node you want to remove from your HA setup from your bastion host. It needs the node's IP address you want to remove as an argument when you run the command. For example,
 
 - To remove Automate node, run the following command:
 
@@ -88,7 +88,7 @@ The command requires some arguments to determine which types of nodes you want t
     chef-automate node remove --automate-ip "<automate-ip-address>"
     ```
 
-- To remove Chef Server node, run the following command:
+- To remove a Chef Infra Server node, run the following command:
 
     ```sh
     chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
@@ -106,4 +106,4 @@ The command requires some arguments to determine which types of nodes you want t
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
-Once the command executes, it will remove the paticular node from your HA setup. The command might take a while to complete.
+Once the command is executed, it will remove the particular node from your HA setup. The command might take a while to complete.

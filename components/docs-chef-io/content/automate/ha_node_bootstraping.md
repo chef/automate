@@ -180,7 +180,7 @@ host: "<MY-HOSTNAME>"
 
 - Command to patch the config
 
-```cmd
+```sh
 chef-automate config patch <toml-file> --cs
 ```
 

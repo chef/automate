@@ -91,7 +91,7 @@ When the primary cluster fails, accomplish the fail-over by updating DNS records
 
     - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes) by running the following command:
 
-    ```cmd
+    ```sh
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
@@ -133,7 +133,7 @@ When the primary cluster fails, accomplish the fail-over by updating DNS records
 
         - In the Disaster Recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
 
-        ```cmd
+        ```sh
         id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
         ```
