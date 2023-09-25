@@ -42,7 +42,7 @@ resource "aws_subnet" "default" {
   cidr_block        = cidrsubnet("${var.aws_cidr_block_addr}/18", 8, count.index + 1)
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_private"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_private"}))
 }
 
 resource "aws_subnet" "public" {
@@ -52,31 +52,31 @@ resource "aws_subnet" "public" {
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_public"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_public"}))
 }
 
 resource "aws_eip" "eip1" {
   count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
-  vpc              = true
+  domain = "vpc"
   public_ipv4_pool = "amazon"
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_eip"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_eip"}))
 }
 
 resource "aws_eip" "eip2" {
   count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
-  vpc              = true
+  domain = "vpc"
   public_ipv4_pool = "amazon"
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_eip"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_eip"}))
 }
 
 resource "aws_eip" "eip3" {
   count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
-  vpc              = true
+  domain = "vpc"
   public_ipv4_pool = "amazon"
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_eip"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_eip"}))
 }
 
 resource "aws_nat_gateway" "nat1" {
@@ -84,7 +84,7 @@ resource "aws_nat_gateway" "nat1" {
   allocation_id = aws_eip.eip1[0].id
   subnet_id     = aws_subnet.public[0].id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_nat_gw"}))
 
   depends_on = [data.aws_internet_gateway.default]
 }
@@ -94,7 +94,7 @@ resource "aws_nat_gateway" "nat2" {
   allocation_id = aws_eip.eip2[0].id
   subnet_id     = aws_subnet.public[1].id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_nat_gw"}))
 
   depends_on = [data.aws_internet_gateway.default]
 }
@@ -104,7 +104,7 @@ resource "aws_nat_gateway" "nat3" {
   allocation_id = aws_eip.eip3[0].id
   subnet_id     = aws_subnet.public[2].id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_nat_gw"}))
 
   depends_on = [data.aws_internet_gateway.default]
 }
@@ -117,7 +117,7 @@ resource "aws_route_table" "route1" {
     nat_gateway_id = aws_nat_gateway.nat1[0].id
   }
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_route_table"}))
 
 }
 
@@ -129,7 +129,7 @@ resource "aws_route_table" "route2" {
     nat_gateway_id = aws_nat_gateway.nat2[0].id
   }
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_route_table"}))
 
 }
 
@@ -141,7 +141,7 @@ resource "aws_route_table" "route3" {
     nat_gateway_id = aws_nat_gateway.nat3[0].id
   }
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_route_table"}))
 
 }
 
@@ -193,17 +193,10 @@ resource "aws_instance" "chef_automate_postgresql" {
     iops                  = var.postgresql_ebs_volume_type == "io1" ? var.postgresql_ebs_volume_iops : 0
     volume_size           = var.postgresql_ebs_volume_size
     volume_type           = var.postgresql_ebs_volume_type
-    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_automate_postgresql_%02d", count.index + 1)))
+    tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_automate_postgresql_%02d", count.index + 1)}))
   }
 
-  tags = merge(var.tags,
-    map("Name",
-      format(
-        "${var.tag_name}_${random_id.random.hex}_chef_automate_postgresql_%02d",
-        count.index + 1
-      )
-    )
-  )
+  tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_automate_postgresql_%02d", count.index + 1)}))
   lifecycle {
     ignore_changes = [
       tags,
@@ -237,15 +230,10 @@ resource "aws_instance" "chef_automate_opensearch" {
     iops                  = var.opensearch_ebs_volume_type == "io1" ? var.opensearch_ebs_volume_iops : 0
     volume_size           = var.opensearch_ebs_volume_size
     volume_type           = var.opensearch_ebs_volume_type
-    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_automate_opensearch_%02d", count.index + 1)))
+    tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_automate_opensearch_%02d", count.index + 1)}))
   }
 
-  tags = merge(
-    var.tags,
-    map("Name",
-      format("${var.tag_name}_${random_id.random.hex}_chef_automate_opensearch_%02d", count.index + 1)
-    )
-  )
+  tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_automate_opensearch_%02d", count.index + 1)}))
   lifecycle {
     ignore_changes = [
       tags,
@@ -280,15 +268,10 @@ resource "aws_instance" "chef_automate" {
     iops                  = var.automate_ebs_volume_type == "io1" ? var.automate_ebs_volume_iops : 0
     volume_size           = var.automate_ebs_volume_size
     volume_type           = var.automate_ebs_volume_type
-    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_automate_%02d", count.index + 1)))
+    tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_automate_%02d", count.index + 1)}))
   }
 
-  tags = merge(
-    var.tags,
-    map("Name",
-      format("${var.tag_name}_${random_id.random.hex}_chef_automate_%02d", count.index + 1)
-    )
-  )
+  tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_automate_%02d", count.index + 1)}))
 
   lifecycle {
     ignore_changes = [
@@ -325,15 +308,10 @@ resource "aws_instance" "chef_server" {
     iops                  = var.chef_ebs_volume_type == "io1" ? var.chef_ebs_volume_iops : 0
     volume_size           = var.chef_ebs_volume_size
     volume_type           = var.chef_ebs_volume_type
-    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)))
+    tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)}))
   }
 
-  tags = merge(
-    var.tags,
-    map("Name",
-      format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)
-    )
-  )
+  tags = merge(var.tags, tomap({"Name" = format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)}))
 
   lifecycle {
     ignore_changes = [

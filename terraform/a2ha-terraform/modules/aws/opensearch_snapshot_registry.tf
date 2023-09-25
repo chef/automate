@@ -20,7 +20,7 @@ resource "aws_iam_policy" "s3_access_policy" {
 POLICY
 
   tags = merge(var.tags,
-    map("X-Application", "automate-opensearch")
+    tomap({"X-Application" = "automate-opensearch"})
   )
 }
 
@@ -46,7 +46,7 @@ resource "aws_iam_role" "pass_es_role" {
 TRUSTPOLICY
   managed_policy_arns = [aws_iam_policy.s3_access_policy[0].arn]
   tags = merge(var.tags,
-    map("X-Application", "automate-opensearch")
+    tomap({"X-Application" = "automate-opensearch"})
   )
 
 }
@@ -74,7 +74,7 @@ resource "aws_iam_policy" "pass_es_role_policy" {
 }
 POLICY
   tags = merge(var.tags,
-    map("X-Application", "automate-opensearch")
+    tomap({"X-Application" = "automate-opensearch"})
   )
 
 }
@@ -95,7 +95,7 @@ resource "aws_iam_user" "snap_reg_user" {
   count  =  var.os_snapshot_user_access_key_id != "" ? 0 : 1
   name = "automate-os-snapshot-user-${random_id.random.hex}"
   tags = merge(var.tags,
-    map("X-Application", "automate-opensearch")
+    tomap({"X-Application" = "automate-opensearch"})
   )
 }
 

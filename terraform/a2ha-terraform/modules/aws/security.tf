@@ -3,7 +3,7 @@ resource "aws_security_group" "base_linux" {
   description = "base security rules for all linux nodes"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_linux_security_group"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_linux_security_group"}))
 }
 
 resource "aws_security_group" "habitat_supervisor" {
@@ -11,7 +11,7 @@ resource "aws_security_group" "habitat_supervisor" {
   description = "Security rules for the Habitat supervisor"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_habsup_security_group"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_habsup_security_group"}))
 }
 
 resource "aws_security_group" "chef_automate" {
@@ -19,7 +19,7 @@ resource "aws_security_group" "chef_automate" {
   description = "Chef Automate Server"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_automate_security_group"}))
 }
 
 resource "aws_security_group" "chef_automate_ui" {
@@ -27,7 +27,7 @@ resource "aws_security_group" "chef_automate_ui" {
   description = "Chef Automate Server protocol"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_automate_security_group"}))
 }
 
 resource "aws_security_group" "efs_mount" {
@@ -35,7 +35,7 @@ resource "aws_security_group" "efs_mount" {
   description = "NFS for EFS"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efs_security_group"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_efs_security_group"}))
 }
 
 resource "aws_security_group" "load_balancer" {
@@ -43,7 +43,7 @@ resource "aws_security_group" "load_balancer" {
   description = "load_balancer rules for all linux nodes"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_linux_security_group"))
+  tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_linux_security_group"}))
 }
 
 //////////////////////////
