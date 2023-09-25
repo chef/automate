@@ -63,7 +63,7 @@ Encrypted S3 buckets are supported only with Amazon S3 managed keys (SSE-S3).
 1. Load the secure settings into the OpenSearch keystore.
 
     ```sh
-    curl https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+    curl -X POST https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k
     ```
 
 1. Repeat these steps on all OpenSearch nodes until they are all updated.
@@ -186,7 +186,7 @@ Add a GCS service account file that gives access to the GCS bucket to every Open
 1. Add the GCS service account file to OpenSearch.
 
     ```sh
-    hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH
+    hab pkg exec chef/automate-ha-opensearch opensearch-keystore add-file --force gcs.client.default.credentials_file $GCS_SERVICE_ACCOUNT_JSON_FILE_PATH
     ```
 
 1. Change ownership of the keystore.
@@ -198,7 +198,7 @@ Add a GCS service account file that gives access to the GCS bucket to every Open
 1. Load the secure settings into the OpenSearch keystore.
 
     ```sh
-    curl https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+    curl -X POST https://localhost:9200/_nodes/reload_secure_settings?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k
     ```
 
 1. Repeat these steps on all OpenSearch nodes until they are all updated.
@@ -262,7 +262,7 @@ Before starting, make sure the frontend nodes and OpenSearch nodes have access t
         # name (required): The name of the bucket
         name = "bucket-name"
 
-        endpoint = "<Your Object Storage URL>"
+        # endpoint = ""
 
         # base_path (optional): The path within the bucket where backups should be stored
         # If base_path is not set, backups will be stored at the root of the bucket.

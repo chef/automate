@@ -199,7 +199,7 @@ To create a data feed select **MinIO** from **Settings > Data Feed > New Integra
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
-{{< figure src="/images/automate/data-feed-instance-using-MinIO-integration.png" alt="Data Feed Instance using MinIO Integration">}}
+{{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using MinIO Integration">}}
 
 #### Edit a MinIO Data Feed Instance
 
