@@ -26,7 +26,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
-    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless if you specify any other location in the `config.toml` file.
 
         ```bash
         chef-automate backup create
@@ -41,10 +41,10 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
         ```
 
 
-1. Copy the backup folder to bootstrapped Automate node of Automate HA using the following command:
+1. Copy the backup folder to first Automate node of Automate HA using the following command:
 
     ```bash
-    scp -i </path/to/key> -r </path/to/backup-file> <user>@<host>:/home/<user>
+    scp -i </path/to/key> -r </path/to/backup-file> <user>@<host>:/home/<user>/<YOUR-BACKUP-FOLDER>
     ```
 
 1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
@@ -61,7 +61,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 
     ```bash
     [path]
-      repo = "</path/to/automate_backups>/opensearch"
+      repo = "DIRECTOY-PATH-WHERE-AUTOMATE-STANDALONE-BACKUP-FOLDER-COPIED"
     ```
 
     The following command will patch the configuration in all the OpenSearch nodes, run this command from bastion.
@@ -77,9 +77,9 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
         enable = true
         location = "fs"
     [global.v1.external.opensearch.backup.fs]
-        path = "</path/to/automate_backups>/opensearch"
+        path = "DIRECTOY-PATH-WHERE-AUTOMATE-STANDALONE-BACKUP-FOLDER-COPIED"
     [global.v1.backups.filesystem]
-        path = "</path/to/automate_backups>/backups"
+        path = "DIRECTOY-PATH-WHERE-AUTOMATE-STANDALONE-BACKUP-FOLDER-COPIED"
     ```
 
     The following command will patch the configuration in all the Frontend nodes, run this command on bastion:
@@ -88,7 +88,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Run the following command on the bootstrapped Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the first Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -112,13 +112,13 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the frontend nodes except boostrap automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend nodes except first automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
     ```
 
-1. Restore in Chef-Automate HA using the following command in boostrap automate node :
+1. Restore in Chef-Automate HA using the following command in first automate node :(Here `/mnt/automate_backups/` is the example path where the backup id folder is copied)
 
     ```bash
     chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
@@ -137,8 +137,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 
 1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:
-    - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
-    - In HA, we are mounting that EFS volume at `</path/to/automate_backups>` for example `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
+    - In Automate, if you are mounting at `/nfs/automate_backups` make sure the same location is mounted in the Automate HA.
 
     Make sure that the location has permission for the hab user.
 
@@ -149,7 +148,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 
     ```bash
     [path]
-      repo = "/path/to/automate_backups/opensearch"
+      repo = "/nfs/automate_backups"
     ```
 
     The following command will patch the configuration in all the OpenSearch nodes, run this command from bastion.
@@ -165,9 +164,9 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
         enable = true
         location = "fs"
     [global.v1.external.opensearch.backup.fs]
-        path = "/path/to/automate_backups/opensearch"
+        path = "/nfs/automate_backups"
     [global.v1.backups.filesystem]
-        path = "/path/to/automate_backups/backups"
+        path = "/nfs/automate_backups"
     ```
 
     The following command will patch the configuration in all the Frontend nodes, run this command on bastion:
@@ -178,7 +177,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
-    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    1. Run the below command to create the backup in the `/nfs/automate_backups` location unless you specify the location in the `config.toml` file.
 
         ```bash
         chef-automate backup create
@@ -192,7 +191,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. Run the following command on the bootstrapped Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the first Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -233,7 +232,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 1. Restore in Chef-Automate HA using the following command:
 
     ```bash
-    chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    chef-automate backup restore /nfs/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ## Refer to the `/var/tmp/frontend-4.x.y.aib` file name for the exact version number.
     ```
 
@@ -363,7 +362,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     chef-automate config patch --frontend automate.toml
     ```
 
-1. Run the following command on the bootstrapped Automate node of Automate HA cluster to get the current config:
+1. Run the following command on the first Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
