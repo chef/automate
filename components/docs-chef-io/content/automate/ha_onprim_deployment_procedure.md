@@ -53,9 +53,7 @@ Make sure you have all resources either on existing infrastructure or on existin
 
     {{< /note >}}
 
-    {{< note >}} If the airgapped bastion host differs, transfer the bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the airgapped bastion host using the `scp` command.
-
-    After transferring the bundle file to the airgapped bastion host, run the following commands:
+    {{< note >}} If the airgapped bastion host differs, transfer the bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the airgapped bastion host using the `scp` command. After transferring the bundle file to the airgapped bastion host, run the following commands:
 
     ```bash
     sudo -- sh -c "
