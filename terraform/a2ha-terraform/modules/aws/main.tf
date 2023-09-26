@@ -55,9 +55,10 @@ resource "aws_subnet" "public" {
   tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_${data.aws_availability_zones.available.names[count.index]}_public"}))
 }
 
+
 resource "aws_eip" "eip1" {
   count                   = (length(var.public_custom_subnets) == 0 && var.aws_cidr_block_addr != "") ? 1 : 0
-  domain = "vpc"
+  domain = "vpc"    # changed in new version
   public_ipv4_pool = "amazon"
 
   tags = merge(var.tags, tomap({"Name" = "${var.tag_name}_${random_id.random.hex}_eip"}))
