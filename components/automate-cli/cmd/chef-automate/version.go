@@ -57,7 +57,6 @@ var VersionCommandFlags = struct {
 
 func runVersionCmd(cmd *cobra.Command, args []string) error {
 	writer.Printf("Version: %s\n", "2")
-
 	// Check for bastion
 	if isA2HARBFileExist() {
 		logrus.Debug("Running command on bastion")
