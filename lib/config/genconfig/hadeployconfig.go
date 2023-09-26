@@ -24,7 +24,7 @@ const (
 	ERR_MSG_AWS_ACCESS_KEY_SECRET = "Please provide valid AWS Access Key Secret of 40 alpha numeric characters"
 	ERR_MSG_ACCESS_KEY            = "Please provide valid Access Key ID with Alpha numeric characters"
 	ERR_MSG_IP                    = "Please provide valid IP Address, like: 192.168.1.1"
-	ERR_MSG_BUCKET_ENDPOINT       = "Please provide a valid Bucket Endpoint URL, like: https://my-object-store.example.com"
+	ERR_MSG_BUCKET_ENDPOINT       = "Please provide a valid Bucket Endpoint URL, like: https://my-object-store.example.com or https://35.2.44.4:9200"
 	ERR_MSG_DIR_LOC               = "Please provide a valid Directory Location on local linux filesystem, like: /mnt/automate_backups"
 )
 
