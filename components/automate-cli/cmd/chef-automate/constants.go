@@ -22,6 +22,7 @@ const (
 	OSVERSIONREGEX      = `"number"\s*:\s*"([^"]+)"`
 	PGCOREPKG           = "core/postgresql13 "
 	AUTOMATE_NAME       = "Automate"
+	BASTION_NAME        = "Bastion"
 	CHEF_SERVER_NAME    = "Chef Server"
 	OPENSEARCH_NAME     = "Opensearch"
 	POSTGRESQL_NAME     = "Postgresql"
