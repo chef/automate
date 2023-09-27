@@ -49,6 +49,7 @@ var verbose bool
 var VersionCommandFlags = struct {
 	node         string
 	verbose      bool
+	isBastion    bool
 	isAutomate   bool
 	isChefServer bool
 	isOpenSearch bool
@@ -60,9 +61,6 @@ func runVersionCmd(cmd *cobra.Command, args []string) error {
 	// Check for bastion
 	if isA2HARBFileExist() {
 		logrus.Debug("Running command on bastion")
-		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(BASTION_NAME))
-		writer.Println("\n")
-		printClientVersion()
 		err := runCommandOnBastion(args)
 
 		if err != nil {
@@ -168,27 +166,49 @@ func printUpgradeStatus() error {
 }
 
 func init() {
-	versionCmd.Flags().BoolVarP(&VersionCommandFlags.verbose, "verbose", "v", false, "Show additional version information")
-
-	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isAutomate, "a2", false, "Get only automate Status")
+	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isBastion, "bastion", "", false, "Shows the versions of bastion node(HA)")
+	versionCmd.PersistentFlags().SetAnnotation("bastion", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isAutomate, "automate", "a", false, "Shows the versions of Automate node(HA)")
 	versionCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
-
-	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isChefServer, "cs", false, "Get only chef server Status")
-	versionCmd.PersistentFlags().SetAnnotation("chef-server", docs.Compatibility, []string{docs.CompatiblewithHA})
-
-	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isOpenSearch, "os", false, "Get only opensearch Status")
-	versionCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
-
-	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isPostgresql, "pg", false, "Get only postgresql Status")
+	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isChefServer, "chef_server", "c", false, "Shows the versions of Chef-server node(HA)")
+	versionCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isPostgresql, "postgresql", "p", false, "Shows the versions of PostgresQL node")
 	versionCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isOpenSearch, "opensearch", "o", false, "Shows the versions of OpenSearch node")
+	versionCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isBastion, "b", false, "Shows the versions of bastion node(HA)[DUPLICATE]")
+	versionCmd.PersistentFlags().SetAnnotation("b", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isAutomate, "a2", false, "Shows the versions of Automate node(HA)[DUPLICATE]")
+	versionCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isChefServer, "cs", false, "Shows the versions of Chef-server node(HA)[DUPLICATE]")
+	versionCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isPostgresql, "pg", false, "Shows the versions of PostgresQL node[DUPLICATE]")
+	versionCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isOpenSearch, "os", false, "Shows the versions of OpenSearch node[DUPLICATE]")
+	versionCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
+	versionCmd.Flags().BoolVarP(&VersionCommandFlags.verbose, "verbose", "v", false, "Show additional version information")
 
 	versionCmd.PersistentFlags().StringVar(&VersionCommandFlags.node, "node", "", "Node Ip address. While using this flag, pass the node type as well. Example : chef-automate version --node 192.0.0.1 --cs")
 	versionCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(versionCmd)
 }
 
+func isServiceFlagsNotProvided() bool {
+	return !VersionCommandFlags.isAutomate &&
+		!VersionCommandFlags.isChefServer &&
+		!VersionCommandFlags.isOpenSearch &&
+		!VersionCommandFlags.isPostgresql
+}
+
 func runCommandOnBastion(args []string) error {
 
+	err := getVersionBasedOnFlag()
+	if err != nil {
+		return err
+	}
+	if VersionCommandFlags.isBastion && isServiceFlagsNotProvided() {
+		return nil
+	}
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		logrus.Errorf("Error while getting HA Infra details :: %s", err)
@@ -276,6 +296,44 @@ func runCommandOnBastion(args []string) error {
 
 	}
 
+	return nil
+}
+
+func getVersionBasedOnFlag() error {
+	isServiceFlagsNotProvided := isServiceFlagsNotProvided()
+	//get version of just bastion
+	if VersionCommandFlags.isBastion && isServiceFlagsNotProvided {
+		err := getBastionVersion()
+		if err != nil {
+			return err
+		}
+	}
+	//get version of all nodes along with bastion
+	if !VersionCommandFlags.isBastion && isServiceFlagsNotProvided {
+		err := getBastionVersion()
+		if err != nil {
+			return err
+		}
+	}
+	//get version of bastion along with other service flags
+	if VersionCommandFlags.isBastion && !isServiceFlagsNotProvided {
+		err := getBastionVersion()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getBastionVersion() error {
+	writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(BASTION_NAME))
+	writer.Println("\n")
+	printClientVersion()
+	workspaceVersion := getCurrentInstalledWorsapceVersion(false)
+	if len(workspaceVersion) >= 2 {
+		timestamp := strings.TrimRight(workspaceVersion[1], "]")
+		writer.Bodyf("Workspace Build: %s", timestamp)
+	}
 	return nil
 }
 
