@@ -37,6 +37,26 @@ const configShow = `[global]
 			username = "admin"
 			password = "admin"`
 
+func Test_getVersionBasedOnFlag(t *testing.T) {
+	t.Run("Version only for bastion", func(t *testing.T) {
+		VersionCommandFlags.isBastion = true
+		err := getVersionBasedOnFlag()
+		assert.Nil(t, err)
+	})
+	t.Run("Version for bastion along with service flag", func(t *testing.T) {
+		VersionCommandFlags.isBastion = true
+		VersionCommandFlags.isAutomate = true
+		err := getVersionBasedOnFlag()
+		assert.Nil(t, err)
+	})
+	t.Run("Version for all nodes including bastion", func(t *testing.T) {
+		VersionCommandFlags.isBastion = false
+		VersionCommandFlags.isAutomate = false
+		err := getVersionBasedOnFlag()
+		assert.Nil(t, err)
+	})
+}
+
 func Test_getChefAutomateVersion(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		mockCmdExecutor := &MockRemoteCmdExecutor{

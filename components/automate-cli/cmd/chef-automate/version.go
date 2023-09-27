@@ -308,7 +308,7 @@ func getVersionBasedOnFlag() error {
 			return err
 		}
 	}
-	//get version of all nodes along with bastion
+	//get version of bastion along with all service flags
 	if !VersionCommandFlags.isBastion && isServiceFlagsNotProvided {
 		err := getBastionVersion()
 		if err != nil {
