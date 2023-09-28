@@ -1177,6 +1177,61 @@ func TestOnPremPromptBackupMinio(t *testing.T) {
 	assert.Equal(t, "/mnt/automate_backups", c.Config.Architecture.ExistingInfra.BackupMount)
 }
 
+func TestOnPremPromptBackupMinioWithDomain(t *testing.T) {
+	b := bytes.NewBuffer([]byte(""))
+	in := io.NopCloser(b)
+	enableBackup := true
+	input(b, "\r")
+
+	useMinio := true
+	input(b, moveDown+"\r")
+
+	backupBucketName := "automate-backup"
+	input(b, backupBucketName+"\r")
+
+	backupAcessKeyId := "AKEKFKEIDKETODDFEDFE"
+	input(b, backupAcessKeyId+"\r")
+
+	backupAcessKeySecret := "sdfsdflsdlfkjsdlkjeflilsfldijflsdkfjddfd"
+	input(b, backupAcessKeySecret+"\r")
+
+	backupEndpoint := "http://s3.amazonaws.com:9000"
+	input(b, backupEndpoint+"\r")
+
+	mfsu := &fileutils.MockFileSystemUtils{
+		ReadFileFunc: func(filepath string) (data []byte, err error) {
+			return
+		},
+		StatFunc: func(name string) (fi os.FileInfo, err error) {
+			if name == "test.pem" {
+				fi = fileutils.MockFileInfo{IsDirFunc: func() bool { return false }}
+			} else {
+				err = errors.New("file not found")
+			}
+			return
+		},
+	}
+	outBuf := &bytes.Buffer{}
+	out := ioutils.NewNopWriteCloser(outBuf)
+	p := pmt.PromptFactory(in, out, mfsu)
+
+	c := HaDeployConfigGen{
+		Prompt:    p,
+		FileUtils: mfsu,
+		Config:    &config.HaDeployConfig{},
+	}
+
+	err := c.PromptBackup()
+
+	assert.NoError(t, err)
+	assert.Equal(t, enableBackup, c.Config.Architecture.ExistingInfra.BackupConfig != "")
+	assert.Equal(t, useMinio, c.Config.Architecture.ExistingInfra.BackupConfig == "object_storage")
+	assert.Equal(t, backupBucketName, c.Config.ObjectStorage.Config.BucketName)
+	assert.Equal(t, backupAcessKeyId, c.Config.ObjectStorage.Config.AccessKey)
+	assert.Equal(t, backupEndpoint, c.Config.ObjectStorage.Config.Endpoint)
+	assert.Equal(t, "/mnt/automate_backups", c.Config.Architecture.ExistingInfra.BackupMount)
+}
+
 func TestOnPremPromptBackupMinioerror(t *testing.T) {
 	b := bytes.NewBuffer([]byte(""))
 	in := io.NopCloser(b)
