@@ -8,7 +8,7 @@ pkg_description="Wrapper package for chef/ocid"
 pkg_origin="chef"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.4.0"
-vendor_origin="chef"
+vendor_origin="roy_test"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 
@@ -21,7 +21,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_id/15.4.0/20230105061030"
+  "roy_test/oc_id/15.7.9/20230928070431"
 )
 
 pkg_binds=(
@@ -53,13 +53,6 @@ do_download() {
 
 do_build() {
   # TODO :: Remove following section once new ocid hab package is used which includes gem: "tzinfo-data"
-  cd $(pkg_path_for "chef/oc_id")/oc_id
-  bundle config path "vendor/bundle"
-  if ! grep -q "gem 'tzinfo-data'" Gemfile; then
-    echo "gem 'tzinfo-data'" >> Gemfile
-    bundle install
-  fi
-
   return 0
 }
 
