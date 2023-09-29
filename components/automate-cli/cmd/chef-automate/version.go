@@ -166,7 +166,7 @@ func printUpgradeStatus() error {
 }
 
 func init() {
-	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isBastion, "bastion", "", false, "Shows the versions of bastion node(HA)")
+	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isBastion, "bastion", "b", false, "Shows the versions of bastion node(HA)")
 	versionCmd.PersistentFlags().SetAnnotation("bastion", docs.Compatibility, []string{docs.CompatiblewithHA})
 	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isAutomate, "automate", "a", false, "Shows the versions of Automate node(HA)")
 	versionCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
@@ -176,8 +176,6 @@ func init() {
 	versionCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 	versionCmd.PersistentFlags().BoolVarP(&VersionCommandFlags.isOpenSearch, "opensearch", "o", false, "Shows the versions of OpenSearch node")
 	versionCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
-	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isBastion, "b", false, "Shows the versions of bastion node(HA)[DUPLICATE]")
-	versionCmd.PersistentFlags().SetAnnotation("b", docs.Compatibility, []string{docs.CompatiblewithHA})
 	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isAutomate, "a2", false, "Shows the versions of Automate node(HA)[DUPLICATE]")
 	versionCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
 	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isChefServer, "cs", false, "Shows the versions of Chef-server node(HA)[DUPLICATE]")
