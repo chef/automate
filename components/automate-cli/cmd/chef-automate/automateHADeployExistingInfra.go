@@ -180,10 +180,8 @@ func (e *existingInfra) populateCertificateTomlFile() {
 		certContent.PostgreSQL = postgresql
 	}
 
-	// Write the TOML data to a file
-	outputFile := "/hab/a2_deploy_workspace/certificate.toml"
 	// Open a file for writing (create or overwrite if it exists)
-	file, err := os.Create(outputFile)
+	file, err := os.Create(CERTIFICATE_TEMPLATE_TOML_FILE)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return
@@ -195,7 +193,7 @@ func (e *existingInfra) populateCertificateTomlFile() {
 		fmt.Println("Error encoding TOML:", err)
 		return
 	}
-	fmt.Printf("Certificate TOML written to %s\n", outputFile)
+	fmt.Printf("Certificate TOML written to %s\n", CERTIFICATE_TEMPLATE_TOML_FILE)
 }
 func (e *existingInfra) addDNTocertConfig() error {
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs

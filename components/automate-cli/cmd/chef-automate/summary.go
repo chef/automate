@@ -45,6 +45,7 @@ type StatusSummary interface {
 	Prepare() error
 	ShowFEStatus() string
 	ShowBEStatus() string
+	GetPGLeaderNode() (string, string)
 }
 
 type Summary struct {
@@ -669,4 +670,14 @@ func (ss *Summary) ShowBEStatus() string {
 		return t.Render()
 	}
 	return ""
+}
+func (ss *Summary) GetPGLeaderNode() (string, string) {
+	if len(ss.beStatus) != 0 {
+		for _, status := range ss.beStatus {
+			if status.role == "Leader" && status.serviceName == "postgresql" {
+				return status.ipAddress, status.health
+			}
+		}
+	}
+	return "", ""
 }
