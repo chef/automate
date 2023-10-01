@@ -58,6 +58,7 @@ output "os_snapshot_user_access_key_id" {
 }
 
 output "os_snapshot_user_access_key_secret" {
+  sensitive = true
   value = var.os_snapshot_user_access_key_id != "" ? var.os_snapshot_user_access_key_secret : aws_iam_access_key.snap_reg_user_key[0].secret
 }
 

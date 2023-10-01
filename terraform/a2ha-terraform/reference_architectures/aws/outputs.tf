@@ -35,6 +35,7 @@ output "os_snapshot_user_access_key_id" {
 }
 
 output "os_snapshot_user_access_key_secret" {
+  sensitive = true
   value = module.aws.os_snapshot_user_access_key_secret
 }
 
