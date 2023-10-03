@@ -37,6 +37,6 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "node_type should be automate or chef-infra-server, Please provide node_type.")
 	}
 
-	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT, time.Minute*1)
+	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT, time.Second*30)
 	return c.JSON(response.BuildSuccessResponse(res))
 }
