@@ -326,7 +326,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Get \"https://localhost2:5345\": dial tcp: lookup localhost2: no such host",
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -546,7 +546,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Get \"https://localhost2:5345/_status\": dial tcp: lookup localhost2: no such host",
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -610,7 +610,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Get \"https://localhost2:5345\": dial tcp: lookup localhost2: no such host",
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -713,7 +713,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.FQDN_ERROR_MESSAGE,
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
