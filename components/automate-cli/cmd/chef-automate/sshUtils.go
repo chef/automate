@@ -337,7 +337,7 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		writer.Printf("\n"+"Failed to copy file %s to remote %s\n", srcFilePath, err.Error())
+		writer.Printf("\n"+"Failed to copy file %s to remote %s:%s %s\n", srcFilePath, s.SshConfig.hostIP, s.SshConfig.sshPort, err.Error())
 		if srcFilePath == "/usr/bin/chef-automate" {
 			writer.Printf("Please copy your chef-automate binary to /usr/bin" + "\n")
 		}
@@ -347,7 +347,7 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 		cmd := "rm"
 		exec_args := []string{"-rf", srcFilePath}
 		if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-			writer.Printf("Failed to copy file to remote %s\n", err.Error())
+			writer.Printf("Failed to copy file to remote %s:%s %s\n", s.SshConfig.hostIP, s.SshConfig.sshPort, err.Error())
 			return err
 		}
 	}
@@ -360,7 +360,7 @@ func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName s
 	destFileName := "/tmp/" + outputFileName
 	execArgs := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-o ConnectTimeout=30", "-i", s.SshConfig.sshKeyFile, "-r", s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":" + remoteFilePath, destFileName}
 	if err := exec.Command(cmd, execArgs...).Run(); err != nil {
-		writer.Printf("Failed to copy file from remote %s\n", err.Error())
+		writer.Printf("Failed to copy file from remote %s:%s %s\n", s.SshConfig.hostIP, s.SshConfig.sshPort, err.Error())
 		return "", err
 	}
 	return destFileName, nil
