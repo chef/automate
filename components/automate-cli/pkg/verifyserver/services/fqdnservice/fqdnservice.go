@@ -200,7 +200,15 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 
 	err := fq.triggerRequest(client, url, duration)
 	if err != nil {
-		return createCheck(constants.FQDN_TITLE, false, "", err.Error(), constants.FQDN_RESOLUTION_MESSAGE)
+		resoultion_message := ""
+		if strings.Contains(err.Error(), constants.CERT_CN_MISMATCH_ERROR_PATTERN) {
+			resoultion_message = constants.CERT_CN_MISMATCH_RESOLUTION_MESSAGE
+		} else if strings.Contains(err.Error(), constants.INVALID_FQDN_CERT_ERROR_PATTERN) {
+			resoultion_message = constants.INVALID_FQDN_CERT_RESOLUTION_MESSAGE
+		} else {
+			resoultion_message = constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE
+		}
+		return createCheck(constants.FQDN_TITLE, false, "", err.Error(), resoultion_message)
 	}
 	return createCheck(constants.FQDN_TITLE, true, constants.FQDN_TITLE, "", "")
 }
