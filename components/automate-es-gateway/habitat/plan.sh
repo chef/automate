@@ -54,6 +54,7 @@ pkg_deps=(
   chef/automate-platform-tools
 )
 
+
 pkg_build_deps=(
   core/gcc
   core/make
