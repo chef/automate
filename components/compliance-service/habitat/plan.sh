@@ -39,6 +39,7 @@ pkg_deps=(
   core/grpcurl              # Used in habitat/hooks/health_check
   core/jq-static            # Used in habitat/hooks/health_check
   core/bash
+  core/firejail
 )
 
 if [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
@@ -64,7 +65,8 @@ do_prepare() {
   do_default_prepare
 
   GO_LDFLAGS="${GO_LDFLAGS} -X main.EXECUTABLE_PATH=$(pkg_path_for chef/inspec)/bin/inspec"
-  export GO_LDFLAGS
+export GO_LDFLAGS
+  
 }
 
 do_install() {

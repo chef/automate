@@ -25,6 +25,8 @@ var ResultMessageLimit int
 // TmpDir is used for setting the location of the /tmp dir to be used by inspec for caching
 var TmpDir string
 
+var FIREJAIL string
+
 // The timeout used for tasks that just evaluate a profile but do not execute it.
 const defaultTimeout = 2 * time.Minute
 
@@ -241,7 +243,16 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 func Check(profilePath string) (CheckResult, error) {
 	var res CheckResult
 
-	args := []string{shimBinName, "check", profilePath, "--format", "json"}
+	firjailBin := os.Getenv("FIREJAIL")
+	firjailCommand := "--profile=./myprofile.profile"
+	firejailFlag := "--quiet"
+
+	//firjailComamnd := "hab pkg exec core"
+
+	args := []string{firjailBin, firjailCommand, firejailFlag}
+
+	args = append(args, []string{shimBinName, "check", profilePath, "--format", "json"}...)
+
 	logrus.Debugf("Run: inspec %v", args)
 	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
 
@@ -249,6 +260,8 @@ func Check(profilePath string) (CheckResult, error) {
 		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
 	}
+
+	logrus.Info("Gicing the ouytpoyut xsjcnasdnca", string(stdout))
 
 	jsonContent := findJsonLine(stdout)
 	err = json.Unmarshal(jsonContent, &res)
@@ -269,7 +282,11 @@ func Check(profilePath string) (CheckResult, error) {
 }
 
 func Json(profilePath string) ([]byte, error) {
-	args := []string{shimBinName, "json", profilePath}
+	firjailBin := os.Getenv("FIREJAIL")
+	//firjailCommand := "--profile=./myprofile.profile"
+	firejailFlag := "--quiet"
+
+	args := []string{firjailBin, firejailFlag, shimBinName, "json", profilePath}
 	logrus.Debugf("Run: inspec %v", args)
 	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
 	logrus.Debugf("Run: %s %s %v", stdout, stderr, err)
@@ -282,7 +299,12 @@ func Json(profilePath string) ([]byte, error) {
 
 // Archives a directory to a TAR.GZ
 func Archive(profilePath string, outputPath string) error {
-	args := []string{shimBinName, "archive", profilePath, "-o", outputPath, "--overwrite"}
+	firjailBin := os.Getenv("FIREJAIL")
+
+	firjailCommand := "--profile=./myprofile.profile"
+	firejailFlag := "--quiet"
+	logrus.Info("--------------------- output path", outputPath)
+	args := []string{firjailBin, firjailCommand, firejailFlag, shimBinName, "archive", profilePath, "-o", outputPath, "--overwrite"}
 	logrus.Debugf("Run: inspec %v", args)
 	_, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
 

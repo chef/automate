@@ -167,6 +167,7 @@ export HOME="{{pkg.svc_data_path}}"
 
 CONFIG="$CONFIG --inspec-tmp-dir {{pkg.svc_var_path}}/tmp"
 
+export FIREJAIL="{{pkgPathFor "core/firejail"}}/bin/firejail"
 # Start our service
 # shellcheck disable=SC2086
 exec compliance-service run ${CONFIG} ${ES_BACKEND} ${PG_BACKEND}
