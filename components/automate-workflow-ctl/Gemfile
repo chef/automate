@@ -5,7 +5,7 @@ gem "httpclient"
 gem "mixlib-config"
 gem "mixlib-install"
 gem "mixlib-shellout"
-gem "train"
+gem "train", ">= 2.0.8"
 
 gem "chef", "~> 12.21"
 gem "ohai", "~> 8.24"
