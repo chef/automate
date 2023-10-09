@@ -66,7 +66,7 @@ const (
 		enforce_hostname_verification = false
 		resolve_hostname = false
 	[plugins.security]
-		nodes_dn = '- %v'`
+		nodes_dn = """- %v"""`
 
 	OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA = `
 	[tls]
@@ -252,6 +252,9 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		sshUtil.setSSHConfig(sshConfig)
 		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), sshUtil, writer)
 		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
+		if err != nil {
+			return errors.WithStack(err)
+		}
 
 		if len(flagsObj.cluster) > 0 {
 			err = c.certRotateFromTemplate(flagsObj.cluster, sshUtil, infra, currentCertsInfo)
@@ -269,10 +272,6 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 			}
 			if (certs.adminCert != "" || certs.adminKey != "") && flagsObj.node != "" {
 				writer.Warn("admin-cert and admin-key flag will be ignored when node flag is provided")
-			}
-
-			if err != nil {
-				return errors.Wrap(err, "Error occured while fetching current certs")
 			}
 
 			if flagsObj.timeout < DEFAULT_TIMEOUT {
@@ -610,6 +609,8 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	patchFnParam.concurrent = false
 	err := c.patchConfig(patchFnParam)
 	if err != nil {
+		fmt.Println("Error @certRotate.go:612")
+		fmt.Println(err)
 		return err
 	}
 
@@ -1044,7 +1045,7 @@ func (c *certRotateFlow) getCerts(infra *AutomateHAInfraDetails, flagsObj *certR
 
 	// Admin Cert and Admin Key is mandatory for OS nodes.
 	if flagsObj.opensearch {
-		if (adminCertPath == "" || adminKeyPath == "") && flagsObj.node == "" {
+		if (len(adminCertPath) == 0 || len(adminKeyPath) == 0) && len(flagsObj.node) == 0 {
 			return nil, errors.New("Please provide both admin-cert and admin-key flags")
 		}
 		if adminCertPath != "" && adminKeyPath != "" {
@@ -1245,7 +1246,7 @@ func getCertsFromTemplate(clusterCertificateFile string) (*CertificateToml, erro
 		writer.Errorln("Error in fetching certificates from template file")
 		return nil, err
 	}
-	writer.Println(string(content))
+	//writer.Println(string(content))
 	certifiacates := &CertificateToml{}
 	toml.Decode(string(content), certifiacates)
 	return certifiacates, nil
@@ -1256,7 +1257,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	if err != nil {
 		return err
 	}
-	fmt.Println(templateCerts)
+	//fmt.Println(templateCerts)
 	if templateCerts != nil {
 		// rotating PG certs
 		writer.Println("Rotating PostgreSQL certificates")
@@ -1271,7 +1272,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 				if strings.EqualFold(strings.TrimSpace(pgIp.IP), strings.TrimSpace(pgLeaderIp)) {
 					//rotate pg leader node certs
 					writer.Println("Rotating PostgreSQL leader node certificates")
-					err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp)
+					err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, false)
 					if err != nil {
 						writer.Println(err.Error())
 						return err
@@ -1279,20 +1280,22 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 				}
 			}
 			for _, pgIp := range templateCerts.PostgreSQL.IPS {
-				if strings.EqualFold(pgIp.IP, pgLeaderIp) {
+				if strings.EqualFold(strings.TrimSpace(pgIp.IP), strings.TrimSpace(pgLeaderIp)) {
 					continue
 				}
 				writer.Println("Rotating PostgreSQL follower node certificates")
-				err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp)
+				err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, false)
 				if err != nil {
 					return err
 				}
 			}
+		} else {
+			return errors.New("Not able to find PostgreSQL leader node, please ensure leader node is in healthy state")
 		}
 		// rotating OS certs
 		for i, osIp := range templateCerts.OpenSearch.IPS {
 			writer.Printf("Rotating OpenSearch node %d certificates \n", i)
-			err := c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp)
+			err := c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false)
 			if err != nil {
 				return err
 			}
@@ -1317,10 +1320,10 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		}
 
 	}
-	return errors.New("Failed")
+	return nil
 }
 
-func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP) error {
+func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool) error {
 	if len(pgIps.PrivateKey) == 0 || len(pgIps.Publickey) == 0 {
 		writer.Printf("Empty certificate for PostgerSQL node %s \n", pgIps.IP)
 		return errors.New(fmt.Sprintf("Empty certificate for PostgerSQL node %s \n", pgIps.IP))
@@ -1337,23 +1340,51 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	if err != nil {
 		return err
 	}
-	err = c.certRotatePG(sshUtil, certs, infra, &flagsObj, currentCertsInfo, true)
+
+	if isManagedServicesOn() {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, POSTGRESQL)
+	}
+	fileName := "cert-rotate-pg.toml"
+	timestamp := time.Now().Format("20060102150405")
+	remoteService := POSTGRESQL
+
+	// Creating and patching the required configurations.
+	config := fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, certs.privateCert, certs.publicCert)
+
+	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, &flagsObj, currentCertsInfo)
+	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
+
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        config,
+		fileName:      fileName,
+		timestamp:     timestamp,
+		remoteService: remoteService,
+		concurrent:    concurrent,
+		infra:         infra,
+		flagsObj:      &flagsObj,
+		skipIpsList:   skipIpsList,
+	}
+
+	// patching on PG
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, os *NodeCertficate, osIp *IP) error {
+func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool) error {
 	if len(osIp.PrivateKey) == 0 || len(osIp.Publickey) == 0 {
 		writer.Printf("Empty certificate for OpenSearch node %s \n", osIp.IP)
 		return errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
 	}
+	fmt.Printf("Admin cert path : %s", oss.AdminPublickey)
 	flagsObj := certRotateFlags{
 		opensearch:      true,
-		rootCAPath:      os.RootCA,
-		adminKeyPath:    os.AdminPrivateKey,
-		adminCertPath:   os.AdminPublickey,
+		rootCAPath:      oss.RootCA,
+		adminKeyPath:    oss.AdminPrivateKey,
+		adminCertPath:   oss.AdminPublickey,
 		privateCertPath: osIp.PrivateKey,
 		publicCertPath:  osIp.Publickey,
 		node:            osIp.IP,
@@ -1363,9 +1394,79 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	if err != nil {
 		return err
 	}
-	err = c.certRotateOS(sshUtil, certs, infra, &flagsObj, currentCertsInfo, true)
+
+	if isManagedServicesOn() {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, OPENSEARCH)
+	}
+	fileName := "cert-rotate-os.toml"
+	timestamp := time.Now().Format("20060102150405")
+	remoteService := OPENSEARCH
+	adminPublicCert, err := c.getCertFromFile(oss.AdminPublickey, infra)
 	if err != nil {
 		return err
+	}
+	adminPublicCertString := strings.TrimSpace(string(adminPublicCert))
+	adminPrivateCert, err := c.getCertFromFile(oss.AdminPrivateKey, infra)
+	if err != nil {
+		return err
+	}
+	adminDn, err := getDistinguishedNameFromKey(adminPublicCertString)
+	if err != nil {
+		fmt.Println("Error in decoding admin cert, not able to get adminDn")
+		return err
+	}
+	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
+	if err != nil {
+		fmt.Println("Error in decoding node cert, not able to get nodeDn")
+		return err
+	}
+	existingNodesDN := strings.TrimSpace(currentCertsInfo.OpensearchCertsByIP[0].NodesDn)
+	if strings.HasSuffix(existingNodesDN, `\n`) {
+		i := strings.LastIndex(existingNodesDN, `\n`)
+		existingNodesDN = existingNodesDN[:i] + strings.Replace(existingNodesDN[i:], `\n`, "", 1)
+	}
+	nodesDn := ""
+	if strings.EqualFold(existingNodesDN, fmt.Sprintf("%v", nodeDn)) {
+		nodesDn = fmt.Sprintf("%v", nodeDn)
+	} else {
+		nodesDn = fmt.Sprintf("%v\n", existingNodesDN) + "  - " + fmt.Sprintf("%v\n", nodeDn)
+	}
+
+	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, &flagsObj, currentCertsInfo)
+	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
+
+	// Creating and patching the required configurations.
+
+	config := fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, adminPublicCertString, strings.TrimSpace(string(adminPrivateCert)), certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
+
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        config,
+		fileName:      fileName,
+		timestamp:     timestamp,
+		remoteService: remoteService,
+		concurrent:    concurrent,
+		infra:         infra,
+		flagsObj:      &flagsObj,
+		skipIpsList:   skipIpsList,
+	}
+
+	err = c.patchConfig(patchFnParam)
+	if err != nil {
+		return err
+	}
+
+	if flagsObj.node != "" && stringutils.SliceContains(skipIpsList, flagsObj.node) {
+		return nil
+	}
+
+	if flagsObj.node != "" {
+
+		err := patchOSNodeDN(&flagsObj, patchFnParam, c, nodesDn)
+		if err != nil {
+			return err
+		}
+
 	}
 	return nil
 }
@@ -1399,15 +1500,7 @@ func (c *certRotateFlow) rotateChefServerNodeCerts(infra *AutomateHAInfraDetails
 		node:            csIp.IP,
 		timeout:         1000,
 	}
-	certs, err := c.getCerts(infra, &flagsObj)
-	if err != nil {
-		return err
-	}
-	err = c.certRotateFrontend(sshUtil, certs, infra, &flagsObj, currentCertsInfo)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.rotateClusterFrontendCertificates(infra, sshUtil, flagsObj, currentCertsInfo, certToml)
 }
 
 func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfraDetails, sshUtil SSHUtil, flagsObj certRotateFlags, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
@@ -1426,8 +1519,8 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 		remoteService = CHEF_SERVER
 	}
 	//get ips to exclude
-	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, &flagsObj, currentCertsInfo)
-	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
+	skipIpsList := []string{}
+
 	nodeDn := pkix.Name{}
 	if len(certToml.OpenSearch.IPS) > 0 {
 		opensearchFlagsObj := certRotateFlags{
@@ -1457,7 +1550,7 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 	}
 
 	// Creating and patching the required configurations.
-	config := fmt.Sprintf(AUTOMATE_HA_CLUSTER_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert, postgreSQLRootCA, opensearchRootCA, nodeDn.CommonName)
+	config := fmt.Sprintf(AUTOMATE_HA_CLUSTER_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert, string(postgreSQLRootCA), string(opensearchRootCA), nodeDn.CommonName)
 	concurrent := true
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
@@ -1470,7 +1563,7 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 		flagsObj:      &flagsObj,
 		skipIpsList:   skipIpsList,
 	}
-	fmt.Println(patchFnParam)
+	//fmt.Println(patchFnParam)
 	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
