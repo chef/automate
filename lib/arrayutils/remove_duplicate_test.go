@@ -32,8 +32,8 @@ func TestRemoveStringDuplicates(t *testing.T) {
 		},
 		{
 			title:         "empty array",
-			inputArray:    []string{"0.0.0.0", "0.0.0.1"},
-			expectedArray: []string{"0.0.0.0", "0.0.0.1"},
+			inputArray:    []string{},
+			expectedArray: []string{},
 			wantErr:       false,
 			expectedErr:   nil,
 		},
