@@ -167,6 +167,7 @@ loop:
 			if err != nil {
 				fq.log.Error("Iteration logs: ", err.Error())
 				fqdnError = err
+				time.Sleep(3 * time.Second)
 				continue
 			}
 			fq.log.Debug("Status Code: ", res.StatusCode)
