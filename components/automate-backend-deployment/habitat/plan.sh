@@ -7,7 +7,7 @@ pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_deps=(
-  core/ruby30
+  core/ruby30/3.0.3/20220312100602
   core/aws-cli
   core/bash
   core/coreutils
@@ -16,14 +16,14 @@ pkg_deps=(
   core/gawk
   core/gzip
   core/jq-static
-  core/openssh
-  core/openssl
+  core/openssh/7.9p1/20220311132702
+  core/openssl/1.0.2zb/20220311111046
   core/make
-  core/curl
-  core/rsync
-  core/terraform/0.14.8/20210826165930
+  core/curl/7.79.1/20220817113628
+  core/rsync/3.2.3/20220817235706
+  schaudha/terraform/1.5.7/20230921122623
   core/busybox-static
-  chef/automate-ha-cluster-ctl
+  jayvikramsharma/automate-ha-cluster-ctl/0.1.0/20230927115358
 )
 
 

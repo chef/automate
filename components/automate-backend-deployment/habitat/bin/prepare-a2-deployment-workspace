@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 echo "A2 deployment workspace will be created in ${PWD}/a2_deploy_workspace.  Please enter your sudo password if prompted"
-sudo rsync -avz  $(hab pkg path chef/automate-ha-deployment)/workspace/ a2_deploy_workspace
+sudo rsync -avz  $(hab pkg path schaudha/automate-ha-deployment)/workspace/ a2_deploy_workspace
 sudo chown -R $(id -u) a2_deploy_workspace
 
 echo "Preparing the airgap bundle"

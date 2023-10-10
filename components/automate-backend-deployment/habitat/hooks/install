@@ -1,9 +1,9 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 hab pkg binlink chef/inspec -f
-hab pkg binlink core/terraform -f
+hab pkg binlink schaudha/terraform/1.5.7/20230921122623 -f
 hab pkg binlink core/jq-static -f
-hab pkg binlink chef/automate-ha-cluster-ctl -f
+hab pkg binlink jayvikramsharma/automate-ha-cluster-ctl/0.1.0/20230927115358 -f
 NEW_WORKSPACE="{{pkg.path}}/workspace"
 
 display_upgrade_help() {
