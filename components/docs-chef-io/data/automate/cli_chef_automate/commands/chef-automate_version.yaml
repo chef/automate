@@ -5,10 +5,27 @@ description: Show the CLI version.
 options:
 - name: a2
   default_value: "false"
-  usage: Get only automate Status
+  usage: Shows the versions of Automate node(HA)[DUPLICATE]
+  compatible_with_options: AutomateHA
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Shows the versions of Automate node(HA)
+  compatible_with_options: AutomateHA
+- name: bastion
+  shorthand: b
+  default_value: "false"
+  usage: Shows the versions of bastion node(HA)
+  compatible_with_options: AutomateHA
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Shows the versions of Chef-server node(HA)
+  compatible_with_options: AutomateHA
 - name: cs
   default_value: "false"
-  usage: Get only chef server Status
+  usage: Shows the versions of Chef-server node(HA)[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: help
   shorthand: h
   default_value: "false"
@@ -17,12 +34,24 @@ options:
   usage: |
     Node Ip address. While using this flag, pass the node type as well. Example : chef-automate version --node 192.0.0.1 --cs
   compatible_with_options: AutomateHA
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: Shows the versions of OpenSearch node
+  compatible_with_options: AutomateHA
 - name: os
   default_value: "false"
-  usage: Get only opensearch Status
+  usage: Shows the versions of OpenSearch node[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: pg
   default_value: "false"
-  usage: Get only postgresql Status
+  usage: Shows the versions of PostgresQL node[DUPLICATE]
+  compatible_with_options: AutomateHA
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: Shows the versions of PostgresQL node
+  compatible_with_options: AutomateHA
 - name: verbose
   shorthand: v
   default_value: "false"
