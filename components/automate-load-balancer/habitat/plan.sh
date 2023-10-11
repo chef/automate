@@ -34,6 +34,7 @@ pkg_deps=(
   chef/mlsa
   core/bash
 )
+
 pkg_build_deps=(
   core/gcc
   core/make

@@ -28,6 +28,7 @@ pkg_exports=(
   [dashboard_username]=opendistro_auth.dashboard_username
   [dashboard_password]=opendistro_auth.dashboard_password
 )
+
 pkg_exposes=(http-port transport-port)
 
 do_before() {
