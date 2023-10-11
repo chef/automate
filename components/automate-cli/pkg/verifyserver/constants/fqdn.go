@@ -3,7 +3,6 @@ package constants
 const (
 	FQDN_TITLE                           = "FQDN is reachable"
 	FQDN_ERROR_MESSAGE                   = "FQDN is not reachable"
-	INVALID_CERTIFICATE_ERROR            = "FQDN is not reachable"
 	FQDN_RESOLUTION_MESSAGE              = "Ensure FQDN is reachable and mapped to load balancer. Also, ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 	CERT_CN_MISMATCH_RESOLUTION_MESSAGE  = "Ensure the certificate provided is Valid. In case of self-signed certificate, make sure the DNS provided in \"subjectAltName\" matches with \"CN\" (Common Name)"
 	CERT_CN_MISMATCH_ERROR_PATTERN       = "x509: certificate is not valid for any names, but wanted to match"
