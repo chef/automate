@@ -92,10 +92,10 @@ require (
 	go.uber.org/multierr v1.5.0
 	go.uber.org/zap v1.15.0
 	gocloud.dev v0.19.0
-	golang.org/x/crypto v0.7.0
+	golang.org/x/crypto v0.14.0
 	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
-	golang.org/x/text v0.8.0
+	golang.org/x/text v0.13.0
 	google.golang.org/api v0.30.0
 	google.golang.org/genproto v0.0.0-20200901141002-b3bf27a9dbd1
 	google.golang.org/grpc v1.36.0
@@ -236,9 +236,9 @@ require (
 	golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/term v0.6.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
