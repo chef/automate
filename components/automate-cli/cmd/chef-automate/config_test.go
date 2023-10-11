@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -101,6 +103,20 @@ func TestTomlFileCreateFromReqConfigLog(t *testing.T) {
 	createTomlFileFromConfig(req, fileName)
 	assert.FileExists(t, fileName)
 	os.Remove(fileName)
+}
+
+func TestCheckIfRequestedIsCentrailisedLogging(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/centralised_log.toml"}
+	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
+	fmt.Println("err : ", err)
+	assert.True(t, val)
+}
+
+func TestCheckIfRequestedIsCentrailisedLoggingwitherror(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/centralised_log.toml"}
+	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
+	fmt.Println("err : ", err)
+	assert.True(t, val)
 }
 
 func TestErrorOnSelfManaged(t *testing.T) {
@@ -246,6 +262,32 @@ func TestSetConfigForFrontEndNodes(t *testing.T) {
 			assert.NoError(t, err)
 		}
 	}
+}
+
+func TestPatchConfigCommand(t *testing.T) {
+	var infra *AutomateHAInfraDetails
+	tests := []struct {
+		testName string
+		//cmd      *cobra.Command
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"aws mode of deployment",
+			[]string{"some_args"}, 
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			if err := runInitConfigHACmd(&cobra.Command{}, tt.args); (err != nil) != tt.wantErr {
+				t.Errorf("runInitConfigHACmd() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+	configCmdFlags.postgresql = true
+	err := runPatchCommand(nil, nil)
+	assert.Equal(t, err.Error(), "Config file should be passed with ha-deployment-config flag")
 }
 
 func getMockSSHUtil(sshConfig *SSHConfig, CFTRError error, CSECOROutput string, CSECORError error) *MockSSHUtilsImpl {
