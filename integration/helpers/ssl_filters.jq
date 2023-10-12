@@ -40,8 +40,10 @@ map(select(
          (.id != "HSTS" or .port != "10161") and
          (.id != "HSTS" or .port != "10143") and
          (.id != "HSTS" or .port != "10200") and
+         (.id != "HSTS" or .port != "10201") and
          (.id != "security_headers" or .port != "10161") and
          (.id != "security_headers" or .port != "10200") and
+         (.id != "security_headers" or .port != "10201") and
          (.id != "security_headers" or .port != "10104") and
 
          # automate-cs erlang-services
