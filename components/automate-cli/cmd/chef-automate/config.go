@@ -469,36 +469,16 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-
-		sshconfig := &SSHConfig{}
-		sshconfig.sshUser = infra.Outputs.SSHUser.Value
-		sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
-		sshconfig.sshPort = infra.Outputs.SSHPort.Value
-		sshUtil := NewSSHUtil(sshconfig)
-
 		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isLoggerConfig {
-			err := patchCentralisedLoggingForPostgresql(args, sshUtil, infra)
+			modifiedConfig, err := patchAndRemoveCentralisedLoggingForBackend(args, infra)
 			if err != nil {
 				return err
 			}
-			inputfile, err := RemoveLogConfig(args[0])
+			checkIfConfigHasMultipleConfigs, err := checkUserConfigHasOnlyCentrailisedLogConfig(modifiedConfig)
 			if err != nil {
 				return err
 			}
-			args[0] = inputfile
-			file, err := os.Open(args[0])
-			if err != nil {
-				return err
-			}
-			defer file.Close()
-			buf := new(bytes.Buffer)
-			_, err = buf.ReadFrom(file)
-			if err != nil {
-				return err
-			}
-
-			content := buf.String()
-			if content == "" {
+			if checkIfConfigHasMultipleConfigs {
 				return nil
 			}
 		}
@@ -589,7 +569,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			Opensearch: opensearch,
 			Infra:      infra,
 		}
-		//sshUtil := NewSSHUtil(&SSHConfig{})
+		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
@@ -632,6 +612,51 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func patchAndRemoveCentralisedLoggingForBackend(args []string, infra *AutomateHAInfraDetails) (string, error) {
+
+	sshconfig := &SSHConfig{}
+	sshconfig.sshUser = infra.Outputs.SSHUser.Value
+	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+	sshconfig.sshPort = infra.Outputs.SSHPort.Value
+	sshUtil := NewSSHUtil(sshconfig)
+
+	err := patchCentralisedLoggingForBackend(args, sshUtil, infra)
+	if err != nil {
+		return "", err
+	}
+	inputfile, err := RemoveCentralisedLogsFromUserConfig(args[0])
+	if err != nil {
+		return "", err
+	}
+	return inputfile, nil
+
+}
+
+func checkUserConfigHasOnlyCentrailisedLogConfig(inputfile string) (bool, error) {
+	//args[0] = inputfile
+	fmt.Println("inputfile string * : ", inputfile)
+	fmt.Println("opening file")
+	file, err := os.Open(inputfile)
+	fmt.Println("opened")
+	if err != nil {
+		return false, err
+	}
+	fmt.Println("closing the file")
+	defer file.Close()
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(file)
+	if err != nil {
+		return false, err
+	}
+
+	content := buf.String()
+	fmt.Println("content : ", content)
+	if content == "" {
+		return true, nil
+	}
+	return false, nil
+}
+
 // prePatchCheckForFrontendNodes patches the configuration for front end nodes in Automate HA
 func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := parseAndRemoveRestrictedKeysFromSrcFile(inputs.Args[0])
@@ -644,17 +669,20 @@ func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Au
 	return nil
 }
 
-func patchCentralisedLoggingForPostgresql(args []string, sshUtil SSHUtil, infra *AutomateHAInfraDetails) error {
+func patchCentralisedLoggingForBackend(args []string, sshUtil SSHUtil, infra *AutomateHAInfraDetails) error {
 	var remoteService string
+	var remoteIps []string
 	if configCmdFlags.postgresql {
 		remoteService = "postgresql"
+		remoteIps = infra.Outputs.PostgresqlPrivateIps.Value
 	}
 	if configCmdFlags.opensearch {
 		remoteService = "opensearch"
+		remoteIps = infra.Outputs.OpensearchPrivateIps.Value
 	}
 	// checking for log configuration
 	fmt.Println("calling enableCentralizedLogConfigForHA...")
-	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value)
+	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, remoteIps)
 	if err != nil {
 		return err
 	}
@@ -1299,13 +1327,15 @@ func checkIfRequestedConfigHasCentrailisedLogging(args []string) (bool, error) {
 		writer.Println(err.Error())
 		return false, err
 	}
-	isconfig := config.Get("global.v1.log").(*ptoml.Tree)
-	fmt.Println("is config val ", isconfig)
-	if isconfig != nil {
-		val := isconfig.Get("redirect_sys_log").(bool)
-		fmt.Println("final value ", val)
-		if val == true {
-			return true, nil
+	if config.Get("global.v1.log") != nil {
+		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+		fmt.Println("is config val ", isconfig)
+		if isconfig != nil {
+			val := isconfig.Get("redirect_sys_log").(bool)
+			fmt.Println("final value ", val)
+			if val == true {
+				return true, nil
+			}
 		}
 	}
 	return false, nil
@@ -1391,43 +1421,26 @@ func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	}
 }
 
-func RemoveLogConfig(srcString string) (string, error) {
+func RemoveCentralisedLogsFromUserConfig(srcString string) (string, error) {
 	tomlbyt, _ := os.ReadFile(srcString)
 	destString := string(tomlbyt)
+	var dest interface{}
 	if configCmdFlags.postgresql {
-		var dest PostgresqlConfig
-		if _, err := toml.Decode(destString, &dest); err != nil {
-			fmt.Println(err)
-		}
-		if dest.Global != nil && dest.Global.V1 != nil && dest.Global.V1.Log != nil {
-			dest.Global.V1.Log = nil
-			dest.Global.V1 = nil
-			dest.Global = nil
-		}
-		srcString, err := createTomlFileFromConfig(dest, srcString)
-		if err != nil {
-			return "", err
-		}
-		return srcString, nil
+		dest = PostgresqlConfig{}
 	}
 	if configCmdFlags.opensearch {
-		var dest OpensearchConfig
-		if _, err := toml.Decode(destString, &dest); err != nil {
-			fmt.Println(err)
-		}
-		if dest.Global != nil && dest.Global.V1 != nil && dest.Global.V1.Log != nil {
-			dest.Global.V1.Log = nil
-			dest.Global.V1 = nil
-			dest.Global = nil
-		}
-		srcString, err := createTomlFileFromConfig(dest, srcString)
-		if err != nil {
-			return "", err
-		}
-		return srcString, nil
+		dest = OpensearchConfig{}
 	}
-	return "", nil
-
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		fmt.Println(err)
+	}
+	timestamp := time.Now().Format("20060102150405")
+	tomlFile := srcString + timestamp
+	newSrcString, err := createTomlFileFromConfig(dest, tomlFile)
+	if err != nil {
+		return "", err
+	}
+	return newSrcString, nil
 }
 
 // If the output contains the word "error" then return error

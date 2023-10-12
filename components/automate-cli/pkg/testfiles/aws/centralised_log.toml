@@ -1,0 +1,6 @@
+[global.v1.log]
+      compress_rotated_logs = true
+      max_number_rotated_logs = 10
+      max_size_rotate_logs = "10M"
+      redirect_log_file_path = "/var/tmp/"
+      redirect_sys_log = true

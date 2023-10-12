@@ -1,28 +1,6 @@
 package main
 
-import (
-	"google.golang.org/protobuf/runtime/protoimpl"
-	"google.golang.org/protobuf/types/known/wrapperspb"
-)
-
 type OpensearchConfig struct {
-	Global *struct {
-		V1 *struct {
-			Log *struct {
-				state         protoimpl.MessageState
-				sizeCache     protoimpl.SizeCache
-				unknownFields protoimpl.UnknownFields
-
-				Level                *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty" toml:"level,omitempty" mapstructure:"level,omitempty"`
-				Format               *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty" toml:"format,omitempty" mapstructure:"format,omitempty"`
-				RedirectSysLog       *wrapperspb.BoolValue   `protobuf:"bytes,3,opt,name=redirect_sys_log,json=redirectSysLog,proto3" json:"redirect_sys_log,omitempty" toml:"redirect_sys_log,omitempty" mapstructure:"redirect_sys_log,omitempty"`
-				RedirectLogFilePath  *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=redirect_log_file_path,json=redirectLogFilePath,proto3" json:"redirect_log_file_path,omitempty" toml:"redirect_log_file_path,omitempty" mapstructure:"redirect_log_file_path,omitempty"`
-				CompressRotatedLogs  *wrapperspb.BoolValue   `protobuf:"bytes,5,opt,name=compress_rotated_logs,json=compressRotatedLogs,proto3" json:"compress_rotated_logs,omitempty" toml:"compress_rotated_logs,omitempty" mapstructure:"compress_rotated_logs,omitempty"`
-				MaxSizeRotateLogs    *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=max_size_rotate_logs,json=maxSizeRotateLogs,proto3" json:"max_size_rotate_logs,omitempty" toml:"max_size_rotate_logs,omitempty" mapstructure:"max_size_rotate_logs,omitempty"`
-				MaxNumberRotatedLogs *wrapperspb.Int32Value  `protobuf:"bytes,7,opt,name=max_number_rotated_logs,json=maxNumberRotatedLogs,proto3" json:"max_number_rotated_logs,omitempty" toml:"max_number_rotated_logs,omitempty" mapstructure:"max_number_rotated_logs,omitempty"`
-			}
-		}
-	}
 	Action *struct {
 		DestructiveRequiresName string `protobuf:"bytes,,opt,name=destructive_requires_name,proto3" toml:"destructive_requires_name,omitempty" json:"destructive_requires_name,omitempty" mapstructure:"destructive_requires_name,omitempty"`
 	} `protobuf:"bytes,,opt,name=action,proto3" toml:"action,omitempty" json:"action,omitempty" mapstructure:"action,omitempty"`
@@ -176,23 +154,6 @@ type TLS struct {
 }
 
 type PostgresqlConfig struct {
-	Global *struct {
-		V1 *struct {
-			Log *struct {
-				state         protoimpl.MessageState
-				sizeCache     protoimpl.SizeCache
-				unknownFields protoimpl.UnknownFields
-
-				Level                *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty" toml:"level,omitempty" mapstructure:"level,omitempty"`
-				Format               *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty" toml:"format,omitempty" mapstructure:"format,omitempty"`
-				RedirectSysLog       *wrapperspb.BoolValue   `protobuf:"bytes,3,opt,name=redirect_sys_log,json=redirectSysLog,proto3" json:"redirect_sys_log,omitempty" toml:"redirect_sys_log,omitempty" mapstructure:"redirect_sys_log,omitempty"`
-				RedirectLogFilePath  *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=redirect_log_file_path,json=redirectLogFilePath,proto3" json:"redirect_log_file_path,omitempty" toml:"redirect_log_file_path,omitempty" mapstructure:"redirect_log_file_path,omitempty"`
-				CompressRotatedLogs  *wrapperspb.BoolValue   `protobuf:"bytes,5,opt,name=compress_rotated_logs,json=compressRotatedLogs,proto3" json:"compress_rotated_logs,omitempty" toml:"compress_rotated_logs,omitempty" mapstructure:"compress_rotated_logs,omitempty"`
-				MaxSizeRotateLogs    *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=max_size_rotate_logs,json=maxSizeRotateLogs,proto3" json:"max_size_rotate_logs,omitempty" toml:"max_size_rotate_logs,omitempty" mapstructure:"max_size_rotate_logs,omitempty"`
-				MaxNumberRotatedLogs *wrapperspb.Int32Value  `protobuf:"bytes,7,opt,name=max_number_rotated_logs,json=maxNumberRotatedLogs,proto3" json:"max_number_rotated_logs,omitempty" toml:"max_number_rotated_logs,omitempty" mapstructure:"max_number_rotated_logs,omitempty"`
-			}
-		}
-	}
 	CheckpointCompletionTarget float64 `protobuf:"bytes,,opt,name=checkpoint_completion_target,proto3" toml:"checkpoint_completion_target,omitzero" json:"checkpoint_completion_target,omitzero" mapstructure:"checkpoint_completion_target,omitzero"`
 	CheckpointTimeout          string  `protobuf:"bytes,,opt,name=checkpoint_timeout,proto3" toml:"checkpoint_timeout,omitempty" json:"checkpoint_timeout,omitempty" mapstructure:"checkpoint_timeout,omitempty"`
 	Host                       string  `protobuf:"bytes,,opt,name=host,proto3" toml:"host,omitempty" json:"host,omitempty" mapstructure:"host,omitempty"`

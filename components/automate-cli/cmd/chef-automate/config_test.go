@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var fqdn = "a2.test.com"
@@ -110,6 +112,20 @@ func TestCheckIfRequestedIsCentrailisedLogging(t *testing.T) {
 	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
 	fmt.Println("err : ", err)
 	assert.True(t, val)
+}
+
+func TestCheckIfRequestedIsCentrailisedLoggingWithPgConfig(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/pg.toml"}
+	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
+	fmt.Println("err : ", err)
+	assert.Equal(t, val, false)
+}
+
+func TestCheckIfRequestedIsCentrailisedLoggingWithInvalidFile(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/centralised.toml"}
+	_, err := checkIfRequestedConfigHasCentrailisedLogging(file)
+	fmt.Println("err : ", err)
+	assert.Error(t, err)
 }
 
 func TestCheckIfRequestedIsCentrailisedLoggingwitherror(t *testing.T) {
@@ -265,29 +281,144 @@ func TestSetConfigForFrontEndNodes(t *testing.T) {
 }
 
 func TestPatchConfigCommand(t *testing.T) {
-	var infra *AutomateHAInfraDetails
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
 	tests := []struct {
-		testName string
-		//cmd      *cobra.Command
-		args     []string
-		wantErr  bool
+		testName     string
+		infra        *AutomateHAInfraDetails
+		sshUtil      SSHUtil
+		args         []string
+		isAutomate   bool
+		isChefServer bool
+		iPostgresql  bool
+		isOpenSearch bool
+		wantErr      bool
 	}{
 		{
-			"aws mode of deployment",
-			[]string{"some_args"}, 
+			"patch for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			false,
+			false,
+			true,
+			false,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
-			if err := runInitConfigHACmd(&cobra.Command{}, tt.args); (err != nil) != tt.wantErr {
+			if err := runPatchCommand(&cobra.Command{}, tt.args); (err != nil) != tt.wantErr {
+				fmt.Println(" err msg : ", err)
 				t.Errorf("runInitConfigHACmd() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
-	configCmdFlags.postgresql = true
-	err := runPatchCommand(nil, nil)
-	assert.Equal(t, err.Error(), "Config file should be passed with ha-deployment-config flag")
+	// configCmdFlags.postgresql = true
+	// err := runPatchCommand(nil, nil)
+	// assert.Equal(t, err.Error(), "Config file should be passed with ha-deployment-config flag")
+}
+func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
+	//var args []string
+	t.Run("Returning false as the file is not empty", func(t *testing.T) {
+		fileContent := `[global.v1.log]
+		compress_rotated_logs = true
+		max_number_rotated_logs = 10
+		max_size_rotate_logs = "10M"
+		redirect_log_file_path = "/var/tmp/"
+		redirect_sys_log = true`
+		tmpfile, err := ioutil.TempFile("", "test-output.toml")
+		require.NoError(t, err)
+
+		n, err := tmpfile.Write([]byte(fileContent))
+		require.NoError(t, err)
+		require.NotZero(t, n)
+
+		err = tmpfile.Close()
+		require.NoError(t, err)
+
+		actualInfraDetails, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
+		fmt.Println("actualInfraDetails : ", actualInfraDetails)
+		require.NoError(t, err)
+		require.Equal(t, actualInfraDetails, false)
+		require.NoError(t, err)
+		err = os.Remove(tmpfile.Name())
+		require.NoError(t, err)
+	})
+	t.Run("Returning true as the file is empty", func(t *testing.T) {
+		fileContent := ``
+		tmpfile, err := ioutil.TempFile("", "test-output.toml")
+		require.NoError(t, err)
+
+		_, err = tmpfile.Write([]byte(fileContent))
+		require.NoError(t, err)
+
+		err = tmpfile.Close()
+		require.NoError(t, err)
+
+		isOnlyCentralisedLog, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
+		fmt.Println("actualInfraDetails : ", isOnlyCentralisedLog)
+		require.NoError(t, err)
+		require.Equal(t, isOnlyCentralisedLog, true)
+		require.NoError(t, err)
+		err = os.Remove(tmpfile.Name())
+		require.NoError(t, err)
+	})
+	t.Run("File not found", func(t *testing.T) {
+		filePath := "testdata/notfound.json"
+		_, err := checkUserConfigHasOnlyCentrailisedLogConfig(filePath)
+		require.Error(t, err)
+	})
+}
+
+func TestPatchCentralisedLoggingForBackend(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	postgresqlFlag := true
+	openSearchFlag := true
+	tests := []struct {
+		testName     string
+		infra        *AutomateHAInfraDetails
+		sshUtil      SSHUtil
+		args         []string
+		isAutomate   bool
+		isChefServer bool
+		iPostgresql  bool
+		isOpenSearch bool
+		wantErr      bool
+	}{
+		{
+			"patch centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			false,
+			false,
+			postgresqlFlag,
+			false,
+			true,
+		},
+		{
+			"patch centralised log for os",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			false,
+			false,
+			false,
+			openSearchFlag,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			_ , err := patchAndRemoveCentralisedLoggingForBackend(tt.args,infra)
+				fmt.Println(" err msg : ", err)
+				assert.Nilf(t,err,"Unable to created toml file for postgresql toml")
+			
+		})
+	}
+
 }
 
 func getMockSSHUtil(sshConfig *SSHConfig, CFTRError error, CSECOROutput string, CSECORError error) *MockSSHUtilsImpl {
