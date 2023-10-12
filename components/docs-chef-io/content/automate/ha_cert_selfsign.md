@@ -51,7 +51,7 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
     echo extendedKeyUsage = clientAuth, serverAuth > client_cert_ext.cnf
     echo subjectAltName = DNS:chefclient >> client_cert_ext.cnf
         openssl genrsa -out root-ca-key.pem 2048
-        openssl req -new -x509 -sha256 -key root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=progress" -out root-ca.pem -days 1095
+        openssl req -new -x509 -sha256 -key root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=progress" -out root-ca.pem -days 1095 -addext basicConstraints=CA:TRUE
 
         # Admin cert
         openssl genrsa -out admin-key-temp.pem 2048
@@ -79,6 +79,12 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
     ```
 
 1. The script generates the certificates at the newly created directory, `rotate-certs` in this case.
+
+{{< note >}}
+
+To create self-signed certificate for FQDN make sure to provide proper DNS and CN value. The DNS in Subject Alternative Name should match with the CN (Comman Name) 
+
+{{< /note >}}
 
 {{< note >}}
 
