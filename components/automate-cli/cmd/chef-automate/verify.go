@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/arrayutils"
 	"github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
@@ -484,8 +485,11 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 			return nil, err
 		}
 
+		// Remove duplicates
+		hostIpWihtoutDuplicates := arrayutils.RemoveStringDuplicates(hostIPs)
+
 		// Starting automate-verify service on remote nodes
-		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
+		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIpWihtoutDuplicates)
 		if err != nil {
 			return nil, err
 		}
