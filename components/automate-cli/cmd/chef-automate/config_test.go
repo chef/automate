@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -109,29 +108,25 @@ func TestTomlFileCreateFromReqConfigLog(t *testing.T) {
 
 func TestCheckIfRequestedIsCentrailisedLogging(t *testing.T) {
 	file := []string{"../../pkg/testfiles/aws/centralised_log.toml"}
-	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
-	fmt.Println("err : ", err)
+	val, _ := checkIfRequestedConfigHasCentrailisedLogging(file)
 	assert.True(t, val)
 }
 
 func TestCheckIfRequestedIsCentrailisedLoggingWithPgConfig(t *testing.T) {
 	file := []string{"../../pkg/testfiles/aws/pg.toml"}
-	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
-	fmt.Println("err : ", err)
+	val, _ := checkIfRequestedConfigHasCentrailisedLogging(file)
 	assert.Equal(t, val, false)
 }
 
 func TestCheckIfRequestedIsCentrailisedLoggingWithInvalidFile(t *testing.T) {
 	file := []string{"../../pkg/testfiles/aws/centralised.toml"}
 	_, err := checkIfRequestedConfigHasCentrailisedLogging(file)
-	fmt.Println("err : ", err)
 	assert.Error(t, err)
 }
 
 func TestCheckIfRequestedIsCentrailisedLoggingwitherror(t *testing.T) {
 	file := []string{"../../pkg/testfiles/aws/centralised_log.toml"}
-	val, err := checkIfRequestedConfigHasCentrailisedLogging(file)
-	fmt.Println("err : ", err)
+	val, _ := checkIfRequestedConfigHasCentrailisedLogging(file)
 	assert.True(t, val)
 }
 
@@ -309,17 +304,12 @@ func TestPatchConfigCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
 			if err := runPatchCommand(&cobra.Command{}, tt.args); (err != nil) != tt.wantErr {
-				fmt.Println(" err msg : ", err)
-				t.Errorf("runInitConfigHACmd() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
-	// configCmdFlags.postgresql = true
-	// err := runPatchCommand(nil, nil)
-	// assert.Equal(t, err.Error(), "Config file should be passed with ha-deployment-config flag")
 }
 func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
-	//var args []string
 	t.Run("Returning false as the file is not empty", func(t *testing.T) {
 		fileContent := `[global.v1.log]
 		compress_rotated_logs = true
@@ -337,10 +327,9 @@ func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
 		err = tmpfile.Close()
 		require.NoError(t, err)
 
-		actualInfraDetails, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
-		fmt.Println("actualInfraDetails : ", actualInfraDetails)
+		isOnlyCentralisedLog, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
 		require.NoError(t, err)
-		require.Equal(t, actualInfraDetails, false)
+		require.Equal(t, isOnlyCentralisedLog, false)
 		require.NoError(t, err)
 		err = os.Remove(tmpfile.Name())
 		require.NoError(t, err)
@@ -357,7 +346,6 @@ func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
 		require.NoError(t, err)
 
 		isOnlyCentralisedLog, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
-		fmt.Println("actualInfraDetails : ", isOnlyCentralisedLog)
 		require.NoError(t, err)
 		require.Equal(t, isOnlyCentralisedLog, true)
 		require.NoError(t, err)
@@ -371,53 +359,191 @@ func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
 	})
 }
 
-func TestPatchCentralisedLoggingForBackend(t *testing.T) {
+func TestPatchAndRemoveCentralisedLoggingForBackendForPg(t *testing.T) {
 	infra := getMockInfra()
 	file := "../../pkg/testfiles/aws/centralised_log.toml"
-	postgresqlFlag := true
-	openSearchFlag := true
 	tests := []struct {
-		testName     string
-		infra        *AutomateHAInfraDetails
-		sshUtil      SSHUtil
-		args         []string
-		isAutomate   bool
-		isChefServer bool
-		iPostgresql  bool
-		isOpenSearch bool
-		wantErr      bool
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
 	}{
 		{
-			"patch centralised log for pg",
+			"patch and remove centralised log for pg",
 			infra,
 			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
 			[]string{file},
-			false,
-			false,
-			postgresqlFlag,
-			false,
-			true,
-		},
-		{
-			"patch centralised log for os",
-			infra,
-			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-			[]string{file},
-			false,
-			false,
-			false,
-			openSearchFlag,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
-			_ , err := patchAndRemoveCentralisedLoggingForBackend(tt.args,infra)
-				fmt.Println(" err msg : ", err)
-				assert.Nilf(t,err,"Unable to created toml file for postgresql toml")
-			
+			fileName, err := patchAndRemoveCentralisedLoggingForBackend(tt.args, infra)
+			os.Remove(fileName)
+			assert.Nilf(t, err, "Unable to created toml file for postgresql toml")
+
 		})
 	}
+
+}
+
+func TestPatchAndRemoveCentralisedLoggingForBackendWithError(t *testing.T) {
+	infra := getMockInfra()
+	file := ""
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Error while patching and remove centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			fileName, err := patchAndRemoveCentralisedLoggingForBackend(tt.args, infra)
+			os.Remove(fileName)
+			assert.Error(t, err)
+
+		})
+	}
+
+}
+
+func TestPatchCentralisedLoggingForBackendForPg(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Patch centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			configCmdFlags.postgresql = true
+			err := patchCentralisedLoggingForBackend(tt.args, tt.sshUtil, infra)
+			assert.Nilf(t, err, "Unable to created toml file for postgresql toml")
+
+		})
+	}
+
+}
+
+func TestPatchCentralisedLoggingForBackendForPgWithError(t *testing.T) {
+	infra := getMockInfra()
+	file := ""
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Error while patching centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			configCmdFlags.postgresql = true
+			err := patchCentralisedLoggingForBackend(tt.args, tt.sshUtil, infra)
+			assert.Error(t, err)
+
+		})
+	}
+
+}
+
+func TestPatchCentralisedLoggingForBackendForOs(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Patch centralised log for os",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			configCmdFlags.opensearch = true
+			err := patchCentralisedLoggingForBackend(tt.args, tt.sshUtil, infra)
+			assert.Nilf(t, err, "Unable to created toml file for postgresql toml")
+
+		})
+	}
+
+}
+
+func TestRemoveCentralisedLogsFromUserConfigForPg(t *testing.T) {
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
+	t.Run("Remove log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForPg(file)
+			os.Remove(file)
+			assert.NoError(t, err)
+
+		},
+	)
+	t.Run("Error while removing log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForPg(emptyFile)
+			os.Remove(file)
+			assert.Error(t, err)
+
+		},
+	)
+}
+
+func TestRemoveCentralisedLogsFromUserConfigForOs(t *testing.T) {
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
+	t.Run("Remove log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForOs(file)
+			os.Remove(file)
+			assert.NoError(t, err)
+
+		},
+	)
+	t.Run("Error while removing log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForOs(emptyFile)
+			os.Remove(file)
+			assert.Error(t, err)
+
+		},
+	)
 
 }
 
