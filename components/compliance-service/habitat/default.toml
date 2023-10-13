@@ -13,6 +13,7 @@ enable_large_reporting = false
 lcr_open_search_requests = 50
 enable_enhanced_compliance_reporting = false
 control_data_populators_count = 1
+firejail_profile_path="secureporofile.profile"
 
 [storage]
 database = "chef_compliance_service"

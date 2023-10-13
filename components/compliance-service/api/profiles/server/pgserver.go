@@ -29,11 +29,12 @@ import (
 
 // PGProfileServer implements the profile store GRPC interface
 type PGProfileServer struct {
-	es           *relaxting.ES2Backend
-	esClient     *ingestic.ESClient
-	profiles     *config.Profiles
-	store        *dbstore.Store
-	eventsClient automate_event.EventServiceClient
+	es                  *relaxting.ES2Backend
+	esClient            *ingestic.ESClient
+	profiles            *config.Profiles
+	store               *dbstore.Store
+	eventsClient        automate_event.EventServiceClient
+	firejailProfilePath string
 }
 
 func (srv *PGProfileServer) convertProfileToTgz(reader io.ReadCloser, contentType string) (string, error) {
@@ -69,7 +70,7 @@ func (srv *PGProfileServer) convertProfileToTgz(reader io.ReadCloser, contentTyp
 			return "", err
 		}
 
-		err = util.ConvertZipToTarGz(tmpZipUpload, tmpWithSuffix)
+		err = util.ConvertZipToTarGz(tmpZipUpload, tmpWithSuffix, srv.firejailProfilePath)
 		if err != nil {
 			return "", err
 		}
@@ -80,7 +81,7 @@ func (srv *PGProfileServer) convertProfileToTgz(reader io.ReadCloser, contentTyp
 func (srv *PGProfileServer) storeProfile(owner string, cacheFile string) (inspec.CheckResult, error) {
 	var inspecCheckResult inspec.CheckResult
 	// Run InSpec check
-	inspecCheckResult, err := market.CheckProfile(cacheFile)
+	inspecCheckResult, err := market.CheckProfile(cacheFile, srv.firejailProfilePath)
 	if err != nil {
 		logrus.Errorf("Create CheckProfile error: %s", err.Error())
 		inspecCheckResult.Summary.Valid = false
@@ -88,7 +89,7 @@ func (srv *PGProfileServer) storeProfile(owner string, cacheFile string) (inspec
 		return inspecCheckResult, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	sha256, tar, info, err := srv.store.GetProfileInfo(cacheFile)
+	sha256, tar, info, err := srv.store.GetProfileInfo(cacheFile, srv.firejailProfilePath)
 	if err != nil {
 		logrus.Errorf("Create GetProfileInfo error: %s", err.Error())
 		inspecCheckResult.Summary.Valid = false

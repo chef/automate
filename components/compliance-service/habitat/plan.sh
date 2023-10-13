@@ -30,6 +30,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
+
 inspec_release="chef/inspec/4.56.22/20220517052126"
 pkg_deps=(
   core/coreutils
@@ -63,14 +64,16 @@ scaffolding_go_binary_list=(
 
 do_prepare() {
   do_default_prepare
-
+   
   GO_LDFLAGS="${GO_LDFLAGS} -X main.EXECUTABLE_PATH=$(pkg_path_for chef/inspec)/bin/inspec"
-export GO_LDFLAGS
+ export GO_LDFLAGS
   
 }
 
 do_install() {
   do_default_install
+
+  echo $HOME
 
   inspec_sem_version=$(awk -F  '/' '{print $3}' <<< ${inspec_release})
   build_line "Setting InSpec version ${inspec_sem_version}"
@@ -83,6 +86,14 @@ do_install() {
   build_line "Setting perms on inspec_runner"
   chown root: "${pkg_prefix}/bin/inspec_runner"
   chmod u+s "${pkg_prefix}/bin/inspec_runner"
+
+
+  mkdir -p "${pkg_prefix}/data/firejail"
+
+  cp -r firejail/* "${pkg_prefix}/data/firejail"
+
+
+
 }
 
 do_strip() {

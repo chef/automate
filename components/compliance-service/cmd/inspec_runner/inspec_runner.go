@@ -12,12 +12,15 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/cmd/inspec_runner/platform"
 	"github.com/chef/automate/lib/user"
+	"github.com/sirupsen/logrus"
 )
 
 // Set at build time via linker flags.
 var EXECUTABLE_PATH string
 
 func main() {
+
+	logrus.Println("Inside the main method ----- main()")
 	if len(EXECUTABLE_PATH) == 0 {
 		log.Fatal("No value present for executable path.")
 	}
@@ -30,6 +33,8 @@ func main() {
 	cmd := path.Base(EXECUTABLE_PATH)
 
 	args := append([]string{cmd}, os.Args[1:]...)
+
+	logrus.Println("Inside the args method ----- main()")
 
 	if err := syscall.Exec(EXECUTABLE_PATH, args, os.Environ()); err != nil {
 		log.Fatal(fmt.Errorf("inspec_runner unable to complete with executable path: %s, args: %v, env: %s - error %w", EXECUTABLE_PATH, args, os.Environ(), err))

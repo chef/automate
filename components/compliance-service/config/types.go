@@ -19,6 +19,7 @@ type Service struct {
 	LcrOpenSearchRequests   int
 	EnableEnhancedReporting bool
 	ControlsPopulatorsCount int
+	FirejailProfilePath     string
 }
 
 // Compliance service specific config options

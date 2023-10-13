@@ -25,6 +25,8 @@ pg-helper migrate-tables-v2 delivery "$DBNAME" \
   agents node_managers results profiles tags jobs jobs_nodes jobs_profiles \
   jobs_tags nodes nodes_agents nodes_secrets nodes_tags
 
+
+
 pg-helper ensure-service-database "$DBNAME"
 
 pg-helper create-extension "$DBNAME" pgcrypto
@@ -32,6 +34,9 @@ pg-helper create-extension "$DBNAME" pgcrypto
 pg-helper fix-permissions "$DBNAME"
 
 mkdir -p "{{pkg.svc_data_path}}/profiles"
+
+mkdir -p "{{pkg.svc_data_path}}/firejail"
+
 
 # cleanup old migration files
 rm -rf "{{pkg.svc_static_path}}/migrations" {{pkg.svc_static_path}}/*.sql
@@ -57,6 +62,7 @@ CONFIG="$CONFIG --enable-large-reporting={{cfg.service.enable_large_reporting}}"
 CONFIG="$CONFIG --lcr-open-search-requests {{cfg.service.lcr_open_search_requests}}"
 CONFIG="$CONFIG --enable-enhanced-reporting={{cfg.service.enable_enhanced_compliance_reporting}}"
 CONFIG="$CONFIG --control-populators-count {{cfg.service.control_data_populators_count}}"
+CONFIG="$CONFIG --firejail-profile-path {{pkg.path}}/data/firejail/{{cfg.service.firejail_profile_path}}"
 
 # Interval in minutes to poll for node status.
 CONFIG="$CONFIG --manager-awsec2-poll {{cfg.nodemanager.awsec2_polling_interval}}"
@@ -167,7 +173,10 @@ export HOME="{{pkg.svc_data_path}}"
 
 CONFIG="$CONFIG --inspec-tmp-dir {{pkg.svc_var_path}}/tmp"
 
+
 export FIREJAIL="{{pkgPathFor "core/firejail"}}/bin/firejail"
+
+
 # Start our service
 # shellcheck disable=SC2086
 exec compliance-service run ${CONFIG} ${ES_BACKEND} ${PG_BACKEND}

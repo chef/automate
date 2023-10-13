@@ -8,9 +8,11 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
@@ -32,6 +34,8 @@ const defaultTimeout = 2 * time.Minute
 
 const binName = "inspec"
 const shimBinName = "inspec_runner"
+const startInspec = "===start inspec==="
+const endInspec = "===end inspec==="
 
 // Set to `true` to emit inspec configuration and environment
 // variables via debug logs. Leave to false for release.
@@ -208,11 +212,12 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
 		cmd.Stdin = bytes.NewBuffer(jsonConf)
 		if logSensitiveData {
-			logrus.Debugf("Using inspec configuration: %s", string(jsonConf))
+			logrus.Infof("Using inspec configuration: %s", string(jsonConf))
 		}
 	}
 
 	cmd.Env = []string{"PATH=" + os.Getenv("PATH")}
+
 	if TmpDir != "" {
 		if _, ok := env["TMPDIR"]; !ok {
 			cmd.Env = append(cmd.Env, "TMPDIR="+TmpDir)
@@ -235,35 +240,33 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 		logCtx = logCtx.WithField("env", cmd.Env)
 	}
 
-	logCtx.Debug("Running Inspec")
+	logCtx.Info("Running Inspec")
 	err := cmd.Run()
 	return stdout.Bytes(), stderr.Bytes(), err
 }
 
-func Check(profilePath string) (CheckResult, error) {
+func Check(profilePath string, firejailprofilePath string) (CheckResult, error) {
 	var res CheckResult
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+	tmpDirFile, args, err := getFirejailArgsaAndOutputFile(false, firejailprofilePath, profilePath, tmpDirPath)
+	if err != nil {
+		return res, err
+	}
 
-	firjailBin := os.Getenv("FIREJAIL")
-	firjailCommand := "--profile=./myprofile.profile"
-	firejailFlag := "--quiet"
+	args = append(args, []string{binName, "check", tmpDirFile, "--format", "json"}...)
 
-	//firjailComamnd := "hab pkg exec core"
-
-	args := []string{firjailBin, firjailCommand, firejailFlag}
-
-	args = append(args, []string{shimBinName, "check", profilePath, "--format", "json"}...)
-
-	logrus.Debugf("Run: inspec %v", args)
+	logrus.Infof("Run: inspec %v", args)
 	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
-
+	//Removing the file before checking the command
+	os.RemoveAll(tmpDirPath)
 	if err != nil {
 		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
 	}
 
-	logrus.Info("Gicing the ouytpoyut xsjcnasdnca", string(stdout))
+	logrus.Info("check command giving the output", string(stdout))
 
-	jsonContent := findJsonLine(stdout)
+	jsonContent := findJsonLine([]byte(stdout))
 	err = json.Unmarshal(jsonContent, &res)
 	if err != nil {
 		return res, fmt.Errorf("Failed to unmarshal json:\n%s\nWith message: %s\nstdout: %s\nstderr: %s", jsonContent, err.Error(), stdout, stderr)
@@ -277,43 +280,66 @@ func Check(profilePath string) (CheckResult, error) {
 		return res, errors.New(strings.Join(errs, "\n"))
 	}
 
-	logrus.Debugf("Successfully checked inspec profile in %s", profilePath)
+	logrus.Infof("Successfully checked inspec profile in %s", profilePath)
 	return res, nil
 }
 
-func Json(profilePath string) ([]byte, error) {
-	firjailBin := os.Getenv("FIREJAIL")
-	//firjailCommand := "--profile=./myprofile.profile"
-	firejailFlag := "--quiet"
+func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
+	var output string
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
 
-	args := []string{firjailBin, firejailFlag, shimBinName, "json", profilePath}
-	logrus.Debugf("Run: inspec %v", args)
+	tmpDirFile, args, err := getFirejailArgsaAndOutputFile(false, firejailprofilePath, profilePath, tmpDirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	//echoStatement := fmt.Sprintf(";echo '%s'", endInspec)
+	args = append(args, []string{binName, "json", tmpDirFile}...)
+	logrus.Infof("Run: inspec %v", args)
 	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
-	logrus.Debugf("Run: %s %s %v", stdout, stderr, err)
+
+	logrus.Infof("Run output from json: %s %s %v", stdout, stderr, err)
+
+	logrus.Infof("Run: %s %s %v", output, stderr, err)
 	if err != nil {
 		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + e)
 	}
-	return stdout, nil
+	os.RemoveAll(tmpDirPath)
+
+	return []byte(output), nil
 }
 
 // Archives a directory to a TAR.GZ
-func Archive(profilePath string, outputPath string) error {
-	firjailBin := os.Getenv("FIREJAIL")
+func Archive(profilePath string, outputPath string, firejailprofilePath string) error {
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+	tmpDirProfilePath, args, err := getFirejailArgsaAndOutputFile(true, firejailprofilePath, profilePath, tmpDirPath)
+	if err != nil {
+		return err
+	}
+	_, outputFileName := filepath.Split(outputPath)
+	outputFilePath := tmpDirPath + "/" + outputFileName
 
-	firjailCommand := "--profile=./myprofile.profile"
-	firejailFlag := "--quiet"
-	logrus.Info("--------------------- output path", outputPath)
-	args := []string{firjailBin, firjailCommand, firejailFlag, shimBinName, "archive", profilePath, "-o", outputPath, "--overwrite"}
-	logrus.Debugf("Run: inspec %v", args)
+	args = append(args, []string{binName, "archive", tmpDirProfilePath, "-o", outputFilePath, "--overwrite"}...)
+
+	logrus.Infof("Run: inspec %v", args)
 	_, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
 
 	if err != nil {
 		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
-		return errors.New("InSpec archive failed for " + profilePath + " with message: " + e)
+		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + e)
 	}
 
-	logrus.Debugf("Successfully archived %s to %s", profilePath, outputPath)
+	err = fileutils.CopyFile(outputFilePath, outputPath)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to copy archived file for output file", outputFileName)
+	}
+	err = os.RemoveAll(tmpDirPath)
+	if err != nil {
+		logrus.Errorf("Unable to delete tmp direcotory created %v", err)
+
+	}
+	logrus.Infof("Successfully archived %s to %s", profilePath, outputPath)
 	return nil
 }
 
@@ -403,3 +429,79 @@ func findJsonLine(in []byte) []byte {
 	}
 	return []byte(rawJson)
 }
+
+func getFirejailArgsaAndOutputFile(isArchive bool, firejailprofilePath string, profilePath string, tmpDirPath string) (string, []string, error) {
+
+	firjailBin := os.Getenv("FIREJAIL")
+	firejailFlag := "--quiet"
+	firejailProfile := fmt.Sprintf("--profile=%s", firejailprofilePath)
+	//echoStatement := fmt.Sprintf("echo '%s' ;", startInspec)
+
+	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
+
+	fileName := filepath.Base(profilePath)
+	fileCreated := tmpDirPath + "/" + fileName
+
+	if isArchive {
+		tempDirProfile := tmpDirPath + "/" + fileName
+		err := prerequisiteForArchive(tempDirProfile, profilePath)
+		if err != nil {
+			logrus.Errorf("Unable to move files %v", err)
+			return "", nil, nil
+		}
+		return tempDirProfile, firejailArgs, nil
+	}
+
+	err := prerequisiteForCommands(tmpDirPath, profilePath, fileName)
+	if err != nil {
+		logrus.Errorf("Unable to move files %v", err)
+		return "", nil, nil
+	}
+	return fileCreated, firejailArgs, nil
+}
+
+func prerequisiteForArchive(tmpDir string, file string) error {
+	err := os.MkdirAll(tmpDir, 0777)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to make tmp directory")
+	}
+
+	err = fileutils.CopyDir(file, tmpDir, fileutils.Overwrite())
+	if err != nil {
+		return errors.Wrapf(err, "Unable to copy files in tmp directory")
+	}
+	return nil
+
+}
+
+func prerequisiteForCommands(tmpDir string, filepath string, fileName string) error {
+
+	err := os.MkdirAll(tmpDir, 0777)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to make tmp directory")
+	}
+	tmpDir = tmpDir + "/" + fileName
+	err = fileutils.CopyFile(filepath, tmpDir, fileutils.Overwrite())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func makeTimestamp() int64 {
+	return time.Now().UnixNano()
+}
+
+// func getTrimmedOutputFromFirejail(output []byte) string {
+// 	var trimmedOutput string
+// 	outputStr := string(output)
+// 	startIndex := strings.Index(outputStr, startInspec)
+// 	endIndex := strings.Index(outputStr, endInspec)
+// 	if startIndex != -1 {
+// 		trimmedOutput = outputStr[startIndex+len(startInspec)+1 : endIndex-1]
+
+// 	}
+
+// 	return trimmedOutput
+// }

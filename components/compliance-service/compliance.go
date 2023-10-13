@@ -235,7 +235,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient,
 		conf.Service.LcrOpenSearchRequests, db, conf.Service.EnableEnhancedReporting))
 
-	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
+	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv, conf.Service.FirejailProfilePath)
 	profiles.RegisterProfilesServiceServer(s, ps)
 	profiles.RegisterProfilesAdminServiceServer(s, ps)
 
@@ -703,7 +703,7 @@ type ServiceInfo struct {
 	connFactory *secureconn.Factory
 }
 
-//TODO(jaym) If these don't get exposed in the gateway, we need to provide the http server certs
+// TODO(jaym) If these don't get exposed in the gateway, we need to provide the http server certs
 // this custom route is used by the inspec-agent scanner to retrieve profile tars for scan execution
 func (conf *ServiceInfo) serveCustomRoutes() error {
 	conf.ServerBind = fmt.Sprintf("%s:%d", conf.HostBind, conf.Port)
