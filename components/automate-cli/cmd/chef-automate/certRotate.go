@@ -1715,12 +1715,13 @@ func writeCertificateConfigToFile(infra *AutomateHAInfraDetails, args []string, 
 	if len(args) < 1 {
 		return errors.Errorf("command need a output file name like cert-config.toml")
 	}
+	certFileName := args[0]
 	config, err := chefToml.Marshal(certTemplate)
 	if err != nil {
 		return err
 	}
-	writer.Printf("certificate config file is generate %s, Please update the file with releavent certificate file paths \n", fileName)
-	return fUtils.WriteFile(fileName, config, 0600)
+	writer.Printf("certificate config file is generated %s, Please update the file with releavent certificate file paths \n", certFileName)
+	return fUtils.WriteFile(certFileName, config, 0600)
 }
 
 func populateCertificateConfig(infra *AutomateHAInfraDetails) (error, *CertificateToml) {
