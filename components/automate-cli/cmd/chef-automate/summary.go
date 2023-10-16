@@ -46,6 +46,7 @@ type StatusSummary interface {
 	ShowFEStatus() string
 	ShowBEStatus() string
 	GetPGLeaderNode() (string, string)
+	GetPGMaxLagAmongFollowers() int64
 }
 
 type Summary struct {
@@ -680,4 +681,23 @@ func (ss *Summary) GetPGLeaderNode() (string, string) {
 		}
 	}
 	return "", ""
+}
+
+func (ss *Summary) GetPGMaxLagAmongFollowers() int64 {
+	var maxLag int64 = 0
+	if len(ss.beStatus) != 0 {
+		for _, status := range ss.beStatus {
+			if status.role == "Follower" && status.serviceName == "postgresql" {
+				re := regexp.MustCompile("[0-9]+")
+				lagsNumberics := re.FindAllString(status.lag, -1)
+				if len(lagsNumberics) > 0 {
+					lag, _ := strconv.ParseInt(lagsNumberics[0], 10, 64)
+					if lag > maxLag {
+						maxLag = lag
+					}
+				}
+			}
+		}
+	}
+	return maxLag
 }

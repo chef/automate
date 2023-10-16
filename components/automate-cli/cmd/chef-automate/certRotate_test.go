@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -10,6 +12,7 @@ import (
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -282,6 +285,131 @@ WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
 	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
 	-----END CERTIFICATE-----"""`
 	testfile = `./testfiles/ssh`
+
+	rootCA = `-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----`
+	admin_cert = `-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----`
+	admin_key = `-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----`
+
+	public_key = `-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----`
+	private_key = `-----BEGIN CERTIFICATE-----
+	MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
+	MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
+	U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
+	NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
+	ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
+	ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
+	DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
+	8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
+	+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
+	X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+	K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
+	1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
+	A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
+	zt0fhvRbVazc1xDCDqmI56FspGowaaBCDEfGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
+	YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
+	bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
+	DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
+	L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
+	eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
+	xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
+	VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
+	WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8xY5Z=
+	-----END CERTIFICATE-----`
+
+	private_cert_path = "../../pkg/testfiles/certs/private_key.pem"
+	public_cert_path  = "../../pkg/testfiles/certs/public_key.pem"
 )
 
 var sshConfig = sshutils.SSHConfig{
@@ -2335,7 +2463,8 @@ func NewMockInfra() *AutomateHAInfraDetails {
 }
 
 func NewCertRotate() *certRotateFlow {
-	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{})
+	log, _ := logger.NewLogger("text", "debug")
+	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log)
 	return c
 }
 
@@ -2352,5 +2481,641 @@ func mockFS() *fileutils.MockFileSystemUtils {
 				return []byte{}, err
 			}
 		},
+		WriteFileFunc: func(filename string, data []byte, prem fs.FileMode) error {
+			if len(filename) > 0 {
+				// path/to/whatever exists
+				return nil
+			} else {
+				errors.New("File not found")
+			}
+			return nil
+		},
+	}
+}
+
+func TestGetIPS(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description   string
+		inf           *AutomateHAInfraDetails
+		nodeType      string
+		isError       bool
+		ExpectedError string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Test Case to get IP of Automate node",
+			inf:         infra,
+			nodeType:    AUTOMATE,
+			isError:     false,
+		},
+		{
+			description: "Test Case to get IP of Chef Server node",
+			inf:         infra,
+			nodeType:    CHEF_SERVER,
+			isError:     false,
+		},
+		{
+			description: "Test Case to get IP of Postgresql node",
+			inf:         infra,
+			nodeType:    POSTGRESQL,
+			isError:     false,
+		},
+		{
+			description: "Test Case to get IP of Opensearch node",
+			inf:         infra,
+			nodeType:    OPENSEARCH,
+			isError:     false,
+		},
+		{
+			description: "Test Case to get Dummy Server of Automate node",
+			inf:         infra,
+			nodeType:    "DummyServer",
+			isError:     true,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			output := getIPS(testCase.inf, testCase.nodeType)
+			if testCase.isError {
+				assert.Empty(t, output, "Invalid server name")
+			} else {
+				assert.NotEmpty(t, output, "Get IPs for "+testCase.nodeType)
+			}
+		})
+	}
+}
+
+func TestPopulateCertificateConfig(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+
+	t.Run("get certificate toml", func(t *testing.T) {
+		err, output := populateCertificateConfig(infra)
+		if err != nil {
+			assert.Error(t, err, "Error in populating certs")
+		} else {
+			assert.NotNil(t, output, "got populated certificates")
+		}
+	})
+}
+
+func TestWriteCertificateConfigToFile(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description   string
+		inf           *AutomateHAInfraDetails
+		args          []string
+		certTemplate  *CertificateToml
+		fileUtil      fileutils.FileUtils
+		isError       bool
+		ExpectedError string
+	}
+	testCases := []testCaseInfo{
+		{
+			description:   "Test to generate file",
+			inf:           infra,
+			args:          []string{"cert-config.toml"},
+			certTemplate:  mockCertifiateTemplate(),
+			fileUtil:      mockFS(),
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description:   "Test to generate file with empty file name",
+			inf:           infra,
+			args:          []string{},
+			certTemplate:  mockCertifiateTemplate(),
+			fileUtil:      mockFS(),
+			isError:       true,
+			ExpectedError: "command need a output file name like cert-config.toml",
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			err := writeCertificateConfigToFile(testCase.inf, testCase.args, testCase.certTemplate, testCase.fileUtil)
+			if testCase.isError {
+				assert.EqualError(t, err, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestRotateClusterFrontendCertificates(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description      string
+		inf              *AutomateHAInfraDetails
+		flagsObj         certRotateFlags
+		currentCertsInfo *certShowCertificates
+		certToml         *CertificateToml
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		isError          bool
+		ExpectedError    string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Rotate Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				privateCertPath: private_cert_path,
+				publicCertPath:  public_cert_path,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+					return "", nil
+				},
+			},
+			isError:       true,
+			ExpectedError: "No  IPs are found",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl()}
+			output := c.rotateClusterFrontendCertificates(testCase.inf, testCase.sshutil, testCase.flagsObj, testCase.currentCertsInfo, testCase.certToml)
+			fmt.Println(output)
+			if testCase.isError {
+				assert.Error(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+			}
+		})
+	}
+}
+
+func TestRotateChefServerNodeCerts(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description      string
+		inf              *AutomateHAInfraDetails
+		flagsObj         certRotateFlags
+		currentCertsInfo *certShowCertificates
+		certToml         *CertificateToml
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		isError          bool
+		ExpectedError    string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Rotate Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				privateCertPath: private_cert_path,
+				publicCertPath:  public_cert_path,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+					return "", nil
+				},
+			},
+			isError:       false,
+			ExpectedError: "Please Enter Valid chef_server IP",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl()}
+			output := c.rotateChefServerNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml, &testCase.certToml.ChefServer.IPS[0])
+			fmt.Println(output)
+			if testCase.isError {
+				assert.Error(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+			}
+		})
+	}
+}
+
+func TestRotateAutomateNodeCerts(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description      string
+		inf              *AutomateHAInfraDetails
+		flagsObj         certRotateFlags
+		currentCertsInfo *certShowCertificates
+		certToml         *CertificateToml
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		isError          bool
+		ExpectedError    string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Rotate Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				privateCertPath: private_cert_path,
+				publicCertPath:  public_cert_path,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+					return "", nil
+				},
+			},
+			isError:       false,
+			ExpectedError: "Please Enter Valid opensearch IP",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl()}
+			output := c.rotateAutomateNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml, &testCase.certToml.Automate.IPS[0])
+			fmt.Println(output)
+			if testCase.isError {
+				assert.Error(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+			}
+		})
+	}
+}
+
+func TestRotatePGNodeCerts(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	log, _ := logger.NewLogger("text", "info")
+	type testCaseInfo struct {
+		description      string
+		inf              *AutomateHAInfraDetails
+		flagsObj         certRotateFlags
+		currentCertsInfo *certShowCertificates
+		certToml         *CertificateToml
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		isError          bool
+		ExpectedError    string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Rotate Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				privateCertPath: private_cert_path,
+				publicCertPath:  public_cert_path,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+					return "", nil
+				},
+			},
+			isError:       false,
+			ExpectedError: "Please Enter Valid postgresql IP",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl(),
+				log:     log,
+			}
+			output := c.rotatePGNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml.PostgreSQL.RootCA, &testCase.certToml.PostgreSQL.IPS[0], true)
+			fmt.Println(output)
+			if testCase.isError {
+				assert.Error(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+			}
+		})
+	}
+}
+
+func TestRotateOSNodeCerts(t *testing.T) {
+	log, _ := logger.NewLogger("text", "info")
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description      string
+		inf              *AutomateHAInfraDetails
+		flagsObj         certRotateFlags
+		currentCertsInfo *certShowCertificates
+		certToml         *CertificateToml
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		isError          bool
+		ExpectedError    string
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Rotate Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				privateCertPath: private_cert_path,
+				publicCertPath:  public_cert_path,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+					return "", nil
+				},
+			},
+			isError:       true,
+			ExpectedError: "Near line 1 (last key parsed 'config'): expected key separator '=', but got 's' instead",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl(), log: log}
+			output := c.rotateOSNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, &testCase.certToml.OpenSearch, &testCase.certToml.OpenSearch.IPS[0], false)
+			fmt.Println(output)
+			if testCase.isError {
+				assert.Error(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+			}
+		})
+	}
+}
+
+func mockCertifiateTemplate() *CertificateToml {
+	return &CertificateToml{
+		Automate: NodeCertficate{
+			RootCA:          "../../pkg/testfiles/certs/test_root_ca.pem",
+			AdminPublickey:  "",
+			AdminPrivateKey: "",
+			IPS: []IP{
+				{
+					IP:         ValidIP,
+					Publickey:  "../../pkg/testfiles/certs/test_a2_public_key_1.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_a2_private_key_1.pem",
+				},
+				{
+					IP:         ValidIP1,
+					Publickey:  "../../pkg/testfiles/certs/test_a2_public_key_2.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_a2_private_key_2.pem",
+				},
+			},
+		},
+		ChefServer: NodeCertficate{
+			RootCA:          "../../pkg/testfiles/certs/test_root_ca.pem",
+			AdminPublickey:  "",
+			AdminPrivateKey: "",
+			IPS: []IP{
+				{
+					IP:         ValidIP2,
+					Publickey:  "../../pkg/testfiles/certs/test_cs_public_key_1.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_cs_private_key_1.pem",
+				},
+				{
+					IP:         ValidIP3,
+					Publickey:  "../../pkg/testfiles/certs/test_cs_public_key_2.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_cs_private_key_2.pem",
+				},
+			},
+		},
+		OpenSearch: NodeCertficate{
+			RootCA:          "../../pkg/testfiles/certs/test_root_ca.pem",
+			AdminPublickey:  "../../pkg/testfiles/certs/test_admin_cert.pem",
+			AdminPrivateKey: "../../pkg/testfiles/certs/test_admin_key.pem",
+			IPS: []IP{
+				{
+					IP:         ValidIP4,
+					Publickey:  "../../pkg/testfiles/certs/test_os_public_key_1.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_os_private_key_1.pem",
+				},
+				{
+					IP:         ValidIP5,
+					Publickey:  "../../pkg/testfiles/certs/test_os_public_key_2.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_os_private_key_2.pem",
+				},
+				{
+					IP:         ValidIP6,
+					Publickey:  "../../pkg/testfiles/certs/test_os_public_key_3.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_os_private_key_3.pem",
+				},
+			},
+		},
+		PostgreSQL: NodeCertficate{
+			RootCA:          "../../pkg/testfiles/certs/test_root_ca.pem",
+			AdminPublickey:  "",
+			AdminPrivateKey: "",
+			IPS: []IP{
+				{
+					IP:         ValidIP7,
+					Publickey:  "../../pkg/testfiles/certs/test_pg_public_key_1.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_pg_private_key_1.pem",
+				},
+				{
+					IP:         ValidIP8,
+					Publickey:  "../../pkg/testfiles/certs/test_pg_public_key_2.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_pg_private_key_2.pem",
+				},
+				{
+					IP:         ValidIP9,
+					Publickey:  "../../pkg/testfiles/certs/test_pg_public_key_3.pem",
+					PrivateKey: "../../pkg/testfiles/certs/test_pg_private_key_3.pem",
+				},
+			},
+		},
+	}
+}
+
+func mockCertShowCertificates() *certShowCertificates {
+	return &certShowCertificates{
+		AutomateRootCert:    rootCA,
+		PostgresqlRootCert:  rootCA,
+		OpensearchRootCert:  rootCA,
+		OpensearchAdminCert: admin_cert,
+		OpensearchAdminKey:  admin_key,
+		AutomateCertsByIP: []CertByIP{
+			{
+				IP:         "10.1.0.1",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+			{
+				IP:         "10.1.0.2",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+			{
+				IP:         "10.1.0.3",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+		},
+		ChefServerCertsByIP: []CertByIP{
+			{
+				IP:         "10.2.0.1",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+			{
+				IP:         "10.2.0.2",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+			{
+				IP:         "10.2.0.3",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+		},
+		OpensearchCertsByIP: []CertByIP{
+			{
+				IP:         "10.3.0.1",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+				NodesDn:    "test_node_dn",
+			},
+			{
+				IP:         "10.3.0.2",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+				NodesDn:    "test_node_dn",
+			},
+			{
+				IP:         "10.3.0.3",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+				NodesDn:    "test_node_dn",
+			},
+		},
+		PostgresqlCertsByIP: []CertByIP{
+			{
+				IP:         "10.4.0.1",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+			{
+				IP:         "10.4.0.2",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+			{
+				IP:         "10.4.0.3",
+				PublicKey:  public_key,
+				PrivateKey: private_key,
+			},
+		},
+	}
+}
+
+func mockCerts() *certificates {
+	return &certificates{
+		privateCert: private_key,
+		publicCert:  public_key,
+		rootCA:      rootCA,
+		adminCert:   admin_cert,
+		adminKey:    admin_key,
 	}
 }

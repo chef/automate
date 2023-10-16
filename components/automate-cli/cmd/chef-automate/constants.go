@@ -35,4 +35,7 @@ const (
 	TMP_DIR                        = "/tmp"
 	CERTIFICATE_TEMPLATE_TOML_FILE = "/hab/a2_deploy_workspace/certificate.toml"
 	CLUSTER                        = "cluster"
+	MAINTENANCE_ON_OFF             = "sudo chef-automate maintenance %s"
+	ON                             = "on"
+	OFF                            = "off"
 )
