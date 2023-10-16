@@ -1,52 +1,52 @@
 [automate]
-  root_ca = "../../../../lib/config/testdata/root-ca.pem"
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
 
   [[automate.ips]]
-    ip = "10.1.0.130"
-    public_key = "/home/ubuntu/certs/automate1.pem"
-    private_key = "/home/ubuntu/certs/automate1-key.pem"
+    ip = "198.51.100.0"
+    public_key = "../../pkg/testfiles/certs/test_a2_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_a2_private_key_1.pem"
 
 [chef_server]
-  root_ca = "/home/ubuntu/certs/root-ca.pem"
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
 
   [[chef_server.ips]]
-    ip = "10.1.0.16"
-    public_key = "/home/ubuntu/certs/cs1.pem"
-    private_key = "/home/ubuntu/certs/cs1-key.pem"
+    ip = "198.51.100.2"
+    public_key = "../../pkg/testfiles/certs/test_cs_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_cs_private_key_1.pem"
 
 [postgresql]
-  root_ca = "/home/ubuntu/certs/root-ca.pem"
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
 
   [[postgresql.ips]]
-    ip = "10.1.0.141"
-    public_key = "/home/ubuntu/certs/pg1.pem"
-    private_key = "/home/ubuntu/certs/pg1-key.pem"
+    ip = "198.51.100.7"
+    public_key = "../../pkg/testfiles/certs/test_pg_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_pg_private_key_1.pem"
 
   [[postgresql.ips]]
-    ip = "10.1.1.190"
-    public_key = "/home/ubuntu/certs/pg2.pem"
-    private_key = "/home/ubuntu/certs/pg2-key.pem"
+    ip = "198.51.100.8"
+    public_key = "../../pkg/testfiles/certs/test_os_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_pg_public_key_2.pem"
 
   [[postgresql.ips]]
-    ip = "10.1.2.130"
-    public_key = "/home/ubuntu/certs/pg3.pem"
-    private_key = "/home/ubuntu/certs/pg3-key.pem"
+    ip = "198.51.100.9"
+    public_key = "../../pkg/testfiles/certs/test_pg_public_key_3.pem"
+    private_key = "../../pkg/testfiles/certs/test_pg_private_key_3.pem"
 
 [opensearch]
-  root_ca = "/home/ubuntu/certs/root-ca.pem"
-  admin_public_key = "/home/ubuntu/certs/os-admin.pem"
-  admin_private_key = "/home/ubuntu/certs/os-admin-key.pem"
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
+  admin_public_key = "../../pkg/testfiles/certs/test_admin_cert.pem"
+  admin_private_key = "../../pkg/testfiles/certs/test_admin_key.pem"
   [[opensearch.ips]]
-    ip = "10.1.0.176"
-    public_key = "/home/ubuntu/certs/os1.pem"
-    private_key = "/home/ubuntu/certs/os1-key.pem"
+    ip = "198.51.100.4"
+    public_key = "../../pkg/testfiles/certs/test_os_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_os_private_key_1.pem"
 
   [[opensearch.ips]]
-    ip = "10.1.1.125"
-    public_key = "/home/ubuntu/certs/os2.pem"
-    private_key = "/home/ubuntu/certs/os2-key.pem"
+    ip = "198.51.100.5"
+    public_key = "../../pkg/testfiles/certs/test_os_public_key_2.pem"
+    private_key = "../../pkg/testfiles/certs/test_os_private_key_2.pem"
 
   [[opensearch.ips]]
-    ip = "10.1.2.247"
-    public_key = "/home/ubuntu/certs/os3.pem"
-    private_key = "/home/ubuntu/certs/os3-key.pem"
+    ip = "198.51.100.6"
+    public_key = "../../pkg/testfiles/certs/test_os_public_key_3.pem"
+    private_key = "../../pkg/testfiles/certs/test_os_private_key_3.pem"

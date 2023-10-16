@@ -2559,6 +2559,47 @@ func TestPopulateCertificateConfig(t *testing.T) {
 	})
 }
 
+func TestGetCertsFromTemplate(t *testing.T) {
+	type testCaseInfo struct {
+		description   string
+		filepath      string
+		isError       bool
+		ExpectedError string
+	}
+	testCases := []testCaseInfo{
+		{
+			description:   "get to certificates from correct template file path",
+			filepath:      "../../pkg/testfiles/onprem/certs-config.toml",
+			isError:       false,
+			ExpectedError: "",
+		},
+		{
+			description:   "get to certificates from incorrect template file path",
+			filepath:      "../../pkg/testfiles/onprem/certs-config1.toml",
+			isError:       true,
+			ExpectedError: "Error in fetching certificates from template file",
+		},
+		{
+			description:   "get to certificates from empty template file path",
+			filepath:      "",
+			isError:       true,
+			ExpectedError: "Cluster certificate file is required",
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			output, err := getCertsFromTemplate(testCase.filepath)
+			if testCase.isError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.ObjectsAreEqual(mockCertifiateTemplate(), output)
+			}
+		})
+	}
+
+}
+
 func TestWriteCertificateConfigToFile(t *testing.T) {
 	_, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
@@ -3038,53 +3079,43 @@ func mockCertShowCertificates() *certShowCertificates {
 		OpensearchAdminKey:  admin_key,
 		AutomateCertsByIP: []CertByIP{
 			{
-				IP:         "10.1.0.1",
+				IP:         ValidIP,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
 			{
-				IP:         "10.1.0.2",
-				PublicKey:  public_key,
-				PrivateKey: private_key,
-			},
-			{
-				IP:         "10.1.0.3",
+				IP:         ValidIP1,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
 		},
 		ChefServerCertsByIP: []CertByIP{
 			{
-				IP:         "10.2.0.1",
+				IP:         ValidIP2,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
 			{
-				IP:         "10.2.0.2",
-				PublicKey:  public_key,
-				PrivateKey: private_key,
-			},
-			{
-				IP:         "10.2.0.3",
+				IP:         ValidIP3,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
 		},
 		OpensearchCertsByIP: []CertByIP{
 			{
-				IP:         "10.3.0.1",
+				IP:         ValidIP4,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 				NodesDn:    "test_node_dn",
 			},
 			{
-				IP:         "10.3.0.2",
+				IP:         ValidIP5,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 				NodesDn:    "test_node_dn",
 			},
 			{
-				IP:         "10.3.0.3",
+				IP:         ValidIP6,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 				NodesDn:    "test_node_dn",
@@ -3092,17 +3123,17 @@ func mockCertShowCertificates() *certShowCertificates {
 		},
 		PostgresqlCertsByIP: []CertByIP{
 			{
-				IP:         "10.4.0.1",
+				IP:         ValidIP7,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
 			{
-				IP:         "10.4.0.2",
+				IP:         ValidIP8,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
 			{
-				IP:         "10.4.0.3",
+				IP:         ValidIP9,
 				PublicKey:  public_key,
 				PrivateKey: private_key,
 			},
