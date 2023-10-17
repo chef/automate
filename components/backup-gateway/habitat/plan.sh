@@ -11,11 +11,11 @@ pkg_deps=(
   chef/automate-platform-tools
 )
 
-
 pkg_exports=(
   [port]=service.port
 )
 pkg_exposes=(port)
+
 
 do_unpack() {
     return 0
