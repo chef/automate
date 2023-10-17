@@ -737,9 +737,9 @@ func TestCheckFqdnReachability(t *testing.T) {
 				for i := 0; i < len(e.ResponseBody.Checks); i++ {
 					check := e.ResponseBody.Checks[i]
 					if check.Passed {
-						assert.Contains(t, check.SuccessMsg, check.SuccessMsg)
+						assert.Contains(t, res.Checks[i].SuccessMsg, check.SuccessMsg)
 					} else {
-						assert.Contains(t, check.ErrorMsg, check.ErrorMsg)
+						assert.Contains(t, res.Checks[i].ErrorMsg, check.ErrorMsg)
 					}
 				}
 			}
