@@ -474,11 +474,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			checkIfConfigHasMultipleConfigs, err := checkUserConfigHasOnlyCentrailisedLogConfig(modifiedConfig)
+			checkIfConfigHasOnlyLogConfig, err := checkUserConfigHasOnlyCentrailisedLogConfig(modifiedConfig)
 			if err != nil {
 				return err
 			}
-			if checkIfConfigHasMultipleConfigs {
+			if checkIfConfigHasOnlyLogConfig {
 				return nil
 			}
 		}
