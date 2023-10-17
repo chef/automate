@@ -349,8 +349,9 @@ func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, isOnlyCentralisedLog, true)
 		require.NoError(t, err)
-		err = os.Remove(tmpfile.Name())
 		require.NoError(t, err)
+		err = os.Remove(tmpfile.Name())
+
 	})
 	t.Run("File not found", func(t *testing.T) {
 		filePath := "testdata/notfound.json"

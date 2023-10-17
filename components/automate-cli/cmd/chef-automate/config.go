@@ -581,6 +581,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		} else {
 			writer.Println(cmd.UsageString())
 		}
+		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isLoggerConfig {
+			os.Remove(configFile)
+		}
 
 	} else {
 		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
@@ -624,7 +627,7 @@ func patchAndRemoveCentralisedLoggingForBackend(args []string, infra *AutomateHA
 	if err != nil {
 		return "", err
 	}
-	writer.Success("\n Centralised logging configuration is patched. \n")
+	writer.Success("Centralised logging configuration is patched. \n")
 	if configCmdFlags.postgresql {
 		inputfile, err = removeCentralisedLogsFromUserConfigForPg(args[0])
 		if err != nil {
@@ -655,6 +658,7 @@ func checkUserConfigHasOnlyCentrailisedLogConfig(inputfile string) (bool, error)
 
 	content := buf.String()
 	if content == "" {
+		os.Remove(inputfile)
 		return true, nil
 	}
 	return false, nil
@@ -1226,7 +1230,6 @@ func getConfigInterfaceForPostgresqlOrOpenSearch(args []string, remoteService st
 		return dest, nil
 	}
 }
-
 
 // isConfigChanged checks if configuration is changed
 func isConfigChanged(src interface{}, dest interface{}) bool {
