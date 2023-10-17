@@ -28,6 +28,7 @@ type StatusCmdFlags struct {
 	postgresql          bool
 	opensearch          bool
 	node                string
+	acceptHabLicense    bool
 }
 type StatusCmdResult struct {
 	cmdResult map[string][]*CmdResult
@@ -63,10 +64,11 @@ type FeStatus []FeStatusValue
 type BeStatus []BeStatusValue
 
 const (
-	STATUS_ERROR_ON_SELF_MANAGED = "Showing the status for externally configured %s is not supported."
-	CMD_FAIL_MSG                 = "Command failed on %s node : %s with error:\n %s\n"
-	BACKEND_STATUS_CMD           = "sudo HAB_LICENSE=accept-no-persist hab svc status"
-	FRONTEND_STATUS_CMD          = "sudo chef-automate status"
+	STATUS_ERROR_ON_SELF_MANAGED          = "Showing the status for externally configured %s is not supported."
+	CMD_FAIL_MSG                          = "Command failed on %s node : %s with error:\n %s\n"
+	BACKEND_STATUS_CMD                    = "sudo HAB_LICENSE=accept-no-persist hab svc status"
+	ACCEPTED_LICENENSE_BACKEND_STATUS_CMD = "sudo echo yes | hab svc status"
+	FRONTEND_STATUS_CMD                   = "sudo chef-automate status"
 )
 
 func newStatusCmd() *cobra.Command {
@@ -116,6 +118,7 @@ func newStatusCmd() *cobra.Command {
 	statusCmd.Flags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
 	statusCmd.Flags().StringVar(&statusCmdFlag.node, "node", "", "Pass this flag to check status of perticular node in the cluster")
 	statusCmd.Flags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().StringVar(&statusCmdFlag.node, "--accept-hab-license", "", "Pass this flag to accept hab license for PostgresQL/OpenSearch nodes")
 
 	statusCmd.AddCommand(newStatusSummaryCmd())
 	return statusCmd
