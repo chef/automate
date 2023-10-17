@@ -253,23 +253,38 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, err
 	}
 
-	args = append(args, []string{binName, "check", tmpDirFile, "--format", "json"}...)
+	stdoutFile := tmpDirPath + "/success_json"
+	erroutFile := tmpDirPath + "/error_json"
+	shellFile := tmpDirPath + "/check_shell.sh"
+	contentForShellFile := fmt.Sprintf(`inspec check $1 --format json>$2 2>$3`)
+
+	createShellFileContent("check")
+	createFileAndAddContent(shellFile, contentForShellFile)
+
+	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
 	logrus.Infof("Run: inspec %v", args)
-	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
-	//Removing the file before checking the command
-	os.RemoveAll(tmpDirPath)
+	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
+		errorContent, _ := readFile(erroutFile)
+		e := fmt.Sprintf("%s\n%s", errorContent)
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
+
+	}
+	//Removing the file before checking the command
+
+	successContent, err := readFile(stdoutFile)
+	if err != nil {
+		return res, err
 	}
 
-	logrus.Info("check command giving the output", string(stdout))
+	os.RemoveAll(tmpDirPath)
 
-	jsonContent := findJsonLine([]byte(stdout))
+	jsonContent := findJsonLine([]byte(successContent))
 	err = json.Unmarshal(jsonContent, &res)
 	if err != nil {
-		return res, fmt.Errorf("Failed to unmarshal json:\n%s\nWith message: %s\nstdout: %s\nstderr: %s", jsonContent, err.Error(), stdout, stderr)
+		errorContent, _ := readFile(erroutFile)
+		return res, fmt.Errorf("Failed to unmarshal json:\n%s\nWith message: %s\nstdout: %s\nstderr: %s", jsonContent, err.Error(), successContent, errorContent)
 	}
 
 	if len(res.Errors) > 0 {
@@ -285,7 +300,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 }
 
 func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
-	var output string
+	//var output string
 	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
 
 	tmpDirFile, args, err := getFirejailArgsaAndOutputFile(false, firejailprofilePath, profilePath, tmpDirPath)
@@ -293,21 +308,30 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 		return nil, err
 	}
 
+	stdoutFile := tmpDirPath + "/success_json"
+	erroutFile := tmpDirPath + "/error_json"
+	shellFile := tmpDirPath + "/json_shell.sh"
+	contentForShellFile := createShellFileContent("json")
+	createFileAndAddContent(shellFile, contentForShellFile)
+
 	//echoStatement := fmt.Sprintf(";echo '%s'", endInspec)
-	args = append(args, []string{binName, "json", tmpDirFile}...)
+	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 	logrus.Infof("Run: inspec %v", args)
-	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
-
-	logrus.Infof("Run output from json: %s %s %v", stdout, stderr, err)
-
-	logrus.Infof("Run: %s %s %v", output, stderr, err)
+	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
+		errorContent, _ := readFile(erroutFile)
+		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + e)
 	}
+	successContent, err := readFile(stdoutFile)
+	if err != nil {
+		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + err.Error())
+	}
+
+	logrus.Infof("Running inspec json: %s %v", successContent, err)
 	os.RemoveAll(tmpDirPath)
 
-	return []byte(output), nil
+	return []byte(successContent), nil
 }
 
 // Archives a directory to a TAR.GZ
@@ -505,3 +529,32 @@ func makeTimestamp() int64 {
 
 // 	return trimmedOutput
 // }
+
+func createShellFileContent(command string) string {
+	return fmt.Sprintf(`inspec %s $1 >$2 2>$3`, command)
+}
+
+func createFileAndAddContent(fileName string, content string) error {
+	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write([]byte(content)); err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func readFile(fileName string) ([]byte, error) {
+	dat, err := os.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	return dat, nil
+
+}
