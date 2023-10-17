@@ -34,8 +34,9 @@ const defaultTimeout = 2 * time.Minute
 
 const binName = "inspec"
 const shimBinName = "inspec_runner"
-const startInspec = "===start inspec==="
-const endInspec = "===end inspec==="
+const json_command = "json"
+const check_command = "check"
+const archive_command = "archive"
 
 // Set to `true` to emit inspec configuration and environment
 // variables via debug logs. Leave to false for release.
@@ -253,13 +254,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, err
 	}
 
-	stdoutFile := tmpDirPath + "/success_json"
-	erroutFile := tmpDirPath + "/error_json"
-	shellFile := tmpDirPath + "/check_shell.sh"
-	contentForShellFile := fmt.Sprintf(`inspec check $1 --format json>$2 2>$3`)
-
-	createShellFileContent("check")
-	createFileAndAddContent(shellFile, contentForShellFile)
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(check_command, tmpDirPath)
 
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
@@ -269,9 +264,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		errorContent, _ := readFile(erroutFile)
 		e := fmt.Sprintf("%s\n%s", errorContent)
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
-
 	}
-	//Removing the file before checking the command
 
 	successContent, err := readFile(stdoutFile)
 	if err != nil {
@@ -295,12 +288,12 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, errors.New(strings.Join(errs, "\n"))
 	}
 
-	logrus.Infof("Successfully checked inspec profile in %s", profilePath)
+	logrus.Debugf("Successfully checked inspec profile in %s", profilePath)
 	return res, nil
 }
 
 func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
-	//var output string
+
 	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
 
 	tmpDirFile, args, err := getFirejailArgsaAndOutputFile(false, firejailprofilePath, profilePath, tmpDirPath)
@@ -308,13 +301,7 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 		return nil, err
 	}
 
-	stdoutFile := tmpDirPath + "/success_json"
-	erroutFile := tmpDirPath + "/error_json"
-	shellFile := tmpDirPath + "/json_shell.sh"
-	contentForShellFile := createShellFileContent("json")
-	createFileAndAddContent(shellFile, contentForShellFile)
-
-	//echoStatement := fmt.Sprintf(";echo '%s'", endInspec)
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(json_command, tmpDirPath)
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 	logrus.Infof("Run: inspec %v", args)
 	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
@@ -335,7 +322,12 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 }
 
 // Archives a directory to a TAR.GZ
+// 1. Creates a tmp directory
+// 2. Copy the uploaded file tmp directory
+// 3. Create firejail command sand box env
+// 4. Create script to add archive command
 func Archive(profilePath string, outputPath string, firejailprofilePath string) error {
+	//Creating a tmp directory for intermittent profile
 	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
 	tmpDirProfilePath, args, err := getFirejailArgsaAndOutputFile(true, firejailprofilePath, profilePath, tmpDirPath)
 	if err != nil {
@@ -344,13 +336,17 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 	_, outputFileName := filepath.Split(outputPath)
 	outputFilePath := tmpDirPath + "/" + outputFileName
 
-	args = append(args, []string{binName, "archive", tmpDirProfilePath, "-o", outputFilePath, "--overwrite"}...)
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(archive_command, tmpDirPath)
+
+	//args = append(args, []string{binName, "archive", tmpDirProfilePath, "-o", outputFilePath, "--overwrite"}...)
+	args = append(args, []string{"/bin/sh", shellFile, tmpDirProfilePath, outputFilePath, stdoutFile, erroutFile}...)
 
 	logrus.Infof("Run: inspec %v", args)
-	_, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
+	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
 
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
+		errorContent, _ := readFile(erroutFile)
+		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + e)
 	}
 
@@ -459,7 +455,6 @@ func getFirejailArgsaAndOutputFile(isArchive bool, firejailprofilePath string, p
 	firjailBin := os.Getenv("FIREJAIL")
 	firejailFlag := "--quiet"
 	firejailProfile := fmt.Sprintf("--profile=%s", firejailprofilePath)
-	//echoStatement := fmt.Sprintf("echo '%s' ;", startInspec)
 
 	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
 
@@ -517,21 +512,30 @@ func makeTimestamp() int64 {
 	return time.Now().UnixNano()
 }
 
-// func getTrimmedOutputFromFirejail(output []byte) string {
-// 	var trimmedOutput string
-// 	outputStr := string(output)
-// 	startIndex := strings.Index(outputStr, startInspec)
-// 	endIndex := strings.Index(outputStr, endInspec)
-// 	if startIndex != -1 {
-// 		trimmedOutput = outputStr[startIndex+len(startInspec)+1 : endIndex-1]
+func shellscriptAndResponse(command string, tmpDirPath string) (string, string, string) {
 
-// 	}
+	stdoutFile := tmpDirPath + "/success_json"
+	erroutFile := tmpDirPath + "/error_json"
+	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
+	contentForShellFile := createShellFileContent(command)
+	createFileAndAddContent(shellFile, contentForShellFile)
 
-// 	return trimmedOutput
-// }
+	return stdoutFile, erroutFile, shellFile
+
+}
 
 func createShellFileContent(command string) string {
-	return fmt.Sprintf(`inspec %s $1 >$2 2>$3`, command)
+	if command == json_command {
+		return fmt.Sprintf(`inspec %s $1 >$2 2>$3`, command)
+	}
+	if command == check_command {
+		return `inspec check $1 --format json>$2 2>$3`
+	}
+	if command == archive_command {
+		return `inspec archive $1 -o $2 --overwrite >$3 2>$4`
+	}
+
+	return ""
 }
 
 func createFileAndAddContent(fileName string, content string) error {
