@@ -276,7 +276,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, err
 	}
 
-	//os.RemoveAll(tmpDirPath)
+	os.RemoveAll(tmpDirPath)
 
 	jsonContent := findJsonLine([]byte(successContent))
 	err = json.Unmarshal(jsonContent, &res)
@@ -327,7 +327,7 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 	}
 
 	logrus.Infof("Running inspec json: %s %v", successContent, err)
-	//os.RemoveAll(tmpDirPath)
+	os.RemoveAll(tmpDirPath)
 
 	return []byte(successContent), nil
 }
@@ -340,10 +340,12 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 func Archive(profilePath string, outputPath string, firejailprofilePath string) error {
 	//Creating a tmp directory for intermittent profile
 	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+
 	tmpDirProfilePath, args, err := getFirejailArgsaAndOutputFile(true, firejailprofilePath, profilePath, tmpDirPath)
 	if err != nil {
 		return err
 	}
+
 	_, outputFileName := filepath.Split(outputPath)
 	outputFilePath := tmpDirPath + "/" + outputFileName
 
@@ -369,13 +371,13 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 
 	err = fileutils.CopyFile(outputFilePath, outputPath)
 	if err != nil {
-		return errors.Wrapf(err, "Unable to copy archived file for output file", outputFileName)
+		return errors.Wrapf(err, "Unable to copy archived file for output file %s", outputFileName)
 	}
-	// err = os.RemoveAll(tmpDirPath)
-	// if err != nil {
-	// 	logrus.Errorf("Unable to delete tmp direcotory created %v", err)
+	err = os.RemoveAll(tmpDirPath)
+	if err != nil {
+		logrus.Errorf("Unable to delete tmp direcotory created %v", err)
 
-	// }
+	}
 	logrus.Infof("Successfully archived %s to %s", profilePath, outputPath)
 	return nil
 }
@@ -483,7 +485,7 @@ func getFirejailArgsaAndOutputFile(isArchive bool, firejailprofilePath string, p
 		err := prerequisiteForArchive(tempDirProfile, profilePath)
 		if err != nil {
 			logrus.Errorf("Unable to move files %v", err)
-			return "", nil, nil
+			return "", nil, err
 		}
 		return tempDirProfile, firejailArgs, nil
 	}
