@@ -213,12 +213,11 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
 		cmd.Stdin = bytes.NewBuffer(jsonConf)
 		if logSensitiveData {
-			logrus.Infof("Using inspec configuration: %s", string(jsonConf))
+			logrus.Debugf("Using inspec configuration: %s", string(jsonConf))
 		}
 	}
 
 	cmd.Env = []string{"PATH=" + os.Getenv("PATH")}
-
 	if TmpDir != "" {
 		if _, ok := env["TMPDIR"]; !ok {
 			cmd.Env = append(cmd.Env, "TMPDIR="+TmpDir)
@@ -241,7 +240,7 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 		logCtx = logCtx.WithField("env", cmd.Env)
 	}
 
-	logCtx.Info("Running Inspec")
+	logCtx.Debug("Running Inspec")
 	err := cmd.Run()
 	return stdout.Bytes(), stderr.Bytes(), err
 }
@@ -258,7 +257,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
-	logrus.Infof("Run: inspec %v", args)
+	logrus.Debugf("Run: inspec %v", args)
 	env := map[string]string{
 		"HOME":         tmpDirPath,
 		"TMPDIR":       tmpDirPath,
@@ -276,12 +275,12 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, err
 	}
 
+	errorContent, _ := readFile(erroutFile)
 	os.RemoveAll(tmpDirPath)
 
 	jsonContent := findJsonLine([]byte(successContent))
 	err = json.Unmarshal(jsonContent, &res)
 	if err != nil {
-		errorContent, _ := readFile(erroutFile)
 		return res, fmt.Errorf("Failed to unmarshal json:\n%s\nWith message: %s\nstdout: %s\nstderr: %s", jsonContent, err.Error(), successContent, errorContent)
 	}
 
@@ -308,7 +307,6 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 
 	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(json_command, tmpDirPath)
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
-	logrus.Infof("Run: inspec %v", args)
 	//Changing the home directory to tmp directory created
 	env := map[string]string{
 		"HOME":         tmpDirPath,
@@ -326,7 +324,6 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + err.Error())
 	}
 
-	logrus.Infof("Running inspec json: %s %v", successContent, err)
 	os.RemoveAll(tmpDirPath)
 
 	return []byte(successContent), nil
@@ -360,7 +357,7 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 		"CHEF_LICENSE": "accept-no-persist",
 	}
 
-	logrus.Infof("Run: inspec %v", args)
+	logrus.Debugf("Run: inspec %v", args)
 	_, _, err = run(args, nil, defaultTimeout, env)
 
 	if err != nil {
@@ -378,7 +375,7 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 		logrus.Errorf("Unable to delete tmp direcotory created %v", err)
 
 	}
-	logrus.Infof("Successfully archived %s to %s", profilePath, outputPath)
+	logrus.Debugf("Successfully archived %s to %s", profilePath, outputPath)
 	return nil
 }
 

@@ -35,9 +35,6 @@ pg-helper fix-permissions "$DBNAME"
 
 mkdir -p "{{pkg.svc_data_path}}/profiles"
 
-mkdir -p "{{pkg.svc_data_path}}/firejail"
-
-
 # cleanup old migration files
 rm -rf "{{pkg.svc_static_path}}/migrations" {{pkg.svc_static_path}}/*.sql
 
