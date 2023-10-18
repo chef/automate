@@ -67,7 +67,7 @@ const (
 	STATUS_ERROR_ON_SELF_MANAGED          = "Showing the status for externally configured %s is not supported."
 	CMD_FAIL_MSG                          = "Command failed on %s node : %s with error:\n %s\n"
 	BACKEND_STATUS_CMD                    = "sudo HAB_LICENSE=accept-no-persist hab svc status"
-	ACCEPTED_LICENENSE_BACKEND_STATUS_CMD = "sudo echo yes | hab svc status"
+	ACCEPTED_LICENENSE_BACKEND_STATUS_CMD = "echo yes | sudo hab svc status"
 	FRONTEND_STATUS_CMD                   = "sudo chef-automate status"
 )
 
@@ -118,7 +118,8 @@ func newStatusCmd() *cobra.Command {
 	statusCmd.Flags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
 	statusCmd.Flags().StringVar(&statusCmdFlag.node, "node", "", "Pass this flag to check status of perticular node in the cluster")
 	statusCmd.Flags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.Flags().StringVar(&statusCmdFlag.node, "--accept-hab-license", "", "Pass this flag to accept hab license for PostgresQL/OpenSearch nodes")
+	statusCmd.Flags().BoolVarP(&statusCmdFlag.acceptHabLicense, "accept-hab-license", "", false, "Pass this flag to accept hab license for PostgresQL/OpenSearch nodes and show status")
+	statusCmd.Flags().SetAnnotation("accept-hab-license", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	statusCmd.AddCommand(newStatusSummaryCmd())
 	return statusCmd
@@ -373,6 +374,18 @@ func nodeStatus(flags StatusCmdFlags, nodeType string, infra *AutomateHAInfraDet
 	writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 	remoteExe.SetWriter(writer)
 	nodeMap := constructNodeMapForStatus(&flags, infra)
+	if flags.opensearch && flags.acceptHabLicense {
+		nodeMap.Opensearch.CmdInputs.Cmd = ACCEPTED_LICENENSE_BACKEND_STATUS_CMD
+	}
+	if flags.opensearch && !flags.acceptHabLicense {
+		nodeMap.Opensearch.CmdInputs.Cmd = BACKEND_STATUS_CMD
+	}
+	if flags.postgresql && flags.acceptHabLicense {
+		nodeMap.Postgresql.CmdInputs.Cmd = ACCEPTED_LICENENSE_BACKEND_STATUS_CMD
+	}
+	if flags.postgresql && !flags.acceptHabLicense {
+		nodeMap.Postgresql.CmdInputs.Cmd = BACKEND_STATUS_CMD
+	}
 	cmdResult, err := remoteExe.ExecuteWithNodeMap(nodeMap)
 	statusCmdResults <- StatusCmdResult{
 		cmdResult: cmdResult,
@@ -482,7 +495,7 @@ func constructNodeMapForStatus(flags *StatusCmdFlags, infra *AutomateHAInfraDeta
 		},
 		Postgresql: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      BACKEND_STATUS_CMD,
+				Cmd:                      "",
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.postgresql,
@@ -493,7 +506,7 @@ func constructNodeMapForStatus(flags *StatusCmdFlags, infra *AutomateHAInfraDeta
 		},
 		Opensearch: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      BACKEND_STATUS_CMD,
+				Cmd:                      "",
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.opensearch,

@@ -59,10 +59,11 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 		{
 			description: "Want service_versions of backend services",
 			flags: &ServiceVersionsCmdFlags{
-				automate:   false,
-				chefServer: false,
-				opensearch: true,
-				postgresql: true,
+				automate:         false,
+				chefServer:       false,
+				opensearch:       true,
+				postgresql:       true,
+				acceptHabLicense: true,
 			},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -179,6 +180,30 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 			},
 			errorWant: errors.New("Some error occured while remote execution"),
 		},
+		{
+			description: "Want service_versions of backend services with --accept-hab-license",
+			flags: &ServiceVersionsCmdFlags{
+				automate:   false,
+				chefServer: false,
+				opensearch: true,
+				postgresql: true,
+			},
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				SetWriterFunc: func(cli *cli.Writer) {},
+			},
+			errorWant: nil,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -281,7 +306,7 @@ func TestConstructNodeMapForServiceVersions(t *testing.T) {
 				},
 				Postgresql: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      BACKEND_SERVICE_VERSIONS_CMD,
+						Cmd:                      "",
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
@@ -291,7 +316,7 @@ func TestConstructNodeMapForServiceVersions(t *testing.T) {
 				},
 				Opensearch: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      BACKEND_SERVICE_VERSIONS_CMD,
+						Cmd:                      "",
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
