@@ -18,7 +18,6 @@ import (
 var EXECUTABLE_PATH string
 
 func main() {
-
 	if len(EXECUTABLE_PATH) == 0 {
 		log.Fatal("No value present for executable path.")
 	}
