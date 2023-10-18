@@ -1,0 +1,33 @@
+[automate]
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
+
+  [[automate.ips]]
+    ip = "198.51.100.0"
+    public_key = "../../pkg/testfiles/certs/test_a2_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_a2_private_key_1.pem"
+
+[chef_server]
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
+
+  [[chef_server.ips]]
+    ip = "198.51.100.2"
+    public_key = "../../pkg/testfiles/certs/test_cs_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_cs_private_key_1.pem"
+
+[postgresql]
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
+
+  [[postgresql.ips]]
+    ip = "198.51.100.7"
+    public_key = "../../pkg/testfiles/certs/test_pg_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_pg_private_key_1.pem"
+
+  [[postgresql.ips]]
+    ip = "198.51.100.8"
+    public_key = "../../pkg/testfiles/certs/test_os_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_pg_public_key_2.pem"
+
+  [[postgresql.ips]]
+    ip = "198.51.100.9"
+    public_key = "../../pkg/testfiles/certs/test_pg_public_key_3.pem"
+    private_key = "../../pkg/testfiles/certs/test_pg_private_key_3.pem"

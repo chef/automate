@@ -107,20 +107,6 @@ const (
 	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip during common name patching as the following %s have same common name as currently provided OpenSearch common name.\n\t %s"
 	DEFAULT_TIMEOUT                   = 600
 
-	AUTOMATE_HA_CLUSTER_CONFIG = `
-	[[load_balancer.v1.sys.frontend_tls]]
-		cert = """%v"""
-		key = """%v"""
-	[[global.v1.frontend_tls]]
-		cert = """%v"""
-		key = """%v"""
-	[global.v1.external.postgresql.ssl]
-		enable = true
-		root_cert = """%v"""
-	[global.v1.external.opensearch.ssl]
-		root_cert = """%v"""
-		server_name = "%v"
-	`
 	MAINTENANICE_ON_LAG = `
 Follower nodes are behind leader node by %d bytes, to avoid data loss we will put cluster on maintenance mode, do you want to continue :
 `
@@ -228,7 +214,7 @@ func init() {
 	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process")
 
 	RootCmd.AddCommand(certRotateCmd)
-	RootCmd.AddCommand(certTemplateGenerateCmd)
+	certRotateCmd.AddCommand(certTemplateGenerateCmd)
 }
 
 func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args []string) error {
@@ -261,8 +247,13 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 			return errors.WithStack(err)
 		}
 
+		statusSummary, err := getStatusSummary(infra, sshUtil)
+		if err != nil {
+			return err
+		}
+
 		if len(flagsObj.cluster) > 0 {
-			err = c.certRotateFromTemplate(flagsObj.cluster, sshUtil, infra, currentCertsInfo)
+			err = c.certRotateFromTemplate(flagsObj.cluster, sshUtil, infra, currentCertsInfo, statusSummary, true, 10, 60)
 			if err != nil {
 				return err
 			}
@@ -762,7 +753,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 			return err
 		}
 
-		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
+		fmt.Printf("Started Applying the Configurations in %s node: %s \n", remoteService, ips[i])
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
 			writer.Errorf("%v", err)
@@ -1224,37 +1215,24 @@ func uniqueIps(ips []string) []string {
 	return uniqueIps
 }
 
-func getStatusSummary() (StatusSummary, error) {
-	infra, err := getAutomateHAInfraDetails()
-	if err != nil {
-		return nil, err
-	}
+func getStatusSummary(infra *AutomateHAInfraDetails, sshUtil SSHUtil) (StatusSummary, error) {
 	var statusSummaryCmdFlags = StatusSummaryCmdFlags{
 		isPostgresql: true,
 	}
-	sshUtil := NewSSHUtil(&SSHConfig{})
 	remoteCmdExecutor := NewRemoteCmdExecutorWithoutNodeMap(sshUtil, writer)
 	statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &statusSummaryCmdFlags, remoteCmdExecutor)
-	err = statusSummary.Prepare()
+	err := statusSummary.Prepare()
 	if err != nil {
 		return nil, err
 	}
 	return statusSummary, nil
 }
 
-func getPGLeader() (string, string) {
-	statusSummary, err := getStatusSummary()
-	if err != nil {
-		return "", ""
-	}
+func getPGLeader(statusSummary StatusSummary) (string, string) {
 	return statusSummary.GetPGLeaderNode()
 }
 
-func getMaxPGLag(log logger.Logger) (int64, error) {
-	statusSummary, err := getStatusSummary()
-	if err != nil {
-		return 0, err
-	}
+func getMaxPGLag(log logger.Logger, statusSummary StatusSummary) (int64, error) {
 	lag := statusSummary.GetPGMaxLagAmongFollowers()
 	log.Debug("==========================================================")
 	log.Debug("Total lag in PostgreSQL follower node is %d \n", lag)
@@ -1293,31 +1271,33 @@ func startTrafficOnChefServerNode(infra *AutomateHAInfraDetails, sshConfig sshut
 	return nil
 }
 
-func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger) error {
+func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtils sshutils.SSHUtil, log logger.Logger, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
 	fontendIps := infra.Outputs.AutomatePrivateIps.Value
 	fontendIps = append(fontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
-	lag, err := getMaxPGLag(log)
+	lag, err := getMaxPGLag(log, statusSummary)
 	if err != nil {
 		return err
 	}
 	//////////////////////////////////////////////////////////////////////////
-	agree, err := writer.Confirm(fmt.Sprintf(MAINTENANICE_ON_LAG, lag))
-	if err != nil {
-		return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+	if userConsent {
+		agree, err := writer.Confirm(fmt.Sprintf(MAINTENANICE_ON_LAG, lag))
+		if err != nil {
+			return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+		}
+		if !agree {
+			return status.New(status.InvalidCommandArgsError, errMLSA)
+		}
 	}
-	if !agree {
-		return status.New(status.InvalidCommandArgsError, errMLSA)
-	}
-	err = frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, ON, fontendIps, log)
+	err = frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtils, ON, fontendIps, log)
 	if err != nil {
 		return err
 	}
 	//////////////////////////////////////////////////////////////////////////
 
 	waitingStart := time.Now()
-	time.Sleep(10 * time.Second)
+	time.Sleep(waitTime * time.Second)
 	for {
-		lag, err := getMaxPGLag(log)
+		lag, err := getMaxPGLag(log, statusSummary)
 		if err != nil {
 			return err
 		}
@@ -1325,7 +1305,7 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 			break
 		} else {
 			timeElapsed := time.Since(waitingStart)
-			if timeElapsed.Seconds() >= 60 {
+			if timeElapsed.Seconds() >= totalWaitTimeOut.Seconds() {
 				return status.Wrap(errors.New(""), status.UnhealthyStatusError, fmt.Sprintf("Follower node is still behind the leader by %d bytes\n", lag))
 			}
 		}
@@ -1349,7 +1329,7 @@ func getCertsFromTemplate(clusterCertificateFile string) (*CertificateToml, erro
 	return certifiacates, nil
 }
 
-func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates) error {
+func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
 	sshConfig := c.getSshDetails(infra)
 	configRes := sshutils.SSHConfig{
 		SshUser:    sshConfig.sshUser,
@@ -1361,7 +1341,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	c.log.Debug("==========================================================")
 	c.log.Debug("Stopping traffic MAINTENANICE MODE ON")
 	c.log.Debug("==========================================================")
-	err := checkLagAndStopTraffic(infra, configRes, c.sshUtil, c.log)
+	err := checkLagAndStopTraffic(infra, configRes, c.sshUtil, c.log, statusSummary, userConsent, waitTime, totalWaitTimeOut)
 	if err != nil {
 		return err
 	}
@@ -1503,7 +1483,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 		c.writer.Printf("Empty certificate for OpenSearch node %s \n", osIp.IP)
 		return errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
 	}
-	fmt.Printf("Admin cert path : %s", oss.AdminPublickey)
+	fmt.Printf("Admin cert path : %s \n", oss.AdminPublickey)
 	flagsObj := certRotateFlags{
 		opensearch:      true,
 		rootCAPath:      oss.RootCA,
@@ -1648,6 +1628,7 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 	skipIpsList := []string{}
 
 	nodeDn := pkix.Name{}
+	patchConfig := ""
 	if len(certToml.OpenSearch.IPS) > 0 {
 		opensearchFlagsObj := certRotateFlags{
 			opensearch:      true,
@@ -1664,23 +1645,26 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 		if err != nil {
 			return err
 		}
+		opensearchRootCA, err := c.getCertFromFile(certToml.OpenSearch.RootCA, infra)
+		if err != nil {
+			return err
+		}
+		patchConfig = patchConfig + "\n" + fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, string(opensearchRootCA), nodeDn.CommonName)
 	}
-	opensearchRootCA, err := c.getCertFromFile(certToml.OpenSearch.RootCA, infra)
-	if err != nil {
-		return err
-	}
-
-	postgreSQLRootCA, err := c.getCertFromFile(certToml.PostgreSQL.RootCA, infra)
-	if err != nil {
-		return err
+	if len(certToml.PostgreSQL.RootCA) > 0 {
+		postgreSQLRootCA, err := c.getCertFromFile(certToml.PostgreSQL.RootCA, infra)
+		if err != nil {
+			return err
+		}
+		patchConfig = patchConfig + "\n" + fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, string(postgreSQLRootCA))
 	}
 
 	// Creating and patching the required configurations.
-	config := fmt.Sprintf(AUTOMATE_HA_CLUSTER_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert, string(postgreSQLRootCA), string(opensearchRootCA), nodeDn.CommonName)
+	patchConfig = patchConfig + "\n" + fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
 	concurrent := true
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
-		config:        config,
+		config:        patchConfig,
 		fileName:      fileName,
 		timestamp:     timestamp,
 		remoteService: remoteService,
