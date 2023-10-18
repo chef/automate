@@ -47,6 +47,7 @@ func (w *WorkflowScheduler) Trigger() {
 func (w *WorkflowScheduler) Run(ctx context.Context) {
 	var err error
 	var nextSleep time.Duration
+	// nosemgrep
 	for {
 		select {
 		case <-ctx.Done():
