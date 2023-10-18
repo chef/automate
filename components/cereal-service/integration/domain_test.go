@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -7,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -20,19 +20,19 @@ import (
 	libgrpc "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/logger"
 )
 
 func TestDomains(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logrus.SetLevel(logrus.DebugLevel)
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(testDBURL(), postgres.WithTaskPingInterval(3*time.Second))
 	require.NoError(t, pgBackend.Init())
 
 	grpcServer := grpc.NewServer()
-	svc := server.NewCerealService(ctx, pgBackend)
+	svc := server.NewCerealService(ctx, pgBackend, logger.NewTestLogger())
 	grpccereal.RegisterCerealServiceServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
 	cereal.MaxWakeupInterval = 2 * time.Second

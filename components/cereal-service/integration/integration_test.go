@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -10,7 +11,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc"
@@ -22,6 +22,7 @@ import (
 	cerealintegration "github.com/chef/automate/lib/cereal/integration"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/pg"
 )
 
@@ -70,13 +71,12 @@ func runResetDB() error {
 
 func TestGrpcPostgres(t *testing.T) {
 	ctx := context.Background()
-	logrus.SetLevel(logrus.DebugLevel)
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(testDBURL(), postgres.WithTaskPingInterval(3*time.Second))
 	require.NoError(t, pgBackend.Init())
 
 	grpcServer := grpc.NewServer()
-	svc := server.NewCerealService(ctx, pgBackend)
+	svc := server.NewCerealService(ctx, pgBackend, logger.NewTestLogger())
 	grpccereal.RegisterCerealServiceServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
 	defer g.Close()
