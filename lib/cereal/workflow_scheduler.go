@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 )
 
@@ -22,13 +22,15 @@ type WorkflowScheduler struct {
 	backend           SchedulerDriver
 	workflowWakeupFun func()
 	triggerChan       chan struct{}
+	log               logger.Logger
 }
 
-func NewWorkflowScheduler(b SchedulerDriver, w func()) *WorkflowScheduler {
+func NewWorkflowScheduler(b SchedulerDriver, w func(), log logger.Logger) *WorkflowScheduler {
 	return &WorkflowScheduler{
 		backend:           b,
 		workflowWakeupFun: w,
 		triggerChan:       make(chan struct{}),
+		log:               log,
 	}
 }
 
@@ -48,19 +50,19 @@ func (w *WorkflowScheduler) Run(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Info("WorkflowScheduler shutting down")
+			w.log.Info("WorkflowScheduler shutting down")
 			return
 		case <-w.triggerChan:
 			nextSleep, err = w.scheduleWorkflows(ctx)
 			if err != nil {
-				logrus.WithError(err).Error("Failed to schedule workflows")
+				w.log.WithError(err).Error("Failed to schedule workflows")
 			}
 		case <-time.After(nextSleep):
 			nextSleep, err = w.scheduleWorkflows(ctx)
 			if err != nil {
-				logrus.WithError(err).Error("Failed to schedule workflows")
+				w.log.WithError(err).Error("Failed to schedule workflows")
 			}
-			logrus.Debugf("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
+			w.log.Debugf("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
 		}
 	}
 }
@@ -91,10 +93,10 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 				if err2 == ErrNoScheduledWorkflows {
 					return MaxWakeupInterval, err
 				}
-				logrus.WithError(err2).Error("Failed to determine next scheduled workflow")
+				w.log.WithError(err2).Error("Failed to determine next scheduled workflow")
 				return MaxWakeupInterval, err
 			}
-			logrus.Debugf("Woke up %fs early for task", time.Until(s.NextDueAt).Seconds())
+			w.log.Debugf("Woke up %fs early for task", time.Until(s.NextDueAt).Seconds())
 			return time.Until(s.NextDueAt), err
 		}
 		return MaxWakeupInterval, errors.Wrap(err, "could not fetch recurring workflows")
@@ -102,12 +104,12 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	defer completer.Close()
 
 	if time.Since(s.NextDueAt) > LateWarningThreshold {
-		logrus.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
+		w.log.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
 	}
 
 	recurrence, err := rrule.StrToRRule(s.Recurrence)
 	if err != nil {
-		logrus.WithError(err).Error("Scheduled workflow has invalid recurrence rule, attempting to disable it")
+		w.log.WithError(err).Error("Scheduled workflow has invalid recurrence rule, attempting to disable it")
 		err2 := completer.DisableSchedule(s)
 		if err2 != nil {
 			return MaxWakeupInterval, errors.Wrap(err2, "failed to disable workflow with invalid recurrence rule")
@@ -122,7 +124,7 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	nowUTC := time.Now().UTC()
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
 	if nextDueAt.IsZero() {
-		logrus.Infof("Recurrence rule for scheduled workflow %q ends after this run, disabling schedule", s.InstanceName)
+		w.log.Infof("Recurrence rule for scheduled workflow %q ends after this run, disabling schedule", s.InstanceName)
 		s.Enabled = false
 	}
 
@@ -130,11 +132,11 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	s.NextDueAt = nextDueAt
 	s.LastEnqueuedAt = nowUTC
 
-	logrus.Debugf("Starting scheduled workflow %q", s.InstanceName)
+	w.log.Debugf("Starting scheduled workflow %q", s.InstanceName)
 	err = completer.EnqueueAndUpdateScheduledWorkflow(s)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
-			logrus.Warnf("Scheduled workflow %q still running, consider increasing recurrence interval", s.InstanceName)
+			w.log.Warnf("Scheduled workflow %q still running, consider increasing recurrence interval", s.InstanceName)
 			// NOTE(ssd) 2019-07-15: If we get
 			// ErrWorkflowInstanceExists, then we know
 			// we've successfully pushed this job into the

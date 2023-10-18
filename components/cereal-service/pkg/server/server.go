@@ -19,6 +19,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cereal"
 	libcereal "github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/logger"
 )
 
 var errInvalidMsg = errors.New("invalid msg")
@@ -35,15 +36,17 @@ var BodyType = struct {
 type CerealService struct {
 	workflowScheduler *libcereal.WorkflowScheduler
 	backend           libcereal.Driver
+	log               logger.Logger
 }
 
-func NewCerealService(ctx context.Context, b libcereal.Driver) *CerealService {
+func NewCerealService(ctx context.Context, b libcereal.Driver, log logger.Logger) *CerealService {
 	cs := &CerealService{
 		backend: b,
+		log:     log,
 	}
 
 	if v, ok := b.(libcereal.SchedulerDriver); ok {
-		cs.workflowScheduler = libcereal.NewWorkflowScheduler(v, func() {})
+		cs.workflowScheduler = libcereal.NewWorkflowScheduler(v, func() {}, log)
 		go cs.workflowScheduler.Run(ctx)
 	}
 
@@ -83,7 +86,7 @@ func validateDomain(domain string) error {
 }
 
 func (s *CerealService) EnqueueWorkflow(ctx context.Context, req *cereal.EnqueueWorkflowRequest) (*cereal.EnqueueWorkflowResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "EnqueueWorkflow",
 		"domain":        req.Domain,
@@ -174,7 +177,7 @@ func readDeqWorkReqMsgForChunkServer(ctx context.Context, s cereal.CerealService
 
 const chunkSize = 64 * 1024 // 64 KiB
 
-func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer, msgType string, msg *cereal.DequeueWorkflowResponse) error {
+func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer, msgType string, msg *cereal.DequeueWorkflowResponse, log logger.Logger) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -194,7 +197,7 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			err = errors.New("Please provide valid body type")
 		}
 		if err != nil {
-			logrus.Errorln("Error marshaling data:", err)
+			log.Errorln("Error marshaling data:", err)
 			out <- err
 			return
 		}
@@ -210,7 +213,7 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			}
 			err = s.Send(data)
 			if err != nil {
-				logrus.Errorln("Error sending data:", err)
+				log.Errorln("Error sending data:", err)
 				out <- err
 				return
 			}
@@ -220,7 +223,7 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 		}
 		err = s.Send(data)
 		if err != nil {
-			logrus.Errorln("Error sending data:", err)
+			log.Errorln("Error sending data:", err)
 		}
 
 		select {
@@ -265,7 +268,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 	ctx, cancel := context.WithTimeout(req.Context(), time.Minute)
 	defer cancel()
 
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "DequeueWorkflow",
 	})
@@ -416,7 +419,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 	ctx, cancel := context.WithTimeout(req.Context(), 5*time.Minute)
 	defer cancel()
 
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "DequeueWorkflowChunk",
 	})
@@ -496,7 +499,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 				},
 			},
 		},
-	})
+	}, s.log)
 	if err != nil {
 		logctx.WithError(err).Error("failed to respond with workflow event")
 		return err
@@ -554,7 +557,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 		Cmd: &cereal.DequeueWorkflowResponse_Committed_{
 			Committed: &cereal.DequeueWorkflowResponse_Committed{},
 		},
-	})
+	}, s.log)
 	if err != nil {
 		logctx.WithError(err).Error("failed to respond with committed message")
 		return err
@@ -564,7 +567,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 }
 
 func (s *CerealService) CancelWorkflow(ctx context.Context, req *cereal.CancelWorkflowRequest) (*cereal.CancelWorkflowResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "CancelWorkflow",
 		"domain":        req.Domain,
@@ -587,7 +590,7 @@ func (s *CerealService) CancelWorkflow(ctx context.Context, req *cereal.CancelWo
 }
 
 func (s *CerealService) KillWorkflow(ctx context.Context, req *cereal.KillWorkflowRequest) (*cereal.KillWorkflowResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "KillWorkflow",
 		"domain":        req.Domain,
@@ -669,7 +672,7 @@ func (s *CerealService) DequeueTask(req cereal.CerealService_DequeueTaskServer) 
 	ctx, cancel := context.WithCancel(req.Context())
 	defer cancel()
 
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "DequeueTask",
 	})
@@ -763,7 +766,7 @@ func (s *CerealService) DequeueTask(req cereal.CerealService_DequeueTaskServer) 
 	} else if succeed := msg.GetSucceed(); succeed != nil {
 		logctx.Debug("succeeding task")
 		if err := completer.Succeed(succeed.GetResult()); err != nil {
-			logrus.WithError(err).Error("failed to succeed task")
+			s.log.WithError(err).Error("failed to succeed task")
 			if err == libcereal.ErrTaskLost {
 				return status.Error(codes.FailedPrecondition, err.Error())
 			}
@@ -783,7 +786,7 @@ func (s *CerealService) DequeueTask(req cereal.CerealService_DequeueTaskServer) 
 }
 
 func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.CreateWorkflowScheduleRequest) (*cereal.CreateWorkflowScheduleResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "CreateWorkflowSchedule",
 		"domain":        req.Domain,
@@ -822,7 +825,7 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 }
 
 func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesRequest, out cereal.CerealService_ListWorkflowSchedulesServer) error {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "ListWorkflowSchedules",
 		"domain": req.Domain,
@@ -866,7 +869,7 @@ func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesR
 }
 
 func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cereal.GetWorkflowScheduleByNameRequest) (*cereal.GetWorkflowScheduleByNameResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "GetWorkflowScheduleByName",
 		"domain":        req.Domain,
@@ -925,7 +928,7 @@ func cerealScheduleToGrpcSchedule(logctx *logrus.Entry, schedule *libcereal.Sche
 }
 
 func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *cereal.UpdateWorkflowScheduleByNameRequest) (*cereal.UpdateWorkflowScheduleByNameResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "UpdateWorkflowScheduleByName",
 		"domain":        req.Domain,
@@ -987,7 +990,7 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 }
 
 func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cereal.GetWorkflowInstanceByNameRequest) (*cereal.GetWorkflowInstanceByNameResponse, error) {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "GetWorkflowInstanceByName",
 		"domain":        req.Domain,
@@ -1015,7 +1018,7 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 }
 
 func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesRequest, resp cereal.CerealService_ListWorkflowInstancesServer) error {
-	logctx := logrus.WithFields(logrus.Fields{
+	logctx := s.log.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"domain": req.Domain,
 		"method": "ListWorkflowInstances",

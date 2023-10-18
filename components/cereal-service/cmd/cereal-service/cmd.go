@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -19,6 +18,7 @@ import (
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/logger"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 )
@@ -34,7 +34,8 @@ type config struct {
 	} `mapstructure:"service"`
 	TLS certs.TLSConfig `mapstructure:"tls"`
 	Log struct {
-		Level string `mapstructure:"level"`
+		Level  string `mapstructure:"level"`
+		Format string `mapstructure:"format"`
 	} `mapstructure:"log"`
 	Database struct {
 		URL string `mapstructure:"url"`
@@ -64,19 +65,6 @@ func initConfig() error {
 
 	if err := viper.Unmarshal(&C); err != nil {
 		return err
-	}
-
-	switch C.Log.Level {
-	case "trace":
-		logrus.SetLevel(logrus.TraceLevel)
-	case "debug":
-		logrus.SetLevel(logrus.DebugLevel)
-	case "info":
-		logrus.SetLevel(logrus.InfoLevel)
-	case "warn":
-		logrus.SetLevel(logrus.WarnLevel)
-	case "error":
-		logrus.Error(logrus.ErrorLevel)
 	}
 
 	if C.Database.URL == "" {
@@ -145,6 +133,11 @@ func serve(*cobra.Command, []string) error {
 		grpc.MaxRecvMsgSize(C.Service.MaxRecvSizeBytes),
 	}
 
+	l, err := logger.NewLogger(C.Log.Level, C.Log.Format)
+	if err != nil {
+		return errors.Wrap(err, "could not initialize logger")
+	}
+
 	if C.Service.DisableTLS {
 		grpcServer = grpc.NewServer(grpcServerOpts...) // nosemgrep: go.grpc.security.grpc-server-insecure-connection.grpc-server-insecure-connection
 	} else {
@@ -156,7 +149,7 @@ func serve(*cobra.Command, []string) error {
 		grpcServer = f.NewServer(grpcServerOpts...)
 	}
 
-	svc := server.NewCerealService(ctx, pgBackend)
+	svc := server.NewCerealService(ctx, pgBackend, l)
 	grpccereal.RegisterCerealServiceServer(grpcServer, svc)
 
 	healthSvc := health.NewService()
@@ -174,7 +167,7 @@ func serve(*cobra.Command, []string) error {
 		sig := <-ch
 		healthSvc.Shutdown()
 		grpcServer.GracefulStop()
-		logrus.WithField("signal", sig).Info("Exiting")
+		l.WithField("signal", sig).Info("Exiting")
 	}()
 
 	return grpcServer.Serve(lis)
