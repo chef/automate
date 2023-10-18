@@ -259,10 +259,15 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
 	logrus.Infof("Run: inspec %v", args)
-	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
+	env := map[string]string{
+		"HOME":         tmpDirPath,
+		"TMPDIR":       tmpDirPath,
+		"CHEF_LICENSE": "accept-no-persist",
+	}
+	_, _, err = run(args, nil, defaultTimeout, env)
 	if err != nil {
 		errorContent, _ := readFile(erroutFile)
-		e := fmt.Sprintf("%s\n%s", errorContent)
+		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
 	}
 
@@ -271,7 +276,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, err
 	}
 
-	os.RemoveAll(tmpDirPath)
+	//os.RemoveAll(tmpDirPath)
 
 	jsonContent := findJsonLine([]byte(successContent))
 	err = json.Unmarshal(jsonContent, &res)
@@ -304,7 +309,13 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(json_command, tmpDirPath)
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 	logrus.Infof("Run: inspec %v", args)
-	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
+	//Changing the home directory to tmp directory created
+	env := map[string]string{
+		"HOME":         tmpDirPath,
+		"TMPDIR":       tmpDirPath,
+		"CHEF_LICENSE": "accept-no-persist",
+	}
+	_, _, err = run(args, nil, defaultTimeout, env)
 	if err != nil {
 		errorContent, _ := readFile(erroutFile)
 		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
@@ -316,7 +327,7 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 	}
 
 	logrus.Infof("Running inspec json: %s %v", successContent, err)
-	os.RemoveAll(tmpDirPath)
+	//os.RemoveAll(tmpDirPath)
 
 	return []byte(successContent), nil
 }
@@ -341,8 +352,14 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 	//args = append(args, []string{binName, "archive", tmpDirProfilePath, "-o", outputFilePath, "--overwrite"}...)
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirProfilePath, outputFilePath, stdoutFile, erroutFile}...)
 
+	env := map[string]string{
+		"HOME":         tmpDirPath,
+		"TMPDIR":       tmpDirPath,
+		"CHEF_LICENSE": "accept-no-persist",
+	}
+
 	logrus.Infof("Run: inspec %v", args)
-	_, _, err = run(args, nil, defaultTimeout, inspecShimEnv())
+	_, _, err = run(args, nil, defaultTimeout, env)
 
 	if err != nil {
 		errorContent, _ := readFile(erroutFile)
@@ -354,11 +371,11 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 	if err != nil {
 		return errors.Wrapf(err, "Unable to copy archived file for output file", outputFileName)
 	}
-	err = os.RemoveAll(tmpDirPath)
-	if err != nil {
-		logrus.Errorf("Unable to delete tmp direcotory created %v", err)
+	// err = os.RemoveAll(tmpDirPath)
+	// if err != nil {
+	// 	logrus.Errorf("Unable to delete tmp direcotory created %v", err)
 
-	}
+	// }
 	logrus.Infof("Successfully archived %s to %s", profilePath, outputPath)
 	return nil
 }
