@@ -127,13 +127,12 @@ func serve(*cobra.Command, []string) error {
 	if err := pgBackend.Init(); err != nil {
 		return errors.Wrap(err, "could not initialize database")
 	}
-
 	var grpcServer *grpc.Server
 	grpcServerOpts := []grpc.ServerOption{
 		grpc.MaxRecvMsgSize(C.Service.MaxRecvSizeBytes),
 	}
 
-	l, err := logger.NewLogger(C.Log.Level, C.Log.Format)
+	l, err := logger.NewLogger(C.Log.Format, C.Log.Level)
 	if err != nil {
 		return errors.Wrap(err, "could not initialize logger")
 	}
