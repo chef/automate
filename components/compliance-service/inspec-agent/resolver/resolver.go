@@ -34,8 +34,8 @@ type Resolver struct {
 	secretsClient secrets.SecretsServiceClient
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) *Resolver {
-	scannerServer := scanner.New(managerClient, nodesClient, db)
+func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, secretsClient secrets.SecretsServiceClient, fireJailProfilePath string) *Resolver {
+	scannerServer := scanner.New(managerClient, nodesClient, db, fireJailProfilePath)
 	return &Resolver{managerClient, nodesClient, db, scannerServer, secretsClient}
 }
 

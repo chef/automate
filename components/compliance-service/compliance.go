@@ -603,7 +603,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
 	scanner := scanner.New(mgrClient, nodesClient, db, conf.FireJailExecProfilePath)
-	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
+	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient, conf.FireJailExecProfilePath)
 
 	err = runner.InitCerealManager(cerealManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
 	if err != nil {
