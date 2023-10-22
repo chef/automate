@@ -29,12 +29,13 @@ import (
 
 // PGProfileServer implements the profile store GRPC interface
 type PGProfileServer struct {
-	es                  *relaxting.ES2Backend
-	esClient            *ingestic.ESClient
-	profiles            *config.Profiles
-	store               *dbstore.Store
-	eventsClient        automate_event.EventServiceClient
-	firejailProfilePath string
+	es                      *relaxting.ES2Backend
+	esClient                *ingestic.ESClient
+	profiles                *config.Profiles
+	store                   *dbstore.Store
+	eventsClient            automate_event.EventServiceClient
+	firejailProfilePath     string
+	fireJailExecProfilePath string
 }
 
 func (srv *PGProfileServer) convertProfileToTgz(reader io.ReadCloser, contentType string) (string, error) {

@@ -60,6 +60,7 @@ CONFIG="$CONFIG --lcr-open-search-requests {{cfg.service.lcr_open_search_request
 CONFIG="$CONFIG --enable-enhanced-reporting={{cfg.service.enable_enhanced_compliance_reporting}}"
 CONFIG="$CONFIG --control-populators-count {{cfg.service.control_data_populators_count}}"
 CONFIG="$CONFIG --firejail-profile-path {{pkg.path}}/data/firejail/{{cfg.service.firejail_profile_path}}"
+CONFIG="$CONFIG --firejail-exec-profile-path {{pkg.path}}/data/firejail/{{cfg.service.firejail_exec_profile_path}}"
 
 # Interval in minutes to poll for node status.
 CONFIG="$CONFIG --manager-awsec2-poll {{cfg.nodemanager.awsec2_polling_interval}}"

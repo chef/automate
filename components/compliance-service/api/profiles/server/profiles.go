@@ -14,15 +14,16 @@ import (
 
 // New creates a new server
 func New(db *pgdb.DB, esBackend *relaxting.ES2Backend, esClient *ingestic.ESClient, profiles *config.Profiles,
-	eventsClient automate_event.EventServiceClient, statusSrv *statusserver.Server, firejailProfilePath string) *PGProfileServer {
+	eventsClient automate_event.EventServiceClient, statusSrv *statusserver.Server, firejailProfilePath string, fireJailExecProfilePath string) *PGProfileServer {
 
 	srv := &PGProfileServer{
-		profiles:            profiles,
-		es:                  esBackend,
-		esClient:            esClient,
-		store:               &dbstore.Store{DB: db},
-		eventsClient:        eventsClient,
-		firejailProfilePath: firejailProfilePath,
+		profiles:                profiles,
+		es:                      esBackend,
+		esClient:                esClient,
+		store:                   &dbstore.Store{DB: db},
+		eventsClient:            eventsClient,
+		firejailProfilePath:     firejailProfilePath,
+		fireJailExecProfilePath: fireJailExecProfilePath,
 	}
 
 	// TODO: unbundle object creation from service bootup sanity check

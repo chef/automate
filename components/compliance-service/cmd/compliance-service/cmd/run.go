@@ -112,6 +112,7 @@ func init() {
 	runCmd.Flags().BoolVar(&conf.Service.EnableEnhancedReporting, "enable-enhanced-reporting", false, "upgrade to support enhanced compliance reporting")
 	runCmd.Flags().IntVar(&conf.Service.ControlsPopulatorsCount, "control-populators-count", 1, "Number of  workers for control workers")
 	runCmd.Flags().StringVar(&conf.Service.FirejailProfilePath, "firejail-profile-path", conf.Service.FirejailProfilePath, "Firejail profile path")
+	runCmd.Flags().StringVar(&conf.Service.FireJailExecProfilePath, "firejail-exec-profile-path", conf.Service.FireJailExecProfilePath, "Firejail profile path for exec")
 	// Postgres Config Flags
 	runCmd.Flags().StringVar(&conf.Postgres.ConnectionString, "postgres-uri", conf.Postgres.ConnectionString, "PostgreSQL connection string to use")
 	runCmd.Flags().StringVar(&conf.Postgres.Database, "postgres-database", "", "PostgreSQL database to use. Will override postgres-uri")

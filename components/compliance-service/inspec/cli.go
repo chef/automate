@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -37,6 +38,7 @@ const shimBinName = "inspec_runner"
 const json_command = "json"
 const check_command = "check"
 const archive_command = "archive"
+const exec_command = "exec"
 
 // Set to `true` to emit inspec configuration and environment
 // variables via debug logs. Leave to false for release.
@@ -73,7 +75,7 @@ func writeInputsToYmlFile(inputs map[string]string, filename string) error {
 }
 
 // Scan a target node with all specified profiles
-func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string, inputs map[string]string) ([]byte, []byte, *Error) {
+func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string, inputs map[string]string, fireJailExecProfilePath string) ([]byte, []byte, *Error) {
 	if err := isTimeoutSane(timeout, 12*time.Hour); err != nil {
 		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
 	}
@@ -85,22 +87,45 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	target.ResultIncludeBacktrace = false
 	target.ResultMessageLimit = ResultMessageLimit
 
-	env["HOME"] = os.Getenv("HOME")
+	//env["HOME"] = os.Getenv("HOME")
 
-	args := append([]string{binName, "exec"}, paths...)
+	//args := append([]string{binName, "exec"}, paths...)
 
 	// write the inputs to a file to be passed to inspec during command execution
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+	tmpDirFiles, args, err := getFirejailArgsaAndOutputFileForExec(fireJailExecProfilePath, paths, tmpDirPath)
+	if err != nil {
+		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
+	}
 	if len(inputs) > 0 {
-		filename := "/tmp/inputs.yml"
+		filename := path.Join(tmpDirPath, "inputs.yml")
 		err := writeInputsToYmlFile(inputs, filename)
 		if err != nil {
 			errString := fmt.Sprintf("unable to write inputs to file for scan job %s : %s", target.Hostname, err.Error())
-			return nil, nil, NewInspecError(INVALID_PARAM, errString)
+			return nil, nil, NewInspecError(UNKNOWN_ERROR, errString)
 		}
 		args = append(args, fmt.Sprintf("--input-file %s", filename))
 	}
 
-	stdOut, stdErr, err := run(args, target, timeout, env)
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(exec_command, tmpDirPath)
+	commandArgs := []string{"/bin/sh", shellFile}
+	commandArgs = append(commandArgs, tmpDirFiles...)
+	commandArgs = append(commandArgs, args...)
+	commandArgs = append(commandArgs, stdoutFile, erroutFile)
+	//Changing the home directory to tmp directory created
+	env["HOME"] = tmpDirPath
+	env["TMPDIR"] = tmpDirPath
+	env["CHEF_LICENSE"] = "accept-no-persist"
+
+	logrus.Debugf("Run: inspec %v", args)
+	_, _, err = run(args, nil, defaultTimeout, env)
+	if err != nil {
+		errorContent, _ := readFile(erroutFile)
+		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
+		return nil, nil, NewInspecError(UNKNOWN_ERROR, fmt.Sprintf("Check InSpec exec failed for with message: %s", e))
+	}
+
+	stdOut, stdErr, err := run(commandArgs, target, timeout, env)
 	stdOutErr := ""
 	if len(stdOut) == 0 {
 		stdOutErr = "Empty STDOUT, we have a problem..."
@@ -466,6 +491,45 @@ func findJsonLine(in []byte) []byte {
 	return []byte(rawJson)
 }
 
+func getFirejailArgsaAndOutputFileForExec(firejailprofilePath string, profilePaths []string, tmpDirPath string) ([]string, []string, error) {
+
+	firjailBin := os.Getenv("FIREJAIL")
+	firejailFlag := "--quiet"
+	firejailProfile := fmt.Sprintf("--profile=%s", firejailprofilePath)
+
+	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
+	var tmpProfilePaths []string
+
+	if len(profilePaths) > 0 {
+		for _, profilePath := range profilePaths {
+			fileName := filepath.Base(profilePath)
+			tmpProfilePath := path.Join(tmpDirPath, fileName)
+			err := prerequisiteForExec(tmpDirPath, profilePath)
+			if err != nil {
+				logrus.Errorf("Unable to move files %v", err)
+				return nil, nil, err
+			}
+			tmpProfilePaths = append(tmpProfilePaths, tmpProfilePath)
+		}
+	}
+
+	return tmpProfilePaths, firejailArgs, nil
+}
+
+func prerequisiteForExec(tmpDir string, profilePath string) error {
+	err := os.MkdirAll(tmpDir, 0777)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to make tmp directory")
+	}
+
+	err = fileutils.CopyDir(profilePath, tmpDir, fileutils.Overwrite())
+	if err != nil {
+		return errors.Wrapf(err, "Unable to copy files in tmp directory")
+	}
+
+	return nil
+}
+
 func getFirejailArgsaAndOutputFile(isArchive bool, firejailprofilePath string, profilePath string, tmpDirPath string) (string, []string, error) {
 
 	firjailBin := os.Getenv("FIREJAIL")
@@ -475,7 +539,7 @@ func getFirejailArgsaAndOutputFile(isArchive bool, firejailprofilePath string, p
 	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
 
 	fileName := filepath.Base(profilePath)
-	fileCreated := tmpDirPath + "/" + fileName
+	fileCreated := path.Join(tmpDirPath, fileName)
 
 	if isArchive {
 		tempDirProfile := tmpDirPath + "/" + fileName
@@ -549,6 +613,9 @@ func createShellFileContent(command string) string {
 	}
 	if command == archive_command {
 		return `inspec archive $1 -o $2 --overwrite >$3 2>$4`
+	}
+	if command == exec_command {
+		return "inspec exec $@ >${@: -2:1} 2>${@:$#}"
 	}
 
 	return ""

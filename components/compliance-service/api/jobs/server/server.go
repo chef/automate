@@ -40,13 +40,13 @@ var empty = pb.Empty{}
 
 // New creates a new jobs server
 func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_event.EventServiceClient,
-	managerEndpoint string, cerealManager *cereal.Manager) *Server {
+	managerEndpoint string, cerealManager *cereal.Manager, fireJailExecProfilePath string) *Server {
 	conf := &Server{
 		db:           db,
 		connFactory:  connFactory,
 		eventsClient: eventsClient,
 	}
-	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, cerealManager)
+	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, cerealManager, fireJailExecProfilePath)
 	return conf
 }
 
@@ -54,7 +54,7 @@ func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_eve
 // the scheduler server is used to call the inspec-agent
 func (srv *Server) getComplianceAndSecretsConnection(
 	connectionFactory *secureconn.Factory, db *pgdb.DB,
-	managerEndpoint string, cerealManager *cereal.Manager) {
+	managerEndpoint string, cerealManager *cereal.Manager, fireJailExecProfilePath string) {
 	if managerEndpoint == "" {
 		logrus.Errorf("complianceEndpoint and managerEndpoint cannot be empty or Dial will get stuck")
 		return
@@ -78,7 +78,7 @@ func (srv *Server) getComplianceAndSecretsConnection(
 		return
 	}
 
-	scanner := scanner.New(mgrClient, nodesClient, db)
+	scanner := scanner.New(mgrClient, nodesClient, db, fireJailExecProfilePath)
 	srv.schedulerServer = scheduler.New(scanner, cerealManager)
 }
 

@@ -20,6 +20,7 @@ type Service struct {
 	EnableEnhancedReporting bool
 	ControlsPopulatorsCount int
 	FirejailProfilePath     string
+	FireJailExecProfilePath string
 }
 
 // Compliance service specific config options
