@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -8,7 +9,9 @@ import (
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var fqdn = "a2.test.com"
@@ -101,6 +104,30 @@ func TestTomlFileCreateFromReqConfigLog(t *testing.T) {
 	createTomlFileFromConfig(req, fileName)
 	assert.FileExists(t, fileName)
 	os.Remove(fileName)
+}
+
+func TestCheckIfRequestedIsCentrailisedLogging(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/centralised_log.toml"}
+	val, _ := checkIfRequestedConfigHasCentrailisedLogging(file)
+	assert.True(t, val)
+}
+
+func TestCheckIfRequestedIsCentrailisedLoggingWithPgConfig(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/pg.toml"}
+	val, _ := checkIfRequestedConfigHasCentrailisedLogging(file)
+	assert.Equal(t, val, false)
+}
+
+func TestCheckIfRequestedIsCentrailisedLoggingWithInvalidFile(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/centralised.toml"}
+	_, err := checkIfRequestedConfigHasCentrailisedLogging(file)
+	assert.Error(t, err)
+}
+
+func TestCheckIfRequestedIsCentrailisedLoggingwitherror(t *testing.T) {
+	file := []string{"../../pkg/testfiles/aws/centralised_log.toml"}
+	val, _ := checkIfRequestedConfigHasCentrailisedLogging(file)
+	assert.True(t, val)
 }
 
 func TestErrorOnSelfManaged(t *testing.T) {
@@ -246,6 +273,279 @@ func TestSetConfigForFrontEndNodes(t *testing.T) {
 			assert.NoError(t, err)
 		}
 	}
+}
+
+func TestPatchConfigCommand(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	tests := []struct {
+		testName     string
+		infra        *AutomateHAInfraDetails
+		sshUtil      SSHUtil
+		args         []string
+		isAutomate   bool
+		isChefServer bool
+		iPostgresql  bool
+		isOpenSearch bool
+		wantErr      bool
+	}{
+		{
+			"patch for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			false,
+			false,
+			true,
+			false,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			if err := runPatchCommand(&cobra.Command{}, tt.args); (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+func TestCheckUserConfigHasOnlyCentrailisedLogConfig(t *testing.T) {
+	t.Run("Returning false as the file is not empty", func(t *testing.T) {
+		fileContent := `[global.v1.log]
+		compress_rotated_logs = true
+		max_number_rotated_logs = 10
+		max_size_rotate_logs = "10M"
+		redirect_log_file_path = "/var/tmp/"
+		redirect_sys_log = true`
+		tmpfile, err := ioutil.TempFile("", "test-output.toml")
+		require.NoError(t, err)
+
+		n, err := tmpfile.Write([]byte(fileContent))
+		require.NoError(t, err)
+		require.NotZero(t, n)
+
+		err = tmpfile.Close()
+		require.NoError(t, err)
+
+		isOnlyCentralisedLog, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
+		require.NoError(t, err)
+		require.Equal(t, isOnlyCentralisedLog, false)
+		require.NoError(t, err)
+		err = os.Remove(tmpfile.Name())
+		require.NoError(t, err)
+	})
+	t.Run("Returning true as the file is empty", func(t *testing.T) {
+		fileContent := ``
+		tmpfile, err := ioutil.TempFile("", "test-output.toml")
+		require.NoError(t, err)
+
+		_, err = tmpfile.Write([]byte(fileContent))
+		require.NoError(t, err)
+
+		err = tmpfile.Close()
+		require.NoError(t, err)
+
+		isOnlyCentralisedLog, err := checkUserConfigHasOnlyCentrailisedLogConfig(tmpfile.Name())
+		require.NoError(t, err)
+		require.Equal(t, isOnlyCentralisedLog, true)
+		require.NoError(t, err)
+		require.NoError(t, err)
+		err = os.Remove(tmpfile.Name())
+
+	})
+	t.Run("File not found", func(t *testing.T) {
+		filePath := "testdata/notfound.json"
+		_, err := checkUserConfigHasOnlyCentrailisedLogConfig(filePath)
+		require.Error(t, err)
+	})
+}
+
+func TestPatchAndRemoveCentralisedLoggingForBackendForPg(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"patch and remove centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			fileName, err := patchAndRemoveCentralisedLoggingForBackend(tt.args, infra)
+			os.Remove(fileName)
+			assert.Nilf(t, err, "Unable to created toml file for postgresql toml")
+
+		})
+	}
+
+}
+
+func TestPatchAndRemoveCentralisedLoggingForBackendWithError(t *testing.T) {
+	infra := getMockInfra()
+	file := ""
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Error while patching and remove centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			fileName, err := patchAndRemoveCentralisedLoggingForBackend(tt.args, infra)
+			os.Remove(fileName)
+			assert.Error(t, err)
+
+		})
+	}
+
+}
+
+func TestPatchCentralisedLoggingForBackendForPg(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Patch centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			configCmdFlags.postgresql = true
+			err := patchCentralisedLoggingForBackend(tt.args, tt.sshUtil, infra)
+			assert.Nilf(t, err, "Unable to created toml file for postgresql toml")
+
+		})
+	}
+
+}
+
+func TestPatchCentralisedLoggingForBackendForPgWithError(t *testing.T) {
+	infra := getMockInfra()
+	file := ""
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Error while patching centralised log for pg",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			configCmdFlags.postgresql = true
+			err := patchCentralisedLoggingForBackend(tt.args, tt.sshUtil, infra)
+			assert.Error(t, err)
+
+		})
+	}
+
+}
+
+func TestPatchCentralisedLoggingForBackendForOs(t *testing.T) {
+	infra := getMockInfra()
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	tests := []struct {
+		testName string
+		infra    *AutomateHAInfraDetails
+		sshUtil  SSHUtil
+		args     []string
+		wantErr  bool
+	}{
+		{
+			"Patch centralised log for os",
+			infra,
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{file},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			configCmdFlags.opensearch = true
+			err := patchCentralisedLoggingForBackend(tt.args, tt.sshUtil, infra)
+			assert.Nilf(t, err, "Unable to created toml file for postgresql toml")
+
+		})
+	}
+
+}
+
+func TestRemoveCentralisedLogsFromUserConfigForPg(t *testing.T) {
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
+	t.Run("Remove log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForPg(file)
+			os.Remove(file)
+			assert.NoError(t, err)
+
+		},
+	)
+	t.Run("Error while removing log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForPg(emptyFile)
+			os.Remove(file)
+			assert.Error(t, err)
+
+		},
+	)
+}
+
+func TestRemoveCentralisedLogsFromUserConfigForOs(t *testing.T) {
+	file := "../../pkg/testfiles/aws/centralised_log.toml"
+	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
+	t.Run("Remove log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForOs(file)
+			os.Remove(file)
+			assert.NoError(t, err)
+
+		},
+	)
+	t.Run("Error while removing log config from the file",
+		func(t *testing.T) {
+			file, err := removeCentralisedLogsFromUserConfigForOs(emptyFile)
+			os.Remove(file)
+			assert.Error(t, err)
+
+		},
+	)
+
 }
 
 func getMockSSHUtil(sshConfig *SSHConfig, CFTRError error, CSECOROutput string, CSECORError error) *MockSSHUtilsImpl {

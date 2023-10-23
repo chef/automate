@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"reflect"
 	"regexp"
 	"strings"
@@ -11,6 +12,8 @@ import (
 	"path/filepath"
 
 	"github.com/fatih/color"
+	ptoml "github.com/pelletier/go-toml"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -462,6 +465,23 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
 			return errors.Errorf("The operation timeout duration for each individual node during the config patch process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
 		}
+		isLoggerConfig, err := checkIfRequestedConfigHasCentrailisedLogging(args)
+		if err != nil {
+			return err
+		}
+		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isLoggerConfig {
+			modifiedConfig, err := patchAndRemoveCentralisedLoggingForBackend(args, infra)
+			if err != nil {
+				return err
+			}
+			checkIfConfigHasOnlyLogConfig, err := checkUserConfigHasOnlyCentrailisedLogConfig(modifiedConfig)
+			if err != nil {
+				return err
+			}
+			if checkIfConfigHasOnlyLogConfig {
+				return nil
+			}
+		}
 
 		configFile := args[0]
 		configFileName := stringutils.GetFileName(configFile)
@@ -561,6 +581,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		} else {
 			writer.Println(cmd.UsageString())
 		}
+		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isLoggerConfig {
+			os.Remove(configFile)
+		}
 
 	} else {
 		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
@@ -592,6 +615,55 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func patchAndRemoveCentralisedLoggingForBackend(args []string, infra *AutomateHAInfraDetails) (string, error) {
+	var inputfile string
+	sshconfig := &SSHConfig{}
+	sshconfig.sshUser = infra.Outputs.SSHUser.Value
+	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+	sshconfig.sshPort = infra.Outputs.SSHPort.Value
+	sshUtil := NewSSHUtil(sshconfig)
+
+	err := patchCentralisedLoggingForBackend(args, sshUtil, infra)
+	if err != nil {
+		return "", err
+	}
+	writer.Success("Centralised logging configuration is patched. \n")
+	if configCmdFlags.postgresql {
+		inputfile, err = removeCentralisedLogsFromUserConfigForPg(args[0])
+		if err != nil {
+			return "", err
+		}
+	}
+	if configCmdFlags.opensearch {
+		inputfile, err = removeCentralisedLogsFromUserConfigForOs(args[0])
+		if err != nil {
+			return "", err
+		}
+	}
+	args[0] = inputfile
+	return inputfile, nil
+}
+
+func checkUserConfigHasOnlyCentrailisedLogConfig(inputfile string) (bool, error) {
+	file, err := os.Open(inputfile)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(file)
+	if err != nil {
+		return false, err
+	}
+
+	content := buf.String()
+	if content == "" {
+		os.Remove(inputfile)
+		return true, nil
+	}
+	return false, nil
+}
+
 // prePatchCheckForFrontendNodes patches the configuration for front end nodes in Automate HA
 func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := parseAndRemoveRestrictedKeysFromSrcFile(inputs.Args[0])
@@ -601,6 +673,25 @@ func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Au
 
 	inputs.InputFiles[0] = srcPath
 
+	return nil
+}
+
+func patchCentralisedLoggingForBackend(args []string, sshUtil SSHUtil, infra *AutomateHAInfraDetails) error {
+	var remoteService string
+	var remoteIps []string
+	if configCmdFlags.postgresql {
+		remoteService = "postgresql"
+		remoteIps = infra.Outputs.PostgresqlPrivateIps.Value
+	}
+	if configCmdFlags.opensearch {
+		remoteService = "opensearch"
+		remoteIps = infra.Outputs.OpensearchPrivateIps.Value
+	}
+	// checking for log configuration
+	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, remoteIps)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -617,14 +708,8 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 
 	args := inputs.Args
 
-	//checking for log configuration
-	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value)
-	if err != nil {
-		return err
-	}
-
 	//checking database configuration
-	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, GET_APPLIED_CONFIG, sshUtil)
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, GET_APPLIED_CONFIG, sshUtil, inputs)
 	if err != nil {
 		return err
 	}
@@ -663,12 +748,6 @@ func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *Autom
 	}
 
 	args := inputs.Args
-
-	//checking for log configuration
-	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value)
-	if err != nil {
-		return err
-	}
 
 	//checking database configuration
 	existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, GET_APPLIED_CONFIG, sshUtil)
@@ -905,7 +984,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 	}
 
 	//Getting Requested Config
-	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, postgresql)
+	reqConfigInterface, err := getConfigInterfaceForPostgresqlOrOpenSearch(args, postgresql)
 	if err != nil {
 		return err
 	}
@@ -939,7 +1018,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 	}
 
 	//Getting Requested Config
-	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, opensearch_const)
+	reqConfigInterface, err := getConfigInterfaceForPostgresqlOrOpenSearch(args, opensearch_const)
 	if err != nil {
 		return err
 	}
@@ -1130,8 +1209,8 @@ func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 	return nil, nil
 }
 
-// getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
-func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
+// getConfigInterfaceForPostgresqlOrOpenSearch gets the requested config from the args provided for postgresql or opensearch
+func getConfigInterfaceForPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
 	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
 		return nil, err
@@ -1157,33 +1236,54 @@ func isConfigChanged(src interface{}, dest interface{}) bool {
 	return !reflect.DeepEqual(src, dest)
 }
 
-// getExistingAndRequestedConfigForPostgres get requested and existing config for postgresql
-func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAInfraDetails, config string, sshUtil SSHUtil) (PostgresqlConfig, PostgresqlConfig, error) {
+// getExistingAndRequestedConfigForPostgres get user updating config and existing *applied* config for postgresql
+func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAInfraDetails, config string, sshUtil SSHUtil, inputs *CmdInputs) (PostgresqlConfig, PostgresqlConfig, error) {
+
 	//Getting Existing config from server
-	var existingConfig PostgresqlConfig
+	var existingAppliedConfig PostgresqlConfig
 	var reqConfig PostgresqlConfig
 	var emptyConfig PostgresqlConfig
+
+	// getting applied remote config from pg node
 	srcInputString, err := getConfigFromRemoteServer(infra, postgresql, config, sshUtil)
 	if err != nil {
-		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
+		return existingAppliedConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
 	}
-	existingConfigInterface, err := getDecodedConfig(srcInputString, postgresql)
+	existingAppliedConfigInterface, err := getDecodedConfig(srcInputString, postgresql)
 	if err != nil {
-		return existingConfig, reqConfig, err
+		return existingAppliedConfig, reqConfig, err
 	}
-	existingConfig = existingConfigInterface.(PostgresqlConfig)
+	existingAppliedConfig = existingAppliedConfigInterface.(PostgresqlConfig)
 
 	//Getting Requested Config
-	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, postgresql)
+	reqConfigInterface, err := getConfigInterfaceForPostgresqlOrOpenSearch(args, postgresql)
 	if err != nil {
-		return existingConfig, reqConfig, err
+		return existingAppliedConfig, reqConfig, err
 	}
 	reqConfig = reqConfigInterface.(PostgresqlConfig)
 	if !isConfigChanged(emptyConfig, reqConfig) {
-		return existingConfig, reqConfig, status.Annotate(errors.New("Incorrect Config"), status.ConfigError)
+		return existingAppliedConfig, reqConfig, status.Annotate(errors.New("Incorrect Config"), status.ConfigError)
 	}
-	mergo.Merge(&reqConfig, existingConfig)
-	return existingConfig, reqConfig, nil
+	mergo.Merge(&reqConfig, existingAppliedConfig)
+	return existingAppliedConfig, reqConfig, nil
+}
+
+func checkIfRequestedConfigHasCentrailisedLogging(args []string) (bool, error) {
+	config, err := ptoml.LoadFile(args[0])
+	if err != nil {
+		writer.Println(err.Error())
+		return false, err
+	}
+	if config.Get("global.v1.log") != nil {
+		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+		if isconfig != nil {
+			val := isconfig.Get("redirect_sys_log").(bool)
+			if val == true {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 // getExistingAndRequestedConfigForOpenSearch gets existed and requested config for opensearch
@@ -1203,7 +1303,7 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomateHA
 	existingConfig = existingConfigInterface.(OpensearchConfig)
 
 	//Getting Requested Config
-	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, opensearch_const)
+	reqConfigInterface, err := getConfigInterfaceForPostgresqlOrOpenSearch(args, opensearch_const)
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
@@ -1264,6 +1364,40 @@ func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		}
 		return srcString, nil
 	}
+}
+
+func removeCentralisedLogsFromUserConfigForPg(srcString string) (string, error) {
+	tomlbyt, _ := os.ReadFile(srcString)
+	destString := string(tomlbyt)
+	var dest PostgresqlConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	timestamp := time.Now().Format("20060102150405")
+	tomlFile := srcString + timestamp
+	newSrcString, err := createTomlFileFromConfig(dest, tomlFile)
+	if err != nil {
+		return "", err
+	}
+	return newSrcString, nil
+}
+
+func removeCentralisedLogsFromUserConfigForOs(srcString string) (string, error) {
+	tomlbyt, _ := os.ReadFile(srcString)
+	destString := string(tomlbyt)
+	var dest OpensearchConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	timestamp := time.Now().Format("20060102150405")
+	tomlFile := srcString + timestamp
+	newSrcString, err := createTomlFileFromConfig(dest, tomlFile)
+	if err != nil {
+		return "", err
+	}
+	return newSrcString, nil
 }
 
 // If the output contains the word "error" then return error
