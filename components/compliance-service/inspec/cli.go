@@ -93,10 +93,18 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 
 	// write the inputs to a file to be passed to inspec during command execution
 	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
-	tmpDirFiles, args, err := getFirejailArgsaAndOutputFileForExec(fireJailExecProfilePath, paths, tmpDirPath)
+	args, err := getFirejailArgsaAndOutputFileForExec(fireJailExecProfilePath, paths, tmpDirPath)
 	if err != nil {
 		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
 	}
+
+	tmpKeys := copyKeyFilesIntoTmpDirectory(tmpDirPath, target.KeyFiles)
+	newTarget := target
+	newTarget.KeyFiles = tmpKeys
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(exec_command, tmpDirPath)
+	commandArgs := args
+	commandArgs = append(commandArgs, []string{"/bin/sh", shellFile}...)
+	commandArgs = append(commandArgs, paths...)
 	if len(inputs) > 0 {
 		filename := path.Join(tmpDirPath, "inputs.yml")
 		err := writeInputsToYmlFile(inputs, filename)
@@ -106,26 +114,13 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 		}
 		args = append(args, fmt.Sprintf("--input-file %s", filename))
 	}
-
-	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(exec_command, tmpDirPath)
-	commandArgs := []string{"/bin/sh", shellFile}
-	commandArgs = append(commandArgs, tmpDirFiles...)
-	commandArgs = append(commandArgs, args...)
-	commandArgs = append(commandArgs, stdoutFile, erroutFile)
 	//Changing the home directory to tmp directory created
 	env["HOME"] = tmpDirPath
-	env["TMPDIR"] = tmpDirPath
-	env["CHEF_LICENSE"] = "accept-no-persist"
 
 	logrus.Debugf("Run: inspec %v", args)
-	_, _, err = run(args, nil, defaultTimeout, env)
-	if err != nil {
-		errorContent, _ := readFile(erroutFile)
-		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
-		return nil, nil, NewInspecError(UNKNOWN_ERROR, fmt.Sprintf("Check InSpec exec failed for with message: %s", e))
-	}
-
-	stdOut, stdErr, err := run(commandArgs, target, timeout, env)
+	_, _, err = run(commandArgs, newTarget, timeout, env)
+	stdOut, _ := readFile(stdoutFile)
+	stdErr, _ := readFile(erroutFile)
 	stdOutErr := ""
 	if len(stdOut) == 0 {
 		stdOutErr = "Empty STDOUT, we have a problem..."
@@ -282,7 +277,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
-	logrus.Debugf("Run: inspec %v", args)
+	logrus.Infof("Run: inspec %v", args)
 	env := map[string]string{
 		"HOME":         tmpDirPath,
 		"TMPDIR":       tmpDirPath,
@@ -301,6 +296,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 	}
 
 	errorContent, _ := readFile(erroutFile)
+
 	os.RemoveAll(tmpDirPath)
 
 	jsonContent := findJsonLine([]byte(successContent))
@@ -317,7 +313,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		return res, errors.New(strings.Join(errs, "\n"))
 	}
 
-	logrus.Debugf("Successfully checked inspec profile in %s", profilePath)
+	logrus.Infof("Successfully checked inspec profile in %s", profilePath)
 	return res, nil
 }
 
@@ -491,29 +487,19 @@ func findJsonLine(in []byte) []byte {
 	return []byte(rawJson)
 }
 
-func getFirejailArgsaAndOutputFileForExec(firejailprofilePath string, profilePaths []string, tmpDirPath string) ([]string, []string, error) {
+func getFirejailArgsaAndOutputFileForExec(firejailprofilePath string, profilePaths []string, tmpDirPath string) ([]string, error) {
 
+	err := os.MkdirAll(tmpDirPath, 0777)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Unable to make tmp directory")
+	}
 	firjailBin := os.Getenv("FIREJAIL")
 	firejailFlag := "--quiet"
 	firejailProfile := fmt.Sprintf("--profile=%s", firejailprofilePath)
 
 	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
-	var tmpProfilePaths []string
 
-	if len(profilePaths) > 0 {
-		for _, profilePath := range profilePaths {
-			fileName := filepath.Base(profilePath)
-			tmpProfilePath := path.Join(tmpDirPath, fileName)
-			err := prerequisiteForExec(tmpDirPath, profilePath)
-			if err != nil {
-				logrus.Errorf("Unable to move files %v", err)
-				return nil, nil, err
-			}
-			tmpProfilePaths = append(tmpProfilePaths, tmpProfilePath)
-		}
-	}
-
-	return tmpProfilePaths, firejailArgs, nil
+	return firejailArgs, nil
 }
 
 func prerequisiteForExec(tmpDir string, profilePath string) error {
@@ -597,14 +583,17 @@ func shellscriptAndResponse(command string, tmpDirPath string) (string, string, 
 	stdoutFile := tmpDirPath + "/success_json"
 	erroutFile := tmpDirPath + "/error_json"
 	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
-	contentForShellFile := createShellFileContent(command)
-	createFileAndAddContent(shellFile, contentForShellFile)
+	contentForShellFile := createShellFileContent(command, stdoutFile, erroutFile)
+	err := createFileAndAddContent(shellFile, contentForShellFile)
+	if err != nil {
+		logrus.Errorf("Unable to create shell script for path %s with error %v", shellFile, err)
+	}
 
 	return stdoutFile, erroutFile, shellFile
 
 }
 
-func createShellFileContent(command string) string {
+func createShellFileContent(command string, stdout string, stderr string) string {
 	if command == json_command {
 		return fmt.Sprintf(`inspec %s $1 >$2 2>$3`, command)
 	}
@@ -615,7 +604,7 @@ func createShellFileContent(command string) string {
 		return `inspec archive $1 -o $2 --overwrite >$3 2>$4`
 	}
 	if command == exec_command {
-		return "inspec exec $@ >${@: -2:1} 2>${@:$#}"
+		return fmt.Sprintf(`inspec exec $@ > %s 2>%s`, stdout, stderr)
 	}
 
 	return ""
@@ -644,4 +633,17 @@ func readFile(fileName string) ([]byte, error) {
 
 	return dat, nil
 
+}
+
+func copyKeyFilesIntoTmpDirectory(tmpDirPath string, keyfiles []string) []string {
+	var outputkeys []string
+	for _, keyFile := range keyfiles {
+		key := filepath.Base(keyFile)
+		outputKey := fmt.Sprintf("%s/%s", tmpDirPath, key)
+		fileutils.CopyFile(keyFile, outputKey, fileutils.Overwrite())
+		outputkeys = append(outputkeys, outputKey)
+
+	}
+
+	return outputkeys
 }

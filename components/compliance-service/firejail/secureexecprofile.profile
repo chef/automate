@@ -78,7 +78,8 @@ noroot
 #notv   # disable DVB TV devices
 #nou2f  # disable U2F devices
 #novideo        # disable video capture devices
-net none
+#net none
+protocol unix,inet,inet6,netlink
 #seccomp !chroot        # allowing chroot, just in case this is an Electron app
 #shell none
 #tracelog       # send blacklist violations to syslog
