@@ -158,6 +158,7 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 		return nil, nil, scanErr
 	}
 
+	os.RemoveAll(tmpDirPath)
 	return stdOut, stdErr, nil
 }
 
