@@ -52,6 +52,13 @@ func inspecShimEnv() map[string]string {
 	}
 }
 
+func errorStringValues() []string {
+	return []string{
+		"Permission denied",
+		"Could not resolve host",
+	}
+}
+
 func isTimeoutSane(timeout time.Duration, max time.Duration) error {
 	if timeout < 1*time.Second {
 		return errors.New("Timeout for InSpec CLI should never be less than 1 second. It is probably misconfigured.")
@@ -284,18 +291,24 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 		"CHEF_LICENSE": "accept-no-persist",
 	}
 	_, _, err = run(args, nil, defaultTimeout, env)
+
+	errorContent, fileErr := readFile(erroutFile)
+	if fileErr != nil {
+		return res, errors.New("InSpec check failed for " + profilePath + " with message: " + fileErr.Error())
+
+	}
 	if err != nil {
-		errorContent, _ := readFile(erroutFile)
-		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
-		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
+		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + err.Error() + string(errorContent))
 	}
 
-	successContent, err := readFile(stdoutFile)
-	if err != nil {
+	successContent, fileErr := readFile(stdoutFile)
+	if fileErr != nil {
 		return res, err
 	}
 
-	errorContent, _ := readFile(erroutFile)
+	if checkForError(errorContent, successContent) {
+		return res, errors.New("InSpec check failed for " + profilePath + " with message: " + string(errorContent))
+	}
 
 	os.RemoveAll(tmpDirPath)
 
@@ -335,14 +348,23 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 		"CHEF_LICENSE": "accept-no-persist",
 	}
 	_, _, err = run(args, nil, defaultTimeout, env)
+	errorContent, fileErr := readFile(erroutFile)
+	if fileErr != nil {
+		return nil, errors.New("InSpec json failed for " + profilePath + " with message: " + fileErr.Error())
+
+	}
+
 	if err != nil {
-		errorContent, _ := readFile(erroutFile)
 		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + e)
 	}
 	successContent, err := readFile(stdoutFile)
 	if err != nil {
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + err.Error())
+	}
+
+	if checkForError(errorContent, successContent) {
+		return nil, errors.New("InSpec json failed for " + profilePath + " with message: " + string(errorContent) + "/n" + string(successContent))
 	}
 
 	os.RemoveAll(tmpDirPath)
@@ -381,10 +403,25 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 	logrus.Debugf("Run: inspec %v", args)
 	_, _, err = run(args, nil, defaultTimeout, env)
 
+	errorContent, fileErr := readFile(erroutFile)
+	if fileErr != nil {
+		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + fileErr.Error())
+
+	}
+
 	if err != nil {
-		errorContent, _ := readFile(erroutFile)
 		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + e)
+	}
+
+	successContent, fileErr := readFile(stdoutFile)
+	if fileErr != nil {
+		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + fileErr.Error())
+
+	}
+
+	if checkForError(errorContent, successContent) {
+		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + string(errorContent) + "/n" + string(successContent))
 	}
 
 	err = fileutils.CopyFile(outputFilePath, outputPath)
@@ -646,4 +683,30 @@ func copyKeyFilesIntoTmpDirectory(tmpDirPath string, keyfiles []string) []string
 	}
 
 	return outputkeys
+}
+
+func checkForError(stdErr []byte, stdOut []byte) bool {
+
+	if stdErr != nil && isErrorInOutput(stdErr, errorStringValues()) {
+		return true
+	}
+
+	if stdOut != nil && isErrorInOutput(stdOut, errorStringValues()) {
+		return true
+	}
+
+	return false
+
+}
+
+func isErrorInOutput(fileContent []byte, value []string) bool {
+
+	for _, val := range value {
+		if strings.Contains(string(fileContent), val) {
+			return true
+		}
+	}
+
+	return false
+
 }
