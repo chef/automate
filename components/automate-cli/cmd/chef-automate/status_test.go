@@ -131,7 +131,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 				},
 				Postgresql: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      BACKEND_STATUS_CMD,
+						Cmd:                      "",
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
@@ -142,7 +142,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 				},
 				Opensearch: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      BACKEND_STATUS_CMD,
+						Cmd:                      "",
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
@@ -273,6 +273,71 @@ func TestRunStatusFromBastion(t *testing.T) {
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL),
+		},
+		{
+			description: "Want status pg services when --accept-hab-license provided",
+			flags: &StatusCmdFlags{
+				postgresql:       true,
+				acceptHabLicense: true,
+			},
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				SetWriterFunc: func(cli *cli.Writer) {},
+			},
+			errorWant: nil,
+		},
+		{
+			description: "Want status os services when --accept-hab-license provided",
+			flags: &StatusCmdFlags{
+				opensearch:       true,
+				acceptHabLicense: true,
+			},
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				SetWriterFunc: func(cli *cli.Writer) {},
+			},
+			errorWant: nil,
+		},
+		{
+			description: "Want status all services when --accept-hab-license provided",
+			flags: &StatusCmdFlags{
+				acceptHabLicense: true,
+			},
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				SetWriterFunc: func(cli *cli.Writer) {},
+			},
+			errorWant: nil,
 		},
 	}
 

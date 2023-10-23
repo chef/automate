@@ -17,7 +17,7 @@ import (
 
 const (
 	RESTART_FRONTEND_COMMAND    = `sudo chef-automate restart-services`
-	RESTART_BACKEND_COMMAND     = `sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup`
+	RESTART_BACKEND_COMMAND     = `sudo systemctl restart hab-sup`
 	DEFAULT_TIMEOUT_FOR_RESTART = 1200
 	ERROR_ON_MANAGED_SERVICES   = "Restart for externally configured %s is not supported."
 	CMD_FAILED_MSG              = "Command failed on %s node : %s with error:\n %s\n"

@@ -17,17 +17,19 @@ import (
 )
 
 const (
-	SERVICE_VERSIONS_ERROR_ON_SELF_MANAGED = "Showing the service-versions for externally configured %s is not supported."
-	BACKEND_SERVICE_VERSIONS_CMD           = `sudo HAB_LICENSE=accept-no-persist hab svc status | awk 'NR>1 {split($1,a,"/"); printf "%s/%s %s %s\n", a[1], a[2], a[3], a[4]}'`
-	FRONTEND_SERVICE_VERSIONS_CMD          = "sudo chef-automate service-versions"
+	SERVICE_VERSIONS_ERROR_ON_SELF_MANAGED          = "Showing the service-versions for externally configured %s is not supported."
+	BACKEND_SERVICE_VERSIONS_CMD                    = `sudo HAB_LICENSE=accept-no-persist hab svc status | awk 'NR>1 {split($1,a,"/"); printf "%s/%s %s %s\n", a[1], a[2], a[3], a[4]}'`
+	ACCEPTED_LICENENSE_BACKEND_SERVICE_VERSIONS_CMD = `echo yes | sudo hab svc status  | awk 'NR>1 {split($1,a,"/"); printf "%s/%s %s %s\n", a[1], a[2], a[3], a[4]}'`
+	FRONTEND_SERVICE_VERSIONS_CMD                   = "sudo chef-automate service-versions"
 )
 
 type ServiceVersionsCmdFlags struct {
-	automate   bool
-	chefServer bool
-	postgresql bool
-	opensearch bool
-	node       string
+	automate         bool
+	chefServer       bool
+	postgresql       bool
+	opensearch       bool
+	acceptHabLicense bool
+	node             string
 }
 
 var serviceVersionsCmdFlag = ServiceVersionsCmdFlags{}
@@ -67,6 +69,8 @@ func init() {
 	serviceVersionsCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
 	serviceVersionsCmd.PersistentFlags().StringVar(&serviceVersionsCmdFlag.node, "node", "", "Pass this flag to check service-versions of particular node in the cluster")
 	serviceVersionsCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
+	serviceVersionsCmd.PersistentFlags().BoolVarP(&serviceVersionsCmdFlag.acceptHabLicense, "accept-hab-license", "", false, "Pass this flag to accept hab license for PostgresQL/OpenSearch nodes and check service-versions")
+	serviceVersionsCmd.PersistentFlags().SetAnnotation("accept-hab-license", docs.Compatibility, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(serviceVersionsCmd)
 }
 
@@ -180,6 +184,18 @@ func nodeServiceVersions(flags ServiceVersionsCmdFlags, nodeType string, infra *
 	writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 	remoteExe.SetWriter(writer)
 	nodeMap := constructNodeMapForServiceVersions(infra, &flags)
+	if flags.opensearch && flags.acceptHabLicense {
+		nodeMap.Opensearch.CmdInputs.Cmd = ACCEPTED_LICENENSE_BACKEND_SERVICE_VERSIONS_CMD
+	}
+	if flags.opensearch && !flags.acceptHabLicense {
+		nodeMap.Opensearch.CmdInputs.Cmd = BACKEND_SERVICE_VERSIONS_CMD
+	}
+	if flags.postgresql && flags.acceptHabLicense {
+		nodeMap.Postgresql.CmdInputs.Cmd = ACCEPTED_LICENENSE_BACKEND_SERVICE_VERSIONS_CMD
+	}
+	if flags.postgresql && !flags.acceptHabLicense {
+		nodeMap.Postgresql.CmdInputs.Cmd = BACKEND_SERVICE_VERSIONS_CMD
+	}
 	cmdResult, err := remoteExe.ExecuteWithNodeMap(nodeMap)
 	serviceVersionsCmdResults <- ServiceVersionsCmdResult{
 		cmdResult: cmdResult,
@@ -220,7 +236,7 @@ func constructNodeMapForServiceVersions(infra *AutomateHAInfraDetails, flags *Se
 		},
 		Postgresql: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      BACKEND_SERVICE_VERSIONS_CMD,
+				Cmd:                      "",
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.postgresql,
@@ -230,7 +246,7 @@ func constructNodeMapForServiceVersions(infra *AutomateHAInfraDetails, flags *Se
 		},
 		Opensearch: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      BACKEND_SERVICE_VERSIONS_CMD,
+				Cmd:                      "",
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.opensearch,
