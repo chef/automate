@@ -9,10 +9,10 @@ include disable-programs.inc    # user configuration for programs such as firefo
 ### Home Directory Whitelisting ###
 ### If something goes wrong, this section is the first one to comment out.
 ### Instead, you'll have to relay on the basic blacklisting above.
-#private
+#private 
 blacklist /hab/cache
 blacklist /hab/etc
-#blacklist /hab/svc
+blacklist /hab/svc
 blacklist /hab/launcher
 blacklist /hab/user
 blacklist /hab/studios
@@ -58,7 +58,7 @@ blacklist /hab/pkgs/chef/pg-sidecar-service
 blacklist /hab/pkgs/chef/user-settings-service
 read-only /hab/pkgs/chef/inspec
 blacklist /hab/pkgs/yjain
-
+ 
 ### Filesystem Whitelisting ###
 include whitelist-run-common.inc
 include whitelist-runuser-common.inc
@@ -68,7 +68,7 @@ include whitelist-var-common.inc
 #apparmor       # if you have AppArmor running, try this one!
 caps.drop all
 ipc-namespace
-#netfilter
+netfilter
 #no3d   # disable 3D acceleration
 #nodvd  # disable DVD and CD devices
 #nogroups       # disable supplementary user groups
@@ -78,9 +78,7 @@ noroot
 #notv   # disable DVB TV devices
 #nou2f  # disable U2F devices
 #novideo        # disable video capture devices
-##net none
-#ip 127.0.0.1
-protocol unix,inet,inet6,netlink
+net none
 #seccomp !chroot        # allowing chroot, just in case this is an Electron app
 #shell none
 #tracelog       # send blacklist violations to syslog
