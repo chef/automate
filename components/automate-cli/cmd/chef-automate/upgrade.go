@@ -386,6 +386,9 @@ func restartDeploymentService() error {
 }
 
 func runAutomateHAFlow(args []string, offlineMode bool) error {
+	// First we need to get the version of the automate node from the bootstrap node
+	// Get the version of the node from the airgap bundle from the command line args
+	// In case args airgap-bundle > install-version then proceed, other wise not
 	if !upgradeRunCmdFlags.skipVerify {
 		err := executeConfigVerifyAndPromptConfirmationOnError("")
 		if err != nil {
