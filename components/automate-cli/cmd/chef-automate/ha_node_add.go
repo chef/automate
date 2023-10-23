@@ -52,6 +52,11 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 		if err != nil {
 			return err
 		}
+		// 1. get the version of the automate from the bootstrap_automate
+		// 2. get the bundle name from /hab/a2_deploy_workspace/terraform/a2ha_aib_fe.auto.tfvars
+		// 3. check bundle existing here /hab/a2_deploy_workspace/terraform/transfer_files/*.aib
+		// 1 and 2 should be same then we have to proceed, other wise we have to give instruction how to proceed
+		// we can test the procedure in case 1 and 2 are different
 		return nodeAdder.Execute(c, args)
 	}
 }
