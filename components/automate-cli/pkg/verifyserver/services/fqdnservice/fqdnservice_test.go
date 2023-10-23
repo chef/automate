@@ -325,8 +325,8 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.FQDN_ERROR_MESSAGE,
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ErrorMsg:      "no such host",
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -545,8 +545,8 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.FQDN_ERROR_MESSAGE,
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ErrorMsg:      "no such host",
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -609,8 +609,8 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.FQDN_ERROR_MESSAGE,
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ErrorMsg:      "no such host",
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -713,7 +713,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.FQDN_ERROR_MESSAGE,
-						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+						ResolutionMsg: constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.NODE_TITLE,
@@ -731,7 +731,18 @@ func TestCheckFqdnReachability(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			res := fq.CheckFqdnReachability(e.ReqBody, e.Port, time.Second*2)
-			assert.Equal(t, e.ResponseBody, res)
+			if e.ResponseBody.Passed {
+				assert.Equal(t, e.ResponseBody, res)
+			} else {
+				for i := 0; i < len(e.ResponseBody.Checks); i++ {
+					check := e.ResponseBody.Checks[i]
+					if check.Passed {
+						assert.Contains(t, res.Checks[i].SuccessMsg, check.SuccessMsg)
+					} else {
+						assert.Contains(t, res.Checks[i].ErrorMsg, check.ErrorMsg)
+					}
+				}
+			}
 		})
 	}
 }

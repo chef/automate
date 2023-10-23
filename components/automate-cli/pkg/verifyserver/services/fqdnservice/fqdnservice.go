@@ -149,25 +149,45 @@ func (fq *FqdnService) MakeConcurrentCalls(url string, client *http.Client, setN
 	return errors.New("nodes are not reachable")
 }
 
-func (fq *FqdnService) triggerRequest(client *http.Client, url string) error {
-	res, err := client.Get(url)
-	if err != nil {
-		fq.log.Error(err.Error())
-		return err
-	}
+func (fq *FqdnService) triggerRequest(client *http.Client, url string, duration time.Duration) error {
+	timeout := time.After(duration)
 
-	fq.log.Debug("Status Code: ", res.StatusCode)
-	if res.StatusCode != 200 {
-		fq.log.Debugf("%v is not reachable.", url)
-		return errors.New("fqdn is not reachable")
-	}
+	var fqdnError error
+loop:
+	for {
+		select {
+		case <-timeout:
+			fq.log.Debugf("Stopped making API calls after %v seconds.", duration)
+			if fqdnError == nil {
+				return errors.New(constants.FQDN_ERROR_MESSAGE)
+			}
+			return fqdnError
+		default:
+			res, err := client.Get(url)
+			if err != nil {
+				fq.log.Error("Iteration logs: ", err.Error())
+				fqdnError = err
+				time.Sleep(3 * time.Second)
+				continue
+			}
+			fq.log.Debug("Status Code: ", res.StatusCode)
+			if res.StatusCode != 200 {
+				fq.log.Errorf("%v is not reachable.", url)
+			}
+			if res.StatusCode == 200 {
+				fq.log.Debug("FQDN is reachable")
+				// return nil
+				break loop
+			}
+		}
+		time.Sleep(3 * time.Second)
 
-	fq.log.Debug("Fqdn is Reachable.")
+	}
 	return nil
 }
 
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
-func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDeployment bool, port string) models.Checks {
+func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDeployment bool, port string, duration time.Duration) models.Checks {
 	fq.log.Debug("Checking Fqdn Reachability...")
 	client := fq.createClient(rootCert)
 	var url string
@@ -179,9 +199,17 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 	}
 	fq.log.Debug("URL: ", url)
 
-	err := fq.triggerRequest(client, url)
+	err := fq.triggerRequest(client, url, duration)
 	if err != nil {
-		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
+		resoultion_message := ""
+		if strings.Contains(err.Error(), constants.CERT_CN_MISMATCH_ERROR_PATTERN) {
+			resoultion_message = constants.CERT_CN_MISMATCH_RESOLUTION_MESSAGE
+		} else if strings.Contains(err.Error(), constants.INVALID_FQDN_CERT_ERROR_PATTERN) {
+			resoultion_message = constants.INVALID_FQDN_CERT_RESOLUTION_MESSAGE
+		} else {
+			resoultion_message = constants.GENERIC_FQDN_CERT_RESOLUTION_MESSAGE
+		}
+		return createCheck(constants.FQDN_TITLE, false, "", err.Error(), resoultion_message)
 	}
 	return createCheck(constants.FQDN_TITLE, true, constants.FQDN_TITLE, "", "")
 }
@@ -266,7 +294,7 @@ func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string
 	}
 
 	if certificateValidityCheck {
-		check = fq.fqdnReachable(req.Fqdn, req.RootCert, req.NodeType, req.IsAfterDeployment, port)
+		check = fq.fqdnReachable(req.Fqdn, req.RootCert, req.NodeType, req.IsAfterDeployment, port, duration)
 	} else {
 		check = createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
 	}
