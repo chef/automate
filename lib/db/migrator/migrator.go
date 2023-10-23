@@ -2,6 +2,7 @@ package migrator
 
 import (
 	"net/url"
+	"os"
 
 	"github.com/golang-migrate/migrate"
 	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
@@ -20,9 +21,27 @@ func (l migrationLog) Verbose() bool {
 	return l.verbose
 }
 
+const filePath = "/hab/.skip_migration"
+
 // Migrate executes all migrations we have
+// Addind the filePath check in the below code to avoid the execution for the Migation code
+// on the other than First Frontend node.
+// Migration code will execute on the First node (Bootstrap_automate node)
+// On the remaining node migration code execution is not required
 func Migrate(pgURL, migrationsPath string, l logger.Logger, verbose bool) error {
-	return MigrateWithMigrationsTable(pgURL, migrationsPath, "", l, verbose)
+	_, err := os.Stat(filePath)
+	if err == nil {
+		l.Infof("File '%s' exists\n", filePath)
+		return nil
+	} else if os.IsNotExist(err) {
+		l.Infof("File '%s' does not exist\n", filePath)
+		return MigrateWithMigrationsTable(pgURL, migrationsPath, "", l, verbose)
+	} else {
+		l.Infof("Error checking file: %v\n", err)
+		return MigrateWithMigrationsTable(pgURL, migrationsPath, "", l, verbose)
+	}
+	//l.Infof("Ideally this should not be printed")
+	//return nil
 }
 
 // MigrateWithMigrationsTable executes all migrations we have, using the
