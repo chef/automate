@@ -18,12 +18,12 @@ pkg_deps=(
   core/gzip
   core/jq-static
   core/openssh
-  core/openssl/1.0.2zb/20220311111046
+  core/openssl
   core/make
   core/curl
-  core/rsync/3.2.3/20220817235706
-  schaudha/terraform/1.5.7/20230921122623
-  core/hab/1.6.521/20220603154827
+  core/rsync
+  core/terraform1
+  core/hab
 )
 
 
