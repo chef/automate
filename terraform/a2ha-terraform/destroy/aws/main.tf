@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "aws_metadata" {
-  source     = "../../modules/aws_metadata"
+  source = "../../modules/aws_metadata"
 }
 
 module "aws" {
@@ -38,7 +38,7 @@ module "aws" {
   opensearch_ebs_volume_size      = var.opensearch_ebs_volume_size
   opensearch_ebs_volume_type      = var.opensearch_ebs_volume_type
   opensearch_instance_count       = var.opensearch_instance_count
-  opensearch_listen_port           = var.opensearch_listen_port
+  opensearch_listen_port          = var.opensearch_listen_port
   opensearch_server_instance_type = var.opensearch_server_instance_type
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   postgresql_ebs_volume_iops      = var.postgresql_ebs_volume_iops
@@ -94,6 +94,6 @@ module "aws-output" {
   postgresql_private_ips  = module.aws.postgresql_private_ips
   opensearch_private_ips  = module.aws.opensearch_private_ips
   automate_fqdn           = module.aws.automate_fqdn
-  automate_frontend_url  = module.aws.automate_frontend_url
+  automate_frontend_url   = module.aws.automate_frontend_url
   bucket_name             = var.backup_config_s3 == "true" ? module.s3[0].bucket_name : ""
 }

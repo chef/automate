@@ -11,7 +11,7 @@ variable "ami_filter_virt_type" {
 }
 
 variable "automate_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -98,7 +98,7 @@ variable "bucket_name" {
 }
 
 variable "chef_server_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -217,7 +217,7 @@ variable "managed_rds_superuser_username_deployment" {
 }
 
 variable "opensearch_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 
@@ -238,7 +238,7 @@ variable "opensearch_private_ips" {
 }
 
 variable "opensearch_root_cert" {
-    default = ""
+  default = ""
 }
 
 variable "opensearch_server_instance_type" {
@@ -262,7 +262,7 @@ variable "os_snapshot_user_access_key_secret_deployment" {
 }
 
 variable "postgresql_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 

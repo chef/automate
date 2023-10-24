@@ -44,7 +44,7 @@ locals {
   })
 
   efs_backup = templatefile("${path.module}/templates/efs_backup.sh.tpl", {
-    nfs_mount_path        = var.nfs_mount_path
+    nfs_mount_path = var.nfs_mount_path
   })
 }
 
@@ -104,7 +104,7 @@ resource "null_resource" "backup_configuration" {
 
   provisioner "file" {
     destination = "${var.tmp_path}/efs_backup.sh"
-    content      = local.efs_backup
+    content     = local.efs_backup
   }
 
   provisioner "remote-exec" {

@@ -1,21 +1,21 @@
 locals {
   checksum_info = [
-    for bundle in var.bundle_files:
+    for bundle in var.bundle_files :
     format("%s %s",
       element(split(" ", file("transfer_files/${bundle.source}.md5")), 0),
       bundle.destination
     )
   ]
   rsync_files = [
-    for bundle in var.bundle_files:
+    for bundle in var.bundle_files :
     format("%s,%s", bundle.source, bundle.destination)
   ]
   airgap_info = templatefile("${path.module}/templates/airgap.info.tpl", {
-    archive_disk_info      = var.archive_disk_info,
-    files                  = join(",", local.rsync_files),
-    instance_count         = var.instance_count,
-    tmp_path               = var.tmp_path,
-    checksums              = join("\n", local.checksum_info)
+    archive_disk_info = var.archive_disk_info,
+    files             = join(",", local.rsync_files),
+    instance_count    = var.instance_count,
+    tmp_path          = var.tmp_path,
+    checksums         = join("\n", local.checksum_info)
   })
 }
 
@@ -30,7 +30,7 @@ resource "null_resource" "rsync" {
   }
 
   triggers = {
-    template = local.airgap_info
+    template   = local.airgap_info
     always_run = timestamp()
   }
 

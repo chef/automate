@@ -37,13 +37,13 @@ data "vsphere_virtual_machine" "template" {
 
 
 locals {
-# This script is meant to be run once at VM provision time only
+  # This script is meant to be run once at VM provision time only
   mount_data_disk = templatefile("${path.module}/mount_data_disk.tpl", {
     disk_dev                = var.vsphere_linux_datadisk_dev,
     lvm_volume_allocate_pct = var.vsphere_linux_lvm_allocate_pct,
     tmp_path                = var.tmp_path
   })
-# This script is meant to be run once at VM provision time only
+  # This script is meant to be run once at VM provision time only
   mount_nfs_share = templatefile("${path.module}/mount_nfs_share.tpl", {
     mount_point = var.nfs_mount_path
   })
