@@ -3290,3 +3290,82 @@ func mockCerts() *certificates {
 		adminKey:    admin_key,
 	}
 }
+
+func TestValidateCertificateTemplate(t *testing.T) {
+	log, _ := logger.NewLogger("text", "info")
+	_, infra := getMockCertRotateFlowAndInfra()
+	certificateTemplate := mockCertifiateTemplate()
+	mockSSHUtils := &sshutils.MockSSHUtilsImpl{
+		CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+			return "", nil
+		},
+	}
+	statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
+		node:         fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8),
+		isAutomate:   true,
+		isChefServer: true,
+		isOpenSearch: true,
+		isPostgresql: true,
+	}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+	})
+	type testCaseInfo struct {
+		description      string
+		certFileName     string
+		inf              *AutomateHAInfraDetails
+		currentCertsInfo *certShowCertificates
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		statusSummary    StatusSummary
+		isError          bool
+		ExpectedError    string
+	}
+	testCases := []testCaseInfo{
+		{
+			description:      "Rotate only frontend Certs",
+			inf:              infra,
+			certFileName:     "../../pkg/testfiles/onprem/certs-config_only_frontend.toml",
+			currentCertsInfo: mockCertShowCertificates(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil:      mockSSHUtils,
+			statusSummary:    statusSummary,
+			isError:          false,
+			ExpectedError:    "",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: &fileutils.FileSystemUtils{},
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl(), log: log}
+			output := c.validateCertificateTemplate(certificateTemplate, testCase.inf)
+			fmt.Println(output)
+			if testCase.isError && len(output) >= 1 {
+				assert.Error(t, output[0], testCase.ExpectedError)
+			} else {
+				assert.NoError(t, nil)
+			}
+		})
+	}
+}
