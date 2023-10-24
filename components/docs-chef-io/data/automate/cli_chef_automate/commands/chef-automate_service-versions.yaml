@@ -9,6 +9,11 @@ options:
   default_value: "false"
   usage: Shows service-versions for Automate nodes[DUPLICATE]
   compatible_with_options: AutomateHA
+- name: accept-hab-license
+  default_value: "false"
+  usage: |
+    Pass this flag to accept hab license for PostgresQL/OpenSearch nodes and check service-versions
+  compatible_with_options: AutomateHA
 - name: automate
   shorthand: a
   default_value: "false"
