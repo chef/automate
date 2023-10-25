@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
@@ -22,6 +23,7 @@ const S3 = "s3"
 type existingInfra struct {
 	config     ExistingInfraConfigToml
 	configPath string
+	log        logger.Logger
 }
 
 type keydetails struct {
@@ -31,8 +33,10 @@ type keydetails struct {
 }
 
 func newExistingInfa(configPath string) *existingInfra {
+	logger, _ := logger.NewLogger("text", "info")
 	return &existingInfra{
 		configPath: configPath,
+		log:        logger,
 	}
 }
 
@@ -77,7 +81,10 @@ func (e *existingInfra) generateConfig(state string) error {
 	if err != nil {
 		return err
 	}
-	e.populateCertificateTomlFile()
+	err = e.populateCertificateTomlFile()
+	if err != nil {
+		return err
+	}
 	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config, state)
 }
 
@@ -100,7 +107,7 @@ type CertificateToml struct {
 	OpenSearch NodeCertficate `toml:"opensearch"`
 }
 
-func (e *existingInfra) populateCertificateTomlFile() {
+func (e *existingInfra) populateCertificateTomlFile() error {
 	// This is just to create the certificate empty file
 	automateCount, _ := strconv.Atoi(e.config.Automate.Config.InstanceCount)
 	chefServerCount, _ := strconv.Atoi(e.config.ChefServer.Config.InstanceCount)
@@ -118,7 +125,7 @@ func (e *existingInfra) populateCertificateTomlFile() {
 			ip.Publickey = "/hab/a2_deploy_workspace/certificate/automte.public.key"
 			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/automte.private.key"
 			ips = append(ips, ip)
-			fmt.Println(e.config.ExistingInfra.Config.AutomatePrivateIps[i], i)
+			e.log.Debug(e.config.ExistingInfra.Config.AutomatePrivateIps[i], i)
 		}
 		automate.IPS = ips
 		certContent.Automate = automate
@@ -136,7 +143,7 @@ func (e *existingInfra) populateCertificateTomlFile() {
 			ip.Publickey = "/hab/a2_deploy_workspace/certificate/chefserver.public.key"
 			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/chefserver.private.key"
 			ips = append(ips, ip)
-			fmt.Println(e.config.ExistingInfra.Config.ChefServerPrivateIps[i], i)
+			e.log.Debug(e.config.ExistingInfra.Config.ChefServerPrivateIps[i], i)
 		}
 		chefserver.IPS = ips
 		certContent.ChefServer = chefserver
@@ -156,7 +163,7 @@ func (e *existingInfra) populateCertificateTomlFile() {
 			ip.Publickey = "/hab/a2_deploy_workspace/certificate/opensearch.public.key"
 			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/opensearch.private.key"
 			ips = append(ips, ip)
-			fmt.Println(e.config.ExistingInfra.Config.OpensearchPrivateIps[i], i)
+			e.log.Debug(e.config.ExistingInfra.Config.OpensearchPrivateIps[i], i)
 		}
 		opensearch.IPS = ips
 		certContent.OpenSearch = opensearch
@@ -174,7 +181,7 @@ func (e *existingInfra) populateCertificateTomlFile() {
 			ip.Publickey = "/hab/a2_deploy_workspace/certificate/postgresql.public.key"
 			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/postgresql.private.key"
 			ips = append(ips, ip)
-			fmt.Println(e.config.ExistingInfra.Config.PostgresqlPrivateIps[i], i)
+			e.log.Debug(e.config.ExistingInfra.Config.PostgresqlPrivateIps[i], i)
 		}
 		postgresql.IPS = ips
 		certContent.PostgreSQL = postgresql
@@ -183,17 +190,18 @@ func (e *existingInfra) populateCertificateTomlFile() {
 	// Open a file for writing (create or overwrite if it exists)
 	file, err := os.Create(CERTIFICATE_TEMPLATE_TOML_FILE)
 	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
+		e.log.Debug("Error creating file:", err)
+		return err
 	}
 	defer file.Close()
 
 	// Use the TOML encoder to write the configuration to the file
 	if err := toml.NewEncoder(file).Encode(certContent); err != nil {
-		fmt.Println("Error encoding TOML:", err)
-		return
+		e.log.Debug("Error encoding TOML:", err)
+		return err
 	}
-	fmt.Printf("Certificate TOML written to %s\n", CERTIFICATE_TEMPLATE_TOML_FILE)
+	e.log.Debug("Certificate TOML written to %s\n", CERTIFICATE_TEMPLATE_TOML_FILE)
+	return nil
 }
 func (e *existingInfra) addDNTocertConfig() error {
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
