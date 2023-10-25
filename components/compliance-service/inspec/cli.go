@@ -346,7 +346,7 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 
 	successContent := readFile(stdoutFile)
 
-	os.RemoveAll(tmpDirFile)
+	os.RemoveAll(tmpDirPath)
 	if err != nil {
 		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + e)
