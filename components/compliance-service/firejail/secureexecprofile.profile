@@ -12,7 +12,7 @@ include disable-programs.inc    # user configuration for programs such as firefo
 #private
 blacklist /hab/cache
 blacklist /hab/etc
-#blacklist /hab/svc
+blacklist /hab/svc
 blacklist /hab/launcher
 blacklist /hab/user
 blacklist /hab/studios
