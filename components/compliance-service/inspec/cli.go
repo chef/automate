@@ -126,8 +126,9 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 
 	logrus.Debugf("Run: inspec %v", args)
 	_, _, err = run(commandArgs, newTarget, timeout, env)
-	stdOut, _ := readFile(stdoutFile)
-	stdErr, _ := readFile(erroutFile)
+	stdOut := readFile(stdoutFile)
+	stdErr := readFile(erroutFile)
+	os.RemoveAll(tmpDirPath)
 	stdOutErr := ""
 	if len(stdOut) == 0 {
 		stdOutErr = "Empty STDOUT, we have a problem..."
@@ -158,7 +159,6 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 		return nil, nil, scanErr
 	}
 
-	os.RemoveAll(tmpDirPath)
 	return stdOut, stdErr, nil
 }
 
@@ -293,25 +293,18 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 	}
 	_, _, err = run(args, nil, defaultTimeout, env)
 
-	errorContent, fileErr := readFile(erroutFile)
-	if fileErr != nil {
-		return res, errors.New("InSpec check failed for " + profilePath + " with message: " + fileErr.Error())
+	errorContent := readFile(erroutFile)
 
-	}
+	successContent := readFile(stdoutFile)
+
+	os.RemoveAll(tmpDirPath)
 	if err != nil {
 		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + err.Error() + string(errorContent))
-	}
-
-	successContent, fileErr := readFile(stdoutFile)
-	if fileErr != nil {
-		return res, err
 	}
 
 	if checkForError(errorContent, successContent) {
 		return res, errors.New("InSpec check failed for " + profilePath + " with message: " + string(errorContent))
 	}
-
-	os.RemoveAll(tmpDirPath)
 
 	jsonContent := findJsonLine([]byte(successContent))
 	err = json.Unmarshal(jsonContent, &res)
@@ -349,26 +342,19 @@ func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
 		"CHEF_LICENSE": "accept-no-persist",
 	}
 	_, _, err = run(args, nil, defaultTimeout, env)
-	errorContent, fileErr := readFile(erroutFile)
-	if fileErr != nil {
-		return nil, errors.New("InSpec json failed for " + profilePath + " with message: " + fileErr.Error())
+	errorContent := readFile(erroutFile)
 
-	}
+	successContent := readFile(stdoutFile)
 
+	os.RemoveAll(tmpDirFile)
 	if err != nil {
 		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + e)
-	}
-	successContent, err := readFile(stdoutFile)
-	if err != nil {
-		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + err.Error())
 	}
 
 	if checkForError(errorContent, successContent) {
 		return nil, errors.New("InSpec json failed for " + profilePath + " with message: " + string(errorContent) + "/n" + string(successContent))
 	}
-
-	os.RemoveAll(tmpDirPath)
 
 	return []byte(successContent), nil
 }
@@ -404,24 +390,16 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 	logrus.Debugf("Run: inspec %v", args)
 	_, _, err = run(args, nil, defaultTimeout, env)
 
-	errorContent, fileErr := readFile(erroutFile)
-	if fileErr != nil {
-		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + fileErr.Error())
-
-	}
+	errorContent := readFile(erroutFile)
+	successContent := readFile(stdoutFile)
 
 	if err != nil {
 		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
+		os.RemoveAll(tmpDirPath)
 		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + e)
 	}
-
-	successContent, fileErr := readFile(stdoutFile)
-	if fileErr != nil {
-		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + fileErr.Error())
-
-	}
-
 	if checkForError(errorContent, successContent) {
+		os.RemoveAll(tmpDirPath)
 		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + string(errorContent) + "/n" + string(successContent))
 	}
 
@@ -429,11 +407,7 @@ func Archive(profilePath string, outputPath string, firejailprofilePath string) 
 	if err != nil {
 		return errors.Wrapf(err, "Unable to copy archived file for output file %s", outputFileName)
 	}
-	err = os.RemoveAll(tmpDirPath)
-	if err != nil {
-		logrus.Errorf("Unable to delete tmp direcotory created %v", err)
-
-	}
+	os.RemoveAll(tmpDirPath)
 	logrus.Debugf("Successfully archived %s to %s", profilePath, outputPath)
 	return nil
 }
@@ -663,13 +637,14 @@ func createFileAndAddContent(fileName string, content string) error {
 	return nil
 }
 
-func readFile(fileName string) ([]byte, error) {
+func readFile(fileName string) []byte {
 	dat, err := os.ReadFile(fileName)
 	if err != nil {
-		return nil, err
+		logrus.Errorf("Unable to read the contents of the file %v", err)
+		return nil
 	}
 
-	return dat, nil
+	return dat
 
 }
 
