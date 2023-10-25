@@ -57,7 +57,6 @@ blacklist /hab/pkgs/chef/license-control-service
 blacklist /hab/pkgs/chef/pg-sidecar-service
 blacklist /hab/pkgs/chef/user-settings-service
 read-only /hab/pkgs/chef/inspec
-blacklist /hab/pkgs/yjain
  
 ### Filesystem Whitelisting ###
 include whitelist-run-common.inc
