@@ -23,7 +23,7 @@ pkg_deps=(
   core/curl
   core/rsync
   core/terraform1
-  core/hab
+  core/hab/1.6.521/20220603154827
 )
 
 
