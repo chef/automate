@@ -28,13 +28,14 @@ import (
 )
 
 type Scanner struct {
-	managerClient manager.NodeManagerServiceClient
-	nodesClient   nodes.NodesServiceClient
-	DB            *pgdb.DB
+	managerClient           manager.NodeManagerServiceClient
+	nodesClient             nodes.NodesServiceClient
+	DB                      *pgdb.DB
+	FireJailExecProfilePath string
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB) *Scanner {
-	return &Scanner{managerClient, nodesClient, db}
+func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, fireJailExecProfilePath string) *Scanner {
+	return &Scanner{managerClient, nodesClient, db, fireJailExecProfilePath}
 }
 
 const sqlUpdateJobStatus = `

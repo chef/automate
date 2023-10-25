@@ -80,7 +80,7 @@ func Zip2Path(zipPath string, extractPath string) error {
 }
 
 // ConvertZipToTarGz extracts the profile to a tmp dir and archives the file as a tar.gz.
-func ConvertZipToTarGz(zipPath string, tarPath string) error {
+func ConvertZipToTarGz(zipPath string, tarPath string, firejailPath string) error {
 	// should we make this user specific
 	tmpPath, err := ioutil.TempDir("", "inspec-upload")
 	if err != nil {
@@ -122,7 +122,7 @@ func ConvertZipToTarGz(zipPath string, tarPath string) error {
 		return err
 	}
 
-	err = inspec.Archive(tmpPath, tarPath)
+	err = inspec.Archive(tmpPath, tarPath, firejailPath)
 	if err != nil {
 		return err
 	}

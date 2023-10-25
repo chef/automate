@@ -85,8 +85,8 @@ func TempUpload(body io.ReadCloser, suffix string) (string, error) {
 	return tmpWithSuffix, nil
 }
 
-func CheckProfile(tmpWithSuffix string) (inspec.CheckResult, error) {
+func CheckProfile(tmpWithSuffix string, firejailProfilePath string) (inspec.CheckResult, error) {
 	defer util.TimeTrack(time.Now(), "CheckProfile")
 
-	return inspec.Check(tmpWithSuffix)
+	return inspec.Check(tmpWithSuffix, firejailProfilePath)
 }

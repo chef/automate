@@ -99,6 +99,7 @@ allowed_licenses:
   - w32-Authors
   - WTFPL
   - Zlib
+  - GPL-2.0
 
 fallbacks:
   golang:

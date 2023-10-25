@@ -420,6 +420,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 				job.NodeStatus = types.StatusCompleted
 			case types.JobTypeExec:
 				// call out to do the ssm job
+				job.FireJailExecProfilePath = t.scannerServer.FireJailExecProfilePath
 				jobInfo.InspecErr = remote.RunSSMJob(ctx, &job)
 			}
 		} else if nodeHasSecrets(&job.TargetConfig) {
@@ -427,6 +428,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 			case types.JobTypeDetect:
 				jobInfo.DetectInfo, jobInfo.InspecErr = doDetect(&job)
 			case types.JobTypeExec:
+				job.FireJailExecProfilePath = t.scannerServer.FireJailExecProfilePath
 				jobInfo.ExecInfo, jobInfo.InspecErr = doExec(&job)
 			}
 		} else {
@@ -806,7 +808,7 @@ func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 	}
 
 	for i, tc := range potentialTargetConfigs(job) {
-		jsonBytes, _, err = inspec.Scan(job.InternalProfiles, &tc, timeout, env, inputs)
+		jsonBytes, _, err = inspec.Scan(job.InternalProfiles, &tc, timeout, env, inputs, job.FireJailExecProfilePath)
 		if err == nil {
 			break
 		}

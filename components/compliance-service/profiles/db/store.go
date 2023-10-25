@@ -26,7 +26,7 @@ type Store struct {
 	DB *pgdb.DB
 }
 
-func (s *Store) GetProfileInfo(filename string) (string, []byte, []byte, error) {
+func (s *Store) GetProfileInfo(filename string, firejailProfilePath string) (string, []byte, []byte, error) {
 	// load profile into memory
 	tarContent, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *Store) GetProfileInfo(filename string) (string, []byte, []byte, error) 
 
 	// JSON file was not pregenerated or could not be read, so delegate to inspec.
 	if len(inspecJSON) == 0 {
-		inspecJSON, err = inspec.Json(filename)
+		inspecJSON, err = inspec.Json(filename, firejailProfilePath)
 		if err != nil {
 			return "", nil, nil, err
 		}
@@ -66,7 +66,7 @@ func (s *Store) GetProfileInfo(filename string) (string, []byte, []byte, error) 
 	return inspecProfile.Sha256, tarContent, inspecJSON, nil
 }
 
-func (s *Store) LoadMarketProfiles(path string) error {
+func (s *Store) LoadMarketProfiles(path string, firejailProfilePath string) error {
 	logrus.Infof("Verify that latest market profiles (%s) are stored in database", path)
 
 	// determine all profiles in directory
@@ -83,7 +83,7 @@ func (s *Store) LoadMarketProfiles(path string) error {
 		logrus.Debugf("Upload profile %s", diskProfile)
 
 		// gather information that we need to store in postgres
-		sha256, tar, info, err := s.GetProfileInfo(diskProfile)
+		sha256, tar, info, err := s.GetProfileInfo(diskProfile, firejailProfilePath)
 		if err != nil {
 			// log error, and ignore profile
 			logrus.Error(err)

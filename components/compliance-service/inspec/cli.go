@@ -8,9 +8,12 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
@@ -25,11 +28,17 @@ var ResultMessageLimit int
 // TmpDir is used for setting the location of the /tmp dir to be used by inspec for caching
 var TmpDir string
 
+var FIREJAIL string
+
 // The timeout used for tasks that just evaluate a profile but do not execute it.
 const defaultTimeout = 2 * time.Minute
 
 const binName = "inspec"
 const shimBinName = "inspec_runner"
+const json_command = "json"
+const check_command = "check"
+const archive_command = "archive"
+const exec_command = "exec"
 
 // Set to `true` to emit inspec configuration and environment
 // variables via debug logs. Leave to false for release.
@@ -40,6 +49,13 @@ func inspecShimEnv() map[string]string {
 		"HOME":         TmpDir,
 		"TMPDIR":       TmpDir,
 		"CHEF_LICENSE": "accept-no-persist",
+	}
+}
+
+func errorStringValues() []string {
+	return []string{
+		"Permission denied",
+		"Could not resolve host",
 	}
 }
 
@@ -66,7 +82,7 @@ func writeInputsToYmlFile(inputs map[string]string, filename string) error {
 }
 
 // Scan a target node with all specified profiles
-func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string, inputs map[string]string) ([]byte, []byte, *Error) {
+func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string, inputs map[string]string, fireJailExecProfilePath string) ([]byte, []byte, *Error) {
 	if err := isTimeoutSane(timeout, 12*time.Hour); err != nil {
 		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
 	}
@@ -78,22 +94,41 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	target.ResultIncludeBacktrace = false
 	target.ResultMessageLimit = ResultMessageLimit
 
-	env["HOME"] = os.Getenv("HOME")
+	//env["HOME"] = os.Getenv("HOME")
 
-	args := append([]string{binName, "exec"}, paths...)
+	//args := append([]string{binName, "exec"}, paths...)
 
 	// write the inputs to a file to be passed to inspec during command execution
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+	args, err := getFirejailArgsaAndOutputFileForExec(fireJailExecProfilePath, paths, tmpDirPath)
+	if err != nil {
+		return nil, nil, NewInspecError(INVALID_PARAM, err.Error())
+	}
+
+	tmpKeys := copyKeyFilesIntoTmpDirectory(tmpDirPath, target.KeyFiles)
+	newTarget := target
+	newTarget.KeyFiles = tmpKeys
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(exec_command, tmpDirPath)
+	commandArgs := args
+	commandArgs = append(commandArgs, []string{"/bin/sh", shellFile}...)
+	commandArgs = append(commandArgs, paths...)
 	if len(inputs) > 0 {
-		filename := "/tmp/inputs.yml"
+		filename := path.Join(tmpDirPath, "inputs.yml")
 		err := writeInputsToYmlFile(inputs, filename)
 		if err != nil {
 			errString := fmt.Sprintf("unable to write inputs to file for scan job %s : %s", target.Hostname, err.Error())
-			return nil, nil, NewInspecError(INVALID_PARAM, errString)
+			return nil, nil, NewInspecError(UNKNOWN_ERROR, errString)
 		}
 		args = append(args, fmt.Sprintf("--input-file %s", filename))
 	}
+	//Changing the home directory to tmp directory created
+	env["HOME"] = tmpDirPath
 
-	stdOut, stdErr, err := run(args, target, timeout, env)
+	logrus.Debugf("Run: inspec %v", args)
+	_, _, err = run(commandArgs, newTarget, timeout, env)
+	stdOut := readFile(stdoutFile)
+	stdErr := readFile(erroutFile)
+	os.RemoveAll(tmpDirPath)
 	stdOutErr := ""
 	if len(stdOut) == 0 {
 		stdOutErr = "Empty STDOUT, we have a problem..."
@@ -238,22 +273,43 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 	return stdout.Bytes(), stderr.Bytes(), err
 }
 
-func Check(profilePath string) (CheckResult, error) {
+func Check(profilePath string, firejailprofilePath string) (CheckResult, error) {
 	var res CheckResult
-
-	args := []string{shimBinName, "check", profilePath, "--format", "json"}
-	logrus.Debugf("Run: inspec %v", args)
-	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
-
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+	tmpDirFile, args, err := getFirejailArgsaAndOutputFile(false, firejailprofilePath, profilePath, tmpDirPath)
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
-		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + e)
+		return res, err
 	}
 
-	jsonContent := findJsonLine(stdout)
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(check_command, tmpDirPath)
+
+	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
+
+	logrus.Infof("Run: inspec %v", args)
+	env := map[string]string{
+		"HOME":         tmpDirPath,
+		"TMPDIR":       tmpDirPath,
+		"CHEF_LICENSE": "accept-no-persist",
+	}
+	_, _, err = run(args, nil, defaultTimeout, env)
+
+	errorContent := readFile(erroutFile)
+
+	successContent := readFile(stdoutFile)
+
+	os.RemoveAll(tmpDirPath)
+	if err != nil {
+		return res, errors.New("Check InSpec check failed for " + profilePath + " with message: " + err.Error() + string(errorContent))
+	}
+
+	if checkForError(errorContent, successContent) {
+		return res, errors.New("InSpec check failed for " + profilePath + " with message: " + string(errorContent))
+	}
+
+	jsonContent := findJsonLine([]byte(successContent))
 	err = json.Unmarshal(jsonContent, &res)
 	if err != nil {
-		return res, fmt.Errorf("Failed to unmarshal json:\n%s\nWith message: %s\nstdout: %s\nstderr: %s", jsonContent, err.Error(), stdout, stderr)
+		return res, fmt.Errorf("Failed to unmarshal json:\n%s\nWith message: %s\nstdout: %s\nstderr: %s", jsonContent, err.Error(), successContent, errorContent)
 	}
 
 	if len(res.Errors) > 0 {
@@ -264,33 +320,94 @@ func Check(profilePath string) (CheckResult, error) {
 		return res, errors.New(strings.Join(errs, "\n"))
 	}
 
-	logrus.Debugf("Successfully checked inspec profile in %s", profilePath)
+	logrus.Infof("Successfully checked inspec profile in %s", profilePath)
 	return res, nil
 }
 
-func Json(profilePath string) ([]byte, error) {
-	args := []string{shimBinName, "json", profilePath}
-	logrus.Debugf("Run: inspec %v", args)
-	stdout, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
-	logrus.Debugf("Run: %s %s %v", stdout, stderr, err)
+func Json(profilePath string, firejailprofilePath string) ([]byte, error) {
+
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
+
+	tmpDirFile, args, err := getFirejailArgsaAndOutputFile(false, firejailprofilePath, profilePath, tmpDirPath)
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
+		return nil, err
+	}
+
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(json_command, tmpDirPath)
+	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
+	//Changing the home directory to tmp directory created
+	env := map[string]string{
+		"HOME":         tmpDirPath,
+		"TMPDIR":       tmpDirPath,
+		"CHEF_LICENSE": "accept-no-persist",
+	}
+	_, _, err = run(args, nil, defaultTimeout, env)
+	errorContent := readFile(erroutFile)
+
+	successContent := readFile(stdoutFile)
+
+	os.RemoveAll(tmpDirPath)
+	if err != nil {
+		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
 		return nil, errors.New("Could not gather profile json for " + profilePath + " caused by: " + e)
 	}
-	return stdout, nil
+
+	if checkForError(errorContent, successContent) {
+		return nil, errors.New("InSpec json failed for " + profilePath + " with message: " + string(errorContent) + "/n" + string(successContent))
+	}
+
+	return []byte(successContent), nil
 }
 
 // Archives a directory to a TAR.GZ
-func Archive(profilePath string, outputPath string) error {
-	args := []string{shimBinName, "archive", profilePath, "-o", outputPath, "--overwrite"}
-	logrus.Debugf("Run: inspec %v", args)
-	_, stderr, err := run(args, nil, defaultTimeout, inspecShimEnv())
+// 1. Creates a tmp directory
+// 2. Copy the uploaded file tmp directory
+// 3. Create firejail command sand box env
+// 4. Create script to add archive command
+func Archive(profilePath string, outputPath string, firejailprofilePath string) error {
+	//Creating a tmp directory for intermittent profile
+	tmpDirPath := fmt.Sprintf("/tmp/inspec-upload-%v", makeTimestamp())
 
+	tmpDirProfilePath, args, err := getFirejailArgsaAndOutputFile(true, firejailprofilePath, profilePath, tmpDirPath)
 	if err != nil {
-		e := fmt.Sprintf("%s\n%s", err.Error(), stderr)
-		return errors.New("InSpec archive failed for " + profilePath + " with message: " + e)
+		return err
 	}
 
+	_, outputFileName := filepath.Split(outputPath)
+	outputFilePath := tmpDirPath + "/" + outputFileName
+
+	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(archive_command, tmpDirPath)
+
+	//args = append(args, []string{binName, "archive", tmpDirProfilePath, "-o", outputFilePath, "--overwrite"}...)
+	args = append(args, []string{"/bin/sh", shellFile, tmpDirProfilePath, outputFilePath, stdoutFile, erroutFile}...)
+
+	env := map[string]string{
+		"HOME":         tmpDirPath,
+		"TMPDIR":       tmpDirPath,
+		"CHEF_LICENSE": "accept-no-persist",
+	}
+
+	logrus.Debugf("Run: inspec %v", args)
+	_, _, err = run(args, nil, defaultTimeout, env)
+
+	errorContent := readFile(erroutFile)
+	successContent := readFile(stdoutFile)
+
+	if err != nil {
+		e := fmt.Sprintf("%s\n%s", err.Error(), errorContent)
+		os.RemoveAll(tmpDirPath)
+		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + e)
+	}
+	if checkForError(errorContent, successContent) {
+		os.RemoveAll(tmpDirPath)
+		return errors.New("InSpec archive failed for " + tmpDirProfilePath + " with message: " + string(errorContent) + "/n" + string(successContent))
+	}
+
+	err = fileutils.CopyFile(outputFilePath, outputPath)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to copy archived file for output file %s", outputFileName)
+	}
+	os.RemoveAll(tmpDirPath)
 	logrus.Debugf("Successfully archived %s to %s", profilePath, outputPath)
 	return nil
 }
@@ -380,4 +497,192 @@ func findJsonLine(in []byte) []byte {
 		}
 	}
 	return []byte(rawJson)
+}
+
+func getFirejailArgsaAndOutputFileForExec(firejailprofilePath string, profilePaths []string, tmpDirPath string) ([]string, error) {
+
+	err := os.MkdirAll(tmpDirPath, 0777)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Unable to make tmp directory")
+	}
+	firjailBin := os.Getenv("FIREJAIL")
+	firejailFlag := "--quiet"
+	firejailProfile := fmt.Sprintf("--profile=%s", firejailprofilePath)
+
+	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
+
+	return firejailArgs, nil
+}
+
+func prerequisiteForExec(tmpDir string, profilePath string) error {
+	err := os.MkdirAll(tmpDir, 0777)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to make tmp directory")
+	}
+
+	err = fileutils.CopyDir(profilePath, tmpDir, fileutils.Overwrite())
+	if err != nil {
+		return errors.Wrapf(err, "Unable to copy files in tmp directory")
+	}
+
+	return nil
+}
+
+func getFirejailArgsaAndOutputFile(isArchive bool, firejailprofilePath string, profilePath string, tmpDirPath string) (string, []string, error) {
+
+	firjailBin := os.Getenv("FIREJAIL")
+	firejailFlag := "--quiet"
+	firejailProfile := fmt.Sprintf("--profile=%s", firejailprofilePath)
+
+	firejailArgs := []string{firjailBin, firejailProfile, firejailFlag}
+
+	fileName := filepath.Base(profilePath)
+	fileCreated := path.Join(tmpDirPath, fileName)
+
+	if isArchive {
+		tempDirProfile := tmpDirPath + "/" + fileName
+		err := prerequisiteForArchive(tempDirProfile, profilePath)
+		if err != nil {
+			logrus.Errorf("Unable to move files %v", err)
+			return "", nil, err
+		}
+		return tempDirProfile, firejailArgs, nil
+	}
+
+	err := prerequisiteForCommands(tmpDirPath, profilePath, fileName)
+	if err != nil {
+		logrus.Errorf("Unable to move files %v", err)
+		return "", nil, nil
+	}
+	return fileCreated, firejailArgs, nil
+}
+
+func prerequisiteForArchive(tmpDir string, file string) error {
+	err := os.MkdirAll(tmpDir, 0777)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to make tmp directory")
+	}
+
+	err = fileutils.CopyDir(file, tmpDir, fileutils.Overwrite())
+	if err != nil {
+		return errors.Wrapf(err, "Unable to copy files in tmp directory")
+	}
+	return nil
+
+}
+
+func prerequisiteForCommands(tmpDir string, filepath string, fileName string) error {
+
+	err := os.MkdirAll(tmpDir, 0777)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to make tmp directory")
+	}
+	tmpDir = tmpDir + "/" + fileName
+	err = fileutils.CopyFile(filepath, tmpDir, fileutils.Overwrite())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func makeTimestamp() int64 {
+	return time.Now().UnixNano()
+}
+
+func shellscriptAndResponse(command string, tmpDirPath string) (string, string, string) {
+
+	stdoutFile := tmpDirPath + "/success_json"
+	erroutFile := tmpDirPath + "/error_json"
+	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
+	contentForShellFile := createShellFileContent(command, stdoutFile, erroutFile)
+	err := createFileAndAddContent(shellFile, contentForShellFile)
+	if err != nil {
+		logrus.Errorf("Unable to create shell script for path %s with error %v", shellFile, err)
+	}
+
+	return stdoutFile, erroutFile, shellFile
+
+}
+
+func createShellFileContent(command string, stdout string, stderr string) string {
+	if command == json_command {
+		return fmt.Sprintf(`inspec %s $1 >$2 2>$3`, command)
+	}
+	if command == check_command {
+		return `inspec check $1 --format json>$2 2>$3`
+	}
+	if command == archive_command {
+		return `inspec archive $1 -o $2 --overwrite >$3 2>$4`
+	}
+	if command == exec_command {
+		return fmt.Sprintf(`inspec exec $@ > %s 2>%s`, stdout, stderr)
+	}
+
+	return ""
+}
+
+func createFileAndAddContent(fileName string, content string) error {
+	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write([]byte(content)); err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func readFile(fileName string) []byte {
+	dat, err := os.ReadFile(fileName)
+	if err != nil {
+		logrus.Errorf("Unable to read the contents of the file %v", err)
+		return nil
+	}
+
+	return dat
+
+}
+
+func copyKeyFilesIntoTmpDirectory(tmpDirPath string, keyfiles []string) []string {
+	var outputkeys []string
+	for _, keyFile := range keyfiles {
+		key := filepath.Base(keyFile)
+		outputKey := fmt.Sprintf("%s/%s", tmpDirPath, key)
+		fileutils.CopyFile(keyFile, outputKey, fileutils.Overwrite())
+		outputkeys = append(outputkeys, outputKey)
+
+	}
+
+	return outputkeys
+}
+
+func checkForError(stdErr []byte, stdOut []byte) bool {
+
+	if stdErr != nil && isErrorInOutput(stdErr, errorStringValues()) {
+		return true
+	}
+
+	if stdOut != nil && isErrorInOutput(stdOut, errorStringValues()) {
+		return true
+	}
+
+	return false
+
+}
+
+func isErrorInOutput(fileContent []byte, value []string) bool {
+
+	for _, val := range value {
+		if strings.Contains(string(fileContent), val) {
+			return true
+		}
+	}
+
+	return false
+
 }

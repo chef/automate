@@ -14,21 +14,23 @@ import (
 
 // New creates a new server
 func New(db *pgdb.DB, esBackend *relaxting.ES2Backend, esClient *ingestic.ESClient, profiles *config.Profiles,
-	eventsClient automate_event.EventServiceClient, statusSrv *statusserver.Server) *PGProfileServer {
+	eventsClient automate_event.EventServiceClient, statusSrv *statusserver.Server, firejailProfilePath string, fireJailExecProfilePath string) *PGProfileServer {
 
 	srv := &PGProfileServer{
-		profiles:     profiles,
-		es:           esBackend,
-		esClient:     esClient,
-		store:        &dbstore.Store{DB: db},
-		eventsClient: eventsClient,
+		profiles:                profiles,
+		es:                      esBackend,
+		esClient:                esClient,
+		store:                   &dbstore.Store{DB: db},
+		eventsClient:            eventsClient,
+		firejailProfilePath:     firejailProfilePath,
+		fireJailExecProfilePath: fireJailExecProfilePath,
 	}
 
 	// TODO: unbundle object creation from service bootup sanity check
 
 	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPRO, "Ensuring Market profiles are up-to-date...")
 	// ensure all market profiles are up to date
-	err := srv.store.LoadMarketProfiles(profiles.MarketPath)
+	err := srv.store.LoadMarketProfiles(profiles.MarketPath, firejailProfilePath)
 	if err != nil {
 		logrus.Errorf("could not ensure all market profiles are up to date: %v", err)
 	}

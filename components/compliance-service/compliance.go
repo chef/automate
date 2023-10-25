@@ -231,11 +231,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting, cerealManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Manager.Endpoint, cerealManager))
+		conf.Manager.Endpoint, cerealManager, conf.Service.FireJailExecProfilePath))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient,
 		conf.Service.LcrOpenSearchRequests, db, conf.Service.EnableEnhancedReporting))
 
-	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
+	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv, conf.Service.FirejailProfilePath, conf.Service.FireJailExecProfilePath)
 	profiles.RegisterProfilesServiceServer(s, ps)
 	profiles.RegisterProfilesAdminServiceServer(s, ps)
 
@@ -602,8 +602,8 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
-	scanner := scanner.New(mgrClient, nodesClient, db)
-	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
+	scanner := scanner.New(mgrClient, nodesClient, db, conf.FireJailExecProfilePath)
+	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient, conf.FireJailExecProfilePath)
 
 	err = runner.InitCerealManager(cerealManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
 	if err != nil {
@@ -703,7 +703,7 @@ type ServiceInfo struct {
 	connFactory *secureconn.Factory
 }
 
-//TODO(jaym) If these don't get exposed in the gateway, we need to provide the http server certs
+// TODO(jaym) If these don't get exposed in the gateway, we need to provide the http server certs
 // this custom route is used by the inspec-agent scanner to retrieve profile tars for scan execution
 func (conf *ServiceInfo) serveCustomRoutes() error {
 	conf.ServerBind = fmt.Sprintf("%s:%d", conf.HostBind, conf.Port)
