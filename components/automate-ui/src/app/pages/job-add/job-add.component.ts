@@ -371,7 +371,8 @@ export class JobAddComponent implements OnDestroy , OnInit {
       ruleOpts['interval'] = repeat.interval;
     }
 
-    return RRule.optionsToString(ruleOpts);
+    
+    return RRule.optionsToString(ruleOpts).replace("\nRRULE:", ";").replace(":", "=");
   }
 
   public nodeFiltersFor(managerGroup) {
