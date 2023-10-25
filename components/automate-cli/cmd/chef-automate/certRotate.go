@@ -1277,7 +1277,7 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 	if err != nil {
 		return err
 	}
-	//////////////////////////////////////////////////////////////////////////
+
 	if userConsent {
 		agree, err := writer.Confirm(fmt.Sprintf(MAINTENANICE_ON_LAG, lag))
 		if err != nil {
@@ -1291,7 +1291,6 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 	if err != nil {
 		return err
 	}
-	//////////////////////////////////////////////////////////////////////////
 
 	waitingStart := time.Now()
 	time.Sleep(waitTime * time.Second)
@@ -1357,6 +1356,14 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		c.log.Debug("==========================================================")
+		c.log.Debug("Defer Starting traffic MAINTENANICE MODE OFF")
+		c.log.Debug("==========================================================")
+		startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log)
+		startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log)
+	}()
 
 	if templateCerts != nil {
 		// rotating PG certs
