@@ -55,7 +55,7 @@ variable "opensearch_admin_key" {
 }
 
 variable "opensearch_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 

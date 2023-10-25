@@ -21,8 +21,8 @@ pkg_deps=(
   core/make
   core/curl
   core/rsync
-  core/terraform/0.14.8/20210826165930
-  core/busybox-static
+  core/terraform1
+  core/busybox-static  
   chef/automate-ha-cluster-ctl
 )
 

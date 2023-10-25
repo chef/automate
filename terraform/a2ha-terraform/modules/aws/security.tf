@@ -3,7 +3,7 @@ resource "aws_security_group" "base_linux" {
   description = "base security rules for all linux nodes"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_linux_security_group"))
+  tags = merge(var.tags, tomap({ "Name" = "${var.tag_name}_${random_id.random.hex}_linux_security_group" }))
 }
 
 resource "aws_security_group" "habitat_supervisor" {
@@ -11,7 +11,7 @@ resource "aws_security_group" "habitat_supervisor" {
   description = "Security rules for the Habitat supervisor"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_habsup_security_group"))
+  tags = merge(var.tags, tomap({ "Name" = "${var.tag_name}_${random_id.random.hex}_habsup_security_group" }))
 }
 
 resource "aws_security_group" "chef_automate" {
@@ -19,7 +19,7 @@ resource "aws_security_group" "chef_automate" {
   description = "Chef Automate Server"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
+  tags = merge(var.tags, tomap({ "Name" = "${var.tag_name}_${random_id.random.hex}_automate_security_group" }))
 }
 
 resource "aws_security_group" "chef_automate_ui" {
@@ -27,7 +27,7 @@ resource "aws_security_group" "chef_automate_ui" {
   description = "Chef Automate Server protocol"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
+  tags = merge(var.tags, tomap({ "Name" = "${var.tag_name}_${random_id.random.hex}_automate_security_group" }))
 }
 
 resource "aws_security_group" "efs_mount" {
@@ -35,7 +35,7 @@ resource "aws_security_group" "efs_mount" {
   description = "NFS for EFS"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efs_security_group"))
+  tags = merge(var.tags, tomap({ "Name" = "${var.tag_name}_${random_id.random.hex}_efs_security_group" }))
 }
 
 resource "aws_security_group" "load_balancer" {
@@ -43,7 +43,7 @@ resource "aws_security_group" "load_balancer" {
   description = "load_balancer rules for all linux nodes"
   vpc_id      = data.aws_vpc.default.id
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_linux_security_group"))
+  tags = merge(var.tags, tomap({ "Name" = "${var.tag_name}_${random_id.random.hex}_linux_security_group" }))
 }
 
 //////////////////////////
@@ -173,12 +173,12 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_proxy_tcp" {
 
 # Allow custom SSH connections
 resource "aws_security_group_rule" "ingress_chef_automate_allow_custom_ssh" {
-  type                     = "ingress"
-  from_port                = var.aws_ssh_port
-  to_port                  = var.aws_ssh_port
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
-  security_group_id        = aws_security_group.chef_automate.id
+  type              = "ingress"
+  from_port         = var.aws_ssh_port
+  to_port           = var.aws_ssh_port
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.chef_automate.id
 }
 
 //////////////////////////
@@ -311,12 +311,12 @@ resource "aws_security_group_rule" "egress_allow_5432_tcp_all" {
 }
 
 resource "aws_security_group_rule" "egress_efs_nfs_2049" {
-  type                     = "egress"
-  from_port                = 2049
-  to_port                  = 2049
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
-  security_group_id        = aws_security_group.base_linux.id
+  type              = "egress"
+  from_port         = 2049
+  to_port           = 2049
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
 }
 
 resource "aws_security_group_rule" "egress_allow_22_tcp_all" {

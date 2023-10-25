@@ -17,7 +17,7 @@ locals {
     efs_region    = var.aws_region,
     mount_path    = var.nfs_mount_path
   })
-  
+
   ip_list = concat(var.automate_private_ips, var.chef_server_private_ips, var.postgresql_private_ips, var.opensearch_private_ips)
 
 }
@@ -25,7 +25,7 @@ locals {
 resource "null_resource" "mount_efs" {
   count = length(local.ip_list)
   connection {
-    host        =  local.ip_list[count.index]
+    host        = local.ip_list[count.index]
     type        = "ssh"
     user        = var.aws_ssh_user
     port        = var.aws_ssh_port

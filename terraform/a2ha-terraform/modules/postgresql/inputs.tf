@@ -46,7 +46,7 @@ variable "postgresql_archive_disk_fs_path" {
 }
 
 variable "postgresql_certs_by_ip" {
-  type = map(map(string))
+  type    = map(map(string))
   default = {}
 }
 

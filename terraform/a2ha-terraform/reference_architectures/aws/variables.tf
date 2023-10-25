@@ -221,6 +221,10 @@ variable "setup_managed_services" {
   default = false
 }
 
+variable "ssh_group_name" {
+  default = "centos"
+}
+
 variable "ssh_key_file" {
 }
 

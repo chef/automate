@@ -37,7 +37,7 @@ locals {
     tmp_path                  = var.tmp_path
   })
   premount = templatefile("${path.module}/templates/pre_mount.tpl", {
-    nfs_mount_path  = var.nfs_mount_path
+    nfs_mount_path = var.nfs_mount_path
   })
 }
 

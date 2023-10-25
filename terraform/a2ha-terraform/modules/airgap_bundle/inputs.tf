@@ -2,7 +2,7 @@ variable "archive_disk_info" {
 }
 
 variable "bundle_files" {
-  default = []
+  default     = []
   description = "Array of hashs for bundle files, hash should have a source and destination key"
 }
 
