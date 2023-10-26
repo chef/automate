@@ -73,7 +73,7 @@ netfilter
 #nogroups       # disable supplementary user groups
 #noinput        # disable input devices
 nonewprivs
-noroot
+#noroot
 #notv   # disable DVB TV devices
 #nou2f  # disable U2F devices
 #novideo        # disable video capture devices

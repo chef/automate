@@ -58,6 +58,7 @@ blacklist /hab/pkgs/chef/pg-sidecar-service
 blacklist /hab/pkgs/chef/user-settings-service
 read-only /hab/pkgs/chef/inspec
 
+
 ### Filesystem Whitelisting ###
 include whitelist-run-common.inc
 include whitelist-runuser-common.inc
@@ -73,7 +74,7 @@ ipc-namespace
 #nogroups       # disable supplementary user groups
 #noinput        # disable input devices
 nonewprivs
-noroot
+#noroot
 #notv   # disable DVB TV devices
 #nou2f  # disable U2F devices
 #novideo        # disable video capture devices

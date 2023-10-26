@@ -282,7 +282,9 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 	}
 
 	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(check_command, tmpDirPath)
+	fmt.Println(shellFile)
 
+	//args = append(args, []string{binName, "check", tmpDirFile, "--format", "json"}...)
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
 	logrus.Infof("Run: inspec %v", args)
@@ -567,6 +569,7 @@ func prerequisiteForArchive(tmpDir string, file string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Unable to copy files in tmp directory")
 	}
+
 	return nil
 
 }
@@ -594,9 +597,12 @@ func shellscriptAndResponse(command string, tmpDirPath string) (string, string, 
 
 	stdoutFile := tmpDirPath + "/success_json"
 	erroutFile := tmpDirPath + "/error_json"
+	createFileAndChangePermission(stdoutFile)
+	createFileAndChangePermission(erroutFile)
+
 	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
 	contentForShellFile := createShellFileContent(command, stdoutFile, erroutFile)
-	err := createFileAndAddContent(shellFile, contentForShellFile)
+	_, err := createFileAndAddContent(shellFile, contentForShellFile)
 	if err != nil {
 		logrus.Errorf("Unable to create shell script for path %s with error %v", shellFile, err)
 	}
@@ -622,19 +628,20 @@ func createShellFileContent(command string, stdout string, stderr string) string
 	return ""
 }
 
-func createFileAndAddContent(fileName string, content string) error {
+func createFileAndAddContent(fileName string, content string) (*os.File, error) {
 	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if _, err := f.Write([]byte(content)); err != nil {
-		return err
+		return nil, err
 	}
+	os.Chmod(fileName, 0777)
 	if err := f.Close(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return f, nil
 }
 
 func readFile(fileName string) []byte {
@@ -684,5 +691,16 @@ func isErrorInOutput(fileContent []byte, value []string) bool {
 	}
 
 	return false
+
+}
+
+func createFileAndChangePermission(fileName string) {
+	new, err := os.Create(fileName)
+	if err != nil {
+		logrus.Errorf("Unable to createfile %v", err)
+	}
+	defer new.Close()
+
+	os.Chmod(fileName, 0777)
 
 }
