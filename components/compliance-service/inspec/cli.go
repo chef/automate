@@ -282,9 +282,7 @@ func Check(profilePath string, firejailprofilePath string) (CheckResult, error) 
 	}
 
 	stdoutFile, erroutFile, shellFile := shellscriptAndResponse(check_command, tmpDirPath)
-	fmt.Println(shellFile)
 
-	//args = append(args, []string{binName, "check", tmpDirFile, "--format", "json"}...)
 	args = append(args, []string{"/bin/sh", shellFile, tmpDirFile, stdoutFile, erroutFile}...)
 
 	logrus.Infof("Run: inspec %v", args)
@@ -602,7 +600,7 @@ func shellscriptAndResponse(command string, tmpDirPath string) (string, string, 
 
 	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
 	contentForShellFile := createShellFileContent(command, stdoutFile, erroutFile)
-	_, err := createFileAndAddContent(shellFile, contentForShellFile)
+	err := createFileAndAddContent(shellFile, contentForShellFile)
 	if err != nil {
 		logrus.Errorf("Unable to create shell script for path %s with error %v", shellFile, err)
 	}
@@ -628,20 +626,20 @@ func createShellFileContent(command string, stdout string, stderr string) string
 	return ""
 }
 
-func createFileAndAddContent(fileName string, content string) (*os.File, error) {
+func createFileAndAddContent(fileName string, content string) error {
 	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if _, err := f.Write([]byte(content)); err != nil {
-		return nil, err
+		return err
 	}
 	os.Chmod(fileName, 0777)
 	if err := f.Close(); err != nil {
-		return nil, err
+		return err
 	}
 
-	return f, nil
+	return nil
 }
 
 func readFile(fileName string) []byte {
