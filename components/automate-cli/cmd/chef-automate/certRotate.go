@@ -1864,7 +1864,7 @@ func (c *certRotateFlow) validatePrivateKey(cert []byte) error {
 	if block == nil {
 		return errors.New("Failed to parse the certificate PEM")
 	}
-	if block.Type != "PRIVATE KEY" {
+	if block.Type != "PRIVATE KEY" && block.Type != "CERTIFICATE" {
 		return errors.New(fmt.Sprintf("Failed to parse the certificate PEM, unexpected type: %s", block.Type))
 	}
 	return nil
