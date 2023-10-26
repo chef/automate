@@ -62,7 +62,7 @@ export isSkipRequired=false
 # and do comparision in case if both are same it set isSkipRequired=true 
 version_check_for_addnode() {
     installed_version=$(chef-automate version 2>/dev/null | grep Server | awk '{print $3}')
-    airgap_bundle_version=$(chef-automate airgap bundle info "$b2" 2>/dev/null | grep "Version" | awk '{print $2}')
+    airgap_bundle_version=$(chef-automate airgap bundle info ${frontend_aib_file} 2>/dev/null | grep "Version" | awk '{print $2}')
 
     # Uncomment this if you want to override the versions for testing
     # installed_version=$1
@@ -300,6 +300,7 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
   version_check_for_addnode
   # If isSkipRequired is true then we are exiting from here  
   if isSkipRequired ; then 
+     echo "Skipping the below flow, not required for the add-node case"
      exit
   fi
   echo "MAINTENANCE MODE ON!"
