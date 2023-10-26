@@ -202,6 +202,7 @@ var a2Config = config{
 		{regex: `components/automate-cli/pkg/testfiles/certs/test_pg_public_key_2.pem`},
 		{regex: `components/automate-cli/pkg/testfiles/certs/test_pg_public_key_3.pem`},
 		{regex: `components/automate-cli/pkg/testfiles/certs/test_root_ca.pem`},
+		{regex: `components/automate-cli/cmd/chef-automate/certRotate_test.go`},
 	},
 	contentInclude: []pattern{
 		{
