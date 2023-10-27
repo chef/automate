@@ -30,7 +30,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-
+#Adding it to use compliance with firejail
 pkg_svc_user=root
 pkg_svc_group=root
 inspec_release="chef/inspec/4.56.22/20220517052126"
