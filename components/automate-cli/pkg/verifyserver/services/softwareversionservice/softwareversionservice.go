@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	semver "github.com/Masterminds/semver/v3"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
@@ -47,7 +48,7 @@ const (
 	AMAZON_LINUX                          = "Amazon Linux"
 	SUSE_LINUX                            = "SUSE Linux"
 	RED_HAT_SUPPORTED_VERSION             = 7
-	KERNAL_SUPPORTED_VERSION              = 3.2
+	KERNAL_SUPPORTED_VERSION              = "3.2"
 	KERNAL_SUPPORTED_VERSION_AMAZON_LINUX = 5.10
 )
 
@@ -186,15 +187,26 @@ func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath, osName stri
 		return failureResponse(KERNAL_VERSION_CHECK, "Its not feasible to determine the Kernal version of the system", "Please run automate on the supported platforms."), err
 	}
 	sv.logger.Debug("Got the kernal version:", kernelVersion)
-	checkVersion, _ := strconv.ParseFloat(kernelVersion, 64)
 	if strings.Contains(strings.ToLower(osName), strings.ToLower(AMAZON_LINUX)) {
+		checkVersion, _ := strconv.ParseFloat(kernelVersion, 64)
 		if checkVersion == KERNAL_SUPPORTED_VERSION_AMAZON_LINUX {
 			return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+fmt.Sprintf("%.2f", checkVersion)), nil
 		}
 		return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is not equal to 5.10", "Use a linux version whose kernel version is equal to 5.10"), nil
 	}
-	if checkVersion >= KERNAL_SUPPORTED_VERSION {
-		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+fmt.Sprintf("%.2f", checkVersion)), nil
+	userVersion, err := semver.NewVersion(kernelVersion)
+	if err != nil {
+		sv.logger.Errorf("Error parsing user kernel version: %v", err)
+		return failureResponse(KERNAL_VERSION_CHECK, "Failed while getting the kernel version", "Check your kernel version."), err
+	}
+	minimumVersion, err := semver.NewVersion(KERNAL_SUPPORTED_VERSION)
+	if err != nil {
+		sv.logger.Errorf("Error parsing minimum required kernel version: %v", err)
+		return failureResponse(KERNAL_VERSION_CHECK, "Failed while getting minimum supported kernel version", "Check your kernel version."), err
+	}
+
+	if userVersion.Compare(minimumVersion) >= 0 {
+		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+kernelVersion), nil
 	}
 	return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is lower than 3.2", "Use a linux version whose kernel version is greater than 3.2"), nil
 }

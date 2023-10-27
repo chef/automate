@@ -18,27 +18,29 @@ var osTestVersion = map[string][]string{
 }
 
 const (
-	osReleaseRedHatFail  = "./testfiles/os_release_red_hat_failure.txt"
-	osReleaseUbuntuFail  = "./testfiles/os_release_ubuntu_failure.txt"
-	osReleaseDebian      = "./testfiles/os_release_debian.txt"
-	osReleaseSuse        = "./testfiles/os_release_suse.txt"
-	osReleaseAmazonLinux = "./testfiles/os_release_amazon_linux.txt"
-	osReleaseRedHat      = "./testfiles/os_release_red_hat.txt"
-	osReleaseCentos      = "./testfiles/os_release_centos.txt"
-	successfile          = "./testfiles/os_release_ubuntu.txt"
-	failurefile          = "./testfiles/failure.txt"
-	versionfile          = "./testfiles/os_release_suse_failure.txt"
-	failfilepath         = "./failfilepath"
-	LinuxVersionTitle    = "Linux Version Check"
-	KernalVersionTitle   = "Kernal Version Check"
-	MkdirTitle           = "mkdir availability"
-	OpensslTitle         = "openssl availability"
-	StatTitle            = "stat availability"
-	MkdirIsAvailable     = "mkdir is available"
-	OpensslIsAvailable   = "openssl is available"
-	StatIsAvailable      = "stat is available"
-	successKernelfile    = "./testfiles/successkernel.txt"
-	failureKernelfile    = "./testfiles/failurekernel.txt"
+	osReleaseRedHatFail      = "./testfiles/os_release_red_hat_failure.txt"
+	osReleaseUbuntuFail      = "./testfiles/os_release_ubuntu_failure.txt"
+	osReleaseDebian          = "./testfiles/os_release_debian.txt"
+	osReleaseSuse            = "./testfiles/os_release_suse.txt"
+	osReleaseAmazonLinux     = "./testfiles/os_release_amazon_linux.txt"
+	osReleaseRedHat          = "./testfiles/os_release_red_hat.txt"
+	osReleaseCentos          = "./testfiles/os_release_centos.txt"
+	successfile              = "./testfiles/os_release_ubuntu.txt"
+	failurefile              = "./testfiles/failure.txt"
+	versionfile              = "./testfiles/os_release_suse_failure.txt"
+	failfilepath             = "./failfilepath"
+	LinuxVersionTitle        = "Linux Version Check"
+	KernalVersionTitle       = "Kernal Version Check"
+	MkdirTitle               = "mkdir availability"
+	OpensslTitle             = "openssl availability"
+	StatTitle                = "stat availability"
+	MkdirIsAvailable         = "mkdir is available"
+	OpensslIsAvailable       = "openssl is available"
+	StatIsAvailable          = "stat is available"
+	successKernelfile        = "./testfiles/successkernel.txt"
+	testKernelfile           = "./testfiles/testkernel.txt"
+	failureParsingKernelfile = "./testfiles/failureparsingkernel.txt"
+	failureKernelfile        = "./testfiles/failurekernel.txt"
 )
 
 var (
@@ -770,6 +772,38 @@ func TestCheckKernelVersion(t *testing.T) {
 			},
 			wantErr:     false,
 			expectedErr: "",
+		},
+		{
+			description: "If the Kernal Version entered is 3.10 suse linux",
+			args: args{
+				kernelFilePath: testKernelfile,
+				osname:         SUSE_LINUX,
+			},
+			expectedBody: &models.Checks{
+				Title:         KernalVersionTitle,
+				Passed:        true,
+				SuccessMsg:    "Linux kernal version is 3.10",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "Failure while passing the user kernel version",
+			args: args{
+				kernelFilePath: failureParsingKernelfile,
+				osname:         SUSE_LINUX,
+			},
+			expectedBody: &models.Checks{
+				Title:         KernalVersionTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      "Failed while getting the kernel version",
+				ResolutionMsg: "Check your kernel version.",
+			},
+			wantErr:     true,
+			expectedErr: "Invalid Semantic Version",
 		},
 		{
 			description: "If the Kernal Version entered is not supported Amazon linux",
