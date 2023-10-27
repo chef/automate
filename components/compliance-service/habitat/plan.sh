@@ -32,7 +32,6 @@ pkg_binds_optional=(
 )
 #Adding it to use compliance with firejail
 pkg_svc_user=root
-pkg_svc_group=root
 inspec_release="chef/inspec/4.56.22/20220517052126"
 pkg_deps=(
   core/coreutils
@@ -88,7 +87,6 @@ do_install() {
   build_line "Setting perms on inspec_runner"
   chown root: "${pkg_prefix}/bin/inspec_runner"
   chmod u+s "${pkg_prefix}/bin/inspec_runner"
-
 
   mkdir -p "${pkg_prefix}/data/firejail"
 
