@@ -9,7 +9,8 @@ include disable-programs.inc    # user configuration for programs such as firefo
 ### Home Directory Whitelisting ###
 ### If something goes wrong, this section is the first one to comment out.
 ### Instead, you'll have to relay on the basic blacklisting above.
-#private 
+#private
+blacklist /root 
 blacklist /hab/cache
 blacklist /hab/etc
 blacklist /hab/svc
@@ -73,7 +74,8 @@ netfilter
 #nogroups       # disable supplementary user groups
 #noinput        # disable input devices
 nonewprivs
-#noroot
+
+noroot
 #notv   # disable DVB TV devices
 #nou2f  # disable U2F devices
 #novideo        # disable video capture devices

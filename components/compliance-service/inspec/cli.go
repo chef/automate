@@ -595,8 +595,8 @@ func shellscriptAndResponse(command string, tmpDirPath string) (string, string, 
 
 	stdoutFile := tmpDirPath + "/success_json"
 	erroutFile := tmpDirPath + "/error_json"
-	createFileAndChangePermission(stdoutFile)
-	createFileAndChangePermission(erroutFile)
+	//createFileAndChangePermission(stdoutFile)
+	//createFileAndChangePermission(erroutFile)
 
 	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
 	contentForShellFile := createShellFileContent(command, stdoutFile, erroutFile)

@@ -31,6 +31,8 @@ pkg_binds_optional=(
   [notifications-service]="port"
 )
 
+pkg_svc_user=root
+pkg_svc_group=root
 inspec_release="chef/inspec/4.56.22/20220517052126"
 pkg_deps=(
   core/coreutils
