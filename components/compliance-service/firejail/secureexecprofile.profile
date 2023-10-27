@@ -10,6 +10,7 @@ include disable-programs.inc    # user configuration for programs such as firefo
 ### If something goes wrong, this section is the first one to comment out.
 ### Instead, you'll have to relay on the basic blacklisting above.
 #private
+blacklist /root 
 blacklist /hab/cache
 blacklist /hab/etc
 blacklist /hab/svc
@@ -57,6 +58,7 @@ blacklist /hab/pkgs/chef/license-control-service
 blacklist /hab/pkgs/chef/pg-sidecar-service
 blacklist /hab/pkgs/chef/user-settings-service
 read-only /hab/pkgs/chef/inspec
+
 
 ### Filesystem Whitelisting ###
 include whitelist-run-common.inc

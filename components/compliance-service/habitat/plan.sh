@@ -30,7 +30,8 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-
+#Adding it to use compliance with firejail
+pkg_svc_user=root
 inspec_release="chef/inspec/4.56.22/20220517052126"
 pkg_deps=(
   core/coreutils
@@ -87,7 +88,6 @@ do_install() {
   chown root: "${pkg_prefix}/bin/inspec_runner"
   chmod u+s "${pkg_prefix}/bin/inspec_runner"
 
-
   mkdir -p "${pkg_prefix}/data/firejail"
 
   cp -r firejail/* "${pkg_prefix}/data/firejail"
@@ -101,4 +101,5 @@ do_strip() {
     do_default_strip
   fi
 }
+
 
