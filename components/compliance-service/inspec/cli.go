@@ -567,7 +567,6 @@ func prerequisiteForArchive(tmpDir string, file string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Unable to copy files in tmp directory")
 	}
-
 	return nil
 
 }
@@ -631,7 +630,6 @@ func createFileAndAddContent(fileName string, content string) error {
 	if _, err := f.Write([]byte(content)); err != nil {
 		return err
 	}
-	os.Chmod(fileName, 0777)
 	if err := f.Close(); err != nil {
 		return err
 	}
