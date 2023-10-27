@@ -595,9 +595,6 @@ func shellscriptAndResponse(command string, tmpDirPath string) (string, string, 
 
 	stdoutFile := tmpDirPath + "/success_json"
 	erroutFile := tmpDirPath + "/error_json"
-	//createFileAndChangePermission(stdoutFile)
-	//createFileAndChangePermission(erroutFile)
-
 	shellFile := fmt.Sprintf("%s/%s_script.sh", tmpDirPath, command)
 	contentForShellFile := createShellFileContent(command, stdoutFile, erroutFile)
 	err := createFileAndAddContent(shellFile, contentForShellFile)
@@ -689,16 +686,5 @@ func isErrorInOutput(fileContent []byte, value []string) bool {
 	}
 
 	return false
-
-}
-
-func createFileAndChangePermission(fileName string) {
-	new, err := os.Create(fileName)
-	if err != nil {
-		logrus.Errorf("Unable to createfile %v", err)
-	}
-	defer new.Close()
-
-	os.Chmod(fileName, 0777)
 
 }
