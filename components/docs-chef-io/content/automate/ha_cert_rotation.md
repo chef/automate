@@ -97,7 +97,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 
     {{< note >}}
 
-    While rotating cert for PG on node level, make sure to wait for sometime before executing cert-rotate for next node.
+While rotating cert for PG on node level, make sure to wait for sometime before executing cert-rotate for next node.
 
     {{< /note >}}
 
