@@ -15,6 +15,7 @@ pkg_deps=(
   core/libevent
   core/openssl11
 )
+
 pkg_build_deps=(
   core/git
   core/gcc
