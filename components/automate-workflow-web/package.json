@@ -82,7 +82,7 @@
     "node-dir": "=0.1.16",
     "node-bourbon": "=1.2.3",
     "node-neat": "=1.4.2",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "protractor": "=4.0.11",
     "proxy-middleware": "=0.15.0",
     "raw-loader": "=0.5.1",
