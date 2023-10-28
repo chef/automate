@@ -68,7 +68,7 @@ wait_for_upgrade() {
     upgrade_complete="false"
     for try in {1..60}; do
         echo "Checking upgrade status (try $try/60)"
-        if chef-automate upgrade status | grep 'up-to-date'; then
+        if chef-automate upgrade status | grep -e "up-to-date" -e "Chef Automate upgraded"; then
             upgrade_complete="true"
             break
         else
