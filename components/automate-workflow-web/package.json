@@ -5,7 +5,7 @@
   "dependencies": {
     "@angular/common": "=2.1.2",
     "@angular/compiler": "=2.1.2",
-    "@angular/core": "=2.1.2",
+    "@angular/core": "=11.0.5",
     "@angular/forms": "=2.1.2",
     "@angular/http": "=2.1.2",
     "@angular/platform-browser": "=2.1.2",
