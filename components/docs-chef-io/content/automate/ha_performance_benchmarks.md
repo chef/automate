@@ -99,6 +99,8 @@ With `splay` intervals, you may find insufficient Cookbook depsolver works avail
 
 If a large number of Chef Infra client converges happen in a small window, it will be necessary to increase the number of database connections. This will impact the amount of CPU and ram the system uses, so monitoring that enough resources are available after increasing these values is important.
 
+{{< note >}}Increasing `timeout` values to very large values can have a detrimental impact on the performance of the cluster, it's often times better for the overall health of the cluster to have requests that are taking too long to timeout to allow other requests to complete in a timely manner.{{< /note >}}
+
 ```toml
 [erchef.v1.sys.data_collector]
   pool_init_size=100
@@ -121,7 +123,16 @@ If a large number of Chef Infra client converges happen in a small window, it wi
   pool_max_size = 100
   pool_queue_max = 200
   pool_queue_timeout = 10000
+[bookshelf.v1.sys.sql]
+  pool_init_size = 40
+  pool_max_size = 40
 ```
+
+## Backend Database Configuration
+
+It's important to consider the max number of allowed database connections for your backend services. Depending onthe type of deployment the way this is configured is going to be different. When adding additional Front-End servers or increasing the max pool queue sizes above it may be necessary to increase the `max_connections` settings in postgresql to handle the additional connections.
+
+For [Chef Managed](/automate/ha_onprim_deployment_procedure/) deployments please refer to the [postgresql configuration documentation](/automate/config_postgresql/#configurations) for how to adjust the settings for `max_connections`  
 
 ## Final Notes
 
