@@ -1829,26 +1829,21 @@ func (c *certRotateFlow) validateCertificateTemplate(template *CertificateToml, 
 func (c *certRotateFlow) validateNodeCerts(ips []IP, infra *AutomateHAInfraDetails, rootCA []byte) []error {
 	errs := []error{}
 	for _, ip := range ips {
-		var private []byte
-		var public []byte
-		var err error
 		if len(ip.PrivateKey) != 0 {
-			private, err = c.getCertFromFile(ip.PrivateKey, infra)
+			private, err := c.getCertFromFile(ip.PrivateKey, infra)
 			if err != nil {
 				errs = append(errs, errors.Wrapf(err, "Node %s Private key file not exist.", ip.IP))
+			}
+			err = c.validatePrivateKey(private)
+			if err != nil {
+				errs = append(errs, errors.Wrapf(err, "Not able to verify Node %s Private key", ip.IP))
 			}
 		}
 
 		if len(ip.Publickey) != 0 {
-			public, err = c.getCertFromFile(ip.Publickey, infra)
+			public, err := c.getCertFromFile(ip.Publickey, infra)
 			if err != nil {
 				errs = append(errs, errors.Wrapf(err, "Node %s Public key file not exist.", ip.IP))
-			}
-		}
-		if len(private) > 0 && len(public) > 0 {
-			err := c.validatePrivateKey(private)
-			if err != nil {
-				errs = append(errs, errors.Wrapf(err, "Not able to verify Node %s Private key", ip.IP))
 			}
 			err = c.validatePublicCertsWithRootCA(rootCA, public)
 			if err != nil {
