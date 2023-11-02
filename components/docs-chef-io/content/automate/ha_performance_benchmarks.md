@@ -70,11 +70,14 @@ A complete cluster deployment will separate various components of the Automate H
 
 ## Tuning the Cluster
 
-The following configs can be used to improve the performance of the Automate HA cluster
+The following configs can be used to improve the performance of the Automate HA cluster. Each of the following configuration settings are applied to the Front-End servers unless otherwise noted and can be applied using the [Automate HA Configuration](/automate/ha_config/) instructions.
 
 ### Cookbook Version Cache
 
 Cookbook Version Cache is worth enabling if you frequently see long response times from `cookbook_versions` when under load. Enabling this can significantly improve the cluster's performance if there are many cookbooks with old versions.
+
+To apply these changes to the cluster follow the [Automate HA Configuration](/automate/ha_config/) instructions.
+
 
 ```toml
 [erchef.v1.sys.api]
@@ -84,6 +87,8 @@ Cookbook Version Cache is worth enabling if you frequently see long response tim
 ### Depsolver workers
 
 With `splay` intervals, you may find insufficient Cookbook depsolver works available to handle all of the requests. Increasing the number of workers will improve the number of requests the cluster can take at once without having them wait in the queue. Suppose there are many older cookbook versions or complex cookbook version dependencies. In that case, it may be necessary to increase the timeout to allow the workers more time to finish the required calculations.
+
+To apply these changes to the cluster follow the [Automate HA Configuration](/automate/ha_config/) instructions.
 
 {{< note >}}The `pool_init_size` should never be more than the number of CPU cores on the system.{{< /note >}}
 
@@ -98,6 +103,8 @@ With `splay` intervals, you may find insufficient Cookbook depsolver works avail
 ### Connection pools
 
 If a large number of Chef Infra client converges happen in a small window, it will be necessary to increase the number of database connections. This will impact the amount of CPU and ram the system uses, so monitoring that enough resources are available after increasing these values is important.
+
+To apply these changes to the cluster follow the [Automate HA Configuration](/automate/ha_config/) instructions.
 
 {{< note >}}Increasing `timeout` values to very large values can have a detrimental impact on the performance of the cluster, it's often times better for the overall health of the cluster to have requests that are taking too long to timeout to allow other requests to complete in a timely manner.{{< /note >}}
 
@@ -132,7 +139,9 @@ If a large number of Chef Infra client converges happen in a small window, it wi
 
 It's important to consider the max number of allowed database connections for your backend services. Depending onthe type of deployment the way this is configured is going to be different. When adding additional Front-End servers or increasing the max pool queue sizes above it may be necessary to increase the `max_connections` settings in postgresql to handle the additional connections.
 
-For [Chef Managed](/automate/ha_onprim_deployment_procedure/) deployments please refer to the [postgresql configuration documentation](/automate/config_postgresql/#configurations) for how to adjust the settings for `max_connections`  
+For [On-Prem Deployment with Chef Managed Database](/automate/ha_onprim_deployment_procedure/) deployments please refer to the [HA Postgresql Config](/automate/config_postgresql/#configurations) documention for how to adjust the settings for `max_connections`
+
+For external or AWS managed databases you will need to consult the documentation for the approriate deployment method to increase the `max_connections`.
 
 ## Final Notes
 
