@@ -139,9 +139,9 @@ To apply these changes to the cluster follow the [Automate HA Configuration](/au
 
 It's important to consider the max number of allowed database connections for your backend services. Depending onthe type of deployment the way this is configured is going to be different. When adding additional Front-End servers or increasing the max pool queue sizes above it may be necessary to increase the `max_connections` settings in postgresql to handle the additional connections.
 
-For [On-Prem Deployment with Chef Managed Database](/automate/ha_onprim_deployment_procedure/) deployments please refer to the [HA Postgresql Config](/automate/config_postgresql/#configurations) documention for how to adjust the settings for `max_connections`
+For [On-Prem Deployment with Chef Managed Database](/automate/ha_onprim_deployment_procedure/) and [AWS Deployment with Chef Managed Database](/automate/ha_aws_deploy_steps/) please refer to the [HA Postgresql Config](/automate/config_postgresql/#configurations) documention for how to adjust the settings for `max_connections`
 
-For external or AWS managed databases you will need to consult the documentation for the approriate deployment method to increase the `max_connections`.
+For external or AWS managed databases you will need to consult the external or AWS documentation for the approriate services to increase the `max_connections` in PostgreSQL.
 
 ## Final Notes
 
