@@ -569,3 +569,47 @@ Global Flags:
       --no-check-version     Disable version check
       --result-json string   Write command result as JSON to PATH	  
 `
+
+const certificateTemplate = `
+[postgresql]
+  root-ca-filepath = "file-path.pem"
+  [ip1]
+    public-key-filepath = "file-path.pem"
+    private-key-filepath = "file-path.pem"
+  [ip2]
+    public-key-filepath = "file-path.pem"
+    private-key-filepath = "file-path.pem"
+  [ip3]
+    public-key-filepath = "file-path.pem"
+    private-key-filepath = "file-path.pem"
+[opensearch]
+  root-ca-filepath = "file-path.pem"
+  admin-public-key-filepath=""
+  admin-private-key-filepath=""
+  [ip1]
+    public-key-filepath = "file-path.pem"
+    private-key-filepath = "file-path.pem"
+  [ip2]
+    public-key-filepath = "file-path.pem"
+    private-key-filepath = "file-path.pem"
+  [ip3]
+    public-key-filepath = "file-path.pem"
+    private-key-filepath = "file-path.pem"
+[automate]
+root-ca-filepath = "file-path.pem"
+[ip1]
+  public-key = "file-path.pem"
+  private-key = "file-path.pem"
+[ip2]
+  public-key = "file-path.pem"
+  private-key = "file-path.pem"
+[chef_server]
+root-ca-filepath = "file-path.pem"
+[ip1]
+  public-key-filepath = "file-path.pem"
+  private-key-filepath = "file-path.pem"
+[ip2]
+  public-key-filepath = "file-path.pem"
+  private-key-filepath = "file-path.pem"
+
+`

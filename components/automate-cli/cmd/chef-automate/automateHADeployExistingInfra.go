@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
 )
 
@@ -75,9 +77,126 @@ func (e *existingInfra) generateConfig(state string) error {
 	if err != nil {
 		return err
 	}
+	e.populateCertificateTomlFile()
 	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config, state)
 }
 
+type IP struct {
+	IP         string `toml:"ip"`
+	Publickey  string `toml:"public_key"`
+	PrivateKey string `toml:"private_key"`
+}
+type NodeCertficate struct {
+	RootCA          string `toml:"root_ca"`
+	AdminPublickey  string `toml:"admin_public_key,omitempty"`
+	AdminPrivateKey string `toml:"admin_private_key,omitempty"`
+	IPS             []IP   `toml:"ips"`
+}
+
+type CertificateToml struct {
+	Automate   NodeCertficate `toml:"automate"`
+	ChefServer NodeCertficate `toml:"chef_server"`
+	PostgreSQL NodeCertficate `toml:"postgresql"`
+	OpenSearch NodeCertficate `toml:"opensearch"`
+}
+
+func (e *existingInfra) populateCertificateTomlFile() {
+	// This is just to create the certificate empty file
+	automateCount, _ := strconv.Atoi(e.config.Automate.Config.InstanceCount)
+	chefServerCount, _ := strconv.Atoi(e.config.ChefServer.Config.InstanceCount)
+	OpensearchCount, _ := strconv.Atoi(e.config.Opensearch.Config.InstanceCount)
+	postgresqlCount, _ := strconv.Atoi(e.config.Postgresql.Config.InstanceCount)
+	var certContent CertificateToml
+	if automateCount > 0 {
+		var automate NodeCertficate
+		var ips []IP
+		// Initialize Automate section
+		automate.RootCA = "/hab/a2_deploy_workspace/certificate/automte.fqdn.root.ca.cert"
+		for i := 0; i < automateCount; i++ {
+			var ip IP
+			ip.IP = e.config.ExistingInfra.Config.AutomatePrivateIps[i]
+			ip.Publickey = "/hab/a2_deploy_workspace/certificate/automte.public.key"
+			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/automte.private.key"
+			ips = append(ips, ip)
+			fmt.Println(e.config.ExistingInfra.Config.AutomatePrivateIps[i], i)
+		}
+		automate.IPS = ips
+		certContent.Automate = automate
+	}
+
+	if chefServerCount > 0 {
+		// Initialize ChefServer section
+		var chefserver NodeCertficate
+		var ips []IP
+		// Initialize ChefServer section
+		chefserver.RootCA = "/hab/a2_deploy_workspace/certificate/chefserver.fqdn.root.ca.cert"
+		for i := 0; i < chefServerCount; i++ {
+			var ip IP
+			ip.IP = e.config.ExistingInfra.Config.ChefServerPrivateIps[i]
+			ip.Publickey = "/hab/a2_deploy_workspace/certificate/chefserver.public.key"
+			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/chefserver.private.key"
+			ips = append(ips, ip)
+			fmt.Println(e.config.ExistingInfra.Config.ChefServerPrivateIps[i], i)
+		}
+		chefserver.IPS = ips
+		certContent.ChefServer = chefserver
+	}
+
+	if OpensearchCount > 0 {
+		// Initialize Opensearch section
+		var opensearch NodeCertficate
+		var ips []IP
+		// Initialize Opensearch section
+		opensearch.RootCA = "/hab/a2_deploy_workspace/certificate/opensearch.fqdn.root.ca.cert"
+		opensearch.AdminPrivateKey = "/hab/a2_deploy_workspace/certificate/opensearch.admin.public.cert"
+		opensearch.AdminPublickey = "/hab/a2_deploy_workspace/certificate/opensearch.admin.private.cert"
+		for i := 0; i < OpensearchCount; i++ {
+			var ip IP
+			ip.IP = e.config.ExistingInfra.Config.OpensearchPrivateIps[i]
+			ip.Publickey = "/hab/a2_deploy_workspace/certificate/opensearch.public.key"
+			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/opensearch.private.key"
+			ips = append(ips, ip)
+			fmt.Println(e.config.ExistingInfra.Config.OpensearchPrivateIps[i], i)
+		}
+		opensearch.IPS = ips
+		certContent.OpenSearch = opensearch
+	}
+
+	if postgresqlCount > 0 {
+		// Initialize postgresql section
+		var postgresql NodeCertficate
+		var ips []IP
+		// Initialize postgresql section
+		postgresql.RootCA = "/hab/a2_deploy_workspace/certificate/postgresql.fqdn.root.ca.cert"
+		for i := 0; i < postgresqlCount; i++ {
+			var ip IP
+			ip.IP = e.config.ExistingInfra.Config.PostgresqlPrivateIps[i]
+			ip.Publickey = "/hab/a2_deploy_workspace/certificate/postgresql.public.key"
+			ip.PrivateKey = "/hab/a2_deploy_workspace/certificate/postgresql.private.key"
+			ips = append(ips, ip)
+			fmt.Println(e.config.ExistingInfra.Config.PostgresqlPrivateIps[i], i)
+		}
+		postgresql.IPS = ips
+		certContent.PostgreSQL = postgresql
+	}
+
+	// Write the TOML data to a file
+	outputFile := "/hab/a2_deploy_workspace/certificate.toml"
+	// Open a file for writing (create or overwrite if it exists)
+	file, err := os.Create(outputFile)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+
+	// Use the TOML encoder to write the configuration to the file
+	if err := toml.NewEncoder(file).Encode(certContent); err != nil {
+		fmt.Println("Error encoding TOML:", err)
+		return
+	}
+	fmt.Printf("Certificate TOML written to %s\n", outputFile)
+}
 func (e *existingInfra) addDNTocertConfig() error {
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if e.config.Opensearch.Config.EnableCustomCerts {
