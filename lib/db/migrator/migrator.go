@@ -1,6 +1,7 @@
 package migrator
 
 import (
+	"io/fs"
 	"net/url"
 	"os"
 
@@ -33,7 +34,7 @@ func Migrate(pgURL, migrationsPath string, l logger.Logger, verbose bool) error 
 	if err == nil {
 		l.Infof("File '%s' exists\n", filePath)
 		return nil
-	} else if os.IsNotExist(err) {
+	} else if errors.Is(err, fs.ErrNotExist) {
 		l.Infof("File '%s' does not exist\n", filePath)
 		return MigrateWithMigrationsTable(pgURL, migrationsPath, "", l, verbose)
 	} else {
