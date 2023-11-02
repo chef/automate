@@ -116,7 +116,10 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 )
 
-require github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+require (
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/hashicorp/go-version v1.6.0 // indirect
+)
 
 require (
 	cloud.google.com/go v0.65.0 // indirect
