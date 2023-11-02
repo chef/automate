@@ -38,22 +38,26 @@ The certificate rotation is also required when the key for a node, client, or CA
 ### Rotate Cluster Certificates
 If you want to rotate certificates of the entire cluster using single command, then you can follow the below commands:
 
-To roate certificates of entire cluster using single command, we need a certificate tempalte,
+To rotate certificates of entire cluster using single command, we need a certificate template.
 - To generate certificate template use below command
-`chef-automate cert-rotate generate-certificate-config certificate-config.toml`
+```
+  chef-automate cert-rotate generate-certificate-config certificate-config.toml
+```
 
 now we can find our certificate template in `certificate-config.toml` file, please edit the file and put required certificate paths
 
 - To rotate the certificates use below command
 
-`chef-automate cert-rotate --certificate-config certificate-config.toml`
+```bash
+  chef-automate cert-rotate --certificate-config certificate-config.toml
+```
 
 You can also use `--cc` instead of `--certificate-config` as a sort form.
 
 
 #### Sample Certificate template
 
-    ```toml
+  ```toml
     [automate]
       root_ca = "full path of root-ca.pem"
 

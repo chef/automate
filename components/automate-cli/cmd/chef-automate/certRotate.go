@@ -1438,7 +1438,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 
 func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool) error {
 	start := time.Now()
-	c.writer.Printf("Roating PostgreSQL node %s certificate at %s \n", pgIps.IP, start.String())
+	c.log.Debug("Roating PostgreSQL node %s certificate at %s \n", pgIps.IP, start.Format(time.ANSIC))
 	if len(pgIps.PrivateKey) == 0 || len(pgIps.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for PostgerSQL node %s \n", pgIps.IP)
 		return errors.New(fmt.Sprintf("Empty certificate for PostgerSQL node %s \n", pgIps.IP))
@@ -1493,7 +1493,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool) error {
 	start := time.Now()
-	c.writer.Printf("Roating opensearch node %s certificate at %s \n", osIp.IP, start.String())
+	c.log.Debug("Roating opensearch node %s certificate at %s \n", osIp.IP, start.Format(time.ANSIC))
 	if len(osIp.PrivateKey) == 0 || len(osIp.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for OpenSearch node %s \n", osIp.IP)
 		return errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
