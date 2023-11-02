@@ -24,6 +24,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/fatih/color"
+	semver "github.com/hashicorp/go-version"
 )
 
 var versionCmd = &cobra.Command{
@@ -55,6 +56,28 @@ var VersionCommandFlags = struct {
 	isOpenSearch bool
 	isPostgresql bool
 }{}
+
+type semverVersion []string
+
+func (s semverVersion) Len() int {
+	return len(s)
+}
+
+func (s semverVersion) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s semverVersion) Less(i, j int) bool {
+	v1, err := semver.NewVersion(s[i])
+	if err != nil {
+		logrus.Errorf("Error while getting HA Infra details :: %s", err)
+	}
+	v2, err := semver.NewVersion(s[j])
+	if err != nil {
+		logrus.Errorf("Error while getting HA Infra details :: %s", err)
+	}
+	return v1.LessThan(v2)
+}
 
 func runVersionCmd(cmd *cobra.Command, args []string) error {
 	writer.Printf("Version: %s\n", "2")
@@ -754,4 +777,70 @@ func extractVersion(input string, pattern string) (string, error) {
 	// Extract the version string
 	version := match[1]
 	return version, nil
+}
+
+// Below function get the chef-automate version from all the node and find the minimum version
+// In case of upgrade break in between, then re-trigger of upgrade required the minimum version
+// to check for other node required to upgrade
+func GetMinimunBuildVersionFromFrontEndServer() (string, error) {
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		logrus.Errorf("Error while getting HA Infra details :: %s", err)
+		return "", err
+	}
+	automateIps, chefServerIps, _, _, errList := getIPAddressesFromFlagOrInfra(infra)
+	if errList != nil && errList.Len() > 0 {
+		logrus.Errorf("Error while getting IP addresses :: %s", getSingleErrorFromList(errList))
+		return "", getSingleErrorFromList(errList)
+	}
+
+	frontEnd := append(automateIps, chefServerIps...)
+	sshUtil := NewSSHUtil(&SSHConfig{})
+	cmdExecutor := NewRemoteCmdExecutorWithoutNodeMap(sshUtil, writer)
+
+	if len(frontEnd) != 0 {
+		versions, err := getChefAutomateVersion(frontEnd, infra, cmdExecutor)
+		if err != nil {
+			logrus.Errorf("Error while getting Automate Version :: %s", err)
+			return "", err
+		}
+		return findMinimumServerVersion(versions), nil //findMinimumServerVersion
+	}
+	return "", nil
+}
+
+/*
+	func getMinimumSemverVersion(versions map[string]string) string {
+		values := make([]string, 0, len(versions))
+		// lenght check is not required here, caller has done the length check
+		for _, value := range versions {
+			values = append(values, value)
+		}
+		sort.Sort(semverVersion(values))
+		return values[0]
+	}
+*/
+
+func findMinimumServerVersion(versions map[string]string) string {
+	minVersion := ""
+	for _, v := range versions {
+		minVersion = v
+		break
+	}
+
+	for _, version := range versions {
+		if CompareSemverVersion(version, minVersion) {
+			minVersion = version
+		}
+	}
+	return minVersion
+}
+
+// return true when second > first
+// return false when second <= first
+// CompareSemverVersion
+func CompareSemverVersion(first, second string) bool {
+	v1, _ := semver.NewVersion(first)
+	v2, _ := semver.NewVersion(second)
+	return v1.LessThan(v2)
 }
