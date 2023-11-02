@@ -39,6 +39,7 @@ const (
 	StatIsAvailable          = "stat is available"
 	successKernelfile        = "./testfiles/successkernel.txt"
 	testKernelfile           = "./testfiles/testkernel.txt"
+	failKernelfile           = "./testfiles/failkernel.txt"
 	failureParsingKernelfile = "./testfiles/failureparsingkernel.txt"
 	failureKernelfile        = "./testfiles/failurekernel.txt"
 )
@@ -767,7 +768,23 @@ func TestCheckKernelVersion(t *testing.T) {
 				Title:         KernalVersionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      "Linux kernel version is lower than 3.2",
+				ErrorMsg:      "Linux kernel version is 2.15 which is lower than 3.2",
+				ResolutionMsg: "Use a linux version whose kernel version is greater than 3.2",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the Kernal Version entered is not supported suse linux",
+			args: args{
+				kernelFilePath: failKernelfile,
+				osname:         SUSE_LINUX,
+			},
+			expectedBody: &models.Checks{
+				Title:         KernalVersionTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      "Linux kernel version is 3.1 which is lower than 3.2",
 				ResolutionMsg: "Use a linux version whose kernel version is greater than 3.2",
 			},
 			wantErr:     false,
@@ -814,7 +831,7 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedBody: &models.Checks{
 				Title:  "Kernal Version Check",
 				Passed: false, SuccessMsg: "",
-				ErrorMsg:      "Linux kernel version is not equal to 5.10",
+				ErrorMsg:      "Linux kernel version is 2.15 which is not equal to 5.10",
 				ResolutionMsg: "Use a linux version whose kernel version is equal to 5.10",
 			},
 			wantErr:     false,

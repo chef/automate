@@ -192,7 +192,7 @@ func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath, osName stri
 		if checkVersion == KERNAL_SUPPORTED_VERSION_AMAZON_LINUX {
 			return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+fmt.Sprintf("%.2f", checkVersion)), nil
 		}
-		return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is not equal to 5.10", "Use a linux version whose kernel version is equal to 5.10"), nil
+		return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is "+kernelVersion+" which is not equal to 5.10", "Use a linux version whose kernel version is equal to 5.10"), nil
 	}
 	userVersion, err := semver.NewVersion(kernelVersion)
 	if err != nil {
@@ -208,8 +208,9 @@ func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath, osName stri
 	if userVersion.Compare(minimumVersion) >= 0 {
 		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+kernelVersion), nil
 	}
-	return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is lower than 3.2", "Use a linux version whose kernel version is greater than 3.2"), nil
+	return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is "+kernelVersion+" which is lower than 3.2", "Use a linux version whose kernel version is greater than 3.2"), nil
 }
+
 
 func successResponse(title string, successMsg string) *models.Checks {
 	checkResponse := &models.Checks{
