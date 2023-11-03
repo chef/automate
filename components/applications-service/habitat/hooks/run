@@ -10,10 +10,14 @@ exec 2>&1
 # Postgres Database Management
 # We do this here because init hooks block the hab supervisor
 DBNAME="{{cfg.storage.database}}"
-
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "pgcrypto"
-pg-helper fix-permissions "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper create-extension "$DBNAME" "pgcrypto"
+  pg-helper fix-permissions "$DBNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
 
 # cleanup old migration files
 rm -rf "{{pkg.svc_static_path}}/schema"

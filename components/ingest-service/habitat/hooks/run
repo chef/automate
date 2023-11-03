@@ -120,7 +120,13 @@ CONFIG="$CONFIG --event-feed-address 127.0.0.1:{{service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 
-pg-helper ensure-service-database "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper ensure-service-database "$DBNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
+
 
 # Start Ingest Service
 # shellcheck disable=SC2086

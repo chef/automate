@@ -13,7 +13,12 @@ source {{pkg.svc_config_path}}/migration.sh
 
 trigger_migrations
 
-pg-helper ensure-service-database "$DBNAME" || exit 1
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper ensure-service-database "$DBNAME" || exit 1
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
 
 # cleanup old migration files
 rm -rf {{pkg.svc_static_path}}/*.sql

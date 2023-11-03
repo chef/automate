@@ -15,8 +15,14 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template pg-env "{{pkg.svc_var_path}}/etc/pg-env"
 source "{{pkg.svc_var_path}}/etc/pg-env"
 
-pg-helper ensure-service-database "notifications_service"
-pg-helper create-extension "notifications_service" "pgcrypto"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper ensure-service-database "notifications_service"
+  pg-helper create-extension "notifications_service" "pgcrypto"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
+
 
 erl_cookie="$HOME/.erlang.cookie"
 if [[ ! -f "$erl_cookie" ]]; then

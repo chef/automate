@@ -18,11 +18,17 @@ export DBNAME="{{cfg.sql.db_name}}"
 mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 
-pg-helper rename-if-exists bookshelf "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/bookshelf"}}/schema"
-pg-helper fix-permissions "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper rename-if-exists bookshelf "$DBNAME"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper create-extension "$DBNAME" "uuid-ossp"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/bookshelf"}}/schema"
+  pg-helper fix-permissions "$DBNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
+
 
 if [[ -z "${CURRENT_SECRET_KEY}" ]]; then
   secrets-helper generate bookshelf.access_key_id 64 --if-not-exists

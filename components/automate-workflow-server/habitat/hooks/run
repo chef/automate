@@ -80,18 +80,23 @@ fi
 
 mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
-
-pg-helper migrate-tables delivery "$DBNAME" "$DBUSER"
-pg-helper ensure-service-database "$DBNAME" "$DBUSER"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper migrate-tables delivery "$DBNAME" "$DBUSER"
+  pg-helper ensure-service-database "$DBNAME" "$DBUSER"
 
 # Remove tables that are not needed for workflow in A2
-pg-helper drop-tables "$DBNAME" agents jobs jobs_nodes jobs_profiles jobs_tags \
+  pg-helper drop-tables "$DBNAME" agents jobs jobs_nodes jobs_profiles jobs_tags \
   node_managers nodes nodes_agents nodes_secrets nodes_tags profiles results s_secrets \
   s_secrets_tags s_tags tags \
     --cascade
 
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkg.path}}/schema"
-pg-helper fix-permissions "$DBNAME" "$DBUSER"
+  pg-helper create-extension "$DBNAME" "uuid-ossp"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkg.path}}/schema"
+  pg-helper fix-permissions "$DBNAME" "$DBUSER"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
+
 
 exec "{{pkg.path}}/delivery/bin/delivery" foreground
