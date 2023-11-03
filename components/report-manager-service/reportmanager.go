@@ -29,6 +29,7 @@ func Serve(conf config.ReportManager, connFactory *secureconn.Factory) error {
 	ctx := context.Background()
 
 	var objStoreClient *minio.Client = nil
+
 	var err error
 	if conf.Service.EnableLargeReporting {
 		if conf.Minio.EndPoint == "" || conf.Minio.RootUser == "" || conf.Minio.RootPassword == "" {
