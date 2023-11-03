@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -57,10 +61,92 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 		// 3. check bundle existing here /hab/a2_deploy_workspace/terraform/transfer_files/*.aib
 		// 1 and 2 should be same then we have to proceed, other wise we have to give instruction how to proceed
 		// we can test the procedure in case 1 and 2 are different
+		/*
+			frontend_aib_dest_file = "/var/tmp/frontend-4.10.21.aib"
+			frontend_aib_local_file = "frontend-4.10.21.aib"
+		*/
+		if !preCheckForAddNode() {
+			// we should not reach here
+			return fmt.Errorf("airgap bundle is missing")
+		}
 		return nodeAdder.Execute(c, args)
 	}
 }
 
+const filePath = "/hab/a2_deploy_workspace/terraform/a2ha_aib_fe.auto.tfvars"
+
+func isFileExist(filePath string) bool {
+	_, err := os.Stat(filePath)
+	if err == nil {
+		return true
+	} else if errors.Is(err, fs.ErrNotExist) {
+		// Need to Add an error Statement
+		return false
+	} else {
+		// Need to Add an error Statement
+		return false
+	}
+
+}
+
+func getAirgapBundleTransferFileVersion(filePath string) (string, error) {
+	fileContent, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		// Need to handle this
+		writer.Error("fail to read the file" + filePath + " " + err.Error())
+		return "", err
+	}
+
+	lines := strings.Split(string(fileContent), "\n")
+	bundleName := ""
+	for _, line := range lines {
+		parts := strings.Split(line, "=")
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		switch key {
+		case "frontend_aib_local_file":
+			bundleName = value
+		}
+	}
+	bundleFilePath := "/hab/a2_deploy_workspace/terraform/transfer_files/" + bundleName
+	writer.Println(bundleFilePath)
+	if isFileExist(bundleFilePath) {
+		airgapbundleVersion, err := GetVersion(bundleFilePath)
+		if err != nil {
+			// Need to handle this
+			writer.Error("fail to GetVersion" + bundleFilePath + " " + err.Error())
+			return "", err
+		}
+		return airgapbundleVersion, err
+	}
+	return "", err
+}
+
+func preCheckForAddNode() bool {
+	if isFileExist(filePath) {
+		airgapBundleVersion, err1 := getAirgapBundleTransferFileVersion(filePath)
+		if err1 != nil {
+			// Not able to get the version still we are proceding
+			writer.Println("not able to get the version from the transfer file " + airgapBundleVersion + err1.Error())
+		}
+		installedVersion, err := GetMinimunBuildVersionFromFrontEndServer()
+		if err != nil {
+			// Not able to get the version still we are proceding
+			writer.Println("not able to get the version from the frontend node " + installedVersion + err.Error())
+		}
+		if airgapBundleVersion == installedVersion {
+			// go-ahead with add-node : success case
+			return true
+		}
+		writer.Println("Airgapped Bundle version : " + airgapBundleVersion)
+		writer.Println("Installed Bundle version : " + installedVersion)
+		return false
+	}
+	return false
+}
 func haAddNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployerType string) (HAModifyAndDeploy, error) {
 	if addDeleteNodeHACmdFlags.onPremMode && addDeleteNodeHACmdFlags.awsMode {
 		return nil, errors.New("Cannot use both --onprem-mode and --aws-mode together. Provide only one at a time")
