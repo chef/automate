@@ -20,11 +20,15 @@ export DBNAME="{{cfg.sql.db_name}}"
 
 mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
-
-pg-helper rename-if-exists oc_id "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper fix-permissions "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper rename-if-exists oc_id "$DBNAME"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper create-extension "$DBNAME" "uuid-ossp"
+  pg-helper fix-permissions "$DBNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
 

@@ -21,12 +21,17 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
-pg-helper rename-if-exists opscode_chef "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
-pg-helper fix-permissions "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command"
+  pg-helper rename-if-exists opscode_chef "$DBNAME"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper create-extension "$DBNAME" "uuid-ossp"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
+  pg-helper fix-permissions "$DBNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
 
 # chef_server_data_bootstrap relies on the webui keys so create that first
 ruby "{{pkg.svc_config_path}}/ensure_webui_key.rb" "{{pkg.svc_data_path}}"

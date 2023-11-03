@@ -18,9 +18,14 @@ render-template config.toml "{{pkg.svc_var_path}}/etc/config.toml" \
 
 export DBNAME="{{cfg.datastore.database}}"
 export USERNAME="{{cfg.datastore.user}}"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper fix-permissions "$USERNAME"
-pg-helper alter-role --superuser=true "$USERNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper fix-permissions "$USERNAME"
+  pg-helper alter-role --superuser=true "$USERNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
 
 if ! ls {{pkg.svc_data_path}}/keys/bldr-*; then
   echo "generating bldr key"

@@ -18,11 +18,17 @@ export OPENSSL_FIPS=1
 mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 
-pg-helper rename-if-exists bifrost "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_bifrost"}}/schema/"
-pg-helper fix-permissions "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper rename-if-exists bifrost "$DBNAME"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper create-extension "$DBNAME" "uuid-ossp"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_bifrost"}}/schema/"
+  pg-helper fix-permissions "$DBNAME"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
+
 
 secrets-helper generate oc_bifrost.superuser_id 32 --if-not-exists
 

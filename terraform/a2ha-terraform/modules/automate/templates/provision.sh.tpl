@@ -250,8 +250,10 @@ rm ${automate_custom_config}
 # Test if this is a non-bootstrap Automate or chef_api only install, else it's a bootstrap install
 if [[ "${automate_role}" != "bootstrap_automate" ]]; then
   DEPLOY_BUNDLES="--airgap-bundle ${frontend_aib_file} --bootstrap-bundle ${tmp_path}/bootstrap.abb"
+  [ ! -f /hab/.skip_migration ] && echo "file not exist, will create it " && touch /hab/.skip_migration
 else
   DEPLOY_BUNDLES="--airgap-bundle ${frontend_aib_file}"
+  [ -f /hab/.skip_migration ] && echo " file exist on bootstrap node" && rm /hab/.skip_migration 
 fi
 
 if [ -e "/hab/user/deployment-service/config/user.toml" ]; then

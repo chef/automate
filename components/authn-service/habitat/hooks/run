@@ -6,8 +6,14 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
-pg-helper ensure-service-database "{{cfg.storage.database}}"
+if [ ! -f /hab/.skip_migration ]; then
+  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
+  pg-helper ensure-service-database "{{cfg.storage.database}}"
 
-pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+  pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+else 
+  echo "/hab/.skip_migration does exist, skipping pg-helper"  
+fi
+
 
 exec authn-service serve {{pkg.svc_config_path}}/config.yml
