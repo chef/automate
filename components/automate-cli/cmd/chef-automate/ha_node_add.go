@@ -102,7 +102,7 @@ func getAirgapBundleTransferFileVersion(filePath string) (string, error) {
 		value := strings.TrimSpace(parts[1])
 		switch key {
 		case "frontend_aib_local_file":
-			bundleName = strings.Trim(value, "\""))
+			bundleName = strings.Trim(value, "\"")
 		}
 	}
 	bundleFilePath := "/hab/a2_deploy_workspace/terraform/transfer_files/" + bundleName
