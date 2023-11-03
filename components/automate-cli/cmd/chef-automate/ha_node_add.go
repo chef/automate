@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -80,19 +79,14 @@ func isFileExist(filePath string) bool {
 	if err == nil {
 		return true
 	} else if errors.Is(err, fs.ErrNotExist) {
-		// Need to Add an error Statement
-		return false
-	} else {
-		// Need to Add an error Statement
-		return false
+		writer.Error("file not exist" + filePath + " " + err.Error())
 	}
-
+	return false
 }
 
 func getAirgapBundleTransferFileVersion(filePath string) (string, error) {
-	fileContent, err := ioutil.ReadFile(filePath)
+	fileContent, err := os.ReadFile(filePath)
 	if err != nil {
-		// Need to handle this
 		writer.Error("fail to read the file" + filePath + " " + err.Error())
 		return "", err
 	}
@@ -116,7 +110,6 @@ func getAirgapBundleTransferFileVersion(filePath string) (string, error) {
 	if isFileExist(bundleFilePath) {
 		airgapbundleVersion, err := GetVersion(bundleFilePath)
 		if err != nil {
-			// Need to handle this
 			writer.Error("fail to GetVersion" + bundleFilePath + " " + err.Error())
 			return "", err
 		}
