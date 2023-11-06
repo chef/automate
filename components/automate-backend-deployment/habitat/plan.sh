@@ -9,7 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_deps=(
   core/ruby30
-  core/aws-cli
+  core/aws-cli/1.21.11/20220817123642
   core/bash
   core/coreutils
   core/cacerts
@@ -18,7 +18,7 @@ pkg_deps=(
   core/gzip
   core/jq-static
   core/openssh
-  core/openssl
+  core/openssl11/1.1.1k/20220311131131
   core/make
   core/curl
   core/rsync
@@ -26,7 +26,10 @@ pkg_deps=(
   core/busybox-static  
   chef/automate-ha-cluster-ctl
 )
-
+#core/aws-cli ( core/aws-cli/1.21.11/20231020110846 core/aws-cli/1.21.11/20220817123642 )
+   # core/openssl11 ( core/openssl11/1.1.1w/20231020105352 core/openssl11/1.1.1k/20220311131131 )
+   # core/python ( core/python/3.10.0/20231020105702 core/python/3.10.0/20220817121853 )
+   #
 pkg_build_deps=(
   core/gcc
 )
