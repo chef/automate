@@ -30,7 +30,7 @@ const (
 	versionfile              = "./testfiles/os_release_suse_failure.txt"
 	failfilepath             = "./failfilepath"
 	LinuxVersionTitle        = "Linux Version Check"
-	KernalVersionTitle       = "Kernal Version Check"
+	KernelVersionTitle       = "Kernel Version Check"
 	MkdirTitle               = "mkdir availability"
 	OpensslTitle             = "openssl availability"
 	StatTitle                = "stat availability"
@@ -91,9 +91,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        true,
-						SuccessMsg:    "Linux kernal version is 5.10",
+						SuccessMsg:    "Linux kernel version is 5.10",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -133,9 +133,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        true,
-						SuccessMsg:    "Linux kernal version is 5.10",
+						SuccessMsg:    "Linux kernel version is 5.10",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -168,9 +168,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        true,
-						SuccessMsg:    "Linux kernal version is 5.10",
+						SuccessMsg:    "Linux kernel version is 5.10",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -210,9 +210,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "Ensure wrong-cammand is available in $PATH on the node",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        true,
-						SuccessMsg:    "Linux kernal version is 5.10",
+						SuccessMsg:    "Linux kernel version is 5.10",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -252,9 +252,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        true,
-						SuccessMsg:    "Linux kernal version is 5.10",
+						SuccessMsg:    "Linux kernel version is 5.10",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -294,9 +294,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        true,
-						SuccessMsg:    "Linux kernal version is 5.10",
+						SuccessMsg:    "Linux kernel version is 5.10",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -311,7 +311,7 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 			},
 		},
 		{
-			description: "If the kernal version is not supported by automate",
+			description: "If the kernel version is not supported by automate",
 			args: args{
 				query:          "postgresql",
 				checkarray:     checktrue,
@@ -336,10 +336,10 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      "Linux kernel version is lower than 3.2",
+						ErrorMsg:      "Linux kernel version is 2.15 which is lower than 3.2",
 						ResolutionMsg: "Use a linux version whose kernel version is greater than 3.2",
 					},
 					{
@@ -353,7 +353,7 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 			},
 		},
 		{
-			description: "If file is not present for reading the kernal version",
+			description: "If file is not present for reading the kernel version",
 			args: args{
 				query:          "postgresql",
 				checkarray:     checktrue,
@@ -378,10 +378,10 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         KernalVersionTitle,
+						Title:         KernelVersionTitle,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      "Its not feasible to determine the Kernal version of the system",
+						ErrorMsg:      "Its not feasible to determine the Kernel version of the system",
 						ResolutionMsg: "Please run automate on the supported platforms.",
 					},
 					{
@@ -743,15 +743,15 @@ func TestCheckKernelVersion(t *testing.T) {
 		expectedErr  string
 	}{
 		{
-			description: "If the Kernal version is supported",
+			description: "If the Kernel version is supported",
 			args: args{
 				kernelFilePath: successKernelfile,
 				osname:         AMAZON_LINUX,
 			},
 			expectedBody: &models.Checks{
-				Title:         "Kernal Version Check",
+				Title:         "Kernel Version Check",
 				Passed:        true,
-				SuccessMsg:    "Linux kernal version is 5.10",
+				SuccessMsg:    "Linux kernel version is 5.10",
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
@@ -759,13 +759,13 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
-			description: "If the Kernal Version entered is not supported suse linux",
+			description: "If the Kernel Version entered is not supported suse linux",
 			args: args{
 				kernelFilePath: failureKernelfile,
 				osname:         SUSE_LINUX,
 			},
 			expectedBody: &models.Checks{
-				Title:         KernalVersionTitle,
+				Title:         KernelVersionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "Linux kernel version is 2.15 which is lower than 3.2",
@@ -775,13 +775,13 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
-			description: "If the Kernal Version entered is not supported suse linux",
+			description: "If the Kernel Version entered is not supported suse linux",
 			args: args{
 				kernelFilePath: failKernelfile,
 				osname:         SUSE_LINUX,
 			},
 			expectedBody: &models.Checks{
-				Title:         KernalVersionTitle,
+				Title:         KernelVersionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "Linux kernel version is 3.1 which is lower than 3.2",
@@ -791,15 +791,15 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
-			description: "If the Kernal Version entered is 3.10 suse linux",
+			description: "If the Kernel Version entered is 3.10 suse linux",
 			args: args{
 				kernelFilePath: testKernelfile,
 				osname:         SUSE_LINUX,
 			},
 			expectedBody: &models.Checks{
-				Title:         KernalVersionTitle,
+				Title:         KernelVersionTitle,
 				Passed:        true,
-				SuccessMsg:    "Linux kernal version is 3.10",
+				SuccessMsg:    "Linux kernel version is 3.10",
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
@@ -813,7 +813,7 @@ func TestCheckKernelVersion(t *testing.T) {
 				osname:         SUSE_LINUX,
 			},
 			expectedBody: &models.Checks{
-				Title:         KernalVersionTitle,
+				Title:         KernelVersionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "Failed while getting the kernel version",
@@ -823,13 +823,13 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "Invalid Semantic Version",
 		},
 		{
-			description: "If the Kernal Version entered is not supported Amazon linux",
+			description: "If the Kernel Version entered is not supported Amazon linux",
 			args: args{
 				kernelFilePath: failureKernelfile,
 				osname:         AMAZON_LINUX,
 			},
 			expectedBody: &models.Checks{
-				Title:  "Kernal Version Check",
+				Title:  "Kernel Version Check",
 				Passed: false, SuccessMsg: "",
 				ErrorMsg:      "Linux kernel version is 2.15 which is not equal to 5.10",
 				ResolutionMsg: "Use a linux version whose kernel version is equal to 5.10",
@@ -838,7 +838,7 @@ func TestCheckKernelVersion(t *testing.T) {
 			expectedErr: "",
 		},
 		{
-			description: "If not able to get the kernal Version",
+			description: "If not able to get the kernel Version",
 			args: args{
 				kernelFilePath: failfilepath,
 				osname:         AMAZON_LINUX,
