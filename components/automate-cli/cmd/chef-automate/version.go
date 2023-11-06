@@ -358,6 +358,39 @@ func getBastionVersion() error {
 	return nil
 }
 
+// getFrontEndVersion : this func use to run the command on all the FE and return the array as a output
+func getFrontEndVersion(automateIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
+	automateCmd := A2VERSIONCMD
+	if VersionCommandFlags.verbose {
+		automateCmd = A2VERSIONVERBOSE
+	}
+	nodeMap := &NodeTypeAndCmd{
+		Automate: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Frontend: &Cmd{CmdInputs: &CmdInputs{
+			Cmd:                      automateCmd,
+			NodeIps:                  automateIps,
+			NodeType:                 true,
+			SkipPrintOutput:          true,
+			HideSSHConnectionMessage: true}},
+		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      infra,
+	}
+
+	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
+	fmt.Println("cmdresult:", cmdresult)
+	if err != nil {
+		logrus.Error("ERROR", err)
+		return nil, err
+	}
+	versionMap := make(map[string]string)
+	for ip, result := range cmdresult {
+		versionMap[ip] = result[0].Output
+	}
+	return versionMap, nil
+}
+
 func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
 	automateCmd := A2VERSIONCMD
 	if VersionCommandFlags.verbose {
@@ -378,7 +411,6 @@ func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails,
 	}
 
 	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
-
 	if err != nil {
 		logrus.Error("ERROR", err)
 		return nil, err
@@ -799,40 +831,47 @@ func GetMinimunBuildVersionFromFrontEndServer() (string, error) {
 	cmdExecutor := NewRemoteCmdExecutorWithoutNodeMap(sshUtil, writer)
 
 	if len(frontEnd) != 0 {
-		versions, err := getChefAutomateVersion(frontEnd, infra, cmdExecutor)
+		versions, err := getFrontEndVersion(frontEnd, infra, cmdExecutor)
+		logrus.Debug("map of versions :", versions)
 		if err != nil {
 			logrus.Errorf("Error while getting Automate Version :: %s", err)
 			return "", err
 		}
-		return findMinimumServerVersion(versions), nil //findMinimumServerVersion
+		return getMinimumVersion(versions), nil
 	}
 	return "", nil
 }
 
-/*
-	func getMinimumSemverVersion(versions map[string]string) string {
-		values := make([]string, 0, len(versions))
-		// lenght check is not required here, caller has done the length check
-		for _, value := range versions {
-			values = append(values, value)
+func getMinimumVersion(mVersions map[string]string) string {
+	minVer := "100.0.0" // need to handle this
+	for key, value := range mVersions {
+		version, _ := extractVersion(value, VERSIONREGEX)
+		if len(version) < 1 {
+			logrus.Debug(key, version)
+			continue
 		}
-		sort.Sort(semverVersion(values))
-		return values[0]
+		if CompareSemverVersion(version, minVer) {
+			minVer = version
+		}
+
 	}
-*/
+	logrus.Debug(minVer)
+	return minVer
+}
 
 func findMinimumServerVersion(versions map[string]string) string {
 	minVersion := ""
 	for _, v := range versions {
 		minVersion = v
+		logrus.Debug("min: %s" + v)
 		break
 	}
-
 	for _, version := range versions {
 		if CompareSemverVersion(version, minVersion) {
 			minVersion = version
 		}
 	}
+	logrus.Debug("return minVersion: %s" + minVersion)
 	return minVersion
 }
 
