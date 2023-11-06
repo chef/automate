@@ -528,6 +528,7 @@ type ApiResult struct {
 	Error       *fiber.Error `json:"error,omitempty"`
 	Skipped     bool         `json:"skipped"`
 	SkipMessage string       `json:"skip_message,omitempty"`
+	Id          SystemUserID `json:"id,omitempty"`
 }
 
 type Checks struct {

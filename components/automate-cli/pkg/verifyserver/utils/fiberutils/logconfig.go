@@ -43,7 +43,7 @@ func GetLogConfig(log logger.Logger) (lc fiberlogger.Config) {
 	} else {
 		lc.Format = generateLogFormat(
 			"${green}"+strings.ToUpper(log.NewEntry().Logger.GetLevel().String())+"${reset}",
-			"time", "pid", "status", "method", "path", "latency", "error", "bytesReceived", "bytesSent",
+			"time", "pid", "status", "method", "path", "latency", "error", "bytesReceived", "bytesSent", "body", "resBody",
 		)
 	}
 	return lc
