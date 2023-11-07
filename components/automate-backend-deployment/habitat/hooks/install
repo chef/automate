@@ -173,6 +173,13 @@ EOF
     display_upgrade_help $(cat $OLD_WORKSPACE/terraform/.tf_arch)
   fi
 fi
+
+if [[ -f $OLD_WORKSPACE/certificate.toml ]]; then
+    echo "Copying previous 'certificate.toml' config to new workspace"
+    echo "Copying previous 'certificate.toml' config to new workspace" >> $LOGGER
+    cp $OLD_WORKSPACE/certificate.toml $NEW_WORKSPACE/certificate.toml
+    echo "Copied previous 'certificate.toml' config to new workspace" >> $LOGGER
+fi
 echo "creating new symlink for new workspace" >> $LOGGER
 # shellcheck disable=SC1083
 ln -nsf $NEW_WORKSPACE /hab/a2_deploy_workspace

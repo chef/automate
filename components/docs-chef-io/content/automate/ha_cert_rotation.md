@@ -35,6 +35,84 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 {{< /note >}}
 
+### Rotate Cluster Certificates
+If you want to rotate certificates of the entire cluster using single command, then you can follow the below commands:
+
+To rotate certificates of entire cluster using single command, we need a certificate template.
+- To generate certificate template use below command
+```
+  chef-automate cert-rotate generate-certificate-config certificate-config.toml
+```
+
+now we can find our certificate template in `certificate-config.toml` file, please edit the file and put required certificate paths
+
+- To rotate the certificates use below command
+
+```bash
+  chef-automate cert-rotate --certificate-config certificate-config.toml
+```
+
+You can also use `--cc` instead of `--certificate-config` as a sort form.
+
+
+#### Sample Certificate template
+
+  ```toml
+    [automate]
+      root_ca = "full path of root-ca.pem"
+
+      [[automate.ips]]
+        ip = "10.1.0.130"
+        public_key = "full path of automate1.pem"
+        private_key = "full path of automate1-key.pem"
+
+    [chef_server]
+      root_ca = "full path of root-ca.pem"
+
+      [[chef_server.ips]]
+        ip = "10.1.0.16"
+        public_key = "full path of  cs1.pem"
+        private_key = "full path of cs1-key.pem"
+
+    [postgresql]
+      root_ca = "full path of root-ca.pem"
+
+      [[postgresql.ips]]
+        ip = "10.1.0.141"
+        public_key = "full path of pg1.pem"
+        private_key = "full path of pg1-key.pem"
+
+      [[postgresql.ips]]
+        ip = "10.1.1.190"
+        public_key = "full path of pg2.pem"
+        private_key = "full path of pg2-key.pem"
+
+      [[postgresql.ips]]
+        ip = "10.1.2.130"
+        public_key = "full path of pg3.pem"
+        private_key = "full path of pg3-key.pem"
+
+    [opensearch]
+      root_ca = "full path of root-ca.pem"
+      admin_public_key = "full path of os-admin.pem"
+      admin_private_key = "full path of os-admin-key.pem"
+      [[opensearch.ips]]
+        ip = "10.1.0.176"
+        public_key = "full path of os1.pem"
+        private_key = "full path of os1-key.pem"
+
+      [[opensearch.ips]]
+        ip = "10.1.1.125"
+        public_key = "full path of os2.pem"
+        private_key = "full path of os2-key.pem"
+
+      [[opensearch.ips]]
+        ip = "10.1.2.247"
+        public_key = "full path of os3.pem"
+        private_key = "full path of os3-key.pem"
+    ```
+
+
 ### Rotate Certificates of each service
 
 If you want to rotate certificates of the entire cluster, then you can follow the below commands:
