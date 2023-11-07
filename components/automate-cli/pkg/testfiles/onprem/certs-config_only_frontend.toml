@@ -1,0 +1,15 @@
+[automate]
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
+
+  [[automate.ips]]
+    ip = "198.51.100.0"
+    public_key = "../../pkg/testfiles/certs/test_a2_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_a2_private_key_1.pem"
+
+[chef_server]
+  root_ca = "../../pkg/testfiles/certs/test_root_ca.pem"
+
+  [[chef_server.ips]]
+    ip = "198.51.100.2"
+    public_key = "../../pkg/testfiles/certs/test_cs_public_key_1.pem"
+    private_key = "../../pkg/testfiles/certs/test_cs_private_key_1.pem"
