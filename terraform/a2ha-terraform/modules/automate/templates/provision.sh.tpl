@@ -76,14 +76,14 @@ version_check_for_addnode() {
     IFS='.' read -ra ver2_arr <<< "$airgap_bundle_version"
 
     # Determine the number of components in the version strings
-    num_components1=${#ver1_arr[@]}
-    num_components2=${#ver2_arr[@]}
+    num_components1=$${#ver1_arr[@]}
+    num_components2=$${#ver2_arr[@]}
 
     # Compare each component of the version strings
     for ((i = 0; i < num_components1 && i < num_components2; i++)); do
-        if [ "${ver1_arr[i]}" -lt "${ver2_arr[i]}" ]; then
+        if [ "$${ver1_arr[i]}" -lt "$${ver2_arr[i]}" ]; then
             echo "Airgap bundle version $airgap_bundle_version is greater than installed version $installed_version"
-        elif [ "${ver1_arr[i]}" -gt "${ver2_arr[i]}" ]; then
+        elif [ "$${ver1_arr[i]}" -gt "$${ver2_arr[i]}" ]; then
             echo "Installed version $installed_version is greater than airgap bundle $airgap_bundle_version"
             isSkipRequired=true
         fi
