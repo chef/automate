@@ -1,9 +1,15 @@
-name: chef-automate cert-rotate
-synopsis: Chef Automate rotate cert
-usage: chef-automate cert-rotate [flags]
+name: chef-automate cert-rotate generate-certificate-config
+synopsis: 'Chef Automate generate certificate config '
+usage: |
+  chef-automate cert-rotate generate-certificate-config [flags]
 description: |
-  Chef Automate CLI command to rotate certificates, this command should always be executed from AutomateHA Bastion Node
+  Chef Automate CLI command to generate certificates config, this command should always be executed from AutomateHA Bastion Node
 options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for generate-certificate-config
+inherited_options:
 - name: a2
   default_value: "false"
   usage: Automate Certificate Rotation
@@ -26,10 +32,13 @@ options:
 - name: cs
   default_value: "false"
   usage: Chef Infra Server Certificate Rotation
-- name: help
-  shorthand: h
+- name: debug
+  shorthand: d
   default_value: "false"
-  usage: help for cert-rotate
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
 - name: node
   usage: Node Ip address
 - name: opensearch
@@ -50,24 +59,15 @@ options:
   usage: Private certificate
 - name: public-cert
   usage: Public certificate
+- name: result-json
+  usage: Write command result as JSON to PATH
 - name: root-ca
   usage: RootCA certificate
 - name: wait-timeout
   default_value: "600"
   usage: |
     This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process
-inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
-- 'generate-certificate-config - Chef Automate generate certificate config '
+- chef-automate cert-rotate - Chef Automate rotate cert
 compatible_with: AutomateHA
 supported_on: Bastion
