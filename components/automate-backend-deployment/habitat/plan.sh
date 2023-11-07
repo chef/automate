@@ -9,7 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_deps=(
   core/ruby30
-  core/aws-cli/1.21.11/20220817123642
+  core/aws-cli
   core/bash
   core/coreutils
   core/cacerts
@@ -18,7 +18,7 @@ pkg_deps=(
   core/gzip
   core/jq-static
   core/openssh
-  core/openssl11/1.1.1k/20220311131131
+  core/openssl
   core/make
   core/curl
   core/rsync
