@@ -15,6 +15,14 @@
     !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="4.0.0";
     }}();
   </script>
+  <script type="text/javascript">
+    (function(apiKey){
+      (function (c, h, e, f) {
+        var x, y, z;y = h.createElement(e);y.async = !0;y.src = 'https://d2mopladttg8fn.cloudfront.net/chef-telemetry-tracker.js?time='+new Date().getTime();
+        z = h.getElementsByTagName(f)[0]; z.appendChild(y);function r(){ if(c.chefTelemetryTracker){c.chefTelemetryTracker.register(apiKey);return;}setTimeout(r,100);};r();
+      }(window, document, 'script', 'head'));
+    }("fb1de17d-939d-46d5-5d06-342927b00d86"));
+  </script>
   <script>
     // This shim is currently necessary for IE11 compatibility for ngx-charts v6.0.2.
     // See https://github.com/swimlane/ngx-charts/issues/386
