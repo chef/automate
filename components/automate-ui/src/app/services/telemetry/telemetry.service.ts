@@ -237,8 +237,7 @@ export class TelemetryService {
     }
     console.log('initializeChefTelemetryTracker');
     try {
-      const isChefTelemetryTrackerInitializedForAutomate = sessionStorage.getItem('isChefTelemetryTrackerInitializedForAutomate') === 'true';
-      if(chefTelemetryTracker && this.chefSessionService.telemetry_enabled && !isChefTelemetryTrackerInitializedForAutomate) {
+      if(chefTelemetryTracker && this.chefSessionService.telemetry_enabled) {
         const chefTelemetryTrackerInitData = {
           visitor: {
             id: this.chefSessionService.uuid,
@@ -262,7 +261,6 @@ export class TelemetryService {
           }
         }
         chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
-        sessionStorage.setItem('isChefTelemetryTrackerInitializedForAutomate', 'true');
         localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
       }
     } catch(e) {
