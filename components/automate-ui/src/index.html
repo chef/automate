@@ -16,12 +16,9 @@
     }}();
   </script>
   <script type="text/javascript">
-    (function(apiKey){
-      (function (c, h, e, f) {
-        var x, y, z;y = h.createElement(e);y.async = !0;y.src = 'https://d2mopladttg8fn.cloudfront.net/chef-telemetry-tracker.js?time='+new Date().getTime();
-        z = h.getElementsByTagName(f)[0]; z.appendChild(y);function r(){ if(c.chefTelemetryTracker){c.chefTelemetryTracker.register(apiKey);return;}setTimeout(r,100);};r();
-      }(window, document, 'script', 'head'));
-    }("fb1de17d-939d-46d5-5d06-342927b00d86"));
+    (function (c, h, e, f) {
+      let y, z;if(c && h && e && f){y = h.createElement(e);y.async = !0;y.src = 'https://d2mopladttg8fn.cloudfront.net/chef-telemetry-tracker.js?time='+new Date().getTime();z = h.getElementsByTagName(f)[0];z.appendChild(y);}
+    }(window, document, 'script', 'head'));
   </script>
   <script>
     // This shim is currently necessary for IE11 compatibility for ngx-charts v6.0.2.
