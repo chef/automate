@@ -1,9 +1,9 @@
 package models
 
 type SystemUserResponse struct {
-	Passed bool         `json:"passed"`
-	Checks []*Checks    `json:"checks"`
-	Id     SystemUserID `json:"id,omitempty"`
+	Passed bool          `json:"passed"`
+	Checks []*Checks     `json:"checks"`
+	Id     *SystemUserID `json:"id,omitempty"`
 }
 
 type SystemUserID struct {

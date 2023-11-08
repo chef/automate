@@ -400,7 +400,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 						ResolutionMsg: "",
 					},
 				},
-				Id: models.SystemUserID{
+				Id: &models.SystemUserID{
 					UserID:  "1001",
 					GroupID: "1001",
 				},
@@ -473,6 +473,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 						ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 					},
 				},
+				Id: &models.SystemUserID{UserID: "", GroupID: ""},
 			},
 		},
 	}

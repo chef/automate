@@ -91,26 +91,26 @@ func (su *SystemUserServiceImp) ValidateOrCreateHabUser() (*models.Checks, bool)
 	return successResponse(constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_USER_HAB_SUCCESS_MSG), false
 }
 
-func (su *SystemUserServiceImp) getUserAndGroupID() (models.SystemUserID, error) {
+func (su *SystemUserServiceImp) getUserAndGroupID() (*models.SystemUserID, error) {
 
-	system_user_id := models.SystemUserID{}
+	systemUserDetails := &models.SystemUserID{}
 
 	// Check for available ID in all machine (?)
 	ids, err := su.user.Lookup(constants.USER_NAME)
 	if err != nil {
 		su.Log.Error("User not found:", err)
-		return system_user_id, err
+		return systemUserDetails, err
 	}
 
 	if ids != nil {
-		system_user_id.UserID = ids.Uid
-		system_user_id.GroupID = ids.Gid
-		su.Log.Infof("UID: %s\nGID: %s\n", system_user_id.UserID, system_user_id.GroupID)
+		systemUserDetails.UserID = ids.Uid
+		systemUserDetails.GroupID = ids.Gid
+		su.Log.Infof("UID: %s\nGID: %s\n", systemUserDetails.UserID, systemUserDetails.GroupID)
 	} else {
 		su.Log.Info("UID not found.")
 	}
 	su.Log.Info("Created 'hab' user and group ")
-	return system_user_id, nil
+	return systemUserDetails, nil
 }
 
 func (su *SystemUserServiceImp) ValidateHabGroup() *models.Checks {

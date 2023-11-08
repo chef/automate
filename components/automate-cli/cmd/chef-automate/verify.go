@@ -688,52 +688,8 @@ func (v *verifyCmdFlow) printResponse(batchCheckResults []models.BatchCheckResul
 func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.VerificationReport {
 	var reports []reporting.VerificationReport
 
-	_isNFSCheckPresent := false
-	uids := []string{}
+	updatedReportForSystemUser(&batchCheckResults)
 
-	for _, batchCheckResult := range batchCheckResults {
-		// Check all IDs
-		for _, test := range batchCheckResult.Tests {
-			if test.Check == "nfs-backup-config" && !test.Skipped {
-				_isNFSCheckPresent = true
-			}
-			if test.Check == "system-user" {
-				if len(test.Checks) == 0 {
-					continue
-				}
-				if !arrayutils.Contains(uids, test.Id.UserID) {
-					uids = append(uids, test.Id.UserID)
-				}
-
-			}
-		}
-
-		if _isNFSCheckPresent {
-			for i, test := range batchCheckResult.Tests {
-				if test.Check == "system-user" {
-					var newCheck models.Checks
-					if len(uids) == 1 {
-						newCheck = models.Checks{
-							Title:      "User ID - validation",
-							Passed:     true,
-							SuccessMsg: "hab uids are same across all nodes",
-							Skipped:    false,
-						}
-					} else {
-						newCheck = models.Checks{
-							Title:         "User ID - validation",
-							Passed:        false,
-							ErrorMsg:      fmt.Sprintf("hab uid: %s. hab uid is not same across all nodes", test.Id.UserID),
-							ResolutionMsg: "hab uid should be same across all nodes/machines",
-							Skipped:       false,
-						}
-						batchCheckResult.Tests[i].Passed = false
-					}
-					batchCheckResult.Tests[i].Checks = append(batchCheckResult.Tests[i].Checks, newCheck)
-				}
-			}
-		}
-	}
 	for _, batchCheckResult := range batchCheckResults {
 		for _, test := range batchCheckResult.Tests {
 
@@ -794,6 +750,57 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 
 	}
 	return reports
+}
+
+func updatedReportForSystemUser(batchCheckResults *[]models.BatchCheckResult) {
+	isNFSCheckPresent := false
+	uids := []string{}
+
+	for _, batchCheckResult := range *batchCheckResults {
+		// Check all IDs
+		for _, test := range batchCheckResult.Tests {
+			if test.Check == "nfs-backup-config" && !test.Skipped {
+				isNFSCheckPresent = true
+			}
+			if test.Check == "system-user" {
+				if len(test.Checks) == 0 {
+					continue
+				}
+				if !arrayutils.Contains(uids, test.Id.UserID) {
+					uids = append(uids, test.Id.UserID)
+				}
+
+			}
+		}
+	}
+
+	for _, batchCheckResult := range *batchCheckResults {
+		if isNFSCheckPresent {
+			for i, test := range batchCheckResult.Tests {
+				if test.Check == "system-user" {
+					var newCheck models.Checks
+					if len(uids) == 1 {
+						newCheck = models.Checks{
+							Title:      "User ID - validation",
+							Passed:     true,
+							SuccessMsg: "hab uids are same across all nodes",
+							Skipped:    false,
+						}
+					} else {
+						newCheck = models.Checks{
+							Title:         "User ID - validation",
+							Passed:        false,
+							ErrorMsg:      fmt.Sprintf("hab uid: %s. hab uid is not same across all nodes", test.Id.UserID),
+							ResolutionMsg: "hab uid should be same across all nodes/machines",
+							Skipped:       false,
+						}
+						batchCheckResult.Tests[i].Passed = false
+					}
+					batchCheckResult.Tests[i].Checks = append(batchCheckResult.Tests[i].Checks, newCheck)
+				}
+			}
+		}
+	}
 }
 
 func createTables(numberOfAutomateNodes, numberOfChefServerNodes, numberOfPostgreSQLNodes, numberOfOpenSearchNodes int) map[string]*reporting.Table {
