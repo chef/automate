@@ -149,11 +149,93 @@ export class TelemetryService {
             properties.url = this.sanitizeDomainURL(properties.url);
           }
         }
-        this.emitToPipeline('page', {
-          name: name,
-          anonymousId: this.anonymousId,
-          properties: properties
-        });
+        // We must retrieve the segment write key before we can load analytics.js
+        this.retrieveSegmentWriteKey().subscribe(result => {
+          this.segmentWriteKey = result['write_key'];
+          // This loads analytics.js javascript from segment, based on the
+          // configured write key. analytics global is initialized by the segment
+          // snippet we have in the <head>. analytics.js expects some things from
+          // the segment snippet so we load this out of band instead of ng2 style
+          // loading. segment snippet buffers the calls made to analytics before
+          // it's loaded and properly initialized so this async operation is safe.
+          analytics.load(this.segmentWriteKey);
+
+          // We'll treat our Telemetry Pipeline as a custom analytics.js
+          // integration and leverage analytics.js emitters to send the
+          // data.
+          analytics.on('page', (_category, name, properties, _options) => {
+            if (properties) {
+              if (properties.referrer) {
+                properties.referrer = this.sanitizeDomainURL(properties.referrer);
+              }
+              if (properties.url) {
+                properties.url = this.sanitizeDomainURL(properties.url);
+              }
+            }
+            this.emitToPipeline('page', {
+              name: name,
+              anonymousId: this.anonymousId,
+              properties: properties
+            });
+          });
+
+          analytics.on('track', (event, properties, _options) => {
+            this.emitToPipeline('track', {
+              userId: this.anonymousId,
+              event: event,
+              properties: properties
+            });
+          });
+
+          analytics.on('group', (id, traits, _options) => {
+            this.emitToPipeline('group', {
+              groupId: id,
+              traits: traits,
+              anonymousId: this.anonymousId
+            });
+          });
+
+          analytics.on('identify', (id, traits, _options) => {
+            this.emitToPipeline('identify', {
+              userId: id,
+              traits: traits,
+              anonymousId: this.anonymousId
+            });
+          });
+
+          analytics.sanitizeDomainURL = this.sanitizeDomainURL;
+          analytics.addSourceMiddleware(this.middleware);
+          // For segment the first call we need to make must be identify().
+          // In the calls below we might as well call analytics.identify() and
+          // analytics.group() but we would like to ensure that we call analytics
+          // from a single place so we queue these requests as the first items in
+          // our trackingOperations queue.
+
+          // Currently we depend on anonymousId segment creates for us. We should
+          // add a userId into this call in the future.
+          this.identify();
+          // Currently we group users by license ID and customer ID
+          this.group(this.licenseId);
+          this.group(this.customerId);
+
+          // We want to make sure we have the config and the required calls are
+          // queued up before starting to send things into analytics. So we don't
+          // subscribe to trackingOperations before these are done.
+          trackingOperations.subscribe((trackingData) => {
+            analytics[trackingData.operation](trackingData.identifier, trackingData.properties);
+          });
+          this.trackInitialData();
+          if (!this.isSkipNotification) {
+            this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
+          }
+
+        },
+          ({ status, error: { message } }: HttpErrorResponse) => {
+            console.log(`Error retrieving Segment API key : ${status}/${message}`);
+            if (!this.isSkipNotification) {
+              this.store.dispatch(new UpdateUserPreferencesFailure(message));
+            }
+          });
       });
 
       analytics.on('track', (event, properties, _options) => {
