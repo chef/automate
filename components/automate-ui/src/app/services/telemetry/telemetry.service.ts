@@ -18,6 +18,7 @@ import { ComplianceStatsService } from './compliance-stats/compliance-stats.serv
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
 import { ApplicationStatsService } from './application-stats/application-stats.service';
+import { environment  } from 'environments/environment';
 
 declare let analytics: any;
 
@@ -86,22 +87,26 @@ export class TelemetryService {
     this.configService.getConfig().pipe(
       filter(config => config.telemetryEnabled),
       map((config) => {
-        this.telemetryEnabled = config.telemetryEnabled;
-        this.telemetryEnabledObservable.next(config.telemetryEnabled);
-        this.hasTelemetryResponse = true;
-        this.telemetryUrl = config.telemetryUrl;
-        this.customerId = config.customerId;
-        this.customerName = config.customerName;
-        this.licenseId = config.licenseId || configService.defaultLicenseId;
-        this.maxNodes = config.maxNodes;
-        this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
-        this.instanceId = config.deploymentId || configService.defaultDeployId;
-        this.deploymentType = config.deploymentType;
-        this.deploymentId = config.deploymentId;
+        try {
+          this.telemetryEnabled = config.telemetryEnabled;
+          this.telemetryEnabledObservable.next(config.telemetryEnabled);
+          this.hasTelemetryResponse = true;
+          this.telemetryUrl = config.telemetryUrl;
+          this.customerId = config.customerId;
+          this.customerName = config.customerName;
+          this.licenseId = config.licenseId || configService.defaultLicenseId;
+          this.maxNodes = config.maxNodes;
+          this.instanceId = config.deploymentId || configService.defaultDeployId;
+          this.deploymentType = config.deploymentType;
+          this.deploymentId = config.deploymentId;
+          this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
+        } catch (e) {
+          console.error(e);
+        }
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
-        this.initializeChefTelemetryTracker();
+        this.registerChefTelemetryTracker();
         this.initiateTelemetry(trackingOperations);
       });
   }
@@ -113,7 +118,7 @@ export class TelemetryService {
   setUserTelemetryPreference(isOptedIn: boolean): void {
     if (isOptedIn === true) {
       this.engageTelemetry(this.trackingOperations);
-      this.initializeChefTelemetryTracker();
+      this.registerChefTelemetryTracker();
     }
     this.chefSessionService.storeTelemetryPreference(isOptedIn);
   }
@@ -215,7 +220,16 @@ export class TelemetryService {
     this.licenseExpirationDate = license;
   }
 
-  async initializeChefTelemetryTracker() {
+  registerChefTelemetryTracker() {
+    if(chefTelemetryTracker) {
+      chefTelemetryTracker.register(environment.pendo_api_key);
+      this.initializeChefTelemetryTracker();
+      return;
+    }
+    setTimeout(this.registerChefTelemetryTracker,100);
+  }
+
+  initializeChefTelemetryTracker() {
     
     if(!this.licenseExpirationDate) {
       setTimeout(() => { this.initializeChefTelemetryTracker() }, 1000);
