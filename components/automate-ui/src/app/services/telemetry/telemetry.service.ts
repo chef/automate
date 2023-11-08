@@ -27,6 +27,8 @@ export interface TelemetryData {
   properties?: Object;
 }
 
+declare let chefTelemetryTracker: any;
+
 @Injectable()
 export class TelemetryService {
   // There is a diagram at /dev-docs/diagrams/telemetry-service-ui.png that describes
@@ -58,6 +60,8 @@ export class TelemetryService {
   private  telemetryCheckboxObservable = new Subject<boolean>();
   private isSkipNotification = false;
   private deploymentType: string;
+  private licenseExpirationDate: string;
+  deploymentId: string;
 
   constructor(private httpClient: HttpClient,
     private configService: ConfigService,
@@ -93,9 +97,11 @@ export class TelemetryService {
         this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
         this.instanceId = config.deploymentId || configService.defaultDeployId;
         this.deploymentType = config.deploymentType;
+        this.deploymentId = config.deploymentId;
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
+        this.initializeChefTelemetryTracker();
         this.initiateTelemetry(trackingOperations);
       });
   }
@@ -107,6 +113,7 @@ export class TelemetryService {
   setUserTelemetryPreference(isOptedIn: boolean): void {
     if (isOptedIn === true) {
       this.engageTelemetry(this.trackingOperations);
+      this.initializeChefTelemetryTracker();
     }
     this.chefSessionService.storeTelemetryPreference(isOptedIn);
   }
@@ -197,14 +204,71 @@ export class TelemetryService {
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
-          console.log(`Error retrieving Segment API key: ${status}/${message}`);
+          console.log(`Error retrieving Segment API key : ${status}/${message}`);
           if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesFailure(message));
           }
         });
   }
 
+  setLicenseExpirationDate(license: string): void {
+    this.licenseExpirationDate = license;
+  }
+
+  async initializeChefTelemetryTracker() {
+    
+    if(!this.licenseExpirationDate) {
+      setTimeout(() => { this.initializeChefTelemetryTracker() }, 1000);
+      return;
+    }
+    console.log('initializeChefTelemetryTracker');
+    try {
+      const isChefTelemetryTrackerInitializedForAutomate = sessionStorage.getItem('isChefTelemetryTrackerInitializedForAutomate') === 'true';
+      if(chefTelemetryTracker && this.chefSessionService.telemetry_enabled && !isChefTelemetryTrackerInitializedForAutomate) {
+        const chefTelemetryTrackerInitData = {
+          visitor: {
+            id: this.chefSessionService.uuid,
+            userName: this.chefSessionService.username,
+            fullName: this.chefSessionService.fullname,
+            telemetryPref: this.chefSessionService.telemetry_enabled,
+            isLocalUser: this.chefSessionService.isLocalUser,
+            group: this.chefSessionService.groups,
+            connector: this.chefSessionService.connector
+          },
+          account: {
+            id: this.customerId,
+            name: this.customerName,
+            instanceId: this.instanceId,
+            deploymentType: this.deploymentType,
+            deploymentId: this.deploymentId,
+            automateVersion: this.buildVersion,
+            licenseId: this.licenseId,
+            licenseType: this.licenseType,
+            licenseExpirationDate: this.licenseExpirationDate
+          }
+        }
+        chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
+        sessionStorage.setItem('isChefTelemetryTrackerInitializedForAutomate', 'true');
+        localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
+      }
+    } catch(e) {
+      console.log('Unable to initialize ChefTelemetryTracker ', e);
+    }
+    
+  }
+
+  captureChefTelemetryEvent(event?: string, properties?: any) {
+    try {
+      if(chefTelemetryTracker) {
+        chefTelemetryTracker.track(event, properties);
+      }
+    }catch(e) {
+      console.log('Unable to send track events to ChefTelemetryTracker ', e);
+    }
+  }
+
   track(event?: string, properties?: any) {
+    this.captureChefTelemetryEvent(event, properties);
     this.trackingOperations.next({
       operation: 'track',
       identifier: event,
