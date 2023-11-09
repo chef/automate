@@ -208,7 +208,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     const value = list.replace(
       searchText, `<span class='highlight-text'>${searchText}</span>` );
 
-    return this.sanitizer.bypassSecurityTrustHtml(value);
+    return this.sanitizer.sanitize(1,value);
   }
 
   moveItemUp(): void {
