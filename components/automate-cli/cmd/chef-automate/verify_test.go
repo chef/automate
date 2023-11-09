@@ -20,12 +20,14 @@ import (
 )
 
 const (
-	CONFIG_FILE                         = "/config_valid_config_parser.toml"
-	STATUS_API_RESPONSE                 = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
-	BATCH_CHECK_REQUEST                 = `{"status":"SUCCESS","result":{"passed":true,"node_result":[]}}`
-	BATCH_CHECK_REQUEST_HAB_ID_WITH_NFS = `{"status":"SUCCESS","result":{"passed":true,"node_result":[{"node_type":"opensearch","ip":"10.0.164.66","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}},{"passed": true,"msg": "NFS Backup Config Check","check": "nfs-backup-config","checks": [{"title": "NFS Mount","passed": true,"success_msg": "NFS mount location found","error_msg": "","resolution_msg": "","skipped": false},{"title": "NFS Mount","passed": true,"success_msg": "NFS mount location is shared across given nodes","error_msg": "","resolution_msg": "","skipped": false}],"skipped": false,"id": { "user_id": "", "group_id": "" }}]},{"node_type":"opensearch","ip":"10.0.133.98","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"opensearch","ip":"10.0.146.192","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1002","group_id":"1002"}}]},{"node_type":"chef-infra-server","ip":"10.0.128.167","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"automate","ip":"10.0.130.38","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.139.234","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.168.59","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.159.200","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]}]}}`
-	AWS_CONFIG_FILE                     = "/valid_config.toml"
-	DARWIN                              = "darwin"
+	CONFIG_FILE                                   = "/config_valid_config_parser.toml"
+	STATUS_API_RESPONSE                           = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
+	BATCH_CHECK_REQUEST                           = `{"status":"SUCCESS","result":{"passed":true,"node_result":[]}}`
+	BATCH_CHECK_REQUEST_HAB_ID_WITH_NFS           = `{"status":"SUCCESS","result":{"passed":true,"node_result":[{"node_type":"opensearch","ip":"10.0.164.66","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}},{"passed": true,"msg": "NFS Backup Config Check","check": "nfs-backup-config"}]},{"node_type":"opensearch","ip":"10.0.133.98","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"opensearch","ip":"10.0.146.192","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"chef-infra-server","ip":"10.0.128.167","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"automate","ip":"10.0.130.38","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.139.234","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.168.59","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.159.200","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]}]}}`
+	BATCH_CHECK_REQUEST_HAB_ID_WITH_NFS_FAILURE   = `{"status":"SUCCESS","result":{"passed":true,"node_result":[{"node_type":"opensearch","ip":"10.0.164.66","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}},{"passed": true,"msg": "NFS Backup Config Check","check": "nfs-backup-config"}]},{"node_type":"opensearch","ip":"10.0.133.98","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"opensearch","ip":"10.0.146.192","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1002","group_id":"1002"}}]},{"node_type":"chef-infra-server","ip":"10.0.128.167","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"automate","ip":"10.0.130.38","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.139.234","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.168.59","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]},{"node_type":"postgresql","ip":"10.0.159.200","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[{"title":"User creation/validation check","passed":true,"success_msg":"User is created or found successfully","skipped":false}],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]}]}}`
+	BATCH_CHECK_REQUEST_HAB_ID_WITH_NFS_FAILURE_2 = `{"status":"SUCCESS","result":{"passed":true,"node_result":[{"node_type":"opensearch","ip":"10.0.164.66","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}},{"passed": true,"msg": "NFS Backup Config Check","check": "nfs-backup-config"}]},{"node_type":"opensearch","ip":"10.0.133.98","tests":[{"passed":true,"msg":"System User Check","check":"system-user","checks":[],"skipped":false,"id":{"user_id":"1001","group_id":"1001"}}]}]}}`
+	AWS_CONFIG_FILE                               = "/valid_config.toml"
+	DARWIN                                        = "darwin"
 )
 
 var AwsAutoTfvarsJsonStringEmpty = `
@@ -375,6 +377,112 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			configFile: "",
 			wantErr:    errors.New("Failed to populate HA common config"),
+		},
+		{
+			description: "bastion with aws automate-verify to check hab if with NFS - failure",
+			IsAws:       true,
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST_HAB_ID_WITH_NFS_FAILURE), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		},
+		{
+			description: "bastion with aws automate-verify to check hab if with NFS - failure_2",
+			IsAws:       true,
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST_HAB_ID_WITH_NFS_FAILURE_2), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
 		},
 		{
 			description: "bastion with aws automate-verify to check hab if with NFS - success",
