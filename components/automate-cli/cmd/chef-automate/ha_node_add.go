@@ -79,7 +79,7 @@ func isFileExist(filePath string) bool {
 	if err == nil {
 		return true
 	} else if errors.Is(err, fs.ErrNotExist) {
-		writer.Error("file not exist" + filePath + " " + err.Error())
+		writer.Error("file not exists " + filePath + " " + err.Error())
 	}
 	return false
 }
@@ -106,7 +106,6 @@ func getAirgapBundleTransferFileVersion(filePath string) (string, error) {
 		}
 	}
 	bundleFilePath := "/hab/a2_deploy_workspace/terraform/transfer_files/" + bundleName
-	writer.Println(bundleFilePath)
 	if isFileExist(bundleFilePath) {
 		airgapbundleVersion, err := GetVersion(bundleFilePath)
 		if err != nil {

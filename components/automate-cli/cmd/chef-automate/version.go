@@ -379,7 +379,6 @@ func getFrontEndVersion(automateIps []string, infra *AutomateHAInfraDetails, cmd
 	}
 
 	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
-	fmt.Println("cmdresult:", cmdresult)
 	if err != nil {
 		logrus.Error("ERROR", err)
 		return nil, err
