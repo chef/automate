@@ -424,10 +424,6 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 	airgapbundleVersion, _ := GetVersion(upgradeRunCmdFlags.airgap)
 	if !CompareSemverVersion(installedVersion, airgapbundleVersion) {
-		// will remove the below line
-		writer.Println(installedVersion)
-		// will remove the below line
-		writer.Println(airgapbundleVersion)
 		return errors.New("cannot downgrade the cluster")
 	}
 
