@@ -2,6 +2,7 @@
 // session-service, and use a standard http.Client to interacting with them.
 // These interactions do properly handle redirects and cookies, so they closely
 // approximate what happens in a real-world setting.
+
 package server_test
 
 import (
@@ -59,6 +60,7 @@ func TestMain(t *testing.T) {
 	s := httptest.NewUnstartedServer(mux)
 	dexCerts := devDexCerts(t)
 	s.TLS = &tls.Config{
+
 		// We have to use the dex certs here because session-service is going
 		// to check that the thing its talking to is automate-dex
 		Certificates: []tls.Certificate{*dexCerts.ServiceKeyPair},
