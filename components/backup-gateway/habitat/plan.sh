@@ -6,8 +6,9 @@ pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache-2.0')
 pkg_build_deps=(core/go19 core/git core/gcc)
+pkg_bin_dirs=(bin)
+
 pkg_deps=(
-  core/minio
   core/cacerts
   chef/automate-platform-tools
 )
@@ -25,7 +26,7 @@ do_before() {
 do_unpack() {
  git clone "https://github.com/chef/minio" "$GOPATH/src/github.com/chef/minio"
  ( cd "$GOPATH/src/github.com/chef/minio" || exit
-   git checkout -b add_invalid_attempts
+   git checkout automate_minio
  )
 }
 
