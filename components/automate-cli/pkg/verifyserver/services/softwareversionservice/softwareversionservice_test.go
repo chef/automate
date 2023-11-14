@@ -415,6 +415,7 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 		})
 	}
 }
+
 func TestCheckOs(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	sv := NewSoftwareVersionService(log, func(cmd string) (string, error) {
