@@ -7,8 +7,8 @@ gem "mixlib-install"
 gem "mixlib-shellout"
 gem "train"
 
-gem "chef", "~> 12.21"
-gem "ohai", "~> 8.24"
+gem "chef", "~> 15.4", ">= 15.4.45"
+gem "ohai", "~> 8.26", ">= 8.26.1"
 
 group :development, :test do
   gem "pry"
