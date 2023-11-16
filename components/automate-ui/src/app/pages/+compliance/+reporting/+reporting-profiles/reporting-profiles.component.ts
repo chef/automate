@@ -66,7 +66,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     if ( includes(status, this.allowedStatus) ) {
       queryParams['status'] = status;
       this.telemetryService.track('applicationsStatusFilter',
-        { entity: 'reportingNodes', statusFilter: status});
+        { entity: 'reportingProfiles', statusFilter: status});
     }
 
     this.router.navigate([], {queryParams});
