@@ -27,7 +27,7 @@ const (
 	curlHeaderFlag              = "--header"
 	curlAuthorization           = "'Authorization: Bearer %s'"
 	initialServiceState         = "down"
-	initialServicePid           = ""
+	initialServicePid           = "0"
 	initialHealth               = "ERROR"
 	initialFormattedDuration    = "0d 0h 0m 0s"
 	initialRole                 = "Unknown"
@@ -478,7 +478,12 @@ func (ss *Summary) getBEDefaultServiceDetails(output string) (string, string, st
 	}
 	memeberId := defaultServiceDetails["sys"].(map[string]interface{})["member_id"].(string)
 	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
-	servicePid := fmt.Sprintf("%d", int(defaultServiceDetails["process"].(map[string]interface{})["pid"].(float64)))
+	var servicePid string
+	if defaultServiceDetails["process"].(map[string]interface{})["pid"] == nil {
+		servicePid = "0"
+	} else {
+		servicePid = fmt.Sprintf("%d", int(defaultServiceDetails["process"].(map[string]interface{})["pid"].(float64)))
+	}
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
 	startingTime = float64(nowFunc().UTC().Unix()) - startingTime
 
