@@ -64,6 +64,8 @@ instance_count = ""
 # automate_setup_type = "automate"
 
 # teams_port = ""
+
+# config_file will be deprecated
 config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
@@ -396,6 +398,7 @@ instance_count = ""
 ## === ===
 
 # teams_port = ""
+# config_file will be deprecated
 config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
