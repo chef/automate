@@ -57,6 +57,68 @@ func Test_getVersionBasedOnFlag(t *testing.T) {
 	})
 }
 
+func Test_getFrontEndVersion(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{
+					TEST_IP_1: {
+						{
+							ScriptName:  "",
+							HostIP:      TEST_IP_1,
+							OutputFiles: []string{},
+							Output:      "Version: 2\n CLI Build: 20230502070346\n Server Build: 4.5.177",
+							Error:       nil,
+						},
+					},
+				}, nil
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		frontEndIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getFrontEndVersion(frontEndIps, infra, mockCmdExecutor)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, versionMap)
+		assert.Contains(t, versionMap, TEST_IP_1)
+	})
+	t.Run("Error", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{}, errors.Errorf("Error sample")
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		frontEndIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getFrontEndVersion(frontEndIps, infra, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Empty(t, versionMap)
+	})
+}
+
 func Test_getChefAutomateVersion(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		mockCmdExecutor := &MockRemoteCmdExecutor{
