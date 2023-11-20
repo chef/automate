@@ -12,12 +12,9 @@ exec 2>&1
 DBNAME="{{cfg.storage.database}}"
 
 if [ ! -f /hab/.skip_migration ]; then
-  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
   pg-helper ensure-service-database "$DBNAME"
   pg-helper create-extension "$DBNAME" "pgcrypto"
   pg-helper fix-permissions "$DBNAME"
-else 
-  echo "/hab/.skip_migration does exist, skipping pg-helper"  
 fi
 
 # cleanup old migration files

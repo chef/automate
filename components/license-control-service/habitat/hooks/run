@@ -8,10 +8,7 @@ exec 2>&1
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
 if [ ! -f /hab/.skip_migration ]; then
-  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
   pg-helper ensure-service-database chef_license_control_service
-else 
-  echo "/hab/.skip_migration does exist, skipping pg-helper"  
 fi
 
 

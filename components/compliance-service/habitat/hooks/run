@@ -21,7 +21,6 @@ export DBNAME="{{cfg.storage.database}}"
 export DBUSER="{{cfg.storage.user}}"
 
 if [ ! -f /hab/.skip_migration ]; then
-  echo "/hab/.skip_migration does not exist, running pg-helper command $(pwd)/$0 at $LINENO"
   # Migrate from A1's delivery database if it's present
   pg-helper migrate-tables-v2 delivery "$DBNAME" \
   agents node_managers results profiles tags jobs jobs_nodes jobs_profiles \
@@ -32,9 +31,6 @@ if [ ! -f /hab/.skip_migration ]; then
   pg-helper create-extension "$DBNAME" pgcrypto
 
   pg-helper fix-permissions "$DBNAME"
-else 
-
-  echo "/hab/.skip_migration does exist, skipping pg-helper"  
 fi
 
 mkdir -p "{{pkg.svc_data_path}}/profiles"
