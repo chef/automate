@@ -859,22 +859,6 @@ func getMinimumVersion(mVersions map[string]string) string {
 	return minVer
 }
 
-func findMinimumServerVersion(versions map[string]string) string {
-	minVersion := ""
-	for _, v := range versions {
-		minVersion = v
-		logrus.Debug("min: %s" + v)
-		break
-	}
-	for _, version := range versions {
-		if CompareSemverVersion(version, minVersion) {
-			minVersion = version
-		}
-	}
-	logrus.Debug("return minVersion: %s" + minVersion)
-	return minVersion
-}
-
 // return true when second > first
 // return false when second <= first
 // CompareSemverVersion

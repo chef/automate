@@ -27,7 +27,6 @@ pkg_deps=(
   chef/automate-ha-cluster-ctl
 )
 
-
 pkg_build_deps=(
   core/gcc
 )
