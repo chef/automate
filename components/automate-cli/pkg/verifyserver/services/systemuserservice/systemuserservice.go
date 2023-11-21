@@ -19,7 +19,7 @@ type SystemUserServiceImp struct {
 }
 
 func NewSystemUserService(log logger.Logger, exec executil.ExecCmdService, user userutils.UserUtil) *SystemUserServiceImp {
-	return &SystemUserServiceImp {
+	return &SystemUserServiceImp{
 		exec: exec,
 		user: user,
 		Log:  log,
@@ -35,6 +35,16 @@ func (su *SystemUserServiceImp) GetSystemUserServiceDetails() *models.SystemUser
 	if !habUserResponse.Passed {
 		serviceResponse.Passed = false
 	}
+
+	// Gets UID for created/existing hab user
+	uid, err := su.getUserAndGroupID()
+	if err != nil {
+		serviceResponse.Passed = false
+		su.Log.Error("User ID for hab not found")
+	}
+	su.Log.Info("User ID for hab found")
+
+	serviceResponse.Id = uid
 
 	habGroupResponse := su.ValidateHabGroup()
 	if !habGroupResponse.Passed {
@@ -79,6 +89,28 @@ func (su *SystemUserServiceImp) ValidateOrCreateHabUser() (*models.Checks, bool)
 	}
 	su.Log.Debug("User 'hab' found successfully")
 	return successResponse(constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_USER_HAB_SUCCESS_MSG), false
+}
+
+func (su *SystemUserServiceImp) getUserAndGroupID() (*models.SystemUserID, error) {
+
+	systemUserDetails := &models.SystemUserID{}
+
+	// Check for available ID in all machine (?)
+	ids, err := su.user.Lookup(constants.USER_NAME)
+	if err != nil {
+		su.Log.Error("User not found:", err)
+		return systemUserDetails, err
+	}
+
+	if ids != nil {
+		systemUserDetails.UserID = ids.Uid
+		systemUserDetails.GroupID = ids.Gid
+		su.Log.Infof("UID: %s\nGID: %s\n", systemUserDetails.UserID, systemUserDetails.GroupID)
+	} else {
+		su.Log.Info("UID not found.")
+	}
+	su.Log.Info("Created 'hab' user and group ")
+	return systemUserDetails, nil
 }
 
 func (su *SystemUserServiceImp) ValidateHabGroup() *models.Checks {
@@ -146,7 +178,7 @@ func (su *SystemUserServiceImp) checkUserPrimaryGroup(username, groupname string
 		su.Log.Debug("User's primary group is not hab")
 		return false
 	}
-	su.Log.Debug("User's primary group is hab with gid '"+ sysUser.Gid+"'")
+	su.Log.Debug("User's primary group is hab with gid '" + sysUser.Gid + "'")
 	return true
 }
 
