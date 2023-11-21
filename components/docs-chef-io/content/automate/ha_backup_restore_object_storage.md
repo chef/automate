@@ -330,6 +330,12 @@ Restore a backup from external object storage.
    chef-automate backup restore <OBJECT-STORAGE-BUCKET-PATH>/BACKUPS/BACKUP_ID --skip-preflight --airgap-bundle </PATH/TO/BUNDLE>
    ```
 
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+- Large Compliance Report is not supported in Automate HA
+{{< /note >}}
+
 #### Troubleshooting
 
 {{< readfile file = "content/automate/reusable/md/restore_troubleshooting.md" >}}
