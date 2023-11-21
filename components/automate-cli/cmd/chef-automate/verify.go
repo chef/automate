@@ -759,10 +759,10 @@ func updatedReportForSystemUser(batchCheckResults *[]models.BatchCheckResult) {
 	for _, batchCheckResult := range *batchCheckResults {
 		// Check all IDs
 		for _, test := range batchCheckResult.Tests {
-			if test.Check == "nfs-backup-config" && !test.Skipped {
+			if test.Check == constants.NFS_BACKUP_CONFIG && !test.Skipped {
 				isNFSCheckPresent = true
 			}
-			if test.Check == "system-user" {
+			if test.Check == constants.SYSTEM_USER {
 				if len(test.Checks) == 0 {
 					continue
 				}
@@ -777,7 +777,7 @@ func updatedReportForSystemUser(batchCheckResults *[]models.BatchCheckResult) {
 	for _, batchCheckResult := range *batchCheckResults {
 		if isNFSCheckPresent {
 			for i, test := range batchCheckResult.Tests {
-				if test.Check == "system-user" {
+				if test.Check == constants.SYSTEM_USER {
 					var newCheck models.Checks
 					if len(uids) == 1 {
 						newCheck = models.Checks{
