@@ -26,6 +26,7 @@ func TestDexUsersAdapter(t *testing.T) {
 	// We need to load the dex certs for the dex server because
 	// local user service checks the name the server gives back
 	// matches automate-dex, which is in the automate-dex cert.
+
 	dexCerts := helpers.LoadDevCerts(t, "automate-dex")
 	dexConnFactory := secureconn.NewFactory(*dexCerts)
 
