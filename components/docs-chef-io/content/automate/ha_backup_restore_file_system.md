@@ -36,6 +36,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 {{< note >}}
 
 - `/mnt/automate_backups` is the default value for the `backup_mount`, which is also used in this document page as reference backup path.
+- While using `file_system` as backup type, the `uid` of `hab` user should be same across all **the remote nodes**. The same will be verified during `verify` check before deployment
 
 {{< /note >}}
 
