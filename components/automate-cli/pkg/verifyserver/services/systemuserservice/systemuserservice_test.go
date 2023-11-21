@@ -7,9 +7,9 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/lib/userutils"
 	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/userutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,6 +53,36 @@ func TestValidateHabUserSuccess(t *testing.T) {
 	}, service)
 }
 
+func TestGetUserAndGroupID(t *testing.T) {
+	mockUser := &userutils.UserUtilMock{
+		LookupFunc: func(name string) (*user.User, error) {
+			return &user.User{
+				Uid: "1002",
+				Gid: "1002",
+			}, nil
+		},
+	}
+
+	mockExec := &executil.ExecCmdServiceMock{
+		CommandFunc: func(name string, args []string) ([]byte, error) {
+			return []byte{}, nil
+		},
+	}
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
+	s := &SystemUserServiceImp{
+		Log:  log,
+		user: mockUser,
+		exec: mockExec,
+	}
+	service, _ := s.getUserAndGroupID()
+
+	assert.Equal(t, service.UserID, "1002")
+	assert.Equal(t, service.GroupID, "1002")
+}
+
 func TestValidateHabUserFailure(t *testing.T) {
 	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
@@ -80,7 +110,7 @@ func TestValidateHabUserFailure(t *testing.T) {
 		Title:         constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      constants.SYSTEM_USER_HAB_ERROR_MSG ,
+		ErrorMsg:      constants.SYSTEM_USER_HAB_ERROR_MSG,
 		ResolutionMsg: constants.SYSTEM_USER_HAB_RESOLUTION_MSG,
 	}, service)
 }
@@ -370,6 +400,10 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 						ResolutionMsg: "",
 					},
 				},
+				Id: &models.SystemUserID{
+					UserID:  "1001",
+					GroupID: "1001",
+				},
 			},
 		},
 	}
@@ -421,7 +455,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 						Title:         constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.SYSTEM_USER_HAB_ERROR_MSG ,
+						ErrorMsg:      constants.SYSTEM_USER_HAB_ERROR_MSG,
 						ResolutionMsg: constants.SYSTEM_USER_HAB_RESOLUTION_MSG,
 					},
 					{
@@ -439,6 +473,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 						ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 					},
 				},
+				Id: &models.SystemUserID{UserID: "", GroupID: ""},
 			},
 		},
 	}

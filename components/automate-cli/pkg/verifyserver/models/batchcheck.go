@@ -521,13 +521,14 @@ type CheckTriggerResponse struct {
 	CheckType string    `json:"check_type"`
 }
 type ApiResult struct {
-	Passed      bool         `json:"passed"`
-	Message     string       `json:"msg"`
-	Check       string       `json:"check"`
-	Checks      []Checks     `json:"checks"`
-	Error       *fiber.Error `json:"error,omitempty"`
-	Skipped     bool         `json:"skipped"`
-	SkipMessage string       `json:"skip_message,omitempty"`
+	Passed      bool          `json:"passed"`
+	Message     string        `json:"msg"`
+	Check       string        `json:"check"`
+	Checks      []Checks      `json:"checks"`
+	Error       *fiber.Error  `json:"error,omitempty"`
+	Skipped     bool          `json:"skipped"`
+	SkipMessage string        `json:"skip_message,omitempty"`
+	Id          *SystemUserID `json:"id,omitempty"`
 }
 
 type Checks struct {
