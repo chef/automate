@@ -29,6 +29,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/fatih/color"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -38,6 +39,18 @@ import (
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade COMMAND",
 	Short: "upgrade automate to the latest version",
+}
+
+type UpgradeClusterImpl struct {
+	nodeOptUtil NodeOpUtils
+}
+
+// Change constructor function name to NewUpgradeClusterImpl
+// if Implementer is modified
+func NewNodeUtilForUpgradeClusterImpl(nodeUtils NodeOpUtils) *UpgradeClusterImpl {
+	return &UpgradeClusterImpl{
+		nodeOptUtil: nodeUtils,
+	}
 }
 
 var upgradeRunCmdFlags = struct {
@@ -475,6 +488,15 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 
 	if offlineMode {
+
+		// Save node config to workspace
+		fmt.Println("saving config")
+		upgradeClusterImpl := NewNodeUtilForUpgradeClusterImpl(NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer))
+		err := upgradeClusterImpl.nodeOptUtil.saveConfigToBastion()
+		if err != nil {
+			return err
+		}
+
 		// Always upgrade the workspace
 		upgradeRunCmdFlags.upgradeHAWorkspace = "yes"
 		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap, upgradeRunCmdFlags.saas, upgradeRunCmdFlags.upgradefrontends, upgradeRunCmdFlags.upgradebackends)
@@ -528,7 +550,25 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			args = append(args, "--skip-deploy")
 		} */
 	}
-	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc, true)
+
+	// Save node config to workspace
+	fmt.Println("saving config")
+	upgradeClusterImpl := NewNodeUtilForUpgradeClusterImpl(NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer))
+	err := upgradeClusterImpl.nodeOptUtil.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
+	err = executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc, true)
+	fmt.Println("syncying config")
+	syncErr := upgradeClusterImpl.nodeOptUtil.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }
 
 func removeCommonContentFromAwsAutoTfvar(filePath string) error {
