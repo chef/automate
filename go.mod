@@ -26,7 +26,7 @@ require (
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/coreos/go-oidc v2.0.0+incompatible
 	github.com/dave/jennifer v0.17.0
-	github.com/dexidp/dex v2.19.0+incompatible
+	github.com/dexidp/dex v2.35.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/fatih/color v1.9.0
