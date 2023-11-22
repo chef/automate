@@ -21,7 +21,8 @@
     "docs": "typedoc src",
     "lint": "npm run lint.ts && npm run lint.sass",
     "lint.ts": "tslint -p tsconfig.json",
-    "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
+    "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q",
+    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
   },
   "author": "Chef Software, Inc. <info@chef.io>",
   "license": "UNLICENSED",
@@ -58,6 +59,9 @@
     "tslint": "^5.20.0",
     "tslint-ionic-rules": "0.0.21",
     "typedoc": "^0.15.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.5.3"
+  },
+  "resolutions": {
+    "@types/babel__traverse": "7.14.2"
   }
 }
