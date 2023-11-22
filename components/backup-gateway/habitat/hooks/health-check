@@ -5,7 +5,7 @@ exec 2>&1
 curlOpts="-sS --fail --max-time 2 -o /dev/null -s -w %{http_code}"
 curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/public.crt"
 curlOpts="$curlOpts --key {{pkg.svc_config_path}}/private.key"
-curlOpts="$curlOpts --cacert /hab/svc/automate-gateway/config/root_ca.crt"
+curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root-ca.crt"
 curlOpts="$curlOpts --resolve backup-gateway:{{cfg.service.port}}:127.0.0.1"
 curlOpts="$curlOpts --noproxy backup-gateway"
 
