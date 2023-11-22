@@ -7,7 +7,7 @@ import pipe from 'lodash/fp/pipe';
 import replace from 'lodash/fp/replace';
 import trim from 'lodash/fp/trim';
 import split from 'lodash/fp/split';
-import first from 'lodash/fp/first';
+import nth from 'lodash/fp/nth';
 
 const getTagList: (json: object) => object[] =
   getOr([], ['comment', 'tags']);
@@ -79,4 +79,4 @@ export function getComponentProps(children: object[]) {
 export const getType: (json: object) => string =
   pipe(get(['sources', 0, 'fileName']),
        split('/'),
-       first);
+       nth(1));
