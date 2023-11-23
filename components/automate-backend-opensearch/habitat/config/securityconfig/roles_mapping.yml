@@ -1,5 +1,11 @@
-# This file intentionally left empty
 all_access:
-  readonly: true
-  backendroles:
-    - admin
+  reserved: false
+  backend_roles:
+  - "admin"
+  description: "Maps admin to all_access"
+
+own_index:
+  reserved: false
+  users:
+  - "*"
+  description: "Allow full access to an index"
