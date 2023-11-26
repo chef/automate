@@ -28,5 +28,6 @@ export const environment = {
     install_id: '00000000-0000-0000-0000-111111111111',
     use_default_session: true,
     remote_library_url: 'https://licensing-acceptance.chef.co/usage/v1/remoteclient.js',
-    remote_library_url_acceptance: 'https://licensing-acceptance.chef.co/usage/v1/remoteclient.js'
+    remote_library_url_acceptance: 'https://licensing-acceptance.chef.co/usage/v1/remoteclient.js',
+    pendo_api_key: "fb1de17d-939d-46d5-5d06-342927b00d86"
 };

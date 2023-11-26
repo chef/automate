@@ -20,6 +20,7 @@ import { LicenseStatus } from 'app/entities/license/license.model';
 
 class MockTelemetryService {
   enabled = observableOf(false);
+  setLicenseExpirationDate = jasmine.createSpy();
 }
 
 class MockSessionStorageService {
@@ -53,6 +54,7 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
 
 describe('LicenseLockoutComponent', () => {
   let component: LicenseLockoutComponent;
+  let telemetryService: TelemetryService;
   // Tests on this action make use of the inherent state updating
   // of the underlying component.
   describe('GetLicenseStatus Action', () => {
@@ -66,12 +68,13 @@ describe('LicenseLockoutComponent', () => {
     it('reflects current license', () => {
       const futureDate = moment().utc().add(2, 'months');
       setup(genLicenseFetchReducer(futureDate));
-
+      // spyOn(telemetryService, 'setLicenseExpirationDate');
       expect(component.licenseExpired).toBeFalsy();
       expect(component.fetchStatusInternalError).toBeFalsy();
       // Note using moment formatting so this unit test will still pass outside the US!
       expect(component.expirationDate).toEqual(futureDate
                                       .format(DateTime.RFC2822));
+      expect(telemetryService.setLicenseExpirationDate).toHaveBeenCalledWith(component.expirationDate);
     });
 
     // this test is failing in wallaby with "Expression has changed after it was checked"
@@ -213,6 +216,7 @@ describe('LicenseLockoutComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     const store = TestBed.inject(Store);
+    telemetryService = TestBed.inject(TelemetryService);
     spyOn(store, 'dispatch').and.callThrough();
     return { state: reducer(), store };
   }
