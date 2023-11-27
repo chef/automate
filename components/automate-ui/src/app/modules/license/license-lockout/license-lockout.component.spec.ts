@@ -68,7 +68,6 @@ describe('LicenseLockoutComponent', () => {
     it('reflects current license', () => {
       const futureDate = moment().utc().add(2, 'months');
       setup(genLicenseFetchReducer(futureDate));
-      // spyOn(telemetryService, 'setLicenseExpirationDate');
       expect(component.licenseExpired).toBeFalsy();
       expect(component.fetchStatusInternalError).toBeFalsy();
       // Note using moment formatting so this unit test will still pass outside the US!
