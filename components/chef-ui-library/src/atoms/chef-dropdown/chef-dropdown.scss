@@ -8,4 +8,8 @@ chef-dropdown {
   &[visible] {
     display: block;
   }
+
+  &[visible="false"] {
+    display: none;
+  }
 }
