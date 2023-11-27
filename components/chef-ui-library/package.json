@@ -22,7 +22,7 @@
     "lint": "npm run lint.ts && npm run lint.sass",
     "lint.ts": "tslint -p tsconfig.json",
     "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q",
-    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
+    "preinstall": "npm set unsafe-perm true && npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
   },
   "author": "Chef Software, Inc. <info@chef.io>",
   "license": "UNLICENSED",
