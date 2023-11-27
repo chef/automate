@@ -7,7 +7,7 @@
     "start": "npm run serve",
     "serve": "ng serve --configuration=no_auth",
     "serve:hab": "echo '*** Please ignore the message to go to http://localhost:4200 -- the correct URL is https://a2-dev.test/ ***' && ng serve --host 0.0.0.0 --disable-host-check --public-host=httpfake://0.0.0.0:0/ --ssl-key ../../dev/certs/automate-ui.key --ssl-cert ../../dev/certs/automate-ui.crt --live-reload false --poll 1000",
-    "preinstall": "npx npm-force-resolutions",
+    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions",
     "install": "echo 'use `npm run install:ui-library` for old behaviour'; npm run copy-ui-lib",
     "install:ui-library": "npm run clean-ui-lib && scripts/build_chef_ui_lib && npm run copy-ui-lib",
     "clean-ui-lib": "rm -rf src/assets/chef-ui-library",
@@ -79,7 +79,7 @@
     "@types/faker": "^5.1.7",
     "@types/jasmine": "^3.6.7",
     "@types/jasminewd2": "^2.0.8",
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "4.14.168",
     "ajv": "^7.2.1",
     "axe-webdriverjs": "^2.3.0",
     "codelyzer": "^6.0.0",
@@ -106,10 +106,13 @@
     "ts-node": "^9.1.1",
     "tslint": "^6.1.3",
     "tslint-defocus": "^2.0.6",
-    "typescript": "^4.0.7",
+    "typescript": "~4.0.7",
     "wallaby-webpack": "^3.9.16"
   },
+  "config": {
+    "unsafe-perm": true
+  },
   "resolutions": {
-    "minimist": "^1.2.5"
+    "@types/node": "14.14.35"
   }
 }
