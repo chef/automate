@@ -31,15 +31,15 @@ export class NodeRollupComponent implements OnInit, OnChanges {
   @HostBinding('attr.role') role = 'button';
   @HostBinding('attr.tabindex') tabindex = '0';
 
-  @HostListener('click', ['$event']) onClick() {
+  @HostListener('click') onClick() {
     this.activated.emit(null);
   }
 
-  @HostListener('keyup.enter', ['$event']) onKeyEnter() {
+  @HostListener('keyup.enter') onKeyEnter() {
     this.activated.emit(null);
   }
 
-  @HostListener('keyup.space', ['$event']) onKeySpace() {
+  @HostListener('keyup.space') onKeySpace() {
     this.activated.emit(null);
   }
 
