@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	"github.com/chef/automate/api/external/cds/request"
 	"github.com/chef/automate/api/external/cds/response"
@@ -17,7 +17,6 @@ import (
 	"github.com/chef/automate/components/automate-cds/service"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/version"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -223,10 +222,9 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 	}
 
 	if !found {
-		return fmt.Errorf("Content item not found with ID %q", request.Id)
+		return fmt.Errorf("content item not found with ID %q", request.Id)
 	}
-
-	log.Infof("DownloadContentItem: Downloading content item with ID %s ...", request.Id)
+	s.service.Logger.Infof("DownloadContentItem: Downloading content item with ID %s ...", request.Id)
 
 	// Get the data
 	resp, err := http.Get(contentItem.DownloadURL)
@@ -243,7 +241,7 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 
 	_, err = reader.WriteTo(writer)
 	if err != nil {
-		return fmt.Errorf("Failed to stream: %+v", err)
+		return fmt.Errorf("failed to stream: %+v", err)
 	}
 
 	return nil
@@ -251,7 +249,7 @@ func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
 
 func (s *Server) installProfile(ctx context.Context,
 	contentItem cloud.ContentItem, owner string, credentials creds.Credentials) error {
-	log.Infof("Installing profile content item with ID %s ...", contentItem.ID)
+	s.service.Logger.Infof("Installing profile content item with ID %s ...", contentItem.ID)
 
 	// Get the data
 	resp, err := http.Get(contentItem.DownloadURL)
@@ -265,7 +263,7 @@ func (s *Server) installProfile(ctx context.Context,
 		return status.Errorf(codes.Internal, "Failed connecting to the compliance-service")
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return status.Errorf(codes.Internal, "Failed streaming from SaaS")
 	}

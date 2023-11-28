@@ -12,7 +12,6 @@ import (
 	"github.com/chef/automate/components/automate-cds/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
-	log "github.com/sirupsen/logrus"
 )
 
 // NewGRPCServer creates a grpc server that serves all Teams GRPC APIs
@@ -38,7 +37,7 @@ func GRPC(config config.AutomateCdsConfig, s *service.Service) error {
 	complianceConn, err := s.ConnFactory.Dial("compliance-service", config.ComplianceService.Address)
 	if err != nil {
 		// This should never happen
-		log.WithError(err).Error("Failed to create compliance-service connection")
+		s.Logger.WithError(err).Error("Failed to create compliance-service connection")
 		return err
 	}
 	defer complianceConn.Close() // nolint: errcheck
