@@ -92,6 +92,30 @@ module AutomateCluster
           'hash' => hash_password(config['admin_password']),
           'reserved' => true,
           'backend_roles' => [config['admin_username']],
+        },
+        'kibanaserver' => {
+          'hash' => hash_password(config['admin_password']),
+          'reserved' => true,
+        },
+        'kibanaro' => {
+          'hash' => hash_password(config['admin_password']),
+          'reserved' => false,
+          'backend_roles' => ['kibanauser', 'readall'],
+        },
+        'logstash' => {
+          'hash' => hash_password(config['admin_password']),
+          'reserved' => false,
+          'backend_roles' => ['logstash'],
+        },
+        'readall' => {
+          'hash' => hash_password(config['admin_password']),
+          'reserved' => false,
+          'backend_roles' => ['readall'],
+        },
+        'snapshotrestore' => {
+          'hash' => hash_password(config['admin_password']),
+          'reserved' => false,
+          'backend_roles' => ['snapshotrestore'],
         }
       }
       f = File.new("#{config['securityconfig_path']}/internal_users.yml", 'w+')
@@ -106,12 +130,32 @@ module AutomateCluster
           "config_version" => "2",
         },
         'all_access' => {
-          'reserved' => 'false',
+          'reserved' => false,
           'backend_roles' => [config['admin_username']],
         },
         'own_index' => {
-          'reserved' => 'false',
+          'reserved' => false,
           'backend_roles' => ['*'],
+        },
+        'logstash' => {
+          'reserved' => false,
+          'backend_roles' => ['logstash'],
+        },
+        'kibana_user' => {
+          'reserved' => false,
+          'backend_roles' => ['kibanauser'],
+        },
+        'readall' => {
+          'reserved' => false,
+          'backend_roles' => ['readall'],
+        },
+        'manage_snapshots' => {
+          'reserved' => false,
+          'backend_roles' => ['snapshotrestore'],
+        },
+        'kibana_server' => {
+          'reserved' => true,
+          'backend_roles' => ['kibanaserver'],
         }
       }
       f = File.new("#{config['securityconfig_path']}/roles_mapping.yml", 'w+')

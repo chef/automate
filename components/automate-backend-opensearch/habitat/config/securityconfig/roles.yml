@@ -9,7 +9,7 @@ kibana_read_only:
 # The security REST API access role is used to assign specific users access to change the security settings through the REST API.
 security_rest_api_access:
   reserved: true
-
+ 
 # Allows users to view monitors, destinations and alerts
 alerting_read_access:
   reserved: true
@@ -187,25 +187,3 @@ cross_cluster_replication_follower_full_access:
         - "indices:admin/plugins/replication/index/stop"
         - "indices:admin/plugins/replication/index/update"
         - "indices:admin/plugins/replication/index/status_check"
-
-# Allow users to read ML stats/models/tasks
-ml_read_access:
-  reserved: true
-  cluster_permissions:
-    - 'cluster:admin/opensearch/ml/stats/nodes'
-    - 'cluster:admin/opensearch/ml/models/get'
-    - 'cluster:admin/opensearch/ml/models/search'
-    - 'cluster:admin/opensearch/ml/tasks/get'
-    - 'cluster:admin/opensearch/ml/tasks/search'
-
-# Allows users to use all ML functionality
-ml_full_access:
-  reserved: true
-  cluster_permissions:
-    - 'cluster_monitor'
-    - 'cluster:admin/opensearch/ml/*'
-  index_permissions:
-    - index_patterns:
-        - '*'
-      allowed_actions:
-        - 'indices_monitor'
