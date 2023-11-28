@@ -18,7 +18,6 @@ import { ComplianceStatsService } from './compliance-stats/compliance-stats.serv
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
 import { ApplicationStatsService } from './application-stats/application-stats.service';
-import { environment  } from 'environments/environment';
 
 declare let analytics: any;
 
@@ -222,7 +221,7 @@ export class TelemetryService {
 
   registerChefTelemetryTracker() {
     if(chefTelemetryTracker) {
-      chefTelemetryTracker.register(environment.pendo_api_key);
+      chefTelemetryTracker.register();
       this.initializeChefTelemetryTracker();
       return;
     }
