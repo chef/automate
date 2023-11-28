@@ -67,6 +67,7 @@ export class SigninComponent implements OnInit, OnDestroy {
     this.path = this.pathFromState(state);
     if (this.idToken === '') {
       error = true;
+      return error;
     }
     this.id = Jwt.parseIDToken(this.idToken);
     if (this.id === null) {
