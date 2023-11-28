@@ -222,17 +222,17 @@ module AutomateCluster
           logger.warn 'Authentication failed, inserting credentials'
           rotate_credentials
         when 503
-          if response.body.to_s.eql? 'Open Distro not initialized'
-            logger.warn 'Open Distro appears to not be setup, inserting credentials'
+          if response.body.to_s.eql? 'OpenSearch security not initialized'
+            logger.warn 'OpenSearch security appears to not be setup, inserting credentials'
             rotate_credentials
           elsif response.body.to_s.valid_json?
-            logger.warn 'Auth successful, but elasticsearch appears to be broken, doing nothing.'
+            logger.warn 'Auth successful, but OpenSearch appears to be broken, doing nothing.'
           else
-            logger.warn 'Elasticsearch returned 503 error with unexpected message'
+            logger.warn 'OpenSearch returned 503 error with unexpected message'
             logger.warn response.body
           end
         else
-          logger.error "Elasticsearch returned #{response.code} code with unexpected message"
+          logger.error "OpenSearch returned #{response.code} code with unexpected message"
           logger.error response.body
         end
         wait
@@ -261,13 +261,13 @@ module AutomateCluster
             logger.warn 'Open Distro appears to not be setup, inserting credentials'
             rotate_credentials
           elsif response.body.to_s.valid_json?
-            logger.warn 'Auth successful, but elasticsearch appears to be broken, doing nothing.'
+            logger.warn 'Auth successful, but OpenSearch appears to be broken, doing nothing.'
           else
-            logger.warn 'Elasticsearch returned 503 error with unexpected message'
+            logger.warn 'OpenSearch returned 503 error with unexpected message'
             logger.warn response.body
           end
         else
-          logger.error "Elasticsearch returned #{response.code} code with unexpected message"
+          logger.error "OpenSearch returned #{response.code} code with unexpected message"
           logger.error response.body
         end
         wait
