@@ -14,7 +14,7 @@ export class DeltaViewerComponent {
   get diffHtml(): SafeHtml {
     const str = this.delta.split('\\n').join('\n');
     const html = Diff2Html.html(str);
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    return this.sanitizer.sanitize(1,html);
   }
 
   constructor(private sanitizer: DomSanitizer) {}
