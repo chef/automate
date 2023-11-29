@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
+	"os"
 	"strings"
 	"time"
 
@@ -175,7 +177,18 @@ func indexNamesByAlias(client *elastic.Client, aliasName string) ([]string, erro
 
 func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 	myName := "RunMigrations"
-
+	filePath := "/hab/.skip_migration"
+	_, err := os.Stat(filePath)
+	if err == nil {
+		logrus.Infof("File '%s' exists\n", filePath)
+		logrus.Infof("..........................skipping the opensearch migration .....................................................")
+		return nil
+	} else if errors.Is(err, fs.ErrNotExist) {
+		logrus.Infof("File '%s' does not exist\n", filePath)
+	} else {
+		logrus.Infof("Error checking file: %v\n", err)
+	}
+	logrus.Infof("................................................................................")
 	// Migrates A1 indices to the current version
 	a1Indices := A1ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a1Indices, statusSrv, statusserver.MigrationLabelESa1)

@@ -273,7 +273,7 @@ func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMeta
 	return nil
 }
 
-func getVersion(airgapBundle string) (string, error) {
+func GetVersion(airgapBundle string) (string, error) {
 	_, manifestBytes, err := airgap.GetMetadata(airgapBundle)
 	if err != nil {
 		return "", status.Annotate(err, status.AirgapUnpackInstallBundleError)
@@ -304,7 +304,7 @@ func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetad
 	return nil
 }
 func getFrontendBundleName(airgapPath string) (string, error) {
-	version, err := getVersion(airgapPath)
+	version, err := GetVersion(airgapPath)
 	if err != nil {
 		return "", err
 	}

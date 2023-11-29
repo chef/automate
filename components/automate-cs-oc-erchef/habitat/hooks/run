@@ -21,47 +21,49 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
-pg-helper rename-if-exists opscode_chef "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
-pg-helper fix-permissions "$DBNAME"
+if [ ! -f /hab/.skip_migration ]; then
+  pg-helper rename-if-exists opscode_chef "$DBNAME"
+  pg-helper ensure-service-database "$DBNAME"
+  pg-helper create-extension "$DBNAME" "uuid-ossp"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
+  pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
+  pg-helper fix-permissions "$DBNAME"
 
-# chef_server_data_bootstrap relies on the webui keys so create that first
-ruby "{{pkg.svc_config_path}}/ensure_webui_key.rb" "{{pkg.svc_data_path}}"
+  # chef_server_data_bootstrap relies on the webui keys so create that first
+  ruby "{{pkg.svc_config_path}}/ensure_webui_key.rb" "{{pkg.svc_data_path}}"
 
-cd {{pkg.path}} || exit
+  cd {{pkg.path}} || exit
 
-# TODO(ssd) 2018-09-21: This is lame. We close FD 0 so that that gets
-# used as the FD that secrets-helper passes. The issue is that some
-# FDs (3,4,5) are reserved by the Ruby VM so you can't use them. This
-# wasn't a problem for the ruby implementation because it was also in
-# ruby so those FD's were taken.
-exec 0<&-
+  # TODO(ssd) 2018-09-21: This is lame. We close FD 0 so that that gets
+  # used as the FD that secrets-helper passes. The issue is that some
+  # FDs (3,4,5) are reserved by the Ruby VM so you can't use them. This
+  # wasn't a problem for the ruby implementation because it was also in
+  # ruby so those FD's were taken.
+  exec 0<&-
 
-source "{{pkg.svc_var_path}}/etc/pg.env"
-HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gemfile" \
-  secrets-helper exec --secret oc_bifrost.superuser_id -- \
-    bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
+  source "{{pkg.svc_var_path}}/etc/pg.env"
+  HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gemfile" \
+    secrets-helper exec --secret oc_bifrost.superuser_id -- \
+      bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
 
-# ruby vars are needed in order to make depselector start up
-export PATH={{pkgPathFor "core/ruby27"}}/bin:${PATH}
-export LD_LIBRARY_PATH={{pkgPathFor "core/libffi"}}/lib:${LD_LIBRARY_PATH}
-export GEM_HOME={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
-export GEM_PATH={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
+  # ruby vars are needed in order to make depselector start up
+  export PATH={{pkgPathFor "core/ruby27"}}/bin:${PATH}
+  export LD_LIBRARY_PATH={{pkgPathFor "core/libffi"}}/lib:${LD_LIBRARY_PATH}
+  export GEM_HOME={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
+  export GEM_PATH={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
 
-# non root svc user and we need write access to the file
-cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}
+  # non root svc user and we need write access to the file
+  cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}
 
-{{#if cfg.external_automate.enable}}
-# TODO(jaym): Our config should know how to deal with the token. We shouldn't be showing
-# it in this script
-echo -n "{{cfg.external_automate.auth.token}}" | \
-  secrets-helper insert data_collector.token
-{{~/if}}
+  {{#if cfg.external_automate.enable}}
+  # TODO(jaym): Our config should know how to deal with the token. We shouldn't be showing
+  # it in this script
+  echo -n "{{cfg.external_automate.auth.token}}" | \
+    secrets-helper insert data_collector.token
+  {{~/if}}
 
-secrets-helper insert chef-server.webui_pub_key <{{pkg.svc_data_path}}/webui_pub.pem
+  secrets-helper insert chef-server.webui_pub_key <{{pkg.svc_data_path}}/webui_pub.pem
+fi
 
 # The erlang VM is also fussy about file descriptors.
 # TODO(yzl): `exec 0</dev/null` can be removed once

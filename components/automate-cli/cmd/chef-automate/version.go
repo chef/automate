@@ -24,6 +24,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/fatih/color"
+	semver "github.com/hashicorp/go-version"
 )
 
 var versionCmd = &cobra.Command{
@@ -55,6 +56,28 @@ var VersionCommandFlags = struct {
 	isOpenSearch bool
 	isPostgresql bool
 }{}
+
+type semverVersion []string
+
+func (s semverVersion) Len() int {
+	return len(s)
+}
+
+func (s semverVersion) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s semverVersion) Less(i, j int) bool {
+	v1, err := semver.NewVersion(s[i])
+	if err != nil {
+		logrus.Errorf("Error while getting HA Infra details :: %s", err)
+	}
+	v2, err := semver.NewVersion(s[j])
+	if err != nil {
+		logrus.Errorf("Error while getting HA Infra details :: %s", err)
+	}
+	return v1.LessThan(v2)
+}
 
 func runVersionCmd(cmd *cobra.Command, args []string) error {
 	writer.Printf("Version: %s\n", "2")
@@ -335,6 +358,38 @@ func getBastionVersion() error {
 	return nil
 }
 
+// getFrontEndVersion : this func use to run the command on all the FE and return the array as a output
+func getFrontEndVersion(automateIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
+	automateCmd := A2VERSIONCMD
+	if VersionCommandFlags.verbose {
+		automateCmd = A2VERSIONVERBOSE
+	}
+	nodeMap := &NodeTypeAndCmd{
+		Automate: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Frontend: &Cmd{CmdInputs: &CmdInputs{
+			Cmd:                      automateCmd,
+			NodeIps:                  automateIps,
+			NodeType:                 true,
+			SkipPrintOutput:          true,
+			HideSSHConnectionMessage: true}},
+		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      infra,
+	}
+
+	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
+	if err != nil {
+		logrus.Error("ERROR", err)
+		return nil, err
+	}
+	versionMap := make(map[string]string)
+	for ip, result := range cmdresult {
+		versionMap[ip] = result[0].Output
+	}
+	return versionMap, nil
+}
+
 func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
 	automateCmd := A2VERSIONCMD
 	if VersionCommandFlags.verbose {
@@ -355,7 +410,6 @@ func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails,
 	}
 
 	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
-
 	if err != nil {
 		logrus.Error("ERROR", err)
 		return nil, err
@@ -754,4 +808,61 @@ func extractVersion(input string, pattern string) (string, error) {
 	// Extract the version string
 	version := match[1]
 	return version, nil
+}
+
+// Below function get the chef-automate version from all the node and find the minimum version
+// In case of upgrade break in between, then re-trigger of upgrade required the minimum version
+// to check for other node required to upgrade
+func GetMinimunBuildVersionFromFrontEndServer() (string, error) {
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		logrus.Errorf("Error while getting HA Infra details :: %s", err)
+		return "", err
+	}
+	automateIps, chefServerIps, _, _, errList := getIPAddressesFromFlagOrInfra(infra)
+	if errList != nil && errList.Len() > 0 {
+		logrus.Errorf("Error while getting IP addresses :: %s", getSingleErrorFromList(errList))
+		return "", getSingleErrorFromList(errList)
+	}
+
+	frontEnd := append(automateIps, chefServerIps...)
+	sshUtil := NewSSHUtil(&SSHConfig{})
+	cmdExecutor := NewRemoteCmdExecutorWithoutNodeMap(sshUtil, writer)
+
+	if len(frontEnd) != 0 {
+		versions, err := getFrontEndVersion(frontEnd, infra, cmdExecutor)
+		logrus.Debug("map of versions :", versions)
+		if err != nil {
+			logrus.Errorf("Error while getting Automate Version :: %s", err)
+			return "", err
+		}
+		return getMinimumVersion(versions), nil
+	}
+	return "", nil
+}
+
+func getMinimumVersion(mVersions map[string]string) string {
+	minVer := "100.0.0" // need to handle this
+	for key, value := range mVersions {
+		version, _ := extractVersion(value, VERSIONREGEX)
+		if len(version) < 1 {
+			logrus.Debug(key, version)
+			continue
+		}
+		if CompareSemverVersion(version, minVer) {
+			minVer = version
+		}
+
+	}
+	logrus.Debug(minVer)
+	return minVer
+}
+
+// return true when second > first
+// return false when second <= first
+// CompareSemverVersion
+func CompareSemverVersion(first, second string) bool {
+	v1, _ := semver.NewVersion(first)
+	v2, _ := semver.NewVersion(second)
+	return v1.LessThan(v2)
 }
