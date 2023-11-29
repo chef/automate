@@ -154,7 +154,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
 - If you have not configured S3 access and secret keys during deployment or if you have taken backup on a different bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
-
+- Large Compliance Report is not supported in Automate HA
 {{< /note >}}
 
 #### Troubleshooting

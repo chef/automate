@@ -127,7 +127,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 {{< note >}}
 
 - If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
-
+- Large Compliance Report is not supported in Automate HA
 {{< /note >}}
 
 ## Troubleshooting
