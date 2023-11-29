@@ -1,1 +1,9 @@
-Special characters ``` **‘ ` " ' \ ; $** ```  are not allowed in the password.
+The following characters aren't allowed in passwords:
+
+- `‘`
+- <code>`</code>
+- `"`
+- `'`
+- `\`
+- `;`
+- `$`
