@@ -221,7 +221,7 @@ export class TelemetryService {
 
   registerChefTelemetryTracker() {
     if(chefTelemetryTracker) {
-      chefTelemetryTracker.register();
+      chefTelemetryTracker.register('automate');
       this.initializeChefTelemetryTracker();
       return;
     }
