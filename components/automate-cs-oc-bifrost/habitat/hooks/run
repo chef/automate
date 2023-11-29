@@ -24,9 +24,8 @@ if [ ! -f /hab/.skip_migration ]; then
   pg-helper create-extension "$DBNAME" "uuid-ossp"
   pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_bifrost"}}/schema/"
   pg-helper fix-permissions "$DBNAME"
+
+  secrets-helper generate oc_bifrost.superuser_id 32 --if-not-exists
 fi
-
-
-secrets-helper generate oc_bifrost.superuser_id 32 --if-not-exists
 
 exec secrets-helper exec --secret oc_bifrost.superuser_id -- oc_bifrost foreground
