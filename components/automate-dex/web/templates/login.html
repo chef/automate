@@ -52,7 +52,7 @@
     {{ end }}
   </div>
 
-  <script>
+  <script nonce="**CSP_NONCE**">
     const populateDisclaimer = () => {
       const show = '{{ "showDisclosure" | extra }}';
       if (show !== 'true') return;
