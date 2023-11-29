@@ -364,7 +364,7 @@ export class JobEditComponent implements OnDestroy {
       ruleOpts['interval'] = repeat.interval;
     }
 
-    return RRule.optionsToString(ruleOpts);
+    return RRule.optionsToString(ruleOpts).replace("\nRRULE:", ";").replace(":", "=");
   }
 
   public nodeFiltersFor(managerGroup) {
