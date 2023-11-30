@@ -136,12 +136,10 @@ module AutomateCluster
               exit 1
             end
           elsif args.key?(:es_pass) && args[:es_pass]
-            if args[:admin_pass] &&
-               args[:kibana_pass]
+            if args[:admin_pass]
               pass_conf = <<~ENDHEREDOC
-                [opendistro_auth]
+                [opensearch_auth]
                   admin_password = '#{args[:admin_pass]}'
-                  dashboard_password = '#{args[:kibana_pass]}'
               ENDHEREDOC
             else
               utils.backend_logger.error 'Opensearch / Kibana Password values were not set properly - aborting!'
@@ -589,9 +587,9 @@ module AutomateCluster
       def opensearch
         utils.backend_logger.info '☘  Opensearch Credentials ☘'
         admin_pass = get_pass('admin')
-        kibana_pass = get_pass('kibana')
+        # kibana_pass = get_pass('kibana')
         patch_frontends(es_pass: true, admin_pass: admin_pass) unless options[:frontend] == false
-        hab_config_apply(es_pass: true, admin_pass: admin_pass, kibana_pass: kibana_pass, service_name: 'opensearch') unless options[:gossip] == false
+        hab_config_apply(es_pass: true, admin_pass: admin_pass, service_name: 'opensearch') unless options[:gossip] == false
         utils.backend_logger.info '★  Opensearch and Kibana Credentials Rotated ★'
       end
 
