@@ -7,7 +7,10 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
-pg-helper ensure-service-database chef_license_control_service
+if [ ! -f /hab/.skip_migration ]; then
+  pg-helper ensure-service-database chef_license_control_service
+fi
+
 
 # Run the License Control gRPC server
 exec license-control-service serve --config {{pkg.svc_config_path}}/config.toml

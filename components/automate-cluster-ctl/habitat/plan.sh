@@ -9,8 +9,8 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_deps=(
   core/ruby30
-  chef/inspec
   core/aws-cli
+  chef/inspec
   core/bash
   core/coreutils
   core/cacerts
@@ -19,12 +19,16 @@ pkg_deps=(
   core/gzip
   core/jq-static
   core/openssh
-  core/openssl
   core/make
   core/curl
-  core/rsync
   core/terraform1
   core/hab/1.6.521/20220603154827
+  core/openssl
+  core/rsync
+  
+#   core/openssh ( core/openssh/7.9p1/20220311132702 core/openssh/7.9p1/20230816095218 )
+#   core/openssl ( core/openssl/1.0.2zf/20230816063107 core/openssl/1.0.2zb/20220311111046 )
+#   core/ruby30 ( core/ruby30/3.0.3/20220312100602 core/ruby30/3.0.3/20230818185900 )
 )
 
 pkg_build_deps=(

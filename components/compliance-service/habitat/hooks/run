@@ -20,18 +20,18 @@ chmod 1777 {{pkg.svc_var_path}}/tmp
 export DBNAME="{{cfg.storage.database}}"
 export DBUSER="{{cfg.storage.user}}"
 
-# Migrate from A1's delivery database if it's present
-pg-helper migrate-tables-v2 delivery "$DBNAME" \
+if [ ! -f /hab/.skip_migration ]; then
+  # Migrate from A1's delivery database if it's present
+  pg-helper migrate-tables-v2 delivery "$DBNAME" \
   agents node_managers results profiles tags jobs jobs_nodes jobs_profiles \
   jobs_tags nodes nodes_agents nodes_secrets nodes_tags
 
+  pg-helper ensure-service-database "$DBNAME"
 
+  pg-helper create-extension "$DBNAME" pgcrypto
 
-pg-helper ensure-service-database "$DBNAME"
-
-pg-helper create-extension "$DBNAME" pgcrypto
-
-pg-helper fix-permissions "$DBNAME"
+  pg-helper fix-permissions "$DBNAME"
+fi
 
 mkdir -p "{{pkg.svc_data_path}}/profiles"
 
