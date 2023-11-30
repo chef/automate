@@ -110,6 +110,9 @@
     "wallaby-webpack": "^3.9.16",
     "@types/node": "14.14.35"
   },
+  "config": {
+    "unsafe-perm": true
+  },
   "resolutions": {
     "@types/node": "14.14.35"
   }
