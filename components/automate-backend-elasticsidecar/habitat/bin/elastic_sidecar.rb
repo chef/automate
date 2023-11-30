@@ -257,8 +257,8 @@ module AutomateCluster
           logger.warn 'Authentication failed, inserting credentials'
           rotate_credentials
         when 503
-          if response.body.to_s.eql? 'Open Distro not initialized'
-            logger.warn 'Open Distro appears to not be setup, inserting credentials'
+          if response.body.to_s.eql? 'Opensearch security not initialized'
+            logger.warn 'Opensearch appears to not be setup, inserting credentials'
             rotate_credentials
           elsif response.body.to_s.valid_json?
             logger.warn 'Auth successful, but OpenSearch appears to be broken, doing nothing.'
