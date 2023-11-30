@@ -28,11 +28,11 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "d3": "^7.8.5",
+    "d3": "^5.9.7",
     "lodash": "^4.17.21",
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
-    "prismjs": "^1.29.0",
+    "prismjs": "^1.24.0",
     "puppeteer": "^14.0.0",
     "redux": "^4.0.4",
     "redux-devtools-extension": "^2.13.8",
