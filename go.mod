@@ -113,6 +113,7 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/gofiber/utils v1.1.0
+	github.com/hashicorp/go-version v1.6.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
 )
 
