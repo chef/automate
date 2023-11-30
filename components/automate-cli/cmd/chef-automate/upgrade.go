@@ -386,6 +386,12 @@ func restartDeploymentService() error {
 }
 
 func runAutomateHAFlow(args []string, offlineMode bool) error {
+	// First, get the minimum version of the automate from all the FE node
+	// we cannot depands up on /hab/a2_deploy_workspace/terraform/a2ha_aib_fe.auto.tfvars for upgrade
+	// In case of upgrade break/fails in-between then the above file do the block us to trigger
+	// the subsequent upgrade
+	// We have version_check_for_addnode in provision.sh.tpl, this will block the upgrade
+	// if version is same on any FE
 	if !upgradeRunCmdFlags.skipVerify {
 		err := executeConfigVerifyAndPromptConfirmationOnError("")
 		if err != nil {
@@ -410,6 +416,17 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 	}
 	modeOfDeployment := getModeOfDeployment()
+	// get the Installed Minimum version
+	installedVersion, err := GetMinimunBuildVersionFromFrontEndServer()
+	if err != nil {
+		// Not able to get the version still we are proceding
+		writer.Println("not able to get the version from the frontend node " + err.Error())
+	}
+	airgapbundleVersion, _ := GetVersion(upgradeRunCmdFlags.airgap)
+	if !CompareSemverVersion(installedVersion, airgapbundleVersion) {
+		return errors.New("cannot downgrade the cluster")
+	}
+
 	if modeOfDeployment == EXISTING_INFRA_MODE {
 
 		infra, err := getAutomateHAInfraDetails()
@@ -432,7 +449,6 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if err != nil {
 			return err
 		}
-
 		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, result, DEPLOY)
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
