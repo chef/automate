@@ -93,7 +93,7 @@ chef-button {
     }
   }
 
-  &[disabled] {
+  &[disabled]:not([disabled="false"]) {
     pointer-events: none;
   }
 }
@@ -115,7 +115,7 @@ chef-button[primary] {
     #{--color}: var(--chef-white);
   }
 
-  &[disabled] {
+  &[disabled]:not([disabled="false"]) {
     #{--background-color}: palette($primary-default, 9);
     #{--border-color}: palette($primary-default, 9);
     #{--color}: var(--chef-white);
@@ -148,7 +148,7 @@ chef-button[primary] {
       #{--color}: var(--chef-white);
     }
 
-    &[disabled] {
+    &[disabled]:not([disabled="false"]) {
       #{--background-color}: palette($primary-caution, 9);
       #{--border-color}: palette($primary-caution, 9);
       #{--color}: var(--chef-white);
@@ -183,7 +183,7 @@ chef-button[secondary] {
     #{--color}: palette($primary-default, 3);
   }
 
-  &[disabled] {
+  &[disabled]:not([disabled="false"]) {
     #{--background-color}: var(--chef-white);
     #{--border-color}: palette($primary-default, 9);
     #{--color}: palette($primary-default, 9);
@@ -216,7 +216,7 @@ chef-button[secondary] {
       #{--color}: palette($primary-caution, 3);
     }
 
-    &[disabled] {
+    &[disabled]:not([disabled="false"]) {
       #{--background-color}: var(--chef-white);
       #{--border-color}: palette($primary-caution, 9);
       #{--color}: palette($primary-caution, 9);
@@ -251,7 +251,7 @@ chef-button[tertiary] {
     #{--color}: palette($primary-default, 3);
   }
 
-  &[disabled] {
+  &[disabled]:not([disabled="false"]) {
     #{--background-color}: transparent;
     #{--border-color}: transparent;
     #{--color}: palette($primary-default, 9);
@@ -284,7 +284,7 @@ chef-button[tertiary] {
       #{--color}: palette($primary-caution, 3);
     }
 
-    &[disabled] {
+    &[disabled]:not([disabled="false"]) {
       #{--background-color}: transparent;
       #{--border-color}: transparent;
       #{--color}: palette($primary-caution, 9);
