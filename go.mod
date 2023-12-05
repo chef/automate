@@ -63,7 +63,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
-	github.com/nats-io/nats-streaming-server v0.21.2
+	github.com/nats-io/nats-streaming-server v0.24.1
 	github.com/nats-io/nats.go v1.31.0
 	github.com/nats-io/stan.go v0.10.4
 	github.com/olivere/elastic/v7 v7.0.28
@@ -120,6 +120,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
+	go.uber.org/automaxprocs v1.5.3 // indirect
 )
 
 require (
@@ -204,7 +205,7 @@ require (
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
 	github.com/nats-io/jwt/v2 v2.5.3 // indirect
-	github.com/nats-io/nats-server/v2 v2.7.4 // indirect
+	github.com/nats-io/nats-server/v2 v2.9.23 // indirect
 	github.com/nats-io/nkeys v0.4.6 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
