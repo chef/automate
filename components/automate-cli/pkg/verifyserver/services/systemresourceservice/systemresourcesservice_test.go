@@ -651,6 +651,7 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_A2), "", ""),
 		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), fmt.Sprintf(constants.SUCCESS_MSG, "/var/tmp", constants.TMP_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100), "", ""),
 		*srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "/(root volume)"), fmt.Sprintf(constants.SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100), "", ""),
+		*srv.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, "/tmp permission"), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, "/tmp", constants.TMP_DIR_REQUIRED_PERMISSION), "", ""),
 	}
 
 	mockSystemResourceInfo := &systemresource.MockSystemResourceInfoImpl{
@@ -668,6 +669,9 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 				Total: uint64(100 * constants.GB_TO_BYTES),
 				Free:  uint64((constants.HAB_FREE_DISK_BEFORE_DEP_A2 + 1) * constants.GB_TO_BYTES),
 			}, nil
+		},
+		GetFilePermissionFunc: func(s string) (fs.FileMode, error) {
+			return 0x1ff, nil
 		},
 	}
 
