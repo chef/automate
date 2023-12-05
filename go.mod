@@ -120,7 +120,6 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
-	go.uber.org/automaxprocs v1.5.3 // indirect
 )
 
 require (
