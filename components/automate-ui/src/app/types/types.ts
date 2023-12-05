@@ -606,8 +606,8 @@ export class NodeAttributes {
 
     this.all = merge(
       {},
-      this.normal,
       this.default,
+      this.normal,
       this.override,
       this.automatic);
   }
