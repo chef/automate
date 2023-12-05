@@ -31,7 +31,7 @@ const (
 
 	GB_TO_BYTES = 1024 * 1024 * 1024
 
-	TMP_DIR_REQUIRED_PERMISSION = "rwxrwxrwt"
+	TMP_DIR_REQUIRED_PERMISSION = "-rwxrwxrwx"
 )
 
 const (

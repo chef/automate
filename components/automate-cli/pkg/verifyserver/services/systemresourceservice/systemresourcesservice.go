@@ -3,7 +3,6 @@ package systemresourceservice
 import (
 	"fmt"
 	"math"
-	"os"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/enums"
@@ -57,7 +56,7 @@ func (srs *SystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType 
 	rootFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
 	srsResponse.Checks = append(srsResponse.Checks, *rootFreeSpaceCheck)
 
-	tmpDirPermissionCheck := srs.CheckFilePermissionOfDir("/tmp", constants.TMP_DIR_REQUIRED_PERMISSION, "/tmp permission")
+	tmpDirPermissionCheck := srs.CheckPermissionOfDir("/tmp", constants.TMP_DIR_REQUIRED_PERMISSION, "/tmp permission")
 	srsResponse.Checks = append(srsResponse.Checks, *tmpDirPermissionCheck)
 
 	if !cpuCountCheck.Passed ||
@@ -238,13 +237,11 @@ func (srs *SystemResourcesServiceImpl) CheckFreeDiskSpaceOfDir(dirPath string, f
 	return srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, checkTitle), successMsg, errorMsg, resolutionMsg)
 }
 
-func (srs *SystemResourcesServiceImpl) CheckFilePermissionOfDir(dirPath string, permissionString string, checkTitle string) *models.Checks {
-	fileStats, err := os.Stat(dirPath)
+func (srs *SystemResourcesServiceImpl) CheckPermissionOfDir(dirPath string, permissionString string, checkTitle string) *models.Checks {
+	permissions, err := srs.SystemResourceInfo.GetFilePermission(dirPath)
 	if err != nil {
-		srs.logger.Debugf("file does not exist: %v", err)
 		return srs.GetChecksModel(false, fmt.Sprintf(constants.PERMISSION_CHECK, checkTitle), "", err.Error(), constants.RESOLUTION_MSG)
 	}
-	permissions := fileStats.Mode().Perm()
 	if permissions.String() == permissionString {
 		srs.logger.Debugf("have correct permisisons %s for %s required %s", permissions.String(), permissionString, dirPath)
 		return srs.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, checkTitle), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, dirPath, permissionString), "", "")

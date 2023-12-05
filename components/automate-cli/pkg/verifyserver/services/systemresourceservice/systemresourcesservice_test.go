@@ -3,6 +3,7 @@ package systemresourceservice_test
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -305,6 +306,50 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 			srv.SystemResourceInfo = testCase.mockSystemResource
 			srv.Fileutils = testCase.mockFileUtils
 			respGet := srv.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
+			assert.Equal(t, testCase.respWant, respGet)
+		})
+	}
+}
+
+func TestGetFilePermissionOfDir(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	srv := systemresourceservice.NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
+	successMockCheckDirFunc := func(s string) (bool, error) {
+		return true, nil
+	}
+
+	testCasesTmpPermissionCheck := []testCase{
+		{
+			testCaseDescription: "Checking directory permission of /tmp 600 failed",
+			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, "/tmp permission"), "", fmt.Sprintf(constants.PERMISSION_ERROR_MSG, "/tmp", "-rw-------"), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, "/tmp", constants.TMP_DIR_REQUIRED_PERMISSION)),
+			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
+				GetFilePermissionFunc: func(s string) (fs.FileMode, error) {
+					return 0x180, nil
+				},
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
+			},
+		},
+		{
+			testCaseDescription: "Checking directory permission of /tmp 1777 passed",
+			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, "/tmp permission"), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, "/tmp", constants.TMP_DIR_REQUIRED_PERMISSION), "", ""),
+			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
+				GetFilePermissionFunc: func(s string) (fs.FileMode, error) {
+					return 0x1ff, nil
+				},
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
+			},
+		},
+	}
+
+	for _, testCase := range testCasesTmpPermissionCheck {
+		t.Run(testCase.testCaseDescription, func(t *testing.T) {
+			srv.SystemResourceInfo = testCase.mockSystemResource
+			srv.Fileutils = testCase.mockFileUtils
+			respGet := srv.CheckPermissionOfDir("/tmp", constants.TMP_DIR_REQUIRED_PERMISSION, "/tmp permission")
 			assert.Equal(t, testCase.respWant, respGet)
 		})
 	}
