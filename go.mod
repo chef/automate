@@ -119,9 +119,7 @@ require (
 
 require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
-	github.com/minio/highwayhash v1.0.1 // indirect
-	github.com/nats-io/jwt/v2 v2.2.0 // indirect
-	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
+	github.com/nats-io/jwt v0.3.2 // indirect
 )
 
 require (
