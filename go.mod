@@ -12,14 +12,14 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/alexedwards/scs v1.4.1
 	github.com/armon/go-metrics v0.4.1 // indirect
-	github.com/aws/aws-sdk-go v1.48.12
+	github.com/aws/aws-sdk-go v1.48.13
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/boltdb/bolt v1.3.2-0.20171120010307-9da317453632
 	github.com/briandowns/spinner v1.23.0
 	github.com/bufbuild/buf v0.20.5
 	github.com/buger/goterm v1.0.4
 	github.com/buger/jsonparser v1.1.1
-	github.com/chef/automate/api/external v0.0.0-20231205104239-6c1021d8a6ea
+	github.com/chef/automate/api/external v0.0.0-20231205131227-2a8d22209284
 	github.com/chef/toml v0.3.1-0.20200730001027-920c30b33b5d
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
@@ -94,7 +94,7 @@ require (
 	golang.org/x/oauth2 v0.15.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.14.0
-	google.golang.org/api v0.152.0
+	google.golang.org/api v0.153.0
 	google.golang.org/genproto v0.0.0-20231127180814-3a041ad873d4 // indirect
 	google.golang.org/grpc v1.59.0
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
