@@ -321,7 +321,7 @@ func TestGetFilePermissionOfDir(t *testing.T) {
 	testCasesTmpPermissionCheck := []testCase{
 		{
 			testCaseDescription: "Checking directory permission of /tmp 600 failed",
-			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, "/tmp permission"), "", fmt.Sprintf(constants.PERMISSION_ERROR_MSG, "/tmp", "-rw-------"), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, "/tmp", constants.TMP_DIR_REQUIRED_PERMISSION)),
+			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, "/tmp permission"), "", fmt.Sprintf(constants.PERMISSION_ERROR_MSG, "/tmp", "-rw-------"), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, "/tmp", constants.TMP_DIR_REQUIRED_PERMISSION+" or 1777")),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetFilePermissionFunc: func(s string) (fs.FileMode, error) {
 					return 0x180, nil
