@@ -3,6 +3,8 @@ package systemresource
 import (
 	"errors"
 	"fmt"
+	"io/fs"
+	"os"
 	"runtime"
 
 	"github.com/shirou/gopsutil/cpu"
@@ -17,6 +19,7 @@ type SystemResourceInfo interface {
 	GetDiskSpaceInfo(dirPath string) (disk.UsageStat, error)
 	GetDiskPartitions(all bool) ([]disk.PartitionStat, error)
 	FormatBytes(bytes uint64) string
+	GetFilePermission(dirPath string) (fs.FileMode, error)
 }
 
 func NewSystemResourceInfoImpl() *SystemResourceInfoImpl {
@@ -83,4 +86,12 @@ func (s *SystemResourceInfoImpl) GetDiskPartitions(all bool) ([]disk.PartitionSt
 		return []disk.PartitionStat{}, errors.New("Failed to retrieve disk partitions: " + err.Error())
 	}
 	return partitions, nil
+}
+
+func (srs *SystemResourceInfoImpl) GetFilePermission(dirPath string) (fs.FileMode, error) {
+	fileStats, err := os.Stat(dirPath)
+	if err != nil {
+		return 0, err
+	}
+	return fileStats.Mode().Perm(), nil
 }
