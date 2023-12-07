@@ -30,6 +30,8 @@ const (
 	ROOT_FREE_DISK_IN_PER = 0.20
 
 	GB_TO_BYTES = 1024 * 1024 * 1024
+
+	TMP_DIR_REQUIRED_PERMISSION = "-rwxrwxrwx"
 )
 
 const (
@@ -43,4 +45,8 @@ const (
 	SUCCESS_MSG_IN_PER = " or %v%% of total size of /hab"
 
 	RESOLUTION_MSG = "Please run system on supported platform"
+
+	PERMISSION_CHECK       = "%s permission check"
+	PERMISSION_SUCCESS_MSG = "%s should have %s permission"
+	PERMISSION_ERROR_MSG   = "%s permission is %s"
 )

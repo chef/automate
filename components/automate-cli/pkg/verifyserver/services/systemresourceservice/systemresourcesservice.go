@@ -56,12 +56,16 @@ func (srs *SystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType 
 	rootFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
 	srsResponse.Checks = append(srsResponse.Checks, *rootFreeSpaceCheck)
 
+	tmpDirPermissionCheck := srs.CheckPermissionOfDir("/tmp", constants.TMP_DIR_REQUIRED_PERMISSION, "/tmp permission")
+	srsResponse.Checks = append(srsResponse.Checks, *tmpDirPermissionCheck)
+
 	if !cpuCountCheck.Passed ||
 		!cpuSpeedCheck.Passed ||
 		!memorySizeCheck.Passed ||
 		!habFreeSpaceCheck.Passed ||
 		!tmpFreeSpaceCheck.Passed ||
-		!rootFreeSpaceCheck.Passed {
+		!rootFreeSpaceCheck.Passed ||
+		!tmpDirPermissionCheck.Passed {
 		srsResponse.Passed = false
 	}
 
@@ -232,6 +236,20 @@ func (srs *SystemResourcesServiceImpl) CheckFreeDiskSpaceOfDir(dirPath string, f
 
 	passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceValue, currentFreeSpaceInDir, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB, constants.POST_DEPLOY, dirPath)
 	return srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, checkTitle), successMsg, errorMsg, resolutionMsg)
+}
+
+func (srs *SystemResourcesServiceImpl) CheckPermissionOfDir(dirPath string, permissionString string, checkTitle string) *models.Checks {
+	permissions, err := srs.SystemResourceInfo.GetFilePermission(dirPath)
+	if err != nil {
+		return srs.GetChecksModel(false, fmt.Sprintf(constants.PERMISSION_CHECK, checkTitle), "", err.Error(), constants.RESOLUTION_MSG)
+	}
+	if permissions.String() == permissionString {
+		srs.logger.Debugf("have correct permisisons %s for %s required %s", permissions.String(), permissionString, dirPath)
+		return srs.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, checkTitle), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, dirPath, permissionString), "", "")
+	} else {
+		srs.logger.Debugf("incorrect permisisons %s for %s required %s", permissions.String(), permissionString, dirPath)
+		return srs.GetChecksModel(true, fmt.Sprintf(constants.PERMISSION_CHECK, checkTitle), "", fmt.Sprintf(constants.PERMISSION_ERROR_MSG, dirPath, permissions.String()), fmt.Sprintf(constants.PERMISSION_SUCCESS_MSG, dirPath, permissionString+" or 1777"))
+	}
 }
 
 func (srs *SystemResourcesServiceImpl) GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceCalculated, currentFreeSpace, expectedFreeSpaceWantInPer, expectedFreeSpaceWantInGB float64, deploymentState, dirName string) (bool, string, string, string) {
