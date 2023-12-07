@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=deployment-service
 pkg_description="Automate Deployment Service"
 pkg_origin=chef
