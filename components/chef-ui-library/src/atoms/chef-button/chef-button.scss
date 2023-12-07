@@ -98,7 +98,7 @@ chef-button {
   }
 }
 
-chef-button[primary] {
+chef-button[primary]:not([primary="false"]) {
   #{--background-color}: palette($primary-default, 5);
   #{--border-color}: palette($primary-default, 5);
   #{--color}: var(--chef-white);
@@ -131,7 +131,7 @@ chef-button[primary] {
     #{--fill-alt}: palette($primary-default, 9);
   }
 
-  &[caution] {
+  &[caution]:not([caution="false"]) {
     #{--background-color}: palette($primary-caution, 5);
     #{--border-color}: palette($primary-caution, 5);
     #{--color}: var(--chef-white);
@@ -166,7 +166,7 @@ chef-button[primary] {
   }
 }
 
-chef-button[secondary] {
+chef-button[secondary]:not([secondary="false"]) {
   #{--background-color}: var(--chef-white);
   #{--border-color}: palette($primary-default, 5);
   #{--color}: palette($primary-default, 5);
@@ -199,7 +199,7 @@ chef-button[secondary] {
     #{--fill-alt}: palette($primary-default, 6);
   }
 
-  &[caution] {
+  &[caution]:not([caution="false"]) {
     #{--background-color}: var(--chef-white);
     #{--border-color}: palette($primary-caution, 5);
     #{--color}: palette($primary-caution, 5);
@@ -234,7 +234,7 @@ chef-button[secondary] {
   }
 }
 
-chef-button[tertiary] {
+chef-button[tertiary]:not([tertiary="false"]) {
   #{--background-color}: transparent;
   #{--border-color}: transparent;
   #{--color}: palette($primary-default, 5);
@@ -267,7 +267,7 @@ chef-button[tertiary] {
     #{--fill-alt}: palette($primary-default, 6);
   }
 
-  &[caution] {
+  &[caution]:not([caution="false"]) {
     #{--background-color}: transparent;
     #{--border-color}: transparent;
     #{--color}: palette($primary-caution, 5);
