@@ -54,11 +54,12 @@ The operating system and the supported version for different nodes in the on-pre
 
 | Operating Systems                        | Supported Version         |
 | :--------------------------------------  | :-----------------------  |
-| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
+| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8, 9 . For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8 and 9. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
 | Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server             | 12.5                      |
+| Oracle Linux                             | 9                         |
 
 ### Minimum Supported Chef Tool Versions
 
