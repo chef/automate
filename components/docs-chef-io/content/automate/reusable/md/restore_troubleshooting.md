@@ -91,7 +91,7 @@ Now check the status of the Automate node and then try running the restore comma
             done
          ```
 
-         - The above scritp requires the `jq` needs to be installed, You can install from the airgap gap bundle, please use command on the one of the automate frontend node to locate the `jq` packeage.
+         - The above scritp requires the `jq` needs to be installed, You can install from the airgap bundle, please use command on the one of the automate frontend node to locate the `jq` package.
 
          ```sh
          ls -ltrh /hab/cache/artifacts/ | grep jq
@@ -100,13 +100,13 @@ Now check the status of the Automate node and then try running the restore comma
          -rw-r--r--. 1 ec2-user ec2-user  730K Dec  8 08:55 core-jq-static-1.6-20190703002933-x86_64-linux.hart
          ```
 
-         - In case of multiple `jq` version, install the latest one. use the below command to install the `jq` package to the automate frontend node
+         - In case of multiple `jq` version, then install the latest one. use the below command to install the `jq` package to the automate frontend node
 
          ```sh
          hab pkg install /hab/cache/artifacts/core-jq-static-1.6-20190703002933-x86_64-linux.hart -bf
          ```
 
-   2. Below steps for object storage as a backup 
+   2. Below steps for object storage as a backup option
 
       - While at the time of deployment `backup_config` will be `object_storage`
       - To use the `object_storage`, we are using below template at the time of deployment
@@ -135,7 +135,7 @@ Now check the status of the Automate node and then try running the restore comma
             base_path = "automate"
       ```  
 
-      - You can choose any value for the variable `base_path`. `base_path` is only required for the frontend node.
+      - You can choose any value for the variable `base_path`. `base_path` patch is only required for the frontend node.
       - Use the command  to apply the above template `chef-automate config patch frontend.toml --fe`
       - Post the configuration patch, use the curl request to validate
 
@@ -189,5 +189,3 @@ Now check the status of the Automate node and then try running the restore comma
          ```
 
          - In case of `base_path` value is not matching, then we have to delete the existing `snapshot`. please refer the steps from the file system
-
-         
