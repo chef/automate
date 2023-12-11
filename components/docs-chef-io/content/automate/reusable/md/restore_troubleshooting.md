@@ -20,11 +20,11 @@ Try these steps if Chef Automate returns an error while restoring data.
 
 Now check the status of the Automate node and then try running the restore command from the bastion host.
 
-1. How to change the `base_path` or `path`. Below steps for the File System backup
+1. How to change the `base_path` or `path`. The steps for the File System backup are as shown below:
    - While at the time of deployment `backup_mount` default value will be `/mnt/automate_backups`
-   - In case, if you modify the `backup_mount` in `config.toml` before deploment, then deployment process will do the configuration with updated value
-   - In case, you changed the `backup_mount` value post deployment, then we need to patch the configuration manually to all the frontend and backend nodes, for example if you change the `backup_mount` to `/bkp/backps`
-   - Update the FE nodes with below template, use command `chef-automate config patch fe.toml --fe`
+   - In case, if you modify the `backup_mount` in `config.toml` before deployment, then the deployment process will do the configuration with the updated value
+   - In case, you changed the `backup_mount` value post-deployment, then we need to patch the configuration manually to all the frontend and backend nodes, for example, if you change the `backup_mount` to `/bkp/backps`
+   - Update the FE nodes with the below template, use the command  `chef-automate config patch fe.toml --fe`
 
       ```sh
          [global.v1.backups]
@@ -35,7 +35,7 @@ Now check the status of the Automate node and then try running the restore comma
                path = "/bkp/backps"
       ```
 
-   - Update the opensearch node with below template, use command `chef-automate config patch os.toml --os`
+   - Update the OpenSearch node with the below template, use the command  `chef-automate config patch os.toml --os`
 
       ```sh
       [path]
@@ -106,7 +106,7 @@ Now check the status of the Automate node and then try running the restore comma
          hab pkg install /hab/cache/artifacts/core-jq-static-1.6-20190703002933-x86_64-linux.hart -bf
          ```
 
-   2. Below steps for object storage as a backup option
+1. Below steps for object storage as a backup option
 
       - While at the time of deployment `backup_config` will be `object_storage`
       - To use the `object_storage`, we are using below template at the time of deployment
@@ -123,7 +123,7 @@ Now check the status of the Automate node and then try running the restore comma
       ```
 
       - If you configured pre deployment, then we are good
-      - If you want to change the `bucket` or `base_path`, then use below template for Frontend nodes
+      - If you want to change the `bucket` or `base_path`, then use the below template for Frontend nodes
 
       ```sh
       [global.v1]
@@ -136,8 +136,8 @@ Now check the status of the Automate node and then try running the restore comma
       ```  
 
       - You can choose any value for the variable `base_path`. `base_path` patch is only required for the frontend node.
-      - Use the command  to apply the above template `chef-automate config patch frontend.toml --fe`
-      - Post the configuration patch, use the curl request to validate
+      - Use the command to apply the above template `chef-automate config patch frontend.toml --fe`
+      - Post the configuration patch, and use the curl request to validate
 
       ```sh
          curl localhost:10144/_snapshot?pretty
@@ -145,7 +145,7 @@ Now check the status of the Automate node and then try running the restore comma
 
          - If the response is empty `{}`, then we are good
 
-         - If the response has json output, then it should have correct value for the `base_path`
+         - If the response has JSON output, then it should have the correct value for the `base_path`
 
          ```sh
          {
@@ -188,4 +188,4 @@ Now check the status of the Automate node and then try running the restore comma
          }
          ```
 
-         - In case of `base_path` value is not matching, then we have to delete the existing `snapshot`. please refer the steps from the file system
+         - In case of `base_path` value is not matching, then we have to delete the existing `snapshot`. please refer to the steps from the file system
