@@ -103,8 +103,7 @@ Then, run `chef-automate config patch config.toml`.
 
 ### Setting Up Data Collection on Chef Infra Server Versions 12.14 and Higher
 
-On a standalone Chef Infra Server install, instead of setting the token directly in `/etc/opscode/chef-server.rb` as was done in older versions of the Chef Infra Server, we'll use the `set-secret` command, so that your API token does not live in
-plaintext in a file:
+On a standalone install of Chef Infra Server, store secrets using [Chef Infra Server's set-secrets subcommand](/server/ctl_chef_server/#ctl-chef-server-secrets-management). This stores the API secret on Chef Infra Server, but not in a plain text file.
 
 ```shell
 sudo chef-server-ctl set-secret data_collector token '<API_TOKEN_FROM_STEP_1>'
