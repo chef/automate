@@ -61,7 +61,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/crunchy v0.4.0
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
-	github.com/nats-io/nats-streaming-server v0.22.0
+	github.com/nats-io/nats-streaming-server v0.21.2
 	github.com/nats-io/nats.go v1.31.0
 	github.com/nats-io/stan.go v0.10.4
 	github.com/olivere/elastic/v7 v7.0.32
@@ -106,7 +106,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require github.com/nats-io/jwt/v2 v2.0.2 // indirect
+require github.com/nats-io/jwt/v2 v2.0.1 // indirect
 
 require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
@@ -158,7 +158,7 @@ require (
 	github.com/lyft/protoc-gen-star/v2 v2.0.3 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
-	github.com/nats-io/jwt v1.2.2 // indirect
+	github.com/nats-io/jwt v2.5.3+incompatible // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
@@ -247,7 +247,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/go-nats v1.7.2 // indirect
-	github.com/nats-io/nats-server/v2 v2.3.2 // indirect
+	github.com/nats-io/nats-server/v2 v2.2.2 // indirect
 	github.com/nats-io/nkeys v0.4.6 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/peterh/liner v1.2.2 // indirect
