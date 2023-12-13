@@ -106,6 +106,8 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
+require github.com/nats-io/jwt/v2 v2.5.3 // indirect
+
 require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
@@ -156,7 +158,6 @@ require (
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/jwt/v2 v2.5.3 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
