@@ -157,6 +157,7 @@ require (
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/lyft/protoc-gen-star/v2 v2.0.3 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt v2.5.3+incompatible // indirect
