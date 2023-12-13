@@ -106,7 +106,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require github.com/nats-io/jwt/v2 v2.0.1 // indirect
+
 
 require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
