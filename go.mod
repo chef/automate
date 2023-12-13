@@ -179,6 +179,16 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
+require(
+
+	github.com/open-policy-agent/opa/ast 
+	github.com/open-policy-agent/opa/rego
+	github.com/open-policy-agent/opa/storage
+	github.com/open-policy-agent/opa/storage/inmem
+	github.com/open-policy-agent/opa/topdown
+	github.com/pkg/errors
+	)
+
 require (
 	cloud.google.com/go v0.111.0 // indirect
 	cloud.google.com/go/storage v1.35.1
