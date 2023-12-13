@@ -3,6 +3,7 @@ module github.com/chef/automate
 go 1.19
 
 require (
+
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.29
 	github.com/Azure/go-autorest/autorest/adal v0.9.23
