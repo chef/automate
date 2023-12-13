@@ -1,4 +1,4 @@
-package opa
+package main
 
 // nolint:lll
 //go:generate go-bindata -pkg $GOPACKAGE -o policy.bindata.go -ignore .*_test.rego -ignore Makefile -ignore README\.md policy/...
