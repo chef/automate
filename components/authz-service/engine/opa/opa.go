@@ -238,6 +238,7 @@ func (s *State) ProjectsAuthorized(
 	}
 	projs := make(ast.Array, len(projects))
 	for i, proj := range projects {
+
 		projs[i] = ast.NewTerm(ast.String(proj))
 	}
 	input := ast.NewObject(
