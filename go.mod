@@ -112,6 +112,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.51.0
 	github.com/gofiber/utils v1.1.0
 	github.com/hashicorp/go-version v1.6.0
+	github.com/nats-io/jwt/v2 v2.5.3
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	google.golang.org/genproto/googleapis/api v0.0.0-20231127180814-3a041ad873d4
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231127180814-3a041ad873d4
@@ -159,7 +160,6 @@ require (
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt v2.5.3+incompatible // indirect
-	github.com/nats-io/jwt/v2 v2.5.3 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
@@ -250,9 +250,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.2.0 // indirect
-	github.com/nats-io/jwt/v2 v2.0.1
-	github.com/nats-io/jwt v1.0.1 // indirect
-
 	github.com/nats-io/nkeys v0.4.6 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/peterh/liner v1.2.2 // indirect
