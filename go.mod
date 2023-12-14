@@ -3,7 +3,6 @@ module github.com/chef/automate
 go 1.19
 
 require (
-
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.29
 	github.com/Azure/go-autorest/autorest/adal v0.9.23
@@ -107,8 +106,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-
-
 require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.1
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
@@ -162,6 +159,7 @@ require (
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt v2.5.3+incompatible // indirect
+	github.com/nats-io/jwt/v2 v2.5.3 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
@@ -178,7 +176,6 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
-
 
 require (
 	cloud.google.com/go v0.111.0 // indirect
