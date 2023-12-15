@@ -5,7 +5,7 @@
 pkg_name="automate-ha-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version= "1.3.14"
+pkg_version="1.3.14"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
@@ -16,6 +16,7 @@ pkg_build_deps=(
   core/make
   core/gcc
 )
+
 pkg_deps=(
   core/coreutils
   core/glibc
