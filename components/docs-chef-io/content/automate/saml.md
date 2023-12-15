@@ -1,10 +1,9 @@
 +++
 title = "SAML"
-
 date = 2018-05-11T09:27:09+00:00
 draft = false
-
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "SAML"
@@ -14,6 +13,12 @@ gh_repo = "automate"
 +++
 
 Chef Automate can integrate with existing Security Assertion Markup Language (SAML) services to authenticate users in Chef Automate, and use their existing group memberships to determine their Chef Automate permissions.
+
+{{< note >}}
+
+Only identity security specialists should configure SAML in Chef Automate and Chef SaaS.
+
+{{< /note >}}
 
 ## Authentication via Existing Identity Management Systems
 
@@ -54,17 +59,14 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 
 ## Supported Identity Management Systems
 
-- [Azure AD]({{< relref "#azure-ad" >}})
-- Office365
-- OKTA
-- OneLogin
-- Ping
-- Tivoli Federated Identity Manager
+Chef Automate supports the following identity providers:
 
-Chef Automate uses the [Dex](https://github.com/dexidp/dex) library to support SAML integrations. Dex does not support IdP-initiated SAML logins with for these IdPs.
-This means that Chef Automate also cannot support IdP-initiated SAML logins with these IdPs.
+{{< readfile file="content/automate/reusable/md/saml_supported_identity_providers.md" >}}
 
-Attempting to sign in with an unsupported IdP-supported SAML login causes the `unsupported auth mode` error. Fall back to the typical SP-initiated login mode and proceed with your Chef Automate SAML configuration.
+Chef Automate uses the [Dex](https://github.com/dexidp/dex) library to support SAML integrations.
+Dex does not support IdP-initiated SAML logins for these IdPs, so Chef Automate also doesn't support IdP-initiated SAML logins with these IdPs.
+
+Attempting to sign in with an unsupported IdP-supported SAML login causes the `unsupported auth mode` error. Fall back to the typical service provider-initiated login mode and proceed with your Chef Automate SAML configuration.
 
 ### Azure Active Directory
 
@@ -177,7 +179,7 @@ Member expressions are required for externally managed users and teams, as well 
   # Example: "https://{{< example_fqdn "automate" >}}/dex/callback"
   entity_issuer = "<your entity issuer>"
 
-  # Optional: Specify the NameIDPolicy to use
+  # Optional: Specify the NameIdPolicy to use
   #
   # When provided, Chef Automate will request a name ID of the configured format
   # in the SAML AuthnRequest.
@@ -216,12 +218,91 @@ Attempting to sign in with an unsupported IdP-supported SAML login causes the `u
 
 To remedy this error, fall back to the standard SP-initiated login mode.
 
-Chef Automate uses the [Dex](https://github.com/dexidp/dex) library to support SAML integrations. Dex does not support IdP-initiated SAML logins with of these IdPs.
-This means that Chef Automate also cannot support IdP-initiated SAML logins with the IdPs:
+Chef Automate uses the [Dex](https://github.com/dexidp/dex) library to support SAML integrations.
+Dex does not support IdP-initiated SAML logins, so Chef Automate also does not support IdP-initiated SAML logins.
 
-- [Azure AD]({{< relref "#azure-ad" >}})
-- Office365
-- OKTA
-- OneLogin
-- Ping
-- Tivoli Federated Identity Manager
+## Chef SaaS SAML configuration
+
+Chef SaaS users can login using a SAML-based external identity provider (IdP).
+
+Chef SaaS supports the following IdPs:
+
+{{< readfile file="content/automate/reusable/md/saml_supported_identity_providers.md" >}}
+
+### Add SAML configuration
+
+Your account must have the [Administrator policy]({{< relref "/automate/policies" >}}) to access the SSO user interface. Members of the [admins team]({{< relref "/automate/teams" >}}) have this by default.
+
+Use the following instructions to add a SAML configuration in Chef SaaS.
+
+1. Login to your Chef SaaS account and then append `/sso` to your Chef SaaS fully qualified domain name in your browser toolbar. For example, `https://automate.example.com/sso`.
+
+1. On the Chef SaaS SSO page, enter the following information:
+
+   SSO URL
+   : The single sign-on URL provided by the IdP.
+   : _Required_
+
+   Email Attribute
+   : The user email attribute set in the IdP.
+   : _Required_
+
+   Username Attribute
+   : The username attribute set in the IdP.
+   : _Required_
+
+   Entity Issuer URL
+   : The authorization callback URL of your Chef SaaS deployment. This is the fully qualified domain name of your Chef SaaS deployment appended with `dex/callback`.
+     For example, `https://automate.example.com/dex/callback`.
+   : _Required_
+
+   CA Certificate
+   : The full certificate provided by the IdP. Include `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----` at the beginning and end of the certificate string.
+   : _Required_
+
+   Group Attribute
+   : The group attribute in the SAML assertion.
+     If not provided, users authenticating with SSO will not be a member of any [team]({{< relref "/automate/teams" >}}).
+   : _Optional_
+
+   Allowed Groups
+   : The groups in the IdP that have single sign-on access to Chef SaaS.
+   : _Optional_
+
+   Name ID Policy Format
+   : The name identifier format used in the SAML AuthnRequest.
+   : _Required for Microsoft 365 and Azure AD_
+
+   : Default value: `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`.
+
+   : Possible values:
+
+     - `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`
+     - `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified`
+     - `urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName`
+     - `urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName`
+     - `urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted`
+     - `urn:oasis:names:tc:SAML:2.0:nameid-format:entity`
+     - `urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos`
+     - `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`
+     - `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`
+
+1. After entering these fields, select **Submit** to add the user SSO configuration. The **Submit** button is enabled after Chef SaaS validates all form values.
+
+   The SSO page refreshes showing the filled in SAML configuration fields with a message at the top that says, "SSO Request is complete. Config applied successfully."
+
+If the new SSO configuration fails, you can edit the form and submit again.
+
+### Delete SAML configuration
+
+Your account must have the [Administrator policy]({{< relref "/automate/policies" >}}) to access the SSO user interface. Members of the [admins team]({{< relref "/automate/teams" >}}) have this by default.
+
+Use the following instructions to remove an existing SAML configuration in Chef SaaS.
+
+1. Login to your Chef SaaS account and then append `/sso` to your Chef SaaS fully qualified domain name in your browser toolbar. For example, `https://automate.example.com/sso`.
+
+1. On the Chef SaaS SSO page, select the **Remove Configuration** button.
+
+1. A dialog box appears asking you to confirm that you want to remove the configuration. Select **Remove** to remove the SSO configuration.
+
+   The SSO page refreshes showing empty SAML configuration fields and a message at the top that says, "SSO Request is complete. Config removed successfully."
