@@ -278,6 +278,7 @@ func getAutomateHAInfraDetailHelper(infraConfigFilePath string) (*AutomateHAInfr
 }
 
 func FileContainingAutomateHAInfraDetails() (string, error) {
+
 	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
 		return automateHATerraformOutputFile, nil
 	}

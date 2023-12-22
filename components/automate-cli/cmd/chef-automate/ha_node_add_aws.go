@@ -164,6 +164,9 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 		return err
 	}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+
+	// TODO: Check if config.toml is getting updated after add node
+	_ = ani.modifyConfigForCertByIp()
 	syncErr := ani.nodeUtils.syncConfigToAllNodes()
 	if syncErr != nil {
 		if err != nil {
