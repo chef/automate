@@ -67,7 +67,7 @@
     "html-webpack-plugin": "=2.24.1",
     "istanbul-instrumenter-loader": "=1.1.0",
     "jasmine-core": "=2.4.1",
-    "jshint": "=2.8.0",
+    "jshint": "=2.13.6",
     "karma": "=0.13.22",
     "karma-browserstack-launcher": "=0.1.11",
     "karma-chrome-launcher": "=0.2.3",
