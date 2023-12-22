@@ -56,17 +56,47 @@ if [[ $(wait_until_healthy 5) -ne 0 ]]; then
 fi
 
 echo "Configuring index settings"
-curl \
-  -s \
-  -i \
-  -H 'Content-Type: application/json'\
-  -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
-  -k \
-  -u admin:admin \
+
+# Getting all indices 
+indices=$(curl -k -XGET https://${HOST}:{{cfg.network.port}}/_cat/indices -u "admin:admin" | awk '{print $3}' | awk '!/^(\.)/' | awk '!/security/')
+echo -e "list of indices\n$indices"
+
+# Looping over each index individually and patching "number_of_replica" from config (toml)
+for index in $indices;do
+echo -e " snapshot status for $index\n"
+curl -X PUT \
+  "https://${HOST}:{{cfg.network.port}}/$index/_settings?pretty=" \
+  -k -u admin:admin \
+  -H 'content-type: application/json' \
   -d '{
-    "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
-    "index.refresh_interval": "{{cfg.index.refresh_interval}}"
-  }'
+      "index" : {
+        "number_of_replicas" : "{{cfg.index.number_of_replicas}}",
+        "refresh_interval": "{{cfg.index.refresh_interval}}"
+      }
+    }'
+done
+
+# Getting all templates
+templates=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_cat/templates -k -u 'admin:admin'| awk '{print $1}')
+echo -e "list of templates\n$templates"
+
+# Looping over each template individually and patching "number_of_replica" from config (toml)
+for template in $templates;do
+echo -e " snapshot status for $template\n"
+index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/"$template"?pretty -u 'admin:admin' --insecure | jq  ".[\"${template}\"].index_patterns")
+echo -e "Index Pattern: $index_patterns"
+echo -e " snapshot status for $template\n"
+curl --location --request PUT "https://${HOST}:{{cfg.network.port}}/_template/$template" --header 'content-type: application/json' -k -u admin:admin \
+-d '{
+    "settings" : {
+      "index" : {
+        "number_of_replicas" : "{{cfg.index.number_of_replicas}}",
+        "refresh_interval" : "{{cfg.index.refresh_interval}}"
+      }
+    }
+}'
+
+done
 
 # The health-check hook will return an error unless we touch sentinel file to
 # signal to the health check that this hook has completed successfully.
