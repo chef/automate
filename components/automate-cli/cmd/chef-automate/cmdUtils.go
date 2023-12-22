@@ -268,8 +268,9 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 			}
 		}
 	}
-
+    fmt.Printf("\nExecuting command on remote Ip %s : %s",sshUtil.getSSHConfig().hostIP,command)
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, false)
+	fmt.Printf("\nError while connecting and executing on remote Ip %s : %s",sshUtil.getSSHConfig().hostIP,err)
 	if err != nil {
 		rc.Output = output
 		rc.Error = err
