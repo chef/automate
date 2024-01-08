@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -16,15 +17,15 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
 
-var backupPathFix = `sleep 5
+var backupPathFix = `#!/bin/sh
+sleep 5
 chef-automate status --wait-for-healthy > /dev/null
-indices=(
-chef-automate-es6-automate-cs-oc-erchef
+indices="chef-automate-es6-automate-cs-oc-erchef
 chef-automate-es6-compliance-service
 chef-automate-es6-event-feed-service
-chef-automate-es6-ingest-service
-)
-for index in ${indices[@]}; do
+chef-automate-es6-ingest-service"
+
+for index in $indices; do
 curl -XPUT -k -H 'Content-Type: application/json' http://localhost:10144/_snapshot/$index --data-binary @- << EOF
 {
 	"type" : "fs",
@@ -107,10 +108,29 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 			if config.Global.V1.Backups.Filesystem.Path.Value != "" && !isOSEnabled {
 				fmt.Println("Waiting till all the services comes in healthy state...")
 				backupScript := fmt.Sprintf(backupPathFix, strings.TrimSuffix(config.Global.V1.Backups.Filesystem.Path.Value, "/"))
-				_, err := exec.Command("/bin/sh", "-c", backupScript).Output()
-				if err != nil {
+				//fmt.Printf("backupScript: %v\n", backupScript)
+				//_, err := exec.Command("/bin/sh", "-c", backupScript).Output()
+				//fmt.Printf("bx: %v\n", string(bx))
+				//fmt.Printf("err: %v\n", err)
+				//fmt.Println("Script executed")
+				cmd := exec.Command("/bin/sh", "-c", backupScript)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+
+				if err := cmd.Start(); err != nil {
+					fmt.Printf("Failed to start script: %v\n", err)
 					return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configurations")
 				}
+
+				if err := cmd.Wait(); err != nil {
+					fmt.Printf("Script execution failed with error: %v\n", err)
+					return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configurations")
+				}
+
+				// if err != nil {
+				// 	return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configurations")
+				// }
+
 			}
 		}
 	}
