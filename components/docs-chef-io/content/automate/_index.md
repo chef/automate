@@ -36,7 +36,7 @@ This includes Chef Infra Client nodes, Infra Client runs, Chef Infra Servers, po
 Filterable dashboards collect configuration and compliance details for every datacenter, cloud provider, and environment under management.
 
 You can dig into the causes of compliance failures or configuration errors across your entire fleet, or filter reports by the systems that matter most.
-Use Chef Automate’s trend graphs, rich query language and other sophisticated interfaces to quickly sift through the noise and prioritize solutions.
+Use Chef Automate's trend graphs, rich query language and other sophisticated interfaces to quickly sift through the noise and prioritize solutions.
 
 Get a real-time view of all changes happening in your environment, whether user- or machine-initiated. See how configuration and compliance policy changes impact each other over time.
 
@@ -48,7 +48,7 @@ Chef Automate creates customizable [compliance reports]({{< relref "/automate/re
 
 You can write your own compliance rules in Chef InSpec, or get started by using built-in profiles -- which are predefined rule sets for a variety of security frameworks, such as Center for Internet Security (CIS) benchmarks or DISA Security Technical Implementation Guides (STIGs). Use these profiles to scan individual machines, VMs, and cloud environments for policy conformance without installing any agents.
 
-Examine past failures and trends to identify areas for targeted process improvement. Use reports to satisfy auditors’ questions about current and historical compliance.
+Examine past failures and trends to identify areas for targeted process improvement. Use reports to satisfy auditors' questions about current and historical compliance.
 
 ### Application monitoring
 
