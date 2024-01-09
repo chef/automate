@@ -240,6 +240,7 @@ DEPENDENCIES
   kitchen-vagrant
   rack (= 2.2.6.4)
   test-kitchen
+  
 
 BUNDLED WITH
    1.17.2
