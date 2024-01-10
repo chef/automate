@@ -759,6 +759,8 @@ github.com/russellhaering/goxmldsig v1.1.0/go.mod h1:QK8GhXPB3+AfuCrfo0oRISa9Nfz
 github.com/russross/blackfriday v0.0.0-20180428102519-11635eb403ff/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
+github.com/ryancragun/dex v2.13.0+incompatible h1:6y3bGwm+vHCsC22XPiYb0DKXlZqq/3DYACk29k7Tszc=
+github.com/ryancragun/dex v2.13.0+incompatible/go.mod h1:IozT/tlbc0NcDGRIsJL0G5DXFxwU7Y7ds2+08QUb7Jg=
 github.com/ryancragun/dex v2.19.0-incompatible+incompatible h1:anC6lCAupWWk/euqF6VivZKspUGSRLaOgqAgSvREnmk=
 github.com/ryancragun/dex v2.19.0-incompatible+incompatible/go.mod h1:IozT/tlbc0NcDGRIsJL0G5DXFxwU7Y7ds2+08QUb7Jg=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=

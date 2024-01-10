@@ -117,7 +117,10 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 )
 
-require github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+require (
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/ryancragun/dex v2.13.0+incompatible // indirect
+)
 
 require (
 	cloud.google.com/go v0.65.0 // indirect
@@ -251,7 +254,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-//...
+
 // https://github.com/dexidp/dex/issues/1578
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
 
