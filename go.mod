@@ -252,6 +252,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
+
 // https://github.com/dexidp/dex/issues/1578
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
 
