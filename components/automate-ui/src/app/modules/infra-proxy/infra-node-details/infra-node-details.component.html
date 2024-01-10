@@ -104,10 +104,13 @@
               <span class="label">Tags</span>
               <div class="node-tags-box">
                 <input chefInput type="text" id="tag-input" autocomplete="off" data-cy="add-tag"
-                  [ngClass]="saving ? 'disable' : ''" [(ngModel)]="inputTxt" />
+                  [ngClass]="saving ? 'disable' : ''" [(ngModel)]="inputTxt" (keyup)="handleTagsChange($event)"/>
                 <button primary type="submit" class="primary" [disabled]="(inputTxt === '') || saving"
                   data-cy="add-tag-button" (click)="addTags()"> Add </button>
               </div>
+              <p *ngIf='isHtmlTags' class="tag-note error">
+                Error: HTML tags and special characters are not allowed. Please remove them and try again.
+              </p>
               <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
               <div *ngIf="nodeTags?.length" class="display-node-tags" [ngClass]="saving ? 'disable' : ''"
                 data-cy="tag-box">
