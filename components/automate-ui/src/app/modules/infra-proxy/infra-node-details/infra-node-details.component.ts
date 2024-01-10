@@ -272,10 +272,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   }
 
   addTags() {
-    const htmlTagsRegex = /<\/?[^>]+(>|$)/;
-    const hasHtmlTags = htmlTagsRegex.test(this.inputTxt);
-
-    if (this.inputTxt !== '' && !hasHtmlTags) {
+    if (this.inputTxt !== '') {
       this.tags = this.tags.concat(this.inputTxt.replace(/^[,\s]+$|^[,\s]+$/g, '')
         .replace(/,[,\s]*,/g, ',').split(',').map(item => item.trim()));
       this.inputTxt = '';
@@ -534,7 +531,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   handleTagsChange(event: Event){
     const inputElement = event.target as HTMLInputElement;
-    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*(),.?":{}|<>]/;
+    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}|<>]/;
     const hasHtmlTags = htmlTagsRegex.test(inputElement.value);
     this.isHtmlTags = hasHtmlTags;
   }
