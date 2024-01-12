@@ -16,7 +16,7 @@ pkg_deps=(
   chef/mlsa/1.0.1/20200421170200
   core/bash/5.0.16/20200305233030
   core/curl/7.68.0/20200601114640
-  core/coreutils/8.30/20200305231640
+  core/coreutils
   core/libossp-uuid/1.6.2/20200319193820
 )
 

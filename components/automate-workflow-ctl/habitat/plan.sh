@@ -8,7 +8,7 @@ pkg_license=('Chef-MLSA')
 vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
-  core/coreutils/8.30/20200305231640
+  core/coreutils
   core/ruby/2.5.7/20200404130135
   core/bundler/2.1.4/20200504102934
   # NOTE(ssd) 2019-04-03: This dependency isn't needed, but we want to
