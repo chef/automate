@@ -323,7 +323,7 @@ fallbacks:
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/golang/appengine/master/LICENSE
     - name: gopkg.in/yaml.v2
-      licence_id: Apache-2.0
+      license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/go-yaml/yaml/v2.3.0/LICENSE
     - name: honnef.co/go/tools
       license_id: MIT
