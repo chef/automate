@@ -1,12 +1,2 @@
-{
-    "gateway": {
-      "backup": {
-        "gcs": {
-          "credentials": {
-            "json": "/gateway/backup/gcs/credentials.json"
-          }
-        }
-      }
-    }
-  }
+{{cfg.gateway.backup.gcs.credentials.json}}
   
