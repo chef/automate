@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
 import { ReplaySubject, Observable, Subject } from 'rxjs';
-import * as Sniffr from 'sniffr';
+import Sniffr from 'sniffr';
 
 import { ChefSessionService } from '../chef-session/chef-session.service';
 import { ConfigService } from '../config/config.service';
@@ -208,7 +208,7 @@ export class TelemetryService {
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
-          console.log(`Error retrieving Segment API key : ${status}/${message}`);
+          console.log(`Error retrieving Segment API key: ${status}/${message}`);
           if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesFailure(message));
           }

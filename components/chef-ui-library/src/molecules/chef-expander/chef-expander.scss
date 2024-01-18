@@ -5,7 +5,7 @@ chef-expander {
     display: none;
   }
 
-  &[opened] > * {
+  &[opened]:not([opened="false"]) > * {
     display: inherit;
   }
 }
