@@ -13,7 +13,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_svc_user="root"
 pkg_deps=(
-  core/coreutils
+  core/coreutils/8.32/20220311101609 
   core/bash
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
