@@ -108,11 +108,6 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 			if config.Global.V1.Backups.Filesystem.Path.Value != "" && !isOSEnabled {
 				fmt.Println("Waiting till all the services comes in healthy state...")
 				backupScript := fmt.Sprintf(backupPathFix, strings.TrimSuffix(config.Global.V1.Backups.Filesystem.Path.Value, "/"))
-				//fmt.Printf("backupScript: %v\n", backupScript)
-				//_, err := exec.Command("/bin/sh", "-c", backupScript).Output()
-				//fmt.Printf("bx: %v\n", string(bx))
-				//fmt.Printf("err: %v\n", err)
-				//fmt.Println("Script executed")
 				cmd := exec.Command("/bin/sh", "-c", backupScript)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
@@ -126,10 +121,6 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 					fmt.Printf("Script execution failed with error: %v\n", err)
 					return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configurations")
 				}
-
-				// if err != nil {
-				// 	return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configurations")
-				// }
 
 			}
 		}
