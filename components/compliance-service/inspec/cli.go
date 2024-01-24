@@ -16,7 +16,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // BackendCache used for configuring inspec exec command, passed in via config flag

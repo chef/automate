@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 const (

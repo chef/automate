@@ -1,6 +1,10 @@
 package systemresource
 
-import "github.com/shirou/gopsutil/disk"
+import (
+	"io/fs"
+
+	"github.com/shirou/gopsutil/disk"
+)
 
 type MockSystemResourceInfoImpl struct {
 	GetNumberOfCPUFunc    func() int
@@ -9,6 +13,7 @@ type MockSystemResourceInfoImpl struct {
 	GetDiskSpaceInfoFunc  func(string) (disk.UsageStat, error)
 	GetDiskPartitionsFunc func(all bool) ([]disk.PartitionStat, error)
 	FormatBytesFunc       func(bytes uint64) string
+	GetFilePermissionFunc func(string) (fs.FileMode, error)
 }
 
 func (mock *MockSystemResourceInfoImpl) GetNumberOfCPU() int {
@@ -33,4 +38,7 @@ func (mock *MockSystemResourceInfoImpl) GetDiskPartitions(all bool) ([]disk.Part
 
 func (mock *MockSystemResourceInfoImpl) FormatBytes(bytes uint64) string {
 	return mock.FormatBytesFunc(bytes)
+}
+func (mock *MockSystemResourceInfoImpl) GetFilePermission(dirPath string) (fs.FileMode, error) {
+	return mock.GetFilePermissionFunc(dirPath)
 }

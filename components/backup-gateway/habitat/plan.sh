@@ -11,6 +11,7 @@ pkg_bin_dirs=(bin)
 pkg_deps=(
   core/cacerts
   chef/automate-platform-tools
+  core/curl
 )
 
 
