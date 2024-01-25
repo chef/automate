@@ -284,3 +284,13 @@ external_os = false
   hashed_password = "$2a$12$yObdBmd8JFy2ar7nRjv46OYs3P3q5uB9llsrLRppWyAO/YOQ2JW3m"
 
 [tls]
+# root pem cert that signed the two cert/key pairs below
+rootCA = """"""
+# Certificate used for admin actions against https://9200
+admin_cert = """"""
+# the private key associated with the above pem cert
+admin_key = """"""
+# Certificate used for intracluster ssl on port 9300
+ssl_cert = """"""
+# the private key associated with the above pem cert
+ssl_key = """"""
