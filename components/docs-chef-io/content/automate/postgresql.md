@@ -1,8 +1,8 @@
 +++
 title = "PostgreSQL"
-
 date = 2022-01-04T12:09:09-08:00
 draft = false
+gh_repo = "automate"
 
 [menu]
   [menu.automate]
@@ -11,8 +11,6 @@ draft = false
     parent = "automate/configuring_automate/postgresql"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/postgresql.md)
 
 You can configure Chef Automate to use external PostgreSQL clusters that are not deployed via Chef Automate itself.
 
