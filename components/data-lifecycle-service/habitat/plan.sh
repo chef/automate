@@ -24,3 +24,4 @@ do_install() {
 do_strip() {
     :
 }
+

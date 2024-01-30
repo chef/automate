@@ -99,3 +99,4 @@ exec $(pkg_path_for ruby30)/bin/ruby -I $pkg_prefix/lib ${bin}.real \$@
 EOF
   chmod -v 755 "$bin"
 }
+
