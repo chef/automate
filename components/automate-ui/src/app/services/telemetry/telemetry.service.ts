@@ -1,4 +1,4 @@
-import { map, filter } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
