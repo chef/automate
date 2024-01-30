@@ -17,9 +17,9 @@ export class LicenseUsageService {
   private licenseId;
   private customerId;
   private customerName;
-  private totalNodes;
-  private totalScans;
-  private totalService;
+  public totalNodes;
+  public totalScans;
+  public totalService;
   private expiration;
   private daysSinceLasPost;
   private periodStartDate;

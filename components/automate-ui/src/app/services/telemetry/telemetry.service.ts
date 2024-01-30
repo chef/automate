@@ -18,6 +18,7 @@ import { ComplianceStatsService } from './compliance-stats/compliance-stats.serv
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
 import { ApplicationStatsService } from './application-stats/application-stats.service';
+import { LicenseUsageService } from '../license-usage/license-usage.service';
 
 declare let analytics: any;
 
@@ -72,7 +73,8 @@ export class TelemetryService {
     private store: Store<NgrxStateAtom>,
     private complianceStatsService: ComplianceStatsService,
     private applicationStatsService: ApplicationStatsService,
-    private clientRunsStatsService: ClientRunsStatsService) {
+    private clientRunsStatsService: ClientRunsStatsService,
+    private licenseUsageService: LicenseUsageService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
     router.events.subscribe((event) => {
@@ -84,7 +86,6 @@ export class TelemetryService {
     });
 
     this.configService.getConfig().pipe(
-      filter(config => config.telemetryEnabled),
       map((config) => {
         try {
           this.telemetryEnabled = config.telemetryEnabled;
@@ -93,6 +94,7 @@ export class TelemetryService {
           this.telemetryUrl = config.telemetryUrl;
           this.customerId = config.customerId;
           this.customerName = config.customerName;
+          this.licenseType = config.licenseType;
           this.licenseId = config.licenseId || configService.defaultLicenseId;
           this.maxNodes = config.maxNodes;
           this.instanceId = config.deploymentId || configService.defaultDeployId;
@@ -105,8 +107,7 @@ export class TelemetryService {
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
-        this.registerChefTelemetryTracker();
-        this.initiateTelemetry(trackingOperations);
+          this.initiateTelemetry(trackingOperations);
       });
   }
 
@@ -236,36 +237,52 @@ export class TelemetryService {
     }
     console.log('initializeChefTelemetryTracker');
     try {
-      if(chefTelemetryTracker && this.chefSessionService.telemetry_enabled) {
-        const chefTelemetryTrackerInitData = {
-          visitor: {
-            id: this.chefSessionService.uuid,
-            userName: this.chefSessionService.username,
-            fullName: this.chefSessionService.fullname,
-            telemetryPref: this.chefSessionService.telemetry_enabled,
-            isLocalUser: this.chefSessionService.isLocalUser,
-            group: this.chefSessionService.groups,
-            connector: this.chefSessionService.connector
-          },
-          account: {
-            id: this.customerId,
-            name: this.customerName,
-            instanceId: this.instanceId,
-            deploymentType: this.deploymentType,
-            deploymentId: this.deploymentId,
-            automateVersion: this.buildVersion,
-            licenseId: this.licenseId,
-            licenseType: this.licenseType,
-            licenseExpirationDate: this.licenseExpirationDate
-          }
+      const chefTelemetryTrackerInitData = {
+        visitor: {
+          "id": this.chefSessionService.uuid,
+          "telemetryPref": this.chefSessionService.telemetry_enabled,
+          "connector": this.encodeConnector(this.chefSessionService.connector)
+        },
+        account: {
+          "id": this.customerId,
+          "name": this.customerName,
+          "instanceId": this.instanceId,
+          "deploymentType": this.deploymentType,
+          "deploymentId": this.deploymentId,
+          "automateVersion": this.buildVersion,
+          "licenseId": this.licenseId,
+          "licenseType": this.licenseType,
+          "licenseExpirationDate": this.licenseExpirationDate,
+          "product": "Automate",
+          "scannedOn":(new Date).toISOString(),
+          "payload_version": 1,
+          "install_context": "habitat",
+          "origin": "user-interface",
+          "periods_summary_nodes_total": parseInt(this.licenseUsageService.totalNodes, 10),
+          "periods_summary_scans_targets": parseInt(this.licenseUsageService.totalScans, 10),
+          "periods_summary_services_targets": parseInt(this.licenseUsageService.totalService, 10)
         }
-        chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
-        localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
       }
+      chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
+      localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
     } catch(e) {
       console.log('Unable to initialize ChefTelemetryTracker ', e);
     }
     
+  }
+
+  encodeConnector(connectorType?: string) {
+    const connector = connectorType.toLowerCase();
+    let encodedConnector = 0;
+    switch(connector) {
+      case 'local':
+        encodedConnector = 1;
+      case 'saml':
+        encodedConnector = 2;
+      case 'ldap':
+        encodedConnector = 3;
+    }
+    return encodedConnector;
   }
 
   captureChefTelemetryEvent(event?: string, properties?: any) {
@@ -429,6 +446,8 @@ export class TelemetryService {
     } catch (error) {
       console.log(error);
     }
+    // initialise Pendo
+    this.registerChefTelemetryTracker();
     if (this.chefSessionService.telemetry_enabled) {
       this.isSkipNotification = true;
       this.engageTelemetry(trackingOperations);
