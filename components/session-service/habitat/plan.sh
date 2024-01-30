@@ -48,3 +48,4 @@ do_install() {
   cp -r migration/sql "${pkg_prefix}/migrations"
 }
 
+

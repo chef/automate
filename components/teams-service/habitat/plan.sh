@@ -47,3 +47,4 @@ do_install() {
   cp -r storage/postgres/migration/sql "${pkg_prefix}/migrations"
 }
 
+
