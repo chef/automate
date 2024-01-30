@@ -88,3 +88,4 @@ do_install() {
 do_after() {
   rm -rf ~/.netrc
 }
+

@@ -37,3 +37,4 @@ scaffolding_go_binary_list=(
 do_strip() {
   return 0
 }
+
