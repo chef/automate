@@ -57,7 +57,7 @@ To rotate certificates of entire cluster using single command, we need a certifi
 
     You can also use `--cc` instead of `--certificate-config` as a sort form.
 
-#### Sample Certificate template
+#### Sample Certificate Template
 
 ```toml
     [automate]
@@ -114,7 +114,7 @@ To rotate certificates of entire cluster using single command, we need a certifi
         private_key = "full path of os3-key.pem"
 ```
 
-### Rotate Certificates of each service
+### Rotate Certificates of Each Service
 
 If you want to rotate certificates of the entire cluster, then you can follow the below commands:
 

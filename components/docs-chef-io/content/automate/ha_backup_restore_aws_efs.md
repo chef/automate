@@ -27,7 +27,7 @@ gh_repo = "automate"
 
 A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the `path.repo` setting on all master and data nodes.
 
-### Setting up the backup configuration
+### Setting up the Backup Configuration
 
 - Create an EFS file system, please refer sample steps [here](https://docs.aws.amazon.com/efs/latest/ug/gs-step-two-create-efs-resources.html)
 
@@ -63,7 +63,7 @@ Configure the OpenSearch `path.repo` attribute.
 
 - Above command will restart the opensearch cluster.
 
-#### Healthcheck commands
+#### Healthcheck Commands
 
 - Following command can be run in the OpenSearch node
 
@@ -76,7 +76,7 @@ Configure the OpenSearch `path.repo` attribute.
     `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
     ```
 
-#### Configuration for Automate node from Bastion host
+#### Configuration for Automate Node from Bastion Host
 
 - Mount the EFS to all the Frontend node manually. For example you mount the EFS to folder structure `/mnt/automate_backups`
 - Create an `automate.toml` file on the bastion host using the following command:
@@ -106,7 +106,7 @@ Configure the OpenSearch `path.repo` attribute.
     ./chef-automate config patch --frontend automate.toml
     ```
 
-## Backup and Restore commands
+## Backup and Restore Commands
 
 ### Backup
 
