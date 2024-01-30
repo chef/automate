@@ -36,28 +36,30 @@ The certificate rotation is also required when the key for a node, client, or CA
 {{< /note >}}
 
 ### Rotate Cluster Certificates
+
 If you want to rotate certificates of the entire cluster using single command, then you can follow the below commands:
 
 To rotate certificates of entire cluster using single command, we need a certificate template.
-- To generate certificate template use below command
-```
-  chef-automate cert-rotate generate-certificate-config certificate-config.toml
-```
 
-now we can find our certificate template in `certificate-config.toml` file, please edit the file and put required certificate paths
+- To generate certificate template use below command
+
+    ```sh
+        chef-automate cert-rotate generate-certificate-config certificate-config.toml
+    ```
+
+    Now, we can find our certificate template in `certificate-config.toml` file, please edit the file and put required certificate paths
 
 - To rotate the certificates use below command
 
-```bash
-  chef-automate cert-rotate --certificate-config certificate-config.toml
-```
+    ```bash
+        chef-automate cert-rotate --certificate-config certificate-config.toml
+    ```
 
-You can also use `--cc` instead of `--certificate-config` as a sort form.
-
+    You can also use `--cc` instead of `--certificate-config` as a sort form.
 
 #### Sample Certificate template
 
-  ```toml
+```toml
     [automate]
       root_ca = "full path of root-ca.pem"
 
@@ -110,8 +112,7 @@ You can also use `--cc` instead of `--certificate-config` as a sort form.
         ip = "10.1.2.247"
         public_key = "full path of os3.pem"
         private_key = "full path of os3-key.pem"
-    ```
-
+```
 
 ### Rotate Certificates of each service
 
@@ -119,8 +120,8 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of automate cluster:
 
-    ```cmd 
-    chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --a2
+    ```cmd
+        chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --a2
     ```
 
     You can also use `--automate` or `-a` instead of a2 flag
@@ -128,7 +129,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 - To rotate certificates of chef server cluster:
 
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs
     ```
 
     You can also use `--chef_server`or `-c` instead of the cs flag.
@@ -136,7 +137,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 - To rotate certificates of the PostgreSQL cluster:
 
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --pg
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --pg
     ```
 
     You can also use `--postgresql` or `-p` instead of the pg flag.
@@ -144,7 +145,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 - To rotate certificates of OpenSearch cluster:
 
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os
     ```
 
     You can also use `--opensearch` or `-o` instead of the os flag.
@@ -158,7 +159,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 - To rotate the certificates of particular automate node:
 
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --a2 --node <IP of a particular automate node>
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --a2 --node <IP of a particular automate node>
     ```
 
     You can also use `--automate` or `-a` instead of a2 flag
@@ -166,7 +167,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 - To rotate the certificates of particular chef server node:
 
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs --node <IP of a particular chef server node>
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs --node <IP of a particular chef server node>
     ```
 
     You can also use `--chef_server` or `-c` instead of the cs flag.
@@ -175,9 +176,8 @@ If you want to rotate certificates of a particular node, then you can follow the
 
     {{< note >}} While rotating cert for PG on node level, make sure to wait for sometime before executing cert-rotate for next node. {{< /note >}}
 
-
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --pg --node <IP of a particular postgresql node>
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --pg --node <IP of a particular postgresql node>
     ```
 
     You can also use `--postgresql` or `-p` instead of the pg flag.
@@ -185,7 +185,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 - To rotate the certificates of a particular OpenSearch node:
 
     ```cmd
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular opensearch node>
+        chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular opensearch node>
     ```
 
     You can also use `--opensearch` or `-o` instead of the os flag
@@ -193,10 +193,9 @@ If you want to rotate certificates of a particular node, then you can follow the
 {{< note >}} Since admin-cert and admin-key are common in all nodes, So if you want to rotate admin-cert and admin-key, you must first run this open search cluster command: 
 `chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os`{{< /note >}}
 
-
 ### Rotate Automate Load Balancer Root CA
 
-To rotate the Automate Load balancer root certificate: 
+To rotate the Automate Load balancer root certificate:
 
 1. Create a root_ca.toml file with the following content. Replace server_name with Automate Fqdn and root_cert with Automate Load balancer root certificate. 
 
