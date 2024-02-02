@@ -9,13 +9,14 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 
 pkg_deps=(
-    core/coreutils/8.30/20200305231640
-    chef/mlsa/1.0.1/20200421170200
+    core/coreutils
+    chef/mlsa
 )
 pkg_build_deps=(
   core/make
   core/gcc
-  core/node/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  # core/node/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  core/node
   core/phantomjs
 )
 pkg_description="Web interface for Chef Automate Workflow"

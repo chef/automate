@@ -16,7 +16,8 @@ pkg_deps=(
 pkg_build_deps=(
   core/git
   core/make
-  core/node/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  # core/node/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  core/node
   core/rsync
 )
 pkg_exports=(
