@@ -12,44 +12,50 @@ gh_repo = "automate"
     weight = 75
 +++
 
-The Chef Automate HA equates to reliability, efficiency, and productivity which is built on Highly-Available Infrastructure. However, it lacks in providing visibility into health of Chef-Automate HA infrastructure, its components and its services.​ By integrating Monitoring, Alerting, and Centralized logging tools with Chef Automate HA, one can get the visibility into various Chef-Automate HA components' health.​
-
-Chef Suite is a set of solutions that most organizations trust to deliver their infrastructure management, automation, compliance, and remediation needs. Given the critical nature of these capabilities, organizations often implement high availability (HA) measures to guarantee the constant accessibility of the systems supporting the Chef solution.
+The Chef Automate HA equates to reliability, efficiency, and productivity which is built on Highly-Available Infrastructure. To improve visibility into health of Chef-Automate HA infrastructure, its components and its services one can integrate Automate HA cluster with industry leading monitoring, alerting and logging platforms.​ By integrating Monitoring, Alerting, and Centralized logging tools with Chef Automate HA, one can get the visibility into various Chef-Automate HA components' health.​
 
 ## Outcomes
 
 The integration comes with:
 
-- High uptime of critical Chef Automate HA infrastructure to maintain system stability.​
+- High uptime of critical Chef Automate HA infrastructure to maintain system stability
 
-- Monitoring of Automate HA services​.
+- Monitoring of Automate HA services​
 
-- Providing advance notification for potential failures.​
+- Providing advance notification for potential failures
 
-- Enabling dashboard and reporting capabilities for Chef-Automate HA cluster.​
+- Enabling dashboard and reporting capabilities for Chef-Automate HA cluster
 
-## Detailed Whitepapers
+Integrations with following monitoring, alerting and centralized logging platforms are available:
 
-The integration and monitoring has taken place using several which you can find in following explained documentation:
+## DataDog
 
-- [ELK Installation and Configuration](https://github.com/chef/monitoring-integration-automate/tree/main/ELK)
+Datadog is a monitoring and analytics platform that delivers real-time insights into application, infrastructure, and cloud service performance. Refer to the following links for the detailed whitepapers and blog documents.
 
-- [AWS CloudWatch](https://github.com/chef/monitoring-integration-automate/tree/main/cloud-watch)
+- [Automate HA and DataDog Integration](https://github.com/chef/monitoring-integration-automate/tree/main/data-dog)
 
-- [DataDog Integration](https://github.com/chef/monitoring-integration-automate/tree/main/data-dog)
+- [Technical Blog reference of Automate HA and DataDog](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/Eb2zXjNHa71Brszy3V_SqsoB0LtyGP7eaBXtBlaqj9rGSA?e=gJcC8b)
 
-- [Prometheus](https://github.com/chef/monitoring-integration-automate/tree/main/prometheus)
+## AWS CloudWatch
 
-## Detailed Blogs
+Chef Automate HA with AWS CloudWatch gives automate and compliance teams the necessary redundancy and visibility to successfully operate the solution. Refer to the following links for the detailed whitepapers and blog documents.
 
-The integration with different tools has been explained in the following blogs. You can refer to them for detailed integration process:
+- [Automate HA and CloudWatch Integration](https://github.com/chef/monitoring-integration-automate/tree/main/cloud-watch)
 
-- [How to set up Automate HA for Managed AWS service](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EQ6LJZh0mP1MhKuyCN91gTYBiRhISU8lxWjW4CZPBtI3LQ?e=REsUTX)
+- [Technical Blog reference of Automate HA and CloudWatch](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EQsURaeVai5Eszc9-3yiHWEBKCeDV0Nz-LhqC2giqefO-Q?e=KM0iWB)
 
-- [Monitoring Chef Automate HA with CloudWatch](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EQsURaeVai5Eszc9-3yiHWEBKCeDV0Nz-LhqC2giqefO-Q?e=KM0iWB)
+## Prometheus
 
-- [Monitoring Chef Automate HA with Datadog](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/Eb2zXjNHa71Brszy3V_SqsoB0LtyGP7eaBXtBlaqj9rGSA?e=gJcC8b)
+Prometheus, an open-source tool excels at scraping metrics from HTTP endpoints, making it a go-to for harvesting data from a variety of targets. Refer to the following links for the detailed whitepapers and blog documents.
 
-- [Monitoring Chef Automate HA with ELK](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/ERxHPHSM92RBnqxLL7GHlF8BNbdOzg_LuCHV-u4O4kH-pw?e=oB58sW)
+- [Automate HA and Prometheus Integration](https://github.com/chef/monitoring-integration-automate/tree/main/prometheus)
 
-- [Monitoring Chef Automate HA with Prometheus](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EZ23D4XeuKJGu-yMzmIehfwBPmTouhykSFqRhCJXdWSQWg?e=tysXun)
+- [Technical Blog reference of Automate HA and Prometheus](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EZ23D4XeuKJGu-yMzmIehfwBPmTouhykSFqRhCJXdWSQWg?e=tysXun)
+
+## ELK
+
+The ELK stack – a trio of open-source tools that has revolutionized the way businesses harness their data. Refer to the following links for the detailed whitepapers and blog documents.
+
+- [Automate HA and ELK Integration](https://github.com/chef/monitoring-integration-automate/tree/main/ELK)
+
+- [Technical Blog reference of Automate HA and ELK](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/ERxHPHSM92RBnqxLL7GHlF8BNbdOzg_LuCHV-u4O4kH-pw?e=oB58sW)
