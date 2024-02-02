@@ -16,6 +16,8 @@ The Chef Automate HA equates to reliability, efficiency, and productivity which 
 
 Chef Suite is a set of solutions that most organizations trust to deliver their infrastructure management, automation, compliance, and remediation needs. Given the critical nature of these capabilities, organizations often implement high availability (HA) measures to guarantee the constant accessibility of the systems supporting the Chef solution.
 
+## Outcomes
+
 The integration comes with:
 
 - High uptime of critical Chef Automate HA infrastructure to maintain system stability.​
@@ -26,6 +28,8 @@ The integration comes with:
 
 - Enabling dashboard and reporting capabilities for Chef-Automate HA cluster.​
 
+## Detailed Whitepapers
+
 The integration and monitoring has taken place using several which you can find in following explained documentation:
 
 - [ELK Installation and Configuration](https://github.com/chef/monitoring-integration-automate/tree/main/ELK)
@@ -35,6 +39,8 @@ The integration and monitoring has taken place using several which you can find 
 - [DataDog Integration](https://github.com/chef/monitoring-integration-automate/tree/main/data-dog)
 
 - [Prometheus](https://github.com/chef/monitoring-integration-automate/tree/main/prometheus)
+
+## Detailed Blogs
 
 The integration with different tools has been explained in the following blogs. You can refer to them for detailed integration process:
 
