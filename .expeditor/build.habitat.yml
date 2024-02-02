@@ -21,4 +21,4 @@ studio_secrets:
     path: secret/a2/a2ha/opensearch
     field: node1-key.pem    
   HAB_FALLBACK_CHANNEL:
-    value: "stable"
+    value: "refresh2024q1"
