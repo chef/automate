@@ -18,7 +18,6 @@ import { ComplianceStatsService } from './compliance-stats/compliance-stats.serv
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
 import { ApplicationStatsService } from './application-stats/application-stats.service';
-import { LicenseUsageService } from '../license-usage/license-usage.service';
 
 declare let analytics: any;
 
@@ -73,8 +72,7 @@ export class TelemetryService {
     private store: Store<NgrxStateAtom>,
     private complianceStatsService: ComplianceStatsService,
     private applicationStatsService: ApplicationStatsService,
-    private clientRunsStatsService: ClientRunsStatsService,
-    private licenseUsageService: LicenseUsageService) {
+    private clientRunsStatsService: ClientRunsStatsService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
     router.events.subscribe((event) => {
@@ -229,13 +227,23 @@ export class TelemetryService {
     setTimeout(this.registerChefTelemetryTracker,100);
   }
 
-  initializeChefTelemetryTracker() {
+  async initializeChefTelemetryTracker() {
     
     if(!this.licenseExpirationDate) {
       setTimeout(() => { this.initializeChefTelemetryTracker() }, 1000);
       return;
     }
     console.log('initializeChefTelemetryTracker');
+
+    const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
+    const totalScans = complianceUsageStats['node_cnt'];
+    console.log('complianceUsageStats ',complianceUsageStats);
+    const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
+    const totalNodes = nodeUsageStats['node_cnt'];
+    console.log('nodeUsageStats ',nodeUsageStats);
+    const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
+    const totalService = applicationUsageStats['total_services'];
+    console.log('applicationUsageStats ',applicationUsageStats);
     try {
       const chefTelemetryTrackerInitData = {
         visitor: {
@@ -258,11 +266,12 @@ export class TelemetryService {
           "payload_version": 1,
           "install_context": "habitat",
           "origin": "user-interface",
-          "periods_summary_nodes_total": parseInt(this.licenseUsageService.totalNodes, 10),
-          "periods_summary_scans_targets": parseInt(this.licenseUsageService.totalScans, 10),
-          "periods_summary_services_targets": parseInt(this.licenseUsageService.totalService, 10)
+          "periods_summary_nodes_total": parseInt(totalNodes, 10),
+          "periods_summary_scans_targets": parseInt(totalScans, 10),
+          "periods_summary_services_targets": parseInt(totalService, 10)
         }
       }
+      console.log('chefTelemetryTrackerInitData ',chefTelemetryTrackerInitData);
       chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
       localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
     } catch(e) {
