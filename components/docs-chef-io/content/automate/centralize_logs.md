@@ -1,5 +1,5 @@
 +++
-title = "Centralize Chef Automate Logs to a File"
+title = "Centralize Chef Automate Logs"
 
 draft = false
 aliases = ['/automate/centralizing_log/']
@@ -14,7 +14,7 @@ gh_repo = "automate"
     weight = 42
 +++
 
-You can centralize Chef Automate logs to a file. This is helpful if you want to transmit the Automate log to a third-party application like Splunk or Logstash.
+You can centralize Chef Automate logs to a file and configure log rotation and retention. This is helpful if you want to transmit the Automate log to a third-party application like Splunk or Logstash.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ The following utilities must be present in your environment:
 
 These come by default with all the operating systems we support.
 
-## Patch the Chef Automate configuration
+## Configure log centralization
 
 To centralize the log to a file, you must patch your Automate configuration.
 
@@ -35,18 +35,12 @@ To centralize the log to a file, you must patch your Automate configuration.
     [global.v1.log]
     redirect_sys_log = true
     redirect_log_file_path = "<PATH/TO/LOG/DIRECTORY>"
-    compress_rotated_logs = false
-    max_size_rotate_logs = "10M"
-    max_number_rotated_logs = 10
     ```
 
     Set the following values:
 
     - `redirect_sys_log`: Whether to save the system logs to a file. Set to `true` to save to a file. Default value: `false`.
     - `redirect_log_file_path`: The path to the directory that you want to save the Automate log to. This value is required if `redirect_sys_log` is `true`.
-    - `compress_rotated_logs`: Optional. Whether to compress log files. Valid values are `true` or `false`. Default value: `false`.
-    - `max_size_rotate_logs`: Optional. The maximum size of rotated log files. The log files will rotate once the file size reaches the specified size. This accepts units in megabytes (`M`) and kilobytes (`K`). Default value: `10M`.
-    - `max_number_rotated_logs`: Optional. The number of file logs you want to save. This limits the number of backup files in storage. The maximum number of log files you can store is 10 per day. Default value: `10`.
 
 1. Patch the Chef Automate configuration.
 
@@ -68,11 +62,57 @@ To centralize the log to a file, you must patch your Automate configuration.
     chef-automate config patch --postgresql </PATH/TO/TOML/FILE>
     ```
 
-    After you patch the Automate configuration, Automate saves the `automate.log` files to the location specified in `redirect_log_file_path`.
+    After you patch the Automate configuration, Automate saves the log files to the location specified in `redirect_log_file_path`.
 
-### Centralize all node logs to one location
+## Configure log rotation and retention
 
-You can configure all nodes in a Chef Automate HA cluster to save log files to one log location. To do this, mount a network file system (NFS) or network-attached storage (NAS) to all the frontend and backend nodes in the Automate HA cluster, then patch the Automate configuration as described in the previous procedure.
+To configure log rotation and retention, you must patch your Automate configuration.
+
+1. Create a TOML file with the following content on the node running Chef Automate in a standalone deployment or on the bastion host in an Automate HA cluster:
+
+    ```toml
+    [global.v1.log]
+    redirect_sys_log = true
+    redirect_log_file_path = "<PATH/TO/LOG/DIRECTORY>"
+    compress_rotated_logs = true
+    max_size_rotate_logs = "10M"
+    max_number_rotated_logs = 10
+    ```
+
+    Set the following values:
+
+    - `redirect_sys_log`: Whether to save the system logs to a file. Set to `true` to save to a file. Default value: `false`.
+    - `redirect_log_file_path`: The path to the directory that you want to save the Automate log to. This value is required if `redirect_sys_log` is `true`.
+    - `compress_rotated_logs`: Whether to compress log files. Valid values are `true` or `false`. Default value: `false`.
+    - `max_size_rotate_logs`: The maximum size of rotated log files. The log files will rotate once the file size reaches the specified size. This accepts units in megabytes (`M`) and kilobytes (`K`). Default value: `10M`.
+    - `max_number_rotated_logs`: The number of file logs you want to save. This limits the number of backup files in storage. The maximum number of log files you can store is 10 per day. Default value: `10`.
+
+1. Patch the Chef Automate configuration.
+
+    To patch a standalone Chef Automate node or Chef Automate HA nodes in a cluster:
+
+    ```bash
+    sudo chef-automate config patch </PATH/TO/TOML/FILE>
+    ```
+
+    To patch OpenSearch nodes in Chef Automate HA cluster:
+
+    ```bash
+    chef-automate config patch --opensearch </PATH/TO/TOML/FILE>
+    ```
+
+    To patch PostgreSQL nodes in Chef Automate HA cluster:
+
+    ```bash
+    chef-automate config patch --postgresql </PATH/TO/TOML/FILE>
+    ```
+
+    After you patch the Automate configuration, Automate saves and rotates the log files in the location specified in `redirect_log_file_path`.
+
+## Centralize all node logs to one location
+
+You can configure all nodes in a Chef Automate HA cluster to save log files to one log location.
+To do this, mount a network file system (NFS) or network-attached storage (NAS) to all the frontend and backend nodes in the Automate HA cluster, then patch the Automate configuration as described in the previous procedures.
 
 ## Consolidate logs using Splunk
 
@@ -87,14 +127,14 @@ For information about configuring Splunk, see [Splunk's Universal Forwader docum
     ./splunk start --accept-license
     ```
 
-1. Add a monitor for the Automate log file to your Splunk forwarder:
+1. Add a monitor for the Automate log files to your Splunk forwarder. For example:
 
     ```bash
     ./splunk add monitor <PATH/TO/LOG/DIRECTORY>/automate.log
     ```
 
-    Replace `<PATH/TO/LOG/DIRECTORY>` with the path to the directory where the `automate.log` is saved.
-    The default path to the `automate.log` file is `/var/tmp/automate.log`.
+    Replace `<PATH/TO/LOG/DIRECTORY>` with the path to the directory where the automate logs are saved.
+    The default path to the  file is `/var/tmp/`.
 
     Splunk returns:
 
