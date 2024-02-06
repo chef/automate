@@ -20,7 +20,7 @@ pkg_deps=(
   core/net-tools
   core/procps-ng
   core/util-linux
-  "aishwarya2001a/automate-platform-tools/0.1.0/20240201072529"
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
   core/bash
   core/cacerts # fetching manifest over HTTPS
   core/certstrap
