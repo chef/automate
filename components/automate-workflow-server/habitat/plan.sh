@@ -12,7 +12,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   core/bash
   core/coreutils
-  core/curl/7.68.0
+  core/curl
   core/erlang18
   core/gawk
   core/gcc-libs
@@ -30,8 +30,8 @@ pkg_deps=(
   # packages.
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 
-  core/bundler/2.1.4/20200504102934
-  core/ruby/2.5.7/20200404130135
+  core/bundler
+  core/ruby25
   "${vendor_origin}/automate-workflow-ctl"
 )
 
