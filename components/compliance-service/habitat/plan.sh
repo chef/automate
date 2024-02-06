@@ -35,7 +35,7 @@ pkg_svc_user=root
 inspec_release="chef/inspec/4.56.22/20240130061718"
 pkg_deps=(
   core/coreutils
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "aishwarya2001a/automate-platform-tools/0.1.0/20240201072529"
   "${inspec_release}"
   chef/mlsa
   core/grpcurl              # Used in habitat/hooks/health_check
@@ -54,7 +54,7 @@ else
   )
 fi
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="aishwarya2001a/automate-scaffolding-go/0.1.0/20240201071731"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

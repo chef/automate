@@ -12,8 +12,8 @@ pkg_upstream_url="http://github.com/chef/a2-ha-backend/components/automate-backe
 pkg_deps=(
   core/bash
   core/ruby30
-  chef/automate-openjdk
-  chef/automate-ha-opensearch
+  aishwarya2001a/automate-openjdk
+  aishwarya2001a/automate-ha-opensearch/1.3.14/20240205105934
 )
 pkg_build_deps=(
   core/make

@@ -20,7 +20,7 @@ pkg_deps=(
   core/net-tools
   core/procps-ng
   core/util-linux
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "aishwarya2001a/automate-platform-tools/0.1.0/20240201072529"
   core/bash
   core/cacerts # fetching manifest over HTTPS
   core/certstrap
@@ -40,7 +40,7 @@ pkg_exports=(
 )
 
 pkg_svc_user=root
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="aishwarya2001a/automate-scaffolding-go/0.1.0/20240201071731"
 scaffolding_no_platform=true # Don't inject automate platform scaffolding
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
