@@ -24,8 +24,8 @@ pkg_deps=(
   core/bash # hooks
   chef/mlsa
   core/curl # health_check
-  chef/automate-openjdk
-  chef/automate-platform-tools
+  aishwarya2001a/automate-openjdk
+  aishwarya2001a/automate-platform-tools/0.1.0/20240201072529
   core/ruby30
 )
 pkg_interpreters=(bin/ruby)
@@ -95,7 +95,7 @@ do_install() {
   chmod 775 $PLAN_CONTEXT/config/securityconfig/roles_mapping.yml
   echo "......................................................................."
 
-  chmod 775 $(pkg_path_for chef/automate-openjdk)/lib/security/cacerts
+  chmod 775 $(pkg_path_for aishwarya2001a/automate-openjdk)/lib/security/cacerts
 
 
 }
