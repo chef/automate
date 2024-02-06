@@ -10,19 +10,19 @@ pkg_description="Chef Automate Workflow server"
 pkg_upstream_url="https://www.chef.io/automate"
 
 pkg_deps=(
-  core/bash/5.0.16/20200305233030
-  core/coreutils/8.30/20200305231640
-  core/curl/7.68.0/20200319191535
-  core/erlang18/18.3/20200404000818
-  core/gawk/5.0.1/20200305233704
-  core/gcc-libs/9.1.0/20200305225533
-  core/grep/3.3/20200305232635
-  core/git/2.26.2/20200501062454
-  core/glibc/2.29/20200305172459
-  core/openssh/7.5p1/20200319192011
-  core/tzdata/2018g/20200403124218
-  core/jq-static/1.6/20190703002933
-  chef/mlsa/1.0.1/20200421170200
+  core/bash
+  core/coreutils
+  core/curl/7.68.0
+  core/erlang18
+  core/gawk
+  core/gcc-libs
+  core/grep
+  core/git
+  core/glibc
+  core/openssh
+  core/tzdata
+  core/jq-static
+  chef/mlsa
 
   # NOTE(ssd) 2019-04-03: Any in-repo dependencies added here MUST be
   # shared with automate-workflow-ctl until we either combine these
