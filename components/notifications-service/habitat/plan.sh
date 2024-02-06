@@ -64,7 +64,7 @@ pkg_srcs=(
   # TODO: VERSION should be in this list
 )
 
-pkg_scaffolding="aishwarya2001a/automate-scaffolding/0.1.0/20240201080453"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
   mkdir -p "${CACHE_PATH}/server"
