@@ -32,7 +32,7 @@ pkg_deps=(
 
   core/bundler/2.1.4/20200504102934
   core/ruby/2.5.7/20200404130135
-  "aishwarya2001a/automate-workflow-ctl/1.0.0/20240202063759"
+  "${vendor_origin}/automate-workflow-ctl"
 )
 
 pkg_build_deps=(
