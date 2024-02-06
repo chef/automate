@@ -22,8 +22,8 @@ pkg_deps=(
   core/bash # hooks
   chef/mlsa
   core/curl # health_check
-  aishwarya2001a/automate-openjdk
-  aishwarya2001a/automate-platform-tools/0.1.0/20240201072529
+  chef/automate-openjdk
+  chef/automate-platform-tools
 )
 pkg_bin_dirs=(os/bin)
 pkg_lib_dirs=(lib)

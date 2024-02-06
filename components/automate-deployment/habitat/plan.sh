@@ -40,7 +40,7 @@ pkg_exports=(
 )
 
 pkg_svc_user=root
-pkg_scaffolding="aishwarya2001a/automate-scaffolding-go/0.1.0/20240201071731"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_no_platform=true # Don't inject automate platform scaffolding
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate

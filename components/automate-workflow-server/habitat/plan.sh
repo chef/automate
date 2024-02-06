@@ -28,7 +28,7 @@ pkg_deps=(
   # shared with automate-workflow-ctl until we either combine these
   # packages or remove all shared dependencies between the two
   # packages.
-  aishwarya2001a/automate-platform-tools/0.1.0/20240201072529
+  ${local_platform_tools_origin:-chef}/automate-platform-tools
 
   core/bundler/2.1.4/20200504102934
   core/ruby/2.5.7/20200404130135
@@ -58,7 +58,7 @@ pkg_exports=(
 
 pkg_exposes=(port git_ssh_port)
 
-pkg_scaffolding="aishwarya2001a/automate-scaffolding/0.1.0/20240201080453"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_download() {
