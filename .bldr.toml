@@ -971,6 +971,7 @@ paths = [
   "lib/user/*"
 ]
 
+
 [data-feed-service]
 plan_path = "components/data-feed-service"
 paths = [
@@ -1288,19 +1289,6 @@ paths = [
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
-[automate-workflow-ctl]
-plan_path = "components/automate-workflow-ctl"
-paths = [
-  "components/automate-workflow-server/*",
-  "components/automate-workflow-ctl/*"
-]
-
-[automate-workflow-server]
-plan_path = "components/automate-workflow-server"
-paths = [
-  "components/automate-workflow-ctl/*",
-  "components/automate-workflow-server/*"
-]
 
 [automate-ui]
 plan_path = "components/automate-ui"
