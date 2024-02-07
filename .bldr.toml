@@ -971,18 +971,6 @@ paths = [
   "lib/user/*"
 ]
 
-[automate-workflow-nginx]
-plan_path = "components/automate-workflow-nginx"
-paths = [
-  "components/automate-workflow-nginx/*"
-]
-
-[automate-workflow-web]
-plan_path = "components/automate-workflow-web"
-paths = [
-  "components/automate-workflow-web/*"
-]
-
 [data-feed-service]
 plan_path = "components/data-feed-service"
 paths = [
