@@ -9,13 +9,13 @@ vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
   core/coreutils
-  core/ruby25/2.5.9/20240107073939
+  core/ruby25
   core/bundler
   # NOTE(ssd) 2019-04-03: This dependency isn't needed, but we want to
   # make sure that this package always gets built whenever
   # automate-workflow-server gets built so we have to share all
   # in-repo dependencies.
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
+  #${local_platform_tools_origin:-chef}/automate-platform-tools
 )
 pkg_build_deps=(
   core/gcc
@@ -68,7 +68,7 @@ do_install() {
     --binstubs
 
   fix_interpreter "$pkg_prefix/bin/*" core/coreutils bin/env
-  fix_interpreter "$pkg_prefix/bin/*" core/ruby25 bin/ruby
+  fix_interpreter "$pkg_prefix/bin/*" core/ruby bin/ruby
   fix_interpreter "$pkg_prefix/bin/knife" core/coreutils bin/env
 
   build_line "Creating bundler config"
