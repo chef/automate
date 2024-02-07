@@ -8,9 +8,9 @@ pkg_license=('Chef-MLSA')
 vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
-  core/coreutils/8.30/20200305231640
-  core/ruby/2.5.7/20200404130135
-  core/bundler/2.1.4/20200504102934
+  core/coreutils
+  core/ruby25/2.5.9/20240107073939
+  core/bundler
   # NOTE(ssd) 2019-04-03: This dependency isn't needed, but we want to
   # make sure that this package always gets built whenever
   # automate-workflow-server gets built so we have to share all
@@ -18,9 +18,9 @@ pkg_deps=(
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 )
 pkg_build_deps=(
-  core/gcc/9.1.0/20200305180723
-  core/git/2.26.2/20200601121014
-  core/make/4.2.1/20200306002515
+  core/gcc
+  core/git
+  core/make
 )
 pkg_lib_dirs=(lib)
 pkg_bin_dirs=(bin)
@@ -68,7 +68,7 @@ do_install() {
     --binstubs
 
   fix_interpreter "$pkg_prefix/bin/*" core/coreutils bin/env
-  fix_interpreter "$pkg_prefix/bin/*" core/ruby bin/ruby
+  fix_interpreter "$pkg_prefix/bin/*" core/ruby25 bin/ruby
   fix_interpreter "$pkg_prefix/bin/knife" core/coreutils bin/env
 
   build_line "Creating bundler config"

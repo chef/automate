@@ -32,7 +32,7 @@ pkg_binds_optional=(
 )
 #Adding it to use compliance with firejail
 pkg_svc_user=root
-inspec_release="chef/inspec/4.56.22/20220517052126"
+inspec_release="chef/inspec/4.56.22/20240130061718"
 pkg_deps=(
   core/coreutils
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
