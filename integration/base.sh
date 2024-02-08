@@ -248,10 +248,10 @@ append_version_file() {
 }
 
 set_version_file() {
-    hab pkg install --binlink core/jq-static
+    hab pkg install --binlink core/jq-static --force
 
     #prepare the versions.json file
-    newversion=$(/bin/jq -r -c ".build"  "$test_manifest_path")
+    newversion=$(jq -r -c ".build"  "$test_manifest_path")
     echo $newversion
     versionsFile="/tmp/versions.json"
     echo '[]' > $versionsFile
