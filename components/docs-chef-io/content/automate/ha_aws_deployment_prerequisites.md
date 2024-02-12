@@ -18,7 +18,7 @@ automate = "AWS Deployment Prerequisites"
 The below prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
 {{< /warning >}}
 
-Before installing Chef automate HA in AWS deployment mode, ensure you have taken a quick tour of this prerequisite page.
+Before installing Chef Automate HA in AWS deployment mode, ensure you have taken a quick tour of this prerequisite page.
 
 ## Chef Automate Architecture
 

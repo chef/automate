@@ -64,7 +64,7 @@ In the above specifications:
 
 ### Patch the Log Configuration
 
-Once you have created the **automate.log** file, patch the above configurations to chef automate. Patching the configuration will start transmitting the `automate.log` file wherever the location is specified in `redirect_log_file_path`.
+Once you have created the **automate.log** file, patch the above configurations to Chef Automate. Patching the configuration will start transmitting the `automate.log` file wherever the location is specified in `redirect_log_file_path`.
 
 ```bash
 sudo chef-automate config patch config.toml

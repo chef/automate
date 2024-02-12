@@ -158,7 +158,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 ## In-place Migration (Chef Backend to Automate HA)
 
-As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the chef backend infrastructure.
+As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the Chef Backend infrastructure.
 
 {{< note >}} In-place Migration will require downtime, so plan accordingly. A reduced performance should be expected with this. {{< /note >}}
 
@@ -223,8 +223,8 @@ Where:
     - Update the `instance_count`
     - fqdn : load balance URL, which points to the frontend node.
     - keys : ssh username and private keys
-    - Ensure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
-    - Ensure to provide Chef backend's backend server IPs for Automate HA PostgreSQL and OpenSearch machines.
+    - Ensure to provide Chef Backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
+    - Ensure to provide Chef Backend's backend server IPs for Automate HA PostgreSQL and OpenSearch machines.
     - Sample configuration; please modify according to your needs.
 
     ```sh

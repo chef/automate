@@ -405,7 +405,7 @@ You can get the information about all snapshot repositories registered in the cl
 GET _snapshot/_all
 ```
 
-Take a backup of chef automate updated config with details of external PostgreSQL/OpenSearch to a new file like `full_config.toml` by running the following command:
+Take a backup of Chef Automate updated config with details of external PostgreSQL/OpenSearch to a new file like `full_config.toml` by running the following command:
 
 ```shell
 chef-automate config show > full_config.toml
