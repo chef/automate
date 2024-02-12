@@ -1,13 +1,13 @@
 +++
-title = "On-Prem Deployment with AWS Managed Database"
+title = "On-Premises Deployment with AWS Managed Database"
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-Prem Deployment with AWS Managed Database"
+    title = "On-Premises Deployment with AWS Managed Database"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_with_aws_managed_deployment.md On-premise Deployment with AWS Managed Database"
+    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_with_aws_managed_deployment.md On-premises Deployment with AWS Managed Database"
     weight = 210
 +++
 
@@ -15,7 +15,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /note >}}
 
-This section will discuss deploying Chef Automate HA on-premise machines with AWS Managed Database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
+This section will discuss deploying Chef Automate HA on-premises machines with AWS Managed Database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 

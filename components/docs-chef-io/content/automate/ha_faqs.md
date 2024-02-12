@@ -20,9 +20,9 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Frequently Asked Questions
 
-### What are different ways to provision an on-premise deployment?
+### What are different ways to provision an on-premises deployment?
 
-- There are two types of infrastructure to provision on-premise deployment as follows:
+- There are two types of infrastructure to provision on-premises deployment as follows:
     -  Existing Infrastructure
     -  Existing Cloud Infrastructure
         -  AWS
