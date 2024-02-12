@@ -111,7 +111,7 @@ done
 
     Check the status using the `hab svc status` command. None of the services should be running. Once checked, stop the habitat supervisor with the command `systemctl stop hab-sup`. Rename /hab dir to something else like /hab-old.
 
-1. Unload services from each of the Elasticsearch Nodes
+1. Unload services from each of the ElasticSearch Nodes
 
     ```sh
     sudo hab svc unload chef/automate-backend-elasticsidecar
@@ -249,7 +249,7 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 
 1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
 2. While restoring the backup if an error related to backup directory occurs like
-> **Error in Automate node:** failed to create snapshot repository: Elasticsearch repository create request failed for repo**
+> **Error in Automate node:** failed to create snapshot repository: ElasticSearch repository create request failed for repo**
 > OR
 > **Error in OpenSearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
 

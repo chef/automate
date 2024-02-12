@@ -31,7 +31,7 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 `On-Premise`
 : To deploy on customer created Chef Automate HA cluster.
 
-`Aws`
+`AWS`
 : To deploy in AWS environment. Cluster will be created by Automate HA.
 
 `Deployment`
@@ -73,7 +73,7 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 : Chef Automate FQDN. For example, `chefserver.example.com`.
 
 `Chef Server FQDN ARN`
-: For Aws deployment ARN name is required for Chef Servers FQDN domain.
+: For AWS deployment ARN name is required for Chef Servers FQDN domain.
 
 `Chef Server FQDN Root Certificate`
 : SSL root certificate for Chef Infra Server FQDN domain.
@@ -222,13 +222,13 @@ Settings for AWS-managed or customer-managed databases.
 
 ### AWS OpenSearch
 
-`Aws OpenSearch snapshot arn`
+`AWS OpenSearch snapshot arn`
 : Snapshot arn is required to take a backup from AWS OpenSearch
 
-`Aws OpenSearch snapshot user accesskey`
+`AWS OpenSearch snapshot user accesskey`
 : Snapshot user accesskey is required to take a backup from AWS OpenSearch
 
-`Aws OpenSearch snapshot secret key`
+`AWS OpenSearch snapshot secret key`
 : Snapshot user accesskey is required to take a backup from AWS OpenSearch. Refer to the [Enabling OpenSearch Backup Restore](/automate/managed_services/#enabling-opensearch-backup-restore) section, to create them and get their values.
 
 ## Backup
