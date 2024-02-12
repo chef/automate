@@ -27,7 +27,7 @@ gh_repo = "automate"
 
 A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the `path.repo` setting on all master and data nodes.
 
-### Setting up the Backup Configuration
+### Setup your Backup Configuration
 
 - Create an EFS file system, please refer sample steps [here](https://docs.aws.amazon.com/efs/latest/ug/gs-step-two-create-efs-resources.html)
 

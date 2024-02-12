@@ -134,14 +134,14 @@ Now check the status of the Automate node and then try running the restore comma
          [global.v1.backups.s3.bucket]
             name = "<BUCKET_NAME>"
             base_path = "automate"
-      ```  
+      ```
 
       - You can choose any value for the variable `base_path`. `base_path` patch is only required for the frontend node.
       - Use the command to apply the above template `chef-automate config patch frontend.toml --fe`
       - Post the configuration patch, and use the curl request to validate
 
          ```sh
-            curl localhost:10144/_snapshot?pretty
+         curl localhost:10144/_snapshot?pretty
          ```
 
       - If the response is empty `{}`, then we are good
