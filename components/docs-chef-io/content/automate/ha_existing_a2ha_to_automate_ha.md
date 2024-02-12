@@ -103,12 +103,12 @@ done
 1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
 
     ```bash
-    sudo chef-automate config show > current_config.toml 
+    sudo chef-automate config show > current_config.toml
     ```
 
 1. Add the OpenSearch credentials to the applied config.
 
-    - If using Chef Managed Opensearch, add the config below into `current_config.toml` (without any changes).  
+    - If using Chef Managed OpenSearch, add the config below into `current_config.toml` (without any changes).
 
         ```bash
         [global.v1.external.opensearch.auth.basic_auth]

@@ -138,7 +138,7 @@ In case the backup configuration was skipped in the deployment config.toml, the 
 
 {{<note>}}
 
-While configuring the backup configuration provide the path of **Elasticsearch** instead of **Opensearch** as A2HA backup was in Elasticsearch directory
+While configuring the backup configuration provide the path of **ElasticSearch** instead of **OpenSearch** as A2HA backup was in ElasticSearch directory
 like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`
 
 {{</note>}}
@@ -205,7 +205,7 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 
 {{< note >}}
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
-1. Reset the backup configuration path to Opensearch so that new backups will be stored in Opensearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
+1. Reset the backup configuration path to OpenSearch so that new backups will be stored in OpenSearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 {{< /note >}}
 
 ## Validate successful migration
@@ -251,6 +251,6 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 2. While restoring the backup if an error related to backup directory occurs like
 > **Error in Automate node:** failed to create snapshot repository: Elasticsearch repository create request failed for repo**
 > OR
-> **Error in Opensearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
+> **Error in OpenSearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
 
 please re-check your EFS backup configuration for the Automate and OpenSearch node, click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.

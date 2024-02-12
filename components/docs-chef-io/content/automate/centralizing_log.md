@@ -96,7 +96,7 @@ In the above specifications:
 To configure the centralizing log feature for OpenSearch in Chef Automate HA, run the following command:
 
 ```toml
-chef-automate config patch --opensearch <file/path/to/toml>
+chef-automate config patch -- <file/path/to/toml>
 ```
 
 ## Configure Logs for PostgreSQL in Chef Automate HA

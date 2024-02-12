@@ -88,6 +88,6 @@ To create self-signed certificate for FQDN make sure to provide proper DNS and C
 
 {{< note >}}
 
-Please refer Opensearch certificate [documentation](https://opensearch.org/docs/1.2/security-plugin/configuration/tls/#x509-pem-certificates-and-pkcs-8-keys)
+Please refer OpenSearch certificate [documentation](https://opensearch.org/docs/1.2/security-plugin/configuration/tls/#x509-pem-certificates-and-pkcs-8-keys)
 
 {{< /note >}}

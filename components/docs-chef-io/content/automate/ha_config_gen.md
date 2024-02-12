@@ -86,8 +86,8 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 `Chef Server node count`
 : Number of nodes we want to keep for Chef Server, in case of On-Premise deployment need to provide IP Address for all nodes.
 
-`Opensearch node count`
-: Number of nodes we want to keep for Opensearch, in case of On-Premise deployment need to provide IP Address for all nodes.
+`OpenSearch node count`
+: Number of nodes we want to keep for OpenSearch, in case of On-Premise deployment need to provide IP Address for all nodes.
 
 `Postgresql node count`
 : Number of nodes we want to keep for Postgresql, in case of On-Premise deployment need to provide IP Address for all nodes.
@@ -178,10 +178,10 @@ Settings for AWS-managed or customer-managed databases.
 
 ### OpenSearch
 
-`Opensearch domain name`
-: Opensearch domain name deployed on AWS or customer environment.
+`OpenSearch domain name`
+: OpenSearch domain name deployed on AWS or customer environment.
 
-`Opensearch domain url`
+`OpenSearch domain url`
 : For AWS managed provide domain URL without port and protocol.
 
   For example, `opensearch.example.com`.
@@ -190,13 +190,13 @@ Settings for AWS-managed or customer-managed databases.
 
   For example, `opensearch.example.com:9200`.
 
-`Opensearch user name`
+`OpenSearch user name`
 : Username to login to OpenSearch.
 
-`Opensearch user passwords`
+`OpenSearch user passwords`
 : Password to login to OpenSearch.
 
-`Opensearch root-ca`
+`OpenSearch root-ca`
 : SSL root certificates to connect with OpenSearch.
 
   If you have AWS managed databases we have option to use default AWS certificates - - If using default certificates then no need to provide root certificates.

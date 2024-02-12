@@ -57,7 +57,7 @@ If you wish to reset to the default configuration or to modify the configuration
 
 ### OpenSearch Setup
 
-- Create an Opensearch domain. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
+- Create an OpenSearch domain. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 
 To create the domain, follow the steps given below:
 
@@ -94,7 +94,7 @@ The steps to enable backup and restore in OpenSearch S3 is:
   ```
 - Copy the `arn` value of `TheSnapshotRole`, example: `arn:aws:iam::123456789012:role/TheSnapshotRole`
 - Create a IAM policy with the json as given below:
-  - Replace the **iam:PassRole** resource with the snapshot role arn we copied previously and replace the **es:ESHttpPut** resource with your opensearch domain arn value which we had copied along with `/*` in the end:
+  - Replace the **iam:PassRole** resource with the snapshot role arn we copied previously and replace the **es:ESHttpPut** resource with your OpenSearch domain arn value which we had copied along with `/*` in the end:
 
     ```json
     {
@@ -292,7 +292,7 @@ Verify whether all services are running using:
 chef-automate status
 ```
 
-Verify if the Chef Automate is running with an external Opensearch by running the command below:
+Verify if the Chef Automate is running with an external OpenSearch by running the command below:
 
 ```shell
 chef-automate config show
@@ -405,7 +405,7 @@ You can get the information about all snapshot repositories registered in the cl
 GET _snapshot/_all
 ```
 
-Take a backup of chef automate updated config with details of external PostgreSQL/Opensearch to a new file like `full_config.toml` by running the following command:
+Take a backup of chef automate updated config with details of external PostgreSQL/OpenSearch to a new file like `full_config.toml` by running the following command:
 
 ```shell
 chef-automate config show > full_config.toml
@@ -419,7 +419,7 @@ See how to [backup to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
 
 Pass s3 access key and s3 secret key to restore command.
 
-Use the `--patch-config` option with a new updated config `full_config.toml` to restore data to external PostgreSQL/Opensearch:
+Use the `--patch-config` option with a new updated config `full_config.toml` to restore data to external PostgreSQL/OpenSearch:
 
 To restore from an AWS S3 bucket backup on a new host, run:
 
@@ -500,7 +500,7 @@ password = "<dbuser password>"
 enable = true
 ```
 
-### Configure External AWS Opensearch
+### Configure External AWS OpenSearch
 
 These configuration directions are intended for External AWS managed OpensSearch service.
 
@@ -692,5 +692,5 @@ Success: Restored backup 20180517223558
 ```
 
 {{< note >}}
-If you are taking backup from existing OpenSearch domain for ex: domain1 and restoring data to new Opensearch domain for ex: domain2 then please follow manual steps of registering snapshot repositories in new OpenSearch domain mentioned here: [Registering Snapshot Repository]({{< ref "managed_services.md#registering-snapshot-repository" >}}) before restoring backup into new OpenSearch domain.
+If you are taking backup from existing OpenSearch domain for ex: domain1 and restoring data to new OpenSearch domain for ex: domain2 then please follow manual steps of registering snapshot repositories in new OpenSearch domain mentioned here: [Registering Snapshot Repository]({{< ref "managed_services.md#registering-snapshot-repository" >}}) before restoring backup into new OpenSearch domain.
 {{< /note >}}
