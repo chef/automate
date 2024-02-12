@@ -108,7 +108,7 @@ sorthands for --chef_server is --cs and -c
 
 sorthands for --chef_server is --fe and -f
 
-- Patch a config to the Back end nodes (Open Search)
+- Patch a config to the Back end nodes (OpenSearch)
   - create a config file `opensearch.toml`
 
 ``` cmd
@@ -117,7 +117,7 @@ sorthands for --chef_server is --fe and -f
 
 sorthands for --opensearch is --os and -o
 
-- Patch a config to the Back end nodes (Postgresql)
+- Patch a config to the Back end nodes (PostgreSQL)
   - create a config file `postgresql.toml`
 
 ``` cmd
@@ -128,7 +128,7 @@ sorthands for --postgresql is --pg and -p
 
 {{< note >}}
 
-- Frontend patch will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node.
+- Frontend patch will be applied to all nodes where are PostgreSQL and OpenSearch changes will be applied to only one node.
 - After patching, some services will go restart. So the health status will take up to 2 minutes to show healthy.
 
 {{< /note >}}

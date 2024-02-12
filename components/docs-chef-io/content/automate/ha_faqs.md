@@ -48,7 +48,7 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 - choose the instance based on the output. To view the logs run the command
 `journalctl --follow --unit chef-automate`
 
-### How to check logs For Postgres nodes?
+### How to check logs For PostgreSQL nodes?
 
 - To view the logs, please do ssh to the respective node by running the command from bastion node
 `./chef-automate ssh --hostname pg`

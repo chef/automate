@@ -89,8 +89,8 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 `OpenSearch node count`
 : Number of nodes we want to keep for OpenSearch, in case of On-Premise deployment need to provide IP Address for all nodes.
 
-`Postgresql node count`
-: Number of nodes we want to keep for Postgresql, in case of On-Premise deployment need to provide IP Address for all nodes.
+`PostgreSQL node count`
+: Number of nodes we want to keep for PostgreSQL, in case of On-Premise deployment need to provide IP Address for all nodes.
 
 ## Private/Public Key For Automate
 
@@ -110,31 +110,31 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 
 ## OpenSearch Certificate and Private/Public Key
 
-`Root CA for Open Search`
-: In case of have custom certificates for Open Search node provide root certificates.
+`Root CA for OpenSearch`
+: In case of have custom certificates for OpenSearch node provide root certificates.
 
-`Admin Key certificate for Open Search`
-: In case of have custom certificates for Open Search node provide admin key certificates.
+`Admin Key certificate for OpenSearch`
+: In case of have custom certificates for OpenSearch node provide admin key certificates.
 
-`Admin certificate for Open Search`
-: In case of have custom certificates for Open Search node provide admin certificates.
+`Admin certificate for OpenSearch`
+: In case of have custom certificates for OpenSearch node provide admin certificates.
 
-`Private key for Open Search`
-: If you have a custom certificate for Open Search node provide your private for Open Search, If you have a custom certificates for each Open Search node then provide different private key for each of Open Search node.
+`Private key for OpenSearch`
+: If you have a custom certificate for OpenSearch node provide your private for OpenSearch, If you have a custom certificates for each OpenSearch node then provide different private key for each of OpenSearch node.
 
-`Public key for Open Search`
-: If you have a custom certificate for Open Search node provide your public for Open Search, If you have a custom certificates for each Open Search node then provide different public key for each of Open Search node.
+`Public key for OpenSearch`
+: If you have a custom certificate for OpenSearch node provide your public for OpenSearch, If you have a custom certificates for each OpenSearch node then provide different public key for each of OpenSearch node.
 
 ## PostgreSQL Certificate and Private/Public Key
 
-`Root CA for Postgresql`
-: In case of have custom certificates for Postgresql node provide root certificates.
+`Root CA for PostgreSQL`
+: In case of have custom certificates for PostgreSQL node provide root certificates.
 
-`Private key for Postgresql`
-: If you have a custom certificate for Postgresql node provide your private for Postgresql, If you have a custom certificates for each Postgresql node then provide different private key for each of Postgresql node.
+`Private key for PostgreSQL`
+: If you have a custom certificate for PostgreSQL node provide your private for PostgreSQL, If you have a custom certificates for each PostgreSQL node then provide different private key for each of PostgreSQL node.
 
-`Public key for Postgresql`
-: If you have a custom certificate for Postgresql node provide your public for Postgresql, If you have a custom certificates for each Postgresql node then provide different public key for each of Postgresql node.
+`Public key for PostgreSQL`
+: If you have a custom certificate for PostgreSQL node provide your public for PostgreSQL, If you have a custom certificates for each PostgreSQL node then provide different public key for each of PostgreSQL node.
 
 ## AWS Deployment
 
@@ -204,7 +204,7 @@ Settings for AWS-managed or customer-managed databases.
 ### PostgreSQL
 
 `PostgreSQL URL and port`
-: Postgresql URL along with port.
+: PostgreSQL URL along with port.
 
   For example, `postgresql.example.com:5432`.
 

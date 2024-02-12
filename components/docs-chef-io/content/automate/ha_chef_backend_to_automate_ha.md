@@ -104,7 +104,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
 ## Add S3 Configurations for Cookbook Storage
 
-Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in the Chef server can be stored in S3 or Postgres in Automate HA.
+Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in the Chef server can be stored in S3 or PostgreSQL in Automate HA.
 
 {{< note >}}
 
@@ -224,7 +224,7 @@ Where:
     - fqdn : load balance URL, which points to the frontend node.
     - keys : ssh username and private keys
     - Ensure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
-    - Ensure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
+    - Ensure to provide Chef backend's backend server IPs for Automate HA PostgreSQL and OpenSearch machines.
     - Sample configuration; please modify according to your needs.
 
     ```sh

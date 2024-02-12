@@ -6,8 +6,8 @@ draft = false
 
 [menu]
   [menu.automate]
-    title = "Configure Postgresql"
-    identifier = "automate/configuring_automate/postgresql/postgresql.md Postgresql"
+    title = "Configure PostgreSQL"
+    identifier = "automate/configuring_automate/postgresql/postgresql.md PostgreSQL"
     parent = "automate/configuring_automate/postgresql"
     weight = 10
 +++

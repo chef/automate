@@ -99,7 +99,7 @@ done
     - `/bin/hab-launch`
     - `/bin/hab-sup`
 
-1. Unload services from each of the Postgresql Nodes:
+1. Unload services from each of the PostgreSQL Nodes:
 
     ```sh
     sudo hab svc unload chef/automate-backend-postgresql
