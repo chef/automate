@@ -283,3 +283,4 @@ external_os = false
   #Bcrypt hashed password
   hashed_password = "$2a$12$yObdBmd8JFy2ar7nRjv46OYs3P3q5uB9llsrLRppWyAO/YOQ2JW3m"
 
+[tls]
