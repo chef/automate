@@ -237,13 +237,13 @@ export class TelemetryService {
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
     const totalScans = complianceUsageStats['node_cnt'];
-    console.log('complianceUsageStats ',complianceUsageStats);
+    // console.log('complianceUsageStats ',complianceUsageStats);
     const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
     const totalNodes = nodeUsageStats['node_cnt'];
-    console.log('nodeUsageStats ',nodeUsageStats);
+    // console.log('nodeUsageStats ',nodeUsageStats);
     const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
     const totalService = applicationUsageStats['total_services'];
-    console.log('applicationUsageStats ',applicationUsageStats);
+    // console.log('applicationUsageStats ',applicationUsageStats);
     try {
       const chefTelemetryTrackerInitData = {
         visitor: {
@@ -257,21 +257,21 @@ export class TelemetryService {
           "instanceId": this.instanceId,
           "deploymentType": this.deploymentType,
           "deploymentId": this.deploymentId,
-          "automateVersion": this.buildVersion,
           "licenseId": this.licenseId,
-          "licenseType": this.licenseType,
           "licenseExpirationDate": this.licenseExpirationDate,
           "product": "Automate",
+          "version": this.buildVersion,
           "scannedOn":(new Date).toISOString(),
           "payload_version": 1,
           "install_context": "habitat",
+          "licenseType": this.licenseType,
           "origin": "user-interface",
           "periods_summary_nodes_total": parseInt(totalNodes, 10),
           "periods_summary_scans_targets": parseInt(totalScans, 10),
           "periods_summary_services_targets": parseInt(totalService, 10)
         }
       }
-      console.log('chefTelemetryTrackerInitData ',chefTelemetryTrackerInitData);
+      // console.log('chefTelemetryTrackerInitData ',chefTelemetryTrackerInitData);
       chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
       localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
     } catch(e) {
