@@ -27,13 +27,13 @@ gh_repo = "automate"
 
 A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the `path.repo` setting on all master and data nodes.
 
-### Setup your Backup Configuration
+### Set up your backup configuration
 
 - Create an EFS file system, please refer sample steps [here](https://docs.aws.amazon.com/efs/latest/ug/gs-step-two-create-efs-resources.html)
 
 - Let's create a folder structure `/mnt/automate_backups/` on all the Frontend and backend nodes, then we have to mount EFS to all the vm's manually. To do that please refer [this](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-helper-ec2-linux.html)
 
-#### Configuration in OpenSearch Node
+#### Configuration in OpenSearch node
 
 - Mount the EFS on all OpenSearch Node. For example you mount the EFS to folder structure `/mnt/automate_backups/`
 
@@ -44,7 +44,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
     sudo chown hab:hab /mnt/automate_backups/opensearch/
     ```
 
-#### Configuration for OpenSearch Node from Provision host
+#### Configuration for OpenSearch Node from provision host
 
 Configure the OpenSearch `path.repo` attribute.
 
@@ -63,7 +63,7 @@ Configure the OpenSearch `path.repo` attribute.
 
 - Above command will restart the opensearch cluster.
 
-#### Healthcheck Commands
+#### Health check commands
 
 - Following command can be run in the OpenSearch node
 
@@ -106,7 +106,7 @@ Configure the OpenSearch `path.repo` attribute.
     ./chef-automate config patch --frontend automate.toml
     ```
 
-## Backup and Restore Commands
+## Backup and Restore commands
 
 ### Backup
 
@@ -116,7 +116,7 @@ Configure the OpenSearch `path.repo` attribute.
     chef-automate backup create
     ```
 
-### Restoring the EFS Backed-up Data
+### Restoring the EFS backed-up data
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
