@@ -14,6 +14,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import * as selectors from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from '../projects-filter/projects-filter.reducer';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 export const InterceptorSkipHeader = 'Skip-Interceptor';
 
@@ -71,6 +73,13 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
             catchError((error: HttpErrorResponse) => {
               if (error.status === 401) {
                 this.chefSession.logout();
+              }
+              else if(error.status === 403) {
+                const err = error?.error;
+                this.store.dispatch(new CreateNotification({
+                  type: Type.error,
+                  message: `${err?.message || error.message}`
+                }));
               }
               return observableThrowError(error);
             }));
