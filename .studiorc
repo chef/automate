@@ -60,14 +60,14 @@ export GOFLAGS=""
 export GO_DEBUG_PORT=2345
 
 # Depot channel for Chef micro-services
-export CHEF_CHANNEL="refresh2024q1"
+export CHEF_CHANNEL=dev
 
 # Flag that will allow us detect when are we in dev mode inside any a2 component
 export CHEF_DEV_ENVIRONMENT=true
 
 # minimal(fast) hart compression level for dev
 export HAB_HART_COMPRESSION_LEVEL=0
-export HAB_BLDR_CHANNEL="refresh2024q1"
+#export HAB_BLDR_CHANNEL="refresh2024q1"
 mkdir -p /tmp/docs /tmp/aliases
 # Source all the files available in the .studio directory of the /src directory
 # Only if the '.studio/' directory exists and it is not empty
