@@ -67,7 +67,6 @@ export CHEF_DEV_ENVIRONMENT=true
 
 # minimal(fast) hart compression level for dev
 export HAB_HART_COMPRESSION_LEVEL=0
-#export HAB_BLDR_CHANNEL="refresh2024q1"
 mkdir -p /tmp/docs /tmp/aliases
 # Source all the files available in the .studio directory of the /src directory
 # Only if the '.studio/' directory exists and it is not empty
