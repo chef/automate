@@ -35,3 +35,21 @@ do_test_deploy() {
     PATH="/hab/bin:/bin" chef-server-ctl test --smoke --skip-status
     test_chef_server_ctl
 }
+
+
+do_dump_logs() {
+  do_dump_logs_default
+    
+     tar cvf logs/automate-cs-oc-erchef.tar /hab/svc/automate-cs-oc-erchef
+
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "logs/*"
+        then
+            echo "Failed to frontend conatiner logs"
+        fi
+    fi
+
+
+
+    rm -r "$tmpdir"
+}

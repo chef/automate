@@ -92,13 +92,16 @@ do_test_deploy() {
 do_dump_logs() {
   do_dump_logs_default
     
-   
-if command -v buildkite-agent; then
-        if ! buildkite-agent artifact upload "/hab/svc/automate-cs-oc-erchef/*"
+     tar cvf logs/automate-cs-oc-erchef.tar /hab/svc/automate-cs-oc-erchef
+
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "logs/*"
         then
             echo "Failed to frontend conatiner logs"
         fi
     fi
+
+
 
     rm -r "$tmpdir"
 }
