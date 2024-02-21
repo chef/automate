@@ -10,7 +10,7 @@ pkg_license=("Chef-MLSA")
 pkg_deps=(
   core/ruby30
   core/aws-cli
-  chef/inspec
+  chef/inspec/4.56.22/20240130061718
   core/bash
   core/coreutils
   core/cacerts
