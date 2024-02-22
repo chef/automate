@@ -9,7 +9,7 @@ vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
   core/coreutils
-  core/ruby25
+  core/ruby/2.5.7/20200404130135
   core/bundler
   # NOTE(ssd) 2019-04-03: This dependency isn't needed, but we want to
   # make sure that this package always gets built whenever
