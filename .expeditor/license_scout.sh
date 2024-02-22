@@ -47,8 +47,6 @@ log "Finished Installing Go 1.19.3"
 
 log_section_start "Installing Chef UI Library dependencies"
 pushd components/chef-ui-library
-  hab pkg install core/erlang25 -bf
-  hab pkg install core/elixir -bf
   log "BEGIN npm install"
   npm install
   log "END npm install"
@@ -65,6 +63,8 @@ popd
 log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
+hab pkg install core/erlang25 -bf
+  hab pkg install core/elixir -bf
 pushd components/notifications-service/server
   git config --global url."https://github.com/".insteadOf git://github.com/
   log "git config updated"
@@ -76,11 +76,11 @@ pushd components/notifications-service/server
 popd
 log "Finished installing Elixir dependencies"
 
-# log_section_start "Installing Ruby dependencies"
-# pushd components/automate-workflow-ctl/
-#   bundle install
-# popd
-# log "Finished installing Ruby dependencies"
+log_section_start "Installing Ruby dependencies"
+pushd components/automate-workflow-ctl/
+  bundle install
+popd
+log "Finished installing Ruby dependencies"
 
 log_section_start "Installing Go dependencies"
 go mod download
