@@ -1003,10 +1003,7 @@ exceptions:
     - name: core/ruby30
       reason: Ruby license (previously shipped in Automate 1)
     - name: core/ruby27
-      reason:  Exception made for chef server upgrade
-    - name: core/ruby25
-      reason:  Exception made for workflow ctl  
-
+      reason:  Exception made for chef server upgrade 
 
   ruby:
     - name: highline
