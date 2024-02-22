@@ -47,6 +47,8 @@ log "Finished Installing Go 1.19.3"
 
 log_section_start "Installing Chef UI Library dependencies"
 pushd components/chef-ui-library
+  hab pkg install core/erlang25 -bf
+  hab pkg install core/elixir -bf
   log "BEGIN npm install"
   npm install
   log "END npm install"
