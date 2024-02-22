@@ -32,13 +32,13 @@ upload_dep_manifest() {
 
 trap upload_dep_manifest EXIT
 
-# log_section_start "Uninstalling License Scout"
-# gem uninstall license_scout -x
-# log "Finished Uninstalling License Scout"
+log_section_start "Uninstalling License Scout"
+gem uninstall license_scout -x
+log "Finished Uninstalling License Scout"
 
-# log_section_start "Installing License Scout"
-# gem install license_scout -v 2.5.1
-# log "Finished Installing License Scout"
+log_section_start "Installing License Scout"
+gem install license_scout -v 2.5.1
+log "Finished Installing License Scout"
 
 log_section_start "Installing Go 1.19.3"
 hab pkg install --force --binlink core/go19/1.19.3 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
@@ -69,7 +69,7 @@ pushd components/notifications-service/server
   log "Print mix.lock file:"
   cat mix.lock
   log "End of mix.lock file"
-  # mix local.hex --force
+  mix local.hex --force
   mix deps.get
 popd
 log "Finished installing Elixir dependencies"
