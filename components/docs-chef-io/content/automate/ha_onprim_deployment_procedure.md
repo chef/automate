@@ -69,7 +69,7 @@ Make sure you have all resources either on existing infrastructure or on existin
     sudo chef-automate config gen config.toml
     ```
 
-Click [here](/automate/ha_config_gen) to know more about generating config.
+To know more on how to generate config, see the [Automate HA Config Generation](/automate/ha_config_gen) page.
 
 You can also view the [Sample Config](#sample-config). You can also view the [Sample Config For 5 Node Cluster](#sample-config-for-5-nodes-cluster).
 
@@ -102,8 +102,9 @@ You can also generate a configuration file using the `init-config` subcommand.
     ```
 
    To skip verification during deployment, use `--skip-verify` flag
+
     ```bash
-     chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
+    chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
 
 ## Verify Deployment
@@ -114,7 +115,7 @@ You can also generate a configuration file using the `init-config` subcommand.
      chef-automate status summary
     ```
 
-1.  Get the service status from each node
+1. Get the service status from each node
 
     ```bash
      chef-automate status
@@ -134,9 +135,9 @@ You can also generate a configuration file using the `init-config` subcommand.
 
     Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
     After successful deployment, proceed with following...
-      1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-      1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-      1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+      1. To know moe about the user and organization creation, check the [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section in Node Bootstrapping page.
+      1. To know more about Workstation setup, see the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section.
+      1. To know more about Node bootstrapping, see the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
 
 ## Backup/Restore
 

@@ -23,7 +23,7 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 ## Prerequisites
 
-- Either existing certificates can be used or to generate new ones, click [here](https://docs.chef.io/automate/ha_cert_selfsign/)
+- Either existing certificates can be used or to generate new ones. For more information, see [Self Sign Certificates](https://docs.chef.io/automate/ha_cert_selfsign/).
 
 ## Rotate using Cert-Rotate Command
 
