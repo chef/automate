@@ -11,7 +11,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 
 pkg_deps=(
   core/bash/5.0.16/20200305233030
-  core/coreutils/8.30/20200305231640
+  core/coreutils
   core/curl/7.68.0/20200319191535
   core/erlang18/18.3/20200404000818
   core/gawk/5.0.1/20200305233704
