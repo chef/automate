@@ -62,9 +62,16 @@ pushd components/automate-ui
 popd
 log "Finished installing Automate UI dependencies"
 
+#This Block will install 'core/elixir/1.11.4/20220301014229' and print the version of erl/iex
+log_section_start "Validating erlang/Elixir dependencies"
+hab pkg install core/elixir/1.11.4/20220301014229 -bf
+erlang_version=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell)
+echo "Erlang version: $erlang_version"
+elixir_version=$(elixir -v)
+echo "Elixir version: $elixir_version"
+log "Finished Validating erlang/Elixir dependencies"
+
 log_section_start "Installing Elixir dependencies"
-hab pkg install core/erlang25 -bf
-  hab pkg install core/elixir -bf
 pushd components/notifications-service/server
   git config --global url."https://github.com/".insteadOf git://github.com/
   log "git config updated"
