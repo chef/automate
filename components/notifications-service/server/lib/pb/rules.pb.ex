@@ -1,7 +1,7 @@
 defmodule Notifications.Rule.Event do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :CCRFailure, 0
   field :CCRSuccess, 1
@@ -12,7 +12,7 @@ end
 defmodule Notifications.URLValidationResponse.Code do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :OK, 0
   field :ERROR, 1
@@ -24,7 +24,7 @@ end
 defmodule Notifications.RuleUpdateResponse.Code do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :OK, 0
   field :DUPLICATE_NAME, 1
@@ -36,7 +36,7 @@ end
 defmodule Notifications.RuleDeleteResponse.Code do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :DELETED, 0
   field :NOT_FOUND, 2
@@ -46,7 +46,7 @@ end
 defmodule Notifications.RuleAddResponse.Code do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :ADDED, 0
   field :DUPLICATE_NAME, 1
@@ -59,7 +59,7 @@ end
 defmodule Notifications.RuleGetResponse.Code do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :OK, 0
   field :NOT_FOUND, 2
@@ -69,7 +69,7 @@ end
 defmodule Notifications.RuleListResponse.Code do
   @moduledoc false
 
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :OK, 0
   field :INTERNAL_ERROR, 99
@@ -78,13 +78,13 @@ end
 defmodule Notifications.Empty do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 end
 
 defmodule Notifications.SlackAlert do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :url, 1, type: :string
 end
@@ -92,7 +92,7 @@ end
 defmodule Notifications.WebhookAlert do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :url, 1, type: :string
 end
@@ -100,7 +100,7 @@ end
 defmodule Notifications.ServiceNowAlert do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :url, 1, type: :string
   field :secret_id, 2, type: :string, json_name: "secretId"
@@ -110,7 +110,7 @@ end
 defmodule Notifications.Rule do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   oneof :action, 0
 
@@ -125,7 +125,7 @@ end
 defmodule Notifications.UsernamePassword do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :username, 1, type: :string
   field :password, 2, type: :string
@@ -134,7 +134,7 @@ end
 defmodule Notifications.SecretId do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :id, 1, type: :string
 end
@@ -142,7 +142,7 @@ end
 defmodule Notifications.URLValidationRequest do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   oneof :credentials, 0
 
@@ -160,7 +160,7 @@ end
 defmodule Notifications.URLValidationResponse do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :code, 1, type: Notifications.URLValidationResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -169,7 +169,7 @@ end
 defmodule Notifications.RuleIdentifier do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :id, 1, type: :string
 end
@@ -177,7 +177,7 @@ end
 defmodule Notifications.RuleUpdateResponse do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleUpdateResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -186,7 +186,7 @@ end
 defmodule Notifications.RuleDeleteResponse do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleDeleteResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -195,7 +195,7 @@ end
 defmodule Notifications.RuleAddResponse do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleAddResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -206,7 +206,7 @@ end
 defmodule Notifications.RuleGetResponse do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleGetResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -216,7 +216,7 @@ end
 defmodule Notifications.RuleListResponse do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleListResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string

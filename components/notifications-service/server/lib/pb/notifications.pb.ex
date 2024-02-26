@@ -1,7 +1,7 @@
 defmodule Notifications.ExceptionInfo do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :class, 1, type: :string
   field :title, 2, type: :string
@@ -12,7 +12,7 @@ end
 defmodule Notifications.TimeInfo do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :start_time, 1, type: :string, json_name: "startTime"
   field :end_time, 2, type: :string, json_name: "endTime"
@@ -21,7 +21,7 @@ end
 defmodule Notifications.Profile.Control.Result do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :status, 1, type: :string
   field :code_desc, 2, type: :string, json_name: "codeDesc"
@@ -34,7 +34,7 @@ end
 defmodule Notifications.Profile.Control.ResultTotals do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :num_tests, 1, type: :int32, json_name: "numTests"
   field :num_failed_tests, 2, type: :int32, json_name: "numFailedTests"
@@ -45,7 +45,7 @@ end
 defmodule Notifications.Profile.Control do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :impact, 2, type: :float
@@ -66,7 +66,7 @@ end
 defmodule Notifications.Profile.Attribute.Options do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :description, 1, type: :string
 end
@@ -74,7 +74,7 @@ end
 defmodule Notifications.Profile.Attribute do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :name, 1, type: :string
   field :options, 2, type: Notifications.Profile.Attribute.Options
@@ -83,7 +83,7 @@ end
 defmodule Notifications.Profile.ControlTotals do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :num_tests, 1, type: :int32, json_name: "numTests"
   field :num_failed_tests, 2, type: :int32, json_name: "numFailedTests"
@@ -94,7 +94,7 @@ end
 defmodule Notifications.Profile do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :name, 1, type: :string
   field :title, 2, type: :string
@@ -119,7 +119,7 @@ end
 defmodule Notifications.SourceLocation do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :ref, 1, type: :string
   field :line, 2, type: :int32
@@ -128,7 +128,7 @@ end
 defmodule Notifications.Refs do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :uri, 2, type: :string
   field :url, 3, type: :string
@@ -137,7 +137,7 @@ end
 defmodule Notifications.PlatformSupport do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :inspec, 1, type: :string
   field :os_name, 2, type: :string, json_name: "osName"
@@ -148,7 +148,7 @@ end
 defmodule Notifications.ComplianceSuccess do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :compliance_url, 2, type: :string, json_name: "complianceUrl"
@@ -161,7 +161,7 @@ end
 defmodule Notifications.ComplianceFailure.ControlTotals do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :skipped, 1, type: :int32
   field :passed, 2, type: :int32
@@ -173,7 +173,7 @@ end
 defmodule Notifications.ComplianceFailure do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :compliance_url, 2, type: :string, json_name: "complianceUrl"
@@ -197,7 +197,7 @@ end
 defmodule Notifications.CCRFailure do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :run_id, 1, type: :string, json_name: "runId"
   field :node_name, 2, type: :string, json_name: "nodeName"
@@ -213,7 +213,7 @@ end
 defmodule Notifications.CCRSuccess do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :run_id, 1, type: :string, json_name: "runId"
   field :node_name, 2, type: :string, json_name: "nodeName"
@@ -226,13 +226,13 @@ end
 defmodule Notifications.Response do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 end
 
 defmodule Notifications.Event do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   oneof :event, 0
 

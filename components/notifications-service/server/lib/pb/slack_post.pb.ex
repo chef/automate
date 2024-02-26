@@ -1,7 +1,7 @@
 defmodule Slack.Message.Attachment.Field do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :short, 1, type: :bool
   field :title, 2, type: :string
@@ -11,7 +11,7 @@ end
 defmodule Slack.Message.Attachment do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :color, 1, type: :string
   field :fallback, 2, type: :string
@@ -24,7 +24,7 @@ end
 defmodule Slack.Message do
   @moduledoc false
 
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   field :icon_url, 1, type: :string, json_name: "iconUrl"
   field :text, 2, type: :string

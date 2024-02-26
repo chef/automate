@@ -1,7 +1,7 @@
 defmodule Notifications.Notifications.Service do
   @moduledoc false
 
-  use GRPC.Service, name: "notifications.Notifications", protoc_gen_elixir_version: "0.11.0"
+  use GRPC.Service, name: "notifications.Notifications", protoc_gen_elixir_version: "0.12.0"
 
   rpc :Notify, Notifications.Event, Notifications.Response
 
