@@ -63,8 +63,8 @@ popd
 log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
-hab pkg install core/erlang25 -bf
-hab pkg install core/elixir/1.11.4 -bf
+# hab pkg install core/erlang25 -bf
+hab pkg install core/elixir/1.14.0/20230321120155 -bf
 pushd components/notifications-service/server
   git config --global url."https://github.com/".insteadOf git://github.com/
   log "git config updated"
