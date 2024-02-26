@@ -92,6 +92,6 @@ hab pkg install core/elixir -bf
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json'
 echo "Erl Version "
-echo erl -v
+echo $(erl -v)
 license_scout --only-show-failures --format csv
 log "Done!"
