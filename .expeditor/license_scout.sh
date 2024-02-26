@@ -62,6 +62,16 @@ pushd components/automate-ui
 popd
 log "Finished installing Automate UI dependencies"
 
+log_section_start "Validating erlang/Elixir dependencies"
+# Check Erlang version
+erlang_version=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell)
+echo "Erlang version: $erlang_version"
+
+# Check Elixir version
+elixir_version=$(elixir -v)
+echo "Elixir version: $elixir_version"
+log "Finished Validating erlang/Elixir dependencies"
+
 log_section_start "Installing Elixir dependencies"
 # hab pkg install core/erlang25 -bf
 # hab pkg install core/elixir/1.14.0/20230321120155 -bf
