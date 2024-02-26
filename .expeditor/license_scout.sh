@@ -64,7 +64,7 @@ log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
 hab pkg install core/erlang25 -bf
-hab pkg install core/elixir -bf
+hab pkg install core/elixir/1.11.4 -bf
 pushd components/notifications-service/server
   git config --global url."https://github.com/".insteadOf git://github.com/
   log "git config updated"
@@ -91,7 +91,10 @@ hab pkg install core/erlang25 -bf
 hab pkg install core/elixir -bf
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json'
-echo "Erl Version "
-echo $(erl -v)
+# echo "Erl Version "
+# echo $(erl -v)
+
+# echo "Elixir Version "
+# echo $(elixir --version)
 license_scout --only-show-failures --format csv
 log "Done!"
