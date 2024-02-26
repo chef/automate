@@ -63,7 +63,7 @@ popd
 log "Finished installing Automate UI dependencies"
 
 log_section_start "Validating erlang/Elixir dependencies"
-hab pkg install core / elixir/1.11.4/20220301014229 -bf
+hab pkg install core/elixir/1.11.4/20220301014229 -bf
 # Check Erlang version
 erlang_version=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell)
 echo "Erlang version: $erlang_version"
