@@ -63,8 +63,6 @@ popd
 log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
-hab pkg install core/erlang25 -bf
-hab pkg install core/elixir -bf
 pushd components/notifications-service/server
   git config --global url."https://github.com/".insteadOf git://github.com/
   log "git config updated"
@@ -88,6 +86,8 @@ log "Finished installing Go dependencies"
 
 log_section_start "Running License Scout"
 # a bug requires the use of `--format csv` but the
-# format of the generated manifest is still json
+# format of the generated manifest is still json'
+echo "Erl Version "
+echo erl -v
 license_scout --only-show-failures --format csv
 log "Done!"
