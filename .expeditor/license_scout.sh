@@ -63,6 +63,7 @@ popd
 log "Finished installing Automate UI dependencies"
 
 log_section_start "Validating erlang/Elixir dependencies"
+hab pkg install chef/elixir/1.14.0/20230319092417
 # Check Erlang version
 erlang_version=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell)
 echo "Erlang version: $erlang_version"
@@ -70,6 +71,7 @@ echo "Erlang version: $erlang_version"
 # Check Elixir version
 elixir_version=$(elixir -v)
 echo "Elixir version: $elixir_version"
+
 log "Finished Validating erlang/Elixir dependencies"
 
 log_section_start "Installing Elixir dependencies"
