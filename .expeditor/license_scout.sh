@@ -99,8 +99,8 @@ go mod download
 log "Finished installing Go dependencies"
 
 log_section_start "Running License Scout"
-hab pkg install core/erlang25 -bf
-hab pkg install core/elixir -bf
+# hab pkg install core/erlang25 -bf
+# hab pkg install core/elixir -bf
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json'
 # echo "Erl Version "
