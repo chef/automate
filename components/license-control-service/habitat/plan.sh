@@ -41,3 +41,4 @@ do_install() {
   cp -r migrations "${pkg_prefix}/migrations"
 }
 
+

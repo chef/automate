@@ -13,7 +13,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pg_version="13.5"
 
 # pinned PG version. We need to also update components/automate-cli/cmd/chef-automate/migration_pg.go (line)
-ident="20220311204618"
+ident="20240106121014"
 
 pkg_deps=(
   core/coreutils
@@ -39,3 +39,4 @@ do_build() {
 do_install() {
   return 0
 }
+

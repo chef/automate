@@ -16,7 +16,7 @@ pkg_deps=(
 pkg_build_deps=(
   core/git
   core/make
-  core/node/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  core/node12/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
   core/rsync
 )
 pkg_exports=(
@@ -88,3 +88,4 @@ do_install() {
 do_after() {
   rm -rf ~/.netrc
 }
+
