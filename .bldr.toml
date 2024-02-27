@@ -971,7 +971,6 @@ paths = [
   "lib/user/*"
 ]
 
-
 [data-feed-service]
 plan_path = "components/data-feed-service"
 paths = [
