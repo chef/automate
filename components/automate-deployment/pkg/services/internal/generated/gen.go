@@ -414,7 +414,13 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/automate-workflow-server",
-      "metadata": null
+      "metadata": {
+        "name": "chef/automate-workflow-server",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-workflow-nginx",
