@@ -94,7 +94,6 @@ go mod download
 log "Finished installing Go dependencies"
 
 log_section_start "Running License Scout"
-hab pkg install core/ruby -bf
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json
 license_scout --only-show-failures --format csv
