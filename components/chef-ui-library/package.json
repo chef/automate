@@ -21,7 +21,8 @@
     "docs": "typedoc src",
     "lint": "npm run lint.ts && npm run lint.sass",
     "lint.ts": "tslint -p tsconfig.json",
-    "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
+    "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q",
+    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
   },
   "author": "Chef Software, Inc. <info@chef.io>",
   "license": "UNLICENSED",
@@ -29,7 +30,7 @@
   "dependencies": {
     "d3": "^7.8.5",
     "lodash": "^4.17.21",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "material-design-icons": "^3.0.1",
     "prismjs": "^1.29.0",
     "puppeteer": "^14.0.0",
@@ -47,6 +48,7 @@
     "@types/jest": "^24.0.16",
     "@types/node": "^12.6.8",
     "@types/puppeteer": "^1.12.4",
+    "ansi-regex": "^4.1.1",
     "jest": "^24.8.0",
     "jest-cli": "^24.8.0",
     "kind-of": "^6.0.3",
@@ -58,6 +60,9 @@
     "tslint": "^5.20.0",
     "tslint-ionic-rules": "0.0.21",
     "typedoc": "^0.15.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.5.3"
+  },
+  "resolutions": {
+    "@types/babel__traverse": "7.14.2"
   }
 }

@@ -1,9 +1,9 @@
-import { map, filter } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
 import { ReplaySubject, Observable, Subject } from 'rxjs';
-import * as Sniffr from 'sniffr';
+import Sniffr from 'sniffr';
 
 import { ChefSessionService } from '../chef-session/chef-session.service';
 import { ConfigService } from '../config/config.service';
@@ -84,7 +84,6 @@ export class TelemetryService {
     });
 
     this.configService.getConfig().pipe(
-      filter(config => config.telemetryEnabled),
       map((config) => {
         try {
           this.telemetryEnabled = config.telemetryEnabled;
@@ -93,6 +92,7 @@ export class TelemetryService {
           this.telemetryUrl = config.telemetryUrl;
           this.customerId = config.customerId;
           this.customerName = config.customerName;
+          this.licenseType = config.licenseType;
           this.licenseId = config.licenseId || configService.defaultLicenseId;
           this.maxNodes = config.maxNodes;
           this.instanceId = config.deploymentId || configService.defaultDeployId;
@@ -105,8 +105,7 @@ export class TelemetryService {
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
-        this.registerChefTelemetryTracker();
-        this.initiateTelemetry(trackingOperations);
+          this.initiateTelemetry(trackingOperations);
       });
   }
 
@@ -208,7 +207,7 @@ export class TelemetryService {
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
-          console.log(`Error retrieving Segment API key : ${status}/${message}`);
+          console.log(`Error retrieving Segment API key: ${status}/${message}`);
           if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesFailure(message));
           }
@@ -228,44 +227,71 @@ export class TelemetryService {
     setTimeout(this.registerChefTelemetryTracker,100);
   }
 
-  initializeChefTelemetryTracker() {
+  async initializeChefTelemetryTracker() {
     
     if(!this.licenseExpirationDate) {
       setTimeout(() => { this.initializeChefTelemetryTracker() }, 1000);
       return;
     }
     console.log('initializeChefTelemetryTracker');
+
+    const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
+    const totalScans = complianceUsageStats['node_cnt'];
+    // console.log('complianceUsageStats ',complianceUsageStats);
+    const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
+    const totalNodes = nodeUsageStats['node_cnt'];
+    // console.log('nodeUsageStats ',nodeUsageStats);
+    const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
+    const totalService = applicationUsageStats['total_services'];
+    // console.log('applicationUsageStats ',applicationUsageStats);
     try {
-      if(chefTelemetryTracker && this.chefSessionService.telemetry_enabled) {
-        const chefTelemetryTrackerInitData = {
-          visitor: {
-            id: this.chefSessionService.uuid,
-            userName: this.chefSessionService.username,
-            fullName: this.chefSessionService.fullname,
-            telemetryPref: this.chefSessionService.telemetry_enabled,
-            isLocalUser: this.chefSessionService.isLocalUser,
-            group: this.chefSessionService.groups,
-            connector: this.chefSessionService.connector
-          },
-          account: {
-            id: this.customerId,
-            name: this.customerName,
-            instanceId: this.instanceId,
-            deploymentType: this.deploymentType,
-            deploymentId: this.deploymentId,
-            automateVersion: this.buildVersion,
-            licenseId: this.licenseId,
-            licenseType: this.licenseType,
-            licenseExpirationDate: this.licenseExpirationDate
-          }
+      const chefTelemetryTrackerInitData = {
+        visitor: {
+          "id": this.chefSessionService.uuid,
+          "telemetryPref": this.chefSessionService.telemetry_enabled,
+          "connector": this.encodeConnector(this.chefSessionService.connector)
+        },
+        account: {
+          "id": this.customerId,
+          "name": this.customerName,
+          "instanceId": this.instanceId,
+          "deploymentType": this.deploymentType,
+          "deploymentId": this.deploymentId,
+          "licenseId": this.licenseId,
+          "licenseExpirationDate": this.licenseExpirationDate,
+          "product": "Automate",
+          "version": this.buildVersion,
+          "scannedOn":(new Date).toISOString(),
+          "payload_version": 1,
+          "install_context": "habitat",
+          "licenseType": this.licenseType,
+          "origin": "user-interface",
+          "periods_summary_nodes_total": parseInt(totalNodes, 10),
+          "periods_summary_scans_targets": parseInt(totalScans, 10),
+          "periods_summary_services_targets": parseInt(totalService, 10)
         }
-        chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
-        localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
       }
+      // console.log('chefTelemetryTrackerInitData ',chefTelemetryTrackerInitData);
+      chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
+      localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
     } catch(e) {
       console.log('Unable to initialize ChefTelemetryTracker ', e);
     }
     
+  }
+
+  encodeConnector(connectorType?: string) {
+    const connector = connectorType.toLowerCase();
+    let encodedConnector = 0;
+    switch(connector) {
+      case 'local':
+        encodedConnector = 1;
+      case 'saml':
+        encodedConnector = 2;
+      case 'ldap':
+        encodedConnector = 3;
+    }
+    return encodedConnector;
   }
 
   captureChefTelemetryEvent(event?: string, properties?: any) {
@@ -429,6 +455,8 @@ export class TelemetryService {
     } catch (error) {
       console.log(error);
     }
+    // initialise Pendo
+    this.registerChefTelemetryTracker();
     if (this.chefSessionService.telemetry_enabled) {
       this.isSkipNotification = true;
       this.engageTelemetry(trackingOperations);
