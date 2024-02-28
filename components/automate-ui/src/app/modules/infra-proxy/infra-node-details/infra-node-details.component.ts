@@ -85,6 +85,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public removeTags: string[] = [];
   public inputTxt = '';
   public updatingTags = false;
+  public isHtmlTags:boolean = false;
 
   // for environments
   public environmentListState: { items: Environment[], total: number };
@@ -526,5 +527,12 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   public closeEditAttributeModal(): void {
     this.openEditAttr = false;
+  }
+
+  handleTagsChange(event: Event){
+    const inputElement = event.target as HTMLInputElement;
+    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}|<>]/;
+    const hasHtmlTags = htmlTagsRegex.test(inputElement.value);
+    this.isHtmlTags = hasHtmlTags;
   }
 }

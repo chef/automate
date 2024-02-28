@@ -5,7 +5,7 @@ chef-dropdown {
   border-radius: var(--chef-border-radius);
   background-color: var(--chef-white);
 
-  &[visible] {
+  &[visible]:not([visible="false"]) {
     display: block;
   }
 }

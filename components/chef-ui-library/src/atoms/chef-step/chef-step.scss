@@ -36,7 +36,7 @@ chef-step {
     background: var(--chef-primary-bright);
   }
 
-  &[selected] {
+  &[selected]:not([selected="false"]) {
     #{--border-color}: var(--chef-primary-bright);
     border: 1px solid var(--border-color);
     color: var(--chef-primary-bright);
@@ -47,7 +47,7 @@ chef-step {
     }
   }
 
-  &[disabled] {
+  &[disabled]:not([disabled="false"]) {
     color: var(--chef-dark-grey);
 
     &::before {
