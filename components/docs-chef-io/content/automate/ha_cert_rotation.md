@@ -110,7 +110,7 @@ You can also use `--cc` instead of `--certificate-config` as a sort form.
         ip = "10.1.2.247"
         public_key = "full path of os3.pem"
         private_key = "full path of os3-key.pem"
-    ```
+  ```
 
 
 ### Rotate Certificates of each service
