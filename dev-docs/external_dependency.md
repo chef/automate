@@ -95,7 +95,7 @@
 
 2. haproxy
     * automate-backend-haproxy
-      * Version: core/haproxy/2.2.2/20200923113708
+      * Version: core/haproxy/2.2.29/20240106203532
 
 3. Opensearch
     * automate-backend-opensearch
