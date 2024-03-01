@@ -46,7 +46,7 @@ Chef Automate HA for Managed Services has default port 5432 for Managed PostgreS
 
 {{< warning >}}
 
-- Choose Minimum node deployment type when you have VM containts.
+- Choose Minimum node deployment type when you have VM constraints.
 - Minimun node deployment is only for Onprem deployment.
 - Minimun node deployment is not supported for AWS deployment.
 
