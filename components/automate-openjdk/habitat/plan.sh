@@ -11,7 +11,7 @@ pkg_name=automate-openjdk
 # Release archive https://jdk.java.net/archive/
 pkg_version=11.0.22+7
 pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.22%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.22_7.tar.gz
-pkg_shasum=519ab3c5c74a8868a47cfd8722353f41410d53a0
+pkg_shasum=25cf602cac350ef36067560a4e8042919f3be973d419eac4d839e2e0000b2cc8
 pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.22_7.tar.gz
 pkg_dirname="jdk-${pkg_version}"
 pkg_license=("GPL-2.0-with-classpath-exception")
