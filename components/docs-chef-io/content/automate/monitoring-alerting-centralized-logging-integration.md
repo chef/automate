@@ -16,35 +16,35 @@ You can integrate third-party platforms with [Chef Automate HA](/automate/ha) to
 
 Chef Automate HA integrates with the following platforms:
 
-- Datadog
 - AWS CloudWatch
-- Prometheus
+- Datadog
 - Elastic Stack (ELK)
-
-## Datadog
-
-Datadog is a monitoring and analytics platform that delivers real-time insights into application, infrastructure, and cloud service performance. Refer to the following links for the detailed whitepapers and blog documents.
-
-- [Automate HA and DataDog Integration](https://github.com/chef/monitoring-integration-automate/tree/main/data-dog)
-- [Technical Blog reference of Automate HA and DataDog](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/Eb2zXjNHa71Brszy3V_SqsoB0LtyGP7eaBXtBlaqj9rGSA?e=gJcC8b)
+- Prometheus
 
 ## AWS CloudWatch
 
 Chef Automate HA with AWS CloudWatch gives automate and compliance teams the necessary redundancy and visibility to successfully operate the solution. Refer to the following links for the detailed whitepapers and blog documents.
 
-- [Automate HA and CloudWatch Integration](https://github.com/chef/monitoring-integration-automate/tree/main/cloud-watch)
-- [Technical Blog reference of Automate HA and CloudWatch](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EQsURaeVai5Eszc9-3yiHWEBKCeDV0Nz-LhqC2giqefO-Q?e=KM0iWB)
+- [Automate HA and CloudWatch Integration](https://github.com/chef/monitoring-integration-automate/blob/main/Whitepaper_AutomateHA_Monitoring_and_Alerting.md#cloudwatch-integration-with-automate-ha---monitoring)
+- [Technical Blog reference of Automate HA and CloudWatch](https://www.chef.io/blog/monitoring-chef-automate-ha-with-cloudwatch)
 
-## Prometheus
+## Datadog
 
-Prometheus, an open-source tool excels at scraping metrics from HTTP endpoints, making it a go-to for harvesting data from various targets. Refer to the following links for the detailed whitepapers and blog documents.
+Datadog is a monitoring and analytics platform that delivers real-time insights into application, infrastructure, and cloud service performance. Refer to the following links for the detailed whitepapers and blog documents.
 
-- [Automate HA and Prometheus Integration](https://github.com/chef/monitoring-integration-automate/tree/main/prometheus)
-- [Technical Blog reference of Automate HA and Prometheus](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/EZ23D4XeuKJGu-yMzmIehfwBPmTouhykSFqRhCJXdWSQWg?e=tysXun)
+- [Automate HA and DataDog Integration](https://github.com/chef/monitoring-integration-automate/blob/main/Whitepaper_AutomateHA_Monitoring_and_Alerting.md#datadog-integration-with-automate-ha---monitoring)
+- [Technical Blog reference of Automate HA and DataDog](https://www.chef.io/blog/monitoring-chef-automate-ha-with-datadog)
 
 ## Elastic Stack
 
 The ELK stack is a trio of open-source tools that have revolutionized how businesses harness their data. Refer to the following links for the detailed whitepapers and blog documents.
 
-- [Automate HA and ELK Integration](https://github.com/chef/monitoring-integration-automate/tree/main/ELK)
-- [Technical Blog reference of Automate HA and ELK](https://progresssoftware-my.sharepoint.com/:w:/g/personal/apravati_progress_com/ERxHPHSM92RBnqxLL7GHlF8BNbdOzg_LuCHV-u4O4kH-pw?e=oB58sW)
+- [Automate HA and ELK Integration](https://github.com/chef/monitoring-integration-automate/blob/main/Whitepaper_AutomateHA_Monitoring_and_Alerting.md#elk-integration-with-automate-ha---centralised-logging)
+- [Technical Blog reference of Automate HA and ELK](https://www.chef.io/blog/monitoring-chef-automate-ha-with-elk)
+
+## Prometheus
+
+Prometheus, an open-source tool excels at scraping metrics from HTTP endpoints, making it a go-to for harvesting data from various targets. Refer to the following links for the detailed whitepapers and blog documents.
+
+- [Automate HA and Prometheus Integration](https://github.com/chef/monitoring-integration-automate/blob/main/Whitepaper_AutomateHA_Monitoring_and_Alerting.md#prometheus-integration-with-automate-ha---monitoring)
+- [Technical Blog reference of Automate HA and Prometheus](https://www.chef.io/blog/monitoring-chef-automate-ha-with-prometheus)
