@@ -152,3 +152,17 @@ sorthands for --postgresql is --pg and -p
  source /hab/sup/default/SystemdEnvironmentFile.sh
  automate-backend-ctl show --svc=automate-ha-postgresql
 ```
+
+- To Rotate the password for Postgres cluster, run the command from the bastion node
+
+```sh
+  cd /hab/a2_deploy_workspace/
+  ./scripts/credentials set postgresql --no-auto
+```
+
+- To Rotate the password for Opensearch cluster, run the command from the bastion node
+
+```sh
+  cd /hab/a2_deploy_workspace/
+  ./scripts/credentials set opensearch --no-auto
+```
