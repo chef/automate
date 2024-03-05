@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 75
 +++
 
-You can integrate third-party platforms with [Chef Automate HA](/automate/ha) to monitor Autoamte's health, infrastructure, components, and services.
+You can integrate third-party platforms with [Chef Automate HA](/automate/ha) to monitor Automate's health, infrastructure, components, and services.
 
 Chef Automate HA integrates with the following platforms:
 
