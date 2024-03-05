@@ -23,7 +23,7 @@ Chef Automate HA integrates with the following platforms:
 
 ## Prerequisites
 
-These integrations are supported on Chef Automate HA x.y.
+These integrations are supported on Chef Automate HA 4.12.66.
 
 ## AWS CloudWatch
 
