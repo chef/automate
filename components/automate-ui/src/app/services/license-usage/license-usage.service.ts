@@ -6,6 +6,7 @@ import { ConfigService } from '../config/config.service';
 import { LicenseStatus } from 'app/entities/license/license.model';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from '../../../environments/environment';
+import { BehaviorSubject } from 'rxjs';
 
 declare var postAnalyticsUsageData: any;
 
@@ -17,9 +18,13 @@ export class LicenseUsageService {
   private licenseId;
   private customerId;
   private customerName;
-  public totalNodes;
-  public totalScans;
-  public totalService;
+  private totalNodes;
+  private totalScans;
+  private totalService;
+  public totalNodesSubject = new BehaviorSubject(null);
+  public totalScansSubject = new BehaviorSubject(null);
+  public totalServiceSubject = new BehaviorSubject(null);
+  public initCountFetch = new BehaviorSubject(null);
   private expiration;
   private daysSinceLasPost;
   private periodStartDate;
@@ -34,6 +39,7 @@ export class LicenseUsageService {
   private isProductVersionLoaded = false;
   private isConfigDataLoaded = false;
   private isSummaryDataLoaded = false;
+  
 
   constructor(
     private complianceStatsService: ComplianceStatsService,
@@ -44,7 +50,7 @@ export class LicenseUsageService {
   ) {}
 
   async postAnalyticsUsageDataCall() {
-
+    this.initCountFetch.next(true);
     this.http.get<LicenseStatus>(`${env.gateway_url}/license/status`).subscribe(data => {
       this.expiration = data.licensed_period.end;
       this.isExpirationLoaded = true;
@@ -67,13 +73,17 @@ export class LicenseUsageService {
 
     const complianceUsageStats = await this.complianceStatsService.getComplianceStats();
     this.totalScans = complianceUsageStats['node_cnt'];
+    this.totalScansSubject.next(this.totalScans);
+
     this.daysSinceLasPost = complianceUsageStats['days_since_last_post'];
 
     const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
     this.totalNodes = nodeUsageStats['node_cnt'];
-
+    this.totalNodesSubject.next(this.totalNodes);
+    
     const applicationUsageStats = await this.applicationStatsService.getApplicationStats();
     this.totalService = applicationUsageStats['total_services'];
+    this.totalServiceSubject.next(this.totalService);
 
     const start = new Date();
     start.setDate(start.getDate() - this.daysSinceLasPost);
