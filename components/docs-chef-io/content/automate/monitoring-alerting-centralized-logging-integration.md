@@ -21,6 +21,10 @@ Chef Automate HA integrates with the following platforms:
 - Elastic Stack (ELK)
 - Prometheus
 
+## Prerequisites
+
+These integrations are supported on Chef Automate HA x.y.
+
 ## AWS CloudWatch
 
 Chef Automate HA with AWS CloudWatch gives automate and compliance teams the necessary redundancy and visibility to successfully operate the solution. Refer to the following links for the detailed whitepapers and blog documents.
