@@ -64,7 +64,7 @@ require (
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
 	github.com/nats-io/nats-streaming-server v0.17.0
-	github.com/nats-io/nats.go v1.9.1
+	github.com/nats-io/nats.go v1.10.1-0.20210228004050-ed743748acac
 	github.com/nats-io/stan.go v0.6.0
 	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
@@ -117,7 +117,13 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 )
 
-require github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+require (
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/minio/highwayhash v1.0.1 // indirect
+	github.com/nats-io/jwt/v2 v2.2.0 // indirect
+	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
+)
 
 require (
 	cloud.google.com/go v0.65.0 // indirect
@@ -199,7 +205,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/nats-server/v2 v2.1.4 // indirect
+	github.com/nats-io/nats-server/v2 v2.2.0 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
