@@ -109,6 +109,23 @@ require (
 )
 
 require (
+	github.com/ansrivas/fiberprometheus/v2 v2.6.0
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
+	github.com/gofiber/fiber/v2 v2.46.0
+	github.com/gofiber/utils v1.1.0
+	github.com/hashicorp/go-version v1.6.0
+	github.com/shirou/gopsutil v3.21.11+incompatible
+)
+
+require (
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/minio/highwayhash v1.0.1 // indirect
+	github.com/nats-io/jwt/v2 v2.2.0 // indirect
+	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
+)
+
+require (
 	cloud.google.com/go v0.65.0 // indirect
 	cloud.google.com/go/storage v1.10.0
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
