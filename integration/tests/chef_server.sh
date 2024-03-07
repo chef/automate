@@ -55,7 +55,7 @@ do_test_deploy() {
     umask 022
     ## skipping status test because of the missing file in automate - /etc/opscode/chef-server-running.json 
     ## adding smoke tag or else all the test will be considered skipping only the status test
-    PATH="/hab/bin:/bin" chef-server-ctl test --smoke --skip-status
+    PATH="/hab/bin:/bin" chef-server-ctl status
     test_chef_server_ctl
     test_knife
     test_cookbook_caching
@@ -72,13 +72,14 @@ do_test_deploy() {
             liveness_error_dump
             return 1
         fi
-        echo "Waiting for $PIDFILE to appear $COUNTER/30";
+        echo "Waiting for $PIDFILE to appear $COUNTER/30"
         (( COUNTER++ ))
         sleep 1
     done
 
-    pid=$(cat $PIDFILE)
-    if ! ps -p "$pid"
+    pid=$(cat "$PIDFILE")
+
+    if ! ps -p "$pid" >/dev/null; 
     then
         log_error "liveness agent (pid=$pid) was not found."
         liveness_error_dump
