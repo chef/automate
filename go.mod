@@ -120,7 +120,7 @@ require (
 require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/minio/highwayhash v1.0.1 // indirect
-	github.com/nats-io/jwt/v2 v2.2.0 // indirect
+	github.com/nats-io/jwt/v2 v2.4.0 // indirect
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 )
 
@@ -211,9 +211,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/jwt/v2 v2.0.1 // indirect
-	github.com/nats-io/nats-server/v2 v2.1.9 // indirect
-	github.com/nats-io/nkeys v0.3.0 // indirect
+	github.com/nats-io/nats-server/v2 v2.2.0 // indirect
+	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/peterh/liner v1.2.0 // indirect
