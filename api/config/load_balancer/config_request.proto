@@ -112,7 +112,6 @@ message ConfigRequest {
 			}
 		}
 
-		
 		message Service {
 		}
 	}
