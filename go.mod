@@ -107,6 +107,9 @@ require (
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.1
+)
+
+require (
 	cloud.google.com/go v0.65.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2 // indirect
