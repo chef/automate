@@ -508,6 +508,9 @@ fallbacks:
     - name: github.com/form3tech-oss/jwt-go
       license_id: MIT
       license_content: https://raw.githubusercontent.com/form3tech-oss/jwt-go/master/LICENSE
+    - name: github.com/nats-io/jwt/v2
+      license_id: Apache-2.0
+      license_content: https://github.com/nats-io/jwt/blob/main/LICENSE
     - name: github.com/fortytw2/leaktest
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/fortytw2/leaktest/master/LICENSE
