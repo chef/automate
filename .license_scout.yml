@@ -625,9 +625,9 @@ fallbacks:
     - name: github.com/hashicorp/memberlist
       license_id: MPL-2.0
       license_content: https://raw.githubusercontent.com/hashicorp/memberlist/master/LICENSE
-    - name: github.com/hashicorp/raft-boltdb
-      license_id: MPL-2.0
-      license_content: https://raw.githubusercontent.com/hashicorp/raft-boltdb/master/LICENSE
+    # - name: github.com/hashicorp/raft-boltdb
+    #   license_id: MPL-2.0
+    #   license_content: https://raw.githubusercontent.com/hashicorp/raft-boltdb/master/LICENSE
     - name: github.com/hashicorp/serf
       license_id: MPL-2.0
       license_content: https://raw.githubusercontent.com/hashicorp/serf/master/LICENSE
