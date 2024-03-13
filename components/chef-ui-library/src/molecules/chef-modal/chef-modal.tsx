@@ -154,11 +154,17 @@ export class ChefModal {
           aria-labelledby={this.label}
           tabindex="0">
           <chef-trap-focus>
-            {
-              this.renderButton()
-            }
-            <slot name="title"></slot>
-            <slot />
+            <div>
+              {
+                this.renderButton()
+              }
+            </div>
+            <div>
+              <slot name="title"></slot>
+            </div>
+            <div>
+              <slot />
+            </div>
           </chef-trap-focus>
         </div>
       </Host>

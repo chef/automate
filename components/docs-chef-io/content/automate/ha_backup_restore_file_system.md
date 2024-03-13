@@ -69,10 +69,10 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 ##### Healthcheck commands
 
-- Following command can be run in the OpenSearch node
+- Following command can be run at the bastion node
 
     ```sh
-    chef-automate status
+    chef-automate status --opensearch
     ```
 
 - Following command can be run in the OpenSearch node

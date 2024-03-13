@@ -44,6 +44,14 @@ Chef Automate HA for Managed Services has default port 5432 for Managed PostgreS
 
 ![High Availability Architecture](/images/automate/ha_arch_minnode_cluster.png)
 
+{{< warning >}}
+
+- Choose Minimum node deployment type when you have VM constraints.
+- Minimum node deployment is only for on-premises deployments
+- Minimum node deployment is not supported for AWS deployments
+
+{{< /warning >}}
+
 ## Chef Automate HA Topology
 
 The Chef Automate HA Architecture involves the following clusters as part of the main cluster:

@@ -1,9 +1,9 @@
-import { map, filter } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
 import { ReplaySubject, Observable, Subject } from 'rxjs';
-import * as Sniffr from 'sniffr';
+import Sniffr from 'sniffr';
 
 import { ChefSessionService } from '../chef-session/chef-session.service';
 import { ConfigService } from '../config/config.service';
@@ -18,6 +18,8 @@ import { ComplianceStatsService } from './compliance-stats/compliance-stats.serv
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
 import { ApplicationStatsService } from './application-stats/application-stats.service';
+import { LicenseUsageService } from '../license-usage/license-usage.service';
+import { combineLatest } from 'rxjs';
 
 declare let analytics: any;
 
@@ -61,6 +63,10 @@ export class TelemetryService {
   private isSkipNotification = false;
   private deploymentType: string;
   private licenseExpirationDate: string;
+  private totalNodes = "0";
+  private totalScans = "0";
+  private totalService = "0";
+  private initCountFetchFromUsageService = false;
   deploymentId: string;
 
   constructor(private httpClient: HttpClient,
@@ -72,7 +78,9 @@ export class TelemetryService {
     private store: Store<NgrxStateAtom>,
     private complianceStatsService: ComplianceStatsService,
     private applicationStatsService: ApplicationStatsService,
-    private clientRunsStatsService: ClientRunsStatsService) {
+    private clientRunsStatsService: ClientRunsStatsService,
+    private licenseUsageService: LicenseUsageService
+    ) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
     router.events.subscribe((event) => {
@@ -82,9 +90,11 @@ export class TelemetryService {
         this.page(this.currentUrl, {previousUrl: this.previousUrl});
       }
     });
+    this.licenseUsageService.initCountFetch.subscribe((val) => {
+      this.initCountFetchFromUsageService = val;
+    })
 
     this.configService.getConfig().pipe(
-      filter(config => config.telemetryEnabled),
       map((config) => {
         try {
           this.telemetryEnabled = config.telemetryEnabled;
@@ -93,6 +103,7 @@ export class TelemetryService {
           this.telemetryUrl = config.telemetryUrl;
           this.customerId = config.customerId;
           this.customerName = config.customerName;
+          this.licenseType = config.licenseType;
           this.licenseId = config.licenseId || configService.defaultLicenseId;
           this.maxNodes = config.maxNodes;
           this.instanceId = config.deploymentId || configService.defaultDeployId;
@@ -105,8 +116,22 @@ export class TelemetryService {
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
-        this.registerChefTelemetryTracker();
-        this.initiateTelemetry(trackingOperations);
+        if(this.initCountFetchFromUsageService) {
+          combineLatest([ 
+            this.licenseUsageService.totalNodesSubject,
+            this.licenseUsageService.totalScansSubject, 
+            this.licenseUsageService.totalServiceSubject]).subscribe(
+              ([totalNodesVal, totalScansVal, totalServicesVal]) => {
+                this.totalNodes = totalNodesVal;
+                this.totalScans = totalScansVal;
+                this.totalService = totalServicesVal;
+                if(this.totalNodes && this.totalScans && this.totalService) {
+                  this.initiateTelemetry(trackingOperations);
+                }
+              })
+        }else {
+          this.initiateTelemetry(trackingOperations);
+        }
       });
   }
 
@@ -208,7 +233,7 @@ export class TelemetryService {
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
-          console.log(`Error retrieving Segment API key : ${status}/${message}`);
+          console.log(`Error retrieving Segment API key: ${status}/${message}`);
           if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesFailure(message));
           }
@@ -228,44 +253,63 @@ export class TelemetryService {
     setTimeout(this.registerChefTelemetryTracker,100);
   }
 
-  initializeChefTelemetryTracker() {
+  async initializeChefTelemetryTracker() {
     
     if(!this.licenseExpirationDate) {
       setTimeout(() => { this.initializeChefTelemetryTracker() }, 1000);
       return;
     }
     console.log('initializeChefTelemetryTracker');
+
+    
     try {
-      if(chefTelemetryTracker && this.chefSessionService.telemetry_enabled) {
-        const chefTelemetryTrackerInitData = {
-          visitor: {
-            id: this.chefSessionService.uuid,
-            userName: this.chefSessionService.username,
-            fullName: this.chefSessionService.fullname,
-            telemetryPref: this.chefSessionService.telemetry_enabled,
-            isLocalUser: this.chefSessionService.isLocalUser,
-            group: this.chefSessionService.groups,
-            connector: this.chefSessionService.connector
-          },
-          account: {
-            id: this.customerId,
-            name: this.customerName,
-            instanceId: this.instanceId,
-            deploymentType: this.deploymentType,
-            deploymentId: this.deploymentId,
-            automateVersion: this.buildVersion,
-            licenseId: this.licenseId,
-            licenseType: this.licenseType,
-            licenseExpirationDate: this.licenseExpirationDate
-          }
+      const chefTelemetryTrackerInitData = {
+        visitor: {
+          "id": this.chefSessionService.uuid,
+          "telemetryPref": this.chefSessionService.telemetry_enabled,
+          "connector": this.encodeConnector(this.chefSessionService.connector)
+        },
+        account: {
+          "id": this.customerId,
+          "name": this.customerName,
+          "instanceId": this.instanceId,
+          "deploymentType": this.deploymentType,
+          "deploymentId": this.deploymentId,
+          "licenseId": this.licenseId,
+          "licenseExpirationDate": this.licenseExpirationDate,
+          "product": "Automate",
+          "version": this.buildVersion,
+          "scannedOn":(new Date).toISOString(),
+          "payload_version": 1,
+          "install_context": "habitat",
+          "licenseType": this.licenseType,
+          "origin": "user-interface",
+          "periods_summary_nodes_total": parseInt(this.totalNodes, 10),
+          "periods_summary_scans_targets": parseInt(this.totalScans, 10),
+          "periods_summary_services_targets": parseInt(this.totalService, 10)
         }
-        chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
-        localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
       }
+      // console.log('chefTelemetryTrackerInitData ',chefTelemetryTrackerInitData);
+      chefTelemetryTracker.initialize(chefTelemetryTrackerInitData);
+      localStorage.setItem('chefTelemetryTrackerInitData', JSON.stringify(chefTelemetryTrackerInitData));
     } catch(e) {
       console.log('Unable to initialize ChefTelemetryTracker ', e);
     }
     
+  }
+
+  encodeConnector(connectorType?: string) {
+    const connector = connectorType.toLowerCase();
+    let encodedConnector = 0;
+    switch(connector) {
+      case 'local':
+        encodedConnector = 1;
+      case 'saml':
+        encodedConnector = 2;
+      case 'ldap':
+        encodedConnector = 3;
+    }
+    return encodedConnector;
   }
 
   captureChefTelemetryEvent(event?: string, properties?: any) {
@@ -429,6 +473,8 @@ export class TelemetryService {
     } catch (error) {
       console.log(error);
     }
+    // initialise Pendo
+    this.registerChefTelemetryTracker();
     if (this.chefSessionService.telemetry_enabled) {
       this.isSkipNotification = true;
       this.engageTelemetry(trackingOperations);
@@ -460,6 +506,9 @@ export class TelemetryService {
     try {
       const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
         .getComplianceStats();
+      if(!this.initCountFetchFromUsageService && nodeUsageStats) {
+        this.totalScans = nodeUsageStats['node_cnt'];
+      }
       if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
         const ackStats: NodeUsageAckStats = await this
         .sendNodeStatsToTelemetry(nodeUsageStats, 'complianceTargetCountsGlobal');
@@ -472,6 +521,9 @@ export class TelemetryService {
     try {
       const nodeUsageStats: NodeUsageStats = await this.clientRunsStatsService
         .getClientRunsStats();
+      if(!this.initCountFetchFromUsageService && nodeUsageStats) {
+        this.totalNodes = nodeUsageStats['node_cnt'];
+      }
       if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
         const ackStats: NodeUsageAckStats = await this
         .sendNodeStatsToTelemetry(nodeUsageStats, 'clientRunPureCountGlobal');
@@ -484,6 +536,9 @@ export class TelemetryService {
     try {
       const applicationUsageStats: ApplicationUsageStats = await this.applicationStatsService
         .getApplicationStats();
+        if(!this.initCountFetchFromUsageService && applicationUsageStats) {
+          this.totalService = applicationUsageStats['total_services'];
+        }
         if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
           const ApplicationAckStats: ApplicationUsageAckStats = await this
           .sendApplicationStatsToTelemetry(applicationUsageStats);
