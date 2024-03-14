@@ -1,4 +1,4 @@
-package shared
+package main
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/proxy"
 	"github.com/chef/automate/lib/stringutils"
-	gw "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/sirupsen/logrus"
+	gw "github.com/golang/protobuf/ptypes/wrappers"
 )
 
 const (
@@ -425,7 +425,7 @@ type NgxSettings struct {
 	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
 }
 type NgxHttpSettings struct {
-	IncludeXForwardedFor *w.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
+	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
