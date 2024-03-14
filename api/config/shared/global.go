@@ -433,10 +433,10 @@ type SysSettings struct {
 type V1Settings struct {
 	Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
 }
-type GlobalConfig struct {
+type GlobalConfig1 struct {
 	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
-func SetIncludeXForwardedForToFalse(config *GlobalConfig) error {
+func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
 	if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
 		return errors.New("NGINX HTTP configuration settings not found or nil")
 	}
