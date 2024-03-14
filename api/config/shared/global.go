@@ -422,23 +422,26 @@ func (c *GlobalConfig) PrepareSystemConfig(certificate *TLSCredentials) (Prepare
 	return c.V1.Sys, nil
 }
 type NgxSettings struct {
-    Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
+	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
 }
 type NgxHttpSettings struct {
-    IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
+	IncludeXForwardedFor *w.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
 type SysSettings struct {
-    Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
+	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
+}
+type V1Settings struct {
+	Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
 }
 type GlobalConfig struct {
-    V1  *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
+	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
 func SetIncludeXForwardedForToFalse(config *GlobalConfig) error {
-    if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
-        return errors.New("NGINX HTTP configuration settings not found or nil")
-    }
-    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
-    return nil
+	if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
+		return errors.New("NGINX HTTP configuration settings not found or nil")
+	}
+	config.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
+	return nil
 }
 func (c *GlobalConfig) ValidateReDirectSysLogConfig() error {
 	if c.GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
