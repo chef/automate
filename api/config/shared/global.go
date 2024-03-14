@@ -419,9 +419,9 @@ func (c *GlobalConfig) SetGlobalConfig(g *GlobalConfig) {
 func (c *GlobalConfig) PrepareSystemConfig(certificate *TLSCredentials) (PreparedSystemConfig, error) {
 	sys := c.V1.Sys
 	sys.Tls = certificate
+	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 	return c.V1.Sys, nil
 }
-
 func (c *GlobalConfig) ValidateReDirectSysLogConfig() error {
 	if c.GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 		if c.GetV1().GetLog().GetRedirectLogFilePath().GetValue() == "" {

@@ -564,6 +564,7 @@ type Log struct {
 	CompressRotatedLogs  *wrapperspb.BoolValue   `protobuf:"bytes,5,opt,name=compress_rotated_logs,json=compressRotatedLogs,proto3" json:"compress_rotated_logs,omitempty" toml:"compress_rotated_logs,omitempty" mapstructure:"compress_rotated_logs,omitempty"`
 	MaxSizeRotateLogs    *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=max_size_rotate_logs,json=maxSizeRotateLogs,proto3" json:"max_size_rotate_logs,omitempty" toml:"max_size_rotate_logs,omitempty" mapstructure:"max_size_rotate_logs,omitempty"`
 	MaxNumberRotatedLogs *wrapperspb.Int32Value  `protobuf:"bytes,7,opt,name=max_number_rotated_logs,json=maxNumberRotatedLogs,proto3" json:"max_number_rotated_logs,omitempty" toml:"max_number_rotated_logs,omitempty" mapstructure:"max_number_rotated_logs,omitempty"`
+	IncludeXForwardedFor *wrapperspb.BoolValue   `protobuf:"bytes,8,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty" toml:"include_x_forwarded_for,omitempty" mapstructure:"include_x_forwarded_for,omitempty"`
 }
 
 func (x *Log) Reset() {
@@ -643,6 +644,13 @@ func (x *Log) GetMaxSizeRotateLogs() *wrapperspb.StringValue {
 func (x *Log) GetMaxNumberRotatedLogs() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.MaxNumberRotatedLogs
+	}
+	return nil
+}
+
+func (x *Log) GetIncludeXForwardedFor() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.IncludeXForwardedFor
 	}
 	return nil
 }
@@ -4828,7 +4836,7 @@ var file_config_shared_global_proto_rawDesc = []byte{
 	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72,
 	0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x4a, 0x04,
-	0x08, 0x01, 0x10, 0x02, 0x22, 0xfb, 0x03, 0x0a, 0x03, 0x4c, 0x6f, 0x67, 0x12, 0x32, 0x0a, 0x05,
+	0x08, 0x01, 0x10, 0x02, 0x22, 0xce, 0x04, 0x0a, 0x03, 0x4c, 0x6f, 0x67, 0x12, 0x32, 0x0a, 0x05,
 	0x6c, 0x65, 0x76, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f,
 	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74,
 	0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x05, 0x6c, 0x65, 0x76, 0x65, 0x6c,
@@ -4860,51 +4868,56 @@ var file_config_shared_global_proto_rawDesc = []byte{
 	0x1b, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2e, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x14, 0x6d, 0x61,
 	0x78, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x6f, 0x74, 0x61, 0x74, 0x65, 0x64, 0x4c, 0x6f,
-	0x67, 0x73, 0x22, 0x86, 0x01, 0x0a, 0x0a, 0x44, 0x69, 0x73, 0x63, 0x6c, 0x6f, 0x73, 0x75, 0x72,
-	0x65, 0x12, 0x2e, 0x0a, 0x04, 0x73, 0x68, 0x6f, 0x77, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
-	0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x04, 0x73, 0x68, 0x6f,
-	0x77, 0x12, 0x48, 0x0a, 0x11, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x66, 0x69, 0x6c,
-	0x65, 0x5f, 0x70, 0x61, 0x74, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67,
-	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53,
-	0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0f, 0x6d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x22, 0xf6, 0x01, 0x0a, 0x06,
-	0x42, 0x61, 0x6e, 0x6e, 0x65, 0x72, 0x12, 0x2e, 0x0a, 0x04, 0x73, 0x68, 0x6f, 0x77, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65,
-	0x52, 0x04, 0x73, 0x68, 0x6f, 0x77, 0x12, 0x36, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67,
-	0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x47,
-	0x0a, 0x10, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x5f, 0x63, 0x6f, 0x6c,
-	0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
-	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e,
-	0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0f, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75,
-	0x6e, 0x64, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x12, 0x3b, 0x0a, 0x0a, 0x74, 0x65, 0x78, 0x74, 0x5f,
-	0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f,
+	0x67, 0x73, 0x12, 0x51, 0x0a, 0x17, 0x69, 0x6e, 0x63, 0x6c, 0x75, 0x64, 0x65, 0x5f, 0x78, 0x5f,
+	0x66, 0x6f, 0x72, 0x77, 0x61, 0x72, 0x64, 0x65, 0x64, 0x5f, 0x66, 0x6f, 0x72, 0x18, 0x08, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52,
+	0x14, 0x69, 0x6e, 0x63, 0x6c, 0x75, 0x64, 0x65, 0x58, 0x46, 0x6f, 0x72, 0x77, 0x61, 0x72, 0x64,
+	0x65, 0x64, 0x46, 0x6f, 0x72, 0x22, 0x86, 0x01, 0x0a, 0x0a, 0x44, 0x69, 0x73, 0x63, 0x6c, 0x6f,
+	0x73, 0x75, 0x72, 0x65, 0x12, 0x2e, 0x0a, 0x04, 0x73, 0x68, 0x6f, 0x77, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x04,
+	0x73, 0x68, 0x6f, 0x77, 0x12, 0x48, 0x0a, 0x11, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f,
+	0x66, 0x69, 0x6c, 0x65, 0x5f, 0x70, 0x61, 0x74, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0f, 0x6d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x22, 0xf6,
+	0x01, 0x0a, 0x06, 0x42, 0x61, 0x6e, 0x6e, 0x65, 0x72, 0x12, 0x2e, 0x0a, 0x04, 0x73, 0x68, 0x6f,
+	0x77, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x04, 0x73, 0x68, 0x6f, 0x77, 0x12, 0x36, 0x0a, 0x07, 0x6d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72,
+	0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x12, 0x47, 0x0a, 0x10, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x5f,
+	0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f,
 	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74,
-	0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x09, 0x74, 0x65, 0x78, 0x74, 0x43,
-	0x6f, 0x6c, 0x6f, 0x72, 0x22, 0xac, 0x01, 0x0a, 0x0f, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x4a, 0x0a, 0x13, 0x65, 0x6e, 0x61, 0x62,
-	0x6c, 0x65, 0x5f, 0x69, 0x64, 0x6c, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75,
-	0x65, 0x52, 0x11, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x6c, 0x65, 0x54, 0x69, 0x6d,
-	0x65, 0x6f, 0x75, 0x74, 0x12, 0x4d, 0x0a, 0x14, 0x69, 0x64, 0x6c, 0x65, 0x5f, 0x74, 0x69, 0x6d,
-	0x65, 0x6f, 0x75, 0x74, 0x5f, 0x6d, 0x69, 0x6e, 0x75, 0x74, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52,
-	0x12, 0x69, 0x64, 0x6c, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x4d, 0x69, 0x6e, 0x75,
-	0x74, 0x65, 0x73, 0x22, 0x62, 0x0a, 0x0e, 0x4c, 0x61, 0x72, 0x67, 0x65, 0x52, 0x65, 0x70, 0x6f,
-	0x72, 0x74, 0x69, 0x6e, 0x67, 0x12, 0x50, 0x0a, 0x16, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f,
-	0x6c, 0x61, 0x72, 0x67, 0x65, 0x5f, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75,
-	0x65, 0x52, 0x14, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x4c, 0x61, 0x72, 0x67, 0x65, 0x52, 0x65,
-	0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x42, 0x2c, 0x5a, 0x2a, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d,
-	0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x73,
-	0x68, 0x61, 0x72, 0x65, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0f, 0x62, 0x61, 0x63, 0x6b, 0x67,
+	0x72, 0x6f, 0x75, 0x6e, 0x64, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x12, 0x3b, 0x0a, 0x0a, 0x74, 0x65,
+	0x78, 0x74, 0x5f, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x09, 0x74, 0x65,
+	0x78, 0x74, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x22, 0xac, 0x01, 0x0a, 0x0f, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x4a, 0x0a, 0x13, 0x65,
+	0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x6c, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x6f,
+	0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x52, 0x11, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x6c, 0x65,
+	0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x12, 0x4d, 0x0a, 0x14, 0x69, 0x64, 0x6c, 0x65, 0x5f,
+	0x74, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x5f, 0x6d, 0x69, 0x6e, 0x75, 0x74, 0x65, 0x73, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x52, 0x12, 0x69, 0x64, 0x6c, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x4d,
+	0x69, 0x6e, 0x75, 0x74, 0x65, 0x73, 0x22, 0x62, 0x0a, 0x0e, 0x4c, 0x61, 0x72, 0x67, 0x65, 0x52,
+	0x65, 0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x12, 0x50, 0x0a, 0x16, 0x65, 0x6e, 0x61, 0x62,
+	0x6c, 0x65, 0x5f, 0x6c, 0x61, 0x72, 0x67, 0x65, 0x5f, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69,
+	0x6e, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x52, 0x14, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x4c, 0x61, 0x72, 0x67,
+	0x65, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x42, 0x2c, 0x5a, 0x2a, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69,
+	0x67, 0x2f, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -5022,185 +5035,186 @@ var file_config_shared_global_proto_depIdxs = []int32{
 	58,  // 35: chef.automate.infra.config.Log.compress_rotated_logs:type_name -> google.protobuf.BoolValue
 	56,  // 36: chef.automate.infra.config.Log.max_size_rotate_logs:type_name -> google.protobuf.StringValue
 	59,  // 37: chef.automate.infra.config.Log.max_number_rotated_logs:type_name -> google.protobuf.Int32Value
-	58,  // 38: chef.automate.infra.config.Disclosure.show:type_name -> google.protobuf.BoolValue
-	56,  // 39: chef.automate.infra.config.Disclosure.message_file_path:type_name -> google.protobuf.StringValue
-	58,  // 40: chef.automate.infra.config.Banner.show:type_name -> google.protobuf.BoolValue
-	56,  // 41: chef.automate.infra.config.Banner.message:type_name -> google.protobuf.StringValue
-	56,  // 42: chef.automate.infra.config.Banner.background_color:type_name -> google.protobuf.StringValue
-	56,  // 43: chef.automate.infra.config.Banner.text_color:type_name -> google.protobuf.StringValue
-	58,  // 44: chef.automate.infra.config.SessionSettings.enable_idle_timeout:type_name -> google.protobuf.BoolValue
-	59,  // 45: chef.automate.infra.config.SessionSettings.idle_timeout_minutes:type_name -> google.protobuf.Int32Value
-	58,  // 46: chef.automate.infra.config.LargeReporting.enable_large_reporting:type_name -> google.protobuf.BoolValue
-	60,  // 47: chef.automate.infra.config.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
-	58,  // 48: chef.automate.infra.config.External.Elasticsearch.enable:type_name -> google.protobuf.BoolValue
-	56,  // 49: chef.automate.infra.config.External.Elasticsearch.nodes:type_name -> google.protobuf.StringValue
-	19,  // 50: chef.automate.infra.config.External.Elasticsearch.backup:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup
-	20,  // 51: chef.automate.infra.config.External.Elasticsearch.auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication
-	21,  // 52: chef.automate.infra.config.External.Elasticsearch.ssl:type_name -> chef.automate.infra.config.External.Elasticsearch.SSL
-	58,  // 53: chef.automate.infra.config.External.Opensearch.enable:type_name -> google.protobuf.BoolValue
-	56,  // 54: chef.automate.infra.config.External.Opensearch.nodes:type_name -> google.protobuf.StringValue
-	28,  // 55: chef.automate.infra.config.External.Opensearch.backup:type_name -> chef.automate.infra.config.External.Opensearch.Backup
-	29,  // 56: chef.automate.infra.config.External.Opensearch.auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication
-	30,  // 57: chef.automate.infra.config.External.Opensearch.ssl:type_name -> chef.automate.infra.config.External.Opensearch.SSL
-	56,  // 58: chef.automate.infra.config.External.Minio.endpoint:type_name -> google.protobuf.StringValue
-	56,  // 59: chef.automate.infra.config.External.Minio.root_user:type_name -> google.protobuf.StringValue
-	56,  // 60: chef.automate.infra.config.External.Minio.root_password:type_name -> google.protobuf.StringValue
-	58,  // 61: chef.automate.infra.config.External.Minio.enable_ssl:type_name -> google.protobuf.BoolValue
-	56,  // 62: chef.automate.infra.config.External.Minio.cert:type_name -> google.protobuf.StringValue
-	59,  // 63: chef.automate.infra.config.External.Minio.concurrent_open_search_requests:type_name -> google.protobuf.Int32Value
-	59,  // 64: chef.automate.infra.config.External.Minio.concurrent_minio_requests:type_name -> google.protobuf.Int32Value
-	58,  // 65: chef.automate.infra.config.External.Postgresql.enable:type_name -> google.protobuf.BoolValue
-	56,  // 66: chef.automate.infra.config.External.Postgresql.nodes:type_name -> google.protobuf.StringValue
-	37,  // 67: chef.automate.infra.config.External.Postgresql.backup:type_name -> chef.automate.infra.config.External.Postgresql.Backup
-	38,  // 68: chef.automate.infra.config.External.Postgresql.auth:type_name -> chef.automate.infra.config.External.Postgresql.Authentication
-	39,  // 69: chef.automate.infra.config.External.Postgresql.ssl:type_name -> chef.automate.infra.config.External.Postgresql.SSL
-	58,  // 70: chef.automate.infra.config.External.Automate.enable:type_name -> google.protobuf.BoolValue
-	56,  // 71: chef.automate.infra.config.External.Automate.node:type_name -> google.protobuf.StringValue
-	42,  // 72: chef.automate.infra.config.External.Automate.auth:type_name -> chef.automate.infra.config.External.Automate.Authentication
-	43,  // 73: chef.automate.infra.config.External.Automate.ssl:type_name -> chef.automate.infra.config.External.Automate.SSL
-	58,  // 74: chef.automate.infra.config.External.Elasticsearch.Backup.enable:type_name -> google.protobuf.BoolValue
-	56,  // 75: chef.automate.infra.config.External.Elasticsearch.Backup.location:type_name -> google.protobuf.StringValue
-	22,  // 76: chef.automate.infra.config.External.Elasticsearch.Backup.fs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings
-	23,  // 77: chef.automate.infra.config.External.Elasticsearch.Backup.s3:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings
-	24,  // 78: chef.automate.infra.config.External.Elasticsearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings
-	56,  // 79: chef.automate.infra.config.External.Elasticsearch.Authentication.scheme:type_name -> google.protobuf.StringValue
-	26,  // 80: chef.automate.infra.config.External.Elasticsearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth
-	27,  // 81: chef.automate.infra.config.External.Elasticsearch.Authentication.aws_es:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth
-	56,  // 82: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert:type_name -> google.protobuf.StringValue
-	56,  // 83: chef.automate.infra.config.External.Elasticsearch.SSL.server_name:type_name -> google.protobuf.StringValue
-	56,  // 84: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
-	56,  // 85: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
-	25,  // 86: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings
-	56,  // 87: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
-	56,  // 88: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
-	56,  // 89: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
-	48,  // 90: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
-	56,  // 91: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
-	56,  // 92: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
-	56,  // 93: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
-	53,  // 94: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
-	56,  // 95: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 96: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 97: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
-	56,  // 98: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
-	56,  // 99: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.username:type_name -> google.protobuf.StringValue
-	56,  // 100: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.password:type_name -> google.protobuf.StringValue
-	56,  // 101: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.access_key:type_name -> google.protobuf.StringValue
-	56,  // 102: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.secret_key:type_name -> google.protobuf.StringValue
-	58,  // 103: chef.automate.infra.config.External.Opensearch.Backup.enable:type_name -> google.protobuf.BoolValue
-	56,  // 104: chef.automate.infra.config.External.Opensearch.Backup.location:type_name -> google.protobuf.StringValue
-	31,  // 105: chef.automate.infra.config.External.Opensearch.Backup.fs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings
-	32,  // 106: chef.automate.infra.config.External.Opensearch.Backup.s3:type_name -> chef.automate.infra.config.External.Opensearch.Backup.S3Settings
-	33,  // 107: chef.automate.infra.config.External.Opensearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.GCSSettings
-	56,  // 108: chef.automate.infra.config.External.Opensearch.Authentication.scheme:type_name -> google.protobuf.StringValue
-	35,  // 109: chef.automate.infra.config.External.Opensearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth
-	36,  // 110: chef.automate.infra.config.External.Opensearch.Authentication.aws_os:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth
-	56,  // 111: chef.automate.infra.config.External.Opensearch.SSL.root_cert:type_name -> google.protobuf.StringValue
-	56,  // 112: chef.automate.infra.config.External.Opensearch.SSL.server_name:type_name -> google.protobuf.StringValue
-	56,  // 113: chef.automate.infra.config.External.Opensearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
-	56,  // 114: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
-	34,  // 115: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings
-	56,  // 116: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
-	56,  // 117: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
-	56,  // 118: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
-	49,  // 119: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
-	56,  // 120: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
-	56,  // 121: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
-	56,  // 122: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
-	54,  // 123: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
-	56,  // 124: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 125: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 126: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
-	56,  // 127: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
-	56,  // 128: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.username:type_name -> google.protobuf.StringValue
-	56,  // 129: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.password:type_name -> google.protobuf.StringValue
-	56,  // 130: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.access_key:type_name -> google.protobuf.StringValue
-	56,  // 131: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.secret_key:type_name -> google.protobuf.StringValue
-	58,  // 132: chef.automate.infra.config.External.Postgresql.Backup.enable:type_name -> google.protobuf.BoolValue
-	56,  // 133: chef.automate.infra.config.External.Postgresql.Authentication.scheme:type_name -> google.protobuf.StringValue
-	40,  // 134: chef.automate.infra.config.External.Postgresql.Authentication.password:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication
-	56,  // 135: chef.automate.infra.config.External.Postgresql.SSL.mode:type_name -> google.protobuf.StringValue
-	56,  // 136: chef.automate.infra.config.External.Postgresql.SSL.cert:type_name -> google.protobuf.StringValue
-	56,  // 137: chef.automate.infra.config.External.Postgresql.SSL.key:type_name -> google.protobuf.StringValue
-	56,  // 138: chef.automate.infra.config.External.Postgresql.SSL.root_cert:type_name -> google.protobuf.StringValue
-	58,  // 139: chef.automate.infra.config.External.Postgresql.SSL.enable:type_name -> google.protobuf.BoolValue
-	41,  // 140: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.superuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
-	41,  // 141: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.dbuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
-	56,  // 142: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.username:type_name -> google.protobuf.StringValue
-	56,  // 143: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.password:type_name -> google.protobuf.StringValue
-	56,  // 144: chef.automate.infra.config.External.Automate.Authentication.scheme:type_name -> google.protobuf.StringValue
-	56,  // 145: chef.automate.infra.config.External.Automate.Authentication.token:type_name -> google.protobuf.StringValue
-	56,  // 146: chef.automate.infra.config.External.Automate.SSL.root_cert:type_name -> google.protobuf.StringValue
-	56,  // 147: chef.automate.infra.config.External.Automate.SSL.server_name:type_name -> google.protobuf.StringValue
-	56,  // 148: chef.automate.infra.config.Backups.Filesystem.path:type_name -> google.protobuf.StringValue
-	56,  // 149: chef.automate.infra.config.Backups.Filesystem.es_max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 150: chef.automate.infra.config.Backups.Filesystem.es_max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	47,  // 151: chef.automate.infra.config.Backups.S3.credentials:type_name -> chef.automate.infra.config.Backups.S3.AWSCredentials
-	48,  // 152: chef.automate.infra.config.Backups.S3.es:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
-	50,  // 153: chef.automate.infra.config.Backups.S3.bucket:type_name -> chef.automate.infra.config.Backups.S3.Bucket
-	51,  // 154: chef.automate.infra.config.Backups.S3.ssl:type_name -> chef.automate.infra.config.Backups.S3.SSL
-	49,  // 155: chef.automate.infra.config.Backups.S3.os:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
-	52,  // 156: chef.automate.infra.config.Backups.GCS.credentials:type_name -> chef.automate.infra.config.Backups.GCS.GCPCredentials
-	53,  // 157: chef.automate.infra.config.Backups.GCS.es:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
-	55,  // 158: chef.automate.infra.config.Backups.GCS.bucket:type_name -> chef.automate.infra.config.Backups.GCS.Bucket
-	54,  // 159: chef.automate.infra.config.Backups.GCS.os:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
-	56,  // 160: chef.automate.infra.config.Backups.S3.AWSCredentials.access_key:type_name -> google.protobuf.StringValue
-	56,  // 161: chef.automate.infra.config.Backups.S3.AWSCredentials.secret_key:type_name -> google.protobuf.StringValue
-	56,  // 162: chef.automate.infra.config.Backups.S3.AWSCredentials.session_token:type_name -> google.protobuf.StringValue
-	58,  // 163: chef.automate.infra.config.Backups.S3.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
-	58,  // 164: chef.automate.infra.config.Backups.S3.Elasticsearch.server_side_encryption:type_name -> google.protobuf.BoolValue
-	56,  // 165: chef.automate.infra.config.Backups.S3.Elasticsearch.buffer_size:type_name -> google.protobuf.StringValue
-	56,  // 166: chef.automate.infra.config.Backups.S3.Elasticsearch.canned_acl:type_name -> google.protobuf.StringValue
-	56,  // 167: chef.automate.infra.config.Backups.S3.Elasticsearch.storage_class:type_name -> google.protobuf.StringValue
-	56,  // 168: chef.automate.infra.config.Backups.S3.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 169: chef.automate.infra.config.Backups.S3.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 170: chef.automate.infra.config.Backups.S3.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
-	56,  // 171: chef.automate.infra.config.Backups.S3.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
-	59,  // 172: chef.automate.infra.config.Backups.S3.Elasticsearch.max_retries:type_name -> google.protobuf.Int32Value
-	58,  // 173: chef.automate.infra.config.Backups.S3.Elasticsearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
-	56,  // 174: chef.automate.infra.config.Backups.S3.Elasticsearch.protocol:type_name -> google.protobuf.StringValue
-	56,  // 175: chef.automate.infra.config.Backups.S3.Elasticsearch.region:type_name -> google.protobuf.StringValue
-	56,  // 176: chef.automate.infra.config.Backups.S3.Elasticsearch.role_arn:type_name -> google.protobuf.StringValue
-	58,  // 177: chef.automate.infra.config.Backups.S3.Opensearch.compress:type_name -> google.protobuf.BoolValue
-	58,  // 178: chef.automate.infra.config.Backups.S3.Opensearch.server_side_encryption:type_name -> google.protobuf.BoolValue
-	56,  // 179: chef.automate.infra.config.Backups.S3.Opensearch.buffer_size:type_name -> google.protobuf.StringValue
-	56,  // 180: chef.automate.infra.config.Backups.S3.Opensearch.canned_acl:type_name -> google.protobuf.StringValue
-	56,  // 181: chef.automate.infra.config.Backups.S3.Opensearch.storage_class:type_name -> google.protobuf.StringValue
-	56,  // 182: chef.automate.infra.config.Backups.S3.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 183: chef.automate.infra.config.Backups.S3.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 184: chef.automate.infra.config.Backups.S3.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
-	56,  // 185: chef.automate.infra.config.Backups.S3.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
-	59,  // 186: chef.automate.infra.config.Backups.S3.Opensearch.max_retries:type_name -> google.protobuf.Int32Value
-	58,  // 187: chef.automate.infra.config.Backups.S3.Opensearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
-	56,  // 188: chef.automate.infra.config.Backups.S3.Opensearch.protocol:type_name -> google.protobuf.StringValue
-	56,  // 189: chef.automate.infra.config.Backups.S3.Opensearch.region:type_name -> google.protobuf.StringValue
-	56,  // 190: chef.automate.infra.config.Backups.S3.Opensearch.role_arn:type_name -> google.protobuf.StringValue
-	56,  // 191: chef.automate.infra.config.Backups.S3.Bucket.endpoint:type_name -> google.protobuf.StringValue
-	56,  // 192: chef.automate.infra.config.Backups.S3.Bucket.base_path:type_name -> google.protobuf.StringValue
-	56,  // 193: chef.automate.infra.config.Backups.S3.Bucket.name:type_name -> google.protobuf.StringValue
-	56,  // 194: chef.automate.infra.config.Backups.S3.SSL.root_cert:type_name -> google.protobuf.StringValue
-	56,  // 195: chef.automate.infra.config.Backups.GCS.GCPCredentials.json:type_name -> google.protobuf.StringValue
-	58,  // 196: chef.automate.infra.config.Backups.GCS.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
-	58,  // 197: chef.automate.infra.config.Backups.GCS.Elasticsearch.application_name:type_name -> google.protobuf.BoolValue
-	56,  // 198: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 199: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 200: chef.automate.infra.config.Backups.GCS.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
-	56,  // 201: chef.automate.infra.config.Backups.GCS.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
-	58,  // 202: chef.automate.infra.config.Backups.GCS.Elasticsearch.connect_timeout:type_name -> google.protobuf.BoolValue
-	58,  // 203: chef.automate.infra.config.Backups.GCS.Opensearch.compress:type_name -> google.protobuf.BoolValue
-	58,  // 204: chef.automate.infra.config.Backups.GCS.Opensearch.application_name:type_name -> google.protobuf.BoolValue
-	56,  // 205: chef.automate.infra.config.Backups.GCS.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 206: chef.automate.infra.config.Backups.GCS.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
-	56,  // 207: chef.automate.infra.config.Backups.GCS.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
-	56,  // 208: chef.automate.infra.config.Backups.GCS.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
-	58,  // 209: chef.automate.infra.config.Backups.GCS.Opensearch.connect_timeout:type_name -> google.protobuf.BoolValue
-	56,  // 210: chef.automate.infra.config.Backups.GCS.Bucket.base_path:type_name -> google.protobuf.StringValue
-	56,  // 211: chef.automate.infra.config.Backups.GCS.Bucket.name:type_name -> google.protobuf.StringValue
-	212, // [212:212] is the sub-list for method output_type
-	212, // [212:212] is the sub-list for method input_type
-	212, // [212:212] is the sub-list for extension type_name
-	212, // [212:212] is the sub-list for extension extendee
-	0,   // [0:212] is the sub-list for field type_name
+	58,  // 38: chef.automate.infra.config.Log.include_x_forwarded_for:type_name -> google.protobuf.BoolValue
+	58,  // 39: chef.automate.infra.config.Disclosure.show:type_name -> google.protobuf.BoolValue
+	56,  // 40: chef.automate.infra.config.Disclosure.message_file_path:type_name -> google.protobuf.StringValue
+	58,  // 41: chef.automate.infra.config.Banner.show:type_name -> google.protobuf.BoolValue
+	56,  // 42: chef.automate.infra.config.Banner.message:type_name -> google.protobuf.StringValue
+	56,  // 43: chef.automate.infra.config.Banner.background_color:type_name -> google.protobuf.StringValue
+	56,  // 44: chef.automate.infra.config.Banner.text_color:type_name -> google.protobuf.StringValue
+	58,  // 45: chef.automate.infra.config.SessionSettings.enable_idle_timeout:type_name -> google.protobuf.BoolValue
+	59,  // 46: chef.automate.infra.config.SessionSettings.idle_timeout_minutes:type_name -> google.protobuf.Int32Value
+	58,  // 47: chef.automate.infra.config.LargeReporting.enable_large_reporting:type_name -> google.protobuf.BoolValue
+	60,  // 48: chef.automate.infra.config.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
+	58,  // 49: chef.automate.infra.config.External.Elasticsearch.enable:type_name -> google.protobuf.BoolValue
+	56,  // 50: chef.automate.infra.config.External.Elasticsearch.nodes:type_name -> google.protobuf.StringValue
+	19,  // 51: chef.automate.infra.config.External.Elasticsearch.backup:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup
+	20,  // 52: chef.automate.infra.config.External.Elasticsearch.auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication
+	21,  // 53: chef.automate.infra.config.External.Elasticsearch.ssl:type_name -> chef.automate.infra.config.External.Elasticsearch.SSL
+	58,  // 54: chef.automate.infra.config.External.Opensearch.enable:type_name -> google.protobuf.BoolValue
+	56,  // 55: chef.automate.infra.config.External.Opensearch.nodes:type_name -> google.protobuf.StringValue
+	28,  // 56: chef.automate.infra.config.External.Opensearch.backup:type_name -> chef.automate.infra.config.External.Opensearch.Backup
+	29,  // 57: chef.automate.infra.config.External.Opensearch.auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication
+	30,  // 58: chef.automate.infra.config.External.Opensearch.ssl:type_name -> chef.automate.infra.config.External.Opensearch.SSL
+	56,  // 59: chef.automate.infra.config.External.Minio.endpoint:type_name -> google.protobuf.StringValue
+	56,  // 60: chef.automate.infra.config.External.Minio.root_user:type_name -> google.protobuf.StringValue
+	56,  // 61: chef.automate.infra.config.External.Minio.root_password:type_name -> google.protobuf.StringValue
+	58,  // 62: chef.automate.infra.config.External.Minio.enable_ssl:type_name -> google.protobuf.BoolValue
+	56,  // 63: chef.automate.infra.config.External.Minio.cert:type_name -> google.protobuf.StringValue
+	59,  // 64: chef.automate.infra.config.External.Minio.concurrent_open_search_requests:type_name -> google.protobuf.Int32Value
+	59,  // 65: chef.automate.infra.config.External.Minio.concurrent_minio_requests:type_name -> google.protobuf.Int32Value
+	58,  // 66: chef.automate.infra.config.External.Postgresql.enable:type_name -> google.protobuf.BoolValue
+	56,  // 67: chef.automate.infra.config.External.Postgresql.nodes:type_name -> google.protobuf.StringValue
+	37,  // 68: chef.automate.infra.config.External.Postgresql.backup:type_name -> chef.automate.infra.config.External.Postgresql.Backup
+	38,  // 69: chef.automate.infra.config.External.Postgresql.auth:type_name -> chef.automate.infra.config.External.Postgresql.Authentication
+	39,  // 70: chef.automate.infra.config.External.Postgresql.ssl:type_name -> chef.automate.infra.config.External.Postgresql.SSL
+	58,  // 71: chef.automate.infra.config.External.Automate.enable:type_name -> google.protobuf.BoolValue
+	56,  // 72: chef.automate.infra.config.External.Automate.node:type_name -> google.protobuf.StringValue
+	42,  // 73: chef.automate.infra.config.External.Automate.auth:type_name -> chef.automate.infra.config.External.Automate.Authentication
+	43,  // 74: chef.automate.infra.config.External.Automate.ssl:type_name -> chef.automate.infra.config.External.Automate.SSL
+	58,  // 75: chef.automate.infra.config.External.Elasticsearch.Backup.enable:type_name -> google.protobuf.BoolValue
+	56,  // 76: chef.automate.infra.config.External.Elasticsearch.Backup.location:type_name -> google.protobuf.StringValue
+	22,  // 77: chef.automate.infra.config.External.Elasticsearch.Backup.fs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings
+	23,  // 78: chef.automate.infra.config.External.Elasticsearch.Backup.s3:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings
+	24,  // 79: chef.automate.infra.config.External.Elasticsearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings
+	56,  // 80: chef.automate.infra.config.External.Elasticsearch.Authentication.scheme:type_name -> google.protobuf.StringValue
+	26,  // 81: chef.automate.infra.config.External.Elasticsearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth
+	27,  // 82: chef.automate.infra.config.External.Elasticsearch.Authentication.aws_es:type_name -> chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth
+	56,  // 83: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 84: chef.automate.infra.config.External.Elasticsearch.SSL.server_name:type_name -> google.protobuf.StringValue
+	56,  // 85: chef.automate.infra.config.External.Elasticsearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
+	56,  // 86: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
+	25,  // 87: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings
+	56,  // 88: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 89: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
+	56,  // 90: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
+	48,  // 91: chef.automate.infra.config.External.Elasticsearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
+	56,  // 92: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 93: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
+	56,  // 94: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
+	53,  // 95: chef.automate.infra.config.External.Elasticsearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
+	56,  // 96: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 97: chef.automate.infra.config.External.Elasticsearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 98: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 99: chef.automate.infra.config.External.Elasticsearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 100: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 101: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 102: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.access_key:type_name -> google.protobuf.StringValue
+	56,  // 103: chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth.secret_key:type_name -> google.protobuf.StringValue
+	58,  // 104: chef.automate.infra.config.External.Opensearch.Backup.enable:type_name -> google.protobuf.BoolValue
+	56,  // 105: chef.automate.infra.config.External.Opensearch.Backup.location:type_name -> google.protobuf.StringValue
+	31,  // 106: chef.automate.infra.config.External.Opensearch.Backup.fs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings
+	32,  // 107: chef.automate.infra.config.External.Opensearch.Backup.s3:type_name -> chef.automate.infra.config.External.Opensearch.Backup.S3Settings
+	33,  // 108: chef.automate.infra.config.External.Opensearch.Backup.gcs:type_name -> chef.automate.infra.config.External.Opensearch.Backup.GCSSettings
+	56,  // 109: chef.automate.infra.config.External.Opensearch.Authentication.scheme:type_name -> google.protobuf.StringValue
+	35,  // 110: chef.automate.infra.config.External.Opensearch.Authentication.basic_auth:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth
+	36,  // 111: chef.automate.infra.config.External.Opensearch.Authentication.aws_os:type_name -> chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth
+	56,  // 112: chef.automate.infra.config.External.Opensearch.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 113: chef.automate.infra.config.External.Opensearch.SSL.server_name:type_name -> google.protobuf.StringValue
+	56,  // 114: chef.automate.infra.config.External.Opensearch.SSL.root_cert_file:type_name -> google.protobuf.StringValue
+	56,  // 115: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.path:type_name -> google.protobuf.StringValue
+	34,  // 116: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.settings:type_name -> chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings
+	56,  // 117: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 118: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.client:type_name -> google.protobuf.StringValue
+	56,  // 119: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.base_path:type_name -> google.protobuf.StringValue
+	49,  // 120: chef.automate.infra.config.External.Opensearch.Backup.S3Settings.settings:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
+	56,  // 121: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.bucket:type_name -> google.protobuf.StringValue
+	56,  // 122: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.client:type_name -> google.protobuf.StringValue
+	56,  // 123: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.base_path:type_name -> google.protobuf.StringValue
+	54,  // 124: chef.automate.infra.config.External.Opensearch.Backup.GCSSettings.settings:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
+	56,  // 125: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 126: chef.automate.infra.config.External.Opensearch.Backup.FsSettings.OptionalSettings.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 127: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 128: chef.automate.infra.config.External.Opensearch.Authentication.BasicAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 129: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.username:type_name -> google.protobuf.StringValue
+	56,  // 130: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.password:type_name -> google.protobuf.StringValue
+	56,  // 131: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.access_key:type_name -> google.protobuf.StringValue
+	56,  // 132: chef.automate.infra.config.External.Opensearch.Authentication.AwsOpensearchAuth.secret_key:type_name -> google.protobuf.StringValue
+	58,  // 133: chef.automate.infra.config.External.Postgresql.Backup.enable:type_name -> google.protobuf.BoolValue
+	56,  // 134: chef.automate.infra.config.External.Postgresql.Authentication.scheme:type_name -> google.protobuf.StringValue
+	40,  // 135: chef.automate.infra.config.External.Postgresql.Authentication.password:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication
+	56,  // 136: chef.automate.infra.config.External.Postgresql.SSL.mode:type_name -> google.protobuf.StringValue
+	56,  // 137: chef.automate.infra.config.External.Postgresql.SSL.cert:type_name -> google.protobuf.StringValue
+	56,  // 138: chef.automate.infra.config.External.Postgresql.SSL.key:type_name -> google.protobuf.StringValue
+	56,  // 139: chef.automate.infra.config.External.Postgresql.SSL.root_cert:type_name -> google.protobuf.StringValue
+	58,  // 140: chef.automate.infra.config.External.Postgresql.SSL.enable:type_name -> google.protobuf.BoolValue
+	41,  // 141: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.superuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
+	41,  // 142: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.dbuser:type_name -> chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User
+	56,  // 143: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.username:type_name -> google.protobuf.StringValue
+	56,  // 144: chef.automate.infra.config.External.Postgresql.Authentication.PasswordAuthentication.User.password:type_name -> google.protobuf.StringValue
+	56,  // 145: chef.automate.infra.config.External.Automate.Authentication.scheme:type_name -> google.protobuf.StringValue
+	56,  // 146: chef.automate.infra.config.External.Automate.Authentication.token:type_name -> google.protobuf.StringValue
+	56,  // 147: chef.automate.infra.config.External.Automate.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 148: chef.automate.infra.config.External.Automate.SSL.server_name:type_name -> google.protobuf.StringValue
+	56,  // 149: chef.automate.infra.config.Backups.Filesystem.path:type_name -> google.protobuf.StringValue
+	56,  // 150: chef.automate.infra.config.Backups.Filesystem.es_max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 151: chef.automate.infra.config.Backups.Filesystem.es_max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	47,  // 152: chef.automate.infra.config.Backups.S3.credentials:type_name -> chef.automate.infra.config.Backups.S3.AWSCredentials
+	48,  // 153: chef.automate.infra.config.Backups.S3.es:type_name -> chef.automate.infra.config.Backups.S3.Elasticsearch
+	50,  // 154: chef.automate.infra.config.Backups.S3.bucket:type_name -> chef.automate.infra.config.Backups.S3.Bucket
+	51,  // 155: chef.automate.infra.config.Backups.S3.ssl:type_name -> chef.automate.infra.config.Backups.S3.SSL
+	49,  // 156: chef.automate.infra.config.Backups.S3.os:type_name -> chef.automate.infra.config.Backups.S3.Opensearch
+	52,  // 157: chef.automate.infra.config.Backups.GCS.credentials:type_name -> chef.automate.infra.config.Backups.GCS.GCPCredentials
+	53,  // 158: chef.automate.infra.config.Backups.GCS.es:type_name -> chef.automate.infra.config.Backups.GCS.Elasticsearch
+	55,  // 159: chef.automate.infra.config.Backups.GCS.bucket:type_name -> chef.automate.infra.config.Backups.GCS.Bucket
+	54,  // 160: chef.automate.infra.config.Backups.GCS.os:type_name -> chef.automate.infra.config.Backups.GCS.Opensearch
+	56,  // 161: chef.automate.infra.config.Backups.S3.AWSCredentials.access_key:type_name -> google.protobuf.StringValue
+	56,  // 162: chef.automate.infra.config.Backups.S3.AWSCredentials.secret_key:type_name -> google.protobuf.StringValue
+	56,  // 163: chef.automate.infra.config.Backups.S3.AWSCredentials.session_token:type_name -> google.protobuf.StringValue
+	58,  // 164: chef.automate.infra.config.Backups.S3.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 165: chef.automate.infra.config.Backups.S3.Elasticsearch.server_side_encryption:type_name -> google.protobuf.BoolValue
+	56,  // 166: chef.automate.infra.config.Backups.S3.Elasticsearch.buffer_size:type_name -> google.protobuf.StringValue
+	56,  // 167: chef.automate.infra.config.Backups.S3.Elasticsearch.canned_acl:type_name -> google.protobuf.StringValue
+	56,  // 168: chef.automate.infra.config.Backups.S3.Elasticsearch.storage_class:type_name -> google.protobuf.StringValue
+	56,  // 169: chef.automate.infra.config.Backups.S3.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 170: chef.automate.infra.config.Backups.S3.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 171: chef.automate.infra.config.Backups.S3.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 172: chef.automate.infra.config.Backups.S3.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
+	59,  // 173: chef.automate.infra.config.Backups.S3.Elasticsearch.max_retries:type_name -> google.protobuf.Int32Value
+	58,  // 174: chef.automate.infra.config.Backups.S3.Elasticsearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
+	56,  // 175: chef.automate.infra.config.Backups.S3.Elasticsearch.protocol:type_name -> google.protobuf.StringValue
+	56,  // 176: chef.automate.infra.config.Backups.S3.Elasticsearch.region:type_name -> google.protobuf.StringValue
+	56,  // 177: chef.automate.infra.config.Backups.S3.Elasticsearch.role_arn:type_name -> google.protobuf.StringValue
+	58,  // 178: chef.automate.infra.config.Backups.S3.Opensearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 179: chef.automate.infra.config.Backups.S3.Opensearch.server_side_encryption:type_name -> google.protobuf.BoolValue
+	56,  // 180: chef.automate.infra.config.Backups.S3.Opensearch.buffer_size:type_name -> google.protobuf.StringValue
+	56,  // 181: chef.automate.infra.config.Backups.S3.Opensearch.canned_acl:type_name -> google.protobuf.StringValue
+	56,  // 182: chef.automate.infra.config.Backups.S3.Opensearch.storage_class:type_name -> google.protobuf.StringValue
+	56,  // 183: chef.automate.infra.config.Backups.S3.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 184: chef.automate.infra.config.Backups.S3.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 185: chef.automate.infra.config.Backups.S3.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 186: chef.automate.infra.config.Backups.S3.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
+	59,  // 187: chef.automate.infra.config.Backups.S3.Opensearch.max_retries:type_name -> google.protobuf.Int32Value
+	58,  // 188: chef.automate.infra.config.Backups.S3.Opensearch.use_throttle_retries:type_name -> google.protobuf.BoolValue
+	56,  // 189: chef.automate.infra.config.Backups.S3.Opensearch.protocol:type_name -> google.protobuf.StringValue
+	56,  // 190: chef.automate.infra.config.Backups.S3.Opensearch.region:type_name -> google.protobuf.StringValue
+	56,  // 191: chef.automate.infra.config.Backups.S3.Opensearch.role_arn:type_name -> google.protobuf.StringValue
+	56,  // 192: chef.automate.infra.config.Backups.S3.Bucket.endpoint:type_name -> google.protobuf.StringValue
+	56,  // 193: chef.automate.infra.config.Backups.S3.Bucket.base_path:type_name -> google.protobuf.StringValue
+	56,  // 194: chef.automate.infra.config.Backups.S3.Bucket.name:type_name -> google.protobuf.StringValue
+	56,  // 195: chef.automate.infra.config.Backups.S3.SSL.root_cert:type_name -> google.protobuf.StringValue
+	56,  // 196: chef.automate.infra.config.Backups.GCS.GCPCredentials.json:type_name -> google.protobuf.StringValue
+	58,  // 197: chef.automate.infra.config.Backups.GCS.Elasticsearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 198: chef.automate.infra.config.Backups.GCS.Elasticsearch.application_name:type_name -> google.protobuf.BoolValue
+	56,  // 199: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 200: chef.automate.infra.config.Backups.GCS.Elasticsearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 201: chef.automate.infra.config.Backups.GCS.Elasticsearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 202: chef.automate.infra.config.Backups.GCS.Elasticsearch.read_timeout:type_name -> google.protobuf.StringValue
+	58,  // 203: chef.automate.infra.config.Backups.GCS.Elasticsearch.connect_timeout:type_name -> google.protobuf.BoolValue
+	58,  // 204: chef.automate.infra.config.Backups.GCS.Opensearch.compress:type_name -> google.protobuf.BoolValue
+	58,  // 205: chef.automate.infra.config.Backups.GCS.Opensearch.application_name:type_name -> google.protobuf.BoolValue
+	56,  // 206: chef.automate.infra.config.Backups.GCS.Opensearch.max_snapshot_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 207: chef.automate.infra.config.Backups.GCS.Opensearch.max_restore_bytes_per_sec:type_name -> google.protobuf.StringValue
+	56,  // 208: chef.automate.infra.config.Backups.GCS.Opensearch.chunk_size:type_name -> google.protobuf.StringValue
+	56,  // 209: chef.automate.infra.config.Backups.GCS.Opensearch.read_timeout:type_name -> google.protobuf.StringValue
+	58,  // 210: chef.automate.infra.config.Backups.GCS.Opensearch.connect_timeout:type_name -> google.protobuf.BoolValue
+	56,  // 211: chef.automate.infra.config.Backups.GCS.Bucket.base_path:type_name -> google.protobuf.StringValue
+	56,  // 212: chef.automate.infra.config.Backups.GCS.Bucket.name:type_name -> google.protobuf.StringValue
+	213, // [213:213] is the sub-list for method output_type
+	213, // [213:213] is the sub-list for method input_type
+	213, // [213:213] is the sub-list for extension type_name
+	213, // [213:213] is the sub-list for extension extendee
+	0,   // [0:213] is the sub-list for field type_name
 }
 
 func init() { file_config_shared_global_proto_init() }
