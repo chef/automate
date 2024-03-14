@@ -1,4 +1,4 @@
-package opa
+package main
 
 // nolint:lll
 //go:generate go-bindata -pkg $GOPACKAGE -o policy.bindata.go -ignore .*_test.rego -ignore Makefile -ignore README\.md policy/...
@@ -238,6 +238,7 @@ func (s *State) ProjectsAuthorized(
 	}
 	projs := make(ast.Array, len(projects))
 	for i, proj := range projects {
+
 		projs[i] = ast.NewTerm(ast.String(proj))
 	}
 	input := ast.NewObject(
