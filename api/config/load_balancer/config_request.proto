@@ -101,8 +101,7 @@ message ConfigRequest {
 					google.protobuf.BoolValue enable_csp_header = 29;
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;
-					google.protobuf.BoolValue enable_param = 30;
-		
+					google.protobuf.BoolValue enable_param = 30;		
 				}
 
 				message Mail {
