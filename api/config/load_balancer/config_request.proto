@@ -99,9 +99,11 @@ message ConfigRequest {
 					google.protobuf.StringValue proxy_buffers = 27;
 					google.protobuf.StringValue proxy_busy_buffers_size = 28;
 					google.protobuf.BoolValue enable_csp_header = 29;
+
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;
-					google.protobuf.BoolValue enable_param = 30;		
+					google.protobuf.BoolValue enable_param = 30;
+		
 				}
 
 				message Mail {
@@ -112,4 +114,4 @@ message ConfigRequest {
 		message Service {
 		}
 	}
-} 
+}
