@@ -99,7 +99,6 @@ message ConfigRequest {
 					google.protobuf.StringValue proxy_buffers = 27;
 					google.protobuf.StringValue proxy_busy_buffers_size = 28;
 					google.protobuf.BoolValue enable_csp_header = 29;
-                    chef.automate.infra.config.V1.System.Nginx.Http IncludeXForwardedFor = 31;
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;
 					google.protobuf.BoolValue enable_param = 30;

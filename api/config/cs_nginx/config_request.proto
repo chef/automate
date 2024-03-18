@@ -68,7 +68,6 @@ message ConfigRequest {
 					google.protobuf.Int32Value ssl_verify_depth = 15;
 					google.protobuf.Int32Value server_names_hash_bucket_size = 16;
 					google.protobuf.StringValue client_body_buffer_size = 17;
-					chef.automate.infra.config.V1.System.Nginx.Http IncludeXForwardedFor = 18;
 				}
 			}
 

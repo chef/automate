@@ -69,7 +69,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
 
 	c.V1.Sys.RequiredRecipe.Enabled = w.Bool(false)
-	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 	return c
 }
 
