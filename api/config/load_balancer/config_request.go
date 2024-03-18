@@ -75,7 +75,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
 	c.V1.Sys.StaticConfig.Products = []string{"automate"}
-	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
+	c.V1.Sys.Ngx.Http.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 	return c
 }
 
