@@ -373,7 +373,6 @@ message Opensearch {
     }
   }
 }
-
 message Log {
   google.protobuf.StringValue level = 1;
   google.protobuf.StringValue format = 2;
