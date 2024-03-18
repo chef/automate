@@ -69,7 +69,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
 
 	c.V1.Sys.RequiredRecipe.Enabled = w.Bool(false)
-    c.V1.Sys.Nginx.Http.IncludeXForwardedFor = w.Bool(false)
+    c.V1.Sys.Ngx.Http.IncludeXForwardedFor = &google.protobuf.BoolValue{Value: false}
 	return c
 }
 
