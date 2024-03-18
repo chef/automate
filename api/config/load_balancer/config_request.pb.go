@@ -642,34 +642,35 @@ type ConfigRequest_V1_System_Nginx_Http struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AccessLog                      *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=access_log,json=accessLog,proto3" json:"access_log,omitempty" toml:"access_log,omitempty" mapstructure:"access_log,omitempty"`
-	AccessLogBufferSize            *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=access_log_buffer_size,json=accessLogBufferSize,proto3" json:"access_log_buffer_size,omitempty" toml:"access_log_buffer_size,omitempty" mapstructure:"access_log_buffer_size,omitempty"`
-	AccessLogFlushTime             *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=access_log_flush_time,json=accessLogFlushTime,proto3" json:"access_log_flush_time,omitempty" toml:"access_log_flush_time,omitempty" mapstructure:"access_log_flush_time,omitempty"`
-	ClientMaxBodySize              *wrapperspb.StringValue `protobuf:"bytes,20,opt,name=client_max_body_size,json=clientMaxBodySize,proto3" json:"client_max_body_size,omitempty" toml:"client_max_body_size,omitempty" mapstructure:"client_max_body_size,omitempty"`
-	ClientBodyBufferSize           *wrapperspb.StringValue `protobuf:"bytes,23,opt,name=client_body_buffer_size,json=clientBodyBufferSize,proto3" json:"client_body_buffer_size,omitempty" toml:"client_body_buffer_size,omitempty" mapstructure:"client_body_buffer_size,omitempty"`
-	DefaultType                    *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=default_type,json=defaultType,proto3" json:"default_type,omitempty" toml:"default_type,omitempty" mapstructure:"default_type,omitempty"`
-	KeepaliveTimeout               *wrapperspb.Int32Value  `protobuf:"bytes,5,opt,name=keepalive_timeout,json=keepaliveTimeout,proto3" json:"keepalive_timeout,omitempty" toml:"keepalive_timeout,omitempty" mapstructure:"keepalive_timeout,omitempty"`
-	KeepaliveRequests              *wrapperspb.Int32Value  `protobuf:"bytes,6,opt,name=keepalive_requests,json=keepaliveRequests,proto3" json:"keepalive_requests,omitempty" toml:"keepalive_requests,omitempty" mapstructure:"keepalive_requests,omitempty"`
-	Gzip                           *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=gzip,proto3" json:"gzip,omitempty" toml:"gzip,omitempty" mapstructure:"gzip,omitempty"`
-	GzipCompLevel                  *wrapperspb.StringValue `protobuf:"bytes,8,opt,name=gzip_comp_level,json=gzipCompLevel,proto3" json:"gzip_comp_level,omitempty" toml:"gzip_comp_level,omitempty" mapstructure:"gzip_comp_level,omitempty"`
-	GzipDisable                    *wrapperspb.StringValue `protobuf:"bytes,9,opt,name=gzip_disable,json=gzipDisable,proto3" json:"gzip_disable,omitempty" toml:"gzip_disable,omitempty" mapstructure:"gzip_disable,omitempty"`
-	GzipHttpVersion                *wrapperspb.StringValue `protobuf:"bytes,10,opt,name=gzip_http_version,json=gzipHttpVersion,proto3" json:"gzip_http_version,omitempty" toml:"gzip_http_version,omitempty" mapstructure:"gzip_http_version,omitempty"`
-	GzipMinLength                  *wrapperspb.Int32Value  `protobuf:"bytes,11,opt,name=gzip_min_length,json=gzipMinLength,proto3" json:"gzip_min_length,omitempty" toml:"gzip_min_length,omitempty" mapstructure:"gzip_min_length,omitempty"`
-	GzipProxied                    *wrapperspb.StringValue `protobuf:"bytes,12,opt,name=gzip_proxied,json=gzipProxied,proto3" json:"gzip_proxied,omitempty" toml:"gzip_proxied,omitempty" mapstructure:"gzip_proxied,omitempty"`
-	GzipTypes                      *wrapperspb.StringValue `protobuf:"bytes,13,opt,name=gzip_types,json=gzipTypes,proto3" json:"gzip_types,omitempty" toml:"gzip_types,omitempty" mapstructure:"gzip_types,omitempty"`
-	GzipVary                       *wrapperspb.StringValue `protobuf:"bytes,14,opt,name=gzip_vary,json=gzipVary,proto3" json:"gzip_vary,omitempty" toml:"gzip_vary,omitempty" mapstructure:"gzip_vary,omitempty"`
-	LargeClientHeaderBuffersSize   *wrapperspb.StringValue `protobuf:"bytes,21,opt,name=large_client_header_buffers_size,json=largeClientHeaderBuffersSize,proto3" json:"large_client_header_buffers_size,omitempty" toml:"large_client_header_buffers_size,omitempty" mapstructure:"large_client_header_buffers_size,omitempty"`
-	LargeClientHeaderBuffersNumber *wrapperspb.Int32Value  `protobuf:"bytes,22,opt,name=large_client_header_buffers_number,json=largeClientHeaderBuffersNumber,proto3" json:"large_client_header_buffers_number,omitempty" toml:"large_client_header_buffers_number,omitempty" mapstructure:"large_client_header_buffers_number,omitempty"`
-	Sendfile                       *wrapperspb.StringValue `protobuf:"bytes,15,opt,name=sendfile,proto3" json:"sendfile,omitempty" toml:"sendfile,omitempty" mapstructure:"sendfile,omitempty"`
-	SslCiphers                     *wrapperspb.StringValue `protobuf:"bytes,16,opt,name=ssl_ciphers,json=sslCiphers,proto3" json:"ssl_ciphers,omitempty" toml:"ssl_ciphers,omitempty" mapstructure:"ssl_ciphers,omitempty"`
-	SslProtocols                   *wrapperspb.StringValue `protobuf:"bytes,17,opt,name=ssl_protocols,json=sslProtocols,proto3" json:"ssl_protocols,omitempty" toml:"ssl_protocols,omitempty" mapstructure:"ssl_protocols,omitempty"`
-	TcpNodelay                     *wrapperspb.StringValue `protobuf:"bytes,18,opt,name=tcp_nodelay,json=tcpNodelay,proto3" json:"tcp_nodelay,omitempty" toml:"tcp_nodelay,omitempty" mapstructure:"tcp_nodelay,omitempty"`
-	TcpNopush                      *wrapperspb.StringValue `protobuf:"bytes,19,opt,name=tcp_nopush,json=tcpNopush,proto3" json:"tcp_nopush,omitempty" toml:"tcp_nopush,omitempty" mapstructure:"tcp_nopush,omitempty"`
-	ProxyBuffering                 *wrapperspb.StringValue `protobuf:"bytes,25,opt,name=proxy_buffering,json=proxyBuffering,proto3" json:"proxy_buffering,omitempty" toml:"proxy_buffering,omitempty" mapstructure:"proxy_buffering,omitempty"`
-	ProxyBufferSize                *wrapperspb.StringValue `protobuf:"bytes,26,opt,name=proxy_buffer_size,json=proxyBufferSize,proto3" json:"proxy_buffer_size,omitempty" toml:"proxy_buffer_size,omitempty" mapstructure:"proxy_buffer_size,omitempty"`
-	ProxyBuffers                   *wrapperspb.StringValue `protobuf:"bytes,27,opt,name=proxy_buffers,json=proxyBuffers,proto3" json:"proxy_buffers,omitempty" toml:"proxy_buffers,omitempty" mapstructure:"proxy_buffers,omitempty"`
-	ProxyBusyBuffersSize           *wrapperspb.StringValue `protobuf:"bytes,28,opt,name=proxy_busy_buffers_size,json=proxyBusyBuffersSize,proto3" json:"proxy_busy_buffers_size,omitempty" toml:"proxy_busy_buffers_size,omitempty" mapstructure:"proxy_busy_buffers_size,omitempty"`
-	EnableCspHeader                *wrapperspb.BoolValue   `protobuf:"bytes,29,opt,name=enable_csp_header,json=enableCspHeader,proto3" json:"enable_csp_header,omitempty" toml:"enable_csp_header,omitempty" mapstructure:"enable_csp_header,omitempty"`
+	AccessLog                      *wrapperspb.StringValue      `protobuf:"bytes,1,opt,name=access_log,json=accessLog,proto3" json:"access_log,omitempty" toml:"access_log,omitempty" mapstructure:"access_log,omitempty"`
+	AccessLogBufferSize            *wrapperspb.StringValue      `protobuf:"bytes,2,opt,name=access_log_buffer_size,json=accessLogBufferSize,proto3" json:"access_log_buffer_size,omitempty" toml:"access_log_buffer_size,omitempty" mapstructure:"access_log_buffer_size,omitempty"`
+	AccessLogFlushTime             *wrapperspb.StringValue      `protobuf:"bytes,3,opt,name=access_log_flush_time,json=accessLogFlushTime,proto3" json:"access_log_flush_time,omitempty" toml:"access_log_flush_time,omitempty" mapstructure:"access_log_flush_time,omitempty"`
+	ClientMaxBodySize              *wrapperspb.StringValue      `protobuf:"bytes,20,opt,name=client_max_body_size,json=clientMaxBodySize,proto3" json:"client_max_body_size,omitempty" toml:"client_max_body_size,omitempty" mapstructure:"client_max_body_size,omitempty"`
+	ClientBodyBufferSize           *wrapperspb.StringValue      `protobuf:"bytes,23,opt,name=client_body_buffer_size,json=clientBodyBufferSize,proto3" json:"client_body_buffer_size,omitempty" toml:"client_body_buffer_size,omitempty" mapstructure:"client_body_buffer_size,omitempty"`
+	DefaultType                    *wrapperspb.StringValue      `protobuf:"bytes,4,opt,name=default_type,json=defaultType,proto3" json:"default_type,omitempty" toml:"default_type,omitempty" mapstructure:"default_type,omitempty"`
+	KeepaliveTimeout               *wrapperspb.Int32Value       `protobuf:"bytes,5,opt,name=keepalive_timeout,json=keepaliveTimeout,proto3" json:"keepalive_timeout,omitempty" toml:"keepalive_timeout,omitempty" mapstructure:"keepalive_timeout,omitempty"`
+	KeepaliveRequests              *wrapperspb.Int32Value       `protobuf:"bytes,6,opt,name=keepalive_requests,json=keepaliveRequests,proto3" json:"keepalive_requests,omitempty" toml:"keepalive_requests,omitempty" mapstructure:"keepalive_requests,omitempty"`
+	Gzip                           *wrapperspb.StringValue      `protobuf:"bytes,7,opt,name=gzip,proto3" json:"gzip,omitempty" toml:"gzip,omitempty" mapstructure:"gzip,omitempty"`
+	GzipCompLevel                  *wrapperspb.StringValue      `protobuf:"bytes,8,opt,name=gzip_comp_level,json=gzipCompLevel,proto3" json:"gzip_comp_level,omitempty" toml:"gzip_comp_level,omitempty" mapstructure:"gzip_comp_level,omitempty"`
+	GzipDisable                    *wrapperspb.StringValue      `protobuf:"bytes,9,opt,name=gzip_disable,json=gzipDisable,proto3" json:"gzip_disable,omitempty" toml:"gzip_disable,omitempty" mapstructure:"gzip_disable,omitempty"`
+	GzipHttpVersion                *wrapperspb.StringValue      `protobuf:"bytes,10,opt,name=gzip_http_version,json=gzipHttpVersion,proto3" json:"gzip_http_version,omitempty" toml:"gzip_http_version,omitempty" mapstructure:"gzip_http_version,omitempty"`
+	GzipMinLength                  *wrapperspb.Int32Value       `protobuf:"bytes,11,opt,name=gzip_min_length,json=gzipMinLength,proto3" json:"gzip_min_length,omitempty" toml:"gzip_min_length,omitempty" mapstructure:"gzip_min_length,omitempty"`
+	GzipProxied                    *wrapperspb.StringValue      `protobuf:"bytes,12,opt,name=gzip_proxied,json=gzipProxied,proto3" json:"gzip_proxied,omitempty" toml:"gzip_proxied,omitempty" mapstructure:"gzip_proxied,omitempty"`
+	GzipTypes                      *wrapperspb.StringValue      `protobuf:"bytes,13,opt,name=gzip_types,json=gzipTypes,proto3" json:"gzip_types,omitempty" toml:"gzip_types,omitempty" mapstructure:"gzip_types,omitempty"`
+	GzipVary                       *wrapperspb.StringValue      `protobuf:"bytes,14,opt,name=gzip_vary,json=gzipVary,proto3" json:"gzip_vary,omitempty" toml:"gzip_vary,omitempty" mapstructure:"gzip_vary,omitempty"`
+	LargeClientHeaderBuffersSize   *wrapperspb.StringValue      `protobuf:"bytes,21,opt,name=large_client_header_buffers_size,json=largeClientHeaderBuffersSize,proto3" json:"large_client_header_buffers_size,omitempty" toml:"large_client_header_buffers_size,omitempty" mapstructure:"large_client_header_buffers_size,omitempty"`
+	LargeClientHeaderBuffersNumber *wrapperspb.Int32Value       `protobuf:"bytes,22,opt,name=large_client_header_buffers_number,json=largeClientHeaderBuffersNumber,proto3" json:"large_client_header_buffers_number,omitempty" toml:"large_client_header_buffers_number,omitempty" mapstructure:"large_client_header_buffers_number,omitempty"`
+	Sendfile                       *wrapperspb.StringValue      `protobuf:"bytes,15,opt,name=sendfile,proto3" json:"sendfile,omitempty" toml:"sendfile,omitempty" mapstructure:"sendfile,omitempty"`
+	SslCiphers                     *wrapperspb.StringValue      `protobuf:"bytes,16,opt,name=ssl_ciphers,json=sslCiphers,proto3" json:"ssl_ciphers,omitempty" toml:"ssl_ciphers,omitempty" mapstructure:"ssl_ciphers,omitempty"`
+	SslProtocols                   *wrapperspb.StringValue      `protobuf:"bytes,17,opt,name=ssl_protocols,json=sslProtocols,proto3" json:"ssl_protocols,omitempty" toml:"ssl_protocols,omitempty" mapstructure:"ssl_protocols,omitempty"`
+	TcpNodelay                     *wrapperspb.StringValue      `protobuf:"bytes,18,opt,name=tcp_nodelay,json=tcpNodelay,proto3" json:"tcp_nodelay,omitempty" toml:"tcp_nodelay,omitempty" mapstructure:"tcp_nodelay,omitempty"`
+	TcpNopush                      *wrapperspb.StringValue      `protobuf:"bytes,19,opt,name=tcp_nopush,json=tcpNopush,proto3" json:"tcp_nopush,omitempty" toml:"tcp_nopush,omitempty" mapstructure:"tcp_nopush,omitempty"`
+	ProxyBuffering                 *wrapperspb.StringValue      `protobuf:"bytes,25,opt,name=proxy_buffering,json=proxyBuffering,proto3" json:"proxy_buffering,omitempty" toml:"proxy_buffering,omitempty" mapstructure:"proxy_buffering,omitempty"`
+	ProxyBufferSize                *wrapperspb.StringValue      `protobuf:"bytes,26,opt,name=proxy_buffer_size,json=proxyBufferSize,proto3" json:"proxy_buffer_size,omitempty" toml:"proxy_buffer_size,omitempty" mapstructure:"proxy_buffer_size,omitempty"`
+	ProxyBuffers                   *wrapperspb.StringValue      `protobuf:"bytes,27,opt,name=proxy_buffers,json=proxyBuffers,proto3" json:"proxy_buffers,omitempty" toml:"proxy_buffers,omitempty" mapstructure:"proxy_buffers,omitempty"`
+	ProxyBusyBuffersSize           *wrapperspb.StringValue      `protobuf:"bytes,28,opt,name=proxy_busy_buffers_size,json=proxyBusyBuffersSize,proto3" json:"proxy_busy_buffers_size,omitempty" toml:"proxy_busy_buffers_size,omitempty" mapstructure:"proxy_busy_buffers_size,omitempty"`
+	EnableCspHeader                *wrapperspb.BoolValue        `protobuf:"bytes,29,opt,name=enable_csp_header,json=enableCspHeader,proto3" json:"enable_csp_header,omitempty" toml:"enable_csp_header,omitempty" mapstructure:"enable_csp_header,omitempty"`
+	IncludeXForwardedFor           *shared.V1_System_Nginx_Http `protobuf:"bytes,31,opt,name=IncludeXForwardedFor,proto3" json:"IncludeXForwardedFor,omitempty" toml:"IncludeXForwardedFor,omitempty" mapstructure:"IncludeXForwardedFor,omitempty"`
 	// Auto-calculated
 	Ipv6Supported *wrapperspb.BoolValue `protobuf:"bytes,24,opt,name=ipv6_supported,json=ipv6Supported,proto3" json:"ipv6_supported,omitempty" toml:"ipv6_supported,omitempty" mapstructure:"ipv6_supported,omitempty"`
 	EnableParam   *wrapperspb.BoolValue `protobuf:"bytes,30,opt,name=enable_param,json=enableParam,proto3" json:"enable_param,omitempty" toml:"enable_param,omitempty" mapstructure:"enable_param,omitempty"`
@@ -903,6 +904,13 @@ func (x *ConfigRequest_V1_System_Nginx_Http) GetEnableCspHeader() *wrapperspb.Bo
 	return nil
 }
 
+func (x *ConfigRequest_V1_System_Nginx_Http) GetIncludeXForwardedFor() *shared.V1_System_Nginx_Http {
+	if x != nil {
+		return x.IncludeXForwardedFor
+	}
+	return nil
+}
+
 func (x *ConfigRequest_V1_System_Nginx_Http) GetIpv6Supported() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.Ipv6Supported
@@ -972,12 +980,12 @@ var file_config_load_balancer_config_request_proto_rawDesc = []byte{
 	0x6e, 0x66, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x77, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x73, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x22, 0xdb, 0x21, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52,
+	0x72, 0x6f, 0x74, 0x6f, 0x22, 0xc1, 0x22, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x43, 0x0a, 0x02, 0x76, 0x31, 0x18, 0x03, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x33, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61,
 	0x74, 0x65, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x2e, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x62, 0x61,
 	0x6c, 0x61, 0x6e, 0x63, 0x65, 0x72, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x31, 0x52, 0x02, 0x76, 0x31, 0x1a, 0xe0, 0x20, 0x0a, 0x02,
+	0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x31, 0x52, 0x02, 0x76, 0x31, 0x1a, 0xc6, 0x21, 0x0a, 0x02,
 	0x56, 0x31, 0x12, 0x4c, 0x0a, 0x03, 0x73, 0x79, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x3a, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e,
 	0x69, 0x6e, 0x66, 0x72, 0x61, 0x2e, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x62, 0x61, 0x6c, 0x61, 0x6e,
@@ -988,7 +996,7 @@ var file_config_load_balancer_config_request_proto_rawDesc = []byte{
 	0x66, 0x72, 0x61, 0x2e, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65,
 	0x72, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e,
 	0x56, 0x31, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x52, 0x03, 0x73, 0x76, 0x63, 0x1a,
-	0xb1, 0x1f, 0x0a, 0x06, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x12, 0x34, 0x0a, 0x04, 0x6d, 0x6c,
+	0x97, 0x20, 0x0a, 0x06, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x12, 0x34, 0x0a, 0x04, 0x6d, 0x6c,
 	0x73, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e,
 	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x2e, 0x63,
 	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x4d, 0x6c, 0x73, 0x61, 0x52, 0x04, 0x6d, 0x6c, 0x73, 0x61,
@@ -1057,7 +1065,7 @@ var file_config_load_balancer_config_request_proto_rawDesc = []byte{
 	0x72, 0x12, 0x32, 0x0a, 0x05, 0x6c, 0x65, 0x76, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
 	0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x05,
-	0x6c, 0x65, 0x76, 0x65, 0x6c, 0x1a, 0xdb, 0x16, 0x0a, 0x05, 0x4e, 0x67, 0x69, 0x6e, 0x78, 0x12,
+	0x6c, 0x65, 0x76, 0x65, 0x6c, 0x1a, 0xc1, 0x17, 0x0a, 0x05, 0x4e, 0x67, 0x69, 0x6e, 0x78, 0x12,
 	0x59, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x45, 0x2e,
 	0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e,
 	0x66, 0x72, 0x61, 0x2e, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65,
@@ -1104,7 +1112,7 @@ var file_config_load_balancer_config_request_proto_rawDesc = []byte{
 	0x6c, 0x74, 0x69, 0x5f, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
 	0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0b,
-	0x6d, 0x75, 0x6c, 0x74, 0x69, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x1a, 0xdd, 0x10, 0x0a, 0x04,
+	0x6d, 0x75, 0x6c, 0x74, 0x69, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x1a, 0xc3, 0x11, 0x0a, 0x04,
 	0x48, 0x74, 0x74, 0x70, 0x12, 0x3b, 0x0a, 0x0a, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x5f, 0x6c,
 	0x6f, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e,
@@ -1230,22 +1238,29 @@ var file_config_load_balancer_config_request_proto_rawDesc = []byte{
 	0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x18, 0x1d, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42,
 	0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0f, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65,
-	0x43, 0x73, 0x70, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12, 0x41, 0x0a, 0x0e, 0x69, 0x70, 0x76,
-	0x36, 0x5f, 0x73, 0x75, 0x70, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x18, 0x18, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0d, 0x69,
-	0x70, 0x76, 0x36, 0x53, 0x75, 0x70, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x12, 0x3d, 0x0a, 0x0c,
-	0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x18, 0x1e, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0b,
-	0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x1a, 0x06, 0x0a, 0x04, 0x4d,
-	0x61, 0x69, 0x6c, 0x1a, 0x09, 0x0a, 0x07, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x3a, 0x1c,
-	0xc2, 0xf3, 0x18, 0x18, 0x0a, 0x16, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2d, 0x6c,
-	0x6f, 0x61, 0x64, 0x2d, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x72, 0x4a, 0x04, 0x08, 0x01,
-	0x10, 0x03, 0x42, 0x33, 0x5a, 0x31, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61,
-	0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x62,
-	0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x43, 0x73, 0x70, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12, 0x64, 0x0a, 0x14, 0x49, 0x6e, 0x63,
+	0x6c, 0x75, 0x64, 0x65, 0x58, 0x46, 0x6f, 0x72, 0x77, 0x61, 0x72, 0x64, 0x65, 0x64, 0x46, 0x6f,
+	0x72, 0x18, 0x1f, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x30, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61,
+	0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x2e, 0x63, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x2e, 0x56, 0x31, 0x2e, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x2e, 0x4e,
+	0x67, 0x69, 0x6e, 0x78, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x52, 0x14, 0x49, 0x6e, 0x63, 0x6c, 0x75,
+	0x64, 0x65, 0x58, 0x46, 0x6f, 0x72, 0x77, 0x61, 0x72, 0x64, 0x65, 0x64, 0x46, 0x6f, 0x72, 0x12,
+	0x41, 0x0a, 0x0e, 0x69, 0x70, 0x76, 0x36, 0x5f, 0x73, 0x75, 0x70, 0x70, 0x6f, 0x72, 0x74, 0x65,
+	0x64, 0x18, 0x18, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x0d, 0x69, 0x70, 0x76, 0x36, 0x53, 0x75, 0x70, 0x70, 0x6f, 0x72, 0x74,
+	0x65, 0x64, 0x12, 0x3d, 0x0a, 0x0c, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x70, 0x61, 0x72,
+	0x61, 0x6d, 0x18, 0x1e, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x52, 0x0b, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x50, 0x61, 0x72, 0x61,
+	0x6d, 0x1a, 0x06, 0x0a, 0x04, 0x4d, 0x61, 0x69, 0x6c, 0x1a, 0x09, 0x0a, 0x07, 0x53, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x3a, 0x1c, 0xc2, 0xf3, 0x18, 0x18, 0x0a, 0x16, 0x61, 0x75, 0x74, 0x6f,
+	0x6d, 0x61, 0x74, 0x65, 0x2d, 0x6c, 0x6f, 0x61, 0x64, 0x2d, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63,
+	0x65, 0x72, 0x4a, 0x04, 0x08, 0x01, 0x10, 0x03, 0x42, 0x33, 0x5a, 0x31, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f,
+	0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f,
+	0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x72, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1281,6 +1296,7 @@ var file_config_load_balancer_config_request_proto_goTypes = []interface{}{
 	(*wrapperspb.StringValue)(nil),               // 16: google.protobuf.StringValue
 	(*wrapperspb.Int32Value)(nil),                // 17: google.protobuf.Int32Value
 	(*wrapperspb.BoolValue)(nil),                 // 18: google.protobuf.BoolValue
+	(*shared.V1_System_Nginx_Http)(nil),          // 19: chef.automate.infra.config.V1.System.Nginx.Http
 }
 var file_config_load_balancer_config_request_proto_depIdxs = []int32{
 	1,  // 0: chef.automate.infra.load_balancer.ConfigRequest.v1:type_name -> chef.automate.infra.load_balancer.ConfigRequest.V1
@@ -1337,13 +1353,14 @@ var file_config_load_balancer_config_request_proto_depIdxs = []int32{
 	16, // 51: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.proxy_buffers:type_name -> google.protobuf.StringValue
 	16, // 52: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.proxy_busy_buffers_size:type_name -> google.protobuf.StringValue
 	18, // 53: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.enable_csp_header:type_name -> google.protobuf.BoolValue
-	18, // 54: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.ipv6_supported:type_name -> google.protobuf.BoolValue
-	18, // 55: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.enable_param:type_name -> google.protobuf.BoolValue
-	56, // [56:56] is the sub-list for method output_type
-	56, // [56:56] is the sub-list for method input_type
-	56, // [56:56] is the sub-list for extension type_name
-	56, // [56:56] is the sub-list for extension extendee
-	0,  // [0:56] is the sub-list for field type_name
+	19, // 54: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.IncludeXForwardedFor:type_name -> chef.automate.infra.config.V1.System.Nginx.Http
+	18, // 55: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.ipv6_supported:type_name -> google.protobuf.BoolValue
+	18, // 56: chef.automate.infra.load_balancer.ConfigRequest.V1.System.Nginx.Http.enable_param:type_name -> google.protobuf.BoolValue
+	57, // [57:57] is the sub-list for method output_type
+	57, // [57:57] is the sub-list for method input_type
+	57, // [57:57] is the sub-list for extension type_name
+	57, // [57:57] is the sub-list for extension extendee
+	0,  // [0:57] is the sub-list for field type_name
 }
 
 func init() { file_config_load_balancer_config_request_proto_init() }

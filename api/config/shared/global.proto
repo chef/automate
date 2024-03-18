@@ -31,6 +31,14 @@ message V1 {
 
   message System {
     chef.automate.infra.config.TLSCredentials tls = 1;
+    Nginx ngx = 2;
+    message Nginx {
+				Http http = 1;
+        message Http {
+          google.protobuf.BoolValue include_x_forwarded_for = 1;
+        }
+    }
+
   }
 
   message Service {}
