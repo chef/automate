@@ -845,6 +845,9 @@ fallbacks:
     - name: core/ruby
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
+    - name: core/ruby25
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/ruby26
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
@@ -1003,8 +1006,7 @@ exceptions:
     - name: core/ruby30
       reason: Ruby license (previously shipped in Automate 1)
     - name: core/ruby27
-      reason:  Exception made for chef server upgrade
-
+      reason:  Exception made for chef server upgrade 
 
   ruby:
     - name: highline

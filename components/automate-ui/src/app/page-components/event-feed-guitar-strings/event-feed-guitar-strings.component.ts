@@ -321,7 +321,7 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
 
   itemSelected(_item: GuitarStringItem): void {}
 
-  @HostListener('window:resize', ['$event.target'])
+  @HostListener('window:resize')
   onResize() {
     this.updateGraphic();
   }

@@ -417,9 +417,7 @@ var ProductMetadataJSON = `
       "metadata": {
         "name": "chef/automate-workflow-server",
         "data_service": false,
-        "binlinks": [
-          "workflow-ctl"
-        ],
+        "binlinks": null,
         "uses_platform_scaffolding": false,
         "bootstrap": null
       }

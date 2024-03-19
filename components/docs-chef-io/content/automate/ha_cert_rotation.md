@@ -23,7 +23,15 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 ## Prerequisites
 
-- Either existing certificates can be used or to generate new ones, click [here](https://docs.chef.io/automate/ha_cert_selfsign/)
+Either existing certificates can be used or to generate new ones, click [here](https://docs.chef.io/automate/ha_cert_selfsign/)
+
+Generate the certificates using recommended tools and supported algorithms and versions mentioned below:
+
+-   OpenSSL: 1.0.2zb-fips
+-   OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
+-   Certificate Format: X509 V3(PEM format) ,Private key is in PKCS8 format
+
+To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
 
 ## Rotate using Cert-Rotate Command
 
@@ -110,7 +118,7 @@ You can also use `--cc` instead of `--certificate-config` as a sort form.
         ip = "10.1.2.247"
         public_key = "full path of os3.pem"
         private_key = "full path of os3-key.pem"
-    ```
+  ```
 
 
 ### Rotate Certificates of each service
