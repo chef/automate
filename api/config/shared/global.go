@@ -11,9 +11,8 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/proxy"
 	"github.com/chef/automate/lib/stringutils"
-	import (
-		"github.com/golang/protobuf/ptypes/wrappers"
-		"github.com/sirupsen/logrus"
+	"github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/sirupsen/logrus"
 	)
 	
 	const (
