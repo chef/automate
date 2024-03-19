@@ -120,7 +120,7 @@ To rotate certificates of entire cluster using single command, we need a certifi
     private_key = "full path of os3-key.pem"
 ```
 
-### Rotate Certificates of Each Service
+### Rotate Certificates of each service
 
 If you want to rotate certificates of the entire cluster, then you can follow the below commands:
 
