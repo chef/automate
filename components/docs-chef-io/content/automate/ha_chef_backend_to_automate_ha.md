@@ -280,7 +280,7 @@ Where:
     ./chef-automate deploy config.toml --airgap-bundle <airgapped bundle name>
     ```
 
-10. Clean up the old packages from the chef-backend (like ElasticSearch and PostgreSQL)
+10. Clean up the old packages from the chef-backend (like Elasticsearch and PostgreSQL)
 11. Once done, [restore data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-data-to-chef-automate-ha)
 12. [Validate the data](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 

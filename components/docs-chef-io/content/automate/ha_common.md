@@ -114,7 +114,7 @@ Follow these steps to rotate your certificates that are to be used in Chef Autom
 
 1. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
 
-1. For rotating the ElasticSearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
+1. For rotating the Elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
 
     <!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
 
@@ -134,7 +134,7 @@ Follow these steps to rotate your certificates that are to be used in Chef Autom
 
 1. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
 
-1. For rotating the ElasticSearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
+1. For rotating the Elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
 
 ### What are Self Signed Certificates?
 
@@ -376,7 +376,7 @@ The default limit to create a VPC in a region is *5*. However, if the VPCs used 
 
 {{< note >}}
 
-You require a minimum of three node clusters for ElasticSearch and PostgreSQL instances.
+You require a minimum of three node clusters for Elasticsearch and PostgreSQL instances.
 
 {{< /note >}}
 

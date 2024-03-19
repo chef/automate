@@ -54,7 +54,7 @@ With the AWS Free Usage Tier*, you can get started with Amazon S3 for free in al
 
 ## Taking Backup with Amazon S3 Bucket
 
-This section explains how to take backup for External ElasticSearch (ES) and PostgreSQL to the Amazon S3 bucket.
+This section explains how to take backup for External Elasticsearch (ES) and PostgreSQL to the Amazon S3 bucket.
 
 {{< note >}}
 

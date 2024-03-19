@@ -111,7 +111,7 @@ done
 
     Check the status using the `hab svc status` command. None of the services should be running. Once checked, stop the habitat supervisor with the command `systemctl stop hab-sup`. Rename /hab dir to something else like /hab-old.
 
-1. Unload services from each of the ElasticSearch Nodes
+1. Unload services from each of the Elasticsearch Nodes
 
     ```sh
     sudo hab svc unload chef/automate-backend-elasticsidecar
@@ -138,7 +138,7 @@ In case the backup configuration was skipped in the deployment config.toml, the 
 
 {{<note>}}
 
-While configuring the backup configuration provide the path of **ElasticSearch** instead of **OpenSearch** as A2HA backup was in ElasticSearch directory
+While configuring the backup configuration provide the path of **ElasticSearch** instead of **OpenSearch** as A2HA backup was in Elasticsearch directory
 like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`
 
 {{</note>}}
@@ -182,11 +182,11 @@ sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ 
 
 {{< note >}}
 
-- After the restore command is successfully executed, run the `chef-automate config show` command. Both the ElasticSearch and OpenSearch configs are part of Automate Config. Keep both configs; it won't impact the functionality. After restoring Automate HA is configured to communicate with OpenSearch.
+- After the restore command is successfully executed, run the `chef-automate config show` command. Both the Elasticsearch and OpenSearch configs are part of Automate Config. Keep both configs; it won't impact the functionality. After restoring Automate HA is configured to communicate with OpenSearch.
 
 OR
 
-- We can remove the ElasticSearch config from the automate. To do that, redirect the applied config to the file and set the config again.
+- We can remove the Elasticsearch config from the automate. To do that, redirect the applied config to the file and set the config again.
 
 ```bash
 chef-automate config show > applied_config.toml
@@ -247,9 +247,9 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 
 1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA CLI `chef-automate cleanup --onprem-deployment` and then remove `/bin/chef-automate` from all frontend nodes, now try the installation again.
 
-1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
+1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the Elasticsearch snapshot.
 2. While restoring the backup if an error related to backup directory occurs like
-> **Error in Automate node:** failed to create snapshot repository: ElasticSearch repository create request failed for repo**
+> **Error in Automate node:** failed to create snapshot repository: Elasticsearch repository create request failed for repo**
 > OR
 > **Error in OpenSearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
 
