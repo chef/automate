@@ -51,9 +51,9 @@ chef-automate cert show -c
 chef-automate cert show --cs
 ```
 
-## Viewing certificates of Postgresql cluster
+## Viewing certificates of PostgreSQL cluster
 
-To view certificates of Postgresql cluster, run the following command:
+To view certificates of PostgreSQL cluster, run the following command:
 
 ```bash
 chef-automate cert show --postgresql

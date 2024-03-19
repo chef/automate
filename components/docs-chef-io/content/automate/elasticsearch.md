@@ -1,18 +1,18 @@
 +++
-title = "Elasticsearch"
+title = "ElasticSearch"
 date = 2022-01-04T12:09:09-08:00
 draft = false
 
 [menu]
   [menu.automate]
-    title = "Configure Elasticsearch"
-    identifier = "automate/configuring_automate/elasticsearch/elasticsearch.md Elasticsearch"
+    title = "Configure ElasticSearch"
+    identifier = "automate/configuring_automate/elasticsearch/elasticsearch.md ElasticSearch"
     parent = "automate/configuring_automate/elasticsearch"
 +++
 
 You can configure Chef Automate to use Elasticsearch clusters that are not deployed via Chef Automate itself.
 
-## Configure External Elasticsearch
+## Configure External ElasticSearch
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
@@ -54,7 +54,7 @@ Add the following to your config.toml:
 
 Because externally-deployed Elasticsearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
-### Add Resolvers for Elasticsearch
+### Add Resolvers for ElasticSearch
 
 In case you want to resolve the Elasticsearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
 
@@ -89,7 +89,7 @@ If you wish to reset to the default configuration or to modify the configuration
 1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
 1. Run `chef-automate config set config.toml` to apply your changes.
 
-## Backup External Elasticsearch
+## Backup External ElasticSearch
 
 ### Backup External Elasticsearch to a Local Filesystem
 

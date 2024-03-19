@@ -16,7 +16,7 @@ This guide covers upgrading services used by Chef Automate.
 
 On January 21, 2021, Elastic NV announced that they would change their software licensing strategy and not release new versions of Elasticsearch and Kibana under the permissive ALv2 license. Instead, Elastic is releasing Elasticsearch and Kibana under the Elastic license, with source code available under the Elastic License or Server Side Public License (SSPL). These licenses are not open source and do not offer users the same freedoms. Because of this, AWS made the decision to create and maintain a fork from the last ALv2 version of Elasticsearch and Kibana. The fork is called OpenSearch and is available under ALv2.
 
-To upgrade AWS Elasticsearch, please follow instructions on [Upgrading to AWS OpenSearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
+To upgrade AWS ElasticSearch, please follow instructions on [Upgrading to AWS OpenSearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
 
 
 ### Migration Planning
@@ -26,7 +26,7 @@ The upgrade process for Elasticsearch to OpenSearch requires a one-time downtime
 ### Requirements
 
 {{< warning >}}
-Upgrading Elasticsearch to OpenSearch upgrades the database for all connected services. If you have multiple services connected to Elasticsearch, make sure that you have stopped the other services and prepared them for the upgrade.
+Upgrading Elasticsearch to OpenSearch upgrades the database for all connected services. If you have multiple services connected to ElasticSearch, make sure that you have stopped the other services and prepared them for the upgrade.
 {{< /warning >}}
 
 This upgrade guide is for systems running:
@@ -109,5 +109,5 @@ Once the migration of the data is complete, you can now configure Chef Automate 
 using `chef-automate config patch` command.
 
 {{< note >}}
-After upgrading to version 4.x, Chef Automate will have the configurations both for OpenSearch and Elasticsearch. We recommend removing the Elasticsearch configuration after upgrading to external OpenSearch.
+After upgrading to version 4.x, Chef Automate will have the configurations both for OpenSearch and ElasticSearch. We recommend removing the Elasticsearch configuration after upgrading to external OpenSearch.
 {{< /note >}}

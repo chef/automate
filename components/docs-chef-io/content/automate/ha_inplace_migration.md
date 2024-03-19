@@ -99,7 +99,7 @@ done
     - `/bin/hab-launch`
     - `/bin/hab-sup`
 
-1. Unload services from each of the Postgresql Nodes:
+1. Unload services from each of the PostgreSQL Nodes:
 
     ```sh
     sudo hab svc unload chef/automate-backend-postgresql
@@ -138,7 +138,7 @@ In case the backup configuration was skipped in the deployment config.toml, the 
 
 {{<note>}}
 
-While configuring the backup configuration provide the path of **Elasticsearch** instead of **Opensearch** as A2HA backup was in Elasticsearch directory
+While configuring the backup configuration provide the path of **ElasticSearch** instead of **OpenSearch** as A2HA backup was in Elasticsearch directory
 like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`
 
 {{</note>}}
@@ -182,11 +182,11 @@ sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ 
 
 {{< note >}}
 
-- After the restore command is successfully executed, run the `chef-automate config show` command. Both the ElasticSearch and OpenSearch configs are part of Automate Config. Keep both configs; it won't impact the functionality. After restoring Automate HA is configured to communicate with OpenSearch.
+- After the restore command is successfully executed, run the `chef-automate config show` command. Both the Elasticsearch and OpenSearch configs are part of Automate Config. Keep both configs; it won't impact the functionality. After restoring Automate HA is configured to communicate with OpenSearch.
 
 OR
 
-- We can remove the ElasticSearch config from the automate. To do that, redirect the applied config to the file and set the config again.
+- We can remove the Elasticsearch config from the automate. To do that, redirect the applied config to the file and set the config again.
 
 ```bash
 chef-automate config show > applied_config.toml
@@ -205,7 +205,7 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 
 {{< note >}}
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
-1. Reset the backup configuration path to Opensearch so that new backups will be stored in Opensearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
+1. Reset the backup configuration path to OpenSearch so that new backups will be stored in OpenSearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 {{< /note >}}
 
 ## Validate successful migration
@@ -247,10 +247,10 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 
 1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA CLI `chef-automate cleanup --onprem-deployment` and then remove `/bin/chef-automate` from all frontend nodes, now try the installation again.
 
-1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
+1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the Elasticsearch snapshot.
 2. While restoring the backup if an error related to backup directory occurs like
 > **Error in Automate node:** failed to create snapshot repository: Elasticsearch repository create request failed for repo**
 > OR
-> **Error in Opensearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
+> **Error in OpenSearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
 
 please re-check your EFS backup configuration for the Automate and OpenSearch node, click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.

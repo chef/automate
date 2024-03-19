@@ -4,7 +4,7 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Che Infra Server/Chef Backend to Automate HA"
+    title = "Chef Infra Server/Chef Backend to Automate HA"
     parent = "automate/deploy_high_availability/migration"
     identifier = "automate/deploy_high_availability/migration/ha_chef_backend_to_automate_ha.md Chef Backend to Automate HA"
     weight = 210
@@ -104,7 +104,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
 ## Add S3 Configurations for Cookbook Storage
 
-Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in the Chef server can be stored in S3 or Postgres in Automate HA.
+Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in the Chef server can be stored in S3 or PostgreSQL in Automate HA.
 
 {{< note >}}
 
@@ -158,7 +158,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 ## In-place Migration (Chef Backend to Automate HA)
 
-As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the chef backend infrastructure.
+As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the Chef Backend infrastructure.
 
 {{< note >}} In-place Migration will require downtime, so plan accordingly. A reduced performance should be expected with this. {{< /note >}}
 
@@ -223,8 +223,8 @@ Where:
     - Update the `instance_count`
     - fqdn : load balance URL, which points to the frontend node.
     - keys : ssh username and private keys
-    - Ensure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
-    - Ensure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
+    - Ensure to provide Chef Backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
+    - Ensure to provide Chef Backend's backend server IPs for Automate HA PostgreSQL and OpenSearch machines.
     - Sample configuration; please modify according to your needs.
 
     ```sh
@@ -280,7 +280,7 @@ Where:
     ./chef-automate deploy config.toml --airgap-bundle <airgapped bundle name>
     ```
 
-10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
+10. Clean up the old packages from the chef-backend (like Elasticsearch and PostgreSQL)
 11. Once done, [restore data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-data-to-chef-automate-ha)
 12. [Validate the data](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 

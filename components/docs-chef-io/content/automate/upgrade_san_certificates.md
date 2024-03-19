@@ -22,7 +22,7 @@ From version 4.7.52 onwards, Chef Automate requires public certificates as SAN c
 Update non-SAN Certificates involves:
 
 - Update internal Public Certificates
-- Update the public certificates of external Postgres/Open Search servers, if using
+- Update the public certificates of external PostgreSQL/OpenSearch servers, if using
 
 ## Update Internal Public Certificates
 

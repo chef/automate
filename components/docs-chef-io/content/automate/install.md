@@ -33,7 +33,7 @@ Create a `config.toml` file with default values for your Chef Automate installat
 sudo ./chef-automate init-config
 ```
 
-You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor. Add ElasticSearch heap size setting at the end of `config` as shown below. The recommended heap size is 50% of total memory but should not exceed more than 32 GB.
+You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor. Add Elasticsearch heap size setting at the end of `config` as shown below. The recommended heap size is 50% of total memory but should not exceed more than 32 GB.
 
 ```toml
 [elasticsearch.v1.sys.runtime]

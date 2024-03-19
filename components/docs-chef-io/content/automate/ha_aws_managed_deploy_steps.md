@@ -188,7 +188,7 @@ After successful deployment, proceed with the following:
 
 {{< note >}}
 
-Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, Managed RDS Postgresql, and Managed OpenSearch) 
+Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, Managed RDS PostgreSQL, and Managed OpenSearch)
 
 {{< /note >}}
 

@@ -26,7 +26,7 @@ The Chef Automate HA equates to reliability, efficiency, and productivity, built
 
 ## Chef Automate HA Architecture
 
-HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *Postgres*, and *OpenSearch*.
+HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *PostgreSQL*, and *OpenSearch*.
 
 ### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
 
@@ -57,7 +57,7 @@ Chef Automate HA for Managed Services has default port 5432 for Managed PostgreS
 The Chef Automate HA Architecture involves the following clusters as part of the main cluster:
 
 - **Backend Cluster** (Persistent Services)
-  - **Postgres:** Database requires a minimum of three nodes. Postgres database uses the *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
+  - **PostgreSQL:** Database requires a minimum of three nodes. PostgreSQL database uses the *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
 
   - **OpenSearch:** Database requires a minimum of three nodes. OpenSearch database manages the [cluster internally](https://opensearch.org/docs/latest/opensearch/cluster/).
 
@@ -76,7 +76,7 @@ Chef Automate High Availability (HA) supports two types of deployment:
 
 In this, we expect VM (Virtual machine) or Bare Metal machines (Physical machine) that are already created and have initial Operating System (OS) setup done. Including Ports and Security policies changed according to requirements.
 
-After this, installation steps will Deploy Chef Automate, Chef Infra Server, Postgresql DB, and OpenSearch DB to the relevant VMs or Physical Machines as provided in Config.
+After this, installation steps will Deploy Chef Automate, Chef Infra Server, PostgreSQL DB, and OpenSearch DB to the relevant VMs or Physical Machines as provided in Config.
 
 Please refer [Performance Bench marking](https://docs.chef.io/automate/ha_performance_benchmarks/#performance-benchmarks) for more info.
 
