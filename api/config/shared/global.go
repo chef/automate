@@ -11,42 +11,42 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/proxy"
 	"github.com/chef/automate/lib/stringutils"
-	g "github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/sirupsen/logrus"
-)
-
-const (
-	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
-)
-
-type NgxSettings struct {
-    Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
-}
-
-type NgxHttpSettings struct {
-    IncludeXForwardedFor *g.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
-}
-
-type SysSettings struct {
-    Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
-}
-
-type V1Settings struct {
-    Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
-}
-
-type GlobalConfig1 struct {
-    V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
-}
-
-func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
-    if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
-        return errors.New("NGINX HTTP configuration settings not found or nil")
-    }
-    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = g.Bool(false)
-    return nil
-}
-
+	import (
+		"github.com/golang/protobuf/ptypes/wrappers"
+		"github.com/sirupsen/logrus"
+	)
+	
+	const (
+		habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
+	)
+	
+	type NgxSettings struct {
+		Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
+	}
+	
+	type NgxHttpSettings struct {
+		IncludeXForwardedFor *wrappers.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
+	}
+	
+	type SysSettings struct {
+		Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
+	}
+	
+	type V1Settings struct {
+		Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
+	}
+	
+	type GlobalConfig1 struct {
+		V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
+	}
+	
+	func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
+		if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
+			return errors.New("NGINX HTTP configuration settings not found or nil")
+		}
+		config.V1.Sys.Ngx.Http.IncludeXForwardedFor = &wrappers.BoolValue{Value: false}
+		return nil
+	}	
 // NewGlobalConfig returns a new GlobalConfig instance with zero values.
 func NewGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
