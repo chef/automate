@@ -113,7 +113,7 @@ func newAutomateAuthenticator(c *config.EventGatewayConfig) (*automateAuthentica
 //     publish/subscribe to.
 func (a *automateAuthenticator) Check(client natsd.ClientAuthentication) bool {
 	log.WithFields(log.Fields{"client": client.RemoteAddress()}).Debug("authenticating NATS connection request")
-	token := client.GetOpts().Authorization
+	token := client.GetOpts().Token
 
 	// use ConstantTimeCompare so as not to leak the healthCheckToken via timing attacks.
 	if subtle.ConstantTimeCompare([]byte(token), []byte(a.healthCheckToken)) == 1 {
