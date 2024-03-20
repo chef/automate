@@ -66,7 +66,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
-	github.com/nats-io/nats-server/v2 v2.2.5
+	github.com/nats-io/nats-server/v2 v2.2.0
 	github.com/nats-io/nats-streaming-server v0.17.0
 	github.com/nats-io/nats.go v1.33.1
 	github.com/nats-io/stan.go v0.6.0
