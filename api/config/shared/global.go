@@ -42,7 +42,7 @@ func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
 } 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
-	return &GlobalConfig{
+	config := &GlobalConfig{
 		V1: &V1{
 			Backups: &Backups{
 				Location: w.String("filesystem"),
