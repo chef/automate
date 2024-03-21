@@ -31,11 +31,6 @@ type NgxSettings struct {
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
-
-type GlobalConfig struct {
-	V1 *V1 `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
-}
-
 func NewGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
 		V1: &V1{},
