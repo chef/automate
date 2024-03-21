@@ -24,44 +24,65 @@ func NewGlobalConfig() *GlobalConfig {
 		V1: &V1{},
 	}
 }
+type NgxSettings struct {
+    Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
+}
+type NgxHttpSettings struct {
+    IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
+}
+type SysSettings struct {
+    Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
+}
+type V1Settings struct {
+    Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
+}
+type GlobalConfig1 struct {
+    V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
+}
+func SetIncludeXForwardedForToFalse(config *GlobalConfig) error {
+    if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
+        return errors.New("NGINX HTTP configuration settings not found or nil")
+    }
+    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
+    return nil
+} 
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
-	config := &GlobalConfig{
-		V1: &V1{
-			Backups: &Backups{
-				Location: w.String("filesystem"),
-				Filesystem: &Backups_Filesystem{
-					Path: w.String("/var/opt/chef-automate/backups"),
-				},
-			},
-			Mlsa: &Mlsa{
-				Accept: w.Bool(true),
-			},
-			Disclosure: &Disclosure{
-				Show:            w.Bool(false),
-				MessageFilePath: w.String(""),
-			},
-			Banner: &Banner{
-				Show:            w.Bool(false),
-				Message:         w.String(""),
-				BackgroundColor: w.String("#3864f2"), // Chef Success blue
-				TextColor:       w.String("#FFFFFF"), // White
-			},
-			SessionSettings: &SessionSettings{
-				EnableIdleTimeout:  w.Bool(false),
-				IdleTimeoutMinutes: w.Int32(30),
-			},
-			LargeReporting: &LargeReporting{
-				EnableLargeReporting: w.Bool(false),
-			},
-		},
-	}
-	if err := SetIncludeXForwardedForToFalse(config); err != nil {
-		logrus.Errorf("Error setting IncludeXForwardedFor to false: %v", err)
-		config.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
-	}
-	return config
+    config := &GlobalConfig{
+        V1: &V1{
+            Backups: &Backups{
+                Location: w.String("filesystem"),
+                Filesystem: &Backups_Filesystem{
+                    Path: w.String("/var/opt/chef-automate/backups"),
+                },
+            },
+            Mlsa: &Mlsa{
+                Accept: w.Bool(true),
+            },
+            Disclosure: &Disclosure{
+                Show:            w.Bool(false),
+                MessageFilePath: w.String(""),
+            },
+            Banner: &Banner{
+                Show:            w.Bool(false),
+                Message:         w.String(""),
+                BackgroundColor: w.String("#3864f2"), // Chef Success blue
+                TextColor:       w.String("#FFFFFF"), // White
+            },
+            SessionSettings: &SessionSettings{
+                EnableIdleTimeout:  w.Bool(false),
+                IdleTimeoutMinutes: w.Int32(30),
+            },
+            LargeReporting: &LargeReporting{
+                EnableLargeReporting: w.Bool(false),
+            },
+        },
+    }
+    if err := SetIncludeXForwardedForToFalse(config); err != nil {
+        logrus.Errorf("Error setting IncludeXForwardedFor to false: %v", err)
+    }
+    return config
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
