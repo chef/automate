@@ -78,7 +78,7 @@
     "karma-phantomjs-launcher": "=1.0.2",
     "karma-safari-launcher": "=0.1.1",
     "karma-sourcemap-loader": "=0.3.7",
-    "karma-webpack": "=1.8.0",
+    "karma-webpack": "=5.0.1",
     "node-dir": "=0.1.16",
     "node-bourbon": "=1.2.3",
     "node-neat": "=1.4.2",
