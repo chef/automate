@@ -73,13 +73,10 @@ func DefaultGlobalConfig() *GlobalConfig {
 			
 		},
 	}
-	err := SetIncludeXForwardedForToFalse(config)
+	err := SetIncludeXForwardedForToFalse(config.V1)
     if err != nil {
-        // Handle the error if necessary
-        fmt.Println("Error:", err)
+    fmt.Println("Error:", err)
     }
-
-    return config
 }
 // Validate validates that the config is valid. If validation succeeds it will
 // return nil, if it fails it will return a new instance of config.InvalidConfigError
