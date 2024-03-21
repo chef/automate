@@ -38,20 +38,20 @@ type V1Settings struct {
 }
 
 // Define GlobalConfig struct
-type GlobalConfig struct {
+type GlobalConfig1 struct {
 	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
 
 // NewGlobalConfig returns a new GlobalConfig instance with zero values.
-func NewGlobalConfig() *GlobalConfig {
+func NewGlobalConfig() *GlobalConfig1 {
 	return &GlobalConfig{
 		V1: &V1{},
 	}
 }
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
-func DefaultGlobalConfig() *GlobalConfig {
-	return &GlobalConfig{
+func DefaultGlobalConfig() *GlobalConfig1 {
+	return &GlobalConfig1{
 		V1: &V1{
 			Backups: &Backups{
 				Location: w.String("filesystem"),
