@@ -68,37 +68,36 @@ func DefaultGlobalConfig() *GlobalConfig1 {
 }
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
-    config := &GlobalConfig{
-        V1: &V1{
-            Backups: &Backups{
-                Location: w.String("filesystem"),
-                Filesystem: &Backups_Filesystem{
-                    Path: w.String("/var/opt/chef-automate/backups"),
-                },
-            },
-            Mlsa: &Mlsa{
-                Accept: w.Bool(true),
-            },
-            Disclosure: &Disclosure{
-                Show:            w.Bool(false),
-                MessageFilePath: w.String(""),
-            },
-            Banner: &Banner{
-                Show:            w.Bool(false),
-                Message:         w.String(""),
-                BackgroundColor: w.String("#3864f2"), // Chef Success blue
-                TextColor:       w.String("#FFFFFF"), // White
-            },
-            SessionSettings: &SessionSettings{
-                EnableIdleTimeout:  w.Bool(false),
-                IdleTimeoutMinutes: w.Int32(30),
-            },
-            LargeReporting: &LargeReporting{
-                EnableLargeReporting: w.Bool(false),
-            },
+	return &GlobalConfig{
+		V1: &V1{
+			Backups: &Backups{
+				Location: w.String("filesystem"),
+				Filesystem: &Backups_Filesystem{
+					Path: w.String("/var/opt/chef-automate/backups"),
+				},
+			},
+			Mlsa: &Mlsa{
+				Accept: w.Bool(true),
+			},
+			Disclosure: &Disclosure{
+				Show:            w.Bool(false),
+				MessageFilePath: w.String(""),
+			},
+			Banner: &Banner{
+				Show:            w.Bool(false),
+				Message:         w.String(""),
+				BackgroundColor: w.String("#3864f2"), // Chef Success blue
+				TextColor:       w.String("#FFFFFF"), // White
+			},
+			SessionSettings: &SessionSettings{
+				EnableIdleTimeout:  w.Bool(false),
+				IdleTimeoutMinutes: w.Int32(30),
+			},
+			LargeReporting: &LargeReporting{
+				EnableLargeReporting: w.Bool(false),
+			},
 		},
-	},
-
+	}
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
