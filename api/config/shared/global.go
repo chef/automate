@@ -24,47 +24,7 @@ func NewGlobalConfig() *GlobalConfig {
 		V1: &V1{},
 	}
 }
-type NgxHttpSettings struct {
-    IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
-}
 
-type NgxSettings struct {
-    Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
-}
-
-type SysSettings struct {
-    Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
-}
-type V1Settings struct {
-    Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
-}
-
-type GlobalConfig1 struct {
-    V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
-}
-
-// Function to set IncludeXForwardedFor to false
-func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
-    if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
-        return errors.New("NGINX HTTP configuration settings not found or nil")
-    }
-    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = &gw.BoolValue{Value: false}
-    return nil
-}
-func DefaultGlobalConfig() *GlobalConfig1 {
-    config := &GlobalConfig1{
-        V1: &V1Settings{
-            Sys: &SysSettings{
-                Ngx: &NgxSettings{
-                    Http: &NgxHttpSettings{
-                        IncludeXForwardedFor: &gw.BoolValue{Value: false},
-                    },
-                },
-            },
-        },
-    }
-    return config
-}
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
@@ -95,8 +55,16 @@ func DefaultGlobalConfig() *GlobalConfig {
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
 			},
+			Sys: &SysSettings{
+                Ngx: &NgxSettings{
+                    Http: &NgxHttpSettings{
+                        IncludeXForwardedFor: &gw.BoolValue{Value: false},
+                    },
+                },
+            },
 		},
 	}
+	return config
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
