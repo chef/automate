@@ -38,21 +38,29 @@ type V1Settings struct {
 }
 
 // Define GlobalConfig struct
+// Define GlobalConfig1 struct
 type GlobalConfig1 struct {
 	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
 
-// NewGlobalConfig returns a new GlobalConfig instance with zero values.
-func NewGlobalConfig() *GlobalConfig1 {
+// NewGlobalConfig1 returns a new GlobalConfig1 instance with zero values.
+func NewGlobalConfig1() *GlobalConfig1 {
 	return &GlobalConfig1{
-		V1: &V1{},
+		V1: &V1Settings{},
 	}
 }
 
-// DefaultGlobalConfig returns a new GlobalConfig instance with default values.
-func DefaultGlobalConfig() *GlobalConfig1 {
+// DefaultGlobalConfig1 returns a new GlobalConfig1 instance with default values.
+func DefaultGlobalConfig1() *GlobalConfig1 {
 	return &GlobalConfig1{
-		V1: &V1{
+		V1: &V1Settings{
+			Sys: &SysSettings{
+				Ngx: &NgxSettings{
+					Http: &NgxHttpSettings{
+						IncludeXForwardedFor: &gw.BoolValue{Value: false},
+					},
+				},
+			},
 			Backups: &Backups{
 				Location: w.String("filesystem"),
 				Filesystem: &Backups_Filesystem{
@@ -79,17 +87,9 @@ func DefaultGlobalConfig() *GlobalConfig1 {
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
 			},
-			Sys: &SysSettings{
-                Ngx: &NgxSettings{
-                    Http: &NgxHttpSettings{
-                        IncludeXForwardedFor: &gw.BoolValue{Value: false},
-                    },
-                },
-            },
 		},
 	}
 }
-
 // Validate validates that the config is valid. If validation succeeds it will
 // return nil, if it fails it will return a new instance of config.InvalidConfigError
 // that has the missing keys and invalid fields populated.
