@@ -44,7 +44,7 @@ type GlobalConfig1 struct {
 
 // NewGlobalConfig returns a new GlobalConfig instance with zero values.
 func NewGlobalConfig() *GlobalConfig1 {
-	return &GlobalConfig{
+	return &GlobalConfig1{
 		V1: &V1{},
 	}
 }
