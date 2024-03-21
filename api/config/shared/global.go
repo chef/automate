@@ -33,13 +33,7 @@ type SysSettings struct {
 }
 
 type V1 struct {
-	Backups         *Backups        `protobuf:"bytes,2,opt,name=backups,proto3" json:"backups,omitempty"`
-	Mlsa            *Mlsa           `protobuf:"bytes,3,opt,name=mlsa,proto3" json:"mlsa,omitempty"`
-	Disclosure      *Disclosure     `protobuf:"bytes,4,opt,name=disclosure,proto3" json:"disclosure,omitempty"`
-	Banner          *Banner         `protobuf:"bytes,5,opt,name=banner,proto3" json:"banner,omitempty"`
-	SessionSettings *SessionSettings `protobuf:"bytes,6,opt,name=session_settings,proto3" json:"session_settings,omitempty"`
-	LargeReporting  *LargeReporting `protobuf:"bytes,7,opt,name=large_reporting,proto3" json:"large_reporting,omitempty"`
-	Sys             *SysSettings    `protobuf:"bytes,8,opt,name=sys,proto3" json:"sys,omitempty"`
+	Sys             *V1_System               `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
 }
 
 func NewGlobalConfig() *GlobalConfig {
