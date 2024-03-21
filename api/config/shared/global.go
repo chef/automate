@@ -88,7 +88,6 @@ func DefaultGlobalConfig() *GlobalConfig {
             },
 		},
 	}
-	return config
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
