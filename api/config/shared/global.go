@@ -32,9 +32,8 @@ type NgxHttpSettings struct {
 type NgxSettings struct {
 	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
 }
-
-type SysSettings struct {
-	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
+type V1 struct {
+	Sys *V1_System `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
 }
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
