@@ -21,44 +21,25 @@ const (
 type NgxHttpSettings struct {
 	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
-
-// Define NgxSettings struct
 type NgxSettings struct {
 	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
 }
-
-// Define SysSettings struct
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
-
-// Define V1Settings struct
-// Define V1Settings struct
 type V1Settings struct {
-	Sys            *SysSettings    `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
-	Backups        *Backups        `protobuf:"bytes,2,opt,name=backups,proto3" json:"backups,omitempty"`
-	Mlsa           *Mlsa           `protobuf:"bytes,3,opt,name=mlsa,proto3" json:"mlsa,omitempty"`
-	Disclosure     *Disclosure     `protobuf:"bytes,4,opt,name=disclosure,proto3" json:"disclosure,omitempty"`
-	Banner         *Banner         `protobuf:"bytes,5,opt,name=banner,proto3" json:"banner,omitempty"`
-	SessionSettings *SessionSettings `protobuf:"bytes,6,opt,name=session_settings,json=sessionSettings,proto3" json:"session_settings,omitempty"`
-	LargeReporting *LargeReporting `protobuf:"bytes,7,opt,name=large_reporting,json=largeReporting,proto3" json:"large_reporting,omitempty"`
+	Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
 }
-// Define GlobalConfig struct
-// Define GlobalConfig1 struct
-type GlobalConfig1 struct {
+type GlobalConfig struct {
 	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
-
-// NewGlobalConfig1 returns a new GlobalConfig1 instance with zero values.
-func NewGlobalConfig1() *GlobalConfig1 {
-	return &GlobalConfig1{
+func NewGlobalConfig() *GlobalConfig {
+	return &GlobalConfig{
 		V1: &V1Settings{},
 	}
 }
-
-// DefaultGlobalConfig1 returns a new GlobalConfig1 instance with default values.
-func DefaultGlobalConfig1() *GlobalConfig1 {
-	return &GlobalConfig1{
+func DefaultGlobalConfig() *GlobalConfig {
+	return &GlobalConfig{
 		V1: &V1Settings{
 			Sys: &SysSettings{
 				Ngx: &NgxSettings{
@@ -95,18 +76,6 @@ func DefaultGlobalConfig1() *GlobalConfig1 {
 			},
 		},
 	}
-}
-func NewGlobalConfig() *GlobalConfig {
-    return &GlobalConfig{
-		V1: &V1{},
-    }
-}
-
-// DefaultGlobalConfig returns a new GlobalConfig instance with default values.
-func DefaultGlobalConfig() *GlobalConfig {
-    return &GlobalConfig{
-		V1: &V1{},
-    }
 }
 // Validate validates that the config is valid. If validation succeeds it will
 // return nil, if it fails it will return a new instance of config.InvalidConfigError
