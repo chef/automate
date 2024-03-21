@@ -23,12 +23,15 @@ const (
 type NgxHttpSettings struct {
 	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
+
 type NgxSettings struct {
 	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
 }
+
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
+
 type GlobalConfig struct {
 	V1 *V1 `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
@@ -69,7 +72,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
 			},
-            Sys: &SysSettings{
+			Sys: &SysSettings{
 				Ngx: &NgxSettings{
 					Http: &NgxHttpSettings{
 						IncludeXForwardedFor: &gw.BoolValue{Value: false},

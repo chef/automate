@@ -45,6 +45,7 @@ message Nginx {
   }
 }
 }
+
 message External {
   message Elasticsearch {
     message Backup {
