@@ -32,8 +32,8 @@ type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
 
-type V1 struct {
-	Sys             *V1_System               `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
+type V1_System struct {
+	Sys *SysSettings `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
 }
 
 func NewGlobalConfig() *GlobalConfig {
