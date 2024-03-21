@@ -25,10 +25,6 @@ func NewGlobalConfig() *GlobalConfig {
 		V1: &V1{},
 	}
 }
-package shared
-
-import "github.com/path/to/gw"
-
 type NgxHttpSettings struct {
 	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
