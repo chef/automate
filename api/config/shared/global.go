@@ -49,8 +49,22 @@ func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
     if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
         return errors.New("NGINX HTTP configuration settings not found or nil")
     }
-    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
+    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = &gw.BoolValue{Value: false}
     return nil
+}
+func DefaultGlobalConfig() *GlobalConfig1 {
+    config := &GlobalConfig1{
+        V1: &V1Settings{
+            Sys: &SysSettings{
+                Ngx: &NgxSettings{
+                    Http: &NgxHttpSettings{
+                        IncludeXForwardedFor: &gw.BoolValue{Value: false},
+                    },
+                },
+            },
+        },
+    }
+    return config
 }
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
@@ -82,16 +96,9 @@ func DefaultGlobalConfig() *GlobalConfig {
             LargeReporting: &LargeReporting{
                 EnableLargeReporting: w.Bool(false),
             },
-            Sys: &SysSettings{
-                Ngx: &NgxSettings{
-                    Http: &NgxHttpSettings{
-                        IncludeXForwardedFor: w.Bool(false),
-                    },
-                },
-            },
-        },
-    }
-    return config
+		},
+	},
+
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
