@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	natsd "github.com/nats-io/gnatsd/server"
+	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -102,18 +102,18 @@ func newAutomateAuthenticator(c *config.EventGatewayConfig) (*automateAuthentica
 // Check is a callback function that NATS will call to authenticate connection
 // requests. We use this behavior to integrate Automate's token authentication
 // with NATS. We do the following:
-// * check for a special health check token that the event gateway creates.
-//   This token is (re-)generated on service start and is used by the hab
-//   health check. If the token given is the health check token, give the
-//   connection just the permissions needed to run the health check.
-// * check the token with the authn service and then the authz service. The
-//   token has to be valid and have the correct ingest permissions to pass.
-// * If the token is valid, assign it a NATS user object. This sets NATS-level
-//   authorization on the connection to limit the topics the client can
-//   publish/subscribe to.
+//   - check for a special health check token that the event gateway creates.
+//     This token is (re-)generated on service start and is used by the hab
+//     health check. If the token given is the health check token, give the
+//     connection just the permissions needed to run the health check.
+//   - check the token with the authn service and then the authz service. The
+//     token has to be valid and have the correct ingest permissions to pass.
+//   - If the token is valid, assign it a NATS user object. This sets NATS-level
+//     authorization on the connection to limit the topics the client can
+//     publish/subscribe to.
 func (a *automateAuthenticator) Check(client natsd.ClientAuthentication) bool {
 	log.WithFields(log.Fields{"client": client.RemoteAddress()}).Debug("authenticating NATS connection request")
-	token := client.GetOpts().Authorization
+	token := client.GetOpts().Token
 
 	// use ConstantTimeCompare so as not to leak the healthCheckToken via timing attacks.
 	if subtle.ConstantTimeCompare([]byte(token), []byte(a.healthCheckToken)) == 1 {
