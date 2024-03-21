@@ -41,6 +41,13 @@ func NewGlobalConfig() *GlobalConfig {
 func DefaultGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
 		V1: &V1{
+			Sys: &SysSettings{
+				Ngx: &NgxSettings{
+					Http: &NgxHttpSettings{
+						IncludeXForwardedFor: &gw.BoolValue{Value: false},
+					},
+				},
+			},
 			Backups: &Backups{
 				Location: w.String("filesystem"),
 				Filesystem: &Backups_Filesystem{
@@ -66,13 +73,6 @@ func DefaultGlobalConfig() *GlobalConfig {
 			},
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
-			},
-			System: &SysSettings{
-				Ngx: &NgxSettings{
-					Http: &NgxHttpSettings{
-						IncludeXForwardedFor: &gw.BoolValue{Value: false},
-					},
-				},
 			},
 		},
 	}
