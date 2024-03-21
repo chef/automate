@@ -96,6 +96,18 @@ func DefaultGlobalConfig1() *GlobalConfig1 {
 		},
 	}
 }
+func NewGlobalConfig() *GlobalConfig {
+    return &GlobalConfig{
+        // Initialize GlobalConfig fields with zero values or default values
+    }
+}
+
+// DefaultGlobalConfig returns a new GlobalConfig instance with default values.
+func DefaultGlobalConfig() *GlobalConfig {
+    return &GlobalConfig{
+        // Initialize GlobalConfig fields with default values
+    }
+}
 // Validate validates that the config is valid. If validation succeeds it will
 // return nil, if it fails it will return a new instance of config.InvalidConfigError
 // that has the missing keys and invalid fields populated.
