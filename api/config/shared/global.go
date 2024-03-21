@@ -33,13 +33,13 @@ type V1Settings struct {
 type GlobalConfig1 struct {
     V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
-func SetIncludeXForwardedForToFalse(config *GlobalConfig1) error {
-    if config.V1 == nil || config.V1.Sys == nil || config.V1.Sys.Ngx == nil || config.V1.Sys.Ngx.Http == nil {
+func SetIncludeXForwardedForToFalse(v1 *V1) error {
+    if v1 == nil || v1.Sys == nil || v1.Sys.Ngx == nil || v1.Sys.Ngx.Http == nil {
         return errors.New("NGINX HTTP configuration settings not found or nil")
     }
-    config.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
+    v1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
     return nil
-} 
+}
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
 	config := &GlobalConfig{
