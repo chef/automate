@@ -35,7 +35,6 @@ type NgxSettings struct {
 type SysSettings struct {
     Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
-
 type V1Settings struct {
     Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
 }
