@@ -33,10 +33,16 @@ type SysSettings struct {
 }
 
 // Define V1Settings struct
+// Define V1Settings struct
 type V1Settings struct {
-	Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
+	Sys            *SysSettings    `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
+	Backups        *Backups        `protobuf:"bytes,2,opt,name=backups,proto3" json:"backups,omitempty"`
+	Mlsa           *Mlsa           `protobuf:"bytes,3,opt,name=mlsa,proto3" json:"mlsa,omitempty"`
+	Disclosure     *Disclosure     `protobuf:"bytes,4,opt,name=disclosure,proto3" json:"disclosure,omitempty"`
+	Banner         *Banner         `protobuf:"bytes,5,opt,name=banner,proto3" json:"banner,omitempty"`
+	SessionSettings *SessionSettings `protobuf:"bytes,6,opt,name=session_settings,json=sessionSettings,proto3" json:"session_settings,omitempty"`
+	LargeReporting *LargeReporting `protobuf:"bytes,7,opt,name=large_reporting,json=largeReporting,proto3" json:"large_reporting,omitempty"`
 }
-
 // Define GlobalConfig struct
 // Define GlobalConfig1 struct
 type GlobalConfig1 struct {
