@@ -30,13 +30,13 @@ type NgxSettings struct {
 type NgxHttpSettings struct {
     IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
-type SysSettings struct {
+type V1_System struct {
     Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
 type V1Settings struct {
-    Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
+    Sys *V1_System `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
 }
-type GlobalConfig1 struct {
+type GlobalConfig struct {
     V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
 func SetIncludeXForwardedForToFalse(config *GlobalConfig) error {
