@@ -18,6 +18,8 @@ import (
 const (
 	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
 )
+
+// NewGlobalConfig returns a new GlobalConfig instance with zero values.
 type NgxHttpSettings struct {
 	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
 }
@@ -26,31 +28,21 @@ type NgxSettings struct {
 }
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
-    Backups        *Backups     `protobuf:"bytes,2,opt,name=backups,proto3" json:"backups,omitempty"`
-	Mlsa           *Mlsa        `protobuf:"bytes,3,opt,name=mlsa,proto3" json:"mlsa,omitempty"`
-	Disclosure     *Disclosure  `protobuf:"bytes,4,opt,name=disclosure,proto3" json:"disclosure,omitempty"`
-	Banner         *Banner      `protobuf:"bytes,5,opt,name=banner,proto3" json:"banner,omitempty"`
-	SessionSettings *SessionSettings `protobuf:"bytes,6,opt,name=session_settings,proto3" json:"session_settings,omitempty"`
-	LargeReporting *LargeReporting `protobuf:"bytes,7,opt,name=large_reporting,proto3" json:"large_reporting,omitempty"`
 }
 type GlobalConfig struct {
-	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
+	V1 *V1 `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
 }
+
 func NewGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
-		V1: &V1Settings{},
+		V1: &V1{},
 	}
 }
+
+// DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
-		V1: &V1Settings{
-			Sys: &SysSettings{
-				Ngx: &NgxSettings{
-					Http: &NgxHttpSettings{
-						IncludeXForwardedFor: &gw.BoolValue{Value: false},
-					},
-				},
-			},
+		V1: &V1{
 			Backups: &Backups{
 				Location: w.String("filesystem"),
 				Filesystem: &Backups_Filesystem{
@@ -77,9 +69,17 @@ func DefaultGlobalConfig() *GlobalConfig {
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
 			},
+            Sys: &SysSettings{
+				Ngx: &NgxSettings{
+					Http: &NgxHttpSettings{
+						IncludeXForwardedFor: &gw.BoolValue{Value: false},
+					},
+				},
+			},
 		},
 	}
 }
+
 // Validate validates that the config is valid. If validation succeeds it will
 // return nil, if it fails it will return a new instance of config.InvalidConfigError
 // that has the missing keys and invalid fields populated.
