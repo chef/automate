@@ -25,17 +25,6 @@ func NewGlobalConfig() *GlobalConfig {
 		V1: &V1{},
 	}
 }
-type NgxHttpSettings struct {
-	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
-}
-
-type NgxSettings struct {
-	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
-}
-type V1 struct {
-	Sys *V1_System `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
-}
-
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
