@@ -98,14 +98,14 @@ func DefaultGlobalConfig1() *GlobalConfig1 {
 }
 func NewGlobalConfig() *GlobalConfig {
     return &GlobalConfig{
-		V1: &V1{}
+		V1: &V1{},
     }
 }
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
     return &GlobalConfig{
-		V1: &V1{}
+		V1: &V1{},
     }
 }
 // Validate validates that the config is valid. If validation succeeds it will
