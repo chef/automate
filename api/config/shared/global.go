@@ -31,6 +31,17 @@ type NgxSettings struct {
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
+
+// Define V1Settings struct
+type V1Settings struct {
+	Sys *SysSettings `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
+}
+
+// Define GlobalConfig struct
+type GlobalConfig struct {
+	V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
+}
+
 // NewGlobalConfig returns a new GlobalConfig instance with zero values.
 func NewGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
