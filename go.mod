@@ -66,8 +66,8 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
-	github.com/nats-io/nats-server/v2 v2.2.0
-	github.com/nats-io/nats-streaming-server v0.17.0
+	github.com/nats-io/nats-server/v2 v2.7.4
+	github.com/nats-io/nats-streaming-server v0.24.3
 	github.com/nats-io/nats.go v1.29.0
 	github.com/nats-io/stan.go v0.10.2
 	github.com/olivere/elastic/v7 v7.0.28
@@ -147,6 +147,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/errors v0.19.0 // indirect
 	github.com/go-openapi/strfmt v0.19.0 // indirect
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gofiber/adaptor/v2 v2.1.31 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
