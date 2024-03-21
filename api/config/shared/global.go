@@ -25,6 +25,21 @@ func NewGlobalConfig() *GlobalConfig {
 		V1: &V1{},
 	}
 }
+package shared
+
+import "github.com/path/to/gw"
+
+type NgxHttpSettings struct {
+	IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
+}
+
+type NgxSettings struct {
+	Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
+}
+
+type SysSettings struct {
+	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
+}
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
