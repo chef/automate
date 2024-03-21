@@ -31,6 +31,17 @@ type NgxSettings struct {
 type SysSettings struct {
 	Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
+
+type V1 struct {
+	Backups         *Backups        `protobuf:"bytes,2,opt,name=backups,proto3" json:"backups,omitempty"`
+	Mlsa            *Mlsa           `protobuf:"bytes,3,opt,name=mlsa,proto3" json:"mlsa,omitempty"`
+	Disclosure      *Disclosure     `protobuf:"bytes,4,opt,name=disclosure,proto3" json:"disclosure,omitempty"`
+	Banner          *Banner         `protobuf:"bytes,5,opt,name=banner,proto3" json:"banner,omitempty"`
+	SessionSettings *SessionSettings `protobuf:"bytes,6,opt,name=session_settings,proto3" json:"session_settings,omitempty"`
+	LargeReporting  *LargeReporting `protobuf:"bytes,7,opt,name=large_reporting,proto3" json:"large_reporting,omitempty"`
+	Sys             *SysSettings    `protobuf:"bytes,8,opt,name=sys,proto3" json:"sys,omitempty"`
+}
+
 func NewGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
 		V1: &V1{},
@@ -41,13 +52,6 @@ func NewGlobalConfig() *GlobalConfig {
 func DefaultGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
 		V1: &V1{
-			Sys: &SysSettings{
-				Ngx: &NgxSettings{
-					Http: &NgxHttpSettings{
-						IncludeXForwardedFor: &gw.BoolValue{Value: false},
-					},
-				},
-			},
 			Backups: &Backups{
 				Location: w.String("filesystem"),
 				Filesystem: &Backups_Filesystem{
@@ -73,6 +77,13 @@ func DefaultGlobalConfig() *GlobalConfig {
 			},
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
+			},
+			Sys: &SysSettings{
+				Ngx: &NgxSettings{
+					Http: &NgxHttpSettings{
+						IncludeXForwardedFor: &gw.BoolValue{Value: false},
+					},
+				},
 			},
 		},
 	}
