@@ -796,6 +796,9 @@ fallbacks:
     - name: golang.org/x/image
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
+    - name: github.com/nats-io/jwt/v2
+      license_id: Apache-2.0
+      license_content: https://github.com/nats-io/jwt/blob/main/LICENSE
     - name: golang.org/x/mobile
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
