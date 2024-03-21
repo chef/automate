@@ -63,7 +63,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
-	github.com/nats-io/nats-streaming-server v0.24.3
+	github.com/nats-io/nats-streaming-server v0.21.2
 	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d
 	github.com/nats-io/stan.go v0.10.2
 	github.com/olivere/elastic/v7 v7.0.28
@@ -109,22 +109,6 @@ require (
 )
 
 require (
-	github.com/ansrivas/fiberprometheus/v2 v2.6.0
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
-	github.com/gofiber/fiber/v2 v2.46.0
-	github.com/gofiber/utils v1.1.0
-	github.com/hashicorp/go-version v1.6.0
-	github.com/shirou/gopsutil v3.21.11+incompatible
-)
-
-require (
-	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
-	github.com/minio/highwayhash v1.0.2 // indirect
-	github.com/nats-io/jwt/v2 v2.2.1-0.20220113022732-58e87895b296 // indirect
-	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
-)
-
-require (
 	cloud.google.com/go v0.65.0 // indirect
 	cloud.google.com/go/storage v1.10.0
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -139,12 +123,15 @@ require (
 	github.com/OneOfOne/xxhash v1.2.7 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/ansrivas/fiberprometheus/v2 v2.6.0
 	github.com/apparentlymart/go-textseg v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/cosiner/argv v0.0.0-20170225145430-13bacc38a0a5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -162,6 +149,8 @@ require (
 	github.com/go-openapi/strfmt v0.19.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gofiber/adaptor/v2 v2.1.31 // indirect
+	github.com/gofiber/fiber/v2 v2.46.0
+	github.com/gofiber/utils v1.1.0
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
@@ -173,6 +162,7 @@ require (
 	github.com/hashicorp/go-hclog v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.1.0 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
+	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/raft v1.3.6 // indirect
@@ -197,6 +187,7 @@ require (
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/minio/md5-simd v1.1.0 // indirect
 	github.com/minio/sha256-simd v0.1.1 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
@@ -204,7 +195,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/nats-server/v2 v2.7.4 // indirect
+	github.com/nats-io/jwt/v2 v2.0.1 // indirect
+	github.com/nats-io/nats-server/v2 v2.1.9 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
@@ -219,6 +211,7 @@ require (
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c // indirect
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/afero v1.3.4 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
@@ -246,6 +239,7 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.6.0 // indirect
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
