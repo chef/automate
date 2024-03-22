@@ -56,7 +56,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
 			},
-			Ngx: &NgxSettings{
+			Nginx: &NgxSettings{
 				Http: &NgxHttpSettings{
 					IncludeXForwardedFor: &gw.BoolValue{Value: false},
 				},
