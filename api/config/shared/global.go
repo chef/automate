@@ -18,91 +18,48 @@ import (
 const (
 	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
 )
-type NgxHttpSettings struct {
-    IncludeXForwardedFor *gw.BoolValue `protobuf:"bytes,1,opt,name=include_x_forwarded_for,json=includeXForwardedFor,proto3" json:"include_x_forwarded_for,omitempty"`
-}
 
-type NgxSettings struct {
-    Http *NgxHttpSettings `protobuf:"bytes,15,opt,name=http,proto3" json:"http,omitempty"`
-}
-
-type SysSettings struct {
-    Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
-}
-
-type V1Settings struct {
-    Sys             *SysSettings        `protobuf:"bytes,1,opt,name=sys,proto3" json:"sys,omitempty"`
-    Backups         *Backups            `protobuf:"bytes,2,opt,name=backups,proto3" json:"backups,omitempty"`
-    Mlsa            *Mlsa               `protobuf:"bytes,3,opt,name=mlsa,proto3" json:"mlsa,omitempty"`
-    Disclosure      *Disclosure         `protobuf:"bytes,4,opt,name=disclosure,proto3" json:"disclosure,omitempty"`
-    Banner          *Banner             `protobuf:"bytes,5,opt,name=banner,proto3" json:"banner,omitempty"`
-    SessionSettings *SessionSettings    `protobuf:"bytes,6,opt,name=session_settings,json=sessionSettings,proto3" json:"session_settings,omitempty"`
-    LargeReporting  *LargeReporting     `protobuf:"bytes,7,opt,name=large_reporting,json=largeReporting,proto3" json:"large_reporting,omitempty"`
-    // Define other fields here if needed
-}
-
-type GlobalConfig struct {
-    V1 *V1Settings `protobuf:"bytes,1,opt,name=v1,proto3" json:"v1,omitempty"`
-    // Define other fields here if needed
-}
-
-func SetIncludeXForwardedForToFalse(v1 *V1Settings) error {
-    if v1 == nil || v1.Sys == nil || v1.Sys.Ngx == nil || v1.Sys.Ngx.Http == nil {
-        return errors.New("NGINX HTTP configuration settings not found or nil")
-    }
-    v1.Sys.Ngx.Http.IncludeXForwardedFor = &gw.BoolValue{Value: false}
-    return nil
+// NewGlobalConfig returns a new GlobalConfig instance with zero values.
+func NewGlobalConfig() *GlobalConfig {
+	return &GlobalConfig{
+		V1: &V1{},
+	}
 }
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
-func DefaultGlobalConfig() (*GlobalConfig, error) {
-    config := &GlobalConfig{
-        V1: &V1Settings{
-            Sys: &SysSettings{
-                Ngx: &NgxSettings{
-                    Http: &NgxHttpSettings{
-                        IncludeXForwardedFor: &gw.BoolValue{Value: false},
-                    },
-                },
-            },
-            Backups: &Backups{
-                Location: w.String("filesystem"),
-                Filesystem: &Backups_Filesystem{
-                    Path: w.String("/var/opt/chef-automate/backups"),
-                },
-            },
-            Mlsa: &Mlsa{
-                Accept: w.Bool(true),
-            },
-            Disclosure: &Disclosure{
-                Show:            w.Bool(false),
-                MessageFilePath: w.String(""),
-            },
-            Banner: &Banner{
-                Show:            w.Bool(false),
-                Message:         w.String(""),
-                BackgroundColor: w.String("#3864f2"), // Chef Success blue
-                TextColor:       w.String("#FFFFFF"), // White
-            },
-            SessionSettings: &SessionSettings{
-                EnableIdleTimeout:  w.Bool(false),
-                IdleTimeoutMinutes: w.Int32(30),
-            },
-            LargeReporting: &LargeReporting{
-                EnableLargeReporting: w.Bool(false),
-            },
-        },
-        // Initialize other fields here if needed
-    }
-
-    // Set IncludeXForwardedFor to false
-    err := SetIncludeXForwardedForToFalse(config.V1)
-    if err != nil {
-        return nil, err
-    }
-
-    return config, nil
+func DefaultGlobalConfig() *GlobalConfig {
+	return &GlobalConfig{
+		V1: &V1{
+			Backups: &Backups{
+				Location: w.String("filesystem"),
+				Filesystem: &Backups_Filesystem{
+					Path: w.String("/var/opt/chef-automate/backups"),
+				},
+			},
+			Mlsa: &Mlsa{
+				Accept: w.Bool(true),
+			},
+			Disclosure: &Disclosure{
+				Show:            w.Bool(false),
+				MessageFilePath: w.String(""),
+			},
+			Banner: &Banner{
+				Show:            w.Bool(false),
+				Message:         w.String(""),
+				BackgroundColor: w.String("#3864f2"), // Chef Success blue
+				TextColor:       w.String("#FFFFFF"), // White
+			},
+			SessionSettings: &SessionSettings{
+				EnableIdleTimeout:  w.Bool(false),
+				IdleTimeoutMinutes: w.Int32(30),
+			},
+			LargeReporting: &LargeReporting{
+				EnableLargeReporting: w.Bool(false),
+			},
+		},
+	}
 }
+
 // Validate validates that the config is valid. If validation succeeds it will
 // return nil, if it fails it will return a new instance of config.InvalidConfigError
 // that has the missing keys and invalid fields populated.
