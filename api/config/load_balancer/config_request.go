@@ -75,6 +75,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
 	c.V1.Sys.StaticConfig.Products = []string{"automate"}
+	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 	return c
 }
 
@@ -169,6 +170,12 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = config.GlobalLogLevelToNginxLevel(logLevel)
 	}
+
+	if err := SetIncludeXForwardedForToFalse(c); err != nil {
+		logrus.WithError(err).Error("failed to set IncludeXForwardedFor to false")
+	}
+
+	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 }
 
 // PrepareSystemConfig returns a system configuration that can be used

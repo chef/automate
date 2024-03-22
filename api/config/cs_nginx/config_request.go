@@ -69,6 +69,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
 
 	c.V1.Sys.RequiredRecipe.Enabled = w.Bool(false)
+	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 
 	return c
 }
@@ -145,6 +146,11 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			ServerName:  gExternalAutomate.GetSsl().GetServerName(),
 			Token:       gExternalAutomate.GetAuth().GetToken(),
 		}
+		if err := SetIncludeXForwardedForToFalse(c); err != nil {
+			logrus.WithError(err).Error("failed to set IncludeXForwardedFor to false")
+		}
+	
+		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 	}
 }
 

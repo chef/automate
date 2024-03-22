@@ -27,7 +27,7 @@ message V1 {
   Service svc = 12;
   LargeReporting large_reporting = 13;
   ChefServer chef_server = 14;
-
+  Nginx nginx = 15;
 
   message System {
     chef.automate.infra.config.TLSCredentials tls = 1;
@@ -42,7 +42,13 @@ message ChefServer {
   google.protobuf.StringValue fqdn = 1;
   google.protobuf.StringValue root_ca = 2;
 }
-
+ 
+message Nginx {
+  Http http = 1;
+  message Http {
+    google.protobuf.BoolValue include_x_forwarded_for = 1;
+    }
+}
 
 message External {
   message Elasticsearch {
