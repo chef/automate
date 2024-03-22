@@ -90,7 +90,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 			Sys: &SysSettings{
 				Ngx: &NgxSettings{
 					Http: &NgxHttpSettings{
-						IncludeXForwardedFor: &gw.BoolValue{Value: false},
+						IncludeXForwardedFor: &wrappers.BoolValue{Value: false},
 					},
 				},
 			},
