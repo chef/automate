@@ -69,7 +69,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
 
 	c.V1.Sys.RequiredRecipe.Enabled = w.Bool(false)
-	
+
 	return c
 }
 
@@ -145,9 +145,9 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			ServerName:  gExternalAutomate.GetSsl().GetServerName(),
 			Token:       gExternalAutomate.GetAuth().GetToken(),
 		}
-		if xForwarded := g.GetV1().GetNginx().GetHttp().GetIncludeXForwardedFor(); xForwarded.Value {
-			c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(xForwarded.Value)
-		}	
+		if xForwarded := g.GetV1().GetNginx().GetHttp().GetIncludeXForwardedFor(); xForwarded != nil {
+        c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xForwarded
+        }
 	}
 }
 
