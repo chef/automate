@@ -30,27 +30,49 @@ type NgxSettings struct {
 type SysSettings struct {
     Ngx *NgxSettings `protobuf:"bytes,10,opt,name=ngx,proto3" json:"ngx,omitempty"`
 }
-
+type V1Settings struct {
+    Fqdn            *wrapperspb.StringValue  `protobuf:"bytes,1,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
+    Mlsa            *Mlsa                    `protobuf:"bytes,2,opt,name=mlsa,proto3" json:"mlsa,omitempty" toml:"mlsa,omitempty" mapstructure:"mlsa,omitempty"`
+    Proxy           *Proxy                   `protobuf:"bytes,3,opt,name=proxy,proto3" json:"proxy,omitempty" toml:"proxy,omitempty" mapstructure:"proxy,omitempty"`
+    Backups         *Backups                 `protobuf:"bytes,4,opt,name=backups,proto3" json:"backups,omitempty" toml:"backups,omitempty" mapstructure:"backups,omitempty"`
+    Log             *Log                     `protobuf:"bytes,5,opt,name=log,proto3" json:"log,omitempty" toml:"log,omitempty" mapstructure:"log,omitempty"`
+    External        *External                `protobuf:"bytes,6,opt,name=external,proto3" json:"external,omitempty" toml:"external,omitempty" mapstructure:"external,omitempty"`
+    FrontendTls     []*FrontendTLSCredential `protobuf:"bytes,7,rep,name=frontend_tls,json=frontendTls,proto3" json:"frontend_tls,omitempty" toml:"frontend_tls,omitempty" mapstructure:"frontend_tls,omitempty"`
+    Disclosure      *Disclosure              `protobuf:"bytes,8,opt,name=disclosure,proto3" json:"disclosure,omitempty" toml:"disclosure,omitempty" mapstructure:"disclosure,omitempty"`
+    Banner          *Banner                  `protobuf:"bytes,9,opt,name=banner,proto3" json:"banner,omitempty" toml:"banner,omitempty" mapstructure:"banner,omitempty"`
+    SessionSettings *SessionSettings         `protobuf:"bytes,10,opt,name=session_settings,json=sessionSettings,proto3" json:"session_settings,omitempty" toml:"session_settings,omitempty" mapstructure:"session_settings,omitempty"`
+    Sys             *SysSettings             `protobuf:"bytes,11,opt,name=sys,proto3" json:"sys,omitempty" toml:"sys,omitempty" mapstructure:"sys,omitempty"`
+    Svc             *V1_Service              `protobuf:"bytes,12,opt,name=svc,proto3" json:"svc,omitempty" toml:"svc,omitempty" mapstructure:"svc,omitempty"`
+    LargeReporting  *LargeReporting          `protobuf:"bytes,13,opt,name=large_reporting,json=largeReporting,proto3" json:"large_reporting,omitempty" toml:"large_reporting,omitempty" mapstructure:"large_reporting,omitempty"`
+}
 // NewGlobalConfig returns a new GlobalConfig instance with zero values.
 func NewGlobalConfig() *GlobalConfig {
-	return &GlobalConfig{
-		V1: &V1{},
-	}
+    return &GlobalConfig{
+        V1: &V1Settings{
+            Sys: &SysSettings{},
+        },
+    }
 }
 
 // DefaultGlobalConfig returns a new GlobalConfig instance with default values.
+// DefaultGlobalConfig returns a new GlobalConfig instance with default values.
 func DefaultGlobalConfig() *GlobalConfig {
 	return &GlobalConfig{
-		V1: &V1{
+		V1: &V1Settings{
+			Fqdn: w.String(""),
+			Mlsa: &Mlsa{
+				Accept: w.Bool(true),
+			},
+			Proxy: &Proxy{},
 			Backups: &Backups{
 				Location: w.String("filesystem"),
 				Filesystem: &Backups_Filesystem{
 					Path: w.String("/var/opt/chef-automate/backups"),
 				},
 			},
-			Mlsa: &Mlsa{
-				Accept: w.Bool(true),
-			},
+			Log: &Log{},
+			External: &External{},
+			FrontendTls: []*FrontendTLSCredential{},
 			Disclosure: &Disclosure{
 				Show:            w.Bool(false),
 				MessageFilePath: w.String(""),
@@ -65,16 +87,17 @@ func DefaultGlobalConfig() *GlobalConfig {
 				EnableIdleTimeout:  w.Bool(false),
 				IdleTimeoutMinutes: w.Int32(30),
 			},
+			Sys: &SysSettings{
+				Ngx: &NgxSettings{
+					Http: &NgxHttpSettings{
+						IncludeXForwardedFor: &gw.BoolValue{Value: false},
+					},
+				},
+			},
+			Svc: &V1_Service{},
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
 			},
-			Sys: &SysSettings{
-                Ngx: &NgxSettings{
-                    Http: &NgxHttpSettings{
-                        IncludeXForwardedFor: &gw.BoolValue{Value: false},
-                    },
-                },
-            },
 		},
 	}
 }
