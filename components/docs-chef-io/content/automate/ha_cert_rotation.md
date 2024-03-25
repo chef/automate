@@ -23,19 +23,15 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 ## Prerequisites
 
-<<<<<<< HEAD
-- Either existing certificates can be used or to generate new ones. For more information, see [Self Sign Certificates](https://docs.chef.io/automate/ha_cert_selfsign/).
-=======
-Either existing certificates can be used or to generate new ones, click [here](https://docs.chef.io/automate/ha_cert_selfsign/)
+[Existing certificates](https://docs.chef.io/automate/ha_cert_selfsign/) can be used to generate new ones.
 
 Generate the certificates using recommended tools and supported algorithms and versions mentioned below:
 
--   OpenSSL: 1.0.2zb-fips
--   OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
--   Certificate Format: X509 V3(PEM format) ,Private key is in PKCS8 format
+- OpenSSL: 1.0.2zb-fips
+- OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
+- Certificate Format: X509 V3(PEM format) ,Private key is in PKCS8 format
 
 To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
->>>>>>> main
 
 ## Rotate using Cert-Rotate Command
 
@@ -48,6 +44,7 @@ To understand how to generate certificates, refer to the [Certificate Generation
 {{< /note >}}
 
 ### Rotate Cluster Certificates
+
 If you want to rotate certificates of the entire cluster using single command, then you can follow the below commands:
 
 To rotate certificates of entire cluster using single command, we need a certificate template.

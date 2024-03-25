@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 ### PostgreSQL Setup
 
-- Setup [PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) RDS DB instance in AWS.
+- Setup [PostgreSQL RDS DB instance]](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) in AWS.
 
 - To connect to the DB instance, the DB instance should be associated with a security group that provides access to it. Ensure External RDS is accessible from Automate instances.
 
@@ -146,7 +146,7 @@ The steps to enable backup and restore in OpenSearch S3 is:
 
       {{< figure src="/images/automate/managed_services_os_dasboard_permission.png" alt="Managed Service OS Dashboard Permission">}}
 
-{{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. To know more see [Developer Guide](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security).
+{{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. To know more, see the [OpenSearch VPC developer guide](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security).
 
 From the terminal, run the following command:
 

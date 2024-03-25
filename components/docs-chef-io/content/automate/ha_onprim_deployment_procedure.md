@@ -135,9 +135,10 @@ You can also generate a configuration file using the `init-config` subcommand.
 
     Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
     After successful deployment, proceed with following...
-      1. To know moe about the user and organization creation, check the [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section in Node Bootstrapping page.
-      1. To know more about Workstation setup, see the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section.
-      1. To know more about Node bootstrapping, see the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
+
+      1. [Create users and organizations](/automate/ha_node_bootstraping/#create-users-and-organization) section in Node Bootstrapping page.
+      1. [Setup Chef Workstation](/automate/ha_node_bootstraping/#workstation-setup)
+      1. [Bootstrap nodes](/automate/ha_node_bootstraping/#bootstraping-a-node)
 
 ## Backup/Restore
 

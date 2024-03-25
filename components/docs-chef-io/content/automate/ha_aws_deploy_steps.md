@@ -69,8 +69,7 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     ```
 
-    To know more about on how to generate config, refer to the [Automate HA Config Generation](/automate/ha_config_gen) page.
-
+    Refer to the [Automate HA Config Generation](/automate/ha_config_gen) page to learn more about generating config.
 
     {{< note spaces=4 >}}
 
@@ -182,9 +181,9 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 After successful deployment, proceed with the following:
 
-   1. To know moe about the user and organization creation, check the [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section in Node Bootstrapping page.
-   1. To know more about Workstation setup, see the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section.
-   1. To know more about Node bootstrapping, see the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
+   1. [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section on the Node Bootstrapping page.
+   1. See the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section to learn more about workstation setup.
+   1. See the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section to learn more about node bootstrapping.
 
 ## Sample Config
 
