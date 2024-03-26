@@ -57,12 +57,10 @@ func DefaultGlobalConfig() *GlobalConfig {
 				EnableLargeReporting: w.Bool(false),
 			},
 			Nginx: &Nginx{
-                Http: &Nginx_Http{
                     IncludeXForwardedFor: w.Bool(false),
                 },
             },
 		},
-	}
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
