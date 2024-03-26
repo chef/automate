@@ -13,11 +13,11 @@ preview_netlify: chef_web_docs
 	cp -R layouts/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/layouts
 	cp -R static/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/static
 	cp -R config.toml chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/
-	pushd chef-web-docs && make bundle; hugo --buildFuture --gc --minify && popd
+	pushd chef-web-docs && bash ./scripts/netlify-deploy-preview.sh && popd
 
 serve: generate_swagger chef_web_docs
-	echo "replace github.com/chef/automate/components/docs-chef-io => ../" >> chef-web-docs/go.mod
-	pushd chef-web-docs && make bundle; hugo server --buildDrafts --buildFuture --noHTTPCache --ignoreVendorPaths "github.com/chef/automate/**" && popd
+	printf "go 1.22\n\nuse .\nuse ../" > chef-web-docs/hugo.work
+	pushd chef-web-docs && make bundle && HUGO_MODULE_WORKSPACE=hugo.work hugo server --buildDrafts --buildFuture --noHTTPCache --ignoreVendorPaths "github.com/chef/automate/components/docs-chef-io" && popd
 
 chef_web_docs:
 	if [ -d "chef-web-docs/" ]; then \
