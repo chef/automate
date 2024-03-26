@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 ### PostgreSQL Setup
 
-- Setup PostgreSQL RDS DB instance in AWS. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
+- Setup [PostgreSQL RDS DB instance]](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) in AWS.
 
 - To connect to the DB instance, the DB instance should be associated with a security group that provides access to it. Ensure External RDS is accessible from Automate instances.
 
@@ -47,7 +47,7 @@ Apply the changes:
 
 ```bash
 sudo chef-automate config patch config.toml
-````
+```
 
 If you wish to reset to the default configuration or to modify the configuration:
 
@@ -57,7 +57,7 @@ If you wish to reset to the default configuration or to modify the configuration
 
 ### OpenSearch Setup
 
-- Create an Opensearch domain. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
+- Create an [Opensearch domain](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html).
 
 To create the domain, follow the steps given below:
 
@@ -71,7 +71,8 @@ To create the domain, follow the steps given below:
 
 - Copy the `domain arn` of the newly created OpenSearch, example: `arn:aws:es:region:123456789012:domain/domain-name`
 
-#### Enabling OpenSearch Backup restore
+#### Enabling OpenSearch Backup Restore
+
 The steps to enable backup and restore in OpenSearch S3 is:
 
 - Create an IAM role with the Permission listed below. The rest of the document refers to the role as `TheSnapshotRole`.
@@ -92,6 +93,7 @@ The steps to enable backup and restore in OpenSearch S3 is:
     ]
   }
   ```
+
 - Copy the `arn` value of `TheSnapshotRole`, example: `arn:aws:iam::123456789012:role/TheSnapshotRole`
 - Create a IAM policy with the json as given below:
   - Replace the **iam:PassRole** resource with the snapshot role arn we copied previously and replace the **es:ESHttpPut** resource with your opensearch domain arn value which we had copied along with `/*` in the end:
@@ -113,6 +115,7 @@ The steps to enable backup and restore in OpenSearch S3 is:
       ]
     }
     ```
+
 - Now edit your snapshot role `TheSnapshotRole` and attach this newly created policy.
 - Create an IAM user and attach the above permission policy, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore. Also save the IAM user arn to be used on OpenSearch Dashboard.
 - Map the snapshot role in OpenSearch Dashboards.
@@ -121,9 +124,11 @@ The steps to enable backup and restore in OpenSearch S3 is:
   1. From the OpenSearch Dashboards, navigate to *Security* in the main menu and choose *Roles*, and then select the `manage_snapshots` role.
   1. Choose Mapped users, and select Manage mapping.
   1. Add the domain ARN of the user and role that has permissions to pass the newly created `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
+
       ```bash
       arn:aws:iam::123456789123:user/user-name
       ```
+
       ```bash
       arn:aws:iam::123456789123:role/role-name
       ```
@@ -141,7 +146,7 @@ The steps to enable backup and restore in OpenSearch S3 is:
 
       {{< figure src="/images/automate/managed_services_os_dasboard_permission.png" alt="Managed Service OS Dashboard Permission">}}
 
-{{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
+{{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. To know more, see the [OpenSearch VPC developer guide](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security).
 
 From the terminal, run the following command:
 
@@ -252,7 +257,6 @@ Create `postgresql.toml` file and add the following details of your AWS PostgreS
 {{< warning >}}
 {{% automate/char-warn %}}
 {{< /warning >}}
-
 
 ```toml
 [global.v1.external.postgresql]
@@ -473,7 +477,6 @@ Add the following settings to your `config.toml`:
 {{% automate/char-warn %}}
 {{< /warning >}}
 
-
 ```toml
 [global.v1.external.postgresql]
 enable = true
@@ -509,7 +512,6 @@ Add the following to your `config.toml` file:
 {{< warning >}}
 {{% automate/char-warn %}}
 {{< /warning >}}
-
 
 ```toml
 [global.v1.external.opensearch]

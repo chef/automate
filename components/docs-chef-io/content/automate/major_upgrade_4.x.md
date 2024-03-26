@@ -659,13 +659,15 @@ After upgrading to version 4.x, Automate will have the configurations both for O
           total_limit = "95%"
 ```
 
-### Shard Failure 
+### Shard Failure
 
-```
+```sh
 [ERROR] Elasticsearch exception [type=validation_exception, reason=Validation Failed: 1: this action would add [5] total shards, but this cluster currently has [997]/[1000] maximum shards open;]
 ```
+
 To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
 Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>` 
+
 ```
 [opensearch]
   [opensearch.v1]
@@ -673,9 +675,12 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
       [opensearch.v1.sys.cluster]
          max_shards_per_node = "<NUMBER_OF_SHARD>"
 ```
+
 ### Proxy Setting issue
+
 If you are using Proxy Settings and have upgraded to a version between 4.0.27 and 4.2.10, then you might get this error when you upgrade:
-```
+
+```sh
 DeploymentServiceCallError: A request to the deployment-service failed: Request to get upgrade status failed: rpc error: code = Unknown desc = error in getting the versions from current channel: error in invoking the endpoint https://packages.chef.io/manifests/current/automate/versions.json: Get "https://packages.chef.io/manifests/current/automate/versions.json": dial tcp: lookup packages.chef.io on 10.2.72.20:53: read udp 10.1.97.98:59620->10.2.72.20:53: i/o timeout
 ```
 To move ahead with upgrade you can download latest CLI and Airgapped bundle using curl command with proxy settings:
@@ -686,10 +691,13 @@ curl -x http://proxy_server:proxy_port --proxy-user username:password -L https:/
 ```
 
 After downloading, run the upgrade command with airgapped bundle option:
+
 ```sh
 ./chef-automate upgrade run --airgap-bundle automate-latest.aib
 ```
+
 Output will look like this:
+
 ```sh
 Installing airgap install bundle
 Trying to restart Deployment Service...
@@ -732,6 +740,7 @@ Before trying the upgrade again, confirm whether all the services are up by runn
 ```sh
 sudo chef-automate status
 ```
+
 ### Migration Fails
 
  If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
@@ -746,27 +755,28 @@ To restore your Air-Gapped bundle, run the following command:
 sudo chef-automate backup restore  --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
 ```
 
-Click [here](/automate/restore/) to know more about the Restore methods.
+For more information, see [Restore Methods](/automate/restore/).
 
 To start the upgrade, use the **backup ID** from the backup created. In case the restore fails even after upgrading the Chef Automate version, follow the steps given below:
 
 1. Uninstall Chef Automate.
 
-```sh
-sudo chef-automate uninstall
-```
+    ```sh
+    sudo chef-automate uninstall
+    ```
 
-2. Install the last major version (`3.0.49`) using the [air-gapped installation](/automate/airgapped_installation/) process.
+1. Install the last major version (`3.0.49`) using the [air-gapped installation](/automate/airgapped_installation/) process.
 
-3. Restore the backup:
+1. Restore the backup:
 
-```sh
-sudo chef-automate backup restore <backup_id>
-```
+    ```sh
+    sudo chef-automate backup restore <backup_id>
+    ```
 
-Refer to the [Chef Automate Restore](/automate/restore/) documentation.
+    Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
 
-### Adding Custom Configuration to optimize OpenSearch performance
+### Adding Custom Configuration to optimize OpenSearch Performance
+
 To add custom configurations or optimizing OpenSearch performance please refer to [Custom OpenSearch configuration docs](/automate/opensearch/#configure-embedded-opensearch).
