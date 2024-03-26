@@ -67,6 +67,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2")
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(ac.InternalCipherSuite)
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
+	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 
 	c.V1.Sys.RequiredRecipe.Enabled = w.Bool(false)
 
@@ -146,6 +147,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			Token:       gExternalAutomate.GetAuth().GetToken(),
 		}
 	}
+
+	if xFwd := g.GetV1().GetSys().GetNgx().GetHttp().IncludeXForwardedFor; xFwd != nil {
+		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xFwd
+	}
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
@@ -171,8 +176,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 // To ensure compatibility with the upstream chef-server this should
 // be the same as the value returned by Ruby's
 //
-//  Digest::MD5.base64digest
-//
+//	Digest::MD5.base64digest
 func CalculateContentMD5(data []byte) string {
 	md5sum := md5.Sum(data) // nosemgrep
 	return base64.StdEncoding.EncodeToString(md5sum[:])
