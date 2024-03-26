@@ -58,9 +58,9 @@ func DefaultGlobalConfig() *GlobalConfig {
 			},
 			Nginx: &Nginx{
 				IncludeXForwardedFor: w.Bool(false),
-			},			
-       },
-    },
+			},
+		},
+	}
 }
 
 // Validate validates that the config is valid. If validation succeeds it will
