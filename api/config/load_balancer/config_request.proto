@@ -49,7 +49,6 @@ message ConfigRequest {
 			}
 
 			message Nginx {
-				google.protobuf.BoolValue http_include_x_forwarded_for = 31;
 				// We've omitted the 'server', 'location', 'upstream' and other
 				// smaller sub-contexts because they are always contained within
 				// another context and are either not generalizable or can have
@@ -103,6 +102,7 @@ message ConfigRequest {
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;
 					google.protobuf.BoolValue enable_param = 30;
+					google.protobuf.BoolValue http_include_x_forwarded_for = 31;
 		
 				}
 
