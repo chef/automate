@@ -14,14 +14,13 @@ This guide covers upgrading services used by Chef Automate.
 
 ## Upgrade Elasticsearch to OpenSearch
 
-On January 21, 2021, Elastic NV announced that they would change their software licensing strategy and not release new versions of Elasticsearch and Kibana under the permissive ALv2 license. Instead, Elastic is releasing Elasticsearch and Kibana under the Elastic license, with source code available under the Elastic License or Server Side Public License (SSPL). These licenses are not open source and do not offer users the same freedoms. Because of this, AWS made the decision to create and maintain a fork from the last ALv2 version of Elasticsearch and Kibana. The fork is called OpenSearch and is available under ALv2.
+On January 21, 2021, Elastic NV announced that they would change their software licensing strategy and not release new versions of Elasticsearch and Kibana under the permissive ALv2 license. Instead, Elastic is releasing Elasticsearch and Kibana under the Elastic license, with source code available under the Elastic License or Server Side Public License (SSPL). These licenses are not open source and do not offer users the same freedoms. Because of this, AWS decided to create and maintain a fork from the last ALv2 version of Elasticsearch and Kibana. The fork is called OpenSearch and is available under ALv2.
 
 To upgrade AWS Elasticsearch, please follow instructions on [Upgrading to AWS OpenSearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
 
-
 ### Migration Planning
 
-The upgrade process for Elasticsearch to OpenSearch requires a one-time downtime and takes about 10 mins. This process may take longer depending on your server hardware and the size of the node objects in Chef Automate.
+The upgrade process for Elasticsearch to OpenSearch requires a one-time downtime and takes about 10 minutes. This process may take longer depending on your server hardware and the size of the node objects in Chef Automate.
 
 ### Requirements
 
@@ -42,18 +41,17 @@ This upgrade guide is for systems running:
 **BACKUP CHEF AUTOMATE AND SECURE THE DATA**. Preserve your backup at all costs. Copy the backup to a second and separate location.
 {{< /danger >}}
 
-Database migrations have inherent risk to your system. Create a backup before beginning any migration or update. This ensures that you have a recoverable state in case any step in the process fails. Copy the backup to a another disk that is not connected to Chef Automate. This ensures that you have state to restore, in case of a failure in the upgrade process.
+Database migrations have inherent risks to your system. Create a backup before beginning any migration or update. This ensures that you have a recoverable state in case any step in the process fails. Copy the backup to another disk that is not connected to Chef Automate. This ensures that you have state to restore, in case of a failure in the upgrade process.
 
 Follow the [Backup]({{< relref "backup.md" >}}) documentation to make a copy of your Chef Automate data.
 
 ### Upgrade Chef Automate
 
-- Follow instructions to upgrade to Chef Automate 4.x or higher. OpenSearch support is available on Chef Automate version 4.x or higher. [Click here to know how to upgrade to Chef Automate 4.x]({{< ref "major_upgrade.md" >}})
-```
+- Follow the instructions to upgrade to Chef Automate 4.x or higher. OpenSearch support is available on [Chef Automate version 4.x]({{< ref "major_upgrade.md" >}}) or higher.
 
 ### Stop Chef Automate
 
-After successful upgrade, stop Chef Automate Services.
+After a successful upgrade, stop Chef Automate Services.
 
 ```bash
 sudo chef-automate stop
@@ -64,6 +62,7 @@ sudo chef-automate stop
 Chef Automate 4.x supports external OpenSearch. Please follow the migration section below to migrate from external Elasticsearch to external OpenSearch.
 
 Steps To Enable External OpenSearch
+
 - Set the `external.opensearch` `enable` attribute to false.
 - Set the `nodes` attribute to the external OpenSearch URL array.
 - Set the auth .
