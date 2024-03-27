@@ -145,9 +145,9 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			ServerName:  gExternalAutomate.GetSsl().GetServerName(),
 			Token:       gExternalAutomate.GetAuth().GetToken(),
 		}
-		if xForwarded := g.GetV1().GetNginx().GetHttp().GetIncludeXForwardedFor(); xForwarded != nil {
-        c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xForwarded
-        }
+		if xForwarded := g.GetV1().GetNginx().GetHttpIncludeXForwardedFor(); xForwarded != nil {
+			c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xForwarded
+		}	
 	}
 }
 

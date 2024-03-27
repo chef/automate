@@ -44,10 +44,7 @@ message ChefServer {
 }
  
 message Nginx {
-  Http http = 1;
-  message Http {
-    google.protobuf.BoolValue include_x_forwarded_for = 1;
-    }
+  google.protobuf.BoolValue http_include_x_forwarded_for = 1;
 }
 
 message External {
