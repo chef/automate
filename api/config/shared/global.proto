@@ -43,9 +43,7 @@ message ChefServer {
   google.protobuf.StringValue root_ca = 2;
 }
 
-message Nginx {
-  google.protobuf.BoolValue http_include_x_forwarded_for = 1;
-}
+
 
 message External {
   message Elasticsearch {
@@ -400,4 +398,8 @@ message SessionSettings {
 
 message LargeReporting {
 	google.protobuf.BoolValue enable_large_reporting = 1;
+}
+
+message Nginx {
+  google.protobuf.BoolValue http_include_x_forwarded_for = 1;
 }
