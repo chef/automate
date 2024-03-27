@@ -170,8 +170,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = config.GlobalLogLevelToNginxLevel(logLevel)
 	}
 	if xForwarded := g.GetV1().GetNginx().GetHttpIncludeXForwardedFor(); xForwarded != nil {
-		c.V1.Nginx.HttpIncludeXForwardedFor = xForwarded.GetValue()
-	}				
+		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xForwarded
+	}
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
