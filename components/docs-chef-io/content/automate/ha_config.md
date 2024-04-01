@@ -26,7 +26,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- For certificate rotation, use the `cert-rotate` command instead of `config patch`. For more information, see [certificate rotation](/automate/ha_cert_rotaion).
+- For certificate rotation, use the `cert-rotate` command instead of `config patch`. For more information, see [certificate rotation](/automate/ha_cert_rotation).
 - While patching the same from **the provision host**, structures such as TLS from the OpenSearch configuration .toml file and SSL from the PostgreSQL configuration toml file will be ignored.
 
 {{< /warning >}}

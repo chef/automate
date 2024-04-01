@@ -23,7 +23,7 @@ If SELinux is enabled, deployment with configure it to `permissive` (Usually in 
 
 {{< /warning >}}
 
-- Before proceeding with deployment steps make sure to [provision](automate/ha_onprim_deployment_procedure/#provisioning).
+- Before proceeding with deployment steps make sure to [provision](/automate/ha_onprim_deployment_procedure/#provisioning).
 
 - [Run on the Bastion host](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host) to download the latest Automate CLI and Airgapped Bundle.
 
