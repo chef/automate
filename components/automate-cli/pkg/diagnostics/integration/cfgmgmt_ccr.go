@@ -53,13 +53,13 @@ const cfgmgmtCCRTemplateStr = `
 	"resources": [
 	  {
 			"type": "file",
-			"name": "/tmp/test.txt",
-			"id": "/tmp/test.txt",
+			"name": "/hab/tmp/test.txt",
+			"id": "/hab/tmp/test.txt",
 			"after": {
 				"owner": null,
 				"group": null,
 				"mode": null,
-				"path": "/tmp/test.txt"
+				"path": "/hab/tmp/test.txt"
 			},
 			"before": {},
 			"duration": "0",
@@ -73,13 +73,13 @@ const cfgmgmtCCRTemplateStr = `
 		},
 		{
 			"type": "file",
-			"name": "/tmp/test1.txt",
-			"id": "/tmp/test1.txt",
+			"name": "/hab/tmp/test1.txt",
+			"id": "/hab/tmp/test1.txt",
 			"after": {
 				"owner": null,
 				"group": null,
 				"mode": null,
-				"path": "/tmp/test1.txt"
+				"path": "/hab/tmp/test1.txt"
 			},
 			"before": {},
 			"duration": "0",

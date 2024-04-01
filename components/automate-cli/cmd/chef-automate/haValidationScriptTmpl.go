@@ -7,7 +7,7 @@ CONFIG=$1
 HAB_PATH=$2
 NETCAT_PATH=$3
 
-
+HAB_TEMP_DIR=/hab/tmp
 RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
@@ -66,11 +66,11 @@ eval postgresql_private_ip=($postgresql_private_ip)
 
 #This will install hab in bastion server to verify port
 if [ -z ${HAB_PATH} ] && [ -z ${NETCAT_PATH} ]; then
-	sudo wget -o /tmp/hab.logs https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz -P /tmp/
-	sudo tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
+	sudo wget -o $HAB_TEMP_DIR/hab.logs https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz -P $HAB_TEMP_DIR/
+	sudo tar -xvzf $HAB_TEMP_DIR/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
 	export HAB_LICENSE=accept-no-persist
 	hab pkg install core/netcat -bf
-	HAB_PATH=$(ls -dtr1 /tmp/hab-x86_64-* | tail -1)
+	HAB_PATH=$(ls -dtr1 $HAB_TEMP_DIR/hab-x86_64-* | tail -1)
 	NC_PKG=$(ls -dtr1 /hab/cache/artifacts/core-netcat-* | tail -1)
 
 else 
@@ -83,14 +83,14 @@ fi
 
 for i in ${automate_server_private_ip[@]};
 do 
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:/tmp/hab-x86_64-linux.tar.gz 
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:/tmp/ 
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:$HAB_TEMP_DIR/hab-x86_64-linux.tar.gz 
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:$HAB_TEMP_DIR/ 
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 		sudo su -
-		tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
+		tar -xvzf $HAB_TEMP_DIR/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
 		export HAB_LICENSE=accept-no-persist
-		ls -dtr1 /tmp/core-netcat-* | tail -1 | xargs hab pkg install -bf
+		ls -dtr1 $HAB_TEMP_DIR/core-netcat-* | tail -1 | xargs hab pkg install -bf
 			
 EOF
 done
@@ -98,14 +98,14 @@ done
 for i in ${chef_server_private_ip[@]};
 do 
 		
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:/tmp/hab-x86_64-linux.tar.gz 
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:/tmp/  
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:$HAB_TEMP_DIR/hab-x86_64-linux.tar.gz 
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:$HAB_TEMP_DIR/  
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 		sudo su -
-		tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
+		tar -xvzf $HAB_TEMP_DIR/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
 		export HAB_LICENSE=accept-no-persist
-		ls -dtr1 /tmp/core-netcat-* | tail -1 | xargs hab pkg install -bf
+		ls -dtr1 $HAB_TEMP_DIR/core-netcat-* | tail -1 | xargs hab pkg install -bf
 			
 EOF
 done
@@ -114,14 +114,14 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 		
 		
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:/tmp/hab-x86_64-linux.tar.gz 
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:/tmp/  
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:$HAB_TEMP_DIR/hab-x86_64-linux.tar.gz 
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:$HAB_TEMP_DIR/  
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 		sudo su -
-		tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
+		tar -xvzf $HAB_TEMP_DIR/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
 		export HAB_LICENSE=accept-no-persist
-		ls -dtr1 /tmp/core-netcat-* | tail -1 | xargs hab pkg install -bf
+		ls -dtr1 $HAB_TEMP_DIR/core-netcat-* | tail -1 | xargs hab pkg install -bf
 			
 EOF
 done
@@ -130,14 +130,14 @@ for i in ${postgresql_private_ip[@]};
 do 
 		
 		
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:/tmp/hab-x86_64-linux.tar.gz 
-		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:/tmp/  
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $HAB_PATH $SSH_USER@$i:$HAB_TEMP_DIR/hab-x86_64-linux.tar.gz 
+		scp -o StrictHostKeyChecking=no -i $SSH_KEY $NC_PKG $SSH_USER@$i:$HAB_TEMP_DIR/  
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 		sudo su -
-		tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
+		tar -xvzf $HAB_TEMP_DIR/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1 2>/dev/null
 		export HAB_LICENSE=accept-no-persist
-		ls -dtr1 /tmp/core-netcat-* | tail -1 | xargs hab pkg install -bf
+		ls -dtr1 $HAB_TEMP_DIR/core-netcat-* | tail -1 | xargs hab pkg install -bf
 			
 EOF
 done
@@ -264,7 +264,7 @@ for i in ${automate_server_private_ip[@]};
 do 
 		
 		ssh -o StrictHostKeyChecking=no  -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-		(ls /tmp | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
+		(ls $HAB_TEMP_DIR | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
 
 EOF
 done
@@ -304,7 +304,7 @@ for i in ${chef_server_private_ip[@]};
 do 
 		
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-		(ls /tmp | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
+		(ls $HAB_TEMP_DIR | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
 
 EOF
 done
@@ -343,7 +343,7 @@ for i in ${elasticsearch_private_ip[@]};
 do
 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $bastion_to_elasticsearch_port &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $bastion_to_elasticsearch_port &) | sleep 2 && exit
 
 
 EOF
@@ -388,7 +388,7 @@ for i in ${postgresql_private_ip[@]};
 do
 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $bastion_to_elasticsearch_port &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $bastion_to_elasticsearch_port &) | sleep 2 && exit
 
 
 EOF
@@ -434,7 +434,7 @@ do
 			
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
-			(ls /tmp | nc -l -p $kibana &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $kibana &) | sleep 2 && exit
 						
 EOF
 				
@@ -475,7 +475,7 @@ do
 	for j in ${elasticsearch_port[@]}; 
 	do 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 		
 		
 EOF
@@ -533,7 +533,7 @@ do
 	for j in ${elasticsearch_port[@]}; 
 	do 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -591,7 +591,7 @@ do
 	for j in ${postgresql_port[@]}; 
 	do 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -648,7 +648,7 @@ do
 	for j in ${postgresql_port[@]}; 
 	do 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -705,7 +705,7 @@ do
 	do 
 		echo "elasticsearch $i" >> output.txt
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -738,7 +738,7 @@ EOF
 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 
 
 EOF
@@ -771,7 +771,7 @@ do
 		
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -805,7 +805,7 @@ EOF
 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 
 
 EOF
@@ -840,7 +840,7 @@ do
 		
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -873,7 +873,7 @@ EOF
 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 
 
 EOF
@@ -906,7 +906,7 @@ do
 	do 
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 			
 			
 EOF
@@ -939,7 +939,7 @@ EOF
 		rm output.txt > /dev/null 2>&1
 		ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
-			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+			(ls $HAB_TEMP_DIR | nc -l -p $j &) | sleep 2 && exit
 
 
 EOF

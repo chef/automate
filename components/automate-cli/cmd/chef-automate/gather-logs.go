@@ -398,8 +398,7 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 	// TODO: This might not always be the right choice, we should look into
 	// assigning this dynamically or allow a config flag. Right now /tmp
 	// works on our target distros and this is just an emergency fallback
-	stagingDir := "/tmp"
-	archiveRoot, err := createTempDir(stagingDir, "log-gathering")
+	archiveRoot, err := createTempDir(HAB_TMP_DIR, "log-gathering")
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)
 	}
@@ -410,7 +409,7 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 
 	// initialize log gathering configuration
 	g := gatherlogs.NewGatherer(
-		stagingDir,
+		HAB_TMP_DIR,
 		archiveRoot,
 		"chef-automate-local-fallback",
 		time.Now(),

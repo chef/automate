@@ -34,13 +34,13 @@ title 'Filesystem Configuration'
 
 control 'fs-1' do
   impact 0.5
-  title 'Create a separate partition for /tmp'
+  title 'Create a separate partition for /hab/tmp'
   desc '
-    Since /tmp is world-writable, avoid resource
+    Since /hab/tmp is world-writable, avoid resource
     exhaustion on the host by mounting this folder
     to a separate partition.
   '
-  describe mount('/tmp') do
+  describe mount('/hab/tmp') do
     it { should be_mounted }
   end
 end

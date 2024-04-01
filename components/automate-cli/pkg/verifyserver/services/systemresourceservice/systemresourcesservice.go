@@ -56,7 +56,7 @@ func (srs *SystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType 
 	rootFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
 	srsResponse.Checks = append(srsResponse.Checks, *rootFreeSpaceCheck)
 
-	tmpDirPermissionCheck := srs.CheckPermissionOfDir("/tmp", constants.TMP_DIR_REQUIRED_PERMISSION, "/tmp permission")
+	tmpDirPermissionCheck := srs.CheckPermissionOfDir("/hab/tmp", constants.TMP_DIR_REQUIRED_PERMISSION, "/hab/tmp permission")
 	srsResponse.Checks = append(srsResponse.Checks, *tmpDirPermissionCheck)
 
 	if !cpuCountCheck.Passed ||

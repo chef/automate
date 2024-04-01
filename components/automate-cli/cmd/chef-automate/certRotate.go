@@ -95,7 +95,7 @@ const (
 
 	COPY_USER_CONFIG = `
 	sudo systemctl stop hab-sup.service
-	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
+	echo "y" | sudo cp /hab/tmp/%s /hab/user/automate-ha-%s/config/user.toml
 	sudo systemctl start hab-sup.service`
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
@@ -767,7 +767,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 func (c *certRotateFlow) copyAndExecuteConcurrentlyToFrontEndNodes(ips []string, sshConfig sshutils.SSHConfig, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
 	ips = uniqueIps(ips)
 	sshConfig.Timeout = flagsObj.timeout
-	copyResults := c.sshUtil.CopyFileToRemoteConcurrently(sshConfig, fileName, remoteService+timestamp, TMP_DIR, false, ips)
+	copyResults := c.sshUtil.CopyFileToRemoteConcurrently(sshConfig, fileName, remoteService+timestamp, HAB_TMP_DIR, false, ips)
 	isError := false
 	for _, result := range copyResults {
 		if result.Error != nil {

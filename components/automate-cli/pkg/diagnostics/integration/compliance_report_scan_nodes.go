@@ -176,7 +176,7 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				// Get scanned nodes from licence usage
 				resp, err := clirequest.LicenseUsage()
 				require.NoError(tstCtx, err)
-				assert.Equal(tstCtx, "/proc/self/exe license usage --result-json /tmp/license_usage.json", resp.Command)
+				assert.Equal(tstCtx, "/proc/self/exe license usage --result-json /hab/tmp/license_usage.json", resp.Command)
 				assert.Equal(tstCtx, "OK", resp.Status)
 				assert.Equal(tstCtx, 0, resp.ErrorCode)
 

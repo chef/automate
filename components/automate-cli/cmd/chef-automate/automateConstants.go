@@ -41,14 +41,14 @@ const RELEASE_AND_VERSION_PATTERN = `.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`
 
 const (
 	FRONTEND_COMMAND = `
-	sudo chef-automate config %s /tmp/%s;
+	sudo chef-automate config %s /hab/tmp/%s;
 	export TIMESTAMP=$(date +'%s');
 	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
 	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
 
 	BACKEND_COMMAND = `
 	export TIMESTAMP=$(date +"%s");
-	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /tmp/%s;
+	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /hab/tmp/%s;
 	`
 
 	GET_CONFIG = `
@@ -63,7 +63,7 @@ const (
 
 	GET_FRONTEND_CONFIG = `echo "y" | sudo chef-automate config show %s`
 
-	PRE_FLIGHT_CHECK = `cd /tmp;
+	PRE_FLIGHT_CHECK = `cd /hab/tmp;
 	chmod +x chef-automate;
 	sudo ./chef-automate preflight-check --airgap`
 

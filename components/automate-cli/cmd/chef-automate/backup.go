@@ -1204,22 +1204,22 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		if len(backupCmdFlags.airgap) > 0 {
 			sshUtil.getSSHConfig().hostIP = automateIps[0]
 			sshUtil.copyFileToRemote(backupCmdFlags.airgap, filepath.Base(backupCmdFlags.airgap), false)
-			commandString = commandString + " --airgap-bundle " + "/tmp/" + filepath.Base(backupCmdFlags.airgap)
+			commandString = commandString + " --airgap-bundle " + HAB_TMP_DIR_WITH_SLASH + filepath.Base(backupCmdFlags.airgap)
 		}
 		if len(backupCmdFlags.patchConfigPath) > 0 {
 			sshUtil.getSSHConfig().hostIP = automateIps[0]
 			sshUtil.copyFileToRemote(backupCmdFlags.patchConfigPath, filepath.Base(backupCmdFlags.patchConfigPath), false)
-			commandString = commandString + " --patch-config " + "/tmp/" + filepath.Base(backupCmdFlags.patchConfigPath)
+			commandString = commandString + " --patch-config " + HAB_TMP_DIR_WITH_SLASH + filepath.Base(backupCmdFlags.patchConfigPath)
 		}
 		if len(backupCmdFlags.setConfigPath) > 0 {
 			sshUtil.getSSHConfig().hostIP = automateIps[0]
 			sshUtil.copyFileToRemote(backupCmdFlags.setConfigPath, filepath.Base(backupCmdFlags.setConfigPath), false)
-			commandString = commandString + " --set-config " + "/tmp/" + filepath.Base(backupCmdFlags.setConfigPath)
+			commandString = commandString + " --set-config " + HAB_TMP_DIR_WITH_SLASH + filepath.Base(backupCmdFlags.setConfigPath)
 		}
 		if len(backupCmdFlags.gcsCredentialsPath) > 0 {
 			sshUtil.getSSHConfig().hostIP = automateIps[0]
 			sshUtil.copyFileToRemote(backupCmdFlags.gcsCredentialsPath, filepath.Base(backupCmdFlags.gcsCredentialsPath), false)
-			commandString = commandString + " --gcs-credentials-path " + "/tmp/" + filepath.Base(backupCmdFlags.gcsCredentialsPath)
+			commandString = commandString + " --gcs-credentials-path " + HAB_TMP_DIR_WITH_SLASH + filepath.Base(backupCmdFlags.gcsCredentialsPath)
 		}
 		err := stopFrontendNodes(sshUtil, automateIps[1:], chefServerIps)
 		if err != nil {

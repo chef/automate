@@ -44,7 +44,6 @@ var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220311204618/bin"
 const (
 	AUTOMATE_VERSION            = "3"
 	NEXT_AUTOMATE_VERSION       = "4"
-	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
 	OLD_PG_VERSION              = "9.6"
 	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
 	NEW_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata13"
@@ -440,7 +439,7 @@ func vacuumDb() error {
 	os.Setenv("PGSSLROOTCERT", PGSSLROOTCERT)
 
 	args := []string{
-		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
+		HAB_TMP_DIR + "/analyze_new_cluster.sh",
 	}
 
 	err := executeCommand("/bin/sh", args, "")
@@ -464,9 +463,9 @@ func cleanUp() error {
 
 	args := []string{
 		"-rf",
-		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
-		AUTOMATE_PG_MIGRATE_LOG_DIR + "delete_old_cluster.sh",
-		AUTOMATE_PG_MIGRATE_LOG_DIR + "/pgmigrate.log",
+		HAB_TMP_DIR + "/analyze_new_cluster.sh",
+		HAB_TMP_DIR + "delete_old_cluster.sh",
+		HAB_TMP_DIR + "/pgmigrate.log",
 		OLD_PG_DATA_DIR,
 	}
 	err := executeCommand("rm", args, "")
@@ -625,13 +624,15 @@ func executePgdata13ShellScript() error {
 
 	output := bytes.Replace(input, []byte("initdb"), []byte(NEW_BIN_DIR+"/initdb"), -1)
 
-	if err = ioutil.WriteFile("/tmp/pgdata13.sh", output, 0100755); err != nil { // nosemgrep
+	scriptPath := HAB_TMP_DIR_WITH_SLASH + "pgdata13.sh"
+
+	if err = ioutil.WriteFile(scriptPath, output, 0100755); err != nil { // nosemgrep
 		fmt.Printf("Failed to write init hook file")
 		return err
 	}
 
 	args := []string{
-		"/tmp/pgdata13.sh",
+		scriptPath,
 	}
 	c := exec.Command("/bin/bash", args...)
 	c.SysProcAttr = &syscall.SysProcAttr{}
@@ -689,7 +690,7 @@ func checkUpdateMigration(check bool) error {
 			NEW_BIN_DIR+"/pg_upgrade",
 			args,
 			"",
-			AUTOMATE_PG_MIGRATE_LOG_DIR+"/pgmigrate.log")
+			HAB_TMP_DIR+"/pgmigrate.log")
 
 		if err != nil {
 			return err
@@ -723,8 +724,8 @@ func executeAutomateCommandAsync(command string, args []string, helpDocs string,
 	if len(command) < 1 {
 		return errors.New("invalid or empty command")
 	}
-	if _, err := os.Stat(AUTOMATE_PG_MIGRATE_LOG_DIR); !errors.Is(err, nil) {
-		err = os.Mkdir(AUTOMATE_PG_MIGRATE_LOG_DIR, os.ModeDir)
+	if _, err := os.Stat(HAB_TMP_DIR); !errors.Is(err, nil) {
+		err = os.Mkdir(HAB_TMP_DIR, os.ModeDir)
 		if err != nil {
 			panic(err)
 		}
@@ -732,7 +733,7 @@ func executeAutomateCommandAsync(command string, args []string, helpDocs string,
 	writer.Printf("%s command execution started \n\n\n", command)
 
 	c := exec.Command(command, args...)
-	c.Dir = AUTOMATE_PG_MIGRATE_LOG_DIR
+	c.Dir = HAB_TMP_DIR
 	c.Stdin = os.Stdin
 
 	outfile, err := os.Create(logFilePath)

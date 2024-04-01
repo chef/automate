@@ -44,7 +44,8 @@ type LicenseUsageResp struct {
 
 // LicenseUsage runs the 'license usage' command
 func LicenseUsage() (*LicenseUsageResp, error) {
-	cmd := Cmd("license", "usage", "--result-json", "/tmp/license_usage.json")
+	licenseTmpPath := "/hab/tmp/license_usage.json"
+	cmd := Cmd("license", "usage", "--result-json", licenseTmpPath)
 	out, err := cmd.Output()
 
 	if err != nil {
@@ -57,9 +58,9 @@ func LicenseUsage() (*LicenseUsageResp, error) {
 	// This is really clumsy. What I would prefer is a global option that if you set --test,
 	// it gives you the status object as json
 
-	jsonFile, err := os.Open("/tmp/license_usage.json")
+	jsonFile, err := os.Open(licenseTmpPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "Could not open /tmp/license_usage.json")
+		return nil, errors.Wrap(err, "Could not open "+licenseTmpPath)
 	}
 	defer func() {
 		_ = jsonFile.Close()
@@ -76,9 +77,9 @@ func LicenseUsage() (*LicenseUsageResp, error) {
 	}
 
 	// Clean up the JSON file.
-	err = os.Remove("/tmp/license_usage.json")
+	err = os.Remove(licenseTmpPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to delete /tmp/license_usage.json")
+		return nil, errors.Wrap(err, "Failed to delete "+licenseTmpPath)
 	}
 
 	return &resp, nil
