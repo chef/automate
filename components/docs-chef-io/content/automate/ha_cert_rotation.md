@@ -44,82 +44,81 @@ To understand how to generate certificates, refer to the [Certificate Generation
 {{< /note >}}
 
 ### Rotate Cluster Certificates
+
 If you want to rotate certificates of the entire cluster using single command, then you can follow the below commands:
 
 To rotate certificates of entire cluster using single command, we need a certificate template.
-- To generate certificate template use below command
-```
-  chef-automate cert-rotate generate-certificate-config certificate-config.toml
-```
 
-now we can find our certificate template in `certificate-config.toml` file, please edit the file and put required certificate paths
+- To generate certificate template use below command
+
+    ```sh
+    chef-automate cert-rotate generate-certificate-config certificate-config.toml
+    ```
+
+    Find the certificate template and add the required certificate paths in `certificate-config.toml` file.
 
 - To rotate the certificates use below command
 
-```bash
-  chef-automate cert-rotate --certificate-config certificate-config.toml
+    ```sh
+    chef-automate cert-rotate --certificate-config certificate-config.toml
+    ```
+
+#### Sample Certificate Template
+
+```toml
+[automate]
+  root_ca = "full path of root-ca.pem"
+
+  [[automate.ips]]
+    ip = "10.1.0.130"
+    public_key = "full path of automate1.pem"
+    private_key = "full path of automate1-key.pem"
+
+[chef_server]
+  root_ca = "full path of root-ca.pem"
+
+  [[chef_server.ips]]
+    ip = "10.1.0.16"
+    public_key = "full path of  cs1.pem"
+    private_key = "full path of cs1-key.pem"
+
+[postgresql]
+  root_ca = "full path of root-ca.pem"
+
+  [[postgresql.ips]]
+    ip = "10.1.0.141"
+    public_key = "full path of pg1.pem"
+    private_key = "full path of pg1-key.pem"
+
+  [[postgresql.ips]]
+    ip = "10.1.1.190"
+    public_key = "full path of pg2.pem"
+    private_key = "full path of pg2-key.pem"
+
+  [[postgresql.ips]]
+    ip = "10.1.2.130"
+    public_key = "full path of pg3.pem"
+    private_key = "full path of pg3-key.pem"
+
+[opensearch]
+  root_ca = "full path of root-ca.pem"
+  admin_public_key = "full path of os-admin.pem"
+  admin_private_key = "full path of os-admin-key.pem"
+  [[opensearch.ips]]
+    ip = "10.1.0.176"
+    public_key = "full path of os1.pem"
+    private_key = "full path of os1-key.pem"
+
+  [[opensearch.ips]]
+    ip = "10.1.1.125"
+    public_key = "full path of os2.pem"
+    private_key = "full path of os2-key.pem"
+
+  [[opensearch.ips]]
+    ip = "10.1.2.247"
+    public_key = "full path of os3.pem"
+    private_key = "full path of os3-key.pem"
 ```
-
-You can also use `--cc` instead of `--certificate-config` as a sort form.
-
-
-#### Sample Certificate template
-
-  ```toml
-    [automate]
-      root_ca = "full path of root-ca.pem"
-
-      [[automate.ips]]
-        ip = "10.1.0.130"
-        public_key = "full path of automate1.pem"
-        private_key = "full path of automate1-key.pem"
-
-    [chef_server]
-      root_ca = "full path of root-ca.pem"
-
-      [[chef_server.ips]]
-        ip = "10.1.0.16"
-        public_key = "full path of  cs1.pem"
-        private_key = "full path of cs1-key.pem"
-
-    [postgresql]
-      root_ca = "full path of root-ca.pem"
-
-      [[postgresql.ips]]
-        ip = "10.1.0.141"
-        public_key = "full path of pg1.pem"
-        private_key = "full path of pg1-key.pem"
-
-      [[postgresql.ips]]
-        ip = "10.1.1.190"
-        public_key = "full path of pg2.pem"
-        private_key = "full path of pg2-key.pem"
-
-      [[postgresql.ips]]
-        ip = "10.1.2.130"
-        public_key = "full path of pg3.pem"
-        private_key = "full path of pg3-key.pem"
-
-    [opensearch]
-      root_ca = "full path of root-ca.pem"
-      admin_public_key = "full path of os-admin.pem"
-      admin_private_key = "full path of os-admin-key.pem"
-      [[opensearch.ips]]
-        ip = "10.1.0.176"
-        public_key = "full path of os1.pem"
-        private_key = "full path of os1-key.pem"
-
-      [[opensearch.ips]]
-        ip = "10.1.1.125"
-        public_key = "full path of os2.pem"
-        private_key = "full path of os2-key.pem"
-
-      [[opensearch.ips]]
-        ip = "10.1.2.247"
-        public_key = "full path of os3.pem"
-        private_key = "full path of os3-key.pem"
-  ```
-
 
 ### Rotate Certificates of each service
 
@@ -127,7 +126,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of automate cluster:
 
-    ```cmd 
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate of automate node> --private-cert <path of private certificate of automate node> --a2
     ```
 
@@ -135,7 +134,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of chef server cluster:
 
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs
     ```
 
@@ -143,7 +142,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of the PostgreSQL cluster:
 
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --pg
     ```
 
@@ -151,7 +150,7 @@ If you want to rotate certificates of the entire cluster, then you can follow th
 
 - To rotate certificates of OpenSearch cluster:
 
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os
     ```
 
@@ -165,7 +164,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 
 - To rotate the certificates of particular automate node:
 
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --a2 --node <IP of a particular automate node>
     ```
 
@@ -173,7 +172,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 
 - To rotate the certificates of particular chef server node:
 
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs --node <IP of a particular chef server node>
     ```
 
@@ -183,8 +182,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 
     {{< note >}} While rotating cert for PG on node level, make sure to wait for sometime before executing cert-rotate for next node. {{< /note >}}
 
-
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --pg --node <IP of a particular postgresql node>
     ```
 
@@ -192,7 +190,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 
 - To rotate the certificates of a particular OpenSearch node:
 
-    ```cmd
+    ```sh
     chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular opensearch node>
     ```
 
@@ -201,10 +199,9 @@ If you want to rotate certificates of a particular node, then you can follow the
 {{< note >}} Since admin-cert and admin-key are common in all nodes, So if you want to rotate admin-cert and admin-key, you must first run this open search cluster command: 
 `chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os`{{< /note >}}
 
-
 ### Rotate Automate Load Balancer Root CA
 
-To rotate the Automate Load balancer root certificate: 
+To rotate the Automate Load balancer root certificate:
 
 1. Create a root_ca.toml file with the following content. Replace server_name with Automate Fqdn and root_cert with Automate Load balancer root certificate. 
 
@@ -218,6 +215,6 @@ To rotate the Automate Load balancer root certificate:
 
 1. Run the following command to apply your configuration on Chef-Server from bastion:
 
-    ```shell
+    ```sh
     chef-automate config patch root_ca.toml --cs
     ```
