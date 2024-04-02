@@ -21,6 +21,7 @@ Try these steps if Chef Automate returns an error while restoring data.
 Now check the status of the Automate node and then try running the restore command from the bastion host.
 
 1. How to change the `base_path` or `path`. The steps for the File System backup are as shown below:
+
    - While at the time of deployment `backup_mount` default value will be `/mnt/automate_backups`
    - In case, if you modify the `backup_mount` in `config.toml` before deployment, then the deployment process will do the configuration with the updated value
    - In case, you changed the `backup_mount` value post-deployment, then we need to patch the configuration manually to all the frontend and backend nodes, for example, if you change the `backup_mount` to `/bkp/backps`
@@ -133,19 +134,19 @@ Now check the status of the Automate node and then try running the restore comma
          [global.v1.backups.s3.bucket]
             name = "<BUCKET_NAME>"
             base_path = "automate"
-      ```  
+      ```
 
       - You can choose any value for the variable `base_path`. `base_path` patch is only required for the frontend node.
       - Use the command to apply the above template `chef-automate config patch frontend.toml --fe`
       - Post the configuration patch, and use the curl request to validate
 
-      ```sh
+         ```sh
          curl localhost:10144/_snapshot?pretty
-      ```
+         ```
 
-         - If the response is empty `{}`, then we are good
+      - If the response is empty `{}`, then we are good
 
-         - If the response has JSON output, then it should have the correct value for the `base_path`
+      - If the response has JSON output, then it should have the correct value for the `base_path`
 
          ```sh
          {
@@ -188,4 +189,4 @@ Now check the status of the Automate node and then try running the restore comma
          }
          ```
 
-         - In case of `base_path` value is not matching, then we have to delete the existing `snapshot`. please refer to the steps from the file system
+         - In case of `base_path` value is not matching, then we have to delete the existing `snapshot`. please refer to the steps from the file system.
