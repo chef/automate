@@ -50,7 +50,7 @@ func createHabTmpDir(writer cli.FormatWriter, tmpDir string) error {
 		}
 
 		// Change the permissions from 0777 to 1777
-		err = os.Chmod(tmpDir, 0777|os.ModeSticky)
+		err = os.Chmod(tmpDir, 1777|os.ModeSticky)
 		if err != nil {
 			return fmt.Errorf("error while modifying the permissions of %s dir: %w", tmpDir, err)
 		}
