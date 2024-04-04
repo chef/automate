@@ -32,7 +32,7 @@ func FullBootstrapHA(ctx context.Context,
 	}
 
 	writer.Body("Creating a temporary folder " + HAB_TMP_DIR)
-	err = createHabTmpDir(writer, HAB_TMP_DIR)
+	err = createHabTmpDir(HAB_TMP_DIR)
 	if err != nil {
 		writer.Printf("Error occured while creating a temporary directory: %s\n", err.Error())
 		return err
@@ -41,7 +41,7 @@ func FullBootstrapHA(ctx context.Context,
 	return nil
 }
 
-func createHabTmpDir(writer cli.FormatWriter, tmpDir string) error {
+func createHabTmpDir(tmpDir string) error {
 	var err error
 	if _, err = os.Stat(tmpDir); os.IsNotExist(err) {
 		err = os.MkdirAll(tmpDir, os.ModePerm)
