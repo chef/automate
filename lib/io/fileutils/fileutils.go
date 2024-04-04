@@ -248,7 +248,7 @@ func RemoveFirstLine(filePath string) error {
 	defer file.Close()
 
 	// Create a temporary file to write the updated content
-	tempFile, err := os.CreateTemp("", "temp")
+	tempFile, err := os.CreateTemp("/hab/tmp", "temp")
 	if err != nil {
 		return err
 	}

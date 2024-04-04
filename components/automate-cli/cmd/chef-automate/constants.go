@@ -33,6 +33,7 @@ const (
 	OCID_SHOW_APP                  = "oc-id-show-app"
 	HOME_DIR                       = "/home"
 	TMP_DIR                        = "/tmp"
+	HAB_TMP_DIR_WITH_SLASH         = "/hab/tmp/"
 	CERTIFICATE_TEMPLATE_TOML_FILE = "/hab/a2_deploy_workspace/certificate.toml"
 	CLUSTER                        = "cluster"
 	MAINTENANCE_ON_OFF             = "sudo chef-automate maintenance %s"
