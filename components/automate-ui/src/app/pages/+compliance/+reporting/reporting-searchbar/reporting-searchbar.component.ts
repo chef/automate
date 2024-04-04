@@ -226,7 +226,7 @@ export class ReportingSearchbarComponent implements OnInit {
       }
     }
   }
-  
+
   pressEnterCategorySelected(currentText: string): void {
     if (this.highlightedIndex >= 0) {
       const search = this.filterValues[this.highlightedIndex];
@@ -270,7 +270,7 @@ export class ReportingSearchbarComponent implements OnInit {
     }
     this.showKeyInput();
     setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus(); }, 10);
-  } 
+  }
 
   pressDefaultText(currentText: string): void {
     if (this.selectedType) {
