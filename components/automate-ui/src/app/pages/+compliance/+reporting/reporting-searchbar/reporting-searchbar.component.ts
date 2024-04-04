@@ -62,6 +62,7 @@ export class ReportingSearchbarComponent implements OnInit {
   highlightedIndex = -1;
   inputText = '';
   delayForNoSuggestions = false;
+  suggestionValueClicked: boolean = false;
 
   constructor(
     public reportQuery: ReportQueryService,
@@ -171,6 +172,7 @@ export class ReportingSearchbarComponent implements OnInit {
         this.suggestionsVisible = true;
         break;
       case 'enter':
+        this.suggestionValueClicked = true;
         this.pressEnter(currentText);
         break;
       case 'backspace':
@@ -224,7 +226,7 @@ export class ReportingSearchbarComponent implements OnInit {
       }
     }
   }
-
+  
   pressEnterCategorySelected(currentText: string): void {
     if (this.highlightedIndex >= 0) {
       const search = this.filterValues[this.highlightedIndex];
@@ -268,7 +270,7 @@ export class ReportingSearchbarComponent implements OnInit {
     }
     this.showKeyInput();
     setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus(); }, 10);
-  }
+  } 
 
   pressDefaultText(currentText: string): void {
     if (this.selectedType) {
@@ -346,6 +348,7 @@ export class ReportingSearchbarComponent implements OnInit {
   }
 
   valueClick(value: any, event: Event) {
+    this.suggestionValueClicked = true;
     const type = this.selectedType;
     event.stopPropagation();
     this.suggestionsVisible = false;
@@ -400,21 +403,24 @@ export class ReportingSearchbarComponent implements OnInit {
     this.clearSuggestions();
     this.requestForSuggestions({
       text: text,
-      type: type,
+      type: type, 
       type_key: this.sugg.selectedControlTagKey
     });
     this.suggestionsVisibleStream.next(true);
+    this.suggestionValueClicked = false;
   }
 
   onValChange(e) {
-    const type = this.selectedType;
-    const text: string = e.target.value;
-    const suggestionValue = this.filterValues.filter(v => v.title === text)[0];
-    if (this.containsWildcardChar(text)) {
-      const wildcardValue = { text, title: text };
-      this.addNewFilter(type, wildcardValue);
-    } else if (suggestionValue && suggestionValue === undefined) {
-      this.addNewFilter(type, suggestionValue);
+    if (this.suggestionValueClicked) {
+      const type = this.selectedType;
+      const text: string = e.target.value;
+      const suggestionValue = this.filterValues.filter(v => v.title === text)[0];
+      if (this.containsWildcardChar(text)) {
+        const wildcardValue = { text, title: text };
+        this.addNewFilter(type, wildcardValue);
+      } else if (suggestionValue && suggestionValue === undefined) {
+        this.addNewFilter(type, suggestionValue);
+      }
     }
   }
 
