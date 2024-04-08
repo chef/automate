@@ -335,7 +335,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands
 
 func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
 	cmd := "scp"
-	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":" + HAB_TMP_DIR_WITH_SLASH + destFileName}
+	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		writer.Printf("\n"+"Failed to copy file %s to remote %s:%s %s\n", srcFilePath, s.SshConfig.hostIP, s.SshConfig.sshPort, err.Error())
 		if srcFilePath == "/usr/bin/chef-automate" {
@@ -357,7 +357,7 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 // This function will copy file from remote to local and return new local file path
 func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
 	cmd := "scp"
-	destFileName := HAB_TMP_DIR_WITH_SLASH + outputFileName
+	destFileName := "/tmp/" + outputFileName
 	execArgs := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-o ConnectTimeout=30", "-i", s.SshConfig.sshKeyFile, "-r", s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":" + remoteFilePath, destFileName}
 	if err := exec.Command(cmd, execArgs...).Run(); err != nil {
 		writer.Printf("Failed to copy file from remote %s:%s %s\n", s.SshConfig.hostIP, s.SshConfig.sshPort, err.Error())
