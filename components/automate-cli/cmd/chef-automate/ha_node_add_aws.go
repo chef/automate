@@ -40,12 +40,12 @@ func (ani *AddNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if !ani.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	err := ani.validate()
+	unreachableNodes, err := ani.validate()
 	if err != nil {
 		return err
 	}
 
-	err = ani.modifyConfig()
+	err = ani.modifyConfig(unreachableNodes)
 	if err != nil {
 		return err
 	}
@@ -72,10 +72,10 @@ func (ani *AddNodeAWSImpl) prepare() error {
 	return ani.nodeUtils.taintTerraform(ani.terraformPath)
 }
 
-func (ani *AddNodeAWSImpl) validate() error {
-	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfigAws(&ani.sshUtil, []string{})
+func (ani *AddNodeAWSImpl) validate() (map[string][]string, error) {
+	updatedConfig, unreachableNodes, err := ani.nodeUtils.pullAndUpdateConfigAws(&ani.sshUtil, []string{}, ani.flags.removeUnreachableNode)
 	if err != nil {
-		return err
+		return unreachableNodes, err
 	}
 	ani.config = *updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
@@ -83,17 +83,17 @@ func (ani *AddNodeAWSImpl) validate() error {
 		ani.flags.chefServerCount == 0 &&
 		ani.flags.opensearchCount == 0 &&
 		ani.flags.postgresqlCount == 0 {
-		return errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
+		return unreachableNodes, errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
 	}
 	if ani.nodeUtils.isManagedServicesOn() {
 		if ani.flags.opensearchCount > 0 || ani.flags.postgresqlCount > 0 {
-			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+			return unreachableNodes, status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
 		}
 	}
-	return nil
+	return unreachableNodes, nil
 }
 
-func (ani *AddNodeAWSImpl) modifyConfig() error {
+func (ani *AddNodeAWSImpl) modifyConfig(unreachableNodes map[string][]string) error {
 	ani.config.Architecture.ConfigInitials.Architecture = "aws"
 	inc, err := modifyInstanceCount(ani.config.Automate.Config.InstanceCount, ani.flags.automateCount)
 	if err != nil {

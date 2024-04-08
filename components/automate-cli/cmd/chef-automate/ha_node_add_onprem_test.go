@@ -72,7 +72,7 @@ func TestAddnodeValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "IP address validation failed: \nIncorrect Automate IP address format for ip ewewedw")
 }
@@ -101,7 +101,7 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
 Incorrect Automate IP address format for ip ewewedw
@@ -124,8 +124,8 @@ func TestAddnodeReadfileError(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
-			return nil, errors.New("random")
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+			return nil, nil, errors.New("random")
 		},
 		isManagedServicesOnFunc: func() bool {
 			return false
@@ -135,7 +135,7 @@ func TestAddnodeReadfileError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
@@ -155,19 +155,19 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
@@ -188,19 +188,19 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
@@ -226,9 +226,9 @@ func TestAddnodeModifyAutomate(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeOnPremImpl).automateIpList[0])
 	assert.Equal(t, "3", nodeAdd.(*AddNodeOnPremImpl).config.Automate.Config.InstanceCount)
@@ -257,9 +257,9 @@ func TestAddnodeModifyInfra(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.chefServerIp, nodeAdd.(*AddNodeOnPremImpl).chefServerIpList[0])
 	assert.Equal(t, "2", nodeAdd.(*AddNodeOnPremImpl).config.ChefServer.Config.InstanceCount)
@@ -288,9 +288,9 @@ func TestAddnodeModifyPostgresql(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.postgresqlIp, nodeAdd.(*AddNodeOnPremImpl).postgresqlIp[0])
 	assert.Equal(t, "4", nodeAdd.(*AddNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
@@ -319,9 +319,9 @@ func TestAddnodeModifyOpensearch(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeOnPremImpl).opensearchIpList[0])
 	assert.Equal(t, "5", nodeAdd.(*AddNodeOnPremImpl).config.Opensearch.Config.InstanceCount)
@@ -350,9 +350,9 @@ func TestAddnodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeOnPremImpl).automateIpList[0])
 	res, err := nodeAdd.promptUserConfirmation()
@@ -410,9 +410,9 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeOnPremImpl).opensearchIpList[0])
 	res, err := nodeAdd.promptUserConfirmation()
@@ -468,9 +468,9 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeOnPremImpl).opensearchIpList[0])
 	res, err := nodeAdd.promptUserConfirmation()
@@ -525,16 +525,16 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			cfg.Automate.Config.CertsByIP = []CertByIP{}
 			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
 			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil

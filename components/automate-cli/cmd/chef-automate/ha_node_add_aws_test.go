@@ -31,7 +31,7 @@ func TestAddnodeAWSValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
 }
@@ -55,7 +55,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
 	assert.Equal(t, "6", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 }
@@ -79,7 +79,7 @@ func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
@@ -105,9 +105,9 @@ func TestAddnodeModifyAws(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 }
 
@@ -130,9 +130,9 @@ func TestAddAwsnodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "6", nodeAdd.(*AddNodeAWSImpl).config.Automate.Config.InstanceCount)
 	res, err := nodeAdd.promptUserConfirmation()
@@ -199,10 +199,10 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -210,9 +210,9 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodeAdd.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "7", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 	res, err := nodeAdd.promptUserConfirmation()
@@ -446,10 +446,10 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -522,10 +522,10 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -598,10 +598,10 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{

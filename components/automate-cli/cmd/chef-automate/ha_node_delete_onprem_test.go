@@ -14,20 +14,20 @@ const (
 	multipleNodeError = `Only one node can be deleted at a time`
 )
 
-func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
+func PullConfFunc(sshUtil *SSHUtil, ex []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &cfg, nil
+	return &cfg, nil, nil
 }
 
-func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
+func PullAwsConfFunc(sshUtil *SSHUtil, ex []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	cfg, err := readConfigAWS(CONFIG_TOML_PATH_AWS + "/config.toml")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &cfg, nil
+	return &cfg, nil, nil
 }
 
 func TestDeleteNodeValidateError(t *testing.T) {
@@ -51,7 +51,7 @@ func TestDeleteNodeValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `
 Automate Ip 192.0.2.2 is not present in existing list of ip addresses. Please use a different private ip.`)
@@ -78,7 +78,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
 		multipleNodeError)
@@ -105,9 +105,9 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "1", nodedelete.(*DeleteNodeOnPremImpl).config.Automate.Config.InstanceCount)
@@ -130,19 +130,19 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
 }
@@ -163,19 +163,19 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	_, err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), multipleNodeError)
 }
@@ -201,11 +201,11 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.")
 	// even though validation will fail still we check if modify config is working as expected or not
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.chefServerIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "0", nodedelete.(*DeleteNodeOnPremImpl).config.ChefServer.Config.InstanceCount)
@@ -234,9 +234,9 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "3", nodedelete.(*DeleteNodeOnPremImpl).config.Opensearch.Config.InstanceCount)
@@ -265,11 +265,11 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
 	// even though validation will fail still we check if modify config is working as expected or not
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "2", nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
@@ -298,9 +298,9 @@ func TestDeleteNodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -363,9 +363,9 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -475,9 +475,9 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -541,9 +541,9 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		},
 	},
 	)
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -607,9 +607,9 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		},
 	},
 	)
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -667,7 +667,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
 		multipleNodeError)
@@ -707,9 +707,9 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
+	_, err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
+	err = nodedelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -773,16 +773,16 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			cfg.Automate.Config.CertsByIP = []CertByIP{}
 			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
 			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 
 		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {

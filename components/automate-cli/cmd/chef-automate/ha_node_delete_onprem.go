@@ -58,11 +58,11 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
-	err := dni.validate()
+	unreachableNodes, err := dni.validate()
 	if err != nil {
 		return err
 	}
-	err = dni.modifyConfig()
+	err = dni.modifyConfig(unreachableNodes)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (dni *DeleteNodeOnPremImpl) prepare() error {
 	return dni.nodeUtils.taintTerraform(dni.terraformPath)
 }
 
-func (dni *DeleteNodeOnPremImpl) validate() error {
+func (dni *DeleteNodeOnPremImpl) validate() (map[string][]string, error) {
 	automateIpList, chefServerIpList, opensearchIpList, postgresqlIpList := splitIPCSV(
 		dni.flags.automateIp,
 		dni.flags.chefServerIp,
@@ -138,7 +138,7 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 
 	// Check if only one node is being deleted
 	if (len(automateIpList) + len(chefServerIpList) + len(opensearchIpList) + len(postgresqlIpList)) != 1 {
-		return status.New(status.InvalidCommandArgsError, "Only one node can be deleted at a time")
+		return nil, status.New(status.InvalidCommandArgsError, "Only one node can be deleted at a time")
 	}
 
 	// Get the node type and ip address of the node to be deleted
@@ -155,32 +155,32 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 		dni.ipToDelete = opensearchIpList[0]
 		dni.nodeType = OPENSEARCH
 	} else {
-		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
+		return nil, status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
 
 	if !isValidIPFormat(dni.ipToDelete) {
-		return status.New(status.InvalidCommandArgsError, "Invalid IP address "+dni.ipToDelete)
+		return nil, status.New(status.InvalidCommandArgsError, "Invalid IP address "+dni.ipToDelete)
 	}
 
-	updatedConfig, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, []string{dni.ipToDelete})
+	updatedConfig, unreachableNodes, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, []string{dni.ipToDelete}, dni.flags.removeUnreachableNode)
 	if err != nil {
-		return err
+		return unreachableNodes, err
 	}
 	dni.config = *updatedConfig
 	dni.copyConfigForUserPrompt = dni.config
 	if dni.nodeUtils.isManagedServicesOn() {
 		if dni.nodeType == POSTGRESQL || dni.nodeType == OPENSEARCH {
-			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+			return unreachableNodes, status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
 		}
 	}
 	errorList := dni.validateCmdArgs()
 	if errorList != nil && errorList.Len() > 0 {
-		return getSingleErrorFromList(errorList)
+		return unreachableNodes, getSingleErrorFromList(errorList)
 	}
-	return nil
+	return unreachableNodes, nil
 }
 
-func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
+func (dni *DeleteNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]string) error {
 	var err error
 
 	switch dni.nodeType {

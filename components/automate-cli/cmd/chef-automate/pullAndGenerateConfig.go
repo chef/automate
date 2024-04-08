@@ -192,14 +192,14 @@ type HATfvars struct {
 	SecretsStoreFile              string   `json:"secrets_store_file"`
 }
 type PullConfigs interface {
-	pullOpensearchConfigs() (map[string]*ConfigKeys, error)
-	pullPGConfigs() (map[string]*ConfigKeys, error)
-	pullAutomateConfigs() (map[string]*dc.AutomateConfig, error)
-	pullChefServerConfigs() (map[string]*dc.AutomateConfig, error)
-	fetchInfraConfig() (*ExistingInfraConfigToml, error)
-	generateInfraConfig() (*ExistingInfraConfigToml, error)
-	fetchAwsConfig() (*AwsConfigToml, error)
-	generateAwsConfig() (*AwsConfigToml, error)
+	pullOpensearchConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
+	pullPGConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
+	pullAutomateConfigs(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
+	pullChefServerConfigs(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
+	fetchInfraConfig(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	generateInfraConfig(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
+	generateAwsConfig(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	getExceptionIps() []string
 	setExceptionIps(ips []string)
 	getOsCertsByIp(map[string]*ConfigKeys) []CertByIP
@@ -232,7 +232,8 @@ func (p *PullConfigsImpl) setExceptionIps(ips []string) {
 	p.exceptionIps = ips
 }
 
-func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error) {
+func (p *PullConfigsImpl) pullOpensearchConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error) {
+	var unreachableNodes []string
 	ipConfigMap := make(map[string]*ConfigKeys)
 	for _, ip := range p.infra.Outputs.OpensearchPrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -242,11 +243,19 @@ func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error
 		scriptCommands := fmt.Sprintf(GET_CONFIG, opensearch_const)
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		var src OpensearchConfig
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		ipConfigMap[ip] = &ConfigKeys{
 			rootCA:     src.TLS.RootCA,
@@ -256,10 +265,11 @@ func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error
 			adminKey:   src.TLS.AdminKey,
 		}
 	}
-	return ipConfigMap, nil
+	return ipConfigMap, unreachableNodes, nil
 }
 
-func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
+func (p *PullConfigsImpl) pullPGConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error) {
+	var unreachableNodes []string
 	ipConfigMap := make(map[string]*ConfigKeys)
 	for _, ip := range p.infra.Outputs.PostgresqlPrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -269,11 +279,19 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 		scriptCommands := fmt.Sprintf(GET_CONFIG, postgresql)
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		var src PostgresqlConfig
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		ipConfigMap[ip] = &ConfigKeys{
 			rootCA:     src.Ssl.IssuerCert,
@@ -281,10 +299,11 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 			publicKey:  src.Ssl.SslCert,
 		}
 	}
-	return ipConfigMap, nil
+	return ipConfigMap, unreachableNodes, nil
 }
 
-func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
+func (p *PullConfigsImpl) pullAutomateConfigs(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error) {
+	var unreachableNodes []string
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -293,19 +312,28 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 		p.sshUtil.getSSHConfig().hostIP = ip
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(fmt.Sprintf(GET_FRONTEND_CONFIG, ""), true)
 		if err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		var src dc.AutomateConfig
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		ipConfigMap[ip] = &src
 	}
-	return ipConfigMap, nil
+	return ipConfigMap, unreachableNodes, nil
 
 }
 
-func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig, error) {
+func (p *PullConfigsImpl) pullChefServerConfigs(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error) {
+	var unreachableNodes []string
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.ChefServerPrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -314,15 +342,23 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 		p.sshUtil.getSSHConfig().hostIP = ip
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(fmt.Sprintf(GET_FRONTEND_CONFIG, ""), true)
 		if err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		var src dc.AutomateConfig
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
-			return nil, err
+			if removeUnreachableNodes {
+				unreachableNodes = append(unreachableNodes, ip)
+				continue
+			}
+			return nil, unreachableNodes, err
 		}
 		ipConfigMap[ip] = &src
 	}
-	return ipConfigMap, nil
+	return ipConfigMap, unreachableNodes, nil
 }
 
 func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s3, fs string) (string, error) {
@@ -385,23 +421,27 @@ func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (
 	return "", errors.New(`unsupported db type. It should be either "aws" or "self-managed" or ""`)
 }
 
-func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
+func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+	unreachableNodes := make(map[string][]string)
 	sharedConfigToml, err := getExistingHAConfig()
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+		return nil, nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
-	a2ConfigMap, err := p.pullAutomateConfigs()
+	a2ConfigMap, automateUnreachableNodes, err := p.pullAutomateConfigs(removeUnreachableNodes)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
+		return nil, nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
 	}
-	csConfigMap, err := p.pullChefServerConfigs()
+	unreachableNodes[AUTOMATE] = automateUnreachableNodes
+
+	csConfigMap, chefServerUnreachableNodes, err := p.pullChefServerConfigs(removeUnreachableNodes)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
+	unreachableNodes[CHEF_SERVER] = chefServerUnreachableNodes
 
 	gcsObjStorageConfig, err := getGcsBackupConfig(a2ConfigMap, fileutils.NewFileSystemUtils())
 	if err != nil {
-		return nil, status.New(status.ConfigError, err.Error())
+		return nil, unreachableNodes, status.New(status.ConfigError, err.Error())
 	}
 	if len(gcsObjStorageConfig.location) > 0 {
 		sharedConfigToml.ObjectStorage.Config.Location = gcsObjStorageConfig.location
@@ -415,28 +455,29 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 
 	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
 	if err != nil {
-		return nil, status.New(status.ConfigError, err.Error())
+		return nil, unreachableNodes, status.New(status.ConfigError, err.Error())
 	}
 	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
 
 	dbtype, err := determineDBType(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
 	if err != nil {
-		return nil, status.New(status.ConfigError, err.Error())
+		return nil, unreachableNodes, status.New(status.ConfigError, err.Error())
 	}
 	sharedConfigToml.ExternalDB.Database.Type = dbtype
 
 	// checking onprem with managed or self managed services
 	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
 	if len(strings.TrimSpace(sharedConfigToml.ExternalDB.Database.Type)) < 1 {
-		osConfigMap, err := p.pullOpensearchConfigs()
+		osConfigMap, osUnreachableNodes, err := p.pullOpensearchConfigs(removeUnreachableNodes)
 		if err != nil {
-			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
+			return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
 		}
-		pgConfigMap, err := p.pullPGConfigs()
+		unreachableNodes[OPENSEARCH] = osUnreachableNodes
+		pgConfigMap, pgUnreachableNode, err := p.pullPGConfigs(removeUnreachableNodes)
 		if err != nil {
-			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
+			return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
 		}
-
+		unreachableNodes[POSTGRESQL] = pgUnreachableNode
 		// Build CertsByIP for Opensearch
 		osCerts := p.getOsCertsByIp(osConfigMap)
 
@@ -478,7 +519,7 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	} else {
 		externalOsDetails, err := p.getExternalOpensearchDetails(a2ConfigMap, sharedConfigToml.ExternalDB.Database.Type)
 		if err != nil {
-			return nil, err
+			return nil, unreachableNodes, err
 		}
 		if externalOsDetails != nil {
 			sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = externalOsDetails.OpensearchDomainName
@@ -564,7 +605,7 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
 	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
 
-	return sharedConfigToml, nil
+	return sharedConfigToml, unreachableNodes, nil
 }
 
 func (p *PullConfigsImpl) getOSpassword() (string, error) {
@@ -732,64 +773,67 @@ func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []C
 	return osCerts
 }
 
-func (p *PullConfigsImpl) generateInfraConfig() (*ExistingInfraConfigToml, error) {
-	sharedConfigToml, err := p.fetchInfraConfig()
+func (p *PullConfigsImpl) generateInfraConfig(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+	sharedConfigToml, unreachableNodes, err := p.fetchInfraConfig(removeUnreachableNodes)
 	if err != nil {
-		return nil, err
+		return nil, unreachableNodes, err
 	}
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 	}
 	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 	}
 
-	return sharedConfigToml, nil
+	return sharedConfigToml, unreachableNodes, nil
 }
 
-func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
+func (p *PullConfigsImpl) fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+	unreachableNodes := make(map[string][]string)
 	sharedConfigToml, err := getAwsHAConfig()
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+		return nil, nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 	archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 	if err != nil {
 		writer.Errorf("%s", err.Error())
-		return nil, err
+		return nil, nil, err
 	}
 	var arch = strings.Trim(string(archBytes), "\n")
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
 
-	a2ConfigMap, err := p.pullAutomateConfigs()
+	a2ConfigMap, automateUnreachableNodes, err := p.pullAutomateConfigs(removeUnreachableNodes)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
 	}
-	csConfigMap, err := p.pullChefServerConfigs()
+	unreachableNodes[AUTOMATE] = automateUnreachableNodes
+	csConfigMap, chefServerUnreachableNodes, err := p.pullChefServerConfigs(removeUnreachableNodes)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
-
+	unreachableNodes[CHEF_SERVER] = chefServerUnreachableNodes
 	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "s3", "efs")
 	if err != nil {
-		return nil, err
+		return nil, unreachableNodes, err
 	}
 	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = bktype
 
 	// checking AWS with managed services or Non managed services
 	logrus.Debug(sharedConfigToml.Aws.Config.SetupManagedServices)
 	if !isManagedServicesOn() {
-		osConfigMap, err := p.pullOpensearchConfigs()
+		osConfigMap, opensearchUnreachableNodes, err := p.pullOpensearchConfigs(removeUnreachableNodes)
 		if err != nil {
-			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
+			return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
 		}
-		pgConfigMap, err := p.pullPGConfigs()
+		unreachableNodes[OPENSEARCH] = opensearchUnreachableNodes
+		pgConfigMap, pgUnreachableNodes, err := p.pullPGConfigs(removeUnreachableNodes)
 		if err != nil {
-			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
+			return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
 		}
-
+		unreachableNodes[POSTGRESQL] = pgUnreachableNodes
 		// Build CertsByIP for Opensearch
 		osCerts := p.getOsCertsByIp(osConfigMap)
 
@@ -851,7 +895,7 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	} else {
 		externalOsDetails, err := p.getExternalOpensearchDetails(a2ConfigMap, TYPE_AWS)
 		if err != nil {
-			return nil, err
+			return nil, unreachableNodes, err
 		}
 		if externalOsDetails != nil {
 			sharedConfigToml.Aws.Config.OpensearchDomainName = externalOsDetails.OpensearchDomainName
@@ -939,25 +983,25 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
 	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
 
-	return sharedConfigToml, nil
+	return sharedConfigToml, unreachableNodes, nil
 }
 
-func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
-	sharedConfigToml, err := p.fetchAwsConfig()
+func (p *PullConfigsImpl) generateAwsConfig(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+	sharedConfigToml, unreachableNodes, err := p.fetchAwsConfig(removeUnreachableNodes)
 	if err != nil {
-		return nil, err
+		return nil, unreachableNodes, err
 	}
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 	}
 	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
+		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 	}
 
-	return sharedConfigToml, nil
+	return sharedConfigToml, unreachableNodes, nil
 }
 
 func getExistingHAConfig() (*ExistingInfraConfigToml, error) {

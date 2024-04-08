@@ -72,11 +72,11 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
-	err := dna.validate()
+	unreachableNodes, err := dna.validate()
 	if err != nil {
 		return err
 	}
-	err = dna.modifyConfig()
+	err = dna.modifyConfig(unreachableNodes)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	return err
 }
 
-func (dna *DeleteNodeAWSImpl) modifyConfig() error {
+func (dna *DeleteNodeAWSImpl) modifyConfig(unreachableNodes map[string][]string) error {
 	dna.config.Architecture.ConfigInitials.Architecture = "aws"
 
 	var err error
@@ -283,10 +283,10 @@ func (dna *DeleteNodeAWSImpl) removeNodeIfExists(nodeType, ipToDelete string, co
 	return nil
 }
 
-func (dna *DeleteNodeAWSImpl) validate() error {
+func (dna *DeleteNodeAWSImpl) validate() (map[string][]string, error) {
 	err := dna.getAwsHAIp()
 	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error getting AWS instance Ip")
+		return nil, status.Wrap(err, status.ConfigError, "Error getting AWS instance Ip")
 	}
 
 	automateIpList, chefServerIpList, opensearchIpList, postgresqlIpList := splitIPCSV(
@@ -298,7 +298,7 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 
 	// Check if only one node is being deleted
 	if (len(automateIpList) + len(chefServerIpList) + len(opensearchIpList) + len(postgresqlIpList)) != 1 {
-		return status.New(status.InvalidCommandArgsError, "Only one node can be deleted at a time")
+		return nil, status.New(status.InvalidCommandArgsError, "Only one node can be deleted at a time")
 	}
 
 	// Get the node type and ip address of the node to be deleted
@@ -315,28 +315,28 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 		dna.ipToDelete = opensearchIpList[0]
 		dna.nodeType = OPENSEARCH
 	} else {
-		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
+		return nil, status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
 
 	if !isValidIPFormat(dna.ipToDelete) {
-		return status.New(status.InvalidCommandArgsError, "Invalid IP address "+dna.ipToDelete)
+		return nil, status.New(status.InvalidCommandArgsError, "Invalid IP address "+dna.ipToDelete)
 	}
 
-	updatedConfig, err := dna.nodeUtils.pullAndUpdateConfigAws(&dna.sshUtil, []string{dna.ipToDelete})
+	updatedConfig, unreachableNodes, err := dna.nodeUtils.pullAndUpdateConfigAws(&dna.sshUtil, []string{dna.ipToDelete}, dna.flags.removeUnreachableNode)
 	if err != nil {
-		return err
+		return unreachableNodes, err
 	}
 	dna.config = *updatedConfig
 	if dna.nodeUtils.isManagedServicesOn() {
 		if dna.nodeType == POSTGRESQL || dna.nodeType == OPENSEARCH {
-			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+			return unreachableNodes, status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
 		}
 	}
 	errorList := dna.validateCmdArgs()
 	if errorList != nil && errorList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		return unreachableNodes, status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 	}
-	return nil
+	return unreachableNodes, nil
 }
 
 func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {

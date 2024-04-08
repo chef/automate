@@ -23,17 +23,18 @@ Please set external.database.type to empty if you want to add OpenSearch or Post
 )
 
 type AddDeleteNodeHACmdFlags struct {
-	automateIp      string
-	chefServerIp    string
-	opensearchIp    string
-	postgresqlIp    string
-	automateCount   int
-	chefServerCount int
-	opensearchCount int
-	postgresqlCount int
-	onPremMode      bool
-	awsMode         bool
-	autoAccept      bool
+	automateIp            string
+	chefServerIp          string
+	opensearchIp          string
+	postgresqlIp          string
+	automateCount         int
+	chefServerCount       int
+	opensearchCount       int
+	postgresqlCount       int
+	onPremMode            bool
+	awsMode               bool
+	autoAccept            bool
+	removeUnreachableNode bool
 }
 
 type AddNodeOnPremImpl struct {
@@ -75,11 +76,11 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
 	}
-	err := ani.validate()
+	unreachableNodes, err := ani.validate()
 	if err != nil {
 		return err
 	}
-	err = ani.modifyConfig()
+	err = ani.modifyConfig(unreachableNodes)
 	if err != nil {
 		return err
 	}
@@ -106,10 +107,10 @@ func (ani *AddNodeOnPremImpl) prepare() error {
 	return ani.nodeUtils.taintTerraform(ani.terraformPath)
 }
 
-func (ani *AddNodeOnPremImpl) validate() error {
-	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil, []string{})
+func (ani *AddNodeOnPremImpl) validate() (map[string][]string, error) {
+	updatedConfig, unreachableNodes, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil, []string{}, ani.flags.removeUnreachableNode)
 	if err != nil {
-		return err
+		return unreachableNodes, err
 	}
 	ani.config = *updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
@@ -121,22 +122,23 @@ func (ani *AddNodeOnPremImpl) validate() error {
 	)
 	if ani.nodeUtils.isManagedServicesOn() {
 		if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
-			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+			return unreachableNodes, status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
 		}
 	}
 	errorList := ani.validateCmdArgs()
 	if errorList != nil && errorList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		return unreachableNodes, status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 	}
-	return nil
+	return unreachableNodes, nil
 }
 
-func (ani *AddNodeOnPremImpl) modifyConfig() error {
+func (ani *AddNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]string) error {
 	err := modifyConfigForAddNewNode(
 		&ani.config.Automate.Config.InstanceCount,
 		&ani.config.ExistingInfra.Config.AutomatePrivateIps,
 		ani.automateIpList,
 		&ani.config.Automate.Config.CertsByIP,
+		unreachableNodes[AUTOMATE],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
@@ -146,6 +148,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig() error {
 		&ani.config.ExistingInfra.Config.ChefServerPrivateIps,
 		ani.chefServerIpList,
 		&ani.config.ChefServer.Config.CertsByIP,
+		unreachableNodes[CHEF_SERVER],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
@@ -155,6 +158,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig() error {
 		&ani.config.ExistingInfra.Config.OpensearchPrivateIps,
 		ani.opensearchIpList,
 		&ani.config.Opensearch.Config.CertsByIP,
+		unreachableNodes[OPENSEARCH],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
@@ -164,6 +168,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig() error {
 		&ani.config.ExistingInfra.Config.PostgresqlPrivateIps,
 		ani.postgresqlIp,
 		&ani.config.Postgresql.Config.CertsByIP,
+		unreachableNodes[POSTGRESQL],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")

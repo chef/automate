@@ -45,7 +45,7 @@ func TestModifyConfigForAddNewNode(t *testing.T) {
 			PublicKey:  "public",
 		},
 	}
-	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs)
+	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "3", incount)
 	assert.Equal(t, []string{TEST_IP_2, TEST_IP_3, TEST_IP_4}, existingIps)
@@ -258,16 +258,16 @@ func TestSaveConfigToBastion(t *testing.T) {
 		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 			return nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			cfg.Automate.Config.CertsByIP = []CertByIP{}
 			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
 			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 
 		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {

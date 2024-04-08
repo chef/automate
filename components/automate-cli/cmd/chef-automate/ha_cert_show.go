@@ -130,7 +130,7 @@ func (c *certShowImpl) fetchCurrentCerts() (*certShowCertificates, error) {
 
 	var certInfo *certShowCertificates
 	if deployerType == EXISTING_INFRA_MODE {
-		config, err := c.nodeUtils.getInfraConfig(&c.sshUtil)
+		config, _, err := c.nodeUtils.getInfraConfig(&c.sshUtil, false)
 		if err != nil {
 			return nil, err
 		}
@@ -139,7 +139,7 @@ func (c *certShowImpl) fetchCurrentCerts() (*certShowCertificates, error) {
 			return nil, err
 		}
 	} else if deployerType == AWS_MODE {
-		config, err := c.nodeUtils.getAWSConfig(&c.sshUtil)
+		config, _, err := c.nodeUtils.getAWSConfig(&c.sshUtil, false)
 		if err != nil {
 			return nil, err
 		}

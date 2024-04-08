@@ -42,8 +42,8 @@ fi`
 type HAModifyAndDeploy interface {
 	Execute(c *cobra.Command, args []string) error
 	prepare() error
-	validate() error
-	modifyConfig() error
+	validate() (map[string][]string, error)
+	modifyConfig(unreachableNodes map[string][]string) error
 	promptUserConfirmation() (bool, error)
 	runDeploy() error
 }
@@ -56,12 +56,12 @@ type NodeOpUtils interface {
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
-	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	isManagedServicesOn() bool
 	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	getModeOfDeployment() string
 	executeShellCommand(command string, path string) error
 	moveAWSAutoTfvarsFile(string) error
@@ -104,31 +104,31 @@ func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	}, nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateInfraConfig()
+	return configPuller.generateInfraConfig(removeUnreachableNodes)
 }
 
-func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return configPuller.fetchInfraConfig()
+	return configPuller.fetchInfraConfig(removeUnreachableNodes)
 }
 
-func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return configPuller.fetchAwsConfig()
+	return configPuller.fetchAwsConfig(removeUnreachableNodes)
 }
 
 func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
@@ -140,17 +140,17 @@ func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) 
 	return NewPullConfigs(infra, *sshUtil), nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
 	configPuller := NewPullConfigs(infra, *sshUtil)
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateAwsConfig()
+	return configPuller.generateAwsConfig(removeUnreachableNodes)
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
@@ -498,11 +498,25 @@ func trimSliceSpace(slc []string) []string {
 	return slc
 }
 
-func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
+	var indexToBeRemoved []int
+	if len(unreachableNodes) > 0 {
+		for _, urNode := range unreachableNodes {
+			for i, exisitingIp := range *existingPrivateIPs {
+				if strings.EqualFold(exisitingIp, urNode) {
+					indexToBeRemoved = append(indexToBeRemoved, i)
+				}
+			}
+		}
+		existingPrivateIPsCopy := *existingPrivateIPs
+		for _, idx := range indexToBeRemoved {
+			*existingPrivateIPs = append(existingPrivateIPsCopy[:idx], existingPrivateIPsCopy[idx+1:]...)
+		}
+	}
 	inc, err := modifyInstanceCount(*instanceCount, len(newIps))
 	*instanceCount = inc
 	if err != nil {

@@ -286,14 +286,14 @@ var awsConfig = &AwsConfigToml{
 }
 
 type MockPullConfigs struct {
-	fetchInfraConfigFunc      func() (*ExistingInfraConfigToml, error)
-	fetchAwsConfigFunc        func() (*AwsConfigToml, error)
-	pullOpensearchConfigsFunc func() (map[string]*ConfigKeys, error)
-	pullPGConfigsFunc         func() (map[string]*ConfigKeys, error)
-	pullAutomateConfigsFunc   func() (map[string]*dc.AutomateConfig, error)
-	pullChefServerConfigsFunc func() (map[string]*dc.AutomateConfig, error)
-	generateInfraConfigFunc   func() (*ExistingInfraConfigToml, error)
-	generateAwsConfigFunc     func() (*AwsConfigToml, error)
+	fetchInfraConfigFunc      func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	fetchAwsConfigFunc        func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
+	pullOpensearchConfigsFunc func(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
+	pullPGConfigsFunc         func(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
+	pullAutomateConfigsFunc   func(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
+	pullChefServerConfigsFunc func(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
+	generateInfraConfigFunc   func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	generateAwsConfigFunc     func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	getExceptionIpsFunc       func() []string
 	setExceptionIpsFunc       func(ips []string)
 	getOsCertsByIpFunc        func(map[string]*ConfigKeys) []CertByIP
@@ -303,36 +303,36 @@ type MockPullConfigs struct {
 func (m *MockPullConfigs) setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil) {
 }
 
-func (m *MockPullConfigs) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
-	return m.fetchInfraConfigFunc()
+func (m *MockPullConfigs) fetchInfraConfig(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+	return m.fetchInfraConfigFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) fetchAwsConfig() (*AwsConfigToml, error) {
-	return m.fetchAwsConfigFunc()
+func (m *MockPullConfigs) fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+	return m.fetchAwsConfigFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) pullOpensearchConfigs() (map[string]*ConfigKeys, error) {
-	return m.pullOpensearchConfigsFunc()
+func (m *MockPullConfigs) pullOpensearchConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error) {
+	return m.pullOpensearchConfigsFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) pullPGConfigs() (map[string]*ConfigKeys, error) {
-	return m.pullPGConfigsFunc()
+func (m *MockPullConfigs) pullPGConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error) {
+	return m.pullPGConfigsFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
-	return m.pullAutomateConfigsFunc()
+func (m *MockPullConfigs) pullAutomateConfigs(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error) {
+	return m.pullAutomateConfigsFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) pullChefServerConfigs() (map[string]*dc.AutomateConfig, error) {
-	return m.pullChefServerConfigsFunc()
+func (m *MockPullConfigs) pullChefServerConfigs(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error) {
+	return m.pullChefServerConfigsFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) generateInfraConfig() (*ExistingInfraConfigToml, error) {
-	return m.generateInfraConfigFunc()
+func (m *MockPullConfigs) generateInfraConfig(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+	return m.generateInfraConfigFunc(removeUnreachableNodes)
 }
 
-func (m *MockPullConfigs) generateAwsConfig() (*AwsConfigToml, error) {
-	return m.generateAwsConfigFunc()
+func (m *MockPullConfigs) generateAwsConfig(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+	return m.generateAwsConfigFunc(removeUnreachableNodes)
 }
 
 func (m *MockPullConfigs) getExceptionIps() []string {
@@ -358,11 +358,11 @@ func TestPopulateHaCommonConfig(t *testing.T) {
 		{
 			name: "ExistingInfraConfig passed",
 			mockPullConfigs: &MockPullConfigs{
-				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-					return existingInfraConfig, nil
+				fetchInfraConfigFunc: func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+					return existingInfraConfig, nil, nil
 				},
-				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-					return nil, nil
+				fetchAwsConfigFunc: func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+					return nil, nil, nil
 				},
 			},
 			getModeOfDeployment: func() string {
@@ -373,11 +373,11 @@ func TestPopulateHaCommonConfig(t *testing.T) {
 		{
 			name: "ExistingInfraConfig failed",
 			mockPullConfigs: &MockPullConfigs{
-				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-					return nil, errors.New("Error while config generation")
+				fetchInfraConfigFunc: func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+					return nil, nil, errors.New("Error while config generation")
 				},
-				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-					return nil, nil
+				fetchAwsConfigFunc: func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+					return nil, nil, nil
 				},
 			},
 			getModeOfDeployment: func() string {
@@ -389,11 +389,11 @@ func TestPopulateHaCommonConfig(t *testing.T) {
 		{
 			name: "AwsConfig passed",
 			mockPullConfigs: &MockPullConfigs{
-				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-					return nil, nil
+				fetchInfraConfigFunc: func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+					return nil, nil, nil
 				},
-				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-					return awsConfig, nil
+				fetchAwsConfigFunc: func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+					return awsConfig, nil, nil
 				},
 			},
 			getModeOfDeployment: func() string {
@@ -404,11 +404,11 @@ func TestPopulateHaCommonConfig(t *testing.T) {
 		{
 			name: "AwsConfig failed",
 			mockPullConfigs: &MockPullConfigs{
-				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-					return nil, nil
+				fetchInfraConfigFunc: func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+					return nil, nil, nil
 				},
-				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-					return nil, errors.New("Error while config generation")
+				fetchAwsConfigFunc: func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+					return nil, nil, errors.New("Error while config generation")
 				},
 			},
 			getModeOfDeployment: func() string {
@@ -420,11 +420,11 @@ func TestPopulateHaCommonConfig(t *testing.T) {
 		{
 			name: "NoConfigFound",
 			mockPullConfigs: &MockPullConfigs{
-				fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
-					return nil, nil
+				fetchInfraConfigFunc: func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+					return nil, nil, nil
 				},
-				fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
-					return nil, nil
+				fetchAwsConfigFunc: func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+					return nil, nil, nil
 				},
 			},
 			getModeOfDeployment: func() string {

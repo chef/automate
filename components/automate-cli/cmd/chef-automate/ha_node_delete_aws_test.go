@@ -71,7 +71,7 @@ func TestDeletenodeAWSValidateIsManagedServicesOnError(t *testing.T) {
 		})
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.True(t, isManagedServicesOn)
 	assert.Contains(t, err.Error(), isManagedServicesError)
 }
@@ -122,7 +122,7 @@ func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 		})
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.Equal(t, automateIpNotPresent, err.Error())
 }
 
@@ -175,7 +175,7 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 		})
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.Contains(t, err.Error(), multipleNodeError)
 }
 
@@ -225,9 +225,9 @@ func TestDeletenodeAWSModifyA2(t *testing.T) {
 		})
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.NoError(t, err)
-	err = nodeDelete.modifyConfig()
+	err = nodeDelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "4", nodeDelete.(*DeleteNodeAWSImpl).config.Automate.Config.InstanceCount)
 }
@@ -279,9 +279,9 @@ func TestDeletenodeAWSModifyCS(t *testing.T) {
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.NoError(t, err)
-	err = nodeDelete.modifyConfig()
+	err = nodeDelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "1", nodeDelete.(*DeleteNodeAWSImpl).config.ChefServer.Config.InstanceCount)
 }
@@ -332,9 +332,9 @@ func TestDeletenodeAWSModifyPG(t *testing.T) {
 		})
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.NoError(t, err)
-	err = nodeDelete.modifyConfig()
+	err = nodeDelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "3", nodeDelete.(*DeleteNodeAWSImpl).config.Postgresql.Config.InstanceCount)
 }
@@ -385,9 +385,9 @@ func TestDeletenodeAWSModifyOS(t *testing.T) {
 		})
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
-	err = nodeDelete.validate()
+	_, err = nodeDelete.validate()
 	assert.NoError(t, err)
-	err = nodeDelete.modifyConfig()
+	err = nodeDelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "5", nodeDelete.(*DeleteNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 }
@@ -436,9 +436,9 @@ func TestDeleteAwsnodePrompt(t *testing.T) {
 				return "", nil
 			},
 		})
-	err := nodeDelete.validate()
+	_, err := nodeDelete.validate()
 	assert.NoError(t, err)
-	err = nodeDelete.modifyConfig()
+	err = nodeDelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "4", nodeDelete.(*DeleteNodeAWSImpl).config.Automate.Config.InstanceCount)
 	res, err := nodeDelete.promptUserConfirmation()
@@ -529,9 +529,9 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 				return "", nil
 			},
 		})
-	err := nodeDelete.validate()
+	_, err := nodeDelete.validate()
 	assert.NoError(t, err)
-	err = nodeDelete.modifyConfig()
+	err = nodeDelete.modifyConfig(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "4", nodeDelete.(*DeleteNodeAWSImpl).config.Automate.Config.InstanceCount)
 	res, err := nodeDelete.promptUserConfirmation()
