@@ -48,17 +48,17 @@ export class ChefBadge {
   /**
    * Indicate badge has no data
    */
-  @Prop({ reflectToAttr: true }) noData = false;
+  @Prop({ reflect: true }) noData = false;
 
   /**
    * The ID of the element to attach the tooltip
    */
-  @Prop({ reflectToAttr: true }) id: string;
+  @Prop({ reflect: true }) id: string;
 
   /**
    * Text to be displayed within tooltips
    */
-  @Prop({ reflectToAttr: true }) tooltip: string;
+  @Prop({ reflect: true }) tooltip: string;
 
   render() {
     const tooltip = this.tooltip ? <chef-tooltip for={this.id}>{this.tooltip}</chef-tooltip> : null;

@@ -1,13 +1,6 @@
-// Collections are now defined as imports in the main component. Since they
-// cause side effects we need to disable that rule in this case.
-/* tslint:disable:no-import-side-effect */
-import '@stencil/router';
-import '@stencil/redux';
-/* tslint:enable:no-import-side-effect */
+import { Component, h } from '@stencil/core';
 
-import { Component, Prop, h } from '@stencil/core';
-
-import { configureStore } from './store';
+import { store } from './store';
 import { getDocs } from './entities/docs/doc.actions';
 
 @Component({
@@ -15,19 +8,16 @@ import { getDocs } from './entities/docs/doc.actions';
 })
 export class ChefLibraryApp {
 
-  @Prop({ context: 'store' }) store;
+  // getDocs: typeof getDocs;
 
-  getDocs: typeof getDocs;
-
-  componentWillLoad() {
-    this.store.setStore(configureStore({}));
-    this.store.mapDispatchToProps(this, {
-      getDocs
-    });
-  }
+  // componentWillLoad() {
+  //   // store.setStore(store);
+  //   store.dispatch(getDocs());
+  // }
 
   componentDidLoad() {
-    this.getDocs();
+    // store.dispatch(getDocs());
+    
   }
 
   render() {

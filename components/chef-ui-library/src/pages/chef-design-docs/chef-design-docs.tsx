@@ -1,5 +1,4 @@
 import { Component, Prop, State, h } from '@stencil/core';
-import { Store } from '@stencil/redux';
 import get from 'lodash/fp/get';
 import getOr from 'lodash/fp/getOr';
 import map from 'lodash/fp/map';
@@ -10,6 +9,7 @@ import filter from 'lodash/fp/filter';
 
 import { IndexedEntities } from '../../entities/entities';
 import { DocEntity } from '../../entities/docs/doc.entity';
+import { store } from "../../store";
 
 @Component({
   tag: 'chef-design-docs',
@@ -17,7 +17,7 @@ import { DocEntity } from '../../entities/docs/doc.entity';
 })
 export class ChefDesignDocs {
 
-  @Prop({ context: 'store' }) store: Store;
+  // @Prop({ context: 'store' }) store;
   @Prop() match: any;
   @Prop() docType: string;
 
@@ -25,16 +25,19 @@ export class ChefDesignDocs {
   @State() docIds: string[];
 
   componentWillLoad() {
-    this.store.mapStateToProps(this, (state) => {
-      const docs = get(['docs', 'byId'], state);
-      const docIds =
-        pipe(get(['docs', 'allIds']),
-             filter((id: string) => get([id, 'docType'], docs) === this.docType))(state);
-      return {
-        docs,
-        docIds
-      };
-    });
+    store.subscribe(() => {
+      console.log(store.getState())
+    })
+    // store.mapStateToProps(this, (state) => {
+    //   const docs = get(['docs', 'byId'], state);
+    //   const docIds =
+    //     pipe(get(['docs', 'allIds']),
+    //          filter((id: string) => get([id, 'docType'], docs) === this.docType))(state);
+    //   return {
+    //     docs,
+    //     docIds
+    //   };
+    // });
   }
 
   render() {

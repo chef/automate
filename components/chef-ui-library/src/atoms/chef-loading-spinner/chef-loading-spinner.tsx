@@ -21,7 +21,7 @@ export class ChefLoadingSpinner {
   /**
    * Fixed styling (default is false and displays inline)
    */
-  @Prop({ reflectToAttr: true }) fixed = false;
+  @Prop({ reflect: true }) fixed = false;
 
   render() {
     const ring = (d, className = '') => {

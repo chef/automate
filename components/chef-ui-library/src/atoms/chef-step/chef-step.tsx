@@ -44,12 +44,12 @@ export class ChefStep {
   /**
    * Indicates that the step is disabled.
    */
-  @Prop({ reflectToAttr: true }) disabled = false;
+  @Prop({ reflect: true }) disabled = false;
 
   /**
    * Indicates that the step is selected.
    */
-  @Prop({ reflectToAttr: true }) selected = false;
+  @Prop({ reflect: true }) selected = false;
 
   render() {
     return (

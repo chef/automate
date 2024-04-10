@@ -1,5 +1,4 @@
 import { Component, Prop, State, h } from '@stencil/core';
-import { Store } from '@stencil/redux';
 import get from 'lodash/fp/get';
 import getOr from 'lodash/fp/getOr';
 import map from 'lodash/fp/map';
@@ -17,7 +16,7 @@ import { DocEntity } from '../../entities/docs/doc.entity';
 })
 export class ChefUIDocs {
 
-  @Prop({ context: 'store' }) store: Store;
+  // @Prop({ context: 'store' }) store;
   @Prop() match: any;
   @Prop() docType: string;
 
@@ -25,16 +24,16 @@ export class ChefUIDocs {
   @State() docIds: string[];
 
   componentWillLoad() {
-    this.store.mapStateToProps(this, (state) => {
-      const docs = get(['docs', 'byId'], state);
-      const docIds =
-        pipe(get(['docs', 'allIds']),
-             filter((id: string) => get([id, 'docType'], docs) === this.docType))(state);
-      return {
-        docs,
-        docIds
-      };
-    });
+    // this.store.mapStateToProps(this, (state) => {
+    //   const docs = get(['docs', 'byId'], state);
+    //   const docIds =
+    //     pipe(get(['docs', 'allIds']),
+    //          filter((id: string) => get([id, 'docType'], docs) === this.docType))(state);
+    //   return {
+    //     docs,
+    //     docIds
+    //   };
+    // });
   }
 
   render() {

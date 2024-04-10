@@ -1,0 +1,3 @@
+{
+  "extends": "@ionic/eslint-config/recommended"
+}
