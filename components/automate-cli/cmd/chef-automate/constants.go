@@ -32,6 +32,7 @@ const (
 	OPENSEARCH_TOML                = "opensearch.config.toml"
 	OCID_SHOW_APP                  = "oc-id-show-app"
 	HOME_DIR                       = "/home"
+	HAB_TMP_DIR                    = "/hab/tmp"
 	TMP_DIR                        = "/tmp"
 	CERTIFICATE_TEMPLATE_TOML_FILE = "/hab/a2_deploy_workspace/certificate.toml"
 	CLUSTER                        = "cluster"

@@ -64,6 +64,7 @@ const (
 var configValid = "Config file must be a valid %s config"
 
 func init() {
+	createHabTmpDir()
 	configCmd.AddCommand(showConfigCmd)
 	configCmd.AddCommand(patchConfigCmd)
 	configCmd.AddCommand(setConfigCmd)
@@ -1427,4 +1428,19 @@ func printConfigErrorMessage(configType string, remoteService string, hostIP str
 func printConfigSuccessMessage(configType string, remoteService string, hostIP string, cliWriter *cli.Writer) {
 	cliWriter.Success(configType + " is completed on " + remoteService + " node : " + hostIP + "\n")
 	cliWriter.BufferWriter().Flush()
+}
+
+func createHabTmpDir() {
+	if _, err := os.Stat(HAB_TMP_DIR); os.IsNotExist(err) {
+		err = os.MkdirAll(HAB_TMP_DIR, os.ModePerm)
+		if err != nil {
+			writer.Errorln(fmt.Sprintf("Error while creating %s dir: %v", HAB_TMP_DIR, err))
+		}
+
+		// Change the permissions from 0777 to 1777
+		err = os.Chmod(HAB_TMP_DIR, 1777|os.ModeSticky)
+		if err != nil {
+			writer.Errorln(fmt.Sprintf("Error while modifying the permissions of %s dir: %v", HAB_TMP_DIR, err))
+		}
+	}
 }
