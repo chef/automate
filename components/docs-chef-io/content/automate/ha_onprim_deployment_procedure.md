@@ -15,14 +15,15 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /note >}}
 
-This document explains how to deploy Chef Automate HA on on-premises machines with Chef Managed Database.
+This document explains how to deploy Chef Automate HA on on-premises machines with the Chef Managed Database.
+
 Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 
 - Do not modify the workspace path. It should always be `/hab/a2_deploy_workspace`.
 - We don't support AD managed users in nodes. We only support local Linux users.
-- If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. Then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
+- If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. Then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer to the [Chef HA Sudo Password](/automate/ha_sudo_password/) page for more details.
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 {{< /warning >}}
 
@@ -45,7 +46,7 @@ Make sure you have all resources either on existing infrastructure or on existin
     "
     ```
 
-    To download specific version bundle, replace `latest.aib` with Chef Automate version number. For example, `4.2.59.aib`.
+    To download a specific version bundle, replace the `latest.aib` with the Chef Automate version number. For example, `4.2.59.aib`.
 
     {{< note spaces=4 >}}
 
@@ -91,17 +92,18 @@ You can also generate a configuration file using the `init-config` subcommand.
 
     To know more about config verify, check [Config Verify Documentation](/automate/ha_verification_check/).
 
-    Once the verification completed successfully, proceed with the deployment. In case of failure, fix the issue and verify it by re-running the verify command.
+    Once the verification is completed successfully, proceed with the deployment. In case of failure, fix the issue and verify it by re-running the verify command.
 
 ## Steps to Deploy
 
-1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during the deploy command use `--skip-verify` flag
 
     ```bash
     chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
    To skip verification during deployment, use `--skip-verify` flag
+
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
@@ -114,7 +116,7 @@ You can also generate a configuration file using the `init-config` subcommand.
      chef-automate status summary
     ```
 
-1.  Get the service status from each node
+1. Get the service status from each node
 
     ```bash
      chef-automate status
@@ -133,7 +135,7 @@ You can also generate a configuration file using the `init-config` subcommand.
     ```
 
     Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-    After successful deployment, proceed with following...
+    After successful deployment, proceed with the following...
       1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
       1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
       1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
@@ -148,7 +150,7 @@ The Chef Automate commands require some arguments so that it can determine which
 
 ## Patch Configs
 
-The bastion server can patch new configurations in all nodes. To know more see [Patch Configuration](/automate/ha_config/#patch-configuration) section.
+The bastion server can patch new configurations in all nodes. To know more see the [Patch Configuration](/automate/ha_config/#patch-configuration) section.
 
 ## Sample Config
 
@@ -208,8 +210,8 @@ The bastion server can patch new configurations in all nodes. To know more see [
 {{< note >}}
 
 - Assuming 5+1 nodes (1 bastion, 2 for Chef Automate and Chef Infra Server, 3 for PostgreSQL and OpenSearch).
-- For the Frontend nodes you can use the same IP in automate and chefserver.
-- For the Backend nodes you can use the same IP in postgresql and opensearch.
+- For the Frontend nodes, you can use the same IP in automate and chefserver.
+- For the Backend nodes, you can use the same IP in PostgreSQL and OpenSearch.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
 
 {{< /note >}}
@@ -259,7 +261,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
 
 ## Uninstall Chef Automate HA
 
-To uninstall Chef Automate HA instances after unsuccessful deployment, run the `cleanup` command on your bastion host.
+To uninstall Chef Automate HA instances after unsuccessful deployment, run the `cleanup` command on your Bastion host.
 
 ```bash
 chef-automate cleanup --onprem-deployment
