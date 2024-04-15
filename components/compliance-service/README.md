@@ -94,7 +94,7 @@ Some notes:
 * `make test-scanner` will test scanner including scheduler and ingest connection.
 * `make test-nodemanager` will run the ingest to manager connection test and then all the nodemanager tests.
 
-Test ElasticSearch migrations:
+Test Elasticsearch migrations:
 A1_DATA=true   TEST="60_A1_migration_spec.rb"   make test-automate-upgrade
 A2V1_DATA=true TEST="61_A2V1_migration_spec.rb" make test-automate-upgrade
 A2V2_DATA=true TEST="62_A2V2_migration_spec.rb" make test-automate-upgrade

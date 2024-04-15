@@ -191,7 +191,7 @@ func init() {
 		Short: "A suite of commands to assist in local development and testing. Not for production use.",
 	}
 	// Most exposed 'dev' commands will use our our elastic interface directly, so make it a common option
-	devCmd.Flags().String("elasticsearch-url", "http://localhost:9200", "URL to ElasticSearch (<protocol>://domain:<port>)/")
+	devCmd.Flags().String("elasticsearch-url", "http://localhost:9200", "URL to Elasticsearch (<protocol>://domain:<port>)/")
 	err := viper.BindPFlags(devCmd.Flags())
 	if err != nil {
 		panic(errors.Wrap(err, "BindPFlags in init failed"))

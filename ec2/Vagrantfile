@@ -128,7 +128,7 @@ if ARGV[0] == "up"
 
   if !ENV['EBS_SNAPSHOT'].nil? && ENV['EBS_SNAPSHOT'] =~ /^snap-\w+$/
     es_ebs_snapshot = ENV['EBS_SNAPSHOT']
-    puts " * Using specified EBS snapshot #{es_ebs_snapshot} for the ElasticSearch data directory"
+    puts " * Using specified EBS snapshot #{es_ebs_snapshot} for the Elasticsearch data directory"
   end
 
   if !ENV['VERSION'].nil?

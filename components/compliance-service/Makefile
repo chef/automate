@@ -234,17 +234,17 @@ start-es-pg: start-pg create-es-data-dir
 start-es: start-os124
 
 start-es5: create-es-data-dir
-	@printf "\n===> ${yellow}Recreating the ElasticSearch 5 container...${reset}\n"
+	@printf "\n===> ${yellow}Recreating the Elasticsearch 5 container...${reset}\n"
 	docker rm -f cc_es5 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es5 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 elasticsearch:5.4.0
 	@$(MAKE) wait-for-es
 
 start-es6: create-es-data-dir
-	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
+	@printf "\n===> ${yellow}Recreating the Elasticsearch 6 container...${reset}\n"
 	docker rm -f cc_es6 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 	@$(MAKE) wait-for-es
 
 start-os124: create-es-data-dir
-	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
+	@printf "\n===> ${yellow}Recreating the Elasticsearch 6 container...${reset}\n"
 	docker rm -f cc_os124 2> /dev/null; sleep 1; docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "DISABLE_SECURITY_PLUGIN=true" opensearchproject/opensearch:1.2.4
 	@$(MAKE) wait-for-es
 
@@ -322,12 +322,12 @@ wait-for-pg:
 	printf " * ${green}PostgreSQL is healthy, moving on...${reset}\n"
 
 wait-for-es:
-	@printf "\n===> ${blue}Checking ElasticSearch to ensure it's ready to receive connections${reset}\n"; \
+	@printf "\n===> ${blue}Checking Elasticsearch to ensure it's ready to receive connections${reset}\n"; \
 	i=1; \
 	max_loops=100; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/_cluster/health" | grep -E '"status":"yellow"|"green"'; \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
-	  printf " * ${yellow}$$i ElasticSearch is not healthy yet, retrying...${reset}\n"; \
+	  printf " * ${yellow}$$i Elasticsearch is not healthy yet, retrying...${reset}\n"; \
 	  sleep 5; \
 	  i=$$(( $$i + 1 )); \
 	  curl -s -X GET "$(ELASTICSEARCH_URL)/_cluster/health" | grep -E '"status":"yellow"|"green"'; \
@@ -351,10 +351,10 @@ wait-for-ingestion:
 	max_loops=50; \
 	es_docs=45; \
 	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
-	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
+	printf "\n===> ${blue}Checking Elasticsearch to ensure it has ingested our reports${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \
 	while [ $$? -ne 0 -a $$i -lt $$max_loops ]; do \
-	  printf " * ${yellow}$$i ElasticSearch is still ingesting, retrying...${reset}\n"; \
+	  printf " * ${yellow}$$i Elasticsearch is still ingesting, retrying...${reset}\n"; \
 	  sleep 5; \
 	  i=$$(( $$i + 1 )); \
 	  curl_output=`curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count"`; \
