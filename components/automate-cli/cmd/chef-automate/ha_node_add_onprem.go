@@ -100,7 +100,7 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 	ani.prepare()
-	return ani.runDeploy()
+	return ani.runDeploy(unreachableNodes)
 }
 
 func (ani *AddNodeOnPremImpl) prepare() error {
@@ -201,14 +201,14 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeOnPremImpl) runDeploy() error {
+func (ani *AddNodeOnPremImpl) runDeploy(unreachableNodes map[string][]string) error {
 	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	syncErr := ani.nodeUtils.syncConfigToAllNodes(unreachableNodes)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())

@@ -108,7 +108,7 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = dna.runDeploy()
+	err = dna.runDeploy(unreachableNodes)
 	currentCount, newErr := dna.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
 		if err != nil {
@@ -201,7 +201,7 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return dna.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dna *DeleteNodeAWSImpl) runDeploy() error {
+func (dna *DeleteNodeAWSImpl) runDeploy(unreachableNodes map[string][]string) error {
 	err := dna.runRemoveNodeFromAws()
 	if err != nil {
 		return err
@@ -235,7 +235,7 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 	// TODO : Remove this after fixing the following ticket
 	// https://chefio.atlassian.net/browse/CHEF-3630
-	syncErr := dna.nodeUtils.syncConfigToAllNodes()
+	syncErr := dna.nodeUtils.syncConfigToAllNodes(unreachableNodes)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())

@@ -45,7 +45,7 @@ type HAModifyAndDeploy interface {
 	validate() (map[string][]string, error)
 	modifyConfig(unreachableNodes map[string][]string) error
 	promptUserConfirmation() (bool, error)
-	runDeploy() error
+	runDeploy(unreachableNodes map[string][]string) error
 }
 
 type NodeOpUtils interface {
@@ -72,9 +72,9 @@ type NodeOpUtils interface {
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCount() (int, error)
 	parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error
-	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastion() error
-	syncConfigToAllNodes() error
+	syncConfigToAllNodes(unreachableNodes map[string][]string) error
 }
 
 type NodeUtilsImpl struct {
@@ -259,22 +259,22 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 
 func (nu *NodeUtilsImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu, nil)
 }
 
-func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
+func (nu *NodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][]string) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu, unreachableNodes)
 }
 
 // Execute custom command in one node of all the each node-type
-func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
+func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils, unreachableNodes map[string][]string) error {
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
 		if nodeObject.NodeType == OPENSEARCH || nodeObject.NodeType == POSTGRESQL {
 			singleNode = true
 		}
-		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, unreachableNodes)
 		if err != nil {
 			return err
 		}
@@ -288,14 +288,14 @@ func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleN
 }
 
 // Execute 'config show' command in specific service and fetch the output file to bastion
-func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
+func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 
 	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
-	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
-
+	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, unreachableNodes)
+	nodeMap.unreachableNodes = unreachableNodes
 	sshUtil := nu.cmdUtil.GetSshUtil()
 
 	sshUtil.setSSHConfig(&SSHConfig{
@@ -775,7 +775,7 @@ func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	return nodeObjects
 }
 
-func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails, unreachableNodes map[string][]string) *NodeTypeAndCmd {
 
 	nodeMap := NewNodeTypeAndCmd()
 	cmd := newNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)

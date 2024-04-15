@@ -93,7 +93,7 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		return err
 	}
 
-	err = dni.runDeploy()
+	err = dni.runDeploy(unreachableNodes)
 	currentCount, newErr := dni.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
 		if err != nil {
@@ -240,7 +240,7 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return dni.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dni *DeleteNodeOnPremImpl) runDeploy() error {
+func (dni *DeleteNodeOnPremImpl) runDeploy(unreachableNodes map[string][]string) error {
 	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config, DEPLOY)
 	if err != nil {
 		return err
@@ -250,7 +250,7 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 
 	// TODO : Remove this after fixing the following ticket
 	// https://chefio.atlassian.net/browse/CHEF-3630
-	syncErr := dni.nodeUtils.syncConfigToAllNodes()
+	syncErr := dni.nodeUtils.syncConfigToAllNodes(unreachableNodes)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())

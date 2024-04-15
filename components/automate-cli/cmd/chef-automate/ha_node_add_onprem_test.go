@@ -401,7 +401,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
@@ -429,7 +429,7 @@ New nodes to be added:
 ================================================
 OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy()
+	err = nodeAdd.runDeploy(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -487,7 +487,7 @@ New nodes to be added:
 ================================================
 OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy()
+	err = nodeAdd.runDeploy(nil)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
@@ -545,7 +545,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -613,7 +613,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -645,17 +645,17 @@ func TestAddnodeExecuteSyncConfigToAllNodes(t *testing.T) {
 
 	t.Run("With sync config error", func(t *testing.T) {
 
-		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+		mockNodeUtil.syncConfigToAllNodesFunc = func(unreachableNodes map[string][]string) error {
 			return errors.New("sync error")
 		}
 		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
 
-		err := nodeAdd.runDeploy()
+		err := nodeAdd.runDeploy(nil)
 		assert.Error(t, err, "sync error")
 	})
 	t.Run("With sync config error and deploy error", func(t *testing.T) {
 
-		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+		mockNodeUtil.syncConfigToAllNodesFunc = func(unreachableNodes map[string][]string) error {
 			return errors.New("sync error")
 		}
 		mockNodeUtil.executeAutomateClusterCtlCommandAsyncfunc = func(command string, args []string, helpDocs string) error {
@@ -663,7 +663,7 @@ func TestAddnodeExecuteSyncConfigToAllNodes(t *testing.T) {
 		}
 		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
 
-		err := nodeAdd.runDeploy()
+		err := nodeAdd.runDeploy(nil)
 		assert.Error(t, err, "sync error")
 	})
 }
@@ -748,7 +748,7 @@ func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		calculateTotalInstanceCountFunc: func() (int, error) {

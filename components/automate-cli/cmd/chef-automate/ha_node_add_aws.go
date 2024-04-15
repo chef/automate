@@ -65,7 +65,7 @@ func (ani *AddNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 	ani.prepare()
-	return ani.runDeploy()
+	return ani.runDeploy(unreachableNodes)
 }
 
 func (ani *AddNodeAWSImpl) prepare() error {
@@ -136,7 +136,7 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeAWSImpl) runDeploy() error {
+func (ani *AddNodeAWSImpl) runDeploy(unreachableNodes map[string][]string) error {
 	err := ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 		return err
 	}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	syncErr := ani.nodeUtils.syncConfigToAllNodes(unreachableNodes)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())

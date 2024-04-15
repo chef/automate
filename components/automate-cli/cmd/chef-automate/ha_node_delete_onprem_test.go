@@ -355,7 +355,7 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -383,7 +383,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy()
+	err = nodedelete.runDeploy(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -421,7 +421,7 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		isA2HARBFileExistFunc: func() bool {
 			return true
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -467,7 +467,7 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -495,7 +495,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy()
+	err = nodedelete.runDeploy(nil)
 	assert.Error(t, err, "Invalid or empty command")
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, false, deployed)
@@ -532,7 +532,7 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("sync failed")
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -561,7 +561,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy()
+	err = nodedelete.runDeploy(nil)
 	assert.Error(t, err, "sync failed")
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -598,7 +598,7 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("Invalid or empty command")
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -627,7 +627,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy()
+	err = nodedelete.runDeploy(nil)
 	assert.Error(t, err, "Invalid or empty command")
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, false, deployed)
@@ -727,7 +727,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy()
+	err = nodedelete.runDeploy(nil)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
@@ -794,7 +794,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -872,7 +872,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -950,7 +950,7 @@ func TestRemovenodeExecuteWithProvisionError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

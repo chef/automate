@@ -25,9 +25,9 @@ type MockNodeUtilsImpl struct {
 	calculateTotalInstanceCountFunc              func() (int, error)
 	parseAndMoveConfigFileToWorkspaceDirFunc     func(outputFiles []string, outputDirectory string) error
 	executeCmdInAllNodeTypesAndCaptureOutputFunc func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
-	executeCustomCmdOnEachNodeTypeFunc           func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	executeCustomCmdOnEachNodeTypeFunc           func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastionFunc                      func() error
-	syncConfigToAllNodesFunc                     func() error
+	syncConfigToAllNodesFunc                     func(unreachableNodes map[string][]string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -107,14 +107,14 @@ func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeTypesAndCaptureOutput(nodeObjec
 	return mnu.executeCmdInAllNodeTypesAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
 }
 
-func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
-	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode)
+func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
+	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, unreachableNodes)
 }
 
 func (mnu *MockNodeUtilsImpl) saveConfigToBastion() error {
 	return mnu.saveConfigToBastionFunc()
 }
 
-func (mnu *MockNodeUtilsImpl) syncConfigToAllNodes() error {
-	return mnu.syncConfigToAllNodesFunc()
+func (mnu *MockNodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][]string) error {
+	return mnu.syncConfigToAllNodesFunc(unreachableNodes)
 }

@@ -518,7 +518,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return nil
 			},
-			syncConfigToAllNodesFunc: func() error {
+			syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 				return nil
 			},
 		},
@@ -549,7 +549,7 @@ Node to be deleted:
 Automate => 192.0.0.1
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeDelete.runDeploy()
+	err = nodeDelete.runDeploy(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, true, autoFileMoved)
 	assert.Equal(t, true, tfArchModified)
@@ -647,7 +647,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			saveConfigToBastionFunc: func() error {
 				return nil
 			},
-			syncConfigToAllNodesFunc: func() error {
+			syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 				return nil
 			},
 		},
@@ -732,7 +732,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}
@@ -792,17 +792,17 @@ func TestDeletenodeDeploy(t *testing.T) {
 
 	t.Run("With sync config error", func(t *testing.T) {
 
-		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+		mockNodeUtil.syncConfigToAllNodesFunc = func(unreachableNodes map[string][]string) error {
 			return errors.New("sync error")
 		}
 		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
 
-		err := nodeDelete.runDeploy()
+		err := nodeDelete.runDeploy(nil)
 		assert.Error(t, err, "sync error")
 	})
 	t.Run("With sync config error and deploy error", func(t *testing.T) {
 
-		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+		mockNodeUtil.syncConfigToAllNodesFunc = func(unreachableNodes map[string][]string) error {
 			return errors.New("sync error")
 		}
 		mockNodeUtil.executeAutomateClusterCtlCommandAsyncfunc = func(command string, args []string, helpDocs string) error {
@@ -813,7 +813,7 @@ func TestDeletenodeDeploy(t *testing.T) {
 		}
 		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
 
-		err := nodeDelete.runDeploy()
+		err := nodeDelete.runDeploy(nil)
 		assert.Error(t, err, "sync error")
 		assert.Error(t, err, "deploy error")
 	})
@@ -869,7 +869,7 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		calculateTotalInstanceCountFunc: func() (int, error) {

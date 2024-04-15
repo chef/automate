@@ -194,7 +194,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
@@ -232,7 +232,7 @@ Chef-Server => 2
 OpenSearch => 7
 Postgresql => 4
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy()
+	err = nodeAdd.runDeploy(nil)
 	assert.NoError(t, err)
 	assert.Equal(t, true, autoFileMoved)
 	assert.Equal(t, true, tfArchModified)
@@ -302,7 +302,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -378,7 +378,7 @@ func TestAddnodeWithSaveConfigToBasionErr(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return errors.New("error removing header")
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -441,7 +441,7 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("random")
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
@@ -517,7 +517,7 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("random")
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
@@ -584,13 +584,13 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {

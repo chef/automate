@@ -279,7 +279,7 @@ func TestSaveConfigToBastion(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}
@@ -636,7 +636,7 @@ func TestSyncConfigToAllNodes(t *testing.T) {
 		assert.Error(t, err, "Automate Ha infra confile file not exist")
 	})
 	t.Run("sync config in all nodes", func(t *testing.T) {
-		err := nodeUtil.syncConfigToAllNodes()
+		err := nodeUtil.syncConfigToAllNodes(nil)
 		assert.Error(t, err, "Automate Ha infra confile file not exist")
 	})
 }
@@ -651,7 +651,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, nil, nil
 			},
-			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 				return nil
 			},
 		}
@@ -659,7 +659,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.NoError(t, err)
 	})
 
@@ -672,7 +672,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, nil, nil
 			},
-			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 				return nil
 			},
 		}
@@ -680,7 +680,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.Error(t, err, "error parsing output file")
 	})
 
@@ -707,7 +707,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 		nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -736,7 +736,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 		}
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -765,7 +765,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 		}
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -792,7 +792,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 		nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.Error(t, err, "No ips found")
 	})
 }
@@ -808,7 +808,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutputToSaveConfigInBastionBeforeNode
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, nil, nil
 			},
-			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 				return nil
 			},
 		}
@@ -816,7 +816,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutputToSaveConfigInBastionBeforeNode
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.NoError(t, err)
 	})
 
@@ -829,7 +829,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutputToSaveConfigInBastionBeforeNode
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, nil, nil
 			},
-			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 				return nil
 			},
 		}
@@ -837,7 +837,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutputToSaveConfigInBastionBeforeNode
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu, nil)
 		assert.Error(t, err, "error parsing output file")
 	})
 }
@@ -852,7 +852,7 @@ func TestCreateNodeMap(t *testing.T) {
 			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
 			return infra, &SSHConfig{}, nil
 		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}
@@ -869,22 +869,22 @@ func TestCreateNodeMap(t *testing.T) {
 
 	t.Run(AUTOMATE, func(t *testing.T) {
 		service := AUTOMATE
-		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, nil)
 		assert.NotNil(t, nodeMap, "automate")
 	})
 	t.Run(CHEF_SERVER, func(t *testing.T) {
 		service := CHEF_SERVER
-		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, nil)
 		assert.NotNil(t, nodeMap, "automate")
 	})
 	t.Run(POSTGRESQL, func(t *testing.T) {
 		service := POSTGRESQL
-		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, nil)
 		assert.NotNil(t, nodeMap, "automate")
 	})
 	t.Run(OPENSEARCH, func(t *testing.T) {
 		service := OPENSEARCH
-		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+		nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, nil)
 		assert.NotNil(t, nodeMap, "automate")
 	})
 }
