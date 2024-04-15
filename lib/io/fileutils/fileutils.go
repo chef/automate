@@ -313,3 +313,20 @@ func GetFilePermission(filePath string) (int64, error) {
 	}
 	return testint, nil
 }
+
+func CreateHabTmpDir() error {
+	habTmpDir := fmt.Sprintf("%s/tmp", HAB_DIR)
+	if _, err := os.Stat(habTmpDir); os.IsNotExist(err) {
+		err = os.MkdirAll(habTmpDir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+
+		// Change the permissions from 0777 to 1777
+		err = os.Chmod(habTmpDir, 1777|os.ModeSticky)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

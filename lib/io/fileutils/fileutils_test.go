@@ -144,6 +144,9 @@ func createTempDir(t *testing.T) string {
 func TestRemoveFirstLine(t *testing.T) {
 	content := "HeaderToBeRemoved\nabc"
 	filename := "file-name"
+	err := fileutils.CreateHabTmpDir()
+	require.NoError(t, err)
+	os.Setenv("TMPDIR", "/hab/tmp")
 
 	t.Run("Remove first line", func(t *testing.T) {
 		res, err := fileutils.CreateTempFile(content, filename)
