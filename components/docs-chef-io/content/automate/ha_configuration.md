@@ -1146,8 +1146,6 @@ Default: none
 
 
 
-
-
 ## AWS
 
 ## External database
