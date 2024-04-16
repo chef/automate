@@ -11,7 +11,6 @@ pkg_svc_user="root" # so we can start nginx properly
 pkg_deps=(
   core/nginx/1.25.4/20240314072919
 )
-
 pkg_build_deps=()
 pkg_exports=(
   [port]=service.port

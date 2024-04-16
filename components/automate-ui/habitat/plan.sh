@@ -13,7 +13,6 @@ pkg_deps=(
   core/nginx/1.25.4/20240314072919
   core/jq-static
 )
-
 pkg_build_deps=(
   core/git
   core/make
