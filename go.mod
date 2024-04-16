@@ -62,7 +62,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
-	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
 	github.com/nats-io/nats-streaming-server v0.24.3
 	github.com/nats-io/nats.go v1.28.0
 	github.com/nats-io/stan.go v0.10.2
@@ -202,9 +201,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/nats-io/go-nats v1.7.2 // indirect
-	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/nats-server/v2 v2.9.23 // indirect
+	github.com/nats-io/nats-server/v2 v2.9.23
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
