@@ -6,8 +6,8 @@ pkg_version="0.1.0"
 pkg_description="internal and external load balancer and reverse proxy for Automate 2.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
-nginx_version="1.21.3"
-headers_more_version="0.33"
+nginx_version="1.25.0"
+headers_more_version="0.36"
 ngx_devel_kit_version="0.3.2"
 set_misc_version="0.33"
 headers_more_filename="headers-more-nginx-module-${headers_more_version}.tar.gz"
@@ -22,7 +22,7 @@ set_misc_shasum=cd5e2cc834bcfa30149e7511f2b5a2183baf0b70dc091af717a89a64e44a2985
 pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
 pkg_dirname="nginx-${nginx_version}"
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_shasum=14774aae0d151da350417efc4afda5cce5035056e71894836797e1f6e2d1175a
+pkg_shasum=5ed44d45943272a4e8a5bcf4434237210f2de31b903fca5e381c1bbd7eee1e8c
 pkg_deps=(
   core/glibc
   core/libedit
