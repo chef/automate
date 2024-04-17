@@ -190,6 +190,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]stri
 			&dni.config.ExistingInfra.Config.AutomatePrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Automate.Config.CertsByIP,
+			unreachableNodes[AUTOMATE],
 		)
 	case CHEF_SERVER:
 		err = modifyConfigForDeleteNode(
@@ -197,6 +198,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]stri
 			&dni.config.ExistingInfra.Config.ChefServerPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.ChefServer.Config.CertsByIP,
+			unreachableNodes[CHEF_SERVER],
 		)
 	case POSTGRESQL:
 		err = modifyConfigForDeleteNode(
@@ -204,6 +206,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]stri
 			&dni.config.ExistingInfra.Config.PostgresqlPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Postgresql.Config.CertsByIP,
+			unreachableNodes[POSTGRESQL],
 		)
 	case OPENSEARCH:
 		err = modifyConfigForDeleteNode(
@@ -211,6 +214,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]stri
 			&dni.config.ExistingInfra.Config.OpensearchPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Opensearch.Config.CertsByIP,
+			unreachableNodes[OPENSEARCH],
 		)
 	default:
 		return errors.New("Invalid node type")

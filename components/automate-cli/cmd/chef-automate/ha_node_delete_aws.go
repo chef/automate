@@ -150,24 +150,28 @@ func (dna *DeleteNodeAWSImpl) modifyConfig(unreachableNodes map[string][]string)
 			&dna.config.Automate.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 			&dna.config.Automate.Config.CertsByIP,
+			unreachableNodes[AUTOMATE],
 		)
 	case CHEF_SERVER:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.ChefServer.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 			&dna.config.ChefServer.Config.CertsByIP,
+			unreachableNodes[CHEF_SERVER],
 		)
 	case POSTGRESQL:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Postgresql.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 			&dna.config.Postgresql.Config.CertsByIP,
+			unreachableNodes[POSTGRESQL],
 		)
 	case OPENSEARCH:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Opensearch.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 			&dna.config.Opensearch.Config.CertsByIP,
+			unreachableNodes[OPENSEARCH],
 		)
 	default:
 		return errors.New("Invalid node type")
@@ -202,7 +206,7 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (dna *DeleteNodeAWSImpl) runDeploy(unreachableNodes map[string][]string) error {
-	err := dna.runRemoveNodeFromAws()
+	err := dna.runRemoveNodeFromAws(unreachableNodes)
 	if err != nil {
 		return err
 	}
@@ -245,23 +249,28 @@ func (dna *DeleteNodeAWSImpl) runDeploy(unreachableNodes map[string][]string) er
 	return err
 }
 
-func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
+func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws(unreachableNodes map[string][]string) error {
 
 	var instanceType string
 	var configNodeIpList []string
+	var unreachableIpList []string
 	switch dna.nodeType {
 	case AUTOMATE:
 		instanceType = "chef_automate"
 		configNodeIpList = dna.configAutomateIpList
+		unreachableIpList = unreachableNodes[AUTOMATE]
 	case CHEF_SERVER:
 		instanceType = "chef_server"
 		configNodeIpList = dna.configChefServerIpList
+		unreachableIpList = unreachableNodes[CHEF_SERVER]
 	case POSTGRESQL:
 		instanceType = "chef_automate_postgresql"
 		configNodeIpList = dna.configPostgresqlIpList
+		unreachableIpList = unreachableNodes[POSTGRESQL]
 	case OPENSEARCH:
 		instanceType = "chef_automate_opensearch"
 		configNodeIpList = dna.configOpensearchIpList
+		unreachableIpList = unreachableNodes[OPENSEARCH]
 	default:
 		status.New(status.InvalidCommandArgsError, "Invalid node type")
 	}
@@ -270,7 +279,13 @@ func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error removing "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" node")
 	}
-
+	unreachableIpList = difference(unreachableIpList, []string{dna.ipToDelete})
+	for _, removeIp := range unreachableIpList {
+		err := dna.removeNodeIfExists(instanceType, removeIp, configNodeIpList)
+		if err != nil {
+			return status.Wrap(err, status.ConfigError, "Error removing "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" node")
+		}
+	}
 	return nil
 }
 

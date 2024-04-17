@@ -1199,3 +1199,64 @@ func TestGetGcsBackupConfig(t *testing.T) {
 		})
 	}
 }
+
+func TestPullAutomateConfigs(t *testing.T) {
+	mockSshUtil := &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return &SSHConfig{}
+		},
+		setSSHConfigFunc: func(sshConfig *SSHConfig) {
+			// No return for this function
+		},
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return completedMessage, errors.New("")
+		},
+		copyFileToRemoteFunc: func(srcFilePath string, destFileName string, removeFile bool) error {
+			return nil
+		},
+		copyFileFromRemoteFunc: func(remoteFilePath string, outputFileName string) (string, error) {
+			return outputFileName, nil
+		},
+	}
+	infra := &AutomateHAInfraDetails{}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1, ValidIP2, ValidIP3}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+	infra.Outputs.SSHUser.Value = "ubuntu"
+	infra.Outputs.SSHKeyFile.Value = "new.pem"
+	infra.Outputs.SSHPort.Value = "22"
+
+	pullconfig := &PullConfigsImpl{
+		infra:        infra,
+		sshUtil:      mockSshUtil,
+		exceptionIps: []string{"198.51.100.1"},
+	}
+	pullconfig.pullAutomateConfigs(true)
+}
+
+func TestFetchInfraConfig(t *testing.T) {
+	mockSshUtil := &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return &SSHConfig{}
+		},
+		setSSHConfigFunc: func(sshConfig *SSHConfig) {
+			// No return for this function
+		},
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return completedMessage, errors.New("")
+		},
+		copyFileToRemoteFunc: func(srcFilePath string, destFileName string, removeFile bool) error {
+			return nil
+		},
+		copyFileFromRemoteFunc: func(remoteFilePath string, outputFileName string) (string, error) {
+			return outputFileName, nil
+		},
+	}
+	pullconfig := &PullConfigsImpl{
+		infra:        NewMockInfra(),
+		sshUtil:      mockSshUtil,
+		exceptionIps: []string{"198.51.100.1"},
+	}
+	pullconfig.fetchInfraConfig(true)
+}

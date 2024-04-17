@@ -499,29 +499,45 @@ func trimSliceSpace(slc []string) []string {
 }
 
 func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
+	fmt.Println("############################ modifyConfigForAddNewNode ###############################")
+	fmt.Println(instanceCount)
+	fmt.Println(existingPrivateIPs)
+	fmt.Println(newIps)
+	//fmt.Println(certsIp)
+	fmt.Println(unreachableNodes)
+	fmt.Println("############################ modifyConfigForAddNewNode ###############################")
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
-	var indexToBeRemoved []int
-	if len(unreachableNodes) > 0 {
-		for _, urNode := range unreachableNodes {
-			for i, exisitingIp := range *existingPrivateIPs {
-				if strings.EqualFold(exisitingIp, urNode) {
-					indexToBeRemoved = append(indexToBeRemoved, i)
-				}
-			}
-		}
-		existingPrivateIPsCopy := *existingPrivateIPs
-		for _, idx := range indexToBeRemoved {
-			*existingPrivateIPs = append(existingPrivateIPsCopy[:idx], existingPrivateIPsCopy[idx+1:]...)
-		}
-	}
-	inc, err := modifyInstanceCount(*instanceCount, len(newIps))
-	*instanceCount = inc
+	// tempExistingPrivateIPs := []string{}
+
+	// if len(unreachableNodes) > 0 {
+	// 	for _, exisitingIp := range *existingPrivateIPs {
+	// 		if !stringutils.SliceContains(unreachableNodes, exisitingIp) {
+	// 			tempExistingPrivateIPs = append(tempExistingPrivateIPs, exisitingIp)
+	// 		}
+	// 	}
+	// }
+	// // (3 + 2) - (5 - 2)
+	// removeIpCount := len(*existingPrivateIPs) - (len(tempExistingPrivateIPs))
+	originalLen := len(*existingPrivateIPs)
+	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
+	filteredLen := len(*existingPrivateIPs)
+	removeIpCount := originalLen - filteredLen
+
+	inc, err := modifyInstanceCount(*instanceCount, len(newIps)-removeIpCount)
 	if err != nil {
 		return err
 	}
+	*instanceCount = inc
+	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
+	fmt.Println(unreachableNodes)
+	fmt.Println("Instance Count : " + inc)
+	fmt.Println("total ips to be deployed : ")
+	fmt.Println(*existingPrivateIPs)
+	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
+
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
 			c := CertByIP{
@@ -531,6 +547,11 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
 			}
 			*certsIp = append(*certsIp, c)
+		}
+	}
+	if len(*certsIp) > 0 {
+		for _, ip := range unreachableNodes {
+			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
 	return nil
@@ -557,12 +578,16 @@ func modifyConfigForNewNodeCertByIp(instanceCount int, existingPrivateIPs []stri
 	return nil
 }
 
-func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = difference(*existingPrivateIPs, newIps)
-	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	originalLen := len(*existingPrivateIPs)
+	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
+	filteredLen := len(*existingPrivateIPs)
+	removeIpCount := originalLen - filteredLen
+	inc, err := modifyInstanceCount(*instanceCount, -(len(newIps) + removeIpCount))
 	*instanceCount = inc
 	if err != nil {
 		return err
@@ -572,20 +597,28 @@ func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]stri
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
+	if len(*certsIp) > 0 && len(unreachableNodes) > 0 {
+		for _, ip := range unreachableNodes {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+	}
 	return nil
 }
 
-func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
-	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	inc, err := modifyInstanceCount(*instanceCount, -(len(newIps) + len(unreachableNodes)))
 	if err != nil {
 		return err
 	}
 	*instanceCount = inc
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+		for _, ip := range unreachableNodes {
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}

@@ -328,6 +328,11 @@ func (p *PullConfigsImpl) pullAutomateConfigs(removeUnreachableNodes bool) (map[
 		}
 		ipConfigMap[ip] = &src
 	}
+	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
+	fmt.Println(unreachableNodes)
+	fmt.Println(p.exceptionIps)
+	fmt.Println(p.infra.Outputs.AutomatePrivateIps.Value)
+	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
 	return ipConfigMap, unreachableNodes, nil
 
 }
@@ -604,7 +609,9 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 
 	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
 	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
-
+	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
+	fmt.Println(unreachableNodes)
+	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
 	return sharedConfigToml, unreachableNodes, nil
 }
 

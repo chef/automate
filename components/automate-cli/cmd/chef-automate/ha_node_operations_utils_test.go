@@ -30,8 +30,8 @@ func TestTrimSliceSpace(t *testing.T) {
 }
 
 func TestModifyConfigForAddNewNode(t *testing.T) {
-	incount := "2"
-	existingIps := []string{TEST_IP_2, TEST_IP_3}
+	incount := "4"
+	existingIps := []string{TEST_IP_2, TEST_IP_3, TEST_IP_1, TEST_IP_5}
 	newIps := []string{TEST_IP_4}
 	certs := []CertByIP{
 		{
@@ -45,20 +45,22 @@ func TestModifyConfigForAddNewNode(t *testing.T) {
 			PublicKey:  "public",
 		},
 	}
-	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs, nil)
+	var unreachableNodes []string
+	unreachableNodes = append(unreachableNodes, TEST_IP_1, TEST_IP_5)
+	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs, unreachableNodes)
 	assert.NoError(t, err)
 	assert.Equal(t, "3", incount)
-	assert.Equal(t, []string{TEST_IP_2, TEST_IP_3, TEST_IP_4}, existingIps)
+	assert.Equal(t, []string{TEST_IP_2, TEST_IP_4}, existingIps)
 	assert.Equal(t, CertByIP{
 		IP:         TEST_IP_4,
 		PrivateKey: "private",
 		PublicKey:  "public",
-	}, certs[2])
+	}, certs[1])
 }
 
 func TestModifyConfigForDeleteNode(t *testing.T) {
-	incount := "2"
-	existingIps := []string{TEST_IP_2, TEST_IP_3}
+	incount := "5"
+	existingIps := []string{TEST_IP_2, TEST_IP_3, TEST_IP_4, TEST_IP_5, TEST_IP_6}
 	newIps := []string{TEST_IP_3}
 	certs := []CertByIP{
 		{
@@ -72,10 +74,11 @@ func TestModifyConfigForDeleteNode(t *testing.T) {
 			PublicKey:  "public",
 		},
 	}
-	err := modifyConfigForDeleteNode(&incount, &existingIps, newIps, &certs)
+	unreachableNodes := []string{TEST_IP_4, TEST_IP_5}
+	err := modifyConfigForDeleteNode(&incount, &existingIps, newIps, &certs, unreachableNodes)
 	assert.NoError(t, err)
-	assert.Equal(t, "1", incount)
-	assert.Equal(t, []string{TEST_IP_2}, existingIps)
+	assert.Equal(t, "2", incount)
+	assert.Equal(t, []string{TEST_IP_2, TEST_IP_6}, existingIps)
 	assert.Equal(t, 1, len(certs))
 }
 

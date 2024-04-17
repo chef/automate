@@ -164,7 +164,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-		filterNodes(nodeIps, nodeMap.unreachableNodes[AUTOMATE], nodeMap.unreachableNodes[CHEF_SERVER])
+		//filterNodes(nodeIps, nodeMap.unreachableNodes[AUTOMATE], nodeMap.unreachableNodes[CHEF_SERVER])
 		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, nodeMap.Frontend.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Automate.CmdInputs.NodeType:
@@ -173,7 +173,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-		filterNodes(nodeIps, nodeMap.unreachableNodes[AUTOMATE])
+		//filterNodes(nodeIps, nodeMap.unreachableNodes[AUTOMATE])
 		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, nodeMap.Automate.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.ChefServer.CmdInputs.NodeType:
@@ -182,7 +182,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-		filterNodes(nodeIps, nodeMap.unreachableNodes[CHEF_SERVER])
+		//filterNodes(nodeIps, nodeMap.unreachableNodes[CHEF_SERVER])
 		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, nodeMap.ChefServer.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Postgresql.CmdInputs.NodeType:
@@ -191,7 +191,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-		filterNodes(nodeIps, nodeMap.unreachableNodes[POSTGRESQL])
+		//filterNodes(nodeIps, nodeMap.unreachableNodes[POSTGRESQL])
 		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, nodeMap.Postgresql.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Opensearch.CmdInputs.NodeType:
@@ -200,7 +200,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-		filterNodes(nodeIps, nodeMap.unreachableNodes[OPENSEARCH])
+		//filterNodes(nodeIps, nodeMap.unreachableNodes[OPENSEARCH])
 		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, nodeMap.Opensearch.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	default:
