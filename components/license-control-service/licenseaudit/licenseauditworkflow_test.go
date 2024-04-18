@@ -345,13 +345,14 @@ func Test_getAppendedCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			startDate := time.Now().AddDate(0, 0, -30).UTC().Format("2006-01-02")
-			endDate := time.Now().Format("2006-01-02")
+			startDate := time.Now().AddDate(0, 0, -30)
+			startDateTime := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC).Format(time.RFC3339)
+			endDate := time.Now().UTC().Format(time.RFC3339)
 
 			got := getAppendedCommand(tt.command, tt.url)
 
 			if tt.url == "" {
-				tt.want = fmt.Sprintf(tt.command, startDate, endDate, OutputFileName)
+				tt.want = fmt.Sprintf(tt.command, startDateTime, endDate, OutputFileName)
 			} else {
 				tt.command = tt.command + " -u %s"
 				tt.want = fmt.Sprintf(tt.command, startDate, endDate, OutputFileName, tt.url)

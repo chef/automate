@@ -218,13 +218,17 @@ func executeCommandforAudit(executeCommand ExecuteCommand, command string) (stri
 
 // getAppendedCommand gets the appended command with date
 func getAppendedCommand(commandToExecute string, url string) string {
-	startDate := time.Now().AddDate(0, 0, -30).UTC().Format("2006-01-02")
-	endDate := time.Now().Format("2006-01-02")
+	//Taking the date time as last 30 days
+	startDate := time.Now().AddDate(0, 0, -30)
+	//StartDateTime start of the day timestamp as 00:00:00
+	startDateTime := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC).Format(time.RFC3339)
+
+	endDate := time.Now().UTC().Format(time.RFC3339)
 	if url == "" {
-		return fmt.Sprintf(commandToExecute, startDate, endDate, OutputFileName)
+		return fmt.Sprintf(commandToExecute, startDateTime, endDate, OutputFileName)
 	}
 	commandToExecute = commandToExecute + " -u %s"
-	return fmt.Sprintf(commandToExecute, startDate, endDate, OutputFileName, url)
+	return fmt.Sprintf(commandToExecute, startDateTime, endDate, OutputFileName, url)
 }
 
 func getWorkflowParametersAndEnqueTask(w cereal.WorkflowInstance) (AuditWorkflowParameters, error) {
