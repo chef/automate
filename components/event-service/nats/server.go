@@ -3,10 +3,13 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
-	natsd "github.com/nats-io/gnatsd/server"
+	natsd "github.com/nats-io/nats-server/v2/server"
 	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
 	stores "github.com/nats-io/nats-streaming-server/stores"
 	nats "github.com/nats-io/nats.go"
@@ -106,7 +109,11 @@ func spawnNatsInternalServer(c *config.EventConfig, m *multiEmbeddedServer) erro
 	m.runInGoroutine(func() error {
 		m.registerServer(ns)
 		ns.Start()
-		return errors.New("NATS server exited")
+
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+		<-signalChan
+		return nil
 	})
 
 	// Wait for it to be able to accept connections

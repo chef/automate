@@ -3,14 +3,15 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-	"net/url"
-
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
-
-	natsd "github.com/nats-io/gnatsd/server"
+	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 // NATSdConfigurator is a functional-options-pattern function that configures
@@ -104,6 +105,8 @@ func WithNATSLogging(c *config.EventGatewayConfig) NATSdConfigurator {
 	return func(nopts *natsd.Options) error {
 		// Logging
 		nopts.NoLog = false
+		nopts.Debug = true
+		nopts.Trace = true
 		if c.LogConfig.LogLevel == "debug" {
 			// This seems to be the only option for adjusting the logging level
 			// available to us. NATS doesn't log too much on "info" level so it should
@@ -168,7 +171,12 @@ func Spawn(c *config.EventGatewayConfig) error {
 	}).Info("Starting NATS messaging Server for event-gateway")
 
 	ns.Start()
-	return errors.New("NATS server exited")
+
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	<-signalChan
+
+	return nil
 }
 
 // ServerWithNATSConfig configures an embedded NATS server with a custom set of NATS
