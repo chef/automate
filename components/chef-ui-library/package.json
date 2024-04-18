@@ -18,7 +18,7 @@
     "test.spec": "stencil test --spec",
     "test.watch": "stencil test --spec --watch",
     "test.e2e": "stencil test --e2e",
-    "docs": "typedoc src",
+    "docs": "typedoc --entryPointStrategy expand ./src",
     "lint": "npm run lint.ts && npm run lint.sass",
     "lint.ts": "tslint -p tsconfig.json",
     "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q",
@@ -31,7 +31,7 @@
     "d3": "^7.8.5",
     "lodash": "^4.17.21",
     "marked": "^4.0.10",
-    "material-design-icons": "^3.0.1",
+    "material-design-icons-iconfont": "^6.7.0",
     "prismjs": "^1.29.0",
     "puppeteer": "^14.0.0",
     "redux": "^4.0.4",
@@ -46,7 +46,7 @@
     "@stencil/router": "^1.0.1",
     "@stencil/sass": "^1.0.1",
     "@types/jest": "^24.0.16",
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.6.8",   
     "@types/puppeteer": "^1.12.4",
     "ansi-regex": "^4.1.1",
     "jest": "^24.8.0",
@@ -55,14 +55,9 @@
     "merge": "^2.1.1",
     "mkdirp": "1.0.0",
     "node-notifier": "^10.0.0",
-    "node-sass": "^6.0.1",
+    "node-sass": "^8.0.0",
     "sass-lint": "^1.13.1",
-    "tslint": "^5.20.0",
-    "tslint-ionic-rules": "0.0.21",
-    "typedoc": "^0.15.0",
-    "typescript": "^3.5.3"
-  },
-  "resolutions": {
-    "@types/babel__traverse": "7.14.2"
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.4"
   }
 }
