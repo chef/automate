@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-//UpdateTelemetryReported Update the last client run telemetry reported date in postgres
+// UpdateTelemetryReported Update the last client run telemetry reported date in postgres
 func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *request.UpdateTelemetryReportedRequest) (*response.UpdateTelemetryReportedResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
@@ -24,7 +24,7 @@ func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *reques
 	return &response.UpdateTelemetryReportedResponse{}, nil
 }
 
-//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+// GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
 func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error) {
 	var count int64
 	// Get last telemetry reported date from postgres
@@ -39,7 +39,8 @@ func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.Get
 		daysSinceLastPost = DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
 	}
 	if daysSinceLastPost > 0 {
-		count, err = s.client.GetUniqueNodesCount(int64(daysSinceLastPost), telemetry.LastTelemetryReportedAt)
+		duration := 30
+		count, err = s.client.GetUniqueNodesCount(int64(duration), telemetry.LastTelemetryReportedAt)
 		if err != nil {
 			return nil, err
 		}

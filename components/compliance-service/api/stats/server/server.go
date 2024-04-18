@@ -160,7 +160,7 @@ func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Fa
 	return failures, nil
 }
 
-//UpdateTelemetryReported Updates the last compliance telemetry reported date in postgres after the telemetry data is sent
+// UpdateTelemetryReported Updates the last compliance telemetry reported date in postgres after the telemetry data is sent
 func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTelemetryReportedRequest) (*stats.UpdateTelemetryReportedResponse, error) {
 	err := srv.pg.UpdateLastTelemetryReported(ctx, in)
 	if err != nil {
@@ -169,7 +169,7 @@ func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.Update
 	return &stats.UpdateTelemetryReportedResponse{}, nil
 }
 
-//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+// GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
 func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
 	var count int64
 	// Get last telemetry reported date from postgres
@@ -184,7 +184,9 @@ func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsa
 		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
 	}
 	if daysSinceLastPost > 0 {
-		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), telemetry.LastTelemetryReportedAt)
+		//CHEF-11615 Making the duration as 30 days
+		duration := 30
+		count, err = srv.es.GetUniqueNodesCount(int64(duration), telemetry.LastTelemetryReportedAt)
 		if err != nil {
 			return nil, err
 		}
