@@ -24,18 +24,19 @@ export class DocEntity implements Entity {
   examples: string[];
   docType: string;
 
-  constructor(jsonDoc = {}) {
-    const { tag, styleUrl, shadow } = getComponentMetaData(jsonDoc);
+  constructor(jsonDoc:any = {}) {
+    const entity = jsonDoc?.children[0];
+    const { tag, styleUrl, shadow } = getComponentMetaData(entity);
 
     this.id = tag;
-    this.name = jsonDoc['name'];
-    this.description = findTag('description', jsonDoc);
+    this.name = entity['name'];
+    this.description = findTag('description', entity);
     this.tag = tag;
     this.styleUrl = styleUrl || '';
     this.shadow = shadow || false;
-    this.properties = getComponentProps(jsonDoc['children']);
-    this.examples = filterTags('example', jsonDoc);
-    this.docType = getType(jsonDoc);
+    this.properties = getComponentProps(entity['children']);
+    this.examples = filterTags('@example', entity);
+    this.docType = getType(entity);
   }
 
   static create(json) {

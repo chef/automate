@@ -1,8 +1,7 @@
 {
   "rulesDirectory": [
     "node_modules/codelyzer",
-    "node_modules/rxjs-tslint",
-    "node_modules/tslint-defocus/dist"
+    "node_modules/rxjs-tslint"
   ],
   "jsRules": {
     "no-debugger": true

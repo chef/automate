@@ -16,7 +16,7 @@ export const config: Config = {
     { src: 'global/variables.css', dest: 'styles/variables.example.css' },
     { src: 'global/ui-lib-styles.css', dest: 'styles/ui-lib-styles.css' },
     { src: 'assets', dest: 'assets' },
-    { src: '../node_modules/material-design-icons/iconfont',
+    { src: '../node_modules/material-design-icons-iconfont/dist/',
       dest: 'assets/fonts/material-icons' },
     { src: 'sandbox.html', dest: 'sandbox.html' }
   ],
