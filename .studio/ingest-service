@@ -86,7 +86,7 @@ function install_ingest_test_framework {
 
   # Install node
   log_line " Installing NodeJS"
-  install_if_missing core/node18 npm;
+  install_if_missing core/node14 npm;
 
   # https://github.com/mochajs/mocha/blob/master/bin/mocha#L1
   # This is needed since mocha use env as interpreter:
@@ -99,13 +99,13 @@ function install_ingest_test_framework {
     HAB_BINLINK_DIR=/bin
   fi
   ln -s ${HAB_BINLINK_DIR}/env /usr/bin/env
-  hab pkg binlink core/node18
+  hab pkg binlink core/node14
 
   log_line " Installing NPM Package 'chakram'"
   npm install chakram
   log_line " Installing NPM Package 'mocha'"
   npm install -g mocha
-  install_if_missing core/node18 mocha;
+  install_if_missing core/node14 mocha;
   log_line " Installing NPM Package 'request'"
   npm install request
   export HAB_INTEGRATION=true

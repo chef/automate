@@ -1,11 +1,12 @@
-import { applyMiddleware, createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
-import thunk from 'redux-thunk';
+import { configureStore } from '@reduxjs/toolkit';
+import { docsSlice } from './entities/docs/doc.reducer';
 
-import { rootReducer } from './root.reducer';
+export const store = configureStore({
+  reducer: {
+    docs: docsSlice.reducer
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false
+  }),
+})
 
-export const configureStore = (initialState) =>
-  createStore(rootReducer,
-              initialState,
-              composeWithDevTools(
-                applyMiddleware(thunk)));

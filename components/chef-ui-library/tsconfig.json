@@ -17,7 +17,8 @@
     "jsxFactory": "h",
     "types": [
       "jest"
-    ]
+    ],
+    "skipLibCheck": true
   },
   "include": [
     "src",
