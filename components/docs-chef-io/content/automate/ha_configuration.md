@@ -50,7 +50,7 @@ The following sets the basic configuration of Chef Automate’s infrastructure i
 
 ### Parameters
 
-#### secrets_key_file
+`secrets_key_file`
 
 Type: string
 
@@ -58,7 +58,7 @@ Default: /hab/a2_deploy_workspace/secrets.key
 
 Some words that describe this.
 
-#### secrets_store_file
+`secrets_store_file`
 
 Type: string
 
@@ -66,7 +66,7 @@ Default: none
 
 Description text.
 
-#### architecture
+`architecture`
 
 Type: string
 
