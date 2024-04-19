@@ -31,7 +31,7 @@ func TestAddnodeAWSValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
 }
@@ -55,7 +55,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	assert.Equal(t, "6", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 }
@@ -79,7 +79,7 @@ func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
@@ -105,9 +105,9 @@ func TestAddnodeModifyAws(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 }
 
@@ -130,9 +130,9 @@ func TestAddAwsnodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, "6", nodeAdd.(*AddNodeAWSImpl).config.Automate.Config.InstanceCount)
 	res, err := nodeAdd.promptUserConfirmation()
@@ -210,9 +210,9 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, "7", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 	res, err := nodeAdd.promptUserConfirmation()
@@ -232,7 +232,7 @@ Chef-Server => 2
 OpenSearch => 7
 Postgresql => 4
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy(nil)
+	err = nodeAdd.runDeploy()
 	assert.NoError(t, err)
 	assert.Equal(t, true, autoFileMoved)
 	assert.Equal(t, true, tfArchModified)

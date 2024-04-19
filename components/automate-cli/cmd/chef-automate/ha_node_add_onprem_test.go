@@ -72,7 +72,7 @@ func TestAddnodeValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "IP address validation failed: \nIncorrect Automate IP address format for ip ewewedw")
 }
@@ -101,7 +101,7 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
 Incorrect Automate IP address format for ip ewewedw
@@ -135,7 +135,7 @@ func TestAddnodeReadfileError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
@@ -167,7 +167,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
@@ -200,7 +200,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
@@ -226,9 +226,9 @@ func TestAddnodeModifyAutomate(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeOnPremImpl).automateIpList[0])
 	assert.Equal(t, "3", nodeAdd.(*AddNodeOnPremImpl).config.Automate.Config.InstanceCount)
@@ -257,9 +257,9 @@ func TestAddnodeModifyInfra(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.chefServerIp, nodeAdd.(*AddNodeOnPremImpl).chefServerIpList[0])
 	assert.Equal(t, "2", nodeAdd.(*AddNodeOnPremImpl).config.ChefServer.Config.InstanceCount)
@@ -288,9 +288,9 @@ func TestAddnodeModifyPostgresql(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.postgresqlIp, nodeAdd.(*AddNodeOnPremImpl).postgresqlIp[0])
 	assert.Equal(t, "4", nodeAdd.(*AddNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
@@ -319,9 +319,9 @@ func TestAddnodeModifyOpensearch(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeOnPremImpl).opensearchIpList[0])
 	assert.Equal(t, "5", nodeAdd.(*AddNodeOnPremImpl).config.Opensearch.Config.InstanceCount)
@@ -350,9 +350,9 @@ func TestAddnodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeOnPremImpl).automateIpList[0])
 	res, err := nodeAdd.promptUserConfirmation()
@@ -410,9 +410,9 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeOnPremImpl).opensearchIpList[0])
 	res, err := nodeAdd.promptUserConfirmation()
@@ -429,7 +429,7 @@ New nodes to be added:
 ================================================
 OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy(nil)
+	err = nodeAdd.runDeploy()
 	assert.NoError(t, err)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -468,9 +468,9 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig(nil)
+	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeOnPremImpl).opensearchIpList[0])
 	res, err := nodeAdd.promptUserConfirmation()
@@ -487,7 +487,7 @@ New nodes to be added:
 ================================================
 OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy(nil)
+	err = nodeAdd.runDeploy()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
@@ -650,7 +650,7 @@ func TestAddnodeExecuteSyncConfigToAllNodes(t *testing.T) {
 		}
 		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
 
-		err := nodeAdd.runDeploy(nil)
+		err := nodeAdd.runDeploy()
 		assert.Error(t, err, "sync error")
 	})
 	t.Run("With sync config error and deploy error", func(t *testing.T) {
@@ -663,7 +663,7 @@ func TestAddnodeExecuteSyncConfigToAllNodes(t *testing.T) {
 		}
 		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
 
-		err := nodeAdd.runDeploy(nil)
+		err := nodeAdd.runDeploy()
 		assert.Error(t, err, "sync error")
 	})
 }

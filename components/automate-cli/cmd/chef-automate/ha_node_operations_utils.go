@@ -42,10 +42,10 @@ fi`
 type HAModifyAndDeploy interface {
 	Execute(c *cobra.Command, args []string) error
 	prepare() error
-	validate() (map[string][]string, error)
-	modifyConfig(unreachableNodes map[string][]string) error
+	validate() error
+	modifyConfig() error
 	promptUserConfirmation() (bool, error)
-	runDeploy(unreachableNodes map[string][]string) error
+	runDeploy() error
 }
 
 type NodeOpUtils interface {
@@ -499,28 +499,10 @@ func trimSliceSpace(slc []string) []string {
 }
 
 func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
-	fmt.Println("############################ modifyConfigForAddNewNode ###############################")
-	fmt.Println(instanceCount)
-	fmt.Println(existingPrivateIPs)
-	fmt.Println(newIps)
-	//fmt.Println(certsIp)
-	fmt.Println(unreachableNodes)
-	fmt.Println("############################ modifyConfigForAddNewNode ###############################")
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
-	// tempExistingPrivateIPs := []string{}
-
-	// if len(unreachableNodes) > 0 {
-	// 	for _, exisitingIp := range *existingPrivateIPs {
-	// 		if !stringutils.SliceContains(unreachableNodes, exisitingIp) {
-	// 			tempExistingPrivateIPs = append(tempExistingPrivateIPs, exisitingIp)
-	// 		}
-	// 	}
-	// }
-	// // (3 + 2) - (5 - 2)
-	// removeIpCount := len(*existingPrivateIPs) - (len(tempExistingPrivateIPs))
 	originalLen := len(*existingPrivateIPs)
 	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
 	filteredLen := len(*existingPrivateIPs)
@@ -531,13 +513,6 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 		return err
 	}
 	*instanceCount = inc
-	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
-	fmt.Println(unreachableNodes)
-	fmt.Println("Instance Count : " + inc)
-	fmt.Println("total ips to be deployed : ")
-	fmt.Println(*existingPrivateIPs)
-	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
-
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
 			c := CertByIP{
@@ -796,8 +771,8 @@ func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
 
 func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	timestamp := time.Now().Format("20060102150405")
-	fmt.Println("====================================================================")
-	fmt.Println("Syncing configs to frontend nodes")
+	writer.Println("====================================================================")
+	writer.Println("Syncing configs to frontend nodes")
 	frontendPrefix := "frontend" + "_" + timestamp + "_"
 	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
 	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)

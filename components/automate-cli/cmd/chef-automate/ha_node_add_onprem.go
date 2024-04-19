@@ -51,6 +51,7 @@ type AddNodeOnPremImpl struct {
 	writer                  *cli.Writer
 	fileutils               fileutils.FileUtils
 	sshUtil                 SSHUtil
+	unreachableIpMap        map[string][]string
 }
 
 func NewAddNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
@@ -76,11 +77,11 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
 	}
-	unreachableNodes, err := ani.validate()
+	err := ani.validate()
 	if err != nil {
 		return err
 	}
-	err = ani.modifyConfig(unreachableNodes)
+	err = ani.modifyConfig()
 	if err != nil {
 		return err
 	}
@@ -100,21 +101,18 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 	ani.prepare()
-	return ani.runDeploy(unreachableNodes)
+	return ani.runDeploy()
 }
 
 func (ani *AddNodeOnPremImpl) prepare() error {
 	return ani.nodeUtils.taintTerraform(ani.terraformPath)
 }
 
-func (ani *AddNodeOnPremImpl) validate() (map[string][]string, error) {
+func (ani *AddNodeOnPremImpl) validate() error {
 	updatedConfig, unreachableNodes, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil, []string{}, ani.flags.removeUnreachableNode)
 	if err != nil {
-		return unreachableNodes, err
+		return err
 	}
-	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
-	fmt.Println(unreachableNodes)
-	fmt.Println("EYUIOP$#%^&*()(*&^%$%^&*(*&^%$#%^&*(*&^%$%^&*()(*&^%$%^&*(*&^%$#%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$#$%^&*()(*&^%$%^&*()(*&^))))))))))")
 	ani.config = *updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
 	ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = splitIPCSV(
@@ -125,23 +123,24 @@ func (ani *AddNodeOnPremImpl) validate() (map[string][]string, error) {
 	)
 	if ani.nodeUtils.isManagedServicesOn() {
 		if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
-			return unreachableNodes, status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
 		}
 	}
 	errorList := ani.validateCmdArgs()
 	if errorList != nil && errorList.Len() > 0 {
-		return unreachableNodes, status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 	}
-	return unreachableNodes, nil
+	ani.unreachableIpMap = unreachableNodes
+	return nil
 }
 
-func (ani *AddNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]string) error {
+func (ani *AddNodeOnPremImpl) modifyConfig() error {
 	err := modifyConfigForAddNewNode(
 		&ani.config.Automate.Config.InstanceCount,
 		&ani.config.ExistingInfra.Config.AutomatePrivateIps,
 		ani.automateIpList,
 		&ani.config.Automate.Config.CertsByIP,
-		unreachableNodes[AUTOMATE],
+		ani.unreachableIpMap[AUTOMATE],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
@@ -151,7 +150,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]string)
 		&ani.config.ExistingInfra.Config.ChefServerPrivateIps,
 		ani.chefServerIpList,
 		&ani.config.ChefServer.Config.CertsByIP,
-		unreachableNodes[CHEF_SERVER],
+		ani.unreachableIpMap[CHEF_SERVER],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
@@ -161,7 +160,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]string)
 		&ani.config.ExistingInfra.Config.OpensearchPrivateIps,
 		ani.opensearchIpList,
 		&ani.config.Opensearch.Config.CertsByIP,
-		unreachableNodes[OPENSEARCH],
+		ani.unreachableIpMap[OPENSEARCH],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
@@ -171,7 +170,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig(unreachableNodes map[string][]string)
 		&ani.config.ExistingInfra.Config.PostgresqlPrivateIps,
 		ani.postgresqlIp,
 		&ani.config.Postgresql.Config.CertsByIP,
-		unreachableNodes[POSTGRESQL],
+		ani.unreachableIpMap[POSTGRESQL],
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")
@@ -191,27 +190,39 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	ani.writer.Println("================================================")
 	if len(ani.automateIpList) > 0 {
 		ani.writer.Println("Automate => " + strings.Join(ani.automateIpList, ", "))
+		if ani.unreachableIpMap != nil && len(ani.unreachableIpMap[AUTOMATE]) > 0 {
+			ani.writer.Println("Unreachable Automate nodes will be removed => " + strings.Join(ani.unreachableIpMap[AUTOMATE], ", "))
+		}
 	}
 	if len(ani.chefServerIpList) > 0 {
 		ani.writer.Println("Chef-Server => " + strings.Join(ani.chefServerIpList, ", "))
+		if ani.unreachableIpMap != nil && len(ani.unreachableIpMap[CHEF_SERVER]) > 0 {
+			ani.writer.Println("Unreachable Chef-Server nodes will be removed => " + strings.Join(ani.unreachableIpMap[CHEF_SERVER], ", "))
+		}
 	}
 	if len(ani.opensearchIpList) > 0 {
 		ani.writer.Println("OpenSearch => " + strings.Join(ani.opensearchIpList, ", "))
+		if ani.unreachableIpMap != nil && len(ani.unreachableIpMap[OPENSEARCH]) > 0 {
+			ani.writer.Println("Unreachable Opensearch nodes will be removed => " + strings.Join(ani.unreachableIpMap[OPENSEARCH], ", "))
+		}
 	}
 	if len(ani.postgresqlIp) > 0 {
 		ani.writer.Println("Postgresql => " + strings.Join(ani.postgresqlIp, ", "))
+		if ani.unreachableIpMap != nil && len(ani.unreachableIpMap[POSTGRESQL]) > 0 {
+			ani.writer.Println("Unreachable Postgresql nodes will be removed => " + strings.Join(ani.unreachableIpMap[POSTGRESQL], ", "))
+		}
 	}
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeOnPremImpl) runDeploy(unreachableNodes map[string][]string) error {
+func (ani *AddNodeOnPremImpl) runDeploy() error {
 	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	syncErr := ani.nodeUtils.syncConfigToAllNodes(unreachableNodes)
+	syncErr := ani.nodeUtils.syncConfigToAllNodes(ani.unreachableIpMap)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())

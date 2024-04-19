@@ -51,7 +51,7 @@ func TestDeleteNodeValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `
 Automate Ip 192.0.2.2 is not present in existing list of ip addresses. Please use a different private ip.`)
@@ -78,7 +78,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
 		multipleNodeError)
@@ -105,9 +105,9 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "1", nodedelete.(*DeleteNodeOnPremImpl).config.Automate.Config.InstanceCount)
@@ -142,7 +142,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
 }
@@ -175,7 +175,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodeAdd.validate()
+	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), multipleNodeError)
 }
@@ -201,11 +201,11 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.")
 	// even though validation will fail still we check if modify config is working as expected or not
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.chefServerIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "0", nodedelete.(*DeleteNodeOnPremImpl).config.ChefServer.Config.InstanceCount)
@@ -234,9 +234,9 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "3", nodedelete.(*DeleteNodeOnPremImpl).config.Opensearch.Config.InstanceCount)
@@ -265,11 +265,11 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
 	// even though validation will fail still we check if modify config is working as expected or not
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "2", nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
@@ -298,9 +298,9 @@ func TestDeleteNodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -363,9 +363,9 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -383,7 +383,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy(nil)
+	err = nodedelete.runDeploy()
 	assert.NoError(t, err)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -475,9 +475,9 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -495,7 +495,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy(nil)
+	err = nodedelete.runDeploy()
 	assert.Error(t, err, "Invalid or empty command")
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, false, deployed)
@@ -541,9 +541,9 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		},
 	},
 	)
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -561,7 +561,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy(nil)
+	err = nodedelete.runDeploy()
 	assert.Error(t, err, "sync failed")
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -607,9 +607,9 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		},
 	},
 	)
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -627,7 +627,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy(nil)
+	err = nodedelete.runDeploy()
 	assert.Error(t, err, "Invalid or empty command")
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, false, deployed)
@@ -667,7 +667,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
 		multipleNodeError)
@@ -707,9 +707,9 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 			return "", nil
 		},
 	})
-	_, err := nodedelete.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodedelete.modifyConfig(nil)
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
@@ -727,7 +727,7 @@ Node to be deleted:
 Opensearch => 192.0.2.3
 Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
 This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy(nil)
+	err = nodedelete.runDeploy()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }

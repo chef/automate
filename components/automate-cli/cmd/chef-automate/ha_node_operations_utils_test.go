@@ -50,9 +50,9 @@ func TestModifyConfigForAddNewNode(t *testing.T) {
 	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs, unreachableNodes)
 	assert.NoError(t, err)
 	assert.Equal(t, "3", incount)
-	assert.Equal(t, []string{TEST_IP_2, TEST_IP_4}, existingIps)
+	assert.Equal(t, []string{TEST_IP_2, TEST_IP_3, TEST_IP_4}, existingIps)
 	assert.Equal(t, CertByIP{
-		IP:         TEST_IP_4,
+		IP:         TEST_IP_3,
 		PrivateKey: "private",
 		PublicKey:  "public",
 	}, certs[1])

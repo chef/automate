@@ -15,13 +15,14 @@ type AddNodeAWSImpl struct {
 	config                  AwsConfigToml
 	copyConfigForUserPrompt AwsConfigToml
 	AWSConfigIp
-	nodeUtils     NodeOpUtils
-	flags         AddDeleteNodeHACmdFlags
-	configpath    string
-	terraformPath string
-	writer        *cli.Writer
-	fileutils     fileutils.FileUtils
-	sshUtil       SSHUtil
+	nodeUtils        NodeOpUtils
+	flags            AddDeleteNodeHACmdFlags
+	configpath       string
+	terraformPath    string
+	writer           *cli.Writer
+	fileutils        fileutils.FileUtils
+	sshUtil          SSHUtil
+	unreachableIpMap map[string][]string
 }
 
 func NewAddNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
@@ -40,12 +41,12 @@ func (ani *AddNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if !ani.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	unreachableNodes, err := ani.validate()
+	err := ani.validate()
 	if err != nil {
 		return err
 	}
 
-	err = ani.modifyConfig(unreachableNodes)
+	err = ani.modifyConfig()
 	if err != nil {
 		return err
 	}
@@ -65,17 +66,17 @@ func (ani *AddNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 	ani.prepare()
-	return ani.runDeploy(unreachableNodes)
+	return ani.runDeploy()
 }
 
 func (ani *AddNodeAWSImpl) prepare() error {
 	return ani.nodeUtils.taintTerraform(ani.terraformPath)
 }
 
-func (ani *AddNodeAWSImpl) validate() (map[string][]string, error) {
+func (ani *AddNodeAWSImpl) validate() error {
 	updatedConfig, unreachableNodes, err := ani.nodeUtils.pullAndUpdateConfigAws(&ani.sshUtil, []string{}, ani.flags.removeUnreachableNode)
 	if err != nil {
-		return unreachableNodes, err
+		return err
 	}
 	ani.config = *updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
@@ -83,17 +84,18 @@ func (ani *AddNodeAWSImpl) validate() (map[string][]string, error) {
 		ani.flags.chefServerCount == 0 &&
 		ani.flags.opensearchCount == 0 &&
 		ani.flags.postgresqlCount == 0 {
-		return unreachableNodes, errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
+		return errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
 	}
 	if ani.nodeUtils.isManagedServicesOn() {
 		if ani.flags.opensearchCount > 0 || ani.flags.postgresqlCount > 0 {
-			return unreachableNodes, status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
 		}
 	}
-	return unreachableNodes, nil
+	ani.unreachableIpMap = unreachableNodes
+	return nil
 }
 
-func (ani *AddNodeAWSImpl) modifyConfig(unreachableNodes map[string][]string) error {
+func (ani *AddNodeAWSImpl) modifyConfig() error {
 	ani.config.Architecture.ConfigInitials.Architecture = "aws"
 	inc, err := modifyInstanceCount(ani.config.Automate.Config.InstanceCount, ani.flags.automateCount)
 	if err != nil {
@@ -136,7 +138,7 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeAWSImpl) runDeploy(unreachableNodes map[string][]string) error {
+func (ani *AddNodeAWSImpl) runDeploy() error {
 	err := ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
 	if err != nil {
 		return err
@@ -164,7 +166,7 @@ func (ani *AddNodeAWSImpl) runDeploy(unreachableNodes map[string][]string) error
 		return err
 	}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	syncErr := ani.nodeUtils.syncConfigToAllNodes(unreachableNodes)
+	syncErr := ani.nodeUtils.syncConfigToAllNodes(ani.unreachableIpMap)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())
