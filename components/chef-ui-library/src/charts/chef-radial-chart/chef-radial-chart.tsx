@@ -89,7 +89,7 @@ export class ChefRadialChart {
   /**
    * The width of the gap (in degrees) to apply between chart segments.
    */
-  @Prop({ reflectToAttr: true }) gapSize = 2;
+  @Prop({ reflect: true }) gapSize = 2;
 
   /**
    * Optionally hide tooltips. They are shown by default.

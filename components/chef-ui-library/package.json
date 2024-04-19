@@ -28,6 +28,7 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.3",
     "d3": "^7.8.5",
     "lodash": "^4.17.21",
     "marked": "^4.0.10",
@@ -41,16 +42,13 @@
     "tar": "^4.4.19"
   },
   "devDependencies": {
-    "@stencil/core": "^1.2.3",
-    "@stencil/redux": "^0.1.1",
+    "@stencil/core": "^4.16.0",
     "@stencil/router": "^1.0.1",
     "@stencil/sass": "^1.0.1",
     "@types/jest": "^24.0.16",
-    "@types/node": "^12.6.8",   
+    "@types/node": "^12.6.8",
     "@types/puppeteer": "^1.12.4",
     "ansi-regex": "^4.1.1",
-    "jest": "^24.8.0",
-    "jest-cli": "^24.8.0",
     "kind-of": "^6.0.3",
     "merge": "^2.1.1",
     "mkdirp": "1.0.0",

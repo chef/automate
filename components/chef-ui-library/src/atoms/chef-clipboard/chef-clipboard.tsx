@@ -60,7 +60,7 @@ export class ChefClipboard {
   /**
    * An optional attribute that creates a plain div instead of a chef-button as the carrier when set to true.
    */
-  @Prop({ reflectToAttr: true }) plain = false;
+  @Prop({ reflect: true }) plain = false;
 
   @State() tooltipText = preClickText;
 

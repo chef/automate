@@ -104,7 +104,7 @@ describe('chef-checkbox', () => {
     });
 
     it('does not have an `aria-disabled` attribute', async () => {
-      expect(element.hasAttribute('aria-disabled')).toEqual(false);
+      expect(element.getAttribute('aria-disabled')).toEqual(false);
     });
   });
 
@@ -115,7 +115,7 @@ describe('chef-checkbox', () => {
     });
 
     it('has an `aria-disabled` attribute', async () => {
-      expect(element.hasAttribute('aria-disabled')).toEqual(true);
+      expect(element.getAttribute('aria-disabled')).toEqual(true);
     });
   });
 

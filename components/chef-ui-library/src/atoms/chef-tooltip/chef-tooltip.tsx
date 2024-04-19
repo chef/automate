@@ -100,7 +100,7 @@ export class ChefTooltip {
   /**
    * The ID of the element to attach the tooltip
    */
-  @Prop({ reflectToAttr: true }) for: string;
+  @Prop({ reflect: true }) for: string;
 
   /**
    * The delay before the tooltip is displayed in milliseconds.
