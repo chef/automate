@@ -192,7 +192,7 @@ backup_config = ""
 
 ### Parameters
 
-#### bucket_name
+`bucket_name`
 
 Type: string
 
@@ -200,7 +200,7 @@ Default: none
 
 The name of the AWS S3 bucket to back up data to.
 
-#### access_key
+`access_key`
 
 Type: string
 
@@ -208,7 +208,7 @@ Default: none
 
 The AWS IAM access key for accessing the S3 bucket is used to back up data.
 
-#### secret_key
+`secret_key`
 
 Type: string
 
@@ -216,7 +216,7 @@ Default: none
 
 Other param description.
 
-#### endpoint
+`endpoint`
 
 Type: string
 
@@ -224,7 +224,7 @@ Default: none
 
 Other param description.
 
-#### region
+`region`
 
 Type: string
 
@@ -271,7 +271,7 @@ Patch the below configuration to PostgreSQL nodes. Please add the values you wan
 
 ### Logging
 
-#### log_level
+`log_level`
 
 Type: string
 
@@ -279,7 +279,7 @@ Default: ERROR
 
 `log_level` controls which message levels are written to the server log. Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC. The default is WARNING.
 
-#### log_line_prefix
+`log_line_prefix`
 
 Type: string
 
@@ -287,7 +287,7 @@ Default: %t [%p]: [%l-1] user=%u,db=%d,client=%h %r (%x:%e)
 
 `log_line_prefix` is a print style string output at the beginning of each log line.
 
-#### logging_collector
+`logging_collector`
 
 Type: string
 
@@ -297,7 +297,7 @@ Default: on
 
 ### Checkpoints
 
-#### checkpoint_timeout
+`checkpoint_timeout`
 
 Type: string
 
@@ -305,7 +305,7 @@ Default: 5min
 
 `checkpoint_timeout` is the maximum time between automatic WAL checkpoints. The valid range is between 30 seconds and one day. The default is five minutes (5min). Increasing this parameter can increase the amount of time needed for crash recovery.
 
-#### max_wal_size
+`max_wal_size`
 
 Type: string
 
@@ -313,7 +313,7 @@ Default: 1GB
 
 `max_wal_size` is the maximum size to let the WAL grow during automatic checkpoints. The default is 1 GB. Increasing this parameter can increase the amount of time needed for crash recovery. This parameter can only be set in the PostgreSQL.conf file or the server command line.
 
-#### min_wal_size
+`min_wal_size`
 
 Type: string
 
@@ -323,7 +323,7 @@ Default: 80MB
 
 ### Wal Keep Size
 
-#### wal_keep_size
+`wal_keep_size`
 
 Type: number
 
@@ -345,7 +345,7 @@ When running a standby server, you must set this parameter to the same or higher
 
 ### Max Connections
 
-#### max_connections
+`max_connections`
 
 Type: number
 
@@ -359,7 +359,7 @@ When running a standby server, you must set this parameter to the same or higher
 
 This section configures `pg_demp`, a PostgreSQL utility for performing database backups.
 
-#### enable
+`enable`
 
 Type: string
 
@@ -367,7 +367,7 @@ Default: true
 
 It enables `pg_demp`.
 
-#### path
+`path`
 
 Type: string
 
@@ -379,7 +379,7 @@ It specified the path where the backups should be stored.
 
 This section configures replication settings.
 
-#### lag_health_threshold
+`lag_health_threshold`
 
 Type: number
 
@@ -387,7 +387,7 @@ Default: 20480
 
 It sets the lag health threshold to 20480 bytes, i.e., the maximum allowed replication lag.
 
-#### max_replay_lag_before_restart_s
+`max_replay_lag_before_restart_s`
 
 Type: number
 
@@ -395,7 +395,7 @@ Default: 180
 
 It specifies the maximum replay lag before restarting the replication.
 
-#### name
+`name`
 
 Type: string
 
@@ -403,7 +403,7 @@ Default: replication
 
 It specifies the name of the replication.
 
-#### password
+`password`
 
 Type: string
 
@@ -415,7 +415,7 @@ It specifies the password for the replication.
 
 This section configures SSL/TLS settings.
 
-#### enable
+`enable`
 
 Type: string
 
@@ -423,7 +423,7 @@ Default: true
 
 It enables the SSL.
 
-#### issuer_cert
+`issuer_cert`
 
 Type: string
 
@@ -431,7 +431,7 @@ Default: none
 
 It specifies the root CA (issuer) certificate.
 
-#### ssl_cert
+`ssl_cert`
 
 Type: string
 
@@ -439,7 +439,7 @@ Default: none
 
 It specifies the public key certificate.
 
-#### ssl_key
+`ssl_key`
 
 Type: string
 
@@ -447,7 +447,7 @@ Default: none
 
 It specifies the private key.
 
-#### tls_ciphers
+`tls_ciphers`
 
 Type: string
 
@@ -459,7 +459,7 @@ It specifies the allowed TLS ciphers.
 
 This section specified the username and password for the superuser (administrator) account.
 
-#### name
+`name`
 
 Type: string
 
@@ -467,7 +467,7 @@ Default: none
 
 It specifies the name of the superuser.
 
-#### password
+`password`
 
 Type: string
 
@@ -479,7 +479,7 @@ It specified the password of the superuser.
 
 This section configures WAL archiving.
 
-#### enable
+`enable`
 
 Type: string
 
@@ -487,7 +487,7 @@ Default: false
 
 It specifies whether WAL archiving is enabled (false in this case).
 
-#### path
+`path`
 
 Type: string
 
@@ -540,7 +540,7 @@ The OpenSearch node in Chef Automate HA provides various configuration options t
 
 It configures action settings.
 
-#### destructive_requires_name
+`destructive_requires_name`
 
 Type: string
 
@@ -552,7 +552,7 @@ Setting `destructive_requires_name` to **true** means that destructive actions, 
 
 This section disables swapping (along with memlock).
 
-#### memory_lock
+`memory_lock`
 
 Type: string
 
@@ -564,7 +564,7 @@ Swapping can dramatically decrease performance and stability, so you should ensu
 
 This section configures cluster settings.
 
-#### name
+`name`
 
 Type: string
 
@@ -572,7 +572,7 @@ Default: opensearch
 
 It sets the name of the OpenSearch cluster to “opensearch”.
 
-#### max_shards_per_node
+`max_shards_per_node`
 
 Type: number
 
@@ -584,7 +584,7 @@ We can use this setting to set the `max_shards_per_node` value for OpenSearch.
 
 This section configures discovery settings. It sets the minimum number of master-eligible nodes required to form a cluster, specifies the unicast hosts for node discovery, and sets the ping timeout.
 
-#### minimum_master_nodes
+`minimum_master_nodes`
 
 Type: number
 
@@ -592,7 +592,7 @@ Default: 2
 
 Set `minimum_master_nodes` to prevent the split brain by configuring the majority of nodes (total number of nodes / 2 + 1):
 
-#### ping_unicast_hosts
+`ping_unicast_hosts`
 
 Type: string
 
@@ -602,7 +602,7 @@ Set ping_unicast_hosts to pass an initial list of hosts to perform discovery whe
 
 ### Gateway
 
-#### recover_after_nodes
+`recover_after_nodes`
 
 Type: string
 
@@ -614,7 +614,7 @@ Set `recover_after_nodes` to block initial recovery after a full cluster restart
 
 This section configures logger settings.
 
-#### level
+`level`
 
 Type: string
 
@@ -624,7 +624,7 @@ Allowed levels are trace, debug, info, warn, error, and fatal.
 
 ### Node
 
-#### max_local_storage_nodes
+`max_local_storage_nodes`
 
 Type: number
 
@@ -632,7 +632,7 @@ Default: 1
 
 Use `max_local_storage_nodes` to disable starting multiple nodes on a single system.
 
-#### name
+`name`
 
 Type: string
 
@@ -644,7 +644,7 @@ Use a descriptive name for the node by setting the `name` field.
 
 This section configures OpenSearch authentication settings.
 
-#### admin_password
+`admin_password`
 
 Type: string
 
@@ -652,7 +652,7 @@ Default: none
 
 It sets the admin password.
 
-#### admin_username
+`admin_username`
 
 Type: string
 
@@ -660,7 +660,7 @@ Default: none
 
 It sets the admin username.
 
-#### hashed_password
+`hashed_password`
 
 Type: string
 
@@ -670,7 +670,7 @@ It provides the hashed version of the password.
 
 ### Path
 
-#### data
+`data`
 
 Type: string
 
@@ -678,7 +678,7 @@ Default: none
 
 Use data to set the path to the directory where to store the data (separate multiple locations by comma).
 
-#### logs
+`logs`
 
 Type: string
 
@@ -686,7 +686,7 @@ Default: none
 
 Use logs to set the path to your log files.
 
-#### repo
+`repo`
 
 Type: string
 
@@ -698,7 +698,7 @@ Use the repo to register the snapshot repository using OpenSearch. It is necessa
 
 This section configures security plugin settings.
 
-#### allow_default_init_securityindex
+`allow_default_init_securityindex`
 
 Type: string
 
@@ -706,7 +706,7 @@ Default: true
 
 Set the value to `true` to allow the default initialization of the security index.
 
-#### allow_unsafe_democertificates
+`allow_unsafe_democertificates`
 
 Type: string
 
@@ -714,7 +714,7 @@ Default: true
 
 Set the value to `true` to allow the default initialization of the unsafe demo certificates.
 
-#### check_snapshot_restore_write_privileges
+`check_snapshot_restore_write_privileges`
 
 Type: string
 
@@ -722,7 +722,7 @@ Default: true
 
 Set the value to `true` to check the snapshot and restore write privileges.
 
-#### enable_snapshot_restore_privilege
+`enable_snapshot_restore_privilege`
 
 Type: string
 
@@ -730,7 +730,7 @@ Default: true
 
 Set the value to `true` to enable snapshot and restore privileges.
 
-#### nodes_dn
+`nodes_dn`
 
 Type: string
 
@@ -742,7 +742,7 @@ It specifies the nodes' distinguished name (DNs).
 
 This section configures security audit settings.
 
-#### type
+`type`
 
 Type: string
 
@@ -754,7 +754,7 @@ It specifies the type of audit logging as "internal_opensearch"
 
 This section specifies the distinguished name (DN) of the admin user.
 
-#### admin_dn
+`admin_dn`
 
 Type: string
 
@@ -766,7 +766,7 @@ Specify the distinguished name (DN) of the admin user.
 
 This section configures security REST API settings.
 
-#### roles_enabled
+`roles_enabled`
 
 Type: string
 
@@ -778,7 +778,7 @@ It enables SSL/TLS, specifying the certificate’s file paths, private key, and 
 
 This section configures SSL/TLS settings for transport layer communication.
 
-#### enforce_hostname_verification
+`enforce_hostname_verification`
 
 Type: string
 
@@ -786,7 +786,7 @@ Default: false
 
 It disables the hostname verification.
 
-#### pemcert_filepath
+`pemcert_filepath`
 
 Type: string
 
@@ -794,7 +794,7 @@ Default: none
 
 It specifies the file paths for the certificate.
 
-#### pemkey_filepath
+`pemkey_filepath`
 
 Type: string
 
@@ -802,7 +802,7 @@ Default: none
 
 It specifies the private key.
 
-#### pemtrustedcas_filepath
+`pemtrustedcas_filepath`
 
 Type: string
 
@@ -810,7 +810,7 @@ Default: none
 
 It specifies the trusted CA certificates.
 
-#### resolve_hostname
+`resolve_hostname`
 
 Type: string
 
@@ -822,7 +822,7 @@ It disables/enables the hostname resolution.
 
 This section configures system indices for the security plugin.
 
-#### cloud_aws_signer
+`cloud_aws_signer`
 
 Type: string
 
@@ -830,7 +830,7 @@ Default: none
 
 It specifies the cloud aws signer.
 
-#### enabled
+`enabled`
 
 Type: string
 
@@ -838,7 +838,7 @@ Default: true
 
 It enables/disables the security plugin.
 
-#### indices
+`indices`
 
 Type: string
 
@@ -850,7 +850,7 @@ It specifies the system indices that are enabled for various functionalities.
 
 This section configures runtime settings.
 
-#### es_java_opts
+`es_java_opts`
 
 Type: string
 
@@ -858,7 +858,7 @@ Default: none
 
 
 
-#### es_startup_sleep_time
+`es_startup_sleep_time`
 
 Type: string
 
@@ -866,7 +866,7 @@ Default: none
 
 
 
-#### g1ReservePercent
+`g1ReservePercent`
 
 Type: number
 
@@ -874,7 +874,7 @@ Default: 25
 
 
 
-#### initiatingHeapOccupancyPercent
+`initiatingHeapOccupancyPercent`
 
 Type: number
 
@@ -882,7 +882,7 @@ Default: 15
 
 
 
-#### maxHeapsize
+`maxHeapsize`
 
 Type: string
 
@@ -890,7 +890,7 @@ Default: 2g
 
 
 
-#### max_locked_memory
+`max_locked_memory`
 
 Type: string
 
@@ -898,7 +898,7 @@ Default: unlimited
 
 
 
-#### max_open_files
+`max_open_files`
 
 Type: string
 
@@ -906,7 +906,7 @@ Default: none
 
 
 
-#### minHeapsize
+`minHeapsize`
 
 Type: string
 
@@ -918,7 +918,7 @@ Default: 2g
 
 This section configures the default S3 client settings.
 
-#### endpoint
+`endpoint`
 
 Type: string
 
@@ -926,7 +926,7 @@ Default: s3.amazonaws.com
 
 It specifies the S3 endpoint.
 
-#### max_retries
+`max_retries`
 
 Type: string
 
@@ -934,7 +934,7 @@ Default: 3
 
 It specifies the maximum number of retries.
 
-#### protocol
+`protocol`
 
 Type: string
 
@@ -942,7 +942,7 @@ Default: https
 
 It specifies the protocol (HTTPS).
 
-#### read_timeout
+`read_timeout`
 
 Type: string
 
@@ -950,7 +950,7 @@ Default: 60s
 
 It specifies the read timeout.
 
-#### use_throttle_retries
+`use_throttle_retries`
 
 Type: string
 
@@ -962,7 +962,7 @@ It sets whether to use throttle retries.
 
 This section configures TLS settings.
 
-#### admin_cert
+`admin_cert`
 
 Type: string
 
@@ -970,7 +970,7 @@ Default: none
 
 It specifies the admin public key.
 
-#### admin_key
+`admin_key`
 
 Type: string
 
@@ -978,7 +978,7 @@ Default: none
 
 It specifies the admin private key.
 
-#### rootCA
+`rootCA`
 
 Type: string
 
@@ -986,7 +986,7 @@ Default: none
 
 It specifies the root CA certificate.
 
-#### ssl_cert
+`ssl_cert`
 
 Type: string
 
@@ -994,7 +994,7 @@ Default: none
 
 It specifies the public key of the SSL certificate.
 
-#### ssl_key
+`ssl_key`
 
 Type: string
 
