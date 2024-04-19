@@ -1,47 +1,47 @@
 name: chef-automate license nodeRunReport
 synopsis: |
-  Generates daily Infra Client Run reports for a span of time duration
+    Generates daily Infra Client Run reports for a span of time duration
 usage: chef-automate license nodeRunReport [flags]
 options:
-- name: end_time
-  shorthand: e
-  usage: end time of the report in yyyy-mm-dd format
-- name: es_hostname
-  shorthand: "n"
-  default_value: localhost
-  usage: hostname of the OpenSource host
-- name: es_port
-  shorthand: p
-  default_value: "10168"
-  usage: port of the OpenSource host
-- name: fileName
-  shorthand: f
-  usage: 'file name for the report Ex: complianceUniqueResourceCount'
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for nodeRunReport
-- name: os_password
-  shorthand: P
-  default_value: admin
-  usage: password of the OpenSource host
-- name: os_username
-  shorthand: u
-  default_value: admin
-  usage: username of the OpenSource host
-- name: start_time
-  shorthand: s
-  usage: start time of the report in yyyy-mm-dd format
+    - name: end_time
+      shorthand: e
+      usage: end time of the report in yyyy-mm-dd format
+    - name: es_hostname
+      shorthand: "n"
+      default_value: localhost
+      usage: hostname of the OpenSource host
+    - name: es_port
+      shorthand: p
+      default_value: "10168"
+      usage: port of the OpenSource host
+    - name: fileName
+      shorthand: f
+      usage: 'file name for the report Ex: complianceUniqueResourceCount'
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for nodeRunReport
+    - name: os_password
+      shorthand: P
+      default_value: admin
+      usage: password of the OpenSource host
+    - name: os_username
+      shorthand: u
+      default_value: admin
+      usage: username of the OpenSource host
+    - name: start_time
+      shorthand: s
+      usage: start time of the report in yyyy-mm-dd format
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate license - Chef Automate license management
+    - chef-automate license - Chef Automate license management
 supported_on: Bastion

@@ -2,29 +2,26 @@ name: chef-automate license
 synopsis: Chef Automate license management
 usage: chef-automate license COMMAND [flags]
 options:
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for license
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for license
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
-- apply - Apply Chef Automate license
-- complianceResourceRunCount - Generates the unique count of reported Compliance scans
-  on hourly basis between the time duration
-- complianceResourceRunReport - Generates daily Compliance scan reports for a span
-  of time duration
-- nodeRunReport - Generates daily Infra Client Run reports for a span of time duration
-- status - Retrieve Chef Automate license status
-- uniqNodeRunReport - Generates the unique count of reported Infra Client nodes on
-  hourly basis between the time duration
+    - chef-automate - Chef Automate CLI
+    - apply - Apply Chef Automate license
+    - complianceResourceRunCount - Generates the unique count of reported Compliance scans on hourly basis between the time duration
+    - complianceResourceRunReport - Generates daily Compliance scan reports for a span of time duration
+    - nodeRunReport - Generates daily Infra Client Run reports for a span of time duration
+    - status - Retrieve Chef Automate license status
+    - uniqNodeRunReport - Generates the unique count of reported Infra Client nodes on hourly basis between the time duration
 supported_on: Bastion

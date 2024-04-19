@@ -1,69 +1,69 @@
 name: chef-automate service-versions
 synopsis: |
-  Retrieve the versions of the individual Chef Automate services
+    Retrieve the versions of the individual Chef Automate services
 usage: chef-automate service-versions [flags]
 description: |
-  Retrieve the versions of the individual Chef Automate services
+    Retrieve the versions of the individual Chef Automate services
 options:
-- name: a2
-  default_value: "false"
-  usage: Shows service-versions for Automate nodes[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: accept-hab-license
-  default_value: "false"
-  usage: |
-    Pass this flag to accept hab license for PostgresQL/OpenSearch nodes and check service-versions
-  compatible_with_options: AutomateHA
-- name: automate
-  shorthand: a
-  default_value: "false"
-  usage: Shows service-versions for Automate nodes
-  compatible_with_options: AutomateHA
-- name: chef_server
-  shorthand: c
-  default_value: "false"
-  usage: Shows service-versions for Chef-server nodes
-  compatible_with_options: AutomateHA
-- name: cs
-  default_value: "false"
-  usage: Shows service-versions for Chef-server nodes[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for service-versions
-- name: node
-  usage: |
-    Pass this flag to check service-versions of particular node in the cluster
-  compatible_with_options: AutomateHA
-- name: opensearch
-  shorthand: o
-  default_value: "false"
-  usage: Shows service-versions for OpenSearch nodes
-  compatible_with_options: AutomateHA
-- name: os
-  default_value: "false"
-  usage: Shows service-versions for OpenSearch nodes[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: pg
-  default_value: "false"
-  usage: Shows service-versions for PostgresQL nodes[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: postgresql
-  shorthand: p
-  default_value: "false"
-  usage: Shows service-versions for PostgresQL nodes
-  compatible_with_options: AutomateHA
+    - name: a2
+      default_value: "false"
+      usage: Shows service-versions for Automate nodes[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: accept-hab-license
+      default_value: "false"
+      usage: |
+        Pass this flag to accept hab license for PostgresQL/OpenSearch nodes and check service-versions
+      compatible_with_options: AutomateHA
+    - name: automate
+      shorthand: a
+      default_value: "false"
+      usage: Shows service-versions for Automate nodes
+      compatible_with_options: AutomateHA
+    - name: chef_server
+      shorthand: c
+      default_value: "false"
+      usage: Shows service-versions for Chef-server nodes
+      compatible_with_options: AutomateHA
+    - name: cs
+      default_value: "false"
+      usage: Shows service-versions for Chef-server nodes[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for service-versions
+    - name: node
+      usage: |
+        Pass this flag to check service-versions of particular node in the cluster
+      compatible_with_options: AutomateHA
+    - name: opensearch
+      shorthand: o
+      default_value: "false"
+      usage: Shows service-versions for OpenSearch nodes
+      compatible_with_options: AutomateHA
+    - name: os
+      default_value: "false"
+      usage: Shows service-versions for OpenSearch nodes[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: pg
+      default_value: "false"
+      usage: Shows service-versions for PostgresQL nodes[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: postgresql
+      shorthand: p
+      default_value: "false"
+      usage: Shows service-versions for PostgresQL nodes
+      compatible_with_options: AutomateHA
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
+    - chef-automate - Chef Automate CLI
 supported_on: Bastion

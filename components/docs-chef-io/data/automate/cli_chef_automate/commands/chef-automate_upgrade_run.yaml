@@ -3,69 +3,69 @@ synopsis: Run an upgrade of Chef Automate
 usage: chef-automate upgrade run [flags]
 description: Run an upgrade of Chef Automate
 options:
-- name: airgap-bundle
-  usage: Path to an airgap install bundle
-- name: auto-approve
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
-  compatible_with_options: AutomateHA
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for run
-- name: major
-  default_value: "false"
-  usage: This flag is only needed for major version upgrades
-  compatible_with_options: Automate
-- name: os-dest-data-dir
-  usage: Flag for providing custom os destination data directory
-  compatible_with_options: Automate
-- name: saas
-  default_value: "false"
-  usage: Flag for saas setup
-  compatible_with_options: AutomateHA
-- name: skip-deploy
-  default_value: "false"
-  usage: will only upgrade and not deploy the bundle
-  compatible_with_options: AutomateHA
-- name: skip-storage-check
-  default_value: "false"
-  usage: Flag for skipping disk space check during upgrade
-  compatible_with_options: Automate
-- name: skip-verify
-  default_value: "false"
-  usage: Flag for skipping config verification check
-- name: upgrade-airgap-bundles
-  default_value: "false"
-  usage: |
-    Update Chef Automate both frontend and backend version to install
-  compatible_with_options: AutomateHA
-- name: upgrade-backends
-  default_value: "false"
-  usage: Update Chef Automate backends version to install
-  compatible_with_options: AutomateHA
-- name: upgrade-frontends
-  default_value: "false"
-  usage: upgrade Chef Automate HA  frontends version to install
-  compatible_with_options: AutomateHA
-- name: version
-  usage: The exact Chef Automate version to install
-  compatible_with_options: Automate
-- name: workspace-upgrade
-  shorthand: w
-  usage: Do not prompt for confirmation to accept workspace upgrade
-  compatible_with_options: AutomateHA
+    - name: airgap-bundle
+      usage: Path to an airgap install bundle
+    - name: auto-approve
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
+      compatible_with_options: AutomateHA
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for run
+    - name: major
+      default_value: "false"
+      usage: This flag is only needed for major version upgrades
+      compatible_with_options: Automate
+    - name: os-dest-data-dir
+      usage: Flag for providing custom os destination data directory
+      compatible_with_options: Automate
+    - name: saas
+      default_value: "false"
+      usage: Flag for saas setup
+      compatible_with_options: AutomateHA
+    - name: skip-deploy
+      default_value: "false"
+      usage: will only upgrade and not deploy the bundle
+      compatible_with_options: AutomateHA
+    - name: skip-storage-check
+      default_value: "false"
+      usage: Flag for skipping disk space check during upgrade
+      compatible_with_options: Automate
+    - name: skip-verify
+      default_value: "false"
+      usage: Flag for skipping config verification check
+    - name: upgrade-airgap-bundles
+      default_value: "false"
+      usage: |
+        Update Chef Automate both frontend and backend version to install
+      compatible_with_options: AutomateHA
+    - name: upgrade-backends
+      default_value: "false"
+      usage: Update Chef Automate backends version to install
+      compatible_with_options: AutomateHA
+    - name: upgrade-frontends
+      default_value: "false"
+      usage: upgrade Chef Automate HA  frontends version to install
+      compatible_with_options: AutomateHA
+    - name: version
+      usage: The exact Chef Automate version to install
+      compatible_with_options: Automate
+    - name: workspace-upgrade
+      shorthand: w
+      usage: Do not prompt for confirmation to accept workspace upgrade
+      compatible_with_options: AutomateHA
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate upgrade - upgrade automate to the latest version
+    - chef-automate upgrade - upgrade automate to the latest version
 supported_on: Bastion
