@@ -20,6 +20,7 @@ import (
 const (
 	HAB_ROOT_CMD string = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
 	HAB_DIR      string = "/hab"
+	HAB_TMP_DIR  string = "/hab/tmp"
 )
 
 type FileUtils interface {
@@ -248,7 +249,7 @@ func RemoveFirstLine(filePath string) error {
 	defer file.Close()
 
 	// Create a temporary file to write the updated content
-	tempFile, err := os.CreateTemp("/hab/tmp", "temp")
+	tempFile, err := os.CreateTemp(HAB_TMP_DIR, "temp")
 	if err != nil {
 		return err
 	}
@@ -314,16 +315,16 @@ func GetFilePermission(filePath string) (int64, error) {
 	return testint, nil
 }
 
+// CreateHabTmpDir creates a temporary directory in the hab directory
 func CreateHabTmpDir() error {
-	habTmpDir := fmt.Sprintf("%s/tmp", HAB_DIR)
-	if _, err := os.Stat(habTmpDir); os.IsNotExist(err) {
-		err = os.MkdirAll(habTmpDir, os.ModePerm)
+	if _, err := os.Stat(HAB_TMP_DIR); os.IsNotExist(err) {
+		err = os.MkdirAll(HAB_TMP_DIR, os.ModePerm)
 		if err != nil {
 			return err
 		}
 
 		// Change the permissions from 0777 to 1777
-		err = os.Chmod(habTmpDir, 1777|os.ModeSticky)
+		err = os.Chmod(HAB_TMP_DIR, 1777|os.ModeSticky)
 		if err != nil {
 			return err
 		}

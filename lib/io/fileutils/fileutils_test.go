@@ -146,7 +146,7 @@ func TestRemoveFirstLine(t *testing.T) {
 	filename := "file-name"
 	err := fileutils.CreateHabTmpDir()
 	require.NoError(t, err)
-	os.Setenv("TMPDIR", "/hab/tmp")
+	os.Setenv("TMPDIR", fileutils.HAB_TMP_DIR)
 
 	t.Run("Remove first line", func(t *testing.T) {
 		res, err := fileutils.CreateTempFile(content, filename)
