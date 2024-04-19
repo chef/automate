@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -135,7 +136,22 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	ani.writer.Println("Chef-Server => " + ani.config.ChefServer.Config.InstanceCount)
 	ani.writer.Println("OpenSearch => " + ani.config.Opensearch.Config.InstanceCount)
 	ani.writer.Println("Postgresql => " + ani.config.Postgresql.Config.InstanceCount)
+
+	if ani.config.Automate.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[AUTOMATE]) > 0 {
+		ani.writer.Println("Unreachable Automate nodes will be removed => " + strings.Join(ani.unreachableIpMap[AUTOMATE], ", "))
+	}
+	if ani.config.ChefServer.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[CHEF_SERVER]) > 0 {
+		ani.writer.Println("Unreachable Chef-Server nodes will be removed => " + strings.Join(ani.unreachableIpMap[CHEF_SERVER], ", "))
+	}
+	if ani.config.Postgresql.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[POSTGRESQL]) > 0 {
+		ani.writer.Println("Unreachable Postgresql nodes will be removed => " + strings.Join(ani.unreachableIpMap[POSTGRESQL], ", "))
+	}
+	if ani.copyConfigForUserPrompt.Opensearch.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[OPENSEARCH]) > 0 {
+		ani.writer.Println("Unreachable Opensearch nodes will be removed => " + strings.Join(ani.unreachableIpMap[OPENSEARCH], ", "))
+	}
+
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
+
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {
