@@ -269,7 +269,9 @@ The PostgreSQL node in Automate HA provides various configuration options you ca
 
 Patch the below configuration to PostgreSQL nodes. Please add the values you want to patch to a `config.toml` file and run the `chef-automate config patch config.toml --pg` from the bastion.
 
-### Logging
+### Parameters
+
+#### Logging
 
 `log_level`
 
@@ -295,7 +297,7 @@ Default: on
 
 `logging_collector` enables the logging collector, which is a background process that captures log messages sent to stderr and redirects them into log files.
 
-### Checkpoints
+#### Checkpoints
 
 `checkpoint_timeout`
 
@@ -321,7 +323,7 @@ Default: 80MB
 
 `min_wal_size` can ensure enough WAL space is reserved to handle spikes in WAL usage, for example, when running large batch jobs. If this value is specified without units, it is taken as megabytes. The default is 80 MB.
 
-### Wal Keep Size
+#### Wal Keep Size
 
 `wal_keep_size`
 
@@ -331,9 +333,9 @@ Default: 1600
 
 `wal_keep_size` specifies the minimum size of past log file segments kept in the pg_wal directory if a standby server needs to fetch them for streaming replication. If wal_keep_size is zero (the default), the system doesn’t keep extra segments for standby purposes. Hence, the number of old WAL segments available to standby servers is a function of the location of the previous checkpoint and the status of WAL archiving.
 
-### Lock Management
+#### Lock Management
 
-### max_locks_per_transaction
+`max_locks_per_transaction`
 
 Type: number
 
@@ -343,7 +345,7 @@ The shared lock table tracks locks on max_locks_per_transaction * (max_connectio
 
 When running a standby server, you must set this parameter to the same or higher value than on the master server. Otherwise, queries will not be allowed on the standby server.
 
-### Max Connections
+#### Max Connections
 
 `max_connections`
 
@@ -355,7 +357,7 @@ In the above snippet, max_connections determines the maximum number of concurren
 
 When running a standby server, you must set this parameter to the same or higher value than on the master server. Otherwise, queries will not be allowed on the standby server.
 
-### Pg Dump
+#### Pg Dump
 
 This section configures `pg_demp`, a PostgreSQL utility for performing database backups.
 
@@ -375,7 +377,7 @@ Default: none
 
 It specified the path where the backups should be stored.
 
-### Replication
+#### Replication
 
 This section configures replication settings.
 
@@ -411,7 +413,7 @@ Default: replication
 
 It specifies the password for the replication.
 
-### SSL
+#### SSL
 
 This section configures SSL/TLS settings.
 
@@ -455,7 +457,7 @@ Default: none
 
 It specifies the allowed TLS ciphers.
 
-### User
+#### User
 
 This section specified the username and password for the superuser (administrator) account.
 
@@ -475,7 +477,7 @@ Default: none
 
 It specified the password of the superuser.
 
-### Wal Archive
+#### Wal Archive
 
 This section configures WAL archiving.
 
@@ -536,7 +538,9 @@ path = "/mnt/automate_backups/postgresql/archive"
 
 The OpenSearch node in Chef Automate HA provides various configuration options that is patched to customize its behavior and meet specific requirements. Patch the below configuration to OpenSearch nodes. Please add the values you want to patch to a config.toml file and run the chef-automate config patch config.toml --os from the bastion node.
 
-### Action
+### Parameters
+
+#### Action
 
 It configures action settings.
 
@@ -548,7 +552,7 @@ Default: true
 
 Setting `destructive_requires_name` to **true** means that destructive actions, such as deleting indices or templates, require an explicit name to prevent accidental deletions.
 
-### Bootstrap
+#### Bootstrap
 
 This section disables swapping (along with memlock).
 
@@ -560,7 +564,7 @@ Default: false
 
 Swapping can dramatically decrease performance and stability, so you should ensure it is disabled on production clusters.
 
-### Cluster
+#### Cluster
 
 This section configures cluster settings.
 
@@ -580,7 +584,7 @@ Default: 20000
 
 We can use this setting to set the `max_shards_per_node` value for OpenSearch.
 
-### Discovery
+#### Discovery
 
 This section configures discovery settings. It sets the minimum number of master-eligible nodes required to form a cluster, specifies the unicast hosts for node discovery, and sets the ping timeout.
 
@@ -600,7 +604,7 @@ Default: [“127.0.0.1”, “[::1]”]
 
 Set ping_unicast_hosts to pass an initial list of hosts to perform discovery when a new node starts.
 
-### Gateway
+#### Gateway
 
 `recover_after_nodes`
 
@@ -610,7 +614,7 @@ Default: none
 
 Set `recover_after_nodes` to block initial recovery after a full cluster restart until N nodes start.
 
-### Logger
+#### Logger
 
 This section configures logger settings.
 
@@ -622,7 +626,7 @@ Default: info
 
 Allowed levels are trace, debug, info, warn, error, and fatal.
 
-### Node
+#### Node
 
 `max_local_storage_nodes`
 
@@ -640,7 +644,7 @@ Default: name
 
 Use a descriptive name for the node by setting the `name` field.
 
-### OpenSearch Auth
+#### OpenSearch Auth
 
 This section configures OpenSearch authentication settings.
 
@@ -668,7 +672,7 @@ Default: none
 
 It provides the hashed version of the password.
 
-### Path
+#### Path
 
 `data`
 
@@ -694,7 +698,7 @@ Default: none
 
 Use the repo to register the snapshot repository using OpenSearch. It is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the path.repo setting on all master and data nodes.
 
-### Plugin Security
+#### Plugin Security
 
 This section configures security plugin settings.
 
@@ -738,7 +742,7 @@ Default: none
 
 It specifies the nodes' distinguished name (DNs).
 
-### Plugin Security Audit
+#### Plugin Security Audit
 
 This section configures security audit settings.
 
@@ -750,7 +754,7 @@ Default: internal_opensearch
 
 It specifies the type of audit logging as "internal_opensearch"
 
-### Plugin Security Authcz
+#### Plugin Security Authcz
 
 This section specifies the distinguished name (DN) of the admin user.
 
@@ -762,7 +766,7 @@ Default: none
 
 Specify the distinguished name (DN) of the admin user.
 
-### Plugin Security Restapi
+#### Plugin Security Restapi
 
 This section configures security REST API settings.
 
@@ -774,7 +778,7 @@ Default: none
 
 It enables SSL/TLS, specifying the certificate’s file paths, private key, and trusted CA certificates.
 
-### Plugin Security SSL Transport
+#### Plugin Security SSL Transport
 
 This section configures SSL/TLS settings for transport layer communication.
 
@@ -818,7 +822,7 @@ Default: false
 
 It disables/enables the hostname resolution.
 
-### Plugin Security System Indices
+#### Plugin Security System Indices
 
 This section configures system indices for the security plugin.
 
@@ -846,7 +850,7 @@ Default: none
 
 It specifies the system indices that are enabled for various functionalities.
 
-### Runtime
+#### Runtime
 
 This section configures runtime settings.
 
@@ -914,7 +918,7 @@ Default: 2g
 
 
 
-### S3 Client Default
+#### S3 Client Default
 
 This section configures the default S3 client settings.
 
@@ -958,7 +962,7 @@ Default: true
 
 It sets whether to use throttle retries.
 
-### TLS
+#### TLS
 
 This section configures TLS settings.
 
