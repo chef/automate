@@ -154,7 +154,7 @@ document "automate_ui_reload_chef_ui_library" <<DOC
         method 'start_automate_ui' or 'start_automate_ui_background'
 DOC
 function automate_ui_reload_chef_ui_library(){
-  build_chef_ui_library
+  # build_chef_ui_library
   # This function is running what we defined in the package.json as the 'install' command
   # "install": "npm run clean-ui-lib && scripts/build_chef_ui_lib && npm run copy-ui-lib",
   ( cd /src/components/automate-ui || return 1
@@ -259,7 +259,7 @@ function _install_nodejs_from_nvmrc() {
   fi
 
   log_line "Installing NodeJS (v.$NODE_VERSION)"
-  hab pkg install -bf "core/node18/$NODE_VERSION" >/dev/null
+  hab pkg install -bf "core/node14/$NODE_VERSION" >/dev/null
 
   install_if_missing core/git git;
   install_if_missing core/coreutils env;
@@ -281,7 +281,7 @@ function _prepare_automate_ui(){
   pushd /src/components/automate-ui >/dev/null || return 1
     _install_nodejs_from_nvmrc
     log_line "Installing npm modules for automate-ui (npm install)"
-    npm install
+    # npm install
     automate_ui_reload_chef_ui_library
     _verify_ng_from_node_modules automate-ui
     _maybe_rebuild_node_sass

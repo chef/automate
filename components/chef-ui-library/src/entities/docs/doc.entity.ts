@@ -25,7 +25,7 @@ export class DocEntity implements Entity {
   docType: string;
 
   constructor(jsonDoc:any = {}) {
-    const entity = jsonDoc?.children[0];
+    const entity = jsonDoc && jsonDoc.children[0];
     const { tag, styleUrl, shadow } = getComponentMetaData(entity);
 
     this.id = tag;

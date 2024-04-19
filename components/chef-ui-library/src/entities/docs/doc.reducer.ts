@@ -1,17 +1,14 @@
+import { createSlice } from '@reduxjs/toolkit';
 import map from 'lodash/fp/map';
-import pipe from 'lodash/fp/pipe';
-import set from 'lodash/fp/set';
 
-import { GET_DOCS,
-         GET_DOCS_FAILED,
-         GET_DOCS_SUCCESS
-       } from './doc.actions';
 import { DocEntity } from './doc.entity';
-import { IndexedEntities,
-         indexer
-       } from '../entities';
+import { IndexedEntities, indexer } from '../entities';
 
-const docIndexer = indexer(DocEntity.create);
+export interface DocEntityState {
+  readonly byId: IndexedEntities<DocEntity>;
+  readonly allIds: string[];
+  readonly status: Status;
+}
 
 export enum Status {
   notLoaded,
@@ -20,33 +17,32 @@ export enum Status {
   loadFailure
 }
 
-export interface DocEntityState {
-  readonly byId: IndexedEntities<DocEntity>;
-  readonly allIds: string[];
-  readonly status: Status;
-}
-
-const initialState = {
+const initialState: DocEntityState = {
   byId: {},
   allIds: [],
   status: Status.notLoaded
 };
 
-export function docReducer(state: DocEntityState = initialState, action): DocEntityState {
-  switch (action.type) {
-  case GET_DOCS:
-    return set('status', Status.loading, state);
-  case GET_DOCS_FAILED:
-    console.warn('FAILED GETTING DOCS');
-    return set('status', Status.loadFailure, state);
-  case GET_DOCS_SUCCESS:
-    const docs = docIndexer(action.payload.children);
-    return pipe(
-      set('status', Status.loadSuccess),
-      set('byId', docs),
-      set('allIds', map('id', docs))
-    )(state) as DocEntityState;
-  default:
-    return state;
+const docIndexer = indexer(DocEntity.create);
+
+export const docsSlice = createSlice({
+  name: 'docs',
+  initialState,
+  reducers: {
+    getDocs: state => {
+      state.status = Status.loading
+    },
+    getDocsFailed: state => {
+      console.warn('FAILED GETTING DOCS');
+      state.status = Status.loadFailure
+    },
+    getDocsSuccess: (state, action) => {
+      const docs = docIndexer(action.payload.children);
+      state.status = Status.loadSuccess;
+      state.byId = { ...docs };
+      state.allIds = map('id', docs);
+    }
   }
-}
+})
+
+export const { getDocs } = docsSlice.actions

@@ -32,7 +32,7 @@ describe('chef-expander', () => {
 
       await page.waitForChanges();
 
-      expect(element.hasAttribute('opened')).toEqual(true);
+      expect(element.getAttribute('opened')).toEqual(true);
     });
   });
 
@@ -46,7 +46,7 @@ describe('chef-expander', () => {
 
       await page.waitForChanges();
 
-      expect(element.hasAttribute('opened')).toEqual(false);
+      expect(element.getAttribute('opened')).toEqual(false);
     });
   });
 
@@ -60,11 +60,11 @@ describe('chef-expander', () => {
 
       await element.callMethod('toggle');
       await page.waitForChanges();
-      expect(element.hasAttribute('opened')).toEqual(false);
+      expect(element.getAttribute('opened')).toEqual(false);
 
       await element.callMethod('toggle');
       await page.waitForChanges();
-      expect(element.hasAttribute('opened')).toEqual(true);
+      expect(element.getAttribute('opened')).toEqual(true);
     });
   });
 });
