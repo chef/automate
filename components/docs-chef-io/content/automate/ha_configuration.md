@@ -74,7 +74,7 @@ Default: none
 
 Description text.
 
-#### workspace_path
+`workspace_path`
 
 Type: string
 
@@ -82,7 +82,7 @@ Default: none
 
 Description text.
 
-#### ssh_user
+`ssh_user`
 
 Type: string
 
@@ -90,7 +90,7 @@ Default: none
 
 Description text.
 
-#### ssh_port
+`ssh_port`
 
 Type: string
 
@@ -98,7 +98,7 @@ Default: none
 
 Description text.
 
-#### ssh_key_file
+`ssh_key_file`
 
 Type: string
 
@@ -106,7 +106,7 @@ Default: none
 
 Description text.
 
-#### sudo_password
+`sudo_password`
 
 Type: string
 
@@ -114,7 +114,7 @@ Default: none
 
 Description text.
 
-#### backup_mount
+`backup_mount`
 
 Type: string
 
@@ -124,7 +124,7 @@ Description text.
 
 Do not modify this value.
 
-#### backup_config
+`backup_config`
 
 Type: string
 
