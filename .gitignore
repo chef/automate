@@ -37,6 +37,7 @@ terraform/test-license-usage/.terraform/
 # node
 node_modules
 dist
+.angular
 
 # Go dep - Some dep versions create this while fetching
 vendor.orig/
