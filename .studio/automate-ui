@@ -259,7 +259,7 @@ function _install_nodejs_from_nvmrc() {
   fi
 
   log_line "Installing NodeJS (v.$NODE_VERSION)"
-  hab pkg install -bf "core/node14/$NODE_VERSION" >/dev/null
+  hab pkg install -bf "core/node18/$NODE_VERSION" >/dev/null
 
   install_if_missing core/git git;
   install_if_missing core/coreutils env;
