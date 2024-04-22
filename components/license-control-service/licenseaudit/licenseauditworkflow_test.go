@@ -355,7 +355,7 @@ func Test_getAppendedCommand(t *testing.T) {
 				tt.want = fmt.Sprintf(tt.command, startDateTime, endDate, OutputFileName)
 			} else {
 				tt.command = tt.command + " -u %s"
-				tt.want = fmt.Sprintf(tt.command, startDate, endDate, OutputFileName, tt.url)
+				tt.want = fmt.Sprintf(tt.command, startDateTime, endDate, OutputFileName, tt.url)
 			}
 			assert.Equal(t, tt.want, got)
 		})
