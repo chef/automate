@@ -741,6 +741,9 @@ func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []C
 		}
 
 		nodeConfig, _ := osConfigMap[currentIp]
+		if nodeConfig == nil {
+			continue
+		}
 		nodeDn, err := getDistinguishedNameFromKey(nodeConfig.publicKey)
 		if err != nil {
 			writer.Fail(err.Error())
