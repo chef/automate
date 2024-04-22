@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"os"
+	"os/signal"
+	"syscall"
 
 	natsd "github.com/nats-io/nats-server/v2/server"
 	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
@@ -105,8 +108,11 @@ func spawnNatsInternalServer(c *config.EventConfig, m *multiEmbeddedServer) erro
 
 	m.runInGoroutine(func() error {
 		m.registerServer(ns)
-		ns.Start()
-		return errors.New("NATS server exited")
+		go ns.Start()
+		sigCh := make(chan os.Signal, 1)
+	    signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+        <-sigCh
+		return nil
 	})
 
 	// Wait for it to be able to accept connections
@@ -162,6 +168,8 @@ func runNATSStreamingServer(c *config.EventConfig, m *multiEmbeddedServer) error
 	opts.ClientCA = c.TLSConfig.RootCACertPath
 	opts.Secure = true
 	opts.EnableLogging = true
+	opts.Debug = true
+	opts.Trace = true
 
 	if c.LogConfig.LogLevel == "debug" {
 		opts.Debug = true
@@ -204,6 +212,8 @@ func natsdOptions(c *config.EventConfig) *natsd.Options {
 
 	// Logging options:
 	nopts.NoLog = false
+	nopts.Debug = true
+    nopts.Trace = true
 
 	if c.LogConfig.LogLevel == "debug" {
 		// This seems to be the only option for adjusting the logging level
