@@ -32,7 +32,6 @@ func InitCerealManager(ctx context.Context, cerealManager *cereal.Manager, worke
 	}
 
 	log.Info("Successfully registered migration-workflow")
-	log.Info("GOt the url as --------------", endpointurl)
 	err = cerealManager.RegisterTaskExecutor(LicenseAuditTaskName, &LicenseAuditTask{ExecuteCommand: NewExecute(logger.NewLogrusStandardLogger()), Command: Command, EndPointURl: endpointurl}, cereal.TaskExecutorOpts{Workers: workerCount})
 	if err != nil {
 		log.Errorf("Found error in RegisterTaskExecutor for license-audit %v", err)
@@ -226,11 +225,9 @@ func getAppendedCommand(commandToExecute string, url string) string {
 
 	endDate := time.Now().UTC().Format(time.RFC3339)
 	if url == "" {
-		fmt.Println("-----test " + fmt.Sprintf(commandToExecute, startDateTime, endDate, OutputFileName))
 		return fmt.Sprintf(commandToExecute, startDateTime, endDate, OutputFileName)
 	}
 	commandToExecute = commandToExecute + " -u %s"
-	fmt.Println("-----test with url---" + fmt.Sprintf(commandToExecute, startDateTime, endDate, OutputFileName))
 	return fmt.Sprintf(commandToExecute, startDateTime, endDate, OutputFileName, url)
 }
 
