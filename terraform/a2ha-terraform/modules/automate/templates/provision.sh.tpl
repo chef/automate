@@ -371,6 +371,9 @@ if [[ "${automate_role}" == "bootstrap_automate" ]]; then
   rm -f ${tmp_path}/bootstrap.abb
   chef-automate bootstrap bundle create ${tmp_path}/bootstrap.abb
   chown ${ssh_user} ${tmp_path}/bootstrap.abb
+  # creating skip_migration file to avoid db lock for restart on First Automate node
+  # this file will getting removed in upgrade flow at line #295
+  [ ! -f /hab/.skip_migration ] && echo "creating on bootstrap node " && touch /hab/.skip_migration
 fi
 
 save_space
