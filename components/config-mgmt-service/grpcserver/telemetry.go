@@ -34,7 +34,7 @@ func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.Get
 	}
 	var daysSinceLastPost int
 	if telemetry.LastTelemetryReportedAt.IsZero() {
-		daysSinceLastPost = 15
+		daysSinceLastPost = 30
 	} else {
 		daysSinceLastPost = DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
 	}
@@ -46,7 +46,7 @@ func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.Get
 		}
 	}
 	return &response.GetNodesUsageCountResponse{
-		DaysSinceLastPost: int64(daysSinceLastPost),
+		DaysSinceLastPost: int64(30),
 		NodeCnt:           count,
 	}, nil
 }

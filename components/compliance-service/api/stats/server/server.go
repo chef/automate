@@ -179,7 +179,7 @@ func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsa
 	}
 	var daysSinceLastPost int
 	if telemetry.LastTelemetryReportedAt.IsZero() {
-		daysSinceLastPost = 15
+		daysSinceLastPost = 30
 	} else {
 		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
 	}
