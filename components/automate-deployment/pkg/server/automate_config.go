@@ -297,6 +297,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 
 		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
 
+			//to restart the log
 			err = restartSyslogService()
 			if err != nil {
 				return status.Error(codes.Internal, err.Error())
