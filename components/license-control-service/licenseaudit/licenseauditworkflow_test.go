@@ -345,7 +345,7 @@ func Test_getAppendedCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			startDate := time.Now().AddDate(0, 0, -30)
+			startDate := time.Now().AddDate(0, 0, -31)
 			startDateTime := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC).Format(time.RFC3339)
 			endDate := time.Now().UTC().Format(time.RFC3339)
 
