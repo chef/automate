@@ -10,6 +10,7 @@ gh_repo = "automate"
     identifier = "automate/deploy_high_availability/manage_ha_cluster/ha_config_gen.md Automate Config Generation"
     weight = 220
 +++
+
 {{< warning >}}
  {{% automate/ha-warn %}}
 {{< /warning >}}
@@ -17,12 +18,12 @@ gh_repo = "automate"
 ## Command Usage
 
 ```bash
- chef-automate config gen config.toml
+chef-automate config gen config.toml
 ```
 
 `config.toml` is the file where all the generated config will be saved at the end, you can choose to not provide this then the output will be shown to stdout.
 
-Refer the fields below to generate Chef Automate High Availability (HA) configuration using `chef-automate config gen` command.
+Refer the fields below to generate Chef Automate High Availability (HA) configuration using `chef-automate config gen` command:
 
 ## Automate HA Topology
 

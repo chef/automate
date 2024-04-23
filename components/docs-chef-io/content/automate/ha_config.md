@@ -26,7 +26,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- For certificate rotation, don't use `config patch`. Instead, the `cert-rotate` command can be used. To know more about certificate rotation, click [here](/automate/ha_cert_rotation)
+- For certificate rotation, use the `cert-rotate` command instead of `config patch`. For more information, see [certificate rotation](/automate/ha_cert_rotation).
 - While patching the same from **the provision host**, structures such as TLS from the OpenSearch configuration .toml file and SSL from the PostgreSQL configuration toml file will be ignored.
 
 {{< /warning >}}
@@ -42,11 +42,15 @@ To show the configuration for Automate cluster, run the following command:
 ```bash
 chef-automate config show --automate
 ```
+
 or
+
 ```bash
 chef-automate config show -a
 ```
+
 or
+
 ```bash
 chef-automate config show --a2
 ```
@@ -58,11 +62,15 @@ To show the configuration for the Chef Server cluster, run the following command
 ```bash
 chef-automate config show --chef_server
 ```
+
 or
+
 ```bash
 chef-automate config show -c
 ```
+
 or
+
 ```bash
 chef-automate config show --cs
 ```
@@ -74,11 +82,15 @@ To show the configuration for the Postgresql cluster, run the following command:
 ```bash
 chef-automate config show --postgresql
 ```
+
 or
+
 ```bash
 chef-automate config show -p
 ```
+
 or
+
 ```bash
 chef-automate config show --pg
 ```
@@ -90,11 +102,15 @@ To show the configuration for the OpenSearch cluster, run the following command:
 ```bash
 chef-automate config show --opensearch
 ```
+
 or
+
 ```bash
 chef-automate config show -o
 ```
+
 or
+
 ```bash
 chef-automate config show --os
 ```
@@ -110,11 +126,15 @@ To patch configuration for the Frontend cluster (includes Automate and Chef Serv
 ```bash
 chef-automate config patch path/to/automate-config.toml --frontend
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/automate-config.toml -f
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/automate-config.toml --fe
 ```
@@ -126,11 +146,15 @@ To patch the configuration for Automate cluster, run the following command:
 ```bash
 chef-automate config patch path/to/automate-config.toml --automate
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/automate-config.toml -a
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/automate-config.toml --a2
 ```
@@ -142,11 +166,15 @@ To patch the configuration for the Chef Server cluster, run the following comman
 ```bash
 chef-automate config patch path/to/chef_server-config.toml --chef_server
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/chef_server-config.toml -c
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/chef_server-config.toml --cs
 ```
@@ -154,18 +182,23 @@ chef-automate config patch path/to/chef_server-config.toml --cs
 ### Patch Configuration for Postgresql cluster
 
 For Information on PostgreSQL node configs visit links below:
-- Click [here](/automate/config_postgresql) for PostgreSQL
+
+- To know more about PostgreSQL node configs, see [HA PostgreSQL Node Config](/automate/config_postgresql) page.
 
 To patch the configuration for the Postgresql cluster, run the following command:
 
 ```bash
 chef-automate config patch path/to/postgresql-config.toml --postgresql
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/postgresql-config.toml -p
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/postgresql-config.toml --pg
 ```
@@ -173,18 +206,23 @@ chef-automate config patch path/to/postgresql-config.toml --pg
 ### Patch Configuration for OpenSearch cluster
 
 For Information on OpenSearch node configs visit links below:
-- Click [here](/automate/config_opensearch) for OpenSearch
+
+- To know more about OpenSearch node configs, see [HA OpenSearch Node Config](/automate/config_opensearch) page.
 
 To patch the configuration for the OpenSearch cluster, run the following command:
 
 ```bash
 chef-automate config patch path/to/opensearch-config.toml --opensearch
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/opensearch-config.toml -o
 ```
+
 or
+
 ```bash
 chef-automate config patch path/to/opensearch-config.toml --os
 ```
@@ -200,11 +238,15 @@ To set the configuration for Automate cluster, run the following command:
 ```bash
 chef-automate config set path/to/automate-config.toml --automate
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/automate-config.toml -a
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/automate-config.toml --a2
 ```
@@ -216,11 +258,15 @@ To set the configuration for the Chef Server cluster, run the following command:
 ```bash
 chef-automate config set path/to/chef_server-config.toml --chef_server
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/chef_server-config.toml -c
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/chef_server-config.toml --cs
 ```
@@ -228,18 +274,23 @@ chef-automate config set path/to/chef_server-config.toml --cs
 ### Set Configuration for Postgresql cluster
 
 For Information on PostgreSQL node configs visit links below:
-- Click [here](/automate/config_postgresql) for PostgreSQL
+
+- To know more about PostgreSQL node configs, see [HA PostgreSQL Node Config](/automate/config_postgresql) page.
 
 To set the configuration for the Postgresql cluster, run the following command:
 
 ```bash
 chef-automate config set path/to/postgresql-config.toml --postgresql
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/postgresql-config.toml -p
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/postgresql-config.toml --pg
 ```
@@ -247,23 +298,29 @@ chef-automate config set path/to/postgresql-config.toml --pg
 ### Set Configuration for OpenSearch cluster
 
 For Information on OpenSearch node configs visit links below:
-- Click [here](/automate/config_opensearch) for OpenSearch
+
+- To know more about OpenSearch node configs, see [HA OpenSearch Node Config](/automate/config_opensearch) page.
 
 To set the configuration for the OpenSearch cluster, run the following command:
 
 ```bash
 chef-automate config set path/to/opensearch-config.toml --opensearch
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/opensearch-config.toml -o
 ```
+
 or
+
 ```bash
 chef-automate config set path/to/opensearch-config.toml --os
 ```
 
 ### How to patch max shards per node for opensearch
+
 To configure OpenSearch max shard per node, create a TOML file that contains the partial configuration below. Change max_shards_per_node as needed, and then run [command]({{< relref "ha_config/#patch-configuration-for-opensearch-cluster" >}}) to apply change.
 
 ```toml

@@ -69,7 +69,7 @@ Run the following steps on Bastion Host Machine:
     chef-automate config gen config.toml
     ```
 
-    Click [here](/automate/ha_config_gen) to know more about generating config
+    Refer to the [Automate HA Config Generation](/automate/ha_config_gen) page to learn more about generating config.
 
     {{< note spaces=4 >}}
 
@@ -112,6 +112,7 @@ Run the following steps on Bastion Host Machine:
     ```
 
    To skip verification in the deployment command, use `--skip-verify` flag
+
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
@@ -124,7 +125,7 @@ Run the following steps on Bastion Host Machine:
      chef-automate status summary
     ```
 
-1.  Get the service status from each node
+1. Get the service status from each node
 
     ```bash
      chef-automate status
@@ -180,9 +181,9 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 After successful deployment, proceed with the following:
 
-   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+   1. [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section on the Node Bootstrapping page.
+   1. See the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section to learn more about workstation setup.
+   1. See the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section to learn more about node bootstrapping.
 
 ## Sample Config
 

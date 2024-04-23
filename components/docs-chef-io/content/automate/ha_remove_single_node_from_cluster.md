@@ -19,7 +19,8 @@ Chef Automate HA comes with five different types of deployment flows. This page 
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for reference.
+- We do not recommend removing any node from the backend cluster, but replacing it is recommended. To learn more, see the [replace node in automate ha cluster](#replace-node-in-automate-ha-cluster) section.
+
 - Removal of nodes for PostgreSQL or OpenSearch is at your own risk and may result in data loss. Consult your database administrator before trying to delete PostgreSQL or OpenSearch nodes.
 - Below process can be done for `chef-server` and `automate`.
 - Only one node can be removed simultaneously, irrespective of a node type.

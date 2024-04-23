@@ -46,7 +46,7 @@ When the primary cluster fails, accomplish the fail-over by updating DNS records
 
 ### Steps to set up the Production and Disaster Recovery Cluster
 
-1. Deploy the Primary cluster following the deployment instructions by [clicking here](/automate/ha_aws_deploy_steps/#deployment).
+1. Deploy the Primary cluster. To know more, follow the [deployment instructions](/automate/ha_aws_deploy_steps/#deployment).
 
 1. Deploy the Disaster Recovery cluster into a different data center/region using the same steps as the Primary cluster
 
