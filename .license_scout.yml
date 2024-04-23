@@ -1033,7 +1033,3 @@ exceptions:
   nodejs:
     - name: jschardet
       reason: Exception made by Chef Legal
-
-  golang:
-    - name: go.uber.org/automaxprocs
-      reason: Added above
