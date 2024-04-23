@@ -838,6 +838,9 @@ fallbacks:
     - name: rsc.io/sampler
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/rsc/sampler/master/LICENSE 
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE  
     - name: github.com/soheilhy/cmux
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/soheilhy/cmux/master/LICENSE
