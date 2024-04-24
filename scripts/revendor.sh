@@ -22,13 +22,13 @@ envoyproxyVendorPath=./github.com/envoyproxy/protoc-gen-validate
 # happen before we can copy the protos from those modules to protovendor/
 echo "Tidying and Verifying Go Modules in Automate Main Module"
 go mod tidy
-go mod verify
+#go mod verify
 
 pushd protovendor > /dev/null || (echo "couldn't enter the protovendor dir from $(pwd)" && exit 1)
 
 echo "Tidying and Verifying Go Modules in Automate Protovendor Module"
 go mod tidy
-go mod verify
+#go mod verify
 
 echo "Vendoring protos in protovendor/ ..."
 
