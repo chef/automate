@@ -1030,3 +1030,6 @@ exceptions:
   nodejs:
     - name: jschardet
       reason: Exception made by Chef Legal
+
+exclude_transitive_dependencies:
+  - go.uber.org/automaxprocs
