@@ -4,6 +4,8 @@ import (
 	"container/list"
 	"fmt"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -37,10 +39,13 @@ type AWSConfigIp struct {
 }
 
 const (
-	terrformStateFile    = "-state=/hab/a2_deploy_workspace/terraform/terraform.tfstate"
-	runTerraformInit     = "terraform init"
-	terraformPath        = "/hab/a2_deploy_workspace/terraform"
-	destoryTerraformPath = terraformPath + "/destroy/aws/"
+	terrformStateFile         = "-state=/hab/a2_deploy_workspace/terraform/terraform.tfstate"
+	runTerraformInit          = "terraform init"
+	terraformPath             = "/hab/a2_deploy_workspace/terraform"
+	destoryTerraformPath      = terraformPath + "/destroy/aws/"
+	destoryPreCommand         = `terraform destroy `
+	destroyTargetCommand      = ` -target="module.aws.aws_instance.`
+	destroyAutoapproveCommand = ` -refresh=true -auto-approve`
 )
 
 var (
@@ -289,13 +294,15 @@ func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
 		status.New(status.InvalidCommandArgsError, "Invalid node type")
 	}
 
-	err := dna.removeNodeIfExists(instanceType, dna.ipToDelete, configNodeIpList)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error removing "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" node")
-	}
 	unreachableIpList = difference(unreachableIpList, []string{dna.ipToDelete})
-	for _, removeIp := range unreachableIpList {
-		err := dna.removeNodeIfExists(instanceType, removeIp, configNodeIpList)
+	if len(unreachableIpList) > 0 {
+		unreachableIpList = append(unreachableIpList, dna.ipToDelete)
+		err := dna.removeMultiNodeIfExists(instanceType, unreachableIpList, configNodeIpList)
+		if err != nil {
+			return status.Wrap(err, status.ConfigError, "Error removing "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" node")
+		}
+	} else {
+		err := dna.removeNodeIfExists(instanceType, dna.ipToDelete, configNodeIpList)
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "Error removing "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" node")
 		}
@@ -310,6 +317,18 @@ func (dna *DeleteNodeAWSImpl) removeNodeIfExists(nodeType, ipToDelete string, co
 		}
 	}
 	return nil
+}
+
+func (dna *DeleteNodeAWSImpl) removeMultiNodeIfExists(nodeType string, ipsToDelete []string, configNodeIpList []string) error {
+	indexes := []int{}
+	for i := 0; i < len(configNodeIpList); i++ {
+		for _, d := range ipsToDelete {
+			if configNodeIpList[i] == d {
+				indexes = append(indexes, i)
+			}
+		}
+	}
+	return dna.removeMultiNodeFromAws(nodeType, indexes, configNodeIpList)
 }
 
 func (dna *DeleteNodeAWSImpl) validate() error {
@@ -433,6 +452,62 @@ func (dna *DeleteNodeAWSImpl) removeNodeFromAws(instanceType string, index int, 
 		return err
 	}
 	return nil
+}
+
+func (dna *DeleteNodeAWSImpl) removeMultiNodeFromAws(instanceType string, indexes []int, configIpList []string) error {
+	err := dna.nodeUtils.executeShellCommand(runTerraformInit, destoryTerraformPath)
+	if err != nil {
+		return err
+	}
+
+	runDestoryCommand := destoryPreCommand
+	for _, i := range indexes {
+		runDestoryCommand = runDestoryCommand + destroyTargetCommand + instanceType + "[" + strconv.Itoa(i) + "]" + "\""
+	}
+	runDestoryCommand = runDestoryCommand + destroyAutoapproveCommand
+
+	err = dna.nodeUtils.executeShellCommand(runDestoryCommand, destoryTerraformPath)
+	if err != nil {
+		return err
+	}
+	moveTerraformStateCommands := getTerraformMoveStateCommand(instanceType, indexes, configIpList)
+	for _, mvCmd := range moveTerraformStateCommands {
+		err = dna.nodeUtils.executeShellCommand(mvCmd, destoryTerraformPath)
+		if err != nil {
+			return err
+		}
+	}
+	err = dna.nodeUtils.executeShellCommand(runTerraformInit, terraformPath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getTerraformMoveStateCommand(instanceType string, indexes []int, configIpList []string) []string {
+	mvCmds := []string{}
+	lastIndex := len(configIpList) - 1
+	sort.Sort(sort.Reverse(sort.IntSlice(indexes)))
+	if len(configIpList) == len(indexes) {
+		return mvCmds
+	}
+	for i := 0; i < len(indexes); i++ {
+		if len(configIpList)-len(indexes) == 1 {
+			if (indexes[i] - indexes[i+1]) > 1 {
+				ruMoveStateCommand := fmt.Sprintf(moveStateCommand, instanceType, indexes[i]-1, 0)
+				mvCmds = append(mvCmds, ruMoveStateCommand)
+				return mvCmds
+			} else {
+				continue
+			}
+		}
+		if indexes[i] < lastIndex {
+			ruMoveStateCommand := fmt.Sprintf(moveStateCommand, instanceType, lastIndex, indexes[i])
+			mvCmds = append(mvCmds, ruMoveStateCommand)
+		}
+		lastIndex--
+	}
+	return mvCmds
 }
 
 func (dna *DeleteNodeAWSImpl) getAwsHAIp() error {

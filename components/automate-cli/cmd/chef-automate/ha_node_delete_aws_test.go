@@ -819,6 +819,71 @@ func TestDeletenodeDeploy(t *testing.T) {
 	})
 }
 
+func TestGetTerraformMoveStateCommand(t *testing.T) {
+
+	t.Run("remove all except 1", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0, 1, 3, 4, 5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 1)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[2]\" \"module.aws.aws_instance.Automate[0]\"")
+	})
+
+	t.Run("remove reandom two ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{1, 4}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 2)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[4]\"")
+		assert.EqualValues(t, cmds[1], "terraform state mv \"module.aws.aws_instance.Automate[4]\" \"module.aws.aws_instance.Automate[1]\"")
+	})
+
+	t.Run("remove all ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0, 1, 2, 3, 4, 5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.Empty(t, cmds)
+		assert.Len(t, cmds, 0)
+	})
+
+	t.Run("remove 1st two ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0, 1}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 2)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[1]\"")
+		assert.EqualValues(t, cmds[1], "terraform state mv \"module.aws.aws_instance.Automate[4]\" \"module.aws.aws_instance.Automate[0]\"")
+	})
+
+	t.Run("remove last 2 ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{4, 5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.Empty(t, cmds)
+	})
+
+	t.Run("remove middle 2 Ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{2, 3}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 2)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[3]\"")
+		assert.EqualValues(t, cmds[1], "terraform state mv \"module.aws.aws_instance.Automate[4]\" \"module.aws.aws_instance.Automate[2]\"")
+	})
+
+	t.Run("remove 1st Ip", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 1)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[0]\"")
+	})
+
+	t.Run("remove last Ip", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.Empty(t, cmds)
+	})
+
+	t.Run("remove mid Ip", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{3}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 1)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[3]\"")
+	})
+
+}
+
 func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 	return &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
