@@ -228,3 +228,15 @@ In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetch
 - Run this query: GET _snapshot/_all to get all the snapshots.
 - Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>
   For example: DELETE _snapshot/ chef-automate-es6-event-feed-service
+
+### Issue: rename /tmp/temp2137181075 automate.config.toml: invalid cross-device link
+
+This issue occurs because the `mv` operation is trying to move a file between different filesystems, which is not allowed due to the "invalid cross-device link" error. It's triggered when attempting to perform file operations across filesystem boundaries.
+
+#### Solution
+
+We have noticed that executing commands that generate such errors are easily solved by just changing the directory from which they are being executed. Before executing the command again, change the directory to `/hab`:
+
+```sh
+cd /hab
+```
