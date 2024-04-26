@@ -276,6 +276,9 @@ func RemoveFirstLine(filePath string) error {
 
 	// Replace the original file with the temporary file
 	if err = os.Rename(tempFile.Name(), filePath); err != nil {
+		if strings.Contains(err.Error(), "invalid cross-device link") {
+			err = errors.Errorf("%v\n\nPlease change directory to /hab and trigger your command again:\n\nUse: cd /hab\n\n", err)
+		}
 		return err
 	}
 
