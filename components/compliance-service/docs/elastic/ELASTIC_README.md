@@ -1,13 +1,13 @@
 # Automate Compliance Reports via ElasticSearch
 
-This file documents the Elasticsearch queries need for the Automate Compliance reports.
+This file documents the ElasticSearch queries need for the Automate Compliance reports.
 Other findings related to performance and maintenance over time.
 
 ## Pre-condition
 
 Load data with `./make generate`
 
-Install required gems by the scripts that query Elasticsearch via Nginx
+Install required gems by the scripts that query ElasticSearch via Nginx
 
 ```bash
 $ bundle install
@@ -93,7 +93,7 @@ Reasoning:
 
 Requirements:
 * inspec only provides the profiles with the results of the controls. No aggregation of failed or passed controls. Data enrichment(i.e. compliance_summary.profiles) is required per scan so that we have access to an array of profiles used, along with failure totals per profile.
-* `compliance_summary.profiles` array needs to be defined as `nested` in the Elasticsearch mapping!!!
+* `compliance_summary.profiles` array needs to be defined as `nested` in the ElasticSearch mapping!!!
 
 * API: `/stats/failures?types=profiles`
 * Ruby script:
@@ -126,7 +126,7 @@ Requirements:
 profiles.controls.results.status
 profiles.controls.id
 ```
-* `profiles`????(need to clarify here) and `profiles.controls` array need to be nested in the Elasticsearch mapping!!!
+* `profiles`????(need to clarify here) and `profiles.controls` array need to be nested in the ElasticSearch mapping!!!
 
 * API: `/stats/failures?types=controls`
 * Ruby script:
@@ -182,7 +182,7 @@ Aggregate all the profiles that's in use across all nodes (or nodes that match f
 Requirements:
 
 * inspec only provides the profiles with the results of the controls. No aggregation of failed or passed controls. Data enrichment(i.e. compliance_summary.profiles) is required per scan so that we have access to an array of profiles used, along with failure totals per profile.
-* `compliance_summary.profiles` array needs to be defined as `nested` in the Elasticsearch mapping!!!
+* `compliance_summary.profiles` array needs to be defined as `nested` in the ElasticSearch mapping!!!
 
 
 * API: `/stats/profiles`
@@ -257,7 +257,7 @@ $ bundle exec elastic_node_list_agg_summaries.rb 'compliance-20*'
 Reasoning: For each control in a single profile, aggregate the compliance results from the latest scans at the specified point in time across all nodes (or nodes that match filter(s))
 
 Requirements:
-* `profiles.controls` array needs to be defined as `nested` in the Elasticsearch mapping!!!
+* `profiles.controls` array needs to be defined as `nested` in the ElasticSearch mapping!!!
 
 * API (top part):    `/stats/profiles/:id/summary`
 * API (bottom part): `/stats/profiles/:id/controls`

@@ -78,7 +78,7 @@ The compliance code responsible for processing the InSpec reports sent to Automa
 /components/compliance-service/ingest/
 ```
 
-Data is stored in Elasticsearch in 3 index types:
+Data is stored in ElasticSearch in 3 index types:
 
  * Daily summary index (e.g. `comp-7-s-2020.11.07`), one for each day
  * Daily reports index (e.g. `comp-7-r-2020.11.07`), one for each day
@@ -99,7 +99,7 @@ components/compliance-service/api/profiles/server/pgserver.go
 components/compliance-service/dao/pgdb/jobs.go
 ```
 
-The profile data is stored in Postgresql and the profile metadata is also cached in Elasticsearch in the `comp-*-profiles` index.
+The profile data is stored in Postgresql and the profile metadata is also cached in ElasticSearch in the `comp-*-profiles` index.
 
 You can interact with the service from this Automate page:
 `Automate UI > Compliance > Profiles`

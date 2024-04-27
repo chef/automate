@@ -198,7 +198,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 		Aggregation("myagg", aggs).
 		Size(0)
 
-	//// Sample search sent to Elasticsearch when suggesting roles:
+	//// Sample search sent to ElasticSearch when suggesting roles:
 	//{
 	//	"query": {
 	//		"bool": {

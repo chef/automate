@@ -124,7 +124,7 @@ func init() {
 	serveCmd.Flags().String("log-level", "info", "the level of logging")
 	serveCmd.Flags().Int("port", 2191, "Port where the gRPC Server will be listening")
 	serveCmd.Flags().Int("rest-port", 2192, "Port where the REST Server will be listening")
-	serveCmd.Flags().String("elasticsearch-url", "http://localhost:9200", "URL to Elasticsearch (<protocol>://domain:<port>)/")
+	serveCmd.Flags().String("elasticsearch-url", "http://localhost:9200", "URL to ElasticSearch (<protocol>://domain:<port>)/")
 	serveCmd.Flags().String("es-sidecar-address", "localhost:10390", "address of es sidecar (domain:<port>)")
 	serveCmd.Flags().String("authz-address", "localhost:10130", "address of authz (domain:<port>)")
 	serveCmd.Flags().String("cereal-address", "localhost:10101", "address of cereal (domain:<port>)")

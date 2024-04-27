@@ -147,10 +147,10 @@ function ingest_load_A1_data() {
 
   log_line "Loading A1 Data from nodes/ directory"
 
-  # The Elasticsearch S3 repository plugin needs to be able to access the snapshot
+  # The ElasticSearch S3 repository plugin needs to be able to access the snapshot
   # location that was configured in A1 when the migration data was backed up.
   # Therefore, we'll configure it to use the A1 default location before restarting
-  # Elasticsearch with A1 data. If we don't, Elasticsearch will initialize with
+  # ElasticSearch with A1 data. If we don't, Elasticsearch will initialize with
   # default settings but will remain in critical health until the repo path
   # configuration is updated.
   local backup_dir

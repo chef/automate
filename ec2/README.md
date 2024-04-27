@@ -91,7 +91,7 @@ Note: Credential is valid for only 1 hour. To refresh the token, you have to rel
 
 5. `VERSION` in format 'channel[/build]' (default: 'dev/latest') can be used to specify which versions to use when pulling the Automate components. Valid examples: 'dev/20190328132226', 'current', 'acceptance'. The latest build will be pulled from channel if the build timestamp is not specified.
 
-6. `EBS_SNAPSHOT` can be used to specify a volume snapshot to restore for the Elasticsearch data directory. Beneficial to load large data sets previously generated for performance or data migration testing. Here are a few public EBS snapshots that can be used:
+6. `EBS_SNAPSHOT` can be used to specify a volume snapshot to restore for the ElasticSearch data directory. Beneficial to load large data sets previously generated for performance or data migration testing. Here are a few public EBS snapshots that can be used:
  * snap-09008b989ac450bf1 : 75GB volume empty, partitioned and ext4 formatted
  * snap-01c2a3639d3146721 : 75GB volume with comp-2 indices for 50k nodes scanned on 2019.03.29
  * snap-08726019113625ec7 : 75GB volume with comp-2 indices for 50k nodes scanned on 2019.03.29, 2019.04.08, 2019.04.09
@@ -182,7 +182,7 @@ To bypass the hab studio, you can login as user `root` using the private key ass
 
 ## Accessing hab services from your local machine
 
-Let's say we want to use Postman locally to query the Elasticsearch hab service running on our remote ec2 instance.
+Let's say we want to use Postman locally to query the ElasticSearch hab service running on our remote ec2 instance.
 
 Start an SSH tunnel like this, where TCP port 9222 on your laptop is proxied to the remote ec2 instance as port 10141. The `ec2-11-22...amazonaws.com` hostname will be different for you.
 ```
