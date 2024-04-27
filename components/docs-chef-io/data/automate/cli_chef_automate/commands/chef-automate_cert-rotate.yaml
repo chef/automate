@@ -2,72 +2,72 @@ name: chef-automate cert-rotate
 synopsis: Chef Automate rotate cert
 usage: chef-automate cert-rotate [flags]
 description: |
-  Chef Automate CLI command to rotate certificates, this command should always be executed from AutomateHA Bastion Node
+    Chef Automate CLI command to rotate certificates, this command should always be executed from AutomateHA Bastion Node
 options:
-- name: a2
-  default_value: "false"
-  usage: Automate Certificate Rotation
-- name: admin-cert
-  usage: Admin certificate
-- name: admin-key
-  usage: Admin Private certificate
-- name: automate
-  shorthand: a
-  default_value: "false"
-  usage: Automate Certificate Rotation
-- name: cc
-  usage: Cluster certificate file
-- name: certificate-config
-  usage: Cluster certificate file
-- name: chef_server
-  shorthand: c
-  default_value: "false"
-  usage: Chef Infra Server Certificate Rotation
-- name: cs
-  default_value: "false"
-  usage: Chef Infra Server Certificate Rotation
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for cert-rotate
-- name: node
-  usage: Node Ip address
-- name: opensearch
-  shorthand: o
-  default_value: "false"
-  usage: OS Certificate Rotation
-- name: os
-  default_value: "false"
-  usage: OS Certificate Rotation
-- name: pg
-  default_value: "false"
-  usage: Postgres Certificate Rotation
-- name: postgresql
-  shorthand: p
-  default_value: "false"
-  usage: Postgres Certificate Rotation
-- name: private-cert
-  usage: Private certificate
-- name: public-cert
-  usage: Public certificate
-- name: root-ca
-  usage: RootCA certificate
-- name: wait-timeout
-  default_value: "600"
-  usage: |
-    This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process
+    - name: a2
+      default_value: "false"
+      usage: Automate Certificate Rotation
+    - name: admin-cert
+      usage: Admin certificate
+    - name: admin-key
+      usage: Admin Private certificate
+    - name: automate
+      shorthand: a
+      default_value: "false"
+      usage: Automate Certificate Rotation
+    - name: cc
+      usage: Cluster certificate file
+    - name: certificate-config
+      usage: Cluster certificate file
+    - name: chef_server
+      shorthand: c
+      default_value: "false"
+      usage: Chef Infra Server Certificate Rotation
+    - name: cs
+      default_value: "false"
+      usage: Chef Infra Server Certificate Rotation
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for cert-rotate
+    - name: node
+      usage: Node Ip address
+    - name: opensearch
+      shorthand: o
+      default_value: "false"
+      usage: OS Certificate Rotation
+    - name: os
+      default_value: "false"
+      usage: OS Certificate Rotation
+    - name: pg
+      default_value: "false"
+      usage: Postgres Certificate Rotation
+    - name: postgresql
+      shorthand: p
+      default_value: "false"
+      usage: Postgres Certificate Rotation
+    - name: private-cert
+      usage: Private certificate
+    - name: public-cert
+      usage: Public certificate
+    - name: root-ca
+      usage: RootCA certificate
+    - name: wait-timeout
+      default_value: "600"
+      usage: |
+        This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
-- 'generate-certificate-config - Chef Automate generate certificate config '
+    - chef-automate - Chef Automate CLI
+    - 'generate-certificate-config - Chef Automate generate certificate config '
 compatible_with: AutomateHA
 supported_on: Bastion

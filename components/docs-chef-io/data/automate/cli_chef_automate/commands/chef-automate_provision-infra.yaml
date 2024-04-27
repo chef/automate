@@ -3,32 +3,32 @@ synopsis: Provision Automate HA infra.
 usage: chef-automate provision-infra [flags]
 description: Provision infra for Automate HA deployment.
 options:
-- name: airgap-bundle
-  usage: Path to an airgap install bundle
-- name: channel
-  usage: Release channel to deploy all services from
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for provision-infra
-- name: saas
-  default_value: "false"
-  usage: Flag for saas setup
-- name: "yes"
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
+    - name: airgap-bundle
+      usage: Path to an airgap install bundle
+    - name: channel
+      usage: Release channel to deploy all services from
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for provision-infra
+    - name: saas
+      default_value: "false"
+      usage: Flag for saas setup
+    - name: "yes"
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
+    - chef-automate - Chef Automate CLI
 compatible_with: AutomateHA
 supported_on: Bastion

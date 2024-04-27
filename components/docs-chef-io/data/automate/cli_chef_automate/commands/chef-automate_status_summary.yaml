@@ -3,43 +3,43 @@ synopsis: Retrieve Chef Automate status-summary
 usage: chef-automate status summary [flags]
 description: Retrieve Chef Automate status node summary for HA deployment
 options:
-- name: automate
-  shorthand: a
-  default_value: "false"
-  usage: Get only automate Status
-  compatible_with_options: AutomateHA
-- name: chef-server
-  shorthand: c
-  default_value: "false"
-  usage: Get only chef server Status
-  compatible_with_options: AutomateHA
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for summary
-- name: node
-  usage: Node Ip address
-  compatible_with_options: AutomateHA
-- name: opensearch
-  shorthand: o
-  default_value: "false"
-  usage: Get only opensearch Status
-  compatible_with_options: AutomateHA
-- name: postgresql
-  shorthand: p
-  default_value: "false"
-  usage: Get only postgresql Status
-  compatible_with_options: AutomateHA
+    - name: automate
+      shorthand: a
+      default_value: "false"
+      usage: Get only automate Status
+      compatible_with_options: AutomateHA
+    - name: chef-server
+      shorthand: c
+      default_value: "false"
+      usage: Get only chef server Status
+      compatible_with_options: AutomateHA
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for summary
+    - name: node
+      usage: Node Ip address
+      compatible_with_options: AutomateHA
+    - name: opensearch
+      shorthand: o
+      default_value: "false"
+      usage: Get only opensearch Status
+      compatible_with_options: AutomateHA
+    - name: postgresql
+      shorthand: p
+      default_value: "false"
+      usage: Get only postgresql Status
+      compatible_with_options: AutomateHA
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate status - Retrieve Chef Automate status
+    - chef-automate status - Retrieve Chef Automate status
 supported_on: Bastion

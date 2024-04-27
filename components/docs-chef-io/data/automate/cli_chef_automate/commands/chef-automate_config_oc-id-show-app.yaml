@@ -1,38 +1,38 @@
 name: chef-automate config oc-id-show-app
 synopsis: |
-  Get the details of the oauth applications registered with OC-ID
+    Get the details of the oauth applications registered with OC-ID
 usage: chef-automate config oc-id-show-app [flags]
 description: |
-  Get the details of the oauth applications registered with OC-ID
+    Get the details of the oauth applications registered with OC-ID
 options:
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for oc-id-show-app
-- name: wait-timeout
-  default_value: "600"
-  usage: |
-    This flag sets the operation timeout duration (in seconds) for each individual node during the config oc-id-show-app process
-  compatible_with_options: Automate
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for oc-id-show-app
+    - name: wait-timeout
+      default_value: "600"
+      usage: |
+        This flag sets the operation timeout duration (in seconds) for each individual node during the config oc-id-show-app process
+      compatible_with_options: Automate
 inherited_options:
-- name: auto-approve
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
-- name: timeout
-  shorthand: t
-  default_value: "10"
-  usage: Request timeout in seconds
-  compatible_with_options: Automate
+    - name: auto-approve
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
+    - name: timeout
+      shorthand: t
+      default_value: "10"
+      usage: Request timeout in seconds
+      compatible_with_options: Automate
 see_also:
-- chef-automate config - Chef Automate configuration
+    - chef-automate config - Chef Automate configuration
 supported_on: Bastion

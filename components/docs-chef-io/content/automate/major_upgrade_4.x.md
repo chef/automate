@@ -671,9 +671,9 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 ```
 
 To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
-Update the OpenSearch Config, using `chef-automate config patch <config_patch.toml>` 
+Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>` 
 
-```cd
+```
 [opensearch]
   [opensearch.v1]
     [opensearch.v1.sys]
@@ -762,7 +762,7 @@ To restore your Air-Gapped bundle, run the following command:
 sudo chef-automate backup restore  --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
 ```
 
-Click [here](/automate/restore/) to know more about the Restore methods.
+For more information, see [Restore Methods](/automate/restore/).
 
 To start the upgrade, use the **backup ID** from the backup created. In case the restore fails even after upgrading the Chef Automate version, follow the steps given below:
 
@@ -780,7 +780,7 @@ To start the upgrade, use the **backup ID** from the backup created. In case the
     sudo chef-automate backup restore <backup_id>
     ```
 
-Refer to the [Chef Automate Restore](/automate/restore/) documentation.
+    Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
 

@@ -10,10 +10,10 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
 # pinned PG version. We need to also update components/automate-cli/cmd/chef-automate/migration_pg.go (line)
-pg_version="13.5"
+pg_version="13.14"
 
 # pinned PG version. We need to also update components/automate-cli/cmd/chef-automate/migration_pg.go (line)
-ident="20240106121014"
+ident="20240312092803"
 
 pkg_deps=(
   core/coreutils

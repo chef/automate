@@ -64,6 +64,10 @@ const (
 var configValid = "Config file must be a valid %s config"
 
 func init() {
+	err := fileutils.CreateHabTmpDir()
+	if err != nil {
+		writer.Errorln(fmt.Sprintf("Error while creating %s dir: %v", HAB_TMP_DIR, err))
+	}
 	configCmd.AddCommand(showConfigCmd)
 	configCmd.AddCommand(patchConfigCmd)
 	configCmd.AddCommand(setConfigCmd)

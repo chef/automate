@@ -2,23 +2,23 @@ name: chef-automate node
 synopsis: This command is used to add or delete HA nodes
 usage: chef-automate node COMMAND [flags]
 options:
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for node
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for node
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
-- add - Add new node in HA
-- remove - remove existing node in HA
+    - chef-automate - Chef Automate CLI
+    - add - Add new node in HA
+    - remove - remove existing node in HA
 compatible_with: AutomateHA
 supported_on: Bastion
