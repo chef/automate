@@ -1,18 +1,18 @@
 +++
-title = "ElasticSearch"
+title = "Elasticsearch"
 date = 2022-01-04T12:09:09-08:00
 draft = false
 
 [menu]
   [menu.automate]
-    title = "Configure ElasticSearch"
-    identifier = "automate/configuring_automate/elasticsearch/elasticsearch.md ElasticSearch"
+    title = "Configure Elasticsearch"
+    identifier = "automate/configuring_automate/elasticsearch/elasticsearch.md Elasticsearch"
     parent = "automate/configuring_automate/elasticsearch"
 +++
 
 You can configure Chef Automate to use Elasticsearch clusters that are not deployed via Chef Automate itself.
 
-## Configure External ElasticSearch
+## Configure External Elasticsearch
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
@@ -31,7 +31,7 @@ Add the following to your config.toml:
   enable = true
   nodes = ["http://elastic1.example:9200", "http://elastic2.example:9200", "..." ]
 
-# Uncomment and fill out if using external elasticsearch with SSL and/or basic auth
+# Uncomment and fill out if using external Elasticsearch with SSL and/or basic auth
 # [global.v1.external.elasticsearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.elasticsearch.auth.basic_auth]
@@ -54,7 +54,7 @@ Add the following to your config.toml:
 
 Because externally-deployed Elasticsearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
-### Add Resolvers for ElasticSearch
+### Add Resolvers for Elasticsearch
 
 In case you want to resolve the Elasticsearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
 
@@ -89,7 +89,7 @@ If you wish to reset to the default configuration or to modify the configuration
 1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
 1. Run `chef-automate config set config.toml` to apply your changes.
 
-## Backup External ElasticSearch
+## Backup External Elasticsearch
 
 ### Backup External Elasticsearch to a Local Filesystem
 

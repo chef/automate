@@ -138,7 +138,7 @@ For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documen
     vacuumdb: vacuuming database "template1"
     ```
 
-3. Exit postgres user
+3. Exit PostgreSQL user
 
     ```bash
     exit
@@ -228,7 +228,7 @@ For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` se
 
     Reindexing is not required for Chef Automate. If `pg_upgrade` reported errors or need for reindexing please refer to [pg_upgrade documentation](https://www.postgresql.org/docs/13/pgupgrade.html) for details.
 
-1. Exit postgres user:
+1. Exit PostgreSQL user:
 
     ```bash
     exit

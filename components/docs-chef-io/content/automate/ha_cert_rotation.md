@@ -191,7 +191,7 @@ If you want to rotate certificates of a particular node, then you can follow the
 - To rotate the certificates of a particular OpenSearch node:
 
     ```sh
-    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular opensearch node>
+    chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular OpenSearch node>
     ```
 
     You can also use `--opensearch` or `-o` instead of the os flag

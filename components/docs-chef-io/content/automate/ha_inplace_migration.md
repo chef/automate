@@ -137,7 +137,7 @@ In case the [backup configuration](/automate/ha_backup_restore_file_system/#conf
 
 {{<note>}}
 
-While configuring the backup configuration provide the path of **Elasticsearch** instead of **Opensearch** as A2HA backup was in Elasticsearch directory like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`.
+While configuring the backup configuration provide the path of **Elasticsearch** instead of **OpenSearch** as A2HA backup was in Elasticsearch directory like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`.
 
 {{</note>}}
 
@@ -203,7 +203,7 @@ To know more about the usage of S3 backup, see [On-Premise Deployment using Obje
 {{< note >}}
 
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
-1. Reset the backup configuration path to Opensearch so that new backups will be stored in Opensearch directory. For more information, see [configuration for automate node from provision host](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host).
+1. Reset the backup configuration path to OpenSearch so that new backups will be stored in OpenSearch directory. For more information, see [configuration for automate node from provision host](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host).
 {{< /note >}}
 
 ## Validate successful migration
@@ -245,7 +245,7 @@ To know more about the usage of S3 backup, see [On-Premise Deployment using Obje
 
 1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA CLI `chef-automate cleanup --onprem-deployment` and then remove `/bin/chef-automate` from all frontend nodes, now try the installation again.
 
-1. See the [troubleshooting](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) section to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
+1. See the [troubleshooting](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) section to know more if you encounter an error while restoring related to the Elasticsearch snapshot.
 
 1. While restoring the backup if an error related to backup directory occurs like:
 

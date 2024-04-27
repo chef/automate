@@ -32,7 +32,7 @@ Add the following settings to your `config.toml`:
 enable = true
 nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
 
-# To use postgres with SSL, Set enable = true then, uncomment root_cert and fill out the certificate value. 
+# To use PostgreSQL with SSL, Set enable = true then, uncomment root_cert and fill out the certificate value. 
 [global.v1.external.postgresql.ssl]
 enable = false
 # root_cert = """$(cat </path/to/root/cert.pem>)"""
@@ -40,7 +40,7 @@ enable = false
 [global.v1.external.postgresql.auth]
 scheme = "password"
 
-# Create these postgres users before starting the Automate deployment;
+# Create these PostgreSQL users before starting the Automate deployment;
 # Automate assumes they already exist.
 [global.v1.external.postgresql.auth.password.superuser]
 username = "<admin username>"
