@@ -1030,5 +1030,10 @@ exceptions:
   nodejs:
     - name: jschardet
       reason: Exception made by Chef Legal
+      
+  golang:
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE
 
 include_subdirectories: false
