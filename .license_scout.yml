@@ -101,6 +101,9 @@ allowed_licenses:
   - Zlib
   - GPL-2.0
 
+flagged_licenses:
+  - MIT
+
 fallbacks:
   golang:
     - name: golang.org/x/term
@@ -1030,5 +1033,7 @@ exceptions:
   nodejs:
     - name: jschardet
       reason: Exception made by Chef Legal
-      
-include_subdirectories: false
+       
+  golang:
+    - name: go.uber.org/automaxprocs
+      reason: Transitive Dependency
