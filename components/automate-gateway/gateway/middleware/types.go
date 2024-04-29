@@ -36,3 +36,8 @@ type AuthorizationHandler interface {
 	GRPCAuthorizationHandler
 	IntrospectionHandler
 }
+
+type ILicenseInterceptor interface {
+	UnaryServerInterceptor() grpc.UnaryServerInterceptor
+	StreamServerInterceptor() grpc.StreamServerInterceptor
+}

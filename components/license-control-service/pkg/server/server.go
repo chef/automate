@@ -126,6 +126,7 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 			},
 			DeploymentId:   deploymentResponse.DeploymentId,
 			DeploymentType: deploymentResponse.DeploymentType,
+			LicenseType:    lic.Type,
 		}
 
 		return response, nil
