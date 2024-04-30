@@ -252,6 +252,7 @@ require (
 	gopkg.in/ldap.v2 v2.5.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1
+	github.com/uber-go/automaxprocs v1.5.0
 )
 
 // https://github.com/dexidp/dex/issues/1578
@@ -261,4 +262,4 @@ replace github.com/chef/automate/api/external => ./api/external/
 
 replace github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.5.0
 
-replace go.uber.org/automaxprocs => ./automaxprocs-excluded
+//replace go.uber.org/automaxprocs => ./automaxprocs-excluded

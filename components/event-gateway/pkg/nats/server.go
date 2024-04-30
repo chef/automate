@@ -171,9 +171,9 @@ func Spawn(c *config.EventGatewayConfig) error {
 	}).Info("Starting NATS messaging Server for event-gateway")
 
 	go ns.Start()
-    sigCh := make(chan os.Signal, 1)
+	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-    <-sigCh
+	<-sigCh
 	return nil
 }
 
