@@ -841,6 +841,9 @@ fallbacks:
     - name: github.com/soheilhy/cmux
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/soheilhy/cmux/master/LICENSE
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE  
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
