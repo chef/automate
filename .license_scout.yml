@@ -106,9 +106,9 @@ fallbacks:
     - name: golang.org/x/term
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/term/master/LICENSE
-    - name: github.com/DataDog/zstd
-      license_id: BSD-3-Clause
-      license_content: https://raw.githubusercontent.com/DataDog/zstd/1.x/LICENSE
+#    - name: github.com/DataDog/zstd
+#      license_id: BSD-3-Clause
+#      license_content: https://raw.githubusercontent.com/DataDog/zstd/1.x/LICENSE
     - name: github.com/Sereal/Sereal/Go/sereal
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/Sereal/Sereal/master/Go/sereal/LICENSE
@@ -1056,4 +1056,8 @@ exceptions:
 
   nodejs:
     - name: jschardet
+      reason: Exception made by Chef Legal
+
+  golang:
+    - name: github.com/DataDog/zstd
       reason: Exception made by Chef Legal
