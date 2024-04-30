@@ -19,7 +19,7 @@ pkg_deps=(
   # chef-server-* packages.
   #
   core/curl
-  core/ruby27
+  core/ruby30
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/15.9.34/20240405100641"
   "${vendor_origin}/chef-server-ctl/15.9.34/20240405100132"
@@ -66,7 +66,7 @@ scaffolding_go_binary_list=(
 chef_automate_hab_binding_mode="relaxed"
 
 do_prepare() {
-  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby27)"
+  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby30)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
   GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
@@ -82,6 +82,6 @@ do_install() {
   install "$PLAN_CONTEXT/bin/knife" "$wrapper_bin_path/knife"
 
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__!$(pkg_path_for chef/chef-server-ctl)!g" "$wrapper_bin_path/knife"
-  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby27)!g" "$wrapper_bin_path/knife"
+  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby30)!g" "$wrapper_bin_path/knife"
 }
 
