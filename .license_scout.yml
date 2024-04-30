@@ -106,6 +106,33 @@ fallbacks:
     - name: golang.org/x/term
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/term/master/LICENSE
+    - name: github.com/DataDog/zstd
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/DataDog/zstd/1.x/LICENSE
+    - name: github.com/Sereal/Sereal/Go/sereal
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/Sereal/Sereal/master/Go/sereal/LICENSE
+    - name: github.com/davecgh/go-xdr
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/davecgh/go-xdr/master/LICENSE
+    - name: github.com/hashicorp/go-msgpack
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/hashicorp/go-msgpack/main/LICENSE
+    - name: github.com/pquerna/ffjson
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/pquerna/ffjson/master/LICENSE
+    - name: go.etcd.io/gofail
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/etcd-io/gofail/master/LICENSE
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/automaxprocs/master/LICENSE
+    - name: gopkg.in/mgo.v2
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/go-mgo/mgo/v2/LICENSE
+    - name: gopkg.in/vmihailenco/msgpack.v2
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/vmihailenco/msgpack/v2.9.2/LICENSE
     - name: golang.org/x/oauth2
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/oauth2/master/LICENSE
