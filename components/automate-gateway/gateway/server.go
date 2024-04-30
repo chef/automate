@@ -63,8 +63,6 @@ func (s *Server) newGRPCServer() (*grpc.Server, error) {
 
 	authInterceptor := middleware.NewAuthInterceptor(authClient, s.authorizer)
 
-	license := middleware.NewLicenseInterceptor()
-
 	logrusEntry := log.NewEntry(log.StandardLogger())
 
 	// This function determines the log level based on the returned status code:
@@ -111,7 +109,6 @@ func (s *Server) newGRPCServer() (*grpc.Server, error) {
 			grpc_ctxtags.StreamServerInterceptor(),
 			grpc_logrus.StreamServerInterceptor(logrusEntry, logrusOpts...),
 			authInterceptor.StreamServerInterceptor(),
-			license.StreamServerInterceptor(),
 			grpc_prometheus.StreamServerInterceptor,
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -119,7 +116,6 @@ func (s *Server) newGRPCServer() (*grpc.Server, error) {
 			grpc_logrus.UnaryServerInterceptor(logrusEntry, logrusOpts...),
 			tracing.ServerInterceptor(tracing.GlobalTracer()),
 			authInterceptor.UnaryServerInterceptor(),
-			license.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 		)),
 	}
