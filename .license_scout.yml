@@ -901,6 +901,10 @@ fallbacks:
     - name: unf
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
+   golang:
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE    
 
 exceptions:
   habitat:
@@ -1031,4 +1035,4 @@ exceptions:
     - name: jschardet
       reason: Exception made by Chef Legal
       
-include_subdirectories: false
+
