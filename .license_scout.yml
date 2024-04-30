@@ -844,6 +844,9 @@ fallbacks:
     - name: go.uber.org/automaxprocs
       license_id: MIT
       license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE  
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE   
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
@@ -904,7 +907,7 @@ fallbacks:
     - name: unf
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
-   golang:
+   
     - name: go.uber.org/automaxprocs
       license_id: MIT
       license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE    

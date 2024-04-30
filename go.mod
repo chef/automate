@@ -114,13 +114,13 @@ require (
 	github.com/gofiber/utils v1.1.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
+	go.uber.org/automaxprocs v1.5.3
 )
 
 require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt/v2 v2.5.0 // indirect
-	go.uber.org/automaxprocs v1.5.3 // indirect
 	golang.org/x/time v0.3.0 // indirect
 )
 
