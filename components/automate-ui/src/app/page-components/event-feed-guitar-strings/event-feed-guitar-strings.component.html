@@ -94,7 +94,6 @@
           <span class="guitar-tooltip-text">
             <span class="guitar-tooltip-date">
               {{ item.start | datetime: DateTime.CHEF_DATE_TIME }}
-              {{ item.start | datetime: DateTime.CHEF_HOURS_MINS }} - {{ item.end | datetime: DateTime.CHEF_HOURS_MINS }} UTC
             </span>
             <span [innerHTML]="getTooltipText(item, item.isMultiple(), guitarString)"></span>
           </span>
