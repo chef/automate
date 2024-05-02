@@ -625,9 +625,9 @@ fallbacks:
     - name: github.com/hashicorp/memberlist
       license_id: MPL-2.0
       license_content: https://raw.githubusercontent.com/hashicorp/memberlist/master/LICENSE
-    - name: https://github.com/prashantv/gostub 
-      licence_id: MIT
-      license_content: https://github.com/prashantv/gostub/blob/master/LICENSE.md
+    #- name: https://github.com/prashantv/gostub 
+    #  licence_id: MIT
+    #  license_content: https://github.com/prashantv/gostub/blob/master/LICENSE.md
     # - name: github.com/hashicorp/raft-boltdb
     #   license_id: MPL-2.0
     #   license_content: https://raw.githubusercontent.com/hashicorp/raft-boltdb/master/LICENSE
