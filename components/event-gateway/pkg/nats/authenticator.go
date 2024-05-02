@@ -11,6 +11,7 @@ import (
 
 	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/pkg/errors"
+	_ "github.com/prashantv/gostub"
 	log "github.com/sirupsen/logrus"
 	_ "go.uber.org/automaxprocs"
 	"google.golang.org/grpc"
