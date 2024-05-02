@@ -263,6 +263,491 @@ region = ""
 
 ## Chef Infra Server
 
+This section lists the Chef Infra Server configurations that can be configured in Standalone Automate and Automate HA.
+
+### Keys
+
+#### nginx
+
+`client_max_body_size`
+
+Type: number
+
+Default: 250
+
+
+
+`ssl_protocols`
+
+Type: string
+
+Default: TLSv1.2
+
+
+
+`worker_connections`
+
+Type: number
+
+Default: 10240
+
+
+
+`worker_processes`
+
+Type: number
+
+Default: 4, 2
+
+
+
+`gzip`
+
+Type: string
+
+Default: ON
+
+
+
+`gzip_comp_level`
+
+Type: number
+
+Default: 2
+
+
+
+`gzip_http_version`
+
+Type: number
+
+Default: 1
+
+
+
+`gzip_types`
+
+Type: string
+
+Default: none
+
+
+
+`keepalive_timeout`
+
+Type: number
+
+Default: 65
+
+
+
+`sendfile`
+
+Type: string
+
+Default: ON
+
+
+
+`ssl_ciphers`
+
+Type: string
+
+Default: none
+
+#### opscode_erchef
+
+`s3_url_ttl`
+
+Type: number
+
+Default: 900, 28800
+
+
+
+`auth_skew`
+
+Type: number
+
+Default: 900
+
+
+
+`authz_fanout`
+
+Type: number
+
+Default: 20
+
+
+
+`authz_timeout`
+
+Type: number
+
+Default: 2000
+
+
+
+`base_resource_url`
+
+Type: string
+
+Default: :host_header
+
+
+
+`bulk_fetch_batch_size`
+
+Type: number
+
+Default: 5
+
+
+
+`cleanup_batch_size`
+
+Type: number
+
+Default: 0
+
+
+
+`depsolver_timeout`
+
+Type: number
+
+Default: 5000
+
+
+
+`depsolver_worker_count`
+
+Type: number
+
+Default: 5
+
+
+
+`depsolver_pooler_timeout`
+
+Type: number
+
+Default: 100000, 0
+
+
+
+`depsolver_pool_queue_max`
+
+Type: number
+
+Default: 10, 50
+
+
+
+`db_pool_size`
+
+Type: number
+
+Default: 40, 20
+
+
+
+`db_pool_queue_max`
+
+Type: number
+
+Default: 40, 20
+
+
+
+`ibrowse_max_pipeline_size`
+
+Type: number
+
+Default: 1
+
+
+
+`ibrowse_max_sessions`
+
+Type: number
+
+Default: 256
+
+
+
+`max_request_size`
+
+Type: number
+
+Default: 4000000
+
+
+
+`keygen_cache_size`
+
+Type: number
+
+Default: 1000, 10
+
+
+
+`reindex_batch_size`
+
+Type: number
+
+Default: 10
+
+
+
+`reindex_sleep_min_ms`
+
+Type: number
+
+Default: 500
+
+
+
+`reindex_sleep_max_ms`
+
+Type: number
+
+Default: 2000
+
+
+
+`reindex_item_retries`
+
+Type: number
+
+Default: 3
+
+
+
+`cbv_cache_enabled`
+
+Type: string
+
+Default: FALSE
+
+
+
+`search_queue_mode`
+
+Type: string
+
+Default: batch
+
+
+
+`s3_enabled`
+
+Type: string
+
+Default: FALSE
+
+
+
+`s3_bucket_name`
+
+Type: string
+
+Default: Bookshelf
+
+
+
+`s3_external_url`
+
+Type: string
+
+Default: none
+
+
+
+`strict_search_result_acls`
+
+Type: string
+
+Default: FALSE
+
+
+
+`enable_ibrowse_traces`
+
+Type: string
+
+Default: FALSE
+
+
+
+`s3_url_expiry_window_size`
+
+Type: string
+
+Default: [100, percent]
+
+
+
+#### oc_chef_authz
+
+`http_queue_max`
+
+Type: number
+
+Default: 200
+
+
+
+`http_max_count`
+
+Type: string
+
+Default: 100
+
+
+
+`http_init_count`
+
+Type: string
+
+Default: 100
+
+
+
+#### data_collector
+
+`timeout`
+
+Type: number
+
+Default: 30000
+
+
+
+`http_init_count`
+
+Type: number
+
+Default: 25
+
+
+
+`http_max_count`
+
+Type: number
+
+Default: 100
+
+
+
+`http_max_age`
+
+Type: string
+
+Default: {70, sec}
+
+
+
+`http_cull_interval`
+
+Type: string
+
+Default: {1, min}
+
+
+
+`http_max_connection_duration`
+
+Type: string
+
+Default: {70, sec}
+
+
+
+`ibrowse_options`
+
+Type: string
+
+Default: [{connect_timeout, 10000}]
+
+
+
+#### oc_bifrost
+
+`db_pool_queue_max`
+
+Type: number
+
+Default: 50
+
+
+
+`extended_perf_log`
+
+Type: string
+
+Default: TRUE
+
+
+
+#### bookshelf
+
+`stream_download`
+
+Type: string
+
+Default: TRUE
+
+
+
+`aws_access_id`
+
+Type: string
+
+Default: none
+
+
+
+`aws_secret_key`
+
+Type: string
+
+Default: none
+
+
+
+`log_rotation`
+
+Type: string
+
+Default: (`file_maxbytes`: 104857600, `num_to_keep`: 10)
+
+
+
+`storage_type`
+
+Type: string
+
+Default: sql
+
+
+
+`vip`
+
+Type: string
+
+Default: 127.0.0.1
+
+#### oc_chef_wm
+
+`health_ping_timeout`
+
+Type: number
+
+Default: 400
+
+
 ## PostgreSQL
 
 The PostgreSQL node in Automate HA provides various configuration options you can configure to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
