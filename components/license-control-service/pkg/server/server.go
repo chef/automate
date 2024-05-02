@@ -126,6 +126,8 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 			},
 			DeploymentId:   deploymentResponse.DeploymentId,
 			DeploymentType: deploymentResponse.DeploymentType,
+			LicenseType:    lic.Type,
+			DeploymentAt:   deploymentResponse.DeploymentAt,
 		}
 
 		return response, nil
@@ -203,6 +205,7 @@ func (s *LicenseControlServer) GetDeploymentID(ctx context.Context, req *lc.GetD
 	return &lc.GetDeploymentIDResponse{
 		DeploymentId:   deployment.ID,
 		DeploymentType: deployment.Type,
+		DeploymentAt:   &timestamp.Timestamp{Seconds: deployment.CreatedAt.Unix()},
 	}, nil
 }
 

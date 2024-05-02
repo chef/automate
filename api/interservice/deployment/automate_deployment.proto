@@ -402,6 +402,9 @@ message LicenseStatusResponse {
 	google.protobuf.Timestamp expiration_date = 4;
 	string deployment_id=5;
 	string deployment_type=6;
+	string license_type = 7;
+	google.protobuf.Timestamp deployment_at=8;
+
 
 }
 
