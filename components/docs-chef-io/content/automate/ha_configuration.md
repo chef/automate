@@ -275,7 +275,7 @@ Type: number
 
 Default: 250
 
-
+The maximum accepted body size for a client request, as indicated by the `Content-Length` request header.
 
 `ssl_protocols`
 
@@ -283,7 +283,7 @@ Type: string
 
 Default: TLSv1.2
 
-
+The SSL protocol versions that are enabled for the Chef Infra Server API. Starting with Chef Infra Server 14.3, this value defaults to `TLSv1.2` for enhanced security. Previous releases defaulted to `TLSv1 TLSv1.1 TLSv1.2`, which allowed for less secure SSL connections. TLS 1.2 is supported on Chef Infra Client 10.16.4 and later on Linux, Unix, and macOS, and on Chef Infra Client 12.8 and later on Windows. If it is necessary to support these older end-of-life Chef Infra Client releases, set this value to `TLSv1.1 TLSv1.2`.
 
 `worker_connections`
 
@@ -291,7 +291,7 @@ Type: number
 
 Default: 10240
 
-
+The maximum number of simultaneous clients. Use with nginx['worker_processes'] to determine the maximum number of allowed clients.
 
 `worker_processes`
 
@@ -299,7 +299,7 @@ Type: number
 
 Default: 4, 2
 
-
+The number of allowed worker processes. Use with nginx['worker_connections'] to determine the maximum number of allowed clients.
 
 `gzip`
 
@@ -307,7 +307,7 @@ Type: string
 
 Default: ON
 
-
+Enable gzip compression.
 
 `gzip_comp_level`
 
@@ -315,15 +315,15 @@ Type: number
 
 Default: 2
 
-
+The compression level used with gzip, from the least amount of compression (1, fastest) to the most (2, slowest).
 
 `gzip_http_version`
 
 Type: number
 
-Default: 1
+Default: 1.0
 
-
+Enable gzip depending on the version of the HTTP request.
 
 `gzip_types`
 
@@ -331,7 +331,7 @@ Type: string
 
 Default: none
 
-
+Enable compression for the specified MIME-types.
 
 `keepalive_timeout`
 
@@ -339,7 +339,7 @@ Type: number
 
 Default: 65
 
-
+The amount of time (in seconds) to wait for requests on HTTP keepalive connection.
 
 `sendfile`
 
@@ -347,13 +347,15 @@ Type: string
 
 Default: ON
 
-
+Copy data between file descriptors when sendfile() is used.
 
 `ssl_ciphers`
 
 Type: string
 
 Default: none
+
+The list of supported cipher suites that are used to establish a secure connection. To favor AES256 with ECDHE forward security, drop the RC4-SHA:RC4-MD5:RC4:RSA prefix. See this link for more information. For example:
 
 #### opscode_erchef
 
@@ -363,7 +365,7 @@ Type: number
 
 Default: 900, 28800
 
-
+The amount of time (in seconds) before connections to the server expire. If node bootstraps are timing out, increase this setting.
 
 `auth_skew`
 
@@ -387,7 +389,7 @@ Type: number
 
 Default: 2000
 
-
+The amount of time (in seconds) before a request to the **oc_bifrost** service times out.
 
 `base_resource_url`
 
@@ -395,7 +397,7 @@ Type: string
 
 Default: :host_header
 
-
+The base URL to which the service is to return links to API resources. Use `:host_header` to ensure the URL is derived from the host header of the incoming HTTP request.
 
 `bulk_fetch_batch_size`
 
@@ -411,7 +413,7 @@ Type: number
 
 Default: 0
 
-
+The number of nodes that may be deserialized. Currently only applies to the /search endpoint in the Chef Infra Server API. The default value is the recommended value.
 
 `depsolver_timeout`
 
@@ -419,7 +421,7 @@ Type: number
 
 Default: 5000
 
-
+The amount of time (in milliseconds) to wait for cookbook dependency problems to be solved.
 
 `depsolver_worker_count`
 
@@ -427,7 +429,7 @@ Type: number
 
 Default: 5
 
-
+The number of Ruby processes for which cookbook dependency problems are unsolved. Use the `pgrep -fl depselector` command to verify the number of depsolver workers that are running. If you are seeing 503 service unavailable errors, increase this value.
 
 `depsolver_pooler_timeout`
 
@@ -451,7 +453,7 @@ Type: number
 
 Default: 40, 20
 
-
+The number of open connections to PostgreSQL that are maintained by the service. This value should be increased if failures indicate that the **oc_bifrost** service ran out of connections. This value should be tuned in conjunction with the `postgresql['max_connections']` setting for PostgreSQL.
 
 `db_pool_queue_max`
 
@@ -467,7 +469,7 @@ Type: number
 
 Default: 1
 
-
+Setting EOL in Chef Infra Server 14.
 
 `ibrowse_max_sessions`
 
@@ -475,7 +477,7 @@ Type: number
 
 Default: 256
 
-
+Setting EOL in Chef Infra Server 14.
 
 `max_request_size`
 
@@ -483,7 +485,7 @@ Type: number
 
 Default: 4000000
 
-
+When the request body size is greater than this value, a `413 Request Entity Too Large` error is returned.
 
 `keygen_cache_size`
 
@@ -499,7 +501,7 @@ Type: number
 
 Default: 10
 
-
+The number of items to fetch from the database and send to the search index at a time.
 
 `reindex_sleep_min_ms`
 
@@ -507,7 +509,7 @@ Type: number
 
 Default: 500
 
-
+The minimum number of milliseconds to sleep before retrying a failed attempt to index an item. Retries are delayed a random number of milliseconds between `reindex_sleep_min_ms` and `reindex_sleep_max_ms`. Set both this and `reindex_sleep_max_ms` to 0 to retry without delay.
 
 `reindex_sleep_max_ms`
 
@@ -515,7 +517,7 @@ Type: number
 
 Default: 2000
 
-
+The maximum number of milliseconds to sleep before retrying a failed attempt to index an item. Retries are delayed a random number of milliseconds between `reindex_sleep_min_ms` and `reindex_sleep_max_ms`. Set both this and `reindex_sleep_min_ms` to 0 to retry without delay.
 
 `reindex_item_retries`
 
@@ -523,7 +525,7 @@ Type: number
 
 Default: 3
 
-
+The number of times to retry sending an object for indexing in the case of failure.
 
 `cbv_cache_enabled`
 
@@ -531,7 +533,7 @@ Type: string
 
 Default: FALSE
 
-
+Whether to enable cookbook version response caching. If you frequently see very long response times from `cookbook_versions` when under load, this is worth enabling. Enabling this makes it possible for a client to receive stale results. When a cookbook is updated in place (without incrementing the version), and the old response has not expired from the cache, the Infra Server will give the old response to the client. Subsequent client runs will receive the updated response.
 
 `search_queue_mode`
 
@@ -539,7 +541,7 @@ Type: string
 
 Default: batch
 
-
+The search index queue mode.
 
 `s3_enabled`
 
@@ -571,7 +573,7 @@ Type: string
 
 Default: FALSE
 
-
+Use to specify that search results only return objects to which an actor (user, client, etc.) has read access, as determined by ACL settings. This affects all searches. When true, the performance of the Chef management console may increase because it enables the Chef management console to skip redundant ACL checks. To ensure the Chef management console is configured properly, after this setting has been applied with a `chef-server-ctl` reconfigure run `chef-manage-ctl` reconfigure to ensure the Chef management console also picks up the setting.
 
 `enable_ibrowse_traces`
 
@@ -579,7 +581,7 @@ Type: string
 
 Default: FALSE
 
-
+Use to configure ibrowse logging for the `opscode_erchef` service.
 
 `s3_url_expiry_window_size`
 
@@ -587,7 +589,7 @@ Type: string
 
 Default: [100, percent]
 
-
+The frequency at which unique URLs are generated. This value may be a specific amount of time, i.e. `15m` (fifteen minutes) or a percentage of the value of s3_url_ttl, i.e. `10%`.
 
 #### oc_chef_authz
 
@@ -605,7 +607,7 @@ Type: string
 
 Default: 100
 
-
+The maximum worker count for the HTTP connection pool that is used by the data collector.
 
 `http_init_count`
 
@@ -623,7 +625,7 @@ Type: number
 
 Default: 30000
 
-
+The amount of time (in milliseconds) before a request to the data collector API times out.
 
 `http_init_count`
 
@@ -631,7 +633,7 @@ Type: number
 
 Default: 25
 
-
+The initial worker count for the HTTP connection pool that is used by the data collector.
 
 `http_max_count`
 
@@ -639,7 +641,7 @@ Type: number
 
 Default: 100
 
-
+The maximum worker count for the HTTP connection pool that is used by the data collector.
 
 `http_max_age`
 
@@ -647,7 +649,7 @@ Type: string
 
 Default: {70, sec}
 
-
+The maximum connection worker age (in seconds) for the HTTP connection pool that is used by the data collector.
 
 `http_cull_interval`
 
@@ -655,7 +657,7 @@ Type: string
 
 Default: {1, min}
 
-
+The maximum cull interval (in minutes) for the HTTP connection pool that is used by the data collector.
 
 `http_max_connection_duration`
 
@@ -663,7 +665,7 @@ Type: string
 
 Default: {70, sec}
 
-
+The maximum connection duration (in seconds) for the HTTP connection pool that is used by the data collector.
 
 `ibrowse_options`
 
@@ -671,7 +673,7 @@ Type: string
 
 Default: [{connect_timeout, 10000}]
 
-
+An array of comma-separated key-value pairs of ibrowse options for the HTTP connection pool that is used by the data collector.
 
 #### oc_bifrost
 
@@ -699,7 +701,7 @@ Type: string
 
 Default: TRUE
 
-
+Enable stream downloading of cookbooks. This setting (when `true`) typically results in improved cookbook download performance, especially with the memory usage of the bookshelf service and the **behavior** of load balancers and proxies in-between Chef Infra Client and the Chef Infra Server.
 
 `aws_access_id`
 
@@ -723,7 +725,7 @@ Type: string
 
 Default: (`file_maxbytes`: 104857600, `num_to_keep`: 10)
 
-
+The log rotation policy for this service. Log files are rotated when they exceed `file_maxbytes`. The maximum number of log files in the rotation is defined by num_to_keep.
 
 `storage_type`
 
@@ -731,13 +733,15 @@ Type: string
 
 Default: sql
 
-
+Determines where cookbooks are stored. In instances that require cookbooks to be stored within a SQL backend, such as in a high availability setup, you must set `storage_type` to `:sql:`.
 
 `vip`
 
 Type: string
 
 Default: 127.0.0.1
+
+The virtual IP address. This may point to an external storage location, such as Amazon EC2.
 
 #### oc_chef_wm
 
@@ -746,6 +750,7 @@ Default: 127.0.0.1
 Type: number
 
 Default: 400
+
 
 
 ## PostgreSQL
