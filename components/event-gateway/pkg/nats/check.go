@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chef/automate/components/event-gateway/pkg/config"
 	natsc "github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
+	_ "github.com/prashantv/gostub"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/chef/automate/components/event-gateway/pkg/config"
 )
 
 func ConnectivityCheck(c *config.EventGatewayConfig) error {
