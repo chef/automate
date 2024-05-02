@@ -150,27 +150,27 @@ func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		getInfraConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+		getInfraConfigFunc: func(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			config, err := getMockReadAnyConfig(EXISTING_INFRA_MODE)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			infraConfig, ok := config.(*ExistingInfraConfigToml)
 			if !ok {
-				return nil, errors.New("Failed to convert config to ExistingInfraConfigToml")
+				return nil, nil, errors.New("Failed to convert config to ExistingInfraConfigToml")
 			}
-			return infraConfig, nil
+			return infraConfig, nil, nil
 		},
-		getAWSConfigFunc: func(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+		getAWSConfigFunc: func(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 			config, err := getMockReadAnyConfig(AWS_MODE)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			awsConfig, ok := config.(*AwsConfigToml)
 			if !ok {
-				return nil, errors.New("Failed to convert config to AwsConfigToml")
+				return nil, nil, errors.New("Failed to convert config to AwsConfigToml")
 			}
-			return awsConfig, nil
+			return awsConfig, nil, nil
 		},
 	}
 }

@@ -39,12 +39,13 @@ type CmdInputs struct {
 }
 
 type NodeTypeAndCmd struct {
-	Frontend   *Cmd
-	Automate   *Cmd
-	ChefServer *Cmd
-	Postgresql *Cmd
-	Opensearch *Cmd
-	Infra      *AutomateHAInfraDetails
+	Frontend         *Cmd
+	Automate         *Cmd
+	ChefServer       *Cmd
+	Postgresql       *Cmd
+	Opensearch       *Cmd
+	Infra            *AutomateHAInfraDetails
+	unreachableNodes map[string][]string
 }
 
 func NewNodeTypeAndCmd() *NodeTypeAndCmd {
@@ -153,7 +154,6 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-
 		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, nodeMap.Automate.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.ChefServer.CmdInputs.NodeType:
@@ -162,7 +162,6 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-
 		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, nodeMap.ChefServer.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Postgresql.CmdInputs.NodeType:
@@ -171,7 +170,6 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-
 		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, nodeMap.Postgresql.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	case nodeMap.Opensearch.CmdInputs.NodeType:
@@ -180,7 +178,6 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
-
 		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, nodeMap.Opensearch.CmdInputs.InputFilesPrefix, c.Output)
 		return output, nil
 	default:

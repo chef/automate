@@ -56,12 +56,12 @@ type NodeOpUtils interface {
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
-	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	isManagedServicesOn() bool
 	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	getModeOfDeployment() string
 	executeShellCommand(command string, path string) error
 	moveAWSAutoTfvarsFile(string) error
@@ -72,9 +72,9 @@ type NodeOpUtils interface {
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCount() (int, error)
 	parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error
-	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastion() error
-	syncConfigToAllNodes() error
+	syncConfigToAllNodes(unreachableNodes map[string][]string) error
 }
 
 type NodeUtilsImpl struct {
@@ -104,31 +104,31 @@ func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	}, nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateInfraConfig()
+	return configPuller.generateInfraConfig(removeUnreachableNodes)
 }
 
-func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return configPuller.fetchInfraConfig()
+	return configPuller.fetchInfraConfig(removeUnreachableNodes)
 }
 
-func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return configPuller.fetchAwsConfig()
+	return configPuller.fetchAwsConfig(removeUnreachableNodes)
 }
 
 func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
@@ -140,17 +140,17 @@ func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) 
 	return NewPullConfigs(infra, *sshUtil), nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
 	configPuller := NewPullConfigs(infra, *sshUtil)
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateAwsConfig()
+	return configPuller.generateAwsConfig(removeUnreachableNodes)
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
@@ -259,22 +259,22 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 
 func (nu *NodeUtilsImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu, nil)
 }
 
-func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
+func (nu *NodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][]string) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu, unreachableNodes)
 }
 
 // Execute custom command in one node of all the each node-type
-func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
+func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils, unreachableNodes map[string][]string) error {
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
 		if nodeObject.NodeType == OPENSEARCH || nodeObject.NodeType == POSTGRESQL {
 			singleNode = true
 		}
-		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, unreachableNodes)
 		if err != nil {
 			return err
 		}
@@ -288,14 +288,14 @@ func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleN
 }
 
 // Execute 'config show' command in specific service and fetch the output file to bastion
-func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
+func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 
 	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
-	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
-
+	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, unreachableNodes)
+	nodeMap.unreachableNodes = unreachableNodes
 	sshUtil := nu.cmdUtil.GetSshUtil()
 
 	sshUtil.setSSHConfig(&SSHConfig{
@@ -498,16 +498,21 @@ func trimSliceSpace(slc []string) []string {
 	return slc
 }
 
-func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
-	inc, err := modifyInstanceCount(*instanceCount, len(newIps))
-	*instanceCount = inc
+	originalLen := len(*existingPrivateIPs)
+	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
+	filteredLen := len(*existingPrivateIPs)
+	removeIpCount := originalLen - filteredLen
+
+	inc, err := modifyInstanceCount(*instanceCount, len(newIps)-removeIpCount)
 	if err != nil {
 		return err
 	}
+	*instanceCount = inc
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
 			c := CertByIP{
@@ -517,6 +522,11 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
 			}
 			*certsIp = append(*certsIp, c)
+		}
+	}
+	if len(*certsIp) > 0 {
+		for _, ip := range unreachableNodes {
+			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
 	return nil
@@ -543,12 +553,16 @@ func modifyConfigForNewNodeCertByIp(instanceCount int, existingPrivateIPs []stri
 	return nil
 }
 
-func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = difference(*existingPrivateIPs, newIps)
-	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	originalLen := len(*existingPrivateIPs)
+	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
+	filteredLen := len(*existingPrivateIPs)
+	removeIpCount := originalLen - filteredLen
+	inc, err := modifyInstanceCount(*instanceCount, -(len(newIps) + removeIpCount))
 	*instanceCount = inc
 	if err != nil {
 		return err
@@ -558,20 +572,28 @@ func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]stri
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
+	if len(*certsIp) > 0 && len(unreachableNodes) > 0 {
+		for _, ip := range unreachableNodes {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+	}
 	return nil
 }
 
-func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
-	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	inc, err := modifyInstanceCount(*instanceCount, -(len(newIps) + len(unreachableNodes)))
 	if err != nil {
 		return err
 	}
 	*instanceCount = inc
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+		for _, ip := range unreachableNodes {
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
@@ -749,8 +771,8 @@ func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
 
 func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	timestamp := time.Now().Format("20060102150405")
-	fmt.Println("====================================================================")
-	fmt.Println("Syncing configs to frontend nodes")
+	writer.Println("====================================================================")
+	writer.Println("Syncing configs to frontend nodes")
 	frontendPrefix := "frontend" + "_" + timestamp + "_"
 	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
 	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
@@ -761,7 +783,7 @@ func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	return nodeObjects
 }
 
-func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails, unreachableNodes map[string][]string) *NodeTypeAndCmd {
 
 	nodeMap := NewNodeTypeAndCmd()
 	cmd := newNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
