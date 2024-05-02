@@ -17,11 +17,11 @@ jdomain_filename="ngx_upstream_jdomain-${jdomain_version}.tar.gz"
 jdomain_source="https://github.com/wdaike/ngx_upstream_jdomain/archive/${jdomain_version}.tar.gz"
 jdomain_shasum=3e7bedcddedf26d82da214d299e4cbee7605ac85a04ff3415c6b85de4f5a4ed5
 
-nginx_version="1.21.3"
+nginx_version="1.25.4"
 pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
 pkg_dirname="nginx-${nginx_version}"
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_shasum=14774aae0d151da350417efc4afda5cce5035056e71894836797e1f6e2d1175a
+pkg_shasum=760729901acbaa517996e681ee6ea259032985e37c2768beef80df3a877deed9
 
 
 chef_automate_hab_binding_mode="relaxed"
