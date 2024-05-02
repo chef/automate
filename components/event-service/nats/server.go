@@ -3,11 +3,11 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-	"sync"
-	"time"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
 
 	natsd "github.com/nats-io/nats-server/v2/server"
 	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
@@ -108,12 +108,12 @@ func spawnNatsInternalServer(c *config.EventConfig, m *multiEmbeddedServer) erro
 
 	m.runInGoroutine(func() error {
 		m.registerServer(ns)
-		go ns.Start()
 		sigCh := make(chan os.Signal, 1)
-	    signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-        <-sigCh
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+		<-sigCh
 		return nil
 	})
+	ns.Start()
 
 	// Wait for it to be able to accept connections
 	if !ns.ReadyForConnections(10 * time.Second) {
@@ -168,7 +168,6 @@ func runNATSStreamingServer(c *config.EventConfig, m *multiEmbeddedServer) error
 	opts.ClientCA = c.TLSConfig.RootCACertPath
 	opts.Secure = true
 	opts.EnableLogging = true
-	opts.Debug = true
 	opts.Trace = true
 
 	if c.LogConfig.LogLevel == "debug" {
@@ -212,8 +211,7 @@ func natsdOptions(c *config.EventConfig) *natsd.Options {
 
 	// Logging options:
 	nopts.NoLog = false
-	nopts.Debug = true
-    nopts.Trace = true
+	nopts.Trace = true
 
 	if c.LogConfig.LogLevel == "debug" {
 		// This seems to be the only option for adjusting the logging level
