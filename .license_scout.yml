@@ -796,6 +796,9 @@ fallbacks:
     - name: golang.org/x/image
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
+    - name: github.com/nats-io/jwt/v2
+      license_id: Apache-2.0
+      license_content: https://github.com/nats-io/jwt/blob/main/LICENSE
     - name: golang.org/x/mobile
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
@@ -838,6 +841,10 @@ fallbacks:
     - name: github.com/soheilhy/cmux
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/soheilhy/cmux/master/LICENSE
+    - name: go.uber.org/automaxprocs
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE  
+   
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
@@ -897,7 +904,7 @@ fallbacks:
       license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
     - name: unf
       license_id: BSD-2-Clause
-      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
+      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE       
 
 exceptions:
   habitat:
@@ -1027,3 +1034,4 @@ exceptions:
   nodejs:
     - name: jschardet
       reason: Exception made by Chef Legal
+      

@@ -4,11 +4,14 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
 
-	natsd "github.com/nats-io/gnatsd/server"
+	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -168,7 +171,10 @@ func Spawn(c *config.EventGatewayConfig) error {
 	}).Info("Starting NATS messaging Server for event-gateway")
 
 	ns.Start()
-	return errors.New("NATS server exited")
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+	return nil
 }
 
 // ServerWithNATSConfig configures an embedded NATS server with a custom set of NATS
