@@ -2,67 +2,67 @@ name: chef-automate config set
 synopsis: set the Chef Automate configuration
 usage: chef-automate config set path/to/config.toml [flags]
 description: |
-  Set the Chef Automate configuration for the deployment. It will replace the Chef Automate configuration with the given configuration and apply any required changes.
+    Set the Chef Automate configuration for the deployment. It will replace the Chef Automate configuration with the given configuration and apply any required changes.
 options:
-- name: a2
-  default_value: "false"
-  usage: Set toml configuration to the automate node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: automate
-  shorthand: a
-  default_value: "false"
-  usage: Set toml configuration to the automate node
-  compatible_with_options: AutomateHA
-- name: chef_server
-  shorthand: c
-  default_value: "false"
-  usage: Set toml configuration to the chef_server node
-  compatible_with_options: AutomateHA
-- name: cs
-  default_value: "false"
-  usage: Set toml configuration to the chef_server node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for set
-- name: opensearch
-  shorthand: o
-  default_value: "false"
-  usage: Set toml configuration to the opensearch node
-  compatible_with_options: AutomateHA
-- name: os
-  default_value: "false"
-  usage: Set toml configuration to the opensearch node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: pg
-  default_value: "false"
-  usage: Set toml configuration to the postgresql node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: postgresql
-  shorthand: p
-  default_value: "false"
-  usage: Set toml configuration to the postgresql node
-  compatible_with_options: AutomateHA
+    - name: a2
+      default_value: "false"
+      usage: Set toml configuration to the automate node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: automate
+      shorthand: a
+      default_value: "false"
+      usage: Set toml configuration to the automate node
+      compatible_with_options: AutomateHA
+    - name: chef_server
+      shorthand: c
+      default_value: "false"
+      usage: Set toml configuration to the chef_server node
+      compatible_with_options: AutomateHA
+    - name: cs
+      default_value: "false"
+      usage: Set toml configuration to the chef_server node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for set
+    - name: opensearch
+      shorthand: o
+      default_value: "false"
+      usage: Set toml configuration to the opensearch node
+      compatible_with_options: AutomateHA
+    - name: os
+      default_value: "false"
+      usage: Set toml configuration to the opensearch node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: pg
+      default_value: "false"
+      usage: Set toml configuration to the postgresql node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: postgresql
+      shorthand: p
+      default_value: "false"
+      usage: Set toml configuration to the postgresql node
+      compatible_with_options: AutomateHA
 inherited_options:
-- name: auto-approve
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
-- name: timeout
-  shorthand: t
-  default_value: "10"
-  usage: Request timeout in seconds
-  compatible_with_options: Automate
+    - name: auto-approve
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
+    - name: timeout
+      shorthand: t
+      default_value: "10"
+      usage: Request timeout in seconds
+      compatible_with_options: Automate
 see_also:
-- chef-automate config - Chef Automate configuration
+    - chef-automate config - Chef Automate configuration
 supported_on: Bastion

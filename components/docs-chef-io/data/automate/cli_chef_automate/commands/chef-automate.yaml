@@ -2,59 +2,59 @@ name: chef-automate
 synopsis: Chef Automate CLI
 usage: chef-automate COMMAND [flags]
 description: |-
-  A helpful utility to deploy and manage Chef Automate.
+    A helpful utility to deploy and manage Chef Automate.
 
-  Docs: https://docs.chef.io/automate/cli_chef_automate/
-  Patents: https://www.chef.io/patents
+    Docs: https://docs.chef.io/automate/cli_chef_automate/
+    Patents: https://www.chef.io/patents
 options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for chef-automate
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for chef-automate
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- 'airgap - '
-- applications - Manage applications observability features
-- backup - Chef Automate backup
-- cert - Chef Automate Certificate Management
-- cert-rotate - Chef Automate rotate cert
-- config - Chef Automate configuration
-- deploy - Deploy Chef Automate
-- external-cert - Manage Chef Automate's external certificate
-- gather-logs - Gather system diagnostics and logs
-- iam - Chef Automate iam commands
-- info - Info about Automate HA
-- infrastructure - Chef Automate infrastructure
-- init-config - Initialize default config
-- init-config-ha - Initialize default config for Automate HA
-- internal-ca - Manage Chef Automate's internal certificate authority
-- license - Chef Automate license management
-- maintenance - Put Chef Automate into or out of maintenance mode
-- migrate-from-v1 - Migrate from Chef Automate v1
-- migrate-from-v1-status - Watch the status of the migration to Chef Automate 2
-- node - This command is used to add or delete HA nodes
-- post-major-upgrade - Utilities for post-major-upgrade
-- preflight-check - Perform preflight check
-- provision-infra - Provision Automate HA infra.
-- restart-services - restart deployment services
-- secrets - Set secrets to Automate HA
-- service-versions - Retrieve the versions of the individual Chef Automate services
-- ssh - SSH into Automate HA servers
-- start - Start Chef Automate
-- status - Retrieve Chef Automate status
-- stop - Stop deployment
-- system-logs - Tail Chef Automate logs
-- test - Run Automate HA smoke tests
-- uninstall - Uninstall Chef Automate
-- upgrade - upgrade automate to the latest version
-- version - Show CLI version
-- workspace - Set workspace env for Automate HA.
+    - 'airgap - '
+    - applications - Manage applications observability features
+    - backup - Chef Automate backup
+    - cert - Chef Automate Certificate Management
+    - cert-rotate - Chef Automate rotate cert
+    - config - Chef Automate configuration
+    - deploy - Deploy Chef Automate
+    - external-cert - Manage Chef Automate's external certificate
+    - gather-logs - Gather system diagnostics and logs
+    - iam - Chef Automate iam commands
+    - info - Info about Automate HA
+    - infrastructure - Chef Automate infrastructure
+    - init-config - Initialize default config
+    - init-config-ha - Initialize default config for Automate HA
+    - internal-ca - Manage Chef Automate's internal certificate authority
+    - license - Chef Automate license management
+    - maintenance - Put Chef Automate into or out of maintenance mode
+    - migrate-from-v1 - Migrate from Chef Automate v1
+    - migrate-from-v1-status - Watch the status of the migration to Chef Automate 2
+    - node - This command is used to add or delete HA nodes
+    - post-major-upgrade - Utilities for post-major-upgrade
+    - preflight-check - Perform preflight check
+    - provision-infra - Provision Automate HA infra.
+    - restart-services - restart deployment services
+    - secrets - Set secrets to Automate HA
+    - service-versions - Retrieve the versions of the individual Chef Automate services
+    - ssh - SSH into Automate HA servers
+    - start - Start Chef Automate
+    - status - Retrieve Chef Automate status
+    - stop - Stop deployment
+    - system-logs - Tail Chef Automate logs
+    - test - Run Automate HA smoke tests
+    - uninstall - Uninstall Chef Automate
+    - upgrade - upgrade automate to the latest version
+    - version - Show CLI version
+    - workspace - Set workspace env for Automate HA.
 supported_on: Bastion

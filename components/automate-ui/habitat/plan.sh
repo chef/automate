@@ -10,7 +10,7 @@ pkg_deps=(
   core/coreutils
   core/curl
   chef/mlsa
-  core/nginx
+  core/nginx/1.25.4/20240314072919
   core/jq-static
 )
 pkg_build_deps=(

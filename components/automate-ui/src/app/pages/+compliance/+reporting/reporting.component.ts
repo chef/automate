@@ -377,6 +377,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
     let filterValue = value.text;
     let typeName = type.name;
 
+    if (value.text === undefined) {
+      filterValue = value;
+    }
+
     if (type.name === 'profile_with_version') {
       if ( value.id ) {
         typeName = 'profile_id';

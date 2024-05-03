@@ -194,15 +194,15 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -302,7 +302,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -378,7 +378,7 @@ func TestAddnodeWithSaveConfigToBasionErr(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return errors.New("error removing header")
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -441,15 +441,15 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("random")
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -517,15 +517,15 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("random")
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -584,13 +584,13 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -598,10 +598,10 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
-				configAutomateIpList: []string{"127.0.0.1","127.0.1.1","127.0.2.1"},
-				configChefServerIpList: []string{"127.0.0.2","127.0.1.2","127.0.2.2"},
-				configOpensearchIpList: []string{"127.0.0.3","127.0.1.3","127.0.2.3"},
-				configPostgresqlIpList: []string{"127.0.0.4","127.0.1.4","127.0.2.4"},
+				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
+				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
+				configOpensearchIpList: []string{"127.0.0.3", "127.0.1.3", "127.0.2.3"},
+				configPostgresqlIpList: []string{"127.0.0.4", "127.0.1.4", "127.0.2.4"},
 			}, nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{

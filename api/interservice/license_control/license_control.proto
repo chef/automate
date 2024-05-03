@@ -56,6 +56,9 @@ message StatusResponse {
 	string customer_name = 4;
   string deployment_id=5;
   string deployment_type=6;
+  string license_type=7;
+  google.protobuf.Timestamp deployment_at=8;
+
 }
 
 message DateRange {
@@ -88,4 +91,5 @@ message GetDeploymentIDRequest {
 message GetDeploymentIDResponse {
   string deployment_id = 1;
   string deployment_type = 2;
+  google.protobuf.Timestamp deployment_at = 3; 
 }

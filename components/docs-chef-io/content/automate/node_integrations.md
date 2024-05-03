@@ -23,7 +23,7 @@ Access the _Node Integrations_ page from the **Settings** tab.
 
 Set up Chef Automate to detect and scan the nodes in your AWS EC2 account by providing your AWS Credentials and creating an _AWS EC2 Node Manager_ from the **Node Credentials** page in the **Settings** tab. Chef Automate requires your information to detect the nodes in your AWS EC2 account. Chef Automate creates a node reference for each EC2 instance in your account and collects all of the tags associated with each instance.
 
-InSpec 2+ supports running scan jobs against your AWS account configuration, such as CloudWatch or IAM, [see more here](https://docs.chef.io/inspec/resources/#aws). Set up Chef Automate to run these scan jobs by providing your AWS Credentials and creating an _AWS API Node Manager_ in the **Node Integrations** page in the **Settings**  tab.
+Chef InSpec has [resources](https://docs.chef.io/inspec/resources/#aws) you can use to run scan jobs against AWS services in your account, such as CloudWatch or IAM. Set up Chef Automate to run these scan jobs by providing your AWS Credentials and creating an _AWS API Node Manager_ in the **Node Integrations** page in the **Settings** tab.
 
 To create an AWS EC2 Node Manager, you need the following information:
 

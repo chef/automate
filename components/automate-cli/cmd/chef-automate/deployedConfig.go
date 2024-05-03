@@ -11,7 +11,7 @@ var GetModeOfDeployment func() string = getModeOfDeployment
 func PopulateHaCommonConfig(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 	modeOfDeployment := GetModeOfDeployment()
 	if modeOfDeployment == EXISTING_INFRA_MODE {
-		existingInfraConfig, err := configPuller.fetchInfraConfig()
+		existingInfraConfig, _, err := configPuller.fetchInfraConfig(false)
 		if err != nil {
 			return nil, err
 		}
@@ -19,7 +19,7 @@ func PopulateHaCommonConfig(configPuller PullConfigs) (haDeployConfig *config.Ha
 			return CopyExistingInfra(existingInfraConfig), nil
 		}
 	} else if modeOfDeployment == AWS_MODE {
-		awsConfig, err := configPuller.fetchAwsConfig()
+		awsConfig, _, err := configPuller.fetchAwsConfig(false)
 		if err != nil {
 			return nil, err
 		}

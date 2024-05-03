@@ -28,6 +28,7 @@ func deleteNodeHACmd() *cobra.Command {
 	deleteNodeHACmd.PersistentFlags().BoolVar(&addDeleteNodeHACmdFlags.onPremMode, "onprem-mode", false, "Use this flag if the deployment type is on prem")
 	deleteNodeHACmd.PersistentFlags().BoolVar(&addDeleteNodeHACmdFlags.awsMode, "aws-mode", false, "Use this flag if the deployment type is AWS")
 	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
+	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.removeUnreachableNode, "remove-unreachable-node", "r", false, "remove unreachable nodes from cluster")
 
 	return deleteNodeHACmd
 }

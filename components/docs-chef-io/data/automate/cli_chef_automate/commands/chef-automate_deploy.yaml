@@ -1,63 +1,64 @@
 name: chef-automate deploy
 synopsis: Deploy Chef Automate
 usage: chef-automate deploy [/path/to/config.toml] [flags]
-description: "Deploy a new Chef Automate instance using the supplied configuration.\n\t-
-  <CONFIG_FILE> must be a valid path to a TOML formatted configuration file"
+description: |-
+    Deploy a new Chef Automate instance using the supplied configuration.
+    	- <CONFIG_FILE> must be a valid path to a TOML formatted configuration file
 options:
-- name: accept-terms-and-mlsa
-  default_value: "false"
-  usage: |
-    Agree to the Chef Software Terms of Service and the Master License and Services Agreement
-- name: airgap-bundle
-  usage: Path to an airgap install bundle
-- name: certificate
-  usage: |
-    The path to a certificate that should be used for external TLS connections (web and API).
-  compatible_with_options: Automate
-- name: channel
-  usage: Release channel to deploy all services from
-  compatible_with_options: Automate
-- name: fqdn
-  usage: |
-    The fully-qualified domain name that Chef Automate can be accessed at. (default: hostname of this machine)
-  compatible_with_options: Automate
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for deploy
-- name: private-key
-  usage: |
-    The path to a private key corresponding to the TLS certificate.
-  compatible_with_options: Automate
-- name: product
-  default_value: '[]'
-  usage: Product to deploy
-  compatible_with_options: Automate
-- name: skip-preflight
-  default_value: "false"
-  usage: Deploy regardless of pre-flight conditions
-  compatible_with_options: Automate
-- name: skip-verify
-  default_value: "false"
-  usage: Flag for skipping config verification check
-- name: upgrade-strategy
-  default_value: at-once
-  usage: Upgrade strategy to use for this deployment.
-  compatible_with_options: Automate
-- name: "yes"
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
+    - name: accept-terms-and-mlsa
+      default_value: "false"
+      usage: |
+        Agree to the Chef Software Terms of Service and the Master License and Services Agreement
+    - name: airgap-bundle
+      usage: Path to an airgap install bundle
+    - name: certificate
+      usage: |
+        The path to a certificate that should be used for external TLS connections (web and API).
+      compatible_with_options: Automate
+    - name: channel
+      usage: Release channel to deploy all services from
+      compatible_with_options: Automate
+    - name: fqdn
+      usage: |
+        The fully-qualified domain name that Chef Automate can be accessed at. (default: hostname of this machine)
+      compatible_with_options: Automate
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for deploy
+    - name: private-key
+      usage: |
+        The path to a private key corresponding to the TLS certificate.
+      compatible_with_options: Automate
+    - name: product
+      default_value: '[]'
+      usage: Product to deploy
+      compatible_with_options: Automate
+    - name: skip-preflight
+      default_value: "false"
+      usage: Deploy regardless of pre-flight conditions
+      compatible_with_options: Automate
+    - name: skip-verify
+      default_value: "false"
+      usage: Flag for skipping config verification check
+    - name: upgrade-strategy
+      default_value: at-once
+      usage: Upgrade strategy to use for this deployment.
+      compatible_with_options: Automate
+    - name: "yes"
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate - Chef Automate CLI
+    - chef-automate - Chef Automate CLI
 supported_on: Bastion

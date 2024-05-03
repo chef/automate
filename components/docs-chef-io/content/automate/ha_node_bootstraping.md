@@ -100,9 +100,9 @@ The Chef Infra Client installer puts everything into a unique directory (/opt/ch
     chef -v
     ```
 
-    Click [here](https://docs.chef.io/workstation/install_workstation/) for any additional information.
+    For additional information, see [Install Workstation](https://docs.chef.io/workstation/install_workstation/) page.
 
-    1. Generate chef-repo using `chef generate repo chef-repo`. Click [here]https://docs.chef.io/workstation/getting_started/ to know more.
+    1. Generate chef-repo using `chef generate repo chef-repo`. For more information, see the [getting station](https://docs.chef.io/workstation/getting_started/) page of Workstation.
 
     1. Paste `pem` files of user and organization inside `/root/.chef/`. For example: `Eg.: /root/.chef/johndoe.pem , /root/.chef/new_org.pem`
 

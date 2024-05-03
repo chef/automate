@@ -270,6 +270,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
+
 		err = restartSyslogService()
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
@@ -295,6 +296,12 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 
 		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
+
+			//to restart the log
+			err = restartSyslogService()
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
 
 			if err = runLogrotateConfig(res); err != nil {
 				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
@@ -324,10 +331,12 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	//Rollback the config if requested
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog() != nil && req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+
 		err := removeConfigFileForAutomateSyslog()
 		if err != nil {
 			return status.Error(codes.Internal, "Failed to remove configuration into syslog")
 		}
+
 		err = restartSyslogService()
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())

@@ -3,67 +3,71 @@ synopsis: Add new node in HA
 usage: chef-automate node add [flags]
 description: Add new node in HA
 options:
-- name: auto-accept
-  shorthand: "y"
-  default_value: "false"
-  usage: auto-accept
-- name: automate-count
-  shorthand: a
-  default_value: "0"
-  usage: |
-    New automate instances to be added. Works with --aws-mode flag
-- name: automate-ips
-  shorthand: A
-  usage: |
-    New automate ip addresses to be added. Works with --onprem-mode flag
-- name: aws-mode
-  default_value: "false"
-  usage: Use this flag if the deployment type is AWS
-- name: chef-server-count
-  shorthand: c
-  default_value: "0"
-  usage: |
-    New chef-server instances to be added. Works with --aws-mode flag
-- name: chef-server-ips
-  shorthand: C
-  usage: |
-    New chef-server ip addresses to be added. Works with --onprem-mode flag
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for add
-- name: onprem-mode
-  default_value: "false"
-  usage: Use this flag if the deployment type is on prem
-- name: opensearch-count
-  shorthand: o
-  default_value: "0"
-  usage: |
-    New opensearch instances to be added. Works with --aws-mode flag
-- name: opensearch-ips
-  shorthand: O
-  usage: |
-    New opensearch ip addresses to be added. Works with --onprem-mode flag
-- name: postgresql-count
-  shorthand: p
-  default_value: "0"
-  usage: |
-    New postgresql instances to be added. Works with --aws-mode flag
-- name: postgresql-ips
-  shorthand: P
-  usage: |
-    New postgres ip addresses to be added. Works with --onprem-mode flag
+    - name: auto-accept
+      shorthand: "y"
+      default_value: "false"
+      usage: auto-accept
+    - name: automate-count
+      shorthand: a
+      default_value: "0"
+      usage: |
+        New automate instances to be added. Works with --aws-mode flag
+    - name: automate-ips
+      shorthand: A
+      usage: |
+        New automate ip addresses to be added. Works with --onprem-mode flag
+    - name: aws-mode
+      default_value: "false"
+      usage: Use this flag if the deployment type is AWS
+    - name: chef-server-count
+      shorthand: c
+      default_value: "0"
+      usage: |
+        New chef-server instances to be added. Works with --aws-mode flag
+    - name: chef-server-ips
+      shorthand: C
+      usage: |
+        New chef-server ip addresses to be added. Works with --onprem-mode flag
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for add
+    - name: onprem-mode
+      default_value: "false"
+      usage: Use this flag if the deployment type is on prem
+    - name: opensearch-count
+      shorthand: o
+      default_value: "0"
+      usage: |
+        New opensearch instances to be added. Works with --aws-mode flag
+    - name: opensearch-ips
+      shorthand: O
+      usage: |
+        New opensearch ip addresses to be added. Works with --onprem-mode flag
+    - name: postgresql-count
+      shorthand: p
+      default_value: "0"
+      usage: |
+        New postgresql instances to be added. Works with --aws-mode flag
+    - name: postgresql-ips
+      shorthand: P
+      usage: |
+        New postgres ip addresses to be added. Works with --onprem-mode flag
+    - name: remove-unreachable-node
+      shorthand: r
+      default_value: "false"
+      usage: remove unreachable nodes from cluster
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate node - This command is used to add or delete HA nodes
+    - chef-automate node - This command is used to add or delete HA nodes
 compatible_with: AutomateHA
 supported_on: Bastion

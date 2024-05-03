@@ -424,7 +424,7 @@ func (c *certRotateFlow) getSkipIpsListForPgRootCAPatching(infra *AutomateHAInfr
 
 	c.pullConfigs.setInfraAndSSHUtil(infra, sshUtil)
 	//fetching current config from automate
-	automateCurrentConfig, err := c.pullConfigs.pullAutomateConfigs()
+	automateCurrentConfig, _, err := c.pullConfigs.pullAutomateConfigs(false)
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +433,7 @@ func (c *certRotateFlow) getSkipIpsListForPgRootCAPatching(infra *AutomateHAInfr
 	skipIpsList := c.getFrontendIPsToSkipRootCAPatchingForPg(automateCurrentConfig, certs.rootCA, infra)
 
 	//fetching current config from chefServer
-	chefServerCurrentConfig, err := c.pullConfigs.pullChefServerConfigs()
+	chefServerCurrentConfig, _, err := c.pullConfigs.pullChefServerConfigs(false)
 
 	if err != nil {
 		return nil, err
@@ -570,7 +570,7 @@ func (c *certRotateFlow) getSkipIpsListForOsRootCACNPatching(infra *AutomateHAIn
 
 	c.pullConfigs.setInfraAndSSHUtil(infra, sshUtil)
 	//fetching current config from automate
-	automateCurrentConfig, err := c.pullConfigs.pullAutomateConfigs()
+	automateCurrentConfig, _, err := c.pullConfigs.pullAutomateConfigs(false)
 	if err != nil {
 		return nil, err
 	}
@@ -581,7 +581,7 @@ func (c *certRotateFlow) getSkipIpsListForOsRootCACNPatching(infra *AutomateHAIn
 	skipIpsList := c.getFrontIpsToSkipRootCAandCNPatchingForOs(automateCurrentConfig, certs.rootCA, cn, flagsObj.node, infra)
 
 	//fetching current config from chefServer
-	chefServerCurrentConfig, err := c.pullConfigs.pullChefServerConfigs()
+	chefServerCurrentConfig, _, err := c.pullConfigs.pullChefServerConfigs(false)
 
 	if err != nil {
 		return nil, err

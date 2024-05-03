@@ -8,12 +8,12 @@ type MockNodeUtilsImpl struct {
 	isA2HARBFileExistFunc                        func() bool
 	getModeFromConfigFunc                        func(path string) (string, error)
 	checkIfFileExistFunc                         func(path string) bool
-	pullAndUpdateConfigFunc                      func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAwsFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	pullAndUpdateConfigFunc                      func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	pullAndUpdateConfigAwsFunc                   func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	isManagedServicesOnFunc                      func() bool
 	getConfigPullerFunc                          func(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfigFunc                           func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfigFunc                             func(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getInfraConfigFunc                           func(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	getAWSConfigFunc                             func(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	getModeOfDeploymentFunc                      func() string
 	executeShellCommandFunc                      func() error
 	moveAWSAutoTfvarsFileFunc                    func(path string) error
@@ -25,9 +25,9 @@ type MockNodeUtilsImpl struct {
 	calculateTotalInstanceCountFunc              func() (int, error)
 	parseAndMoveConfigFileToWorkspaceDirFunc     func(outputFiles []string, outputDirectory string) error
 	executeCmdInAllNodeTypesAndCaptureOutputFunc func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
-	executeCustomCmdOnEachNodeTypeFunc           func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	executeCustomCmdOnEachNodeTypeFunc           func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastionFunc                      func() error
-	syncConfigToAllNodesFunc                     func() error
+	syncConfigToAllNodesFunc                     func(unreachableNodes map[string][]string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -55,8 +55,8 @@ func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
 func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
 	return mnu.checkIfFileExistFunc(path)
 }
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
-	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps, removeUnreachableNodes)
 }
 func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
 	return mnu.isManagedServicesOnFunc()
@@ -64,11 +64,11 @@ func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
 func (mnu *MockNodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
 	return mnu.getConfigPullerFunc(sshUtil)
 }
-func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
-	return mnu.getInfraConfigFunc(sshUtil)
+func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
+	return mnu.getInfraConfigFunc(sshUtil, removeUnreachableNodes)
 }
-func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
-	return mnu.getAWSConfigFunc(sshUtil)
+func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+	return mnu.getAWSConfigFunc(sshUtil, removeUnreachableNodes)
 }
 func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
 	return mnu.getModeOfDeploymentFunc()
@@ -83,8 +83,8 @@ func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
 func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
 	return mnu.modifyTfArchFileFunc(path)
 }
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
-	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
+	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps, removeUnreachableNodes)
 }
 func (mnu *MockNodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 	return mnu.stopServicesOnNodeFunc(ip, nodeType, deploymentType, infra)
@@ -107,14 +107,14 @@ func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeTypesAndCaptureOutput(nodeObjec
 	return mnu.executeCmdInAllNodeTypesAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
 }
 
-func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
-	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode)
+func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
+	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, unreachableNodes)
 }
 
 func (mnu *MockNodeUtilsImpl) saveConfigToBastion() error {
 	return mnu.saveConfigToBastionFunc()
 }
 
-func (mnu *MockNodeUtilsImpl) syncConfigToAllNodes() error {
-	return mnu.syncConfigToAllNodesFunc()
+func (mnu *MockNodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][]string) error {
+	return mnu.syncConfigToAllNodesFunc(unreachableNodes)
 }

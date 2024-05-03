@@ -3,47 +3,51 @@ synopsis: remove existing node in HA
 usage: chef-automate node remove [flags]
 description: remove existing node in HA
 options:
-- name: auto-accept
-  shorthand: "y"
-  default_value: "false"
-  usage: auto-accept
-- name: automate-ip
-  shorthand: A
-  usage: |
-    Automate ip addresses to be removed. Works with --onprem-mode flag
-- name: aws-mode
-  default_value: "false"
-  usage: Use this flag if the deployment type is AWS
-- name: chef-server-ip
-  shorthand: C
-  usage: |
-    Chef-server ip addresses to be removed. Works with --onprem-mode flag
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for remove
-- name: onprem-mode
-  default_value: "false"
-  usage: Use this flag if the deployment type is on prem
-- name: opensearch-ip
-  shorthand: O
-  usage: |
-    OpenSearch ip addresses to be removed. Works with --onprem-mode flag
-- name: postgresql-ip
-  shorthand: P
-  usage: |
-    Postgresql ip addresses to be removed. Works with --onprem-mode flag
+    - name: auto-accept
+      shorthand: "y"
+      default_value: "false"
+      usage: auto-accept
+    - name: automate-ip
+      shorthand: A
+      usage: |
+        Automate ip addresses to be removed. Works with --onprem-mode flag
+    - name: aws-mode
+      default_value: "false"
+      usage: Use this flag if the deployment type is AWS
+    - name: chef-server-ip
+      shorthand: C
+      usage: |
+        Chef-server ip addresses to be removed. Works with --onprem-mode flag
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for remove
+    - name: onprem-mode
+      default_value: "false"
+      usage: Use this flag if the deployment type is on prem
+    - name: opensearch-ip
+      shorthand: O
+      usage: |
+        OpenSearch ip addresses to be removed. Works with --onprem-mode flag
+    - name: postgresql-ip
+      shorthand: P
+      usage: |
+        Postgresql ip addresses to be removed. Works with --onprem-mode flag
+    - name: remove-unreachable-node
+      shorthand: r
+      default_value: "false"
+      usage: remove unreachable nodes from cluster
 inherited_options:
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
 see_also:
-- chef-automate node - This command is used to add or delete HA nodes
+    - chef-automate node - This command is used to add or delete HA nodes
 compatible_with: AutomateHA
 supported_on: Bastion

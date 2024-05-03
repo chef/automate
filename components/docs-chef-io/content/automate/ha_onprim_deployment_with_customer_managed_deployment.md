@@ -23,19 +23,17 @@ If SELinux is enabled, deployment with configure it to `permissive` (Usually in 
 
 {{< /warning >}}
 
-- Before proceeding with deployment steps make sure to provision ,Click here to know more [details](automate/ha_onprim_deployment_procedure/#provisioning).
+- Before proceeding with deployment steps make sure to [provision](/automate/ha_onprim_deployment_procedure/#provisioning).
 
-- See the steps [here](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host) to run on bastion host to download the latest Automate CLI and Airgapped Bundle.
+- [Run on the Bastion host](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host) to download the latest Automate CLI and Airgapped Bundle.
 
 ## Generate Chef Automate config
 
-1. Generate the configuration file.
+1. [Generate](/automate/ha_config_gen) the configuration file.
 
     ```bash
     sudo chef-automate config gen config.toml
     ```
-
-    Click [here](/automate/ha_config_gen) to know more about generating config.
 
     You can also view the [Sample Config](#sample-config-to-setup-on-premises-deployment-with-self-managed-services).
 
@@ -103,9 +101,9 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 After successful deployment, proceed with the following:
 
-   1. Create user and orgs, Click [here](/automate/ha_node_bootstraping/#create-users-and-organization) to learn more about user and org creation
-   1. Workstation setup, Click [here](/automate/ha_node_bootstraping/#workstation-setup) to learn more about workstation setup
-   1. Node bootstrapping, Click [here](/automate/ha_node_bootstraping/#bootstraping-a-node) to learn more about node bootstrapping.
+   1. [Create users and organizations](/automate/ha_node_bootstraping/#create-users-and-organization)
+   1. [Workstation setup](/automate/ha_node_bootstraping/#workstation-setup)
+   1. [Node bootstrapping](/automate/ha_node_bootstraping/#bootstraping-a-node)
 
 ## Backup/Restore
 

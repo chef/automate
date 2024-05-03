@@ -440,7 +440,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateInfraConfig()
+		config, _, err := configPuller.generateInfraConfig(false)
 		if err != nil {
 			return err
 		}
@@ -465,7 +465,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateAwsConfig()
+		config, _, err := configPuller.generateAwsConfig(false)
 		if err != nil {
 			return err
 		}

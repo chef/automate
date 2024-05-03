@@ -1,78 +1,78 @@
 name: chef-automate config show
 synopsis: show the Chef Automate configuration
 usage: |
-  chef-automate config show [/path/to/write/config.toml] [flags]
+    chef-automate config show [/path/to/write/config.toml] [flags]
 description: |
-  Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT
+    Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT
 options:
-- name: a2
-  default_value: "false"
-  usage: Shows configurations from Automate node(HA)[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: automate
-  shorthand: a
-  default_value: "false"
-  usage: Shows configurations from Automate node(HA)
-  compatible_with_options: AutomateHA
-- name: chef_server
-  shorthand: c
-  default_value: "false"
-  usage: Shows configurations from Chef-server node(HA)
-  compatible_with_options: AutomateHA
-- name: cs
-  default_value: "false"
-  usage: Shows configurations from Chef-server node(HA)[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for show
-- name: opensearch
-  shorthand: o
-  default_value: "false"
-  usage: Shows configurations from OpenSearch node
-  compatible_with_options: AutomateHA
-- name: os
-  default_value: "false"
-  usage: Shows configurations from OpenSearch node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: overwrite
-  shorthand: O
-  default_value: "false"
-  usage: Overwrite existing config.toml [Standalone]
-- name: pg
-  default_value: "false"
-  usage: Shows configurations from PostgresQL node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: postgresql
-  shorthand: p
-  default_value: "false"
-  usage: Shows configurations from PostgresQL node
-  compatible_with_options: AutomateHA
-- name: wait-timeout
-  default_value: "600"
-  usage: |
-    This flag sets the operation timeout duration (in seconds) for each individual node during the config show process
-  compatible_with_options: AutomateHA
+    - name: a2
+      default_value: "false"
+      usage: Shows configurations from Automate node(HA)[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: automate
+      shorthand: a
+      default_value: "false"
+      usage: Shows configurations from Automate node(HA)
+      compatible_with_options: AutomateHA
+    - name: chef_server
+      shorthand: c
+      default_value: "false"
+      usage: Shows configurations from Chef-server node(HA)
+      compatible_with_options: AutomateHA
+    - name: cs
+      default_value: "false"
+      usage: Shows configurations from Chef-server node(HA)[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for show
+    - name: opensearch
+      shorthand: o
+      default_value: "false"
+      usage: Shows configurations from OpenSearch node
+      compatible_with_options: AutomateHA
+    - name: os
+      default_value: "false"
+      usage: Shows configurations from OpenSearch node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: overwrite
+      shorthand: O
+      default_value: "false"
+      usage: Overwrite existing config.toml [Standalone]
+    - name: pg
+      default_value: "false"
+      usage: Shows configurations from PostgresQL node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: postgresql
+      shorthand: p
+      default_value: "false"
+      usage: Shows configurations from PostgresQL node
+      compatible_with_options: AutomateHA
+    - name: wait-timeout
+      default_value: "600"
+      usage: |
+        This flag sets the operation timeout duration (in seconds) for each individual node during the config show process
+      compatible_with_options: AutomateHA
 inherited_options:
-- name: auto-approve
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
-- name: timeout
-  shorthand: t
-  default_value: "10"
-  usage: Request timeout in seconds
-  compatible_with_options: Automate
+    - name: auto-approve
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
+    - name: timeout
+      shorthand: t
+      default_value: "10"
+      usage: Request timeout in seconds
+      compatible_with_options: Automate
 see_also:
-- chef-automate config - Chef Automate configuration
+    - chef-automate config - Chef Automate configuration
 supported_on: Bastion

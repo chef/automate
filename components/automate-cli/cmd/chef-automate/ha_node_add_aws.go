@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -15,13 +16,14 @@ type AddNodeAWSImpl struct {
 	config                  AwsConfigToml
 	copyConfigForUserPrompt AwsConfigToml
 	AWSConfigIp
-	nodeUtils     NodeOpUtils
-	flags         AddDeleteNodeHACmdFlags
-	configpath    string
-	terraformPath string
-	writer        *cli.Writer
-	fileutils     fileutils.FileUtils
-	sshUtil       SSHUtil
+	nodeUtils        NodeOpUtils
+	flags            AddDeleteNodeHACmdFlags
+	configpath       string
+	terraformPath    string
+	writer           *cli.Writer
+	fileutils        fileutils.FileUtils
+	sshUtil          SSHUtil
+	unreachableIpMap map[string][]string
 }
 
 func NewAddNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
@@ -73,7 +75,7 @@ func (ani *AddNodeAWSImpl) prepare() error {
 }
 
 func (ani *AddNodeAWSImpl) validate() error {
-	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfigAws(&ani.sshUtil, []string{})
+	updatedConfig, unreachableNodes, err := ani.nodeUtils.pullAndUpdateConfigAws(&ani.sshUtil, []string{}, ani.flags.removeUnreachableNode)
 	if err != nil {
 		return err
 	}
@@ -90,6 +92,7 @@ func (ani *AddNodeAWSImpl) validate() error {
 			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
 		}
 	}
+	ani.unreachableIpMap = unreachableNodes
 	return nil
 }
 
@@ -133,7 +136,22 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	ani.writer.Println("Chef-Server => " + ani.config.ChefServer.Config.InstanceCount)
 	ani.writer.Println("OpenSearch => " + ani.config.Opensearch.Config.InstanceCount)
 	ani.writer.Println("Postgresql => " + ani.config.Postgresql.Config.InstanceCount)
+
+	if ani.config.Automate.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[AUTOMATE]) > 0 {
+		ani.writer.Println("Unreachable Automate nodes need to be removed manually using chef-automate node remove command => " + strings.Join(ani.unreachableIpMap[AUTOMATE], ", "))
+	}
+	if ani.config.ChefServer.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[CHEF_SERVER]) > 0 {
+		ani.writer.Println("Unreachable Chef-Server nodes need to be removed manually using chef-automate node remove command => " + strings.Join(ani.unreachableIpMap[CHEF_SERVER], ", "))
+	}
+	if ani.config.Postgresql.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[POSTGRESQL]) > 0 {
+		ani.writer.Println("Unreachable Postgresql nodes need to be removed manually using chef-automate node remove command => " + strings.Join(ani.unreachableIpMap[POSTGRESQL], ", "))
+	}
+	if ani.copyConfigForUserPrompt.Opensearch.Config.InstanceCount != "" && ani.unreachableIpMap != nil && len(ani.unreachableIpMap[OPENSEARCH]) > 0 {
+		ani.writer.Println("Unreachable Opensearch nodes need to be removed manually using chef-automate node remove command => " + strings.Join(ani.unreachableIpMap[OPENSEARCH], ", "))
+	}
+
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
+
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {
@@ -164,7 +182,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 		return err
 	}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	syncErr := ani.nodeUtils.syncConfigToAllNodes(ani.unreachableIpMap)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())

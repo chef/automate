@@ -2,82 +2,82 @@ name: chef-automate config patch
 synopsis: patch the Chef Automate configuration
 usage: chef-automate config patch path/to/config.toml [flags]
 description: |
-  Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.
+    Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.
 options:
-- name: a2
-  default_value: "false"
-  usage: Patch toml configuration to the automate node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: automate
-  shorthand: a
-  default_value: "false"
-  usage: Patch toml configuration to the automate node
-  compatible_with_options: AutomateHA
-- name: chef_server
-  shorthand: c
-  default_value: "false"
-  usage: Patch toml configuration to the chef_server node
-  compatible_with_options: AutomateHA
-- name: cs
-  default_value: "false"
-  usage: Patch toml configuration to the chef_server node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: fe
-  default_value: "false"
-  usage: |
-    Patch toml configuration to the all frontend nodes[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: frontend
-  shorthand: f
-  default_value: "false"
-  usage: Patch toml configuration to the all frontend nodes
-  compatible_with_options: AutomateHA
-- name: help
-  shorthand: h
-  default_value: "false"
-  usage: help for patch
-- name: opensearch
-  shorthand: o
-  default_value: "false"
-  usage: Patch toml configuration to the opensearch node
-  compatible_with_options: AutomateHA
-- name: os
-  default_value: "false"
-  usage: Patch toml configuration to the opensearch node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: pg
-  default_value: "false"
-  usage: Patch toml configuration to the postgresql node[DUPLICATE]
-  compatible_with_options: AutomateHA
-- name: postgresql
-  shorthand: p
-  default_value: "false"
-  usage: Patch toml configuration to the postgresql node
-  compatible_with_options: AutomateHA
-- name: wait-timeout
-  default_value: "600"
-  usage: |
-    This flag sets the operation timeout duration (in seconds) for each individual node during the config patch process
-  compatible_with_options: AutomateHA
+    - name: a2
+      default_value: "false"
+      usage: Patch toml configuration to the automate node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: automate
+      shorthand: a
+      default_value: "false"
+      usage: Patch toml configuration to the automate node
+      compatible_with_options: AutomateHA
+    - name: chef_server
+      shorthand: c
+      default_value: "false"
+      usage: Patch toml configuration to the chef_server node
+      compatible_with_options: AutomateHA
+    - name: cs
+      default_value: "false"
+      usage: Patch toml configuration to the chef_server node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: fe
+      default_value: "false"
+      usage: |
+        Patch toml configuration to the all frontend nodes[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: frontend
+      shorthand: f
+      default_value: "false"
+      usage: Patch toml configuration to the all frontend nodes
+      compatible_with_options: AutomateHA
+    - name: help
+      shorthand: h
+      default_value: "false"
+      usage: help for patch
+    - name: opensearch
+      shorthand: o
+      default_value: "false"
+      usage: Patch toml configuration to the opensearch node
+      compatible_with_options: AutomateHA
+    - name: os
+      default_value: "false"
+      usage: Patch toml configuration to the opensearch node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: pg
+      default_value: "false"
+      usage: Patch toml configuration to the postgresql node[DUPLICATE]
+      compatible_with_options: AutomateHA
+    - name: postgresql
+      shorthand: p
+      default_value: "false"
+      usage: Patch toml configuration to the postgresql node
+      compatible_with_options: AutomateHA
+    - name: wait-timeout
+      default_value: "600"
+      usage: |
+        This flag sets the operation timeout duration (in seconds) for each individual node during the config patch process
+      compatible_with_options: AutomateHA
 inherited_options:
-- name: auto-approve
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
-- name: debug
-  shorthand: d
-  default_value: "false"
-  usage: Enable debug output
-- name: no-check-version
-  default_value: "false"
-  usage: Disable version check
-- name: result-json
-  usage: Write command result as JSON to PATH
-- name: timeout
-  shorthand: t
-  default_value: "10"
-  usage: Request timeout in seconds
-  compatible_with_options: Automate
+    - name: auto-approve
+      shorthand: "y"
+      default_value: "false"
+      usage: Do not prompt for confirmation; accept defaults and continue
+    - name: debug
+      shorthand: d
+      default_value: "false"
+      usage: Enable debug output
+    - name: no-check-version
+      default_value: "false"
+      usage: Disable version check
+    - name: result-json
+      usage: Write command result as JSON to PATH
+    - name: timeout
+      shorthand: t
+      default_value: "10"
+      usage: Request timeout in seconds
+      compatible_with_options: Automate
 see_also:
-- chef-automate config - Chef Automate configuration
+    - chef-automate config - Chef Automate configuration
 supported_on: Bastion
