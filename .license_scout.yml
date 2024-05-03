@@ -904,9 +904,7 @@ fallbacks:
       license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
     - name: unf
       license_id: BSD-2-Clause
-      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE
-   
-       
+      license_content: https://raw.githubusercontent.com/knu/ruby-unf/master/LICENSE       
 
 exceptions:
   habitat:
@@ -1037,4 +1035,3 @@ exceptions:
     - name: jschardet
       reason: Exception made by Chef Legal
       
-
