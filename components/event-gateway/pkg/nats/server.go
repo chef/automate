@@ -10,7 +10,6 @@ import (
 
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	_ "go.uber.org/automaxprocs"
 
 	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/pkg/errors"

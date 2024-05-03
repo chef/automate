@@ -111,9 +111,9 @@ func spawnNatsInternalServer(c *config.EventConfig, m *multiEmbeddedServer) erro
 		sigCh := make(chan os.Signal, 1)
 		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 		<-sigCh
+		ns.Start()
 		return nil
 	})
-	ns.Start()
 
 	// Wait for it to be able to accept connections
 	if !ns.ReadyForConnections(10 * time.Second) {
@@ -211,7 +211,6 @@ func natsdOptions(c *config.EventConfig) *natsd.Options {
 
 	// Logging options:
 	nopts.NoLog = false
-	nopts.Trace = true
 
 	if c.LogConfig.LogLevel == "debug" {
 		// This seems to be the only option for adjusting the logging level
@@ -220,7 +219,6 @@ func natsdOptions(c *config.EventConfig) *natsd.Options {
 		nopts.Debug = true
 		// Trace logs all client activity in messages like this:
 		// [TRC] 127.0.0.1:53438 - cid:2 - <<- [SUB _STAN.discover.event-service  2]
-		nopts.Trace = true
 	}
 
 	// Setting to zero disables the HTTP monitoring server.
