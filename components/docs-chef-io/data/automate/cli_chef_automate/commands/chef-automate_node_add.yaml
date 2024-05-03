@@ -53,6 +53,10 @@ options:
       shorthand: P
       usage: |
         New postgres ip addresses to be added. Works with --onprem-mode flag
+    - name: remove-unreachable-node
+      shorthand: r
+      default_value: "false"
+      usage: remove unreachable nodes from cluster
 inherited_options:
     - name: debug
       shorthand: d
