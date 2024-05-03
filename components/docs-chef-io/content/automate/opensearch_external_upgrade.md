@@ -16,7 +16,7 @@ This guide covers upgrading services used by Chef Automate.
 
 On January 21, 2021, Elastic NV announced that they would change their software licensing strategy and not release new versions of Elasticsearch and Kibana under the permissive ALv2 license. Instead, Elastic is releasing Elasticsearch and Kibana under the Elastic license, with source code available under the Elastic License or Server Side Public License (SSPL). These licenses are not open source and do not offer users the same freedoms. Because of this, AWS decided to create and maintain a fork from the last ALv2 version of Elasticsearch and Kibana. The fork is called OpenSearch and is available under ALv2.
 
-To upgrade AWS Elasticsearch, please follow instructions on [Upgrading to AWS OpenSearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
+To upgrade AWS Elasticsearch, please follow the instructions on [Upgrading to AWS OpenSearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
 
 ### Migration Planning
 
@@ -77,11 +77,11 @@ For example:
   enable = true
   nodes = ["http://opensearch1.example:10168", "http://opensearch2.example:10168", "..." ]
 
-# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+# Uncomment and fill out if using external OpenSearch with SSL and/or basic auth
 # [global.v1.external.opensearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Chef Automate deployment;
+## Create this OpenSearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
 #   username = "<admin username>"
 #   password = "<admin password>"
@@ -90,7 +90,7 @@ For example:
 #  root_cert = """$(cat </path/to/cert_file.crt>)"""
 #  server_name = "<opensearch server name>"
 
-# Uncomment and fill out if using external opensearch that uses hostname-based routing/load balancing
+# Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
 #  proxy_set_header_host = "<your external es hostname>:1234"
 
@@ -100,7 +100,7 @@ For example:
 
 ## Steps To Migrate from External Elasticsearch to External OpenSearch
 
-Please refer the documentation for the Elasticsearch migration to OpenSearch.
+Please refer to the documentation for the Elasticsearch migration to OpenSearch.
 
 [OpenSearch's documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
 

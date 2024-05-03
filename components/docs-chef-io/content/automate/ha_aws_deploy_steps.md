@@ -189,7 +189,7 @@ After successful deployment, proceed with the following:
 
 {{< note >}}
 
-Assuming 10+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
+Assuming 10+1 nodes (1 bastion, 2 for Automate UI, 2 for Chef-server, 3 for PostgreSQL, 3 for OpenSearch)
 
 {{< /note >}}
 

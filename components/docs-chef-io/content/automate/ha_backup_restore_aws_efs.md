@@ -37,7 +37,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 - Mount the EFS on all OpenSearch Node. For example you mount the EFS to folder structure `/mnt/automate_backups/`
 
-- Create an `opensearch` sub-directory and set permissions as mention below  (all the opensearch nodes).
+- Create an `opensearch` sub-directory and set permissions as mention below  (all the OpenSearch nodes).
 
     ```sh
     sudo mkdir -p /mnt/automate_backups/opensearch
@@ -55,13 +55,13 @@ Configure the OpenSearch `path.repo` attribute.
     repo = "/mnt/automate_backups/opensearch"
     ```
 
-- Patch the config `os_config.toml` from bastion to the opensearch cluster.
+- Patch the config `os_config.toml` from bastion to the OpenSearch cluster.
 
     ```sh
     chef-automate config patch --opensearch os_config.toml
     ```
 
-- Above command will restart the opensearch cluster.
+- Above command will restart the OpenSearch cluster.
 
 #### Healthcheck commands
 
@@ -100,7 +100,7 @@ Configure the OpenSearch `path.repo` attribute.
     path = "/mnt/automate_backups/backups"
     ```
 
-- Patch the `config` using below command.
+- Patch the `config` using the below command.
 
     ```sh
     ./chef-automate config patch --frontend automate.toml
@@ -110,7 +110,7 @@ Configure the OpenSearch `path.repo` attribute.
 
 ### Backup
 
-- Run the backup command from bastion as shown below to create a backup:
+- Run the backup command from Bastion as shown below to create a backup:
 
     ```sh
     chef-automate backup create

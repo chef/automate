@@ -20,50 +20,56 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Frequently Asked Questions
 
-### What are different ways to provision an on-premise deployment?
-- There are two types of infrastructure to provision on-premise deployment as follows:
-   -  Existing Infrastructure
-   -  Existing Cloud Infrastructure
-      -  AWS
-      -  Google Cloud Platform
+### What are different ways to provision an on-premises deployment?
+
+- There are two types of infrastructure to provision on-premises deployment as follows:
+    -  Existing Infrastructure
+    -  Existing Cloud Infrastructure
+        -  AWS
+        -  Google Cloud Platform
 
 ### What are different types of backup available for deployment on GCP platform?
+
 - Google Cloud Storage(GCS) and File System(FS) type backup is supported for deployment on GCP platform
 
 ### How to check logs For automate nodes?
-- To view the logs please do ssh to the respective node by running the command from bastion node 
+
+- To view the logs please do ssh to the respective node by running the command from bastion node
 `./chef-automate ssh --hostname a2`
 
-- choose the instance based on the output. To view the logs run the command 
-`journalctl --follow --unit chef-automate` 
+- choose the instance based on the output. To view the logs run the command
+`journalctl --follow --unit chef-automate`
 
 ### How to check logs For Chef Infra Server nodes?
-- To view the logs, please do ssh to the respective node by running the command from bastion node 
+
+- To view the logs, please do ssh to the respective node by running the command from bastion node
 `./chef-automate ssh --hostname cs`
 
-- choose the instance based on the output. To view the logs run the command 
-`journalctl --follow --unit chef-automate` 
+- choose the instance based on the output. To view the logs run the command
+`journalctl --follow --unit chef-automate`
 
-### How to check logs For Postgres nodes?
-- To view the logs, please do ssh to the respective node by running the command from bastion node 
+### How to check logs For PostgreSQL nodes?
+
+- To view the logs, please do ssh to the respective node by running the command from bastion node
 `./chef-automate ssh --hostname pg`
 
-- choose the instance based on the output. To view the logs run the command 
-`journalctl --follow --unit hab-sup` 
+- choose the instance based on the output. To view the logs run the command
+`journalctl --follow --unit hab-sup`
 
-### How to check logs For Opensearch nodes?
-- To view the logs, please do ssh to the respective node by running the command from bastion node 
+### How to check logs For OpenSearch nodes?
+
+- To view the logs, please do ssh to the respective node by running the command from bastion node
 `./chef-automate ssh --hostname os`
 
-- choose the instance based on the output. To view the logs run the command 
-`journalctl --follow --unit hab-sup` 
+- choose the instance based on the output. To view the logs run the command
+`journalctl --follow --unit hab-sup`
 
 ### How to Pass the custom config for the Frontend node (Automate / ChefInfraServer)?
+
 - Create a file with say `customconfig.toml`, pass the absolute path `config_file=/ABSOLUTE_PATH/customconfig.toml`
 
+### How to Add more nodes in AWS Deployment, post deployment
 
-
-### How to Add more nodes In AWS Deployment, post deployment.
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
 
 For example,
@@ -116,30 +122,30 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 {{< /note >}}
 
-
 {{< warning >}}
   Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
 {{< /warning >}}
 
-### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS?
- - No, Automate HA support https connection only with Managed services. 
+### Is Automate HA supports unencrypted traffic with managed service like AWS-OpenSearch / RDS?
 
+- No, Automate HA support https connection only with Managed services.
 
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
-
 
 ### How to perform infrastructure cleanup for AutomateHA nodes
 
 Execute the following commands from bastion host as per your deployment to perform infrastructure cleanup
 
 for AWS deployment
+
 ```bash
 chef-automate cleanup --aws-deployment
 ```
 
 for on premises deployment
+
 ```bash
 chef-automate cleanup --onprem-deployment
 ```

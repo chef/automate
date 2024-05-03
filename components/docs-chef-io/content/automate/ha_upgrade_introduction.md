@@ -42,7 +42,7 @@ Steps to upgrade the Chef Automate HA are as shown below:
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends
   ```
 
-- If we want to only upgrade BackEnd Services i.e. Postgresql and OpenSearch.
+- If we want to only upgrade BackEnd Services i.e. PostgreSQL and OpenSearch.
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends
   ```

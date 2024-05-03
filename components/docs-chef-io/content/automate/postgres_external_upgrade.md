@@ -22,7 +22,7 @@ To upgrade AWS RDS, please follow instructions on [Upgrading the PostgreSQL DB e
 
 ## Upgrade External PostgreSQL from 9.6 to 13.4
 
-Chef Automate uses PostgreSQL as the primary database for storing node data. [PostgreSQL 9.6 is EOL](https://endoflife.date/postgresql) and Chef customers running Chef Automate with PostgreSQL 9.6 should upgrade to [Postgres 13](https://www.postgresql.org/about/news/postgresql-13-released-2077/).
+Chef Automate uses PostgreSQL as the primary database for storing node data. [PostgreSQL 9.6 is EOL](https://endoflife.date/postgresql) and Chef customers running Chef Automate with PostgreSQL 9.6 should upgrade to [PostgreSQL 13](https://www.postgresql.org/about/news/postgresql-13-released-2077/).
 
 ### Migration Planning
 
@@ -138,7 +138,7 @@ For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documen
     vacuumdb: vacuuming database "template1"
     ```
 
-3. Exit postgres user
+3. Exit PostgreSQL user
 
     ```bash
     exit
@@ -198,8 +198,8 @@ For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` se
 1. Swap the ports of PostgreSQL v9.6 and 13.4:
 
     ```bash
-    PG_9_6_PORT=5432 # Assuming Postgres v9.6 is currently running on this port
-    PG_13_PORT=5433 # Assuming Postgres 13 is currently running on this port
+    PG_9_6_PORT=5432 # Assuming PostgreSQL v9.6 is currently running on this port
+    PG_13_PORT=5433 # Assuming PostgreSQL 13 is currently running on this port
     sudo sed -i "s/port = $PG_9_6_PORT/port = $PG_13_PORT/g" /etc/postgresql/9.6/main/postgresql.conf
     sudo sed -i "s/port = $PG_13_PORT/port = $PG_9_6_PORT/g" /etc/postgresql/13/main/postgresql.conf
     ```
@@ -228,7 +228,7 @@ For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` se
 
     Reindexing is not required for Chef Automate. If `pg_upgrade` reported errors or need for reindexing please refer to [pg_upgrade documentation](https://www.postgresql.org/docs/13/pgupgrade.html) for details.
 
-1. Exit postgres user:
+1. Exit PostgreSQL user:
 
     ```bash
     exit

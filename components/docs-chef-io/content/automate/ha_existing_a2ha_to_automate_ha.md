@@ -103,12 +103,12 @@ done
 1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
 
     ```bash
-    sudo chef-automate config show > current_config.toml 
+    sudo chef-automate config show > current_config.toml
     ```
 
 1. Add the OpenSearch credentials to the applied config.
 
-    - If using Chef Managed Opensearch, add the config below into `current_config.toml` (without any changes).  
+    - If using Chef Managed OpenSearch, add the config below into `current_config.toml` (without any changes).
 
         ```bash
         [global.v1.external.opensearch.auth.basic_auth]
@@ -177,7 +177,7 @@ done
 
     {{< warning >}}
 
-    - After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. After restoring Automate HA talk to OpenSearch.
+    - After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both Elasticsearch and OpenSearch config are part of Automate Config. After restoring Automate HA talk to OpenSearch.
 
     - Remove the elastic search config from all Frontend nodes; to do that, redirect the applied config to the file and set the config again. For example:
 
@@ -264,7 +264,7 @@ In Automate HA there are equivalent command which had been used in A2HA:
 
 ## Troubleshooting
 
-**In case of Restore failure from ElasticSearch to OpenSearch**
+**In case of Restore failure from Elasticsearch to OpenSearch**
 
 > **Error: Failed to restore a snapshot**
 
@@ -315,11 +315,11 @@ done
 
 {{< note >}}
 
-- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. We can keep both config; it won't impact the functionality. After restoring Automate HA, talk to OpenSearch.
+- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both Elasticsearch and OpenSearch config are part of Automate Config. We can keep both config; it won't impact the functionality. After restoring Automate HA, talk to OpenSearch.
 
 OR
 
-- We can remove the ElasticSearch config from the automate. To do that, redirect the applied config to the file and set the config again.
+- We can remove the Elasticsearch config from the automate. To do that, redirect the applied config to the file and set the config again.
 
 ```bash
 chef-automate config show > applied_config.toml

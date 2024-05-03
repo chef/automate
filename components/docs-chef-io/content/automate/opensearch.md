@@ -33,11 +33,11 @@ Add the following to your `config.toml` for HTTPS connection:
   enable = true
   nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
 
-# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+# Uncomment and fill out if using external OpenSearch with SSL and/or basic auth
 [global.v1.external.opensearch.auth]
   scheme = "basic_auth"
 [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Chef Automate deployment;
+## Create this OpenSearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
   username = "<admin username>"
   password = "<admin password>"
@@ -65,11 +65,11 @@ Add the following to your `config.toml` for HTTP connection:
   enable = true
   nodes = ["http://opensearch1.example:9200", "http://opensearch2.example:9200", "..." ]
 
-# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+# Uncomment and fill out if using external OpenSearch with SSL and/or basic auth
 [global.v1.external.opensearch.auth]
   scheme = "basic_auth"
 [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Chef Automate deployment;
+## Create this OpenSearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
   username = "<admin username>"
   password = "<admin password>"

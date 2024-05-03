@@ -34,7 +34,7 @@ Data restore is the process of copying backup data from secondary storage and re
 
 ## Chef Automate High Availability (HA) Backups
 
-You can manually back up the OpenSearch, Postgres, and Chef Automate Server data and configurations. The built-in Chef Automate CLI has no automated backup procedure that periodically backups the data.
+You can manually back up the OpenSearch, PostgreSQL, and Chef Automate Server data and configurations. The built-in Chef Automate CLI has no automated backup procedure that periodically backups the data.
 
 ## Backup Types
 
@@ -54,7 +54,7 @@ With the AWS Free Usage Tier*, you can get started with Amazon S3 for free in al
 
 ## Taking Backup with Amazon S3 Bucket
 
-This section explains how to take backup for External Elastic Search (ES) and Postgres-Sql to the Amazon S3 bucket.
+This section explains how to take backup for External Elasticsearch (ES) and PostgreSQL to the Amazon S3 bucket.
 
 {{< note >}}
 

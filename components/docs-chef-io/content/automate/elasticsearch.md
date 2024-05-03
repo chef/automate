@@ -31,7 +31,7 @@ Add the following to your config.toml:
   enable = true
   nodes = ["http://elastic1.example:9200", "http://elastic2.example:9200", "..." ]
 
-# Uncomment and fill out if using external elasticsearch with SSL and/or basic auth
+# Uncomment and fill out if using external Elasticsearch with SSL and/or basic auth
 # [global.v1.external.elasticsearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.elasticsearch.auth.basic_auth]
