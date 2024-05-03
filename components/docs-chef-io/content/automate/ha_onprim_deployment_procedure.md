@@ -16,7 +16,6 @@ gh_repo = "automate"
 {{< /note >}}
 
 This document explains how to deploy Chef Automate HA on on-premises machines with Chef Managed Database.
-
 Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
@@ -24,7 +23,6 @@ Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_p
 - Do not modify the workspace path. It should always be `/hab/a2_deploy_workspace`.
 - We don't support AD managed users in nodes. We only support local Linux users.
 - If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
-
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 {{< /warning >}}
 
@@ -97,7 +95,7 @@ You can also generate a configuration file using the `init-config` subcommand.
 
 ## Steps to Deploy
 
-1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during the deploy command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip a verification process during deploy command use `--skip-verify` flag
 
     ```bash
     chef-automate deploy config.toml --airgap-bundle automate.aib
