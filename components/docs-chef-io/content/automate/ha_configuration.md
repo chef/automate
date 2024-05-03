@@ -751,8 +751,6 @@ Type: number
 
 Default: 400
 
-
-
 ## PostgreSQL
 
 The PostgreSQL node in Automate HA provides various configuration options you can configure to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
@@ -1606,38 +1604,6 @@ ssl_key = "Enter Private Key----"
 [transport]
 port = 9300
 ```
-
-Type: string
-
-Default: none
-
-Type: string
-
-Default: none
-
-Type: string
-
-Default: none
-
-Type: string
-
-Default: none
-
-Type: string
-
-Default: none
-
-Type: string
-
-Default: none
-
-Type: string
-
-Default: none
-
-
-
-
 
 
 ## AWS
