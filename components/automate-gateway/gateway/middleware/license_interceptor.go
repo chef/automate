@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chef/automate/api/interservice/license_control"
+	license_middleware "github.com/chef/automate/components/automate-gateway/gateway/middleware/license"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -13,14 +13,14 @@ import (
 )
 
 type licenseInterceptor struct {
-	license_client license_control.LicenseControlServiceClient
-	isError        bool
+	licenseClient license_middleware.ILicense
+	licenseStatus *LicenseStatus
 }
 
-func NewLicenseInterceptor(license_client license_control.LicenseControlServiceClient) ILicenseInterceptor {
+func NewLicenseInterceptor(licenseInterserviceClient license_control.LicenseControlServiceClient) ILicenseInterceptor {
+	licenseClient := license_middleware.NewLicenseClient(licenseInterserviceClient)
 	return &licenseInterceptor{
-		license_client: license_client,
-		isError:        false,
+		licenseClient: licenseClient,
 	}
 }
 
@@ -28,16 +28,33 @@ const (
 	commercial = "commercial"
 )
 
-type LicenseStatus struct {
-	LicenseDetails  *LicenseDetails
-	DetailsValidity time.Time
-}
-type LicenseDetails struct {
-	licenseType string
-	expiryDate  time.Time
-}
+// allowAPiList consists of every api endpoints which is allowed without validating license details
+var allowApiList = []string{"/chef.automate.api.event_feed.EventFeedService/GetEventTypeCounts",
+	"/chef.automate.api.telemetry.Telemetry/GetTelemetryConfiguration",
+	"/chef.automate.api.license.License/GetStatus",
+	"/chef.automate.api.deployment.Deployment/GetVersion",
+	"/chef.automate.api.iam.v2.Policies/IntrospectAllProjects",
+	"/chef.automate.api.license.License/RequestLicense",
+	"/chef.automate.api.iam.v2.Authorization/IntrospectAll",
+	"/chef.automate.api.license.License/ApplyLicense",
+	"/chef.automate.api.iam.v2.Policies/ListProjects",
+	"/chef.automate.api.iam.v2.Users/GetUser",
+	"/chef.automate.api.user_settings.UserSettingsService/GetUserSettings",
+	"/chef.automate.api.iam.v2.Rules/ApplyRulesStatus",
+	"/chef.automate.api.iam.v2.Users/CreateUser",
+	"/chef.automate.api.iam.v2.Users/GetUser"}
 
-var licenseStatus *LicenseStatus
+// refreshLicenseList consists of api endpoints after which the license details needs to be fetchef again
+var refreshLicenseList = []string{"/chef.automate.api.license.License/RequestLicense", "/chef.automate.api.license.License/ApplyLicense"}
+
+type LicenseStatus struct {
+	//LicenseDetails information regarding license
+	LicenseDetails *license_middleware.LicenseDetails
+	//Till When the details are valid
+	DetailsValidity time.Time
+	//LicenseDetailsRefresh hard refresh details even if the DetailsValidity is valid
+	LicenseDetailsRefresh bool
+}
 
 // UnaryInterceptor returns a grpc UnaryServerInterceptor that performs license check
 func (l *licenseInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
@@ -47,29 +64,54 @@ func (l *licenseInterceptor) UnaryServerInterceptor() grpc.UnaryServerIntercepto
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler) (interface{}, error) {
 
-		//if the global variable license status containing details is nil or If its not nil checking the details validity.
-		//If the details validity is before the current time refersh the license details
-		if (licenseStatus != nil && licenseStatus.DetailsValidity.Before(time.Now())) || licenseStatus == nil {
-			fmt.Println("Getting details again----------------")
-			err := l.getLicenseDetails(ctx)
-			if err != nil {
-				return nil, errors.Wrap(err, "Unable to fetch license details")
+		if contains(refreshLicenseList, info.FullMethod) {
+			l.licenseStatus = &LicenseStatus{
+				LicenseDetailsRefresh: true,
 			}
 		}
 
-		fmt.Println("-------------- licene we got " + licenseStatus.LicenseDetails.licenseType)
-		if !l.isValidLicense() {
-			return nil, status.Errorf(codes.PermissionDenied, "License is expired, please apply a new license")
-
+		if contains(allowApiList, info.FullMethod) {
+			h, err := handler(ctx, req)
+			return h, err
 		}
 
-		return handler(ctx, req)
+		err := l.refreshLicenseDetails(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to refresh details")
+		}
+
+		if !l.isValidLicense() {
+			return nil, status.Errorf(codes.PermissionDenied, "License is expired, please apply a new license")
+		}
+
+		h, err := handler(ctx, req)
+
+		return h, err
 
 	}
 }
 
 func (l *licenseInterceptor) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(req interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		if contains(refreshLicenseList, info.FullMethod) {
+			l.licenseStatus = &LicenseStatus{
+				LicenseDetailsRefresh: true,
+			}
+		}
+
+		if contains(allowApiList, info.FullMethod) {
+			i := interceptedServerStream{ServerStream: ss}
+			return handler(req, &i)
+		}
+
+		err := l.refreshLicenseDetails(ss.Context())
+		if err != nil {
+			return errors.Wrap(err, "unable to refresh details")
+		}
+
+		if !l.isValidLicense() {
+			return status.Errorf(codes.PermissionDenied, "License is expired, please apply a new license")
+		}
 
 		i := interceptedServerStream{ServerStream: ss}
 		return handler(req, &i)
@@ -78,21 +120,15 @@ func (l *licenseInterceptor) StreamServerInterceptor() grpc.StreamServerIntercep
 }
 
 func (l *licenseInterceptor) getLicenseDetails(ctx context.Context) error {
-	//Getting the license details for license service
-	licenseDetailsResponse, err := l.license_client.Status(ctx, &license_control.StatusRequest{})
+	licenseDetails, err := l.licenseClient.GetLicenseDetails(ctx)
 	if err != nil {
-		return errors.Wrap(err, "unable to get the status of the license")
-	}
-
-	licenseDetails := &LicenseDetails{
-		licenseType: licenseDetailsResponse.LicenseType,
-		expiryDate:  time.Unix(licenseDetailsResponse.LicensedPeriod.End.GetSeconds(), 0).UTC(),
+		return errors.Wrap(err, "Unable to fetch license details")
 	}
 
 	//Marking the validity of the license details for next 6 hours of time
-	validity := time.Now().Add(time.Minute * time.Duration(2))
+	validity := time.Now().Add(time.Hour * time.Duration(6))
 
-	licenseStatus = &LicenseStatus{
+	l.licenseStatus = &LicenseStatus{
 		LicenseDetails:  licenseDetails,
 		DetailsValidity: validity,
 	}
@@ -103,13 +139,13 @@ func (l *licenseInterceptor) getLicenseDetails(ctx context.Context) error {
 
 func (l *licenseInterceptor) isValidLicense() bool {
 
-	if licenseStatus.LicenseDetails == nil {
+	if l.licenseStatus.LicenseDetails == nil {
 		return false
 	}
-	licenseValidDate := licenseStatus.LicenseDetails.expiryDate
+	licenseValidDate := l.licenseStatus.LicenseDetails.ExpiryDate
 
 	//If the license type is commercial, adding grace period of 1 week
-	if licenseStatus.LicenseDetails.licenseType == commercial {
+	if l.licenseStatus.LicenseDetails.LicenseType == commercial {
 		//Adding grace period for 7 days i.e. one week
 		licenseValidDate = licenseValidDate.AddDate(0, 0, 7)
 	}
@@ -119,4 +155,30 @@ func (l *licenseInterceptor) isValidLicense() bool {
 	}
 
 	return true
+}
+
+func (l *licenseInterceptor) refreshLicenseDetails(ctx context.Context) error {
+	//if the global variable license status containing details is nil or If its not nil checking the details validity.
+	//If the details validity is before the current time refersh the license details
+	if (l.licenseStatus != nil && l.licenseStatus.DetailsValidity.Before(time.Now())) ||
+		(l.licenseStatus != nil && l.licenseStatus.LicenseDetailsRefresh) || l.licenseStatus == nil {
+		err := l.getLicenseDetails(ctx)
+		if err != nil {
+			return errors.Wrap(err, "Unable to fetch license details")
+		}
+	}
+
+	return nil
+}
+
+func contains(listOfApis []string, functionName string) bool {
+
+	for _, name := range listOfApis {
+		if name == functionName {
+			return true
+		}
+	}
+
+	return false
+
 }
