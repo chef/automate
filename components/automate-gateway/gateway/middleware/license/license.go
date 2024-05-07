@@ -32,7 +32,7 @@ func (l *License) GetLicenseDetails(ctx context.Context) (*LicenseDetails, error
 		return licenseDetails, errors.Wrap(err, "unable to get the status of the license")
 	}
 
-	if licenseDetailsResponse != nil {
+	if licenseDetailsResponse.LicenseId != "" {
 		if licenseDetailsResponse.LicensedPeriod.End.GetSeconds() != int64(0) {
 			expiryDate = time.Unix(licenseDetailsResponse.LicensedPeriod.End.GetSeconds(), 0).UTC()
 		}
