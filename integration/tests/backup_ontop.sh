@@ -21,6 +21,7 @@ install_automate() {
 }
 do_deploy() {
     install_automate
+    do_apply_license
 }
 
 do_prepare_restore() {
