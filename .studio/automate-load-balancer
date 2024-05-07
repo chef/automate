@@ -4,6 +4,8 @@ document "automate_load_balancer_integration" <<DOC
   Runs some integration tests for automate-load-balancer
 DOC
 automate_load_balancer_integration() {
+
+  apply_license
   local target=${1:-"https://127.0.0.1"}
   local output
 
@@ -25,3 +27,7 @@ automate_load_balancer_integration() {
   jq -ne --argjson status "$status" '$status.ok' || return 1
 }
 
+
+function apply_license(){
+    chef-automate license apply eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBiZjA4ZDM4LTdiYzQtNDRjMy1hMzYyLTA3ZDlmNzEwZmVkYyIsInZlcnNpb24iOiIxIiwidHlwZSI6ImludGVybmFsIiwiZ2VuZXJhdG9yIjoiY2hlZi9saWNlbnNlLTIuMC4wIiwia2V5X3NoYTI1NiI6ImUwZGYyOGM4YmM2ODE1MGVkYmZlZjk4Y2Q2YjdkYzQzOWMxZjgwYzdlN2VmNzQ3ODkzYTY4OTNhMmY3YjYwZjciLCJnZW5lcmF0aW9uX2RhdGUiOnsic2Vjb25kcyI6MTcxNTA1OTQ4Nn0sImN1c3RvbWVyIjoiY2hlZiBBdXRvbWF0ZSBpbnRlcm5hbCBsaWNlbnNlIiwiY3VzdG9tZXJfaWQiOiI0QjM5Q0Q3QS04QzEwLTRFNjAtQTUwQi1BNDNCODAyM0RCMTMiLCJjdXN0b21lcl9pZF92ZXJzaW9uIjoiMSIsImVudGl0bGVtZW50cyI6W3sibmFtZSI6IkNoZWYgQXV0b21hdGUiLCJtZWFzdXJlIjoibm9kZXMiLCJsaW1pdCI6LTEsInN0YXJ0Ijp7InNlY29uZHMiOjE3MTUwNDAwMDB9LCJlbmQiOnsic2Vjb25kcyI6MTc0NjU3NTk5OX19XX0.AEMHZjRSytD6rzejer-FzFQ84O0GBjdoQCinKFxAKY1nvUbhJIXCF5abBjOHYzZSvKe30XM5U232e9AnHUMGWJWKAcbEK-eMQiHy2iwB6mKpEq6hXuO27P0xZBUHkq0Rz3WpWry6NLVQqqJXAbE79hsOE-g4Ms4C-y1rEw0fkP19RJLQ
+}
