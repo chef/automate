@@ -235,7 +235,7 @@ This issue occurs because the `mv` operation is trying to move a file between di
 
 #### Solution
 
-We have noticed that executing commands that generate such errors are easily solved by just changing the directory from which they are being executed. Before executing the command again, change the directory to `/hab`:
+We have noticed that executing commands that generate such errors is easily solved by changing the directory from which they are executed. Before implementing the command again, change the directory to `/hab`:
 
 ```sh
 cd /hab
