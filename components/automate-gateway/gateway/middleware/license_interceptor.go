@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chef/automate/api/interservice/license_control"
@@ -67,8 +66,6 @@ func (l *licenseInterceptor) UnaryServerInterceptor() grpc.UnaryServerIntercepto
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler) (interface{}, error) {
-
-		fmt.Println("Goy the viewersss------", info.FullMethod)
 
 		if contains(refreshLicenseList, info.FullMethod) {
 			l.licenseStatus = &LicenseStatus{
