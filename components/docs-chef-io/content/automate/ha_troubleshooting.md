@@ -231,11 +231,11 @@ In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetch
 
 ### Issue: rename /tmp/temp2137181075 automate.config.toml: invalid cross-device link
 
-This issue occurs because the `mv` operation is trying to move a file between different filesystems, which is not allowed due to the "invalid cross-device link" error. It's triggered when attempting to perform file operations across filesystem boundaries.
+This issue arises because the `mv` operation attempts to move a file between distinct filesystems. This process is disallowed due to the 'invalid cross-device link' error. It's triggered when trying to execute file operations across filesystem boundaries.
 
 #### Solution
 
-We have noticed that executing commands that generate such errors is easily solved by changing the directory from which they are executed. Before implementing the command again, change the directory to `/hab`:
+We have noticed that resolving commands that lead to such errors is straightforward. Change the directory from which they are executed. Before reapplying the command, switch the directory to `/hab`:
 
 ```sh
 cd /hab
