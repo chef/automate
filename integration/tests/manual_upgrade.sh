@@ -52,6 +52,8 @@ do_deploy() {
         --debug
 
     chef-automate version
+
+    do_apply_license
 }
 
 # By default, do_prepare_upgrade will replace the latest manifest.
