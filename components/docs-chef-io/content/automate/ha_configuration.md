@@ -52,85 +52,85 @@ The following sets the basic configuration of Chef Automate’s infrastructure i
 
 `secrets_key_file`
 
-Type: string
+: Type: string
 
-Default: /hab/a2_deploy_workspace/secrets.key
+  Default: /hab/a2_deploy_workspace/secrets.key
 
-Some words that describe this.
+  Some words that describe this.
 
 `secrets_store_file`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `architecture`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `workspace_path`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `ssh_user`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `ssh_port`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `ssh_key_file`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `sudo_password`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Description text.
+  Description text.
 
 `backup_mount`
 
-Type: string
+: Type: string
 
-Default: /mnt/automate_backups
+  Default: /mnt/automate_backups
 
-Description text.
+  Description text.
 
 Do not modify this value.
 
 `backup_config`
 
-Type: string
+: Type: string
 
-Default: None
+  Default: None
 
-Allowed values: file_system, object_storage.
+  Allowed values: file_system, object_storage.
 
 The type of storage for backing up Chef Automate data.
 
@@ -194,43 +194,43 @@ backup_config = ""
 
 `bucket_name`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-The name of the AWS S3 bucket to back up data to.
+  The name of the AWS S3 bucket to back up data to.
 
 `access_key`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-The AWS IAM access key for accessing the S3 bucket is used to back up data.
+  The AWS IAM access key for accessing the S3 bucket is used to back up data.
 
 `secret_key`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Other param description.
+  Other param description.
 
 `endpoint`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Other param description.
+  Other param description.
 
 `region`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Other param description.
+  Other param description.
 
 ### Example
 
@@ -271,487 +271,487 @@ This section lists the Chef Infra Server configurations that can be configured i
 
 `client_max_body_size`
 
-Type: number
+: Type: number
 
-Default: 250
+  Default: 250
 
-The maximum accepted body size for a client request, as indicated by the `Content-Length` request header.
+  The maximum accepted body size for a client request, as indicated by the `Content-Length` request header.
 
 `ssl_protocols`
 
-Type: string
+: Type: string
 
-Default: TLSv1.2
+  Default: TLSv1.2
 
-The SSL protocol versions that are enabled for the Chef Infra Server API. Starting with Chef Infra Server 14.3, this value defaults to `TLSv1.2` for enhanced security. Previous releases defaulted to `TLSv1 TLSv1.1 TLSv1.2`, which allowed for less secure SSL connections. TLS 1.2 is supported on Chef Infra Client 10.16.4 and later on Linux, Unix, and macOS, and on Chef Infra Client 12.8 and later on Windows. If it is necessary to support these older end-of-life Chef Infra Client releases, set this value to `TLSv1.1 TLSv1.2`.
+  The SSL protocol versions that are enabled for the Chef Infra Server API. Starting with Chef Infra Server 14.3, this value defaults to `TLSv1.2` for enhanced security. Previous releases defaulted to `TLSv1 TLSv1.1 TLSv1.2`, which allowed for less secure SSL connections. TLS 1.2 is supported on Chef Infra Client 10.16.4 and later on Linux, Unix, and macOS, and on Chef Infra Client 12.8 and later on Windows. If it is necessary to support these older end-of-life Chef Infra Client releases, set this value to `TLSv1.1 TLSv1.2`.
 
 `worker_connections`
 
-Type: number
+: Type: number
 
-Default: 10240
+  Default: 10240
 
-The maximum number of simultaneous clients. Use with nginx['worker_processes'] to determine the maximum number of allowed clients.
+  The maximum number of simultaneous clients. Use with nginx['worker_processes'] to determine the maximum number of allowed clients.
 
 `worker_processes`
 
-Type: number
+: Type: number
 
-Default: 4, 2
+  Default: 4, 2
 
-The number of allowed worker processes. Use with nginx['worker_connections'] to determine the maximum number of allowed clients.
+  The number of allowed worker processes. Use with nginx['worker_connections'] to determine the maximum number of allowed clients.
 
 `gzip`
 
-Type: string
+: Type: string
 
-Default: ON
+  Default: ON
 
-Enable gzip compression.
+  Enable gzip compression.
 
 `gzip_comp_level`
 
-Type: number
+: Type: number
 
-Default: 2
+  Default: 2
 
-The compression level used with gzip, from the least amount of compression (1, fastest) to the most (2, slowest).
+  The compression level used with gzip, from the least amount of compression (1, fastest) to the most (2, slowest).
 
 `gzip_http_version`
 
-Type: number
+: Type: number
 
-Default: 1.0
+  Default: 1.0
 
-Enable gzip depending on the version of the HTTP request.
+  Enable gzip depending on the version of the HTTP request.
 
 `gzip_types`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Enable compression for the specified MIME-types.
+  Enable compression for the specified MIME-types.
 
 `keepalive_timeout`
 
-Type: number
+: Type: number
 
-Default: 65
+  Default: 65
 
-The amount of time (in seconds) to wait for requests on HTTP keepalive connection.
+  The amount of time (in seconds) to wait for requests on HTTP keepalive connection.
 
 `sendfile`
 
-Type: string
+: Type: string
 
-Default: ON
+  Default: ON
 
-Copy data between file descriptors when sendfile() is used.
+  Copy data between file descriptors when sendfile() is used.
 
 `ssl_ciphers`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-The list of supported cipher suites that are used to establish a secure connection. To favor AES256 with ECDHE forward security, drop the RC4-SHA:RC4-MD5:RC4:RSA prefix. See this link for more information. For example:
+  The list of supported cipher suites that are used to establish a secure connection. To favor AES256 with ECDHE forward security, drop the RC4-SHA:RC4-MD5:RC4:RSA prefix. See this link for more information. For example:
 
 #### opscode_erchef
 
 `s3_url_ttl`
 
-Type: number
+: Type: number
 
-Default: 900, 28800
+  Default: 900, 28800
 
-The amount of time (in seconds) before connections to the server expire. If node bootstraps are timing out, increase this setting.
+  The amount of time (in seconds) before connections to the server expire. If node bootstraps are timing out, increase this setting.
 
 `auth_skew`
 
-Type: number
+: Type: number
 
-Default: 900
+  Default: 900
 
-
+  
 
 `authz_fanout`
 
-Type: number
+: Type: number
 
-Default: 20
+  Default: 20
 
-
+  
 
 `authz_timeout`
 
-Type: number
+: Type: number
 
-Default: 2000
+  Default: 2000
 
-The amount of time (in seconds) before a request to the **oc_bifrost** service times out.
+  The amount of time (in seconds) before a request to the **oc_bifrost** service times out.
 
 `base_resource_url`
 
-Type: string
+: Type: string
 
-Default: :host_header
+  Default: :host_header
 
-The base URL to which the service is to return links to API resources. Use `:host_header` to ensure the URL is derived from the host header of the incoming HTTP request.
+  The base URL to which the service is to return links to API resources. Use `:host_header` to ensure the URL is derived from the host header of the incoming HTTP request.
 
 `bulk_fetch_batch_size`
 
-Type: number
+: Type: number
 
-Default: 5
+  Default: 5
 
-
+  
 
 `cleanup_batch_size`
 
-Type: number
+: Type: number
 
-Default: 0
+  Default: 0
 
-The number of nodes that may be deserialized. Currently only applies to the /search endpoint in the Chef Infra Server API. The default value is the recommended value.
+  The number of nodes that may be deserialized. Currently only applies to the /search endpoint in the Chef Infra Server API. The default value is the recommended value.
 
 `depsolver_timeout`
 
-Type: number
+: Type: number
 
-Default: 5000
+  Default: 5000
 
-The amount of time (in milliseconds) to wait for cookbook dependency problems to be solved.
+  The amount of time (in milliseconds) to wait for cookbook dependency problems to be solved.
 
 `depsolver_worker_count`
 
-Type: number
+: Type: number
 
-Default: 5
+  Default: 5
 
-The number of Ruby processes for which cookbook dependency problems are unsolved. Use the `pgrep -fl depselector` command to verify the number of depsolver workers that are running. If you are seeing 503 service unavailable errors, increase this value.
+  The number of Ruby processes for which cookbook dependency problems are unsolved. Use the `pgrep -fl depselector` command to verify the number of depsolver workers that are running. If you are seeing 503 service unavailable errors, increase this value.
 
 `depsolver_pooler_timeout`
 
-Type: number
+: Type: number
 
-Default: 100000, 0
+  Default: 100000, 0
 
-
+  
 
 `depsolver_pool_queue_max`
 
-Type: number
+: Type: number
 
-Default: 10, 50
+  Default: 10, 50
 
-
+  
 
 `db_pool_size`
 
-Type: number
+: Type: number
 
-Default: 40, 20
+  Default: 40, 20
 
-The number of open connections to PostgreSQL that are maintained by the service. This value should be increased if failures indicate that the **oc_bifrost** service ran out of connections. This value should be tuned in conjunction with the `postgresql['max_connections']` setting for PostgreSQL.
+  The number of open connections to PostgreSQL that are maintained by the service. This value should be increased if failures indicate that the **oc_bifrost** service ran out of connections. This value should be tuned in conjunction with the `postgresql['max_connections']` setting for PostgreSQL.
 
 `db_pool_queue_max`
 
-Type: number
+: Type: number
 
-Default: 40, 20
+  Default: 40, 20
 
-
+  
 
 `ibrowse_max_pipeline_size`
 
-Type: number
+: Type: number
 
-Default: 1
+  Default: 1
 
-Setting EOL in Chef Infra Server 14.
+  Setting EOL in Chef Infra Server 14.
 
 `ibrowse_max_sessions`
 
-Type: number
+: Type: number
 
-Default: 256
+  Default: 256
 
-Setting EOL in Chef Infra Server 14.
+  Setting EOL in Chef Infra Server 14.
 
 `max_request_size`
 
-Type: number
+: Type: number
 
-Default: 4000000
+  Default: 4000000
 
-When the request body size is greater than this value, a `413 Request Entity Too Large` error is returned.
+  When the request body size is greater than this value, a `413 Request Entity Too Large` error is returned.
 
 `keygen_cache_size`
 
-Type: number
+: Type: number
 
-Default: 1000, 10
+  Default: 1000, 10
 
-
+  
 
 `reindex_batch_size`
 
-Type: number
+: Type: number
 
-Default: 10
+  Default: 10
 
-The number of items to fetch from the database and send to the search index at a time.
+  The number of items to fetch from the database and send to the search index at a time.
 
 `reindex_sleep_min_ms`
 
-Type: number
+: Type: number
 
-Default: 500
+  Default: 500
 
-The minimum number of milliseconds to sleep before retrying a failed attempt to index an item. Retries are delayed a random number of milliseconds between `reindex_sleep_min_ms` and `reindex_sleep_max_ms`. Set both this and `reindex_sleep_max_ms` to 0 to retry without delay.
+  The minimum number of milliseconds to sleep before retrying a failed attempt to index an item. Retries are delayed a random number of milliseconds between `reindex_sleep_min_ms` and `reindex_sleep_max_ms`. Set both this and `reindex_sleep_max_ms` to 0 to retry without delay.
 
 `reindex_sleep_max_ms`
 
-Type: number
+: Type: number
 
-Default: 2000
+  Default: 2000
 
-The maximum number of milliseconds to sleep before retrying a failed attempt to index an item. Retries are delayed a random number of milliseconds between `reindex_sleep_min_ms` and `reindex_sleep_max_ms`. Set both this and `reindex_sleep_min_ms` to 0 to retry without delay.
+  The maximum number of milliseconds to sleep before retrying a failed attempt to index an item. Retries are delayed a random number of milliseconds between `reindex_sleep_min_ms` and `reindex_sleep_max_ms`. Set both this and `reindex_sleep_min_ms` to 0 to retry without delay.
 
 `reindex_item_retries`
 
-Type: number
+: Type: number
 
-Default: 3
+  Default: 3
 
-The number of times to retry sending an object for indexing in the case of failure.
+  The number of times to retry sending an object for indexing in the case of failure.
 
 `cbv_cache_enabled`
 
-Type: string
+: Type: string
 
-Default: FALSE
+  Default: FALSE
 
-Whether to enable cookbook version response caching. If you frequently see very long response times from `cookbook_versions` when under load, this is worth enabling. Enabling this makes it possible for a client to receive stale results. When a cookbook is updated in place (without incrementing the version), and the old response has not expired from the cache, the Infra Server will give the old response to the client. Subsequent client runs will receive the updated response.
+  Whether to enable cookbook version response caching. If you frequently see very long response times from `cookbook_versions` when under load, this is worth enabling. Enabling this makes it possible for a client to receive stale results. When a cookbook is updated in place (without incrementing the version), and the old response has not expired from the cache, the Infra Server will give the old response to the client. Subsequent client runs will receive the updated response.
 
 `search_queue_mode`
 
-Type: string
+: Type: string
 
-Default: batch
+  Default: batch
 
-The search index queue mode.
+  The search index queue mode.
 
 `s3_enabled`
 
-Type: string
+: Type: string
 
-Default: FALSE
+  Default: FALSE
 
-
+  
 
 `s3_bucket_name`
 
-Type: string
+: Type: string
 
-Default: Bookshelf
+  Default: Bookshelf
 
-
+  
 
 `s3_external_url`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-
+  
 
 `strict_search_result_acls`
 
-Type: string
+: Type: string
 
-Default: FALSE
+  Default: FALSE
 
-Use to specify that search results only return objects to which an actor (user, client, etc.) has read access, as determined by ACL settings. This affects all searches. When true, the performance of the Chef management console may increase because it enables the Chef management console to skip redundant ACL checks. To ensure the Chef management console is configured properly, after this setting has been applied with a `chef-server-ctl` reconfigure run `chef-manage-ctl` reconfigure to ensure the Chef management console also picks up the setting.
+  Use to specify that search results only return objects to which an actor (user, client, etc.) has read access, as determined by ACL settings. This affects all searches. When true, the performance of the Chef management console may increase because it enables the Chef management console to skip redundant ACL checks. To ensure the Chef management console is configured properly, after this setting has been applied with a `chef-server-ctl` reconfigure run `chef-manage-ctl` reconfigure to ensure the Chef management console also picks up the setting.
 
 `enable_ibrowse_traces`
 
-Type: string
+: Type: string
 
-Default: FALSE
+  Default: FALSE
 
-Use to configure ibrowse logging for the `opscode_erchef` service.
+  Use to configure ibrowse logging for the `opscode_erchef` service.
 
 `s3_url_expiry_window_size`
 
-Type: string
+: Type: string
 
-Default: [100, percent]
+  Default: [100, percent]
 
-The frequency at which unique URLs are generated. This value may be a specific amount of time, i.e. `15m` (fifteen minutes) or a percentage of the value of s3_url_ttl, i.e. `10%`.
+  The frequency at which unique URLs are generated. This value may be a specific amount of time, i.e. `15m` (fifteen minutes) or a percentage of the value of s3_url_ttl, i.e. `10%`.
 
 #### oc_chef_authz
 
 `http_queue_max`
 
-Type: number
+: Type: number
 
-Default: 200
+  Default: 200
 
-
+  
 
 `http_max_count`
 
-Type: string
+: Type: string
 
-Default: 100
+  Default: 100
 
-The maximum worker count for the HTTP connection pool that is used by the data collector.
+  The maximum worker count for the HTTP connection pool that is used by the data collector.
 
 `http_init_count`
 
-Type: string
+: Type: string
 
-Default: 100
+  Default: 100
 
-
+  
 
 #### data_collector
 
 `timeout`
 
-Type: number
+: Type: number
 
-Default: 30000
+  Default: 30000
 
-The amount of time (in milliseconds) before a request to the data collector API times out.
+  The amount of time (in milliseconds) before a request to the data collector API times out.
 
 `http_init_count`
 
-Type: number
+: Type: number
 
-Default: 25
+  Default: 25
 
-The initial worker count for the HTTP connection pool that is used by the data collector.
+  The initial worker count for the HTTP connection pool that is used by the data collector.
 
 `http_max_count`
 
-Type: number
+: Type: number
 
-Default: 100
+  Default: 100
 
-The maximum worker count for the HTTP connection pool that is used by the data collector.
+  The maximum worker count for the HTTP connection pool that is used by the data collector.
 
 `http_max_age`
 
-Type: string
+: Type: string
 
-Default: {70, sec}
+  Default: {70, sec}
 
-The maximum connection worker age (in seconds) for the HTTP connection pool that is used by the data collector.
+  The maximum connection worker age (in seconds) for the HTTP connection pool that is used by the data collector.
 
 `http_cull_interval`
 
-Type: string
+: Type: string
 
-Default: {1, min}
+  Default: {1, min}
 
-The maximum cull interval (in minutes) for the HTTP connection pool that is used by the data collector.
+  The maximum cull interval (in minutes) for the HTTP connection pool that is used by the data collector.
 
 `http_max_connection_duration`
 
-Type: string
+: Type: string
 
-Default: {70, sec}
+  Default: {70, sec}
 
-The maximum connection duration (in seconds) for the HTTP connection pool that is used by the data collector.
+  The maximum connection duration (in seconds) for the HTTP connection pool that is used by the data collector.
 
 `ibrowse_options`
 
-Type: string
+: Type: string
 
-Default: [{connect_timeout, 10000}]
+  Default: [{connect_timeout, 10000}]
 
-An array of comma-separated key-value pairs of ibrowse options for the HTTP connection pool that is used by the data collector.
+  An array of comma-separated key-value pairs of ibrowse options for the HTTP connection pool that is used by the data collector.
 
 #### oc_bifrost
 
 `db_pool_queue_max`
 
-Type: number
+: Type: number
 
-Default: 50
+  Default: 50
 
-
+  
 
 `extended_perf_log`
 
-Type: string
+: Type: string
 
-Default: TRUE
+  Default: TRUE
 
-
+  
 
 #### bookshelf
 
 `stream_download`
 
-Type: string
+: Type: string
 
-Default: TRUE
+  Default: TRUE
 
-Enable stream downloading of cookbooks. This setting (when `true`) typically results in improved cookbook download performance, especially with the memory usage of the bookshelf service and the **behavior** of load balancers and proxies in-between Chef Infra Client and the Chef Infra Server.
+  Enable stream downloading of cookbooks. This setting (when `true`) typically results in improved cookbook download performance, especially with the memory usage of the bookshelf service and the **behavior** of load balancers and proxies in-between Chef Infra Client and the Chef Infra Server.
 
 `aws_access_id`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-
+  
 
 `aws_secret_key`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-
+  
 
 `log_rotation`
 
-Type: string
+: Type: string
 
-Default: (`file_maxbytes`: 104857600, `num_to_keep`: 10)
+  Default: (`file_maxbytes`: 104857600, `num_to_keep`: 10)
 
-The log rotation policy for this service. Log files are rotated when they exceed `file_maxbytes`. The maximum number of log files in the rotation is defined by num_to_keep.
+  The log rotation policy for this service. Log files are rotated when they exceed `file_maxbytes`. The maximum number of log files in the rotation is defined by num_to_keep.
 
 `storage_type`
 
-Type: string
+: Type: string
 
-Default: sql
+  Default: sql
 
-Determines where cookbooks are stored. In instances that require cookbooks to be stored within a SQL backend, such as in a high availability setup, you must set `storage_type` to `:sql:`.
+  Determines where cookbooks are stored. In instances that require cookbooks to be stored within a SQL backend, such as in a high availability setup, you must set `storage_type` to `:sql:`.
 
 `vip`
 
-Type: string
+: Type: string
 
-Default: 127.0.0.1
+  Default: 127.0.0.1
 
-The virtual IP address. This may point to an external storage location, such as Amazon EC2.
+  The virtual IP address. This may point to an external storage location, such as Amazon EC2.
 
 #### oc_chef_wm
 
 `health_ping_timeout`
 
-Type: number
+: Type: number
 
-Default: 400
+  Default: 400
 
-## PostgreSQL
+  ## PostgreSQL
 
 The PostgreSQL node in Automate HA provides various configuration options you can configure to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
 
@@ -763,73 +763,73 @@ Patch the below configuration to PostgreSQL nodes. Please add the values you wan
 
 `log_level`
 
-Type: string
+: Type: string
 
-Default: ERROR
+  Default: ERROR
 
-`log_level` controls which message levels are written to the server log. Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC. The default is WARNING.
+  `log_level` controls which message levels are written to the server log. Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC. The default is WARNING.
 
 `log_line_prefix`
 
-Type: string
+: Type: string
 
-Default: %t [%p]: [%l-1] user=%u,db=%d,client=%h %r (%x:%e)
+  Default: %t [%p]: [%l-1] user=%u,db=%d,client=%h %r (%x:%e)
 
-`log_line_prefix` is a print style string output at the beginning of each log line.
+  `log_line_prefix` is a print style string output at the beginning of each log line.
 
 `logging_collector`
 
-Type: string
+: Type: string
 
-Default: on
+  Default: on
 
-`logging_collector` enables the logging collector, which is a background process that captures log messages sent to stderr and redirects them into log files.
+  `logging_collector` enables the logging collector, which is a background process that captures log messages sent to stderr and redirects them into log files.
 
 #### Checkpoints
 
 `checkpoint_timeout`
 
-Type: string
+: Type: string
 
-Default: 5min
+  Default: 5min
 
-`checkpoint_timeout` is the maximum time between automatic WAL checkpoints. The valid range is between 30 seconds and one day. The default is five minutes (5min). Increasing this parameter can increase the amount of time needed for crash recovery.
+  `checkpoint_timeout` is the maximum time between automatic WAL checkpoints. The valid range is between 30 seconds and one day. The default is five minutes (5min). Increasing this parameter can increase the amount of time needed for crash recovery.
 
 `max_wal_size`
 
-Type: string
+: Type: string
 
-Default: 1GB
+  Default: 1GB
 
-`max_wal_size` is the maximum size to let the WAL grow during automatic checkpoints. The default is 1 GB. Increasing this parameter can increase the amount of time needed for crash recovery. This parameter can only be set in the PostgreSQL.conf file or the server command line.
+  `max_wal_size` is the maximum size to let the WAL grow during automatic checkpoints. The default is 1 GB. Increasing this parameter can increase the amount of time needed for crash recovery. This parameter can only be set in the PostgreSQL.conf file or the server command line.
 
 `min_wal_size`
 
-Type: string
+: Type: string
 
-Default: 80MB
+  Default: 80MB
 
-`min_wal_size` can ensure enough WAL space is reserved to handle spikes in WAL usage, for example, when running large batch jobs. If this value is specified without units, it is taken as megabytes. The default is 80 MB.
+  `min_wal_size` can ensure enough WAL space is reserved to handle spikes in WAL usage, for example, when running large batch jobs. If this value is specified without units, it is taken as megabytes. The default is 80 MB.
 
 #### Wal Keep Size
 
 `wal_keep_size`
 
-Type: number
+: Type: number
 
-Default: 1600
+  Default: 1600
 
-`wal_keep_size` specifies the minimum size of past log file segments kept in the pg_wal directory if a standby server needs to fetch them for streaming replication. If wal_keep_size is zero (the default), the system doesn’t keep extra segments for standby purposes. Hence, the number of old WAL segments available to standby servers is a function of the location of the previous checkpoint and the status of WAL archiving.
+  `wal_keep_size` specifies the minimum size of past log file segments kept in the pg_wal directory if a standby server needs to fetch them for streaming replication. If wal_keep_size is zero (the default), the system doesn’t keep extra segments for standby purposes. Hence, the number of old WAL segments available to standby servers is a function of the location of the previous checkpoint and the status of WAL archiving.
 
 #### Lock Management
 
 `max_locks_per_transaction`
 
-Type: number
+: Type: number
 
-Default: 64
+  Default: 64
 
-The shared lock table tracks locks on max_locks_per_transaction * (max_connections + max_prepared_transactions) objects (e.g., tables); hence, no more than this many distinct objects can be locked at any time. This parameter controls the average number of object locks allocated for each transaction; individual transactions can lock more objects as long as the locks of all transactions fit in the lock table. This is not the number of rows that can be locked; that value is unlimited. The default is 64.
+  The shared lock table tracks locks on max_locks_per_transaction * (max_connections + max_prepared_transactions) objects (e.g., tables); hence, no more than this many distinct objects can be locked at any time. This parameter controls the average number of object locks allocated for each transaction; individual transactions can lock more objects as long as the locks of all transactions fit in the lock table. This is not the number of rows that can be locked; that value is unlimited. The default is 64.
 
 When running a standby server, you must set this parameter to the same or higher value than on the master server. Otherwise, queries will not be allowed on the standby server.
 
@@ -837,11 +837,11 @@ When running a standby server, you must set this parameter to the same or higher
 
 `max_connections`
 
-Type: number
+: Type: number
 
-Default: 350
+  Default: 350
 
-In the above snippet, max_connections determines the maximum number of concurrent connections to the database server. The default for Automate is 350 connections.
+  In the above snippet, max_connections determines the maximum number of concurrent connections to the database server. The default for Automate is 350 connections.
 
 When running a standby server, you must set this parameter to the same or higher value than on the master server. Otherwise, queries will not be allowed on the standby server.
 
@@ -851,19 +851,19 @@ This section configures `pg_demp`, a PostgreSQL utility for performing database 
 
 `enable`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-It enables `pg_demp`.
+  It enables `pg_demp`.
 
 `path`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specified the path where the backups should be stored.
+  It specified the path where the backups should be stored.
 
 #### Replication
 
@@ -871,35 +871,35 @@ This section configures replication settings.
 
 `lag_health_threshold`
 
-Type: number
+: Type: number
 
-Default: 20480
+  Default: 20480
 
-It sets the lag health threshold to 20480 bytes, i.e., the maximum allowed replication lag.
+  It sets the lag health threshold to 20480 bytes, i.e., the maximum allowed replication lag.
 
 `max_replay_lag_before_restart_s`
 
-Type: number
+: Type: number
 
-Default: 180
+  Default: 180
 
-It specifies the maximum replay lag before restarting the replication.
+  It specifies the maximum replay lag before restarting the replication.
 
 `name`
 
-Type: string
+: Type: string
 
-Default: replication
+  Default: replication
 
-It specifies the name of the replication.
+  It specifies the name of the replication.
 
 `password`
 
-Type: string
+: Type: string
 
-Default: replication
+  Default: replication
 
-It specifies the password for the replication.
+  It specifies the password for the replication.
 
 #### SSL
 
@@ -907,43 +907,43 @@ This section configures SSL/TLS settings.
 
 `enable`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-It enables the SSL.
+  It enables the SSL.
 
 `issuer_cert`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the root CA (issuer) certificate.
+  It specifies the root CA (issuer) certificate.
 
 `ssl_cert`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the public key certificate.
+  It specifies the public key certificate.
 
 `ssl_key`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the private key.
+  It specifies the private key.
 
 `tls_ciphers`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the allowed TLS ciphers.
+  It specifies the allowed TLS ciphers.
 
 #### User
 
@@ -951,19 +951,19 @@ This section specified the username and password for the superuser (administrato
 
 `name`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the name of the superuser.
+  It specifies the name of the superuser.
 
 `password`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specified the password of the superuser.
+  It specified the password of the superuser.
 
 #### Wal Archive
 
@@ -971,19 +971,19 @@ This section configures WAL archiving.
 
 `enable`
 
-Type: string
+: Type: string
 
-Default: false
+  Default: false
 
-It specifies whether WAL archiving is enabled (false in this case).
+  It specifies whether WAL archiving is enabled (false in this case).
 
 `path`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the path where archived WAL files should be stored.
+  It specifies the path where archived WAL files should be stored.
 
 ### Example
 
@@ -1034,11 +1034,11 @@ It configures action settings.
 
 `destructive_requires_name`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-Setting `destructive_requires_name` to **true** means that destructive actions, such as deleting indices or templates, require an explicit name to prevent accidental deletions.
+  Setting `destructive_requires_name` to **true** means that destructive actions, such as deleting indices or templates, require an explicit name to prevent accidental deletions.
 
 #### Bootstrap
 
@@ -1046,11 +1046,11 @@ This section disables swapping (along with memlock).
 
 `memory_lock`
 
-Type: string
+: Type: string
 
-Default: false
+  Default: false
 
-Swapping can dramatically decrease performance and stability, so you should ensure it is disabled on production clusters.
+  Swapping can dramatically decrease performance and stability, so you should ensure it is disabled on production clusters.
 
 #### Cluster
 
@@ -1058,19 +1058,19 @@ This section configures cluster settings.
 
 `name`
 
-Type: string
+: Type: string
 
-Default: opensearch
+  Default: opensearch
 
-It sets the name of the OpenSearch cluster to “opensearch”.
+  It sets the name of the OpenSearch cluster to “opensearch”.
 
 `max_shards_per_node`
 
-Type: number
+: Type: number
 
-Default: 20000
+  Default: 20000
 
-We can use this setting to set the `max_shards_per_node` value for OpenSearch.
+  We can use this setting to set the `max_shards_per_node` value for OpenSearch.
 
 #### Discovery
 
@@ -1078,29 +1078,29 @@ This section configures discovery settings. It sets the minimum number of master
 
 `minimum_master_nodes`
 
-Type: number
+: Type: number
 
-Default: 2
+  Default: 2
 
-Set `minimum_master_nodes` to prevent the split brain by configuring the majority of nodes (total number of nodes / 2 + 1):
+  Set `minimum_master_nodes` to prevent the split brain by configuring the majority of nodes (total number of nodes / 2 + 1):
 
 `ping_unicast_hosts`
 
-Type: string
+: Type: string
 
-Default: [“127.0.0.1”, “[::1]”]
+  Default: [“127.0.0.1”, “[::1]”]
 
-Set ping_unicast_hosts to pass an initial list of hosts to perform discovery when a new node starts.
+  Set ping_unicast_hosts to pass an initial list of hosts to perform discovery when a new node starts.
 
 #### Gateway
 
 `recover_after_nodes`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Set `recover_after_nodes` to block initial recovery after a full cluster restart until N nodes start.
+  Set `recover_after_nodes` to block initial recovery after a full cluster restart until N nodes start.
 
 #### Logger
 
@@ -1108,29 +1108,29 @@ This section configures logger settings.
 
 `level`
 
-Type: string
+: Type: string
 
-Default: info
+  Default: info
 
-Allowed levels are trace, debug, info, warn, error, and fatal.
+  Allowed levels are trace, debug, info, warn, error, and fatal.
 
 #### Node
 
 `max_local_storage_nodes`
 
-Type: number
+: Type: number
 
-Default: 1
+  Default: 1
 
-Use `max_local_storage_nodes` to disable starting multiple nodes on a single system.
+  Use `max_local_storage_nodes` to disable starting multiple nodes on a single system.
 
 `name`
 
-Type: string
+: Type: string
 
-Default: name
+  Default: name
 
-Use a descriptive name for the node by setting the `name` field.
+  Use a descriptive name for the node by setting the `name` field.
 
 #### OpenSearch Auth
 
@@ -1138,53 +1138,53 @@ This section configures OpenSearch authentication settings.
 
 `admin_password`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It sets the admin password.
+  It sets the admin password.
 
 `admin_username`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It sets the admin username.
+  It sets the admin username.
 
 `hashed_password`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It provides the hashed version of the password.
+  It provides the hashed version of the password.
 
 #### Path
 
 `data`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Use data to set the path to the directory where to store the data (separate multiple locations by comma).
+  Use data to set the path to the directory where to store the data (separate multiple locations by comma).
 
 `logs`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Use logs to set the path to your log files.
+  Use logs to set the path to your log files.
 
 `repo`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Use the repo to register the snapshot repository using OpenSearch. It is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the path.repo setting on all master and data nodes.
+  Use the repo to register the snapshot repository using OpenSearch. It is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the path.repo setting on all master and data nodes.
 
 #### Plugin Security
 
@@ -1192,43 +1192,43 @@ This section configures security plugin settings.
 
 `allow_default_init_securityindex`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-Set the value to `true` to allow the default initialization of the security index.
+  Set the value to `true` to allow the default initialization of the security index.
 
 `allow_unsafe_democertificates`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-Set the value to `true` to allow the default initialization of the unsafe demo certificates.
+  Set the value to `true` to allow the default initialization of the unsafe demo certificates.
 
 `check_snapshot_restore_write_privileges`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-Set the value to `true` to check the snapshot and restore write privileges.
+  Set the value to `true` to check the snapshot and restore write privileges.
 
 `enable_snapshot_restore_privilege`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-Set the value to `true` to enable snapshot and restore privileges.
+  Set the value to `true` to enable snapshot and restore privileges.
 
 `nodes_dn`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the nodes' distinguished name (DNs).
+  It specifies the nodes' distinguished name (DNs).
 
 #### Plugin Security Audit
 
@@ -1236,11 +1236,11 @@ This section configures security audit settings.
 
 `type`
 
-Type: string
+: Type: string
 
-Default: internal_opensearch
+  Default: internal_opensearch
 
-It specifies the type of audit logging as "internal_opensearch"
+  It specifies the type of audit logging as "internal_opensearch"
 
 #### Plugin Security Authcz
 
@@ -1248,11 +1248,11 @@ This section specifies the distinguished name (DN) of the admin user.
 
 `admin_dn`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-Specify the distinguished name (DN) of the admin user.
+  Specify the distinguished name (DN) of the admin user.
 
 #### Plugin Security Restapi
 
@@ -1260,11 +1260,11 @@ This section configures security REST API settings.
 
 `roles_enabled`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It enables SSL/TLS, specifying the certificate’s file paths, private key, and trusted CA certificates.
+  It enables SSL/TLS, specifying the certificate’s file paths, private key, and trusted CA certificates.
 
 #### Plugin Security SSL Transport
 
@@ -1272,43 +1272,43 @@ This section configures SSL/TLS settings for transport layer communication.
 
 `enforce_hostname_verification`
 
-Type: string
+: Type: string
 
-Default: false
+  Default: false
 
-It disables the hostname verification.
+  It disables the hostname verification.
 
 `pemcert_filepath`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the file paths for the certificate.
+  It specifies the file paths for the certificate.
 
 `pemkey_filepath`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the private key.
+  It specifies the private key.
 
 `pemtrustedcas_filepath`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the trusted CA certificates.
+  It specifies the trusted CA certificates.
 
 `resolve_hostname`
 
-Type: string
+: Type: string
 
-Default: false
+  Default: false
 
-It disables/enables the hostname resolution.
+  It disables/enables the hostname resolution.
 
 #### Plugin Security System Indices
 
@@ -1316,27 +1316,27 @@ This section configures system indices for the security plugin.
 
 `cloud_aws_signer`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the cloud aws signer.
+  It specifies the cloud aws signer.
 
 `enabled`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-It enables/disables the security plugin.
+  It enables/disables the security plugin.
 
 `indices`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the system indices that are enabled for various functionalities.
+  It specifies the system indices that are enabled for various functionalities.
 
 #### Runtime
 
@@ -1344,67 +1344,67 @@ This section configures runtime settings.
 
 `es_java_opts`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-
+  
 
 `es_startup_sleep_time`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-
+  
 
 `g1ReservePercent`
 
-Type: number
+: Type: number
 
-Default: 25
+  Default: 25
 
-
+  
 
 `initiatingHeapOccupancyPercent`
 
-Type: number
+: Type: number
 
-Default: 15
+  Default: 15
 
-
+  
 
 `maxHeapsize`
 
-Type: string
+: Type: string
 
-Default: 2g
+  Default: 2g
 
-
+  
 
 `max_locked_memory`
 
-Type: string
+: Type: string
 
-Default: unlimited
+  Default: unlimited
 
-
+  
 
 `max_open_files`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-
+  
 
 `minHeapsize`
 
-Type: string
+: Type: string
 
-Default: 2g
+  Default: 2g
 
-
+  
 
 #### S3 Client Default
 
@@ -1412,43 +1412,43 @@ This section configures the default S3 client settings.
 
 `endpoint`
 
-Type: string
+: Type: string
 
-Default: s3.amazonaws.com
+  Default: s3.amazonaws.com
 
-It specifies the S3 endpoint.
+  It specifies the S3 endpoint.
 
 `max_retries`
 
-Type: string
+: Type: string
 
-Default: 3
+  Default: 3
 
-It specifies the maximum number of retries.
+  It specifies the maximum number of retries.
 
 `protocol`
 
-Type: string
+: Type: string
 
-Default: https
+  Default: https
 
-It specifies the protocol (HTTPS).
+  It specifies the protocol (HTTPS).
 
 `read_timeout`
 
-Type: string
+: Type: string
 
-Default: 60s
+  Default: 60s
 
-It specifies the read timeout.
+  It specifies the read timeout.
 
 `use_throttle_retries`
 
-Type: string
+: Type: string
 
-Default: true
+  Default: true
 
-It sets whether to use throttle retries.
+  It sets whether to use throttle retries.
 
 #### TLS
 
@@ -1456,43 +1456,43 @@ This section configures TLS settings.
 
 `admin_cert`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the admin public key.
+  It specifies the admin public key.
 
 `admin_key`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the admin private key.
+  It specifies the admin private key.
 
 `rootCA`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the root CA certificate.
+  It specifies the root CA certificate.
 
 `ssl_cert`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the public key of the SSL certificate.
+  It specifies the public key of the SSL certificate.
 
 `ssl_key`
 
-Type: string
+: Type: string
 
-Default: none
+  Default: none
 
-It specifies the SSL private key.
+  It specifies the SSL private key.
 
 ### Example
 
