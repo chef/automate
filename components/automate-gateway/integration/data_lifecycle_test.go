@@ -7,6 +7,7 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/api/external/data_lifecycle"
+	"github.com/chef/automate/api/interservice/license_control"
 )
 
 const (
@@ -71,6 +72,15 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 			},
 		},
 	}
+
+	licenseClient, _ := suite.clients.LicenseControlClient()
+
+	updateRequest := &license_control.UpdateRequest{
+		LicenseData: "eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBiZjA4ZDM4LTdiYzQtNDRjMy1hMzYyLTA3ZDlmNzEwZmVkYyIsInZlcnNpb24iOiIxIiwidHlwZSI6ImludGVybmFsIiwiZ2VuZXJhdG9yIjoiY2hlZi9saWNlbnNlLTIuMC4wIiwia2V5X3NoYTI1NiI6ImUwZGYyOGM4YmM2ODE1MGVkYmZlZjk4Y2Q2YjdkYzQzOWMxZjgwYzdlN2VmNzQ3ODkzYTY4OTNhMmY3YjYwZjciLCJnZW5lcmF0aW9uX2RhdGUiOnsic2Vjb25kcyI6MTcxNTA1OTQ4Nn0sImN1c3RvbWVyIjoiY2hlZiBBdXRvbWF0ZSBpbnRlcm5hbCBsaWNlbnNlIiwiY3VzdG9tZXJfaWQiOiI0QjM5Q0Q3QS04QzEwLTRFNjAtQTUwQi1BNDNCODAyM0RCMTMiLCJjdXN0b21lcl9pZF92ZXJzaW9uIjoiMSIsImVudGl0bGVtZW50cyI6W3sibmFtZSI6IkNoZWYgQXV0b21hdGUiLCJtZWFzdXJlIjoibm9kZXMiLCJsaW1pdCI6LTEsInN0YXJ0Ijp7InNlY29uZHMiOjE3MTUwNDAwMDB9LCJlbmQiOnsic2Vjb25kcyI6MTc0NjU3NTk5OX19XX0.AEMHZjRSytD6rzejer-FzFQ84O0GBjdoQCinKFxAKY1nvUbhJIXCF5abBjOHYzZSvKe30XM5U232e9AnHUMGWJWKAcbEK-eMQiHy2iwB6mKpEq6hXuO27P0xZBUHkq0Rz3WpWry6NLVQqqJXAbE79hsOE-g4Ms4C-y1rEw0fkP19RJLQ",
+		Force:       true,
+	}
+
+	licenseClient.Update(suite.ctx, updateRequest)
 
 	newEventFeedConfig := &data_lifecycle.SetEventFeedConfigRequest{
 		JobSettings: []*data_lifecycle.JobSettings{

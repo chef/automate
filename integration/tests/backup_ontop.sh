@@ -18,6 +18,8 @@ install_automate() {
         --admin-password chefautomate \
         --skip-preflight \
         --debug
+
+    do_apply_license    
 }
 do_deploy() {
     install_automate
@@ -39,6 +41,8 @@ do_prepare_restore() {
     copy_hartifacts "$test_hartifacts_path"
 
     install_automate
+
+    
     # Run the diagnostics command again. We'll verify that this does not pass
     #shellcheck disable=SC2154
     chef-automate diagnostics run $test_diagnostics_filters --lb-url "$test_loadbalancer_url" --skip-cleanup --save-file "/tmp/context2"

@@ -45,8 +45,7 @@ var allowApiList = []string{"/chef.automate.api.event_feed.EventFeedService/GetE
 	"/chef.automate.api.iam.v2.Users/GetUser",
 	"/chef.automate.api.iam.v2.Teams/GetTeam",
 	"/chef.automate.api.iam.v2.Teams/GetTeamMembership",
-	"/chef.automate.api.iam.v2.Teams/AddTeamMembers",
-	"/chef.automate.api.iam.v2.Tokens/CreateToken"}
+	"/chef.automate.api.iam.v2.Teams/AddTeamMembers"}
 
 // refreshLicenseList consists of api endpoints after which the license details needs to be fetchef again
 var refreshLicenseList = []string{"/chef.automate.api.license.License/RequestLicense", "/chef.automate.api.license.License/ApplyLicense"}
