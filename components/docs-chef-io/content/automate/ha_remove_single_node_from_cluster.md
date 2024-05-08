@@ -63,9 +63,9 @@ The command requires some arguments to determine which types of nodes you want t
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
-You can remove other unreachable nodes while removing a node
+You can remove other unreachable nodes while removing a node.
 
-- To remove unreachable nodes while removing a node, pass the flag `--remove-unreachable-node` or `-r` like example below
+- To remove unreachable nodes while removing a node, pass the flag --remove-unreachable-node or -r like the example below:
 
      ```sh
      chef-automate node remove --automate-ip 10.1.2.23 --remove-unreachable-node
@@ -121,9 +121,9 @@ The command requires some arguments to determine the type of node you want to re
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
-You can remove other unreachable nodes while removing a node
+You can remove other unreachable nodes while removing a node.
 
-- To remove unreachable nodes while removing a node, pass the flag `--remove-unreachable-node` or `-r` like example below
+- To remove unreachable nodes while removing a node, pass the flag --remove-unreachable-node or -r like the example below:
 
      ```sh
      chef-automate node remove --automate-ip 10.1.2.23 --remove-unreachable-node
