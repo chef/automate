@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/pmt"
 	"github.com/chef/automate/lib/sshutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -158,4 +159,13 @@ func executeConfigVerifyAndPromptConfirmationOnError(configFile string) error {
 		}
 	}
 	return nil
+}
+
+func markGlobalFlagsHiddenExcept(command *cobra.Command, unhidden ...string) {
+	command.PersistentFlags().VisitAll(func(f *pflag.Flag) {
+		name := f.Name
+		if !stringutils.SliceContains(unhidden, name) {
+			f.Hidden = true
+		}
+	})
 }
