@@ -45,7 +45,7 @@ do_deploy_gcs_default() {
 }
 
 do_apply_license(){
-    chef-automate license apply "temp-license"
+   chef-automate license apply "$A2_LICENSE"
 }
 
 
