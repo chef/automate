@@ -15,6 +15,7 @@ import { of } from "rxjs";
 import * as eventFeedActions from "../../services/event-feed/event-feed.actions";
 import * as eventFeedSelectors from "../../services/event-feed/event-feed.selectors";
 import { EventTaskCount } from "../../types/types";
+import * as moment from 'moment';
 
 describe("EventFeedComponent", () => {
   let component: EventFeedComponent;
@@ -32,10 +33,10 @@ describe("EventFeedComponent", () => {
     };
 
     mockActivatedRoute = {
-        snapshot: {
-          queryParamMap: { get: () => {} }, // Simulate snapshot queryParamMap
-        },
-        queryParamMap: of({ get: () => {} }), // Simulate observable queryParamMap
+      snapshot: {
+        queryParamMap: { getAll: () => [] },
+      },
+      queryParamMap: of({ getAll: () => [] }),
     };
       
     mockRouter = {
@@ -123,6 +124,7 @@ describe("EventFeedComponent", () => {
     expect(mockStore.dispatch).toHaveBeenCalled();
   }));
 
+  // addFeedDateRangeFilter
   it("should disable resetTimescale and clear filterTimeScaleDates when date range is within 6 days", () => {
     const dateRange = { start: new Date(), end: new Date() };
     component.selectDateRange(dateRange);
@@ -134,6 +136,7 @@ describe("EventFeedComponent", () => {
     );
   });
   
+  // addFeedDateRangeFilter
   it("should enable resetTimescale and set filterTimeScaleDates when date range exceeds 6 days", () => {
     const startDate = new Date("2024-05-01");
     const endDate = new Date("2024-05-08");
@@ -150,6 +153,7 @@ describe("EventFeedComponent", () => {
     );
   });
   
+  // setHeadersCountOnFilterTimeScale
   it("should update header counts after a delay", fakeAsync(() => {
     const initialCounts: EventTaskCount = {
       total: 10,
@@ -168,4 +172,37 @@ describe("EventFeedComponent", () => {
     expect(component.createCounts).toEqual(initialCounts.create);
     expect(component.deleteCounts).toEqual(initialCounts.delete);
   }));
+
+  // getAllDatesInRange
+  it('should generate correct array of dates between start and end date', () => {
+    const startDate = new Date('2024-05-01');
+    const endDate = new Date('2024-05-05');
+    const expectedDates = ['2024-05-01', '2024-05-02', '2024-05-03', '2024-05-04', '2024-05-05'];
+    const generatedDates = component.getAllDatesInRange(startDate, endDate);
+    expect(generatedDates).toEqual(expectedDates);
+  });
+
+  it('should handle the case when start and end dates are the same', () => {
+    const startDate = new Date('2024-05-01');
+    const endDate = new Date('2024-05-01');
+    const expectedDates = ['2024-05-01'];
+    const generatedDates = component.getAllDatesInRange(startDate, endDate);
+    expect(generatedDates).toEqual(expectedDates);
+  });
+
+  it('should handle the case when end date is before the start date', () => {
+    const startDate = new Date('2024-05-05');
+    const endDate = new Date('2024-05-01');
+    const generatedDates = component.getAllDatesInRange(startDate, endDate);
+    expect(generatedDates.length).toBe(0);
+  });
+
+  it('should handle edge cases for large date ranges', () => {
+    const startDate = new Date('2024-05-01');
+    const endDate = new Date('2024-05-10');
+    const generatedDates = component.getAllDatesInRange(startDate, endDate);
+    const expectedLength = moment(endDate).diff(startDate, 'days') + 1;
+    expect(generatedDates.length).toBe(expectedLength);
+  });
+  
 });
