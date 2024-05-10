@@ -765,6 +765,11 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license    
+          
 
   - label: "upgrade dev -> master"
     command:
@@ -774,6 +779,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license    
 
   - label: "upgrade acceptance -> master"
     command:
@@ -783,6 +792,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license    
 
   - label: "upgrade current -> master"
     command:
