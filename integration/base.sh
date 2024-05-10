@@ -211,7 +211,7 @@ do_deploy() {
 }
 
 do_apply_license(){
-    chef-automate license apply "temp-license"
+    chef-automate license apply "$A2_LICENSE"
 }
 
 do_deploy_default() {
@@ -221,7 +221,7 @@ do_deploy_default() {
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
         --accept-terms-and-mlsa \
-        --debug
+        --debug 
 }
 
 do_test_deploy() {
