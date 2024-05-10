@@ -1,12 +1,22 @@
-import { ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core/testing';
-import { EventFeedComponent } from './event-feed.component';
-import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { of } from 'rxjs';
-import * as eventFeedActions from '../../services/event-feed/event-feed.actions';
+import {
+  ComponentFixture,
+  TestBed,
+  tick,
+  fakeAsync,
+} from "@angular/core/testing";
+import { EventFeedComponent } from "./event-feed.component";
+import { Store } from "@ngrx/store";
+import { ActivatedRoute, Router } from "@angular/router";
+import {
+  LayoutFacadeService,
+  Sidebar,
+} from "app/entities/layout/layout.facade";
+import { of } from "rxjs";
+import * as eventFeedActions from "../../services/event-feed/event-feed.actions";
+import * as eventFeedSelectors from "../../services/event-feed/event-feed.selectors";
+import { EventTaskCount } from "../../types/types";
 
-describe('EventFeedComponent', () => {
+describe("EventFeedComponent", () => {
   let component: EventFeedComponent;
   let fixture: ComponentFixture<EventFeedComponent>;
   let mockStore: any;
@@ -17,27 +27,23 @@ describe('EventFeedComponent', () => {
 
   beforeEach(async () => {
     mockStore = {
-      select: jasmine.createSpy('select').and.returnValue(of([])),
-      dispatch: jasmine.createSpy('dispatch')
+      select: jasmine.createSpy("select").and.returnValue(of([])),
+      dispatch: jasmine.createSpy("dispatch"),
     };
 
     mockActivatedRoute = {
         snapshot: {
-          queryParamMap: of({}), // Mocking queryParamMap to return an observable with an empty object
+          queryParamMap: { get: () => {} }, // Simulate snapshot queryParamMap
         },
-        // Provide a mock for the pipe method of queryParamMap
-        queryParamMap: {
-          pipe: () => of({}) // Mocking the pipe method to return an observable with an empty object
-        }
-      };
-    
-
+        queryParamMap: of({ get: () => {} }), // Simulate observable queryParamMap
+    };
+      
     mockRouter = {
-      navigate: jasmine.createSpy('navigate')
+      navigate: jasmine.createSpy("navigate"),
     };
 
     mockLayoutFacadeService = {
-      showSidebar: jasmine.createSpy('showSidebar')
+      showSidebar: jasmine.createSpy("showSidebar"),
     };
 
     await TestBed.configureTestingModule({
@@ -46,8 +52,8 @@ describe('EventFeedComponent', () => {
         { provide: Store, useValue: mockStore },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: LayoutFacadeService, useValue: mockLayoutFacadeService },
-        { provide: Router, useValue: mockRouter }, 
-      ]
+        { provide: Router, useValue: mockRouter },
+      ],
     }).compileComponents();
     router = TestBed.inject(Router);
   });
@@ -58,58 +64,108 @@ describe('EventFeedComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize component properly', () => {
-    expect(mockLayoutFacadeService.showSidebar).toHaveBeenCalledWith(Sidebar.Dashboards);
+  it("should initialize component properly", () => {
+    expect(mockLayoutFacadeService.showSidebar).toHaveBeenCalledWith(
+      Sidebar.Dashboards
+    );
   });
 
-  it('should toggle filters visibility', () => {
+  it("should toggle filters visibility", () => {
     const initialVisibility = component.filtersVisible;
     component.toggleFilters();
     expect(component.filtersVisible).toEqual(!initialVisibility);
   });
 
-  it('should dispatch suggestion action on suggest values', () => {
-    const type = 'test';
-    const text = 'test';
+  it("should dispatch suggestion action on suggest values", () => {
+    const type = "test";
+    const text = "test";
     component.onSuggestValues({ detail: { type, text } });
-    expect(mockStore.dispatch).toHaveBeenCalledWith(eventFeedActions.getSuggestions(type, text));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      eventFeedActions.getSuggestions(type, text)
+    );
   });
 
-  it('should update router on filter added', () => {
-    const event = { detail: { type: 'test', text: 'test' } };
-    const navigateSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+  it("should update router on filter added", () => {
+    const event = { detail: { type: "test", text: "test" } };
     component.onFilterAdded(event);
-    expect(navigateSpy).toHaveBeenCalledWith([], {
-      queryParams: { test: ['test'] }
-    }); 
+    expect(router.navigate).toHaveBeenCalledWith([], {
+      queryParams: { test: ["test"] },
+    });
   });
-  
 
-  it('should update router on filters clear', () => {
+  it("should update router on filters clear", () => {
     const event = {};
     component.onFiltersClear(event);
     expect(mockRouter.navigate).toHaveBeenCalled();
   });
 
-  it('should update router on filter removed', () => {
-    const event = { detail: { type: 'test', text: 'test' } };
+  it("should update router on filter removed", () => {
+    const event = { detail: { type: "test", text: "test" } };
     component.onFilterRemoved(event);
     expect(mockRouter.navigate).toHaveBeenCalled();
   });
 
-  it('should dispatch load more action on load more', () => {
+  it("should dispatch load more action on load more", () => {
     component.loadMore();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(eventFeedActions.loadMoreFeed());
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      eventFeedActions.loadMoreFeed()
+    );
   });
 
-  it('should dispatch date range filter action on select date range', fakeAsync(() => {
+  it("should dispatch date range filter action on select date range", fakeAsync(() => {
     const dateRange = { start: new Date(), end: new Date() };
     component.selectDateRange(dateRange);
     tick();
     expect(mockStore.dispatch).toHaveBeenCalled();
+  }));
+
+  it("should disable resetTimescale and clear filterTimeScaleDates when date range is within 6 days", () => {
+    const dateRange = { start: new Date(), end: new Date() };
+    component.selectDateRange(dateRange);
+  
+    expect(component.resetTimescaleDisabled).toBe(true);
+    expect(component.filterTimeScaleDates).toEqual([]);
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      eventFeedActions.addFeedDateRangeFilter(dateRange.start, dateRange.end)
+    );
+  });
+  
+  it("should enable resetTimescale and set filterTimeScaleDates when date range exceeds 6 days", () => {
+    const startDate = new Date("2024-05-01");
+    const endDate = new Date("2024-05-08");
+    const dateRange = { start: startDate, end: endDate };
+  
+    component.selectDateRange(dateRange);
+  
+    expect(component.resetTimescaleDisabled).toBe(false);
+    // Mock the expected date range within the function
+    const expectedDateRange = ["2024-05-01", "2024-05-02", "2024-05-03", "2024-05-04", "2024-05-05", "2024-05-06", "2024-05-07", "2024-05-08"];
+    expect(component.filterTimeScaleDates).toEqual(expectedDateRange);
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      eventFeedActions.addFeedDateRangeFilter(dateRange.start, dateRange.end)
+    );
+  });
+  
+  it("should update header counts after a delay", fakeAsync(() => {
+    const initialCounts: EventTaskCount = {
+      total: 10,
+      update: 3,
+      create: 4,
+      delete: 3,
+    };
+    spyOn(eventFeedSelectors, "eventTaskCounts").and.returnValue(
+      of(initialCounts)
+    );
+    component.setHeadersCountOnFilterTimeScale();
+    tick(1000);
+
+    expect(component.totalTaskCounts).toEqual(initialCounts.total);
+    expect(component.updateCounts).toEqual(initialCounts.update);
+    expect(component.createCounts).toEqual(initialCounts.create);
+    expect(component.deleteCounts).toEqual(initialCounts.delete);
   }));
 });
