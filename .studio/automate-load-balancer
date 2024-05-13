@@ -25,9 +25,3 @@ automate_load_balancer_integration() {
   status="$(curl -fsS --insecure -H "api-token: ${api_token}" "${target}/api/v0/status")"
   jq -ne --argjson status "$status" '$status.ok' || return 1
 }
-
-
-function apply_license(){
-  license=${A2_LICENSE-default}
-    chef-automate license apply license
-}
