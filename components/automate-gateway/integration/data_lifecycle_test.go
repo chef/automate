@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -49,6 +50,8 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 
 	licenseClient, _ := suite.clients.LicenseControlClient()
 
+	fmt.Println("-----", os.Getenv("A2_LICENSE"))
+
 	updateRequest := &license_control.UpdateRequest{
 		LicenseData: os.Getenv("A2_LICENSE"),
 		Force:       true,
@@ -58,12 +61,12 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	oldStatus, err := dlClient.GetStatus(suite.ctx, &data_lifecycle.GetStatusRequest{})
 	suite.Require().NoError(err)
 
-	// Se
+	// Set each config individually
 	newComplianceConfig := &data_lifecycle.SetComplianceConfigRequest{
 		JobSettings: []*data_lifecycle.JobSettings{
 			&data_lifecycle.JobSettings{
 				Name:       compliancePurgeJobName,
-				Di
+				Disabled:   true,
 				Recurrence: testRecurrence,
 				PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
 					Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
@@ -82,8 +85,6 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 			},
 		},
 	}
-
-	
 
 	newEventFeedConfig := &data_lifecycle.SetEventFeedConfigRequest{
 		JobSettings: []*data_lifecycle.JobSettings{
@@ -253,6 +254,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 // if our job was successfully run.
 func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	dlClient := data_lifecycle.NewDataLifecycleClient(suite.gwConn)
+
 	licenseClient, _ := suite.clients.LicenseControlClient()
 
 	updateRequest := &license_control.UpdateRequest{
@@ -368,15 +370,6 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 			},
 		},
 	})
-
-	licenseClient, _ := suite.clients.LicenseControlClient()
-
-	updateRequest := &license_control.UpdateRequest{
-		LicenseData: os.Getenv("A2_LICENSE"),
-		Force:       true,
-	}
-
-	licenseClient.Update(suite.ctx, updateRequest)
 
 	// Config changes will kick off enabled jobs. Let's wait for them to quickly
 	// finish and then reset the start time for our next jobs.
@@ -664,7 +657,6 @@ func (suite *GatewayTestSuite) TestConvertJobStatusToJobSetting() {
 
 	licenseClient.Update(suite.ctx, updateRequest)
 	generatedSettings := jobStatusesToJobSettings(statuses)
-
 
 	// Rather than deep compare our expected settings with the generated settings
 	// we can assert that both match the statuses.

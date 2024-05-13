@@ -267,50 +267,50 @@ steps:
 #             - HAB_STUDIO_SUP=false
 #             - HAB_NONINTERACTIVE=true
 
-#   # The license_usage_nodes_test appears to require AWS access. We
-#   # might consider splitting this into two different tests.
-#   - label: "gateway-integration"
-#     command:
-#       - . scripts/verify_setup.sh
-#       - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test ./components/automate-gateway/integration/..."
-#     timeout_in_minutes: 20
-#     retry:
-#       automatic:
-#         limit: 1
-#     expeditor:
-#       accounts:
-#         - aws/chef-cd
-#       secrets:
-#         HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
-#           account: aws/chef-cd
-#           field: access_key_id
-#         HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
-#           account: aws/chef-cd
-#           field: secret_access_key
-#         HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
-#           account: aws/chef-cd
-#           field: session_token
-#         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST:
-#           path: secret/a2/testing/target_host
-#           field: data
-#         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST2:
-#           path: secret/a2/testing/target_host2
-#           field: data
-#         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USER:
-#           path: secret/a2/testing/target_user
-#           field: data
-#         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY:
-#           path: secret/a2/testing/target_key
-#           field: data
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license  
-#       executor:
-#         docker:
-#           privileged: true
-#           environment:
-#             - HAB_STUDIO_SUP=false
-#             - HAB_NONINTERACTIVE=true
+  # The license_usage_nodes_test appears to require AWS access. We
+  # might consider splitting this into two different tests.
+  - label: "gateway-integration"
+    command:
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test ./components/automate-gateway/integration/..."
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      secrets:
+        HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST:
+          path: secret/a2/testing/target_host
+          field: data
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST2:
+          path: secret/a2/testing/target_host2
+          field: data
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USER:
+          path: secret/a2/testing/target_user
+          field: data
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY:
+          path: secret/a2/testing/target_key
+          field: data
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license  
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
 
 #   - label: "iam automate-gateway integration"
 #     command:
