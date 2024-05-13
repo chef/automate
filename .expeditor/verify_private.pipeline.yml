@@ -171,6 +171,8 @@ steps:
       automatic:
         limit: 1
     expeditor:
+      accounts:
+        - aws/chef-cd
       executor:
         docker:
           privileged: true
@@ -300,6 +302,9 @@ steps:
         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY:
           path: secret/a2/testing/target_key
           field: data
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license  
       executor:
         docker:
           privileged: true

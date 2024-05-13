@@ -160,6 +160,13 @@ start_all_services() {
   if [[ -f "/src/dev/license.jwt" ]]; then
      chef-automate license apply "/src/dev/license.jwt"
   fi
+
+  if [[ -z "$A2_LICENSE" ]]; then
+    log_line "env not set"
+  else
+    chef-automate license apply "$A2_LICENSE"
+  fi  
+
   chef-automate dev create-iam-dev-users
 }
 

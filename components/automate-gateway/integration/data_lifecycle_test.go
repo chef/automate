@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -76,7 +77,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	licenseClient, _ := suite.clients.LicenseControlClient()
 
 	updateRequest := &license_control.UpdateRequest{
-		LicenseData: "temp-license",
+		LicenseData: os.Getenv("A2_LICENSE"),
 		Force:       true,
 	}
 
@@ -358,6 +359,15 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 		},
 	})
 
+	licenseClient, _ := suite.clients.LicenseControlClient()
+
+	updateRequest := &license_control.UpdateRequest{
+		LicenseData: os.Getenv("A2_LICENSE"),
+		Force:       true,
+	}
+
+	licenseClient.Update(suite.ctx, updateRequest)
+
 	// Config changes will kick off enabled jobs. Let's wait for them to quickly
 	// finish and then reset the start time for our next jobs.
 	time.Sleep(1 * time.Second)
@@ -635,7 +645,16 @@ func (suite *GatewayTestSuite) TestConvertJobStatusToJobSetting() {
 		},
 	}
 
+	licenseClient, _ := suite.clients.LicenseControlClient()
+
+	updateRequest := &license_control.UpdateRequest{
+		LicenseData: os.Getenv("A2_LICENSE"),
+		Force:       true,
+	}
+
+	licenseClient.Update(suite.ctx, updateRequest)
 	generatedSettings := jobStatusesToJobSettings(statuses)
+
 
 	// Rather than deep compare our expected settings with the generated settings
 	// we can assert that both match the statuses.
