@@ -244,9 +244,9 @@ export class EventFeedComponent implements OnInit, OnDestroy {
 
     if (start.add(6, 'days').format('l') !== end.format('l')) {
       this.resetTimescaleDisabled = false;
-      const isStartDate = moment(dateRange.start).toDate();
-      const isEndDate = moment(dateRange.end).toDate();
-      const dateInRange = this.getAllDatesInRange(isStartDate, isEndDate)
+      const startDateFrom = moment(dateRange.start).toDate();
+      const endDateTo = moment(dateRange.end).toDate();
+      const dateInRange = this.getAllDatesInRange(startDateFrom, endDateTo)
       this.filterTimeScaleDates = [...dateInRange];
     } else {
       this.resetTimescaleDisabled = true;
