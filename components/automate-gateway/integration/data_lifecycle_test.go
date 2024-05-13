@@ -368,15 +368,6 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 		},
 	})
 
-	licenseClient, _ := suite.clients.LicenseControlClient()
-
-	updateRequest := &license_control.UpdateRequest{
-		LicenseData: os.Getenv("A2_LICENSE"),
-		Force:       true,
-	}
-
-	licenseClient.Update(suite.ctx, updateRequest)
-
 	// Config changes will kick off enabled jobs. Let's wait for them to quickly
 	// finish and then reset the start time for our next jobs.
 	time.Sleep(1 * time.Second)
