@@ -164,7 +164,7 @@ start_all_services() {
   if [[ -z "$A2_LICENSE" ]]; then
     log_line "env not set"
   else
-    chef-automate license apply "$A2_LICENSE"
+    chef-automate license apply "'$A2_LICENSE'"
   fi  
 
   chef-automate dev create-iam-dev-users
