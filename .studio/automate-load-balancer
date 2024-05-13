@@ -29,5 +29,6 @@ automate_load_balancer_integration() {
 
 
 function apply_license(){
-    chef-automate license apply "$A2_LICENSE"
+  license=${A2_LICENSE-default}
+  chef-automate license apply license
 }
