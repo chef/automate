@@ -161,8 +161,9 @@ steps:
   - label: "automate-load-balancer"
     command:
       - . scripts/verify_setup.sh
+      - echo "\$A2_LICENSE" > dev/license.jwt
       - |
-        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > dev/license.jwt
+        hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deploy-some chef/automate-load-balancer --with-deps &&
           automate_load_balancer_integration"
