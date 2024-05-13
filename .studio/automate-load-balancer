@@ -5,7 +5,6 @@ document "automate_load_balancer_integration" <<DOC
 DOC
 automate_load_balancer_integration() {
 
-  apply_license
   local target=${1:-"https://127.0.0.1"}
   local output
 
