@@ -12,14 +12,11 @@ gh_repo = "automate"
     weight = 50
 +++
 
-## Insuring autocomplete remains disable on login screen.
+## Insuring autocomplete remains disabled on the login screen.
 
-Their is a configration maintained in automate this determine autocomplete functionlity
+A configuration maintained in automate determines to autocomplete functionality in the nginx config.
 
-in the nginx config 
-
-    
     add_header Cache-Control "no-cache, no-store, must-revalidate";
     
 
-Please insure that you don't update or change this confugration.
+Please ensure you don't update or change this configuration.
