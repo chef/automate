@@ -12,9 +12,9 @@ gh_repo = "automate"
     weight = 50
 +++
 
-## Insuring autocomplete remains disabled on the login screen.
+## Ensuring autocomplete remains disabled on the login screen.
 
-A configuration maintained in automate determines to autocomplete functionality in the nginx config.
+A configuration maintained in Chef Automate's nginx.conf file determines the autocomplete functionality.
 
     add_header Cache-Control "no-cache, no-store, must-revalidate";
     
