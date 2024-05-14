@@ -303,7 +303,7 @@ steps:
         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY:
           path: secret/a2/testing/target_key
           field: data
-        A2_LICENSE:
+        HAB_STUDIO_SECRET_A2_LICENSE:
           path: secret/a2/license
           field: license  
       executor:
