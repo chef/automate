@@ -245,10 +245,14 @@ export class TelemetryService {
   }
 
   registerChefTelemetryTracker() {
-    if(chefTelemetryTracker) {
-      chefTelemetryTracker.register('automate');
-      this.initializeChefTelemetryTracker();
-      return;
+    try {
+      if(chefTelemetryTracker) {
+        chefTelemetryTracker.register('automate');
+        this.initializeChefTelemetryTracker();
+        return;
+      }
+    }catch (e) {
+      console.log('Unable to register ChefTelemetryTracker ', e);
     }
     setTimeout(this.registerChefTelemetryTracker,100);
   }
