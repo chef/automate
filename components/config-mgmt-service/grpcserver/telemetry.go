@@ -46,7 +46,7 @@ func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.Get
 		}
 	}
 	return &response.GetNodesUsageCountResponse{
-		DaysSinceLastPost: int64(30),
+		DaysSinceLastPost: int64(daysSinceLastPost),
 		NodeCnt:           count,
 	}, nil
 }
