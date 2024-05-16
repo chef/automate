@@ -549,6 +549,12 @@ func (t *LocalTarget) UnloadService(ctx context.Context, svc habpkg.VersionedPac
 	fmt.Printf("**************************output: %v\n", output)
 	fmt.Printf("*******************************err: %v\n", err)
 	if err != nil {
+		// Check if the error message indicates inability to contact the Supervisor
+		if strings.Contains(err.Error(), "Unable to contact the Supervisor") {
+			// Handle Supervisor not reachable error gracefully
+			return errors.Wrapf(err, "Failed to unload service %s\nSupervisor is not reachable",
+				ident)
+		}
 		return errors.Wrapf(err, "Failed to unload service %s\nOutput:\n%s",
 			ident, output)
 	}
