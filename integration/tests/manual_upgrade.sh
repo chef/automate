@@ -99,6 +99,8 @@ y' | chef-automate upgrade status --versions-file "$versionsFile"
         #shellcheck disable=SC2154
         wait_for_upgrade "false"
     fi
+
+    do_apply_license
 }
 
 do_test_upgrade() {
