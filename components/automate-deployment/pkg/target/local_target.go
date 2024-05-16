@@ -538,6 +538,7 @@ func (t *LocalTarget) StopService(ctx context.Context, svc habpkg.VersionedPacka
 // returns an error if any portion of the removal fails. Packages are
 // not deleted for unload
 func (t *LocalTarget) UnloadService(ctx context.Context, svc habpkg.VersionedPackage) error {
+	logrus.Debug("*****************************************started unloading service %s\n ***********", svc)
 	ident := habpkg.ShortIdent(svc)
 	logrus.WithFields(logrus.Fields{
 		"package": ident,
@@ -545,6 +546,8 @@ func (t *LocalTarget) UnloadService(ctx context.Context, svc habpkg.VersionedPac
 	}).Debug()
 
 	output, err := t.HabCmd.UnloadService(ctx, svc)
+	fmt.Printf("**************************output: %v\n", output)
+	fmt.Printf("*******************************err: %v\n", err)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to unload service %s\nOutput:\n%s",
 			ident, output)
