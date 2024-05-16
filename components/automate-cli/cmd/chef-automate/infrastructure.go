@@ -13,7 +13,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -145,7 +144,10 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 				licenseResult.ErrorDescription,
 			)
 		}
-		return errors.New("Please apply a license")
+		return status.New(
+			status.LicenseError,
+			"Please apply a license.Please contact sales@chef.io to have your Chef Automate license.",
+		)
 	}
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) //gives unix time stamp in utc
 
