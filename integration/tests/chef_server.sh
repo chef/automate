@@ -39,6 +39,7 @@ do_deploy() {
         --enable-chef-server \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
+    do_apply_license    
 }
 
 liveness_error_dump() {
