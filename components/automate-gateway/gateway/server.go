@@ -61,7 +61,14 @@ func (s *Server) newGRPCServer() (*grpc.Server, error) {
 		return nil, errors.Wrap(err, "create auth client")
 	}
 
+	licenseClient, err := s.clientsFactory.LicenseControlClient()
+	if err != nil {
+		return nil, errors.Wrap(err, "create license client")
+	}
+
 	authInterceptor := middleware.NewAuthInterceptor(authClient, s.authorizer)
+
+	license := middleware.NewLicenseInterceptor(licenseClient)
 
 	logrusEntry := log.NewEntry(log.StandardLogger())
 
@@ -109,6 +116,7 @@ func (s *Server) newGRPCServer() (*grpc.Server, error) {
 			grpc_ctxtags.StreamServerInterceptor(),
 			grpc_logrus.StreamServerInterceptor(logrusEntry, logrusOpts...),
 			authInterceptor.StreamServerInterceptor(),
+			license.StreamServerInterceptor(),
 			grpc_prometheus.StreamServerInterceptor,
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -116,6 +124,7 @@ func (s *Server) newGRPCServer() (*grpc.Server, error) {
 			grpc_logrus.UnaryServerInterceptor(logrusEntry, logrusOpts...),
 			tracing.ServerInterceptor(tracing.GlobalTracer()),
 			authInterceptor.UnaryServerInterceptor(),
+			license.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 		)),
 	}

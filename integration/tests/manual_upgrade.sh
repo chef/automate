@@ -52,6 +52,8 @@ do_deploy() {
         --debug
 
     chef-automate version
+
+    do_apply_license
 }
 
 # By default, do_prepare_upgrade will replace the latest manifest.
@@ -97,6 +99,8 @@ y' | chef-automate upgrade status --versions-file "$versionsFile"
         #shellcheck disable=SC2154
         wait_for_upgrade "false"
     fi
+
+    do_apply_license
 }
 
 do_test_upgrade() {
