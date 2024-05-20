@@ -78,7 +78,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 **In AWS Managed Services**
 
--   **SQL Database:** AWS RDS PostgreSQL: 13.5
+-   **SQL Database:** AWS RDS PostgreSQL: 13.14
 -   **NoSQL Database:** AWS OpenSearch: 1.3
 -   **Load Balancer:** External not supported
 
@@ -175,7 +175,7 @@ The AWS deployment specific pre-requisites are as follows:
 -   Bastion must be in the same VPC for deployment.
 -   It is recommended to use subnet IDs over CIDR, CIDR will only work if VPC has sufficient range available to create new subnets.
 -   **In AWS Managed Services:**
-    -   Setup [AWS RDS PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
+    -   Setup [AWS RDS PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.14 in the same VPC.
     -   Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
 
 ### Infra Server
@@ -229,7 +229,7 @@ Setup the following databases with password-based authentication.
 
 ### AWS Managed
 
--   AWS RDS PostgreSQL: 13.5
+-   AWS RDS PostgreSQL: 13.14
 -   AWS OpenSearch: 1.3
 
 Configure the backup only with **S3** when using AWS managed databases.
