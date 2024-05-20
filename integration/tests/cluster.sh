@@ -63,6 +63,9 @@ do_deploy() {
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
 
+    docker exec -t "$_frontend1_container_name" \
+        "$cli_bin" license apply "$A2_LICENSE"       
+
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" deploy config.toml \
             --hartifacts "$test_hartifacts_path" \
@@ -71,6 +74,9 @@ do_deploy() {
             --admin-password chefautomate \
             --bootstrap-bundle bootstrap.abb \
             --accept-terms-and-mlsa
+
+    docker exec -t "$_frontend2_container_name" \
+        "$cli_bin" license apply "$A2_LICENSE"           
 
     start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 
