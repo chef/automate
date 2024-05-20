@@ -52,7 +52,7 @@ export const NodesEntityInitialState: NodesEntityState = nodesEntityAdapter.getI
 });
 
 export function nodesEntityReducer(state: NodesEntityState = NodesEntityInitialState,
-  action: NodesActions): NodesEntityState {
+  action: NodesActions | any): NodesEntityState {
 
   switch (action.type) {
     case NodesActionTypes.LIST_NODES: {

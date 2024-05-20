@@ -11,7 +11,7 @@ import {
 export class PolicyGroupsListComponent implements OnChanges {
   @Input() serverId: string;
   @Input() orgId: string;
-  @Input() policyGroups: [];
+  @Input() policyGroups: any;
   @Input() pageOfItems: [];
 
   constructor() { }

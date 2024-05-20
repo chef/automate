@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { Utilities } from '../../helpers/utilities/utilities';
 
 enum UrlTestState {
   Inactive,

@@ -2,10 +2,10 @@ import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { ProfilesService } from 'app/services/profiles/profiles.service';
-import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { ProfilesService } from '../../../../services/profiles/profiles.service';
+import { AvailableProfilesService } from '../../../../services/profiles/available-profiles.service';
+import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
+import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout.facade';
 
 import { saveAs } from 'file-saver';
 

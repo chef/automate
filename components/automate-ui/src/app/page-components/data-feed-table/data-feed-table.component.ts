@@ -3,12 +3,12 @@ import {
   Input
 } from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core';
-import { DeleteDestination, EnableDisableDestination } from 'app/entities/destinations/destination.actions';
-import { Destination } from 'app/entities/destinations/destination.model';
+import { DeleteDestination, EnableDisableDestination } from '../../entities/destinations/destination.actions';
+import { Destination } from '../../entities/destinations/destination.model';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-data-feed-table',

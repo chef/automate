@@ -8,10 +8,10 @@ import {
   ElementRef
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Revision } from 'app/entities/revisions/revision.model';
-import { Regex } from 'app/helpers/auth/regex';
-import { regions } from 'app/entities/destinations/destination.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { Revision } from '../../entities/revisions/revision.model';
+import { Regex } from '../../helpers/auth/regex';
+import { regions } from '../../entities/destinations/destination.model';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
@@ -382,7 +382,8 @@ export class DataFeedCreateComponent {
     return (this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD);
   }
 
-  public validateHeaders(customHeaders: string): void {
+  public validateHeaders(e): void {
+    const customHeaders = e.target.value;
     const headersVal = customHeaders.split('\n');
     for (const values in headersVal) {
       if (this.headerChecked && headersVal[values]) {

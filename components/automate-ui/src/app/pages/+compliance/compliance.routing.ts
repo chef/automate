@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { ComplianceComponent } from './compliance.component';
 import {
   ComplianceLandingComponent
-} from 'app/pages/compliance-landing/compliance-landing.component';
+} from '../../pages/compliance-landing/compliance-landing.component';
 
 const routes: Routes = [
   {

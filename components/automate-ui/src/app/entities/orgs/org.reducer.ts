@@ -2,7 +2,7 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { OrgActionTypes, OrgActions } from './org.actions';
 import { Org } from './org.model';
 
@@ -36,7 +36,7 @@ export const OrgEntityInitialState: OrgEntityState =
 
 export function orgEntityReducer(
   state: OrgEntityState = OrgEntityInitialState,
-  action: OrgActions): OrgEntityState {
+  action: OrgActions | any): OrgEntityState {
 
   switch (action.type) {
     case OrgActionTypes.GET_ALL:

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { mapKeys, snakeCase } from 'lodash/fp';
 
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { CreateUserPayload } from './user.actions';
 import { User } from './user.model';
 import { SelfUser } from './userself.model';

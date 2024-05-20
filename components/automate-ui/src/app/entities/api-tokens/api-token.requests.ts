@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { ApiToken } from './api-token.model';
 import { CreateTokenPayload } from './api-token.actions';
 

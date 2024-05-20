@@ -2,28 +2,28 @@ import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams, routeURL } from 'app/route.selectors';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { routeParams, routeURL } from '../../../route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
-import { environmentFromRoute } from 'app/entities/environments/environment-details.selectors';
-import { GetEnvironment } from 'app/entities/environments/environment.action';
-import { Org } from 'app/entities/orgs/org.model';
-import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
-import { GetOrg } from 'app/entities/orgs/org.actions';
+import { Cookbook } from '../../../entities/cookbooks/cookbook.model';
+import { environmentFromRoute } from '../../../entities/environments/environment-details.selectors';
+import { GetEnvironment } from '../../../entities/environments/environment.action';
+import { Org } from '../../../entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from '../../../entities/orgs/org.selectors';
+import { GetOrg } from '../../../entities/orgs/org.actions';
 import {
   Environment,
   EnvironmentAttributes,
   CookbookVersionDisplay
-} from 'app/entities/environments/environment.model';
-import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
+} from '../../../entities/environments/environment.model';
+import { GetCookbooks } from '../../../entities/cookbooks/cookbook.actions';
 import {
   allCookbooks,
   getAllStatus as getAllCookbooksForOrgStatus
-} from 'app/entities/cookbooks/cookbook.selectors';
-import { EntityStatus } from 'app/entities/entities';
+} from '../../../entities/cookbooks/cookbook.selectors';
+import { EntityStatus } from '../../../entities/entities';
 import { isNil } from 'ngx-cookie';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -115,7 +115,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(gtStatus),
-      this.store.select(orgFromRoute)
+      this.store.select(orgFromRoute as any)
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
@@ -141,7 +141,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
     this.loadCookbooks();
 
-    this.store.select(environmentFromRoute).pipe(
+    this.store.select(environmentFromRoute as any).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(environment => {
@@ -208,7 +208,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSelectedTab(event: { target: { value: EnvironmentTabName } }) {
+  onSelectedTab(event: { target: { value: EnvironmentTabName } } | any) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
     this.filter(this.selected_level);

@@ -26,7 +26,7 @@ export const cdsEntityInitialState: CdsEntityState = {
 };
 
 export function desktopEntityReducer(state: CdsEntityState = cdsEntityInitialState,
-  action: CdsActions): CdsEntityState {
+  action: CdsActions | any): CdsEntityState {
 
   switch (action.type) {
     case CdsActionTypes.GET_CONTENT_ITEMS:

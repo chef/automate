@@ -2,7 +2,7 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RuleActionTypes, RuleActions } from './rule.actions';
 import { Rule, RuleTypeMappedObject, ProjectStatus } from './rule.model';
 
@@ -85,7 +85,7 @@ export const RuleEntityInitialState: RuleEntityState =
 
 export function ruleEntityReducer(
   state: RuleEntityState = RuleEntityInitialState,
-  action: RuleActions): RuleEntityState {
+  action: RuleActions | any): RuleEntityState {
 
   switch (action.type) {
     case RuleActionTypes.GET_ALL:

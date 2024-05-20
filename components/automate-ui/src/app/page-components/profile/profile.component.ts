@@ -3,21 +3,21 @@ import {
 } from '@angular/core';
 import { Subscription, Observable, combineLatest, Subject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { filter, takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { MetadataService } from 'app/services/metadata/metadata.service';
-import { EntityStatus } from 'app/entities/entities';
+import { ChefSessionService } from '../../services/chef-session/chef-session.service';
+import { MetadataService } from '../../services/metadata/metadata.service';
+import { EntityStatus } from '../../entities/entities';
 import {
   WelcomeModalComponent
- } from 'app/page-components/welcome-modal/welcome-modal.component';
-import { userSelf, getStatus } from 'app/entities/users/userself.selectors';
+ } from '../../page-components/welcome-modal/welcome-modal.component';
+import { userSelf, getStatus } from '../../entities/users/userself.selectors';
 import {
   GetUserSelf
- } from 'app/entities/users/userself.actions';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+ } from '../../entities/users/userself.actions';
+import { UserPreferencesService } from '../../services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-profile',

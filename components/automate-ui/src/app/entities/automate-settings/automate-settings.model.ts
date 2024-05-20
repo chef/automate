@@ -117,11 +117,11 @@ export class IngestJob {
       this.recurrence = respJob.recurrence;
       this.threshold = respJob.threshold;
       this.purge_policies = respJob.purge_policies;
-      this.last_elapsed = new Date(respJob.last_elapsed);
-      this.next_due_at = new Date(respJob.next_due_at);
-      this.last_enqueued_at = new Date(respJob.last_enqueued_at);
-      this.last_started_at = new Date(respJob.last_started_at);
-      this.last_ended_at = new Date(respJob.last_ended_at);
+      this.last_elapsed = new Date(respJob.last_elapsed as any);
+      this.next_due_at = new Date(respJob.next_due_at as any);
+      this.last_enqueued_at = new Date(respJob.last_enqueued_at as any);
+      this.last_started_at = new Date(respJob.last_started_at as any);
+      this.last_ended_at = new Date(respJob.last_ended_at as any);
     }
   }
 }

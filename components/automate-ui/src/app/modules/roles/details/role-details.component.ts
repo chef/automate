@@ -4,13 +4,13 @@ import { identity, isNil } from 'lodash/fp';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
-import { EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
-import { GetRole } from 'app/entities/roles/role.actions';
-import { roleFromRoute, getStatus } from 'app/entities/roles/role.selectors';
-import { Role } from 'app/entities/roles/role.model';
+import { EntityStatus } from '../../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeParams } from '../../../route.selectors';
+import { GetRole } from '../../../entities/roles/role.actions';
+import { roleFromRoute, getStatus } from '../../../entities/roles/role.selectors';
+import { Role } from '../../../entities/roles/role.model';
 
 @Component({
   selector: 'app-role-details',

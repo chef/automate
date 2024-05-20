@@ -2,9 +2,9 @@ import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
-import { Notification } from 'app/entities/notifications/notification.model';
+import { LayoutFacadeService } from '../../../entities/layout/layout.facade';
+import { LicenseFacadeService, LicenseApplyReason } from '../../../entities/license/license.facade';
+import { Notification } from '../../../entities/notifications/notification.model';
 
 @Component({
   selector: 'app-license-notifications',

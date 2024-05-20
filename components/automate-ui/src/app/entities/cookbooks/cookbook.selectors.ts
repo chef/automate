@@ -1,7 +1,7 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { find } from 'lodash/fp';
 import { CookbookEntityState, cookbookEntityAdapter } from './cookbook.reducer';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 
 export const cookbookState = createFeatureSelector<CookbookEntityState>('cookbooks');
 

@@ -19,7 +19,7 @@ export const IntegrationsAddInitialState: IntegrationsAddState = {
 
 export function integrationsAddReducer(
   state: IntegrationsAddState = IntegrationsAddInitialState,
-  action: ManagerActions | RouterAction<any>): IntegrationsAddState {
+  action: ManagerActions | RouterAction<any> | any): IntegrationsAddState {
   switch (action.type) {
     case ManagerActionTypes.CREATE:
       return set('status', Status.saving, state);

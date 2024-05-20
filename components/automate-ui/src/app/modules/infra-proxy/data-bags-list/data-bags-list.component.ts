@@ -4,17 +4,17 @@ import { combineLatest, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { GetDataBags, DeleteDataBag } from 'app/entities/data-bags/data-bags.actions';
-import { DataBag } from 'app/entities/data-bags/data-bags.model';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { EntityStatus } from '../../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { GetDataBags, DeleteDataBag } from '../../../entities/data-bags/data-bags.actions';
+import { DataBag } from '../../../entities/data-bags/data-bags.model';
 import {
   allDataBags,
   getAllStatus as getAllDatabagsForOrgStatus,
   deleteStatus
-} from 'app/entities/data-bags/data-bags.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/data-bags/data-bags.selectors';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-data-bags-list',
@@ -121,6 +121,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
         if (key) {
           return key.name.includes(searchText);
         }
+        return null
       });
     }
     this.searching = false;

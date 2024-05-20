@@ -2,7 +2,7 @@ import { map } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../../../../entities/layout/layout.facade';
 import * as selectors from '../../state/scanner.selectors';
 
 @Component({

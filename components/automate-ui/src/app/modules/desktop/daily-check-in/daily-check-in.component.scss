@@ -1,5 +1,5 @@
-@import "~styles/variables";
-@import "@carbon/layout/scss/layout";
+@use "@carbon/grid" as cg;
+@import "../../../styles/variables";
 
 .heading {
 
@@ -51,7 +51,7 @@ app-chart-progress-bar {
 chef-phat-radio {
   display: flex;
 
-  @include carbon--breakpoint-down(md) {
+  @include cg.breakpoint-down(md) {
     flex-direction: column;
 
     chef-option {

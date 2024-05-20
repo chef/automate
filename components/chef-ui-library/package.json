@@ -21,7 +21,7 @@
     "docs": "typedoc --entryPointStrategy expand ./src",
     "lint": "npm run lint.ts && npm run lint.sass",
     "lint.ts": "tslint -p tsconfig.json",
-    "lint.sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
+    "lint.sass": "stylelint '**/*.scss'"
   },
   "author": "Chef Software, Inc. <info@chef.io>",
   "license": "UNLICENSED",
@@ -38,7 +38,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "set-value": "^4.1.0",
-    "tar": "^4.4.19"
+    "tar": "^7.0.1"
   },
   "devDependencies": {
     "@stencil/core": "^4.16.0",
@@ -52,8 +52,12 @@
     "merge": "^2.1.1",
     "mkdirp": "1.0.0",
     "node-notifier": "^10.0.0",
-    "node-sass": "^8.0.0",
-    "sass-lint": "^1.13.1",
+    "node-sass": "^9.0.0",
+    "stylelint": "^16.5.0",
+    "stylelint-config-recommended": "^14.0.0",
+    "stylelint-config-sass-guidelines": "^11.1.0",
+    "stylelint-config-standard": "^36.0.0",
+    "stylelint-scss": "^6.2.1",
     "typedoc": "^0.25.13",
     "typescript": "^5.4.4"
   }

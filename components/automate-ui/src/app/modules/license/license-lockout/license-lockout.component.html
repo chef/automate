@@ -37,14 +37,14 @@
               <div class="suggester-input-wrapper">
                 <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus>
               </div>
-              <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required.</chef-error>
+              <chef-error *ngIf="trialForm.get('firstName')?.hasError('required') && trialForm.get('firstName')?.dirty">First name required.</chef-error>
             </chef-form-field>
             <chef-form-field>
               <label for="lastName">Last Name <span aria-hidden="true">*</span></label>
               <div class="suggester-input-wrapper">
                 <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text">
               </div>
-                <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required.</chef-error>
+                <chef-error *ngIf="trialForm.get('lastName')?.hasError('required') && trialForm.get('lastName')?.dirty">Last name required.</chef-error>
             </chef-form-field>
           </div>
           <div class="email-container">
@@ -53,7 +53,7 @@
               <div class="suggester-input-wrapper">
                 <input chefInput name="email" id="email" formControlName="email" type="text">
               </div>
-              <chef-error *ngIf="trialForm.get('email').hasError('email') && trialForm.get('email').dirty">Valid email required.</chef-error>
+              <chef-error *ngIf="trialForm.get('email')?.hasError('email') && trialForm.get('email')?.dirty">Valid email required.</chef-error>
             </chef-form-field>
           </div>
           <chef-checkbox (change)="updateGDPR($event.detail)" [checked]="gdprAgree">I would like to receive email communications from Chef</chef-checkbox>

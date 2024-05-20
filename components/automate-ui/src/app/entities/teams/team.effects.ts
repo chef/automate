@@ -4,9 +4,9 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 
-import { HttpStatus } from 'app/types/types';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { HttpStatus } from '../../types/types';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 import {
   GetTeam,
   GetTeamSuccess,
@@ -219,7 +219,7 @@ export class TeamEffects {
     this.actions$.pipe(ofType<RemoveTeamUsers>(TeamActionTypes.REMOVE_USERS),
     mergeMap(({ payload }: RemoveTeamUsers) =>
       this.requests.removeTeamUsers(payload).pipe(
-        map((resp: UsersResponse ) => new RemoveTeamUsersSuccess({...resp, id: payload.id})),
+        map((resp ) => new RemoveTeamUsersSuccess({...resp, id: payload.id} as any)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new RemoveTeamUsersFailure(error))))
     )));

@@ -6,25 +6,25 @@ import { map, takeUntil } from 'rxjs/operators';
 import * as moment from 'moment/moment';
 import { MatOptionSelectionChange } from '@angular/material/core';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { NodeCredentialsSearch, DeleteNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
-import { loading } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout.facade';
+import { DateTime } from '../../../../helpers/datetime/datetime';
+import { NodeCredentialsSearch, DeleteNodeCredential } from '../../../../entities/node-credentials/node-credential.actions';
+import { loading } from '../../../../entities/entities';
 import {
   getAllStatus
-} from 'app/entities/node-credentials/node-credential.selectors';
-import { NodeCredential, NodeCredentialTypes } from 'app/entities/node-credentials/node-credential.model';
+} from '../../../../entities/node-credentials/node-credential.selectors';
+import { NodeCredential, NodeCredentialTypes } from '../../../../entities/node-credentials/node-credential.model';
 import {
   allCredentials,
   totalNodeCredential
-} from 'app/entities/node-credentials/node-credential.selectors';
+} from '../../../../entities/node-credentials/node-credential.selectors';
 
 import { NodeCredentialOrder, SortParams } from './node-credential-list.reducer';
 import { nodeCredentialListState } from './node-credential-list.selectors';
 import { SortNodeCredentialList } from './node-credential-list.actions';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-node-credential-list',
@@ -124,7 +124,7 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy, AfterView
     return column === this.sortBy ? this.orderBy : 'none';
   }
 
-  handleSortToggle({ detail: sortParams }): void {
+  handleSortToggle({ detail: sortParams }: any): void {
     this.nodesListLoading = true;
     this.store.dispatch(new SortNodeCredentialList(sortParams));
     this.getNodeList();

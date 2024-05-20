@@ -4,16 +4,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import {  Observable, Subject  } from 'rxjs';
 import { startWith, switchMap, map, takeUntil, filter } from 'rxjs/operators';
-import { environment as env } from 'environments/environment';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NodeCredentialsSearchPayload, SearchCredentials } from 'app/entities/credentials/credential.actions';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { environment as env } from '../../../../../../environments/environment';
+import { LayoutFacadeService, Sidebar } from '../../../../../entities/layout/layout.facade';
+import { NodeCredentialsSearchPayload, SearchCredentials } from '../../../../../entities/credentials/credential.actions';
+import { NgrxStateAtom } from '../../../../../ngrx.reducers';
 import { select, Store } from '@ngrx/store';
-import { allCredentials, credStatus, credtotal } from 'app/entities/credentials/credential.selectors';
-import { allCredentials as allCredentialsGetById } from 'app/entities/node-credentials/node-credential.selectors';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { Credential } from 'app/entities/credentials/credential.model';
-import { GetNodeCredential, ResetStore } from 'app/entities/node-credentials/node-credential.actions';
+import { allCredentials, credStatus, credtotal } from '../../../../../entities/credentials/credential.selectors';
+import { allCredentials as allCredentialsGetById } from '../../../../../entities/node-credentials/node-credential.selectors';
+import { EntityStatus, pending } from '../../../../../entities/entities';
+import { Credential } from '../../../../../entities/credentials/credential.model';
+import { GetNodeCredential, ResetStore } from '../../../../../entities/node-credentials/node-credential.actions';
 
 @Component({
   templateUrl: './nodes-edit.component.html',
