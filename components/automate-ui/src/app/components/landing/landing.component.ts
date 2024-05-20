@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Check, AuthorizedComponent } from 'app/components/authorized/authorized.component';
-import { AuthorizedChecker, CheckObj } from 'app/helpers/auth/authorized';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { Check, AuthorizedComponent } from '../../components/authorized/authorized.component';
+import { AuthorizedChecker, CheckObj } from '../../helpers/auth/authorized';
 
   /**
    * Each RoutePerm specifies the same `anyOf` and `allOf` values used
@@ -110,7 +110,7 @@ export class LandingComponent implements OnInit, OnDestroy {
       this.routePerms[index].allOfCheck);
   }
 
-  private normalizeChecks(check: Check[]): CheckObj[] {
+  private normalizeChecks(check: Check[] | undefined): CheckObj[] {
     return check ? this.authComponent.normalizeInput(check) : [];
   }
 

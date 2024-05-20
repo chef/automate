@@ -1,6 +1,6 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { NodeCredentialDetailsEntityState, nodeCredentialDetailsEntityAdapter } from './node-credential-details.reducer';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { find } from 'lodash/fp';
 
 export const nodeCredentialState =

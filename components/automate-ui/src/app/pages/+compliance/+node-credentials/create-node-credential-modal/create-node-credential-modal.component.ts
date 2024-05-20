@@ -7,17 +7,17 @@ import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { EntityStatus } from 'app/entities/entities';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { NgrxStateAtom } from '../../../../ngrx.reducers';
+import { IdMapper } from '../../../../helpers/auth/id-mapper';
+import { EntityStatus } from '../../../../entities/entities';
+import { Utilities } from '../../../../helpers/utilities/utilities';
 import {
   saveError,
   saveStatus
-} from 'app/entities/node-credentials/node-credential.selectors';
-import { SaveNodeCredential } from 'app/entities/node-credentials/node-credential.model';
-import { CreateNodeCredential, NodeCredentialsSearch } from 'app/entities/node-credentials/node-credential.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../../entities/node-credentials/node-credential.selectors';
+import { SaveNodeCredential } from '../../../../entities/node-credentials/node-credential.model';
+import { CreateNodeCredential, NodeCredentialsSearch } from '../../../../entities/node-credentials/node-credential.actions';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-node-credential-modal',

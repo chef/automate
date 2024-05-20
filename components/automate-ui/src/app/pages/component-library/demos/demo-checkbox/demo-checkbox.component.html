@@ -52,11 +52,11 @@ updateCheckedValue(event) {{ '{' }}
         Specify whether the checkbox is initialized disabled.
       </api-prop>
 
-      <api-prop name="checkValue" type="Function(Boolean): void" required>
+      <api-prop name="checkValue" type="Function(Boolean): void" [required]="true">
         Catch the checkValue event emitted when the checkbox changes.
       </api-prop>
 
-      <api-prop name="Content Model" type="DOM nodes" required>
+      <api-prop name="Content Model" type="DOM nodes" [required]="true">
         Specify text that comprises the rendered label of the
         <token>&lt;chef-checkbox&gt;</token>.
       </api-prop>

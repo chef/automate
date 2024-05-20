@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs/operators';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { combineLatest, Subject } from 'rxjs';
-import { ResetKeyClient } from 'app/entities/clients/client.action';
+import { ResetKeyClient } from '../../../entities/clients/client.action';
 import { getStatus,
   resetKeyClient,
-  saveError } from 'app/entities/clients/client-details.selectors';
-import { EntityStatus } from 'app/entities/entities';
-import { Utilities } from 'app/helpers/utilities/utilities';
+  saveError } from '../../../entities/clients/client-details.selectors';
+import { EntityStatus } from '../../../entities/entities';
+import { Utilities } from '../../../helpers/utilities/utilities';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
-import { ResetKey } from 'app/entities/clients/client.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ResetKey } from '../../../entities/clients/client.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-reset-client-key',

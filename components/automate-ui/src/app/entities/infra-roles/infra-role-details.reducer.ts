@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RoleActionTypes, RoleActions } from './infra-role.action';
 import { InfraRole } from './infra-role.model';
 
@@ -26,7 +26,7 @@ export const InfraRoleEntityInitialState: InfraRoleDetailsEntityState =
 
 export function infraRoleDetailsEntityReducer(
   state: InfraRoleDetailsEntityState = InfraRoleEntityInitialState,
-  action: RoleActions): InfraRoleDetailsEntityState {
+  action: RoleActions | any): InfraRoleDetailsEntityState {
 
   switch (action.type) {
     case RoleActionTypes.GET:

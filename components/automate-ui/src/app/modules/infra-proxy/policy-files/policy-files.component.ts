@@ -4,17 +4,17 @@ import { combineLatest, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { EntityStatus } from 'app/entities/entities';
-import { GetPolicyFiles, DeletePolicyFile } from 'app/entities/policy-files/policy-file.action';
-import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { EntityStatus } from '../../../entities/entities';
+import { GetPolicyFiles, DeletePolicyFile } from '../../../entities/policy-files/policy-file.action';
+import { PolicyFile } from '../../../entities/policy-files/policy-file.model';
 import {
   allPolicyFiles,
   getAllStatus as getAllPolicyFilesForOrgStatus,
   deleteStatus
-} from 'app/entities/policy-files/policy-file.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/policy-files/policy-file.selectors';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-policy-files',
@@ -116,6 +116,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
         if (key) {
           return key.name.includes(searchText);
         }
+        return null;
       });
     }
     this.searching = false;

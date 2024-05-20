@@ -3,15 +3,21 @@
 $chef-mat-primary: (
   100: $chef-primary-bright,
   500: $chef-primary-bright,
+  700: $chef-primary-bright,
   contrast: (
-    500: $chef-primary-light
+    100: $chef-primary-light,
+    500: $chef-primary-light,
+    700: $chef-primary-light,
   )
 );
 
 $chef-mat-warn: (
   100: $chef-critical,
   500: $chef-critical,
+  700: $chef-critical,
   contrast: (
-    500: $chef-yellow
+    100: $chef-yellow,
+    500: $chef-yellow,
+    700: $chef-yellow,
   )
 );

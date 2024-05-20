@@ -6,14 +6,14 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
-import { GetPolicies } from 'app/entities/policies/policy.actions';
-import { allPolicies } from 'app/entities/policies/policy.selectors';
-import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { ChefSorters } from '../../helpers/auth/sorter';
+import { IdMapper } from '../../helpers/auth/id-mapper';
+import { Project, ProjectConstants } from '../../entities/projects/project.model';
+import { GetPolicies } from '../../entities/policies/policy.actions';
+import { allPolicies } from '../../entities/policies/policy.selectors';
+import { ResourceCheckedSection } from '../../components/resource-dropdown/resource-dropdown.component';
+import { Utilities } from '../../helpers/utilities/utilities';
 
 const INGEST_POLICY_ID = 'ingest-access';
 
@@ -100,7 +100,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  onProjectDropdownClosing(projectsSelected: string[]): void {
+  onProjectDropdownClosing(projectsSelected: string[] | any): void {
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 

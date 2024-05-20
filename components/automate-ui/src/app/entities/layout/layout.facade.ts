@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { filter, first } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { AuthorizedChecker } from 'app/helpers/auth/authorized';
-import { GetProjects } from 'app/entities/projects/project.actions';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { AuthorizedChecker } from '../../helpers/auth/authorized';
+import { GetProjects } from '../../entities/projects/project.actions';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';

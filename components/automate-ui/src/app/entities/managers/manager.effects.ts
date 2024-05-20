@@ -198,7 +198,7 @@ export class ManagerEffects {
       ofType(ManagerActionTypes.DELETE_NODES_SUCCESS),
       withLatestFrom(this.store),
       map(([_action, storeState]) => {
-        const integrationsDetailState: IntegrationsDetailState = storeState.integrations_detail;
+        const integrationsDetailState: IntegrationsDetailState = (storeState as any).integrations_detail;
         const managerId = integrationsDetailState.manager.id;
         const page = integrationsDetailState.managerNodesPage;
         const per_page = integrationsDetailState.managerNodesPerPage;

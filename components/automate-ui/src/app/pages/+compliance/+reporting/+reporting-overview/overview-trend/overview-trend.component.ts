@@ -12,9 +12,9 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
-import * as moment from 'moment/moment';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import moment from 'moment';
+import { DateTime } from '../../../../../helpers/datetime/datetime';
+import { UserPreferencesService } from '../../../../../services/user-preferences/user-preferences.service';
 import { Subscription } from 'rxjs';
 
 export interface TrendData {

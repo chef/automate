@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { ClientActionTypes, ClientActions } from './client.action';
 import { Client, ClientKey } from './client.model';
 
@@ -29,7 +29,7 @@ export const ClientEntityInitialState: ClientDetailsEntityState =
 
 export function clientDetailsEntityReducer(
   state: ClientDetailsEntityState = ClientEntityInitialState,
-  action: ClientActions): ClientDetailsEntityState {
+  action: ClientActions | any): ClientDetailsEntityState {
 
   switch (action.type) {
     case ClientActionTypes.GET:

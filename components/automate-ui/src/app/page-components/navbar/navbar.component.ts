@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+import { ProductDeployedService } from '../../services/product-deployed/product-deployed.service';
 
 @Component({
   selector: 'app-navbar',

@@ -1,7 +1,7 @@
 
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { ProjectEntityState, projectEntityAdapter } from './project.reducer';
 
 export const projectState = createFeatureSelector<ProjectEntityState>('projects');

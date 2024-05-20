@@ -7,7 +7,7 @@ import {
   UserPreferencesPayload
 } from './user-preferences.model';
 import { UserPreferencesService } from './user-preferences.service';
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 const USER_PREFERENCE_URL = environment.user_preference_url;
 
 @Injectable()

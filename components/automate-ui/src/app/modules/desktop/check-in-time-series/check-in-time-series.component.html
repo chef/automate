@@ -10,7 +10,7 @@
       </div>
       <h6 *ngIf="hasData" class="heading-time">Updated {{ lastUpdatedMessage }}</h6>
     </div>
-    <select *ngIf="hasData" (change)="dateChanged($event.target.value)">
+    <select *ngIf="hasData" (change)="dateChanged($event)">
       <option *ngFor="let selectableDaysAgo of selectableDaysAgoCollection" [value]="selectableDaysAgo"
         [selected]="selectableDaysAgo == selectedDaysAgo">
         Last {{ selectableDaysAgo }} Days

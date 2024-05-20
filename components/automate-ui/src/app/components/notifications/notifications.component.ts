@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { Notification, Type } from 'app/entities/notifications/notification.model';
-import { DeleteNotification } from 'app/entities/notifications/notification.actions';
+import { LayoutFacadeService } from '../../entities/layout/layout.facade';
+import { notificationState } from '../../entities/notifications/notification.selectors';
+import { Notification, Type } from '../../entities/notifications/notification.model';
+import { DeleteNotification } from '../../entities/notifications/notification.actions';
 
 @Component({
   selector: 'app-chef-notifications',

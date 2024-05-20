@@ -130,7 +130,7 @@
                     Case sensitive, must match exactly.
                 </small>
                 <small class="help"
-                  *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
+                  *ngIf="condition?.controls?.operator?.value === 'MEMBER_OF'">
                     Comma-separated list, at least one must match exactly.
                 </small>
               </chef-form-field>

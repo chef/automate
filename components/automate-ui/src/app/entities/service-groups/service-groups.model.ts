@@ -1,10 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import {
   Chicklet,
   RollupServiceStatus,
   SortDirection
-} from 'app/types/types';
+} from '../../types/types';
 
 export interface ServiceGroup {
   id: string;
@@ -84,6 +84,9 @@ export interface GroupService {
   current_health_since: string;
   health_updated_at: Date;
   health_check_result: HealthCheckResult;
+  last_event_occurred_at: string;
+  last_event_since: string;
+  disconnected: boolean;
   id?: number;
 }
 

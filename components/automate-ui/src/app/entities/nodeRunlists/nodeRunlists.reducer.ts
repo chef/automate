@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { NodeRunlistActionTypes, NodeRunlistActions } from './nodeRunlists.action';
 import { NodeRunlist } from './nodeRunlists.model';
 
@@ -23,7 +23,7 @@ export const NodeRunlistEntityInitialState: NodeRunlistEntityState =
 
 export function nodeRunlistEntityReducer(
   state: NodeRunlistEntityState = NodeRunlistEntityInitialState,
-  action: NodeRunlistActions): NodeRunlistEntityState {
+  action: NodeRunlistActions | any): NodeRunlistEntityState {
 
   switch (action.type) {
     case NodeRunlistActionTypes.GET_ALL:

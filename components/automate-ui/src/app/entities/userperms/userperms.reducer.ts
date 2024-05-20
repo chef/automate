@@ -33,8 +33,9 @@ export const initialState: PermEntityState = {
   lastTimeFetchAll: new Date(0)
 };
 
+// Need to check : why Any for action
 export function permEntityReducer(
-  state: PermEntityState = initialState, action: UserPermsActions): PermEntityState {
+  state: PermEntityState = initialState, action: any): PermEntityState {
 
   switch (action.type) {
 

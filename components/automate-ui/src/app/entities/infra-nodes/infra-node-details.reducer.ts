@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { NodeActionTypes, NodeActions } from './infra-nodes.actions';
 import { InfraNode } from './infra-nodes.model';
 
@@ -23,7 +23,7 @@ export const InfraNodeEntityInitialState: InfraNodeDetailsEntityState =
 
 export function infraNodeDetailsEntityReducer(
   state: InfraNodeDetailsEntityState = InfraNodeEntityInitialState,
-  action: NodeActions): InfraNodeDetailsEntityState {
+  action: NodeActions | any): InfraNodeDetailsEntityState {
 
   switch (action.type) {
     case NodeActionTypes.GET:

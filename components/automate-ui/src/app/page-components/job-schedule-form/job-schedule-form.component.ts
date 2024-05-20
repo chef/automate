@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { RRule } from 'rrule';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 @Component({
   selector: 'chef-job-schedule-form',

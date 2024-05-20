@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe, unset } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { ClientActionTypes, ClientActions } from './client.action';
 import { Client } from './client.model';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -39,7 +39,7 @@ export const ClientEntityInitialState: ClientEntityState =
 
 export function clientEntityReducer(
   state: ClientEntityState = ClientEntityInitialState,
-  action: ClientActions): ClientEntityState {
+  action: ClientActions | any): ClientEntityState {
 
   switch (action.type) {
     case ClientActionTypes.GET_ALL:

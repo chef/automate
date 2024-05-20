@@ -1,4 +1,4 @@
-import { Menu, CookbookDetails } from 'app/entities/cookbooks/cookbook-details.model';
+import { Menu, CookbookDetails } from '../../entities/cookbooks/cookbook-details.model';
 
 export class CollapsibleListMapper {
     public static transform( resp: CookbookDetails, keys: string[] ): Menu[] {

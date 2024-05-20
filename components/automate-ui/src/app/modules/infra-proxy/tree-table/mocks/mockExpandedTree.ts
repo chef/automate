@@ -1,4 +1,4 @@
-import { Runlist } from 'app/entities/runlists/runlists.model';
+import { Runlist } from '../../../../entities/runlists/runlists.model';
 
 export const mockExpandedTree: Runlist[] = [
 {

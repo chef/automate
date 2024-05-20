@@ -19,7 +19,7 @@ export const InitialState: CredentialState = credentialAdapter.getInitialState({
 
 export function credentialReducer(
   state: CredentialState = InitialState,
-  action: CredentialActions): CredentialState {
+  action: CredentialActions | any): CredentialState {
 
   switch (action.type) {
 

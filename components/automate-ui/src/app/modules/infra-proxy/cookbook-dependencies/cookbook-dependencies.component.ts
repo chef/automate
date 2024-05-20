@@ -10,7 +10,7 @@ import {
   CookbookDependencyList,
   CookbookList
 } from '../policy-file-details/policy-file-details.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-cookbook-dependencies',

@@ -15,7 +15,7 @@ import {
   JobCategories
 } from './automate-settings.model';
 
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 
 const RETENTION_URL = environment.retention_url;
 
@@ -140,7 +140,7 @@ export class AutomateSettingsRequests {
 
     const allJobs = [];
 
-    Object.keys(respJobSchedulerStatus).forEach((category: JobCategories) => {
+    Object.keys(respJobSchedulerStatus).forEach((category: JobCategories | any) => {
       if (respJobSchedulerStatus[category]) {
         const catJobs = respJobSchedulerStatus[category].jobs
           .map((respJob: RespJob) => new IngestJob(category, respJob));

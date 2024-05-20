@@ -5,8 +5,8 @@
 */
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { environment } from 'environments/environment';
+import { ChefSessionService } from '../../services/chef-session/chef-session.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class UploadService {
