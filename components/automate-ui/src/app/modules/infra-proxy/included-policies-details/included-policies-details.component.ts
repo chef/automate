@@ -5,8 +5,8 @@ import {
   Output,
   HostBinding
 } from '@angular/core';
-import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
-import { PolicyFileRequests } from 'app/entities/policy-files/policy-file.requests';
+import { PolicyFile } from '../../../entities/policy-files/policy-file.model';
+import { PolicyFileRequests } from '../../../entities/policy-files/policy-file.requests';
 
 @Component({
   selector: 'app-included-policies-details',

@@ -1,6 +1,6 @@
-@import "~styles/variables";
-@import 'app/page-components/json-tree/json-tree.component.scss';
-@import "~styles/mixins";
+@import "../../../styles/variables";
+@import '../../../page-components/json-tree/json-tree.component.scss';
+@import "../../../styles/mixins";
 @import '../infra_shared/shared';
 
 chef-page-header {

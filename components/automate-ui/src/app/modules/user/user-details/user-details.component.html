@@ -27,7 +27,7 @@
             <input id="displayName" chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
               data-cy="user-details-name-input" [readonly]="!isDisplayNameEditable">
             <chef-error
-              *ngIf="(userDetails.displayNameForm.get('displayName').hasError('required') || userDetails.displayNameForm.get('displayName').hasError('pattern')) && userDetails.displayNameForm.get('displayName').dirty">
+              *ngIf="(userDetails.displayNameForm.get('displayName')?.hasError('required') || userDetails.displayNameForm.get('displayName')?.hasError('pattern')) && userDetails.displayNameForm.get('displayName')?.dirty">
               Display Name is required.
             </chef-error>
           </chef-form-field>
@@ -57,7 +57,7 @@
             <span *ngIf="userDetails.saveInProgress">Saving...</span>
             <span *ngIf="!userDetails.saveInProgress">Save</span>
         </chef-button>
-        <span id="saved-note" *ngIf="userDetails.saveSuccessful && !userDetails.displayNameForm.dirty">All changes saved.</span>
+        <span id="saved-note" *ngIf="userDetails.saveSuccessful && !userDetails.displayNameForm?.dirty">All changes saved.</span>
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
         <form [formGroup]="userDetails.passwordForm">
@@ -67,11 +67,11 @@
               <input chefInput formControlName="previousPassword" type="password"/>
             </label>
             <chef-error
-              *ngIf="userDetails.passwordForm.get('previousPassword').hasError('required') && userDetails.passwordForm.get('previousPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('previousPassword')?.hasError('required') && userDetails.passwordForm.get('previousPassword')?.dirty">
               Previous Password is required.
             </chef-error>
             <chef-error
-              *ngIf="userDetails.passwordForm.get('previousPassword').hasError('minlength') && userDetails.passwordForm.get('previousPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('previousPassword')?.hasError('minlength') && userDetails.passwordForm.get('previousPassword')?.dirty">
               Previous Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
@@ -81,11 +81,11 @@
               <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput()" />
             </label>
             <chef-error
-              *ngIf="(userDetails.passwordForm.get('newPassword').hasError('required') || userDetails.passwordForm.get('newPassword').hasError('pattern')) && userDetails.passwordForm.get('newPassword').dirty">
+              *ngIf="(userDetails.passwordForm.get('newPassword')?.hasError('required') || userDetails.passwordForm.get('newPassword')?.hasError('pattern')) && userDetails.passwordForm.get('newPassword')?.dirty">
               New Password is required.
             </chef-error>
             <chef-error
-              *ngIf="userDetails.passwordForm.get('newPassword').hasError('minlength') && userDetails.passwordForm.get('newPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('newPassword')?.hasError('minlength') && userDetails.passwordForm.get('newPassword')?.dirty">
               New Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
@@ -99,7 +99,7 @@
               <input chefInput formControlName="confirmPassword" type="password"/>
             </label>
             <chef-error
-              *ngIf="userDetails.passwordForm.get('confirmPassword').hasError('noMatch') && userDetails.passwordForm.get('confirmPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('confirmPassword')?.hasError('noMatch') && userDetails.passwordForm.get('confirmPassword')?.dirty">
               Passwords must match.
             </chef-error>
           </chef-form-field>

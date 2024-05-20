@@ -8,35 +8,35 @@ import { filter, pluck, takeUntil, first, map } from 'rxjs/operators';
 
 import { identity, isNil } from 'lodash/fp';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ChefValidators } from 'app/helpers/auth/validator';
-import { routeURL, routeParams } from 'app/route.selectors';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { ChefValidators } from '../../../helpers/auth/validator';
+import { routeURL, routeParams } from '../../../route.selectors';
+import { EntityStatus, loading } from '../../../entities/entities';
 import {
   GetUser,
   UpdatePasswordUser,
   UpdateNameUser
- } from 'app/entities/users/user.actions';
+ } from '../../../entities/users/user.actions';
  import {
   UpdatePasswordSelf,
   UpdateNameSelf,
   GetUserSelf
- } from 'app/entities/users/userself.actions';
+ } from '../../../entities/users/userself.actions';
 import {
   getStatus as getUserStatus, userFromRoute, updateStatus as updateUserStatus
-} from 'app/entities/users/user.selectors';
+} from '../../../entities/users/user.selectors';
 import {
   getStatus as getUserSelfStatus, userSelf, updateStatus as updateUserSelfStatus,
   userSelfId
-} from 'app/entities/users/userself.selectors';
-import { User } from 'app/entities/users/user.model';
-import { Regex } from 'app/helpers/auth/regex';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { UpdateUserPreferences, UpdateUserPreferencesSuccess } from 'app/services/user-preferences/user-preferences.actions';
-import { userPreferencesStatus } from 'app/services/user-preferences/user-preferences.selector';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/users/userself.selectors';
+import { User } from '../../../entities/users/user.model';
+import { Regex } from '../../../helpers/auth/regex';
+import { UserPreferencesService } from '../../../services/user-preferences/user-preferences.service';
+import { UpdateUserPreferences, UpdateUserPreferencesSuccess } from '../../../services/user-preferences/user-preferences.actions';
+import { userPreferencesStatus } from '../../../services/user-preferences/user-preferences.selector';
+import { ChefSessionService } from '../../../services/chef-session/chef-session.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 export type UserTabName = 'password' | 'details';
 
@@ -79,7 +79,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.data.pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe((data: { isNonAdmin: boolean }) => {
+    ).subscribe((data: any) => {
       // undefined for admin view
       // true for profile view
       if (data.isNonAdmin) {
@@ -132,7 +132,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.userDetailsFormControl.timeformat = timeformat.value;
       if (this.userDetailsFormControl.timeformatValues.length === 0 &&
          timeformat && timeformat.valid_values && timeformat.valid_values.length > 0) {
-        this.userDetailsFormControl.timeformatValues = timeformat.valid_values;
+        this.userDetailsFormControl.timeformatValues = timeformat.valid_values as any;
       }
     });
     this.telemetryCheckboxSubscription = this.telemetryService.getTelemetryCheckboxObservable()
@@ -153,14 +153,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.telemetryCheckboxSubscription.unsubscribe();
   }
 
-  public onSelectedTab(event: { target: { value: UserTabName } }): void {
+  public onSelectedTab(event: any): void {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
   public handlePasswordInput(): void {
-    this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
+    this.userDetails.passwordForm.get('confirmPassword')?.updateValueAndValidity();
   }
 
   public handleTimeFormatChange(event): void {
@@ -190,7 +190,7 @@ abstract class UserDetails {
   public savePassword(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const password = this.passwordForm.get('newPassword').value;
+    const password = this.passwordForm.get('newPassword')?.value;
     this.store.dispatch(this.createUpdatePasswordUserAction(password));
     this.telemetryService.track('Settings_Users_Details_ResetPassword');
   }
@@ -200,7 +200,7 @@ abstract class UserDetails {
     this.saveInProgress = true;
     if (this.userPrefsService.uiSettings &&
         this.userPrefsService.uiSettings.isDisplayNameEditable && this.displayNameForm.dirty) {
-      const name = this.displayNameForm.get('displayName').value.trim();
+      const name = this.displayNameForm.get('displayName')?.value.trim();
       this.store.dispatch(this.createUpdateNameUserAction(name));
       this.resetForms();
     }
@@ -284,7 +284,7 @@ class UserAdminDetails extends UserDetails {
 
       combineLatest([
         this.loading$,
-        store.select(userFromRoute)
+        store.select(userFromRoute as any)
       ]).pipe(
         filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
         map(([_, user]) => user),
@@ -380,7 +380,7 @@ class UserAdminSelfDetails extends UserDetails {
   }
 
   protected createUpdatePasswordUserAction(password: string): Action {
-    const previous_password = this.passwordForm.get('previousPassword').value;
+    const previous_password = this.passwordForm.get('previousPassword')?.value;
     return new UpdatePasswordSelf({
       id: this.user.id,
       name: this.user.name,
@@ -472,7 +472,7 @@ class UserProfileDetails extends UserDetails {
   }
 
   protected createUpdatePasswordUserAction(password: string): Action {
-    const previous_password = this.passwordForm.get('previousPassword').value;
+    const previous_password = this.passwordForm.get('previousPassword')?.value;
     return new UpdatePasswordSelf({
       id: this.user.id,
       name: this.user.name,

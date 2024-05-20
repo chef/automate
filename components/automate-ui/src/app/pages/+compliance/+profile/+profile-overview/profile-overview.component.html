@@ -6,14 +6,14 @@
           <app-notification
             *ngIf="downloadErrorVisible"
             type="error"
-            timeout="5"
+            [timeout]="5"
             (dismissed)="hideDownloadError()">
             Failed to install profile. Please try again later.
           </app-notification>
           <app-notification
             *ngIf="authErrorVisible"
             type="error"
-            timeout="5"
+            [timeout]="5"
             (dismissed)="hideAuthError()">
             You are not authorized to create compliance profiles.
           </app-notification>

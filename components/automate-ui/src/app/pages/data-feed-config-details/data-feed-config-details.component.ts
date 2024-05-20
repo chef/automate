@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import {
   GlobalDataFeedConfig
-} from 'app/entities/global-config/destination-config.actions';
+} from '../../entities/global-config/destination-config.actions';
 import {
   globalDataFeed
-} from 'app/entities/global-config/destination-config.selectors';
+} from '../../entities/global-config/destination-config.selectors';
 import { Observable } from 'rxjs';
-import { GlobalConfig } from 'app/entities/global-config/destination-config.model';
+import { GlobalConfig } from '../../entities/global-config/destination-config.model';
 import { map } from 'rxjs/operators';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 
 enum UrlTestState {
   Inactive,

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { User } from 'app/entities/users/user.model';
+import { User } from '../../entities/users/user.model';
 import { ContinuousPipe } from '../../pipes/continuous.pipe';
 
 @Component({

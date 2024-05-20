@@ -1,4 +1,4 @@
-// Modules
+// // Modules
 import { ChefPipesModule } from '../pipes/chef-pipes.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -6,13 +6,14 @@ import { RouterModule } from '@angular/router';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule  } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 
-// Chart components
+// // Chart components
 import { ChartProgressBarComponent } from './chart-progress-bar/chart-progress-bar.component';
 
-// Components
+// // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
@@ -22,7 +23,7 @@ import { ChefNotificationsComponent } from './notifications/notifications.compon
 import { ConfirmApplyStartModalComponent } from './confirm-apply-start-modal/confirm-apply-start-modal.component';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
-import { CreateUserModalComponent } from 'app/page-components/create-user-modal/create-user-modal.component';
+import { CreateUserModalComponent } from '../page-components/create-user-modal/create-user-modal.component';
 import { DeleteObjectModalComponent } from './delete-object-modal/delete-object-modal.component';
 import { ErrorDirective } from './error/error.directive';
 import { FormControlDirective } from './form-control/form-control.directive';
@@ -67,9 +68,10 @@ import { TimeComponent } from './time/time.component';
     ReactiveFormsModule,
     RouterModule,
 
-    // Angular Material
+    // // Angular Material
     MatDialogModule,
     MatSelectModule,
+    MatOptionModule,
     MatProgressBarModule,
     MatButtonModule
   ],
@@ -77,13 +79,14 @@ import { TimeComponent } from './time/time.component';
     // Angular Material
     MatDialogModule,
     MatSelectModule,
+    MatOptionModule,
     MatProgressBarModule,
     MatButtonModule,
 
     // Charts
     ChartProgressBarComponent,
 
-    // Components
+    // // Components
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,

@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { EnvironmentActionTypes, EnvironmentActions } from './environment.action';
 import { Environment } from './environment.model';
 
@@ -26,7 +26,7 @@ export const EnvironmentEntityInitialState: EnvironmentDetailsEntityState =
 
 export function environmentDetailsEntityReducer(
   state: EnvironmentDetailsEntityState = EnvironmentEntityInitialState,
-  action: EnvironmentActions): EnvironmentDetailsEntityState {
+  action: EnvironmentActions | any): EnvironmentDetailsEntityState {
 
   switch (action.type) {
     case EnvironmentActionTypes.GET:

@@ -17,13 +17,13 @@ import {
   map
 } from 'lodash/fp';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { managerFromRoute } from '../../../entities/managers/manager.selectors';
 import { UpdateManager } from '../../../entities/managers/manager.actions';
 import { Status } from './integrations-edit.reducer';
 import { integrationsEditState } from './integrations-edit.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations-edit',

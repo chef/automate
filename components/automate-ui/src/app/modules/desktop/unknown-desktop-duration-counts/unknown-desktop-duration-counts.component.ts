@@ -2,11 +2,11 @@ import { Component, Input, OnInit, OnDestroy, OnChanges, Output, EventEmitter, S
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { maxBy } from 'lodash/fp';
-import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
+import { TimeFromNowPipe } from '../../../pipes/time-from-now.pipe';
 
 import {
   CountedDurationItem
-} from 'app/entities/desktop/desktop.model';
+} from '../../../entities/desktop/desktop.model';
 
 @Component({
   selector: 'app-unknown-desktop-duration-counts',

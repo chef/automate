@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { DataBagsSuccessPayload } from './data-bags.actions';
 import { DataBagItemPayload } from './data-bag-details.actions';
 import { DataBag, DataBagsItemDetails, DataBagItem } from './data-bags.model';
-import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
+import { InterceptorSkipHeader } from '../../services/http/http-client-auth.interceptor';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 

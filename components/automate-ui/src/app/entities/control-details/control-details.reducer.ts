@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { ControlDetailActionTypes, ControlDetailActions } from './control-details.action';
 import { ControlDetail } from './control-details.model';
 
@@ -27,7 +27,7 @@ export const ControlDetailEntityInitialState: ControlDetailEntityState =
 
 export function controlDetailEntityReducer(
   state: ControlDetailEntityState = ControlDetailEntityInitialState,
-  action: ControlDetailActions): ControlDetailEntityState {
+  action: ControlDetailActions | any): ControlDetailEntityState {
 
   switch (action.type) {
     case ControlDetailActionTypes.GET:

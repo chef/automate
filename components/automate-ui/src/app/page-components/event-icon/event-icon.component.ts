@@ -7,8 +7,8 @@ import { Component, Input } from '@angular/core';
 })
 export class EventIconComponent {
   @Input() group: boolean;
-  @Input() type: number;
-  @Input() task: number;
+  @Input() type: number | string;
+  @Input() task: number | string;
 
   getEventIcon(eventType): string {
     switch (eventType) {

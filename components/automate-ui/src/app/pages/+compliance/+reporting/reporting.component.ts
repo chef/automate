@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subject, Observable, Subscription } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import {
   StatsService,
   SuggestionsService,
@@ -23,22 +23,22 @@ import {
   ReportQuery,
   ReportingSummaryStatus
 } from '../shared/reporting';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
 import { saveAs } from 'file-saver';
 import {
   Chicklet,
   ReportingFilterTypes
-} from 'app/types/types';
-import { DateTime } from 'app/helpers/datetime/datetime';
+} from '../../../types/types';
+import { DateTime } from '../../../helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { AckDownloadReports } from 'app/entities/download-reports/download-reports.actions';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
-import { AppConfigService } from 'app/services/app-config/app-config.service';
-import { DownloadReportsService } from 'app/entities/download-reports/download-reports.service';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { AckDownloadReports } from '../../../entities/download-reports/download-reports.actions';
+import { CreateNotification } from '../../../entities/notifications/notification.actions';
+import { Type } from '../../../entities/notifications/notification.model';
+import { AppConfigService } from '../../../services/app-config/app-config.service';
+import { DownloadReportsService } from '../../../entities/download-reports/download-reports.service';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -177,7 +177,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   downloadStatusVisible = false;
   downloadInProgress = false;
   downloadFailed = false;
-  endDate$: Observable<Date>;
+  endDate$: Observable<Date> | any;
   filters$: Observable<FilterC[]>;
   ChefDateTime = DateTime.CHEF_DATE_TIME;
 

@@ -14,7 +14,7 @@
   <app-notification
     *ngIf="notificationShow"
     type="{{notificationType}}"
-    timeout="5"
+    [timeout]="5"
     (dismissed)="dismissNotification()">
     <span>{{notificationMessage}}</span>
   </app-notification>
@@ -251,7 +251,7 @@
                     id="headers-input"
                     placeholder="key:value"
                     autocomplete="off"
-                    (input)="validateHeaders($event.target.value)"
+                    (input)="validateHeaders($event)"
                     rows="5"
                     ></textarea>
                 </div>

@@ -2,20 +2,20 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams, routeURL } from 'app/route.selectors';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { routeParams, routeURL } from '../../../route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { PolicyFile, CookbookLocks, IncludedPolicyLocks, SolutionDependencies } from 'app/entities/policy-files/policy-file.model';
-import { GetPolicyFile } from 'app/entities/policy-files/policy-file.action';
-import { policyFileFromRoute } from 'app/entities/policy-files/policy-file-details.selectors';
+import { PolicyFile, CookbookLocks, IncludedPolicyLocks, SolutionDependencies } from '../../../entities/policy-files/policy-file.model';
+import { GetPolicyFile } from '../../../entities/policy-files/policy-file.action';
+import { policyFileFromRoute } from '../../../entities/policy-files/policy-file-details.selectors';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
-import { Org } from 'app/entities/orgs/org.model';
-import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
-import { GetOrg } from 'app/entities/orgs/org.actions';
+import { Org } from '../../../entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from '../../../entities/orgs/org.selectors';
+import { GetOrg } from '../../../entities/orgs/org.actions';
 import { isNil } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../../entities/entities';
 export type PolicyFileTabName = 'details' | 'runList' | 'attributes';
 export class CookbookList {
   name: string;
@@ -112,7 +112,7 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(gtStatus),
-      this.store.select(orgFromRoute)
+      this.store.select(orgFromRoute as any)
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
@@ -139,7 +139,7 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
         }));
       }
     });
-    this.store.select(policyFileFromRoute).pipe(
+    this.store.select(policyFileFromRoute as any).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(policyFile => {
@@ -168,7 +168,7 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onSelectedTab(event: { target: { value: PolicyFileTabName } }) {
+  onSelectedTab(event: { target: { value: PolicyFileTabName } } | any) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }

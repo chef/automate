@@ -21,8 +21,8 @@ import {
   SubmitCredentialsSuccess
 } from './cds.actions';
 import { CdsRequests } from './cds.requests';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 import { saveAs } from 'file-saver';
 
 @Injectable()

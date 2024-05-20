@@ -2,9 +2,9 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ChefComponentsModule } from 'app/components/chef-components.module';
-import { AppRoutingModule } from 'app/app-routing.module';
-import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { ChefComponentsModule } from '../../components/chef-components.module';
+import { AppRoutingModule } from '../../app-routing.module';
+import { ChefPipesModule } from '../../pipes/chef-pipes.module';
 
 import { IntegrationsAddComponent } from './add/integrations-add.component';
 import { IntegrationsAWSFormComponent } from './aws-form/aws-form.component';

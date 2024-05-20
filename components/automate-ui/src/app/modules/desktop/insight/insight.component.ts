@@ -3,16 +3,16 @@ import { Store, createSelector } from '@ngrx/store';
 import { finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
 import { find } from 'lodash/fp';
-import * as moment from 'moment/moment';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import moment from 'moment';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import {
   Desktop, TermFilter, NodeMetadataCount, NodeMetadataCountValue, PageSizeChangeEvent,
   DesktopColumnOption, DesktopColumnOptionUpdate
-} from 'app/entities/desktop/desktop.model';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { ClientRunsRequests } from 'app/entities/client-runs/client-runs.requests';
-import { clientRunsState } from 'app/entities/client-runs/client-runs.selectors';
-import { NodeFilter } from 'app/entities/client-runs/client-runs.model';
+} from '../../../entities/desktop/desktop.model';
+import { DateTime } from '../../../helpers/datetime/datetime';
+import { ClientRunsRequests } from '../../../entities/client-runs/client-runs.requests';
+import { clientRunsState } from '../../../entities/client-runs/client-runs.selectors';
+import { NodeFilter } from '../../../entities/client-runs/client-runs.model';
 
 @Component({
   selector: 'app-insight',
@@ -72,7 +72,7 @@ export class InsightComponent implements OnInit {
     this.pageChange.emit(pageNumber);
   }
 
-  public onPageSizeChanged(event: PageSizeChangeEvent) {
+  public onPageSizeChanged(event: PageSizeChangeEvent| any) {
     this.pageSizeChange.emit({
       pageSize: event.pageSize,
       updatedPageNumber: event.updatedPageNumber

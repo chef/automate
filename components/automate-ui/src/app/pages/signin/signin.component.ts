@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
+import { ChefSessionService } from '../../services/chef-session/chef-session.service';
+import { IDToken, Jwt } from '../../helpers/jwt/jwt';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SigninService } from 'app/services/signin/signin.service';
-import { LicenseUsageService } from 'app/services/license-usage/license-usage.service';
+import { SigninService } from '../../services/signin/signin.service';
+import { LicenseUsageService } from '../../services/license-usage/license-usage.service';
 
 
 @Component({
@@ -69,7 +69,7 @@ export class SigninComponent implements OnInit, OnDestroy {
       error = true;
       return error;
     }
-    this.id = Jwt.parseIDToken(this.idToken);
+    this.id = Jwt.parseIDToken(this.idToken) || {} as IDToken;
     if (this.id === null) {
       error = true;
     }
@@ -93,7 +93,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   // errors. If something goes wrong, it returns '/', since the possible issues
   // here are not "stop-the-world" problems.
   pathFromState(state: string): string {
-    let path: string;
+    let path: string = "";
     try {
       path = decodeURIComponent(state);
     } catch (e) {

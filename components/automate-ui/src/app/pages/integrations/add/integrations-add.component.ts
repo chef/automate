@@ -12,12 +12,12 @@ import {
   toPairs,
   toUpper
 } from 'lodash/fp';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { CreateManager } from '../../../entities/managers/manager.actions';
 import { integrationsAddState } from './integrations-add.selectors';
 import { Status } from './integration-add.reducer';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations-add',

@@ -2,14 +2,13 @@ import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import * as moment from 'moment/moment';
+import moment from 'moment/moment';
 
-import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
-import { HttpStatus } from 'app/types/types';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { EntityStatus, pendingState } from 'app/entities/entities';
-import { ApplyStatus, FetchStatus } from 'app/entities/license/license.model';
-import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/license.model';
+import { LicenseFacadeService, LicenseApplyReason } from '../../../entities/license/license.facade';
+import { HttpStatus } from '../../../types/types';
+import { ChefSessionService } from '../../../services/chef-session/chef-session.service';
+import { EntityStatus, pendingState } from '../../../entities/entities';
+import { ApplyStatus, FetchStatus, LicenseStatus, parsedExpirationDate } from '../../../entities/license/license.model';
 
 @Component({
   selector: 'app-license-apply',
@@ -56,7 +55,7 @@ export class LicenseApplyComponent implements AfterViewInit {
     public licenseFacade: LicenseFacadeService,
     private chefSessionService: ChefSessionService,
     fb: FormBuilder) {
-      // keep these subscriptions always present
+    // keep these subscriptions always present
 
       this.licenseFacade.licenseApplyReason$.subscribe((reason) => {
         this.licenseApplyReason = reason;
@@ -78,9 +77,9 @@ export class LicenseApplyComponent implements AfterViewInit {
         }))
         .subscribe(() => this.closeModal());
 
-      this.applyForm = fb.group({
-        licenseKey: ['', [Validators.required]]
-      });
+    this.applyForm = fb.group({
+      licenseKey: ['', [Validators.required]]
+    });
   }
 
   private startListening() {
@@ -94,7 +93,7 @@ export class LicenseApplyComponent implements AfterViewInit {
   }
 
   public onApplyLicenseFormSubmit(): void {
-    const license: string = this.applyForm.get('licenseKey').value;
+    const license: string = this.applyForm.get('licenseKey')?.value;
 
     this.clearErrors();
     this.applyingLicense = true; // round-trip initiating...
@@ -117,12 +116,12 @@ export class LicenseApplyComponent implements AfterViewInit {
     }
 
     // loadingFailure:
-    switch (state.errorResp.status) {
+    switch (state.errorResp?.status) {
       case HttpStatus.FORBIDDEN:
         this.permissionDenied = true;
         break;
       case HttpStatus.BAD_REQUEST:
-        const reason = state.errorResp.error.error;
+        const reason = state.errorResp?.error.error;
         this.badRequestReason =
           reason.includes('expired') ? 'has expired' : 'is invalid';
         break;

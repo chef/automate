@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { mapKeys, snakeCase } from 'lodash/fp';
 
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { Team } from './team.model';
 import { CreateTeamPayload, TeamUserMgmtPayload } from './team.actions';
 

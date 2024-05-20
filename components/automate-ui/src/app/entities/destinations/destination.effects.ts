@@ -4,9 +4,9 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 
-import { HttpStatus } from 'app/types/types';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { HttpStatus } from '../../types/types';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 
 import {
   DestinationSuccessPayload,
@@ -173,14 +173,14 @@ export class DestinationEffects {
       });
     })));
 
-  testDestination$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(DestinationActionTypes.SEND_TEST),
-    mergeMap(({ payload: { destination } }: TestDestination) =>
-      this.requests.testDestination(destination).pipe(
-        map(() => new TestDestinationSuccess(destination)),
-        catchError(() =>
-          observableOf(new TestDestinationFailure(destination)))))));
+  // testDestination$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //   ofType(DestinationActionTypes.SEND_TEST),
+  //   mergeMap(({ payload: { destination } }: TestDestination) =>
+  //     this.requests.testDestination(destination).pipe(
+  //       map(() => new TestDestinationSuccess(destination)),
+  //       catchError(() =>
+  //         observableOf(new TestDestinationFailure(destination)))))));
 
   testDestinationSuccess$ = createEffect(() =>
     this.actions$.pipe(

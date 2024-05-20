@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf, of } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 
 import {
   NodeCredentialActionTypes,
@@ -27,7 +27,7 @@ import {
 } from './node-credential.actions';
 
 import { NodeCredentialRequests, NodeCredentialResponse } from './node-credential.requests';
-import { HttpStatus } from 'app/types/types';
+import { HttpStatus } from '../../types/types';
 import { NodeCredential } from './node-credential.model';
 
 @Injectable()

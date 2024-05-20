@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 import { compact, concat } from 'lodash';
 import { Destination, EnableDestination } from './destination.model';
 import { CreateDestinationPayload } from './destination.actions';
@@ -134,7 +134,7 @@ export class DestinationRequests {
     };
   }
 
-  public testDestination(destination: Destination): Observable<Object> {
+  public testDestination(destination: Destination): Observable<Object> | any {
     if (destination.secret) {
       return this.testDestinationWithSecretId(destination);
     }

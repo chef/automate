@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { isNil } from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ChefSessionService } from '../../services/chef-session/chef-session.service';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-telemetry-checkbox',

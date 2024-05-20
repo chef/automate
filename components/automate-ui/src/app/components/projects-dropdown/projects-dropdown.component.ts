@@ -3,11 +3,11 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ProjectConstants } from 'app/entities/projects/project.model';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { ProjectConstants } from '../../entities/projects/project.model';
+import { assignableProjects } from '../../services/projects-filter/projects-filter.selectors';
+import { ProjectsFilterOption } from '../../services/projects-filter/projects-filter.reducer';
+import { ResourceCheckedSection } from '../../components/resource-dropdown/resource-dropdown.component';
 
 @Component({
   selector: 'app-projects-dropdown',

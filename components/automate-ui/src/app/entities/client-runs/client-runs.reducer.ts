@@ -36,7 +36,7 @@ export const ClientRunsEntityInitialState: ClientRunsEntityState = {
     sortDirection: 'ASC',
     sortField: 'name'
   },
-  errorResp: null,
+  errorResp: {} as HttpErrorResponse,
   columns: {
     check_in: true,
     uptime: true,
@@ -50,7 +50,7 @@ export const ClientRunsEntityInitialState: ClientRunsEntityState = {
 
 export function clientRunsEntityReducer(
       state: ClientRunsEntityState = ClientRunsEntityInitialState,
-      action: ClientRunsActions): ClientRunsEntityState {
+      action: ClientRunsActions | any): ClientRunsEntityState {
 
   switch (action.type) {
 

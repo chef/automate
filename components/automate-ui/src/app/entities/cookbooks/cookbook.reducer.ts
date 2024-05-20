@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { CookbookActionTypes, CookbookActions } from './cookbook.actions';
 import { Cookbook } from './cookbook.model';
 
@@ -22,7 +22,7 @@ export const CookbookEntityInitialState: CookbookEntityState =
 
 export function cookbookEntityReducer(
   state: CookbookEntityState = CookbookEntityInitialState,
-  action: CookbookActions): CookbookEntityState {
+  action: CookbookActions | any): CookbookEntityState {
 
   switch (action.type) {
     case CookbookActionTypes.GET_ALL:

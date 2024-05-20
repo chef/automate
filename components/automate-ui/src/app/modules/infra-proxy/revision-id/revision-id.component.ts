@@ -11,16 +11,16 @@ import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { EntityStatus } from '../../../entities/entities';
 
-import { GetRevisions } from 'app/entities/revisions/revision.action';
+import { GetRevisions } from '../../../entities/revisions/revision.action';
 import {
   allRevisions,
   getAllStatus as getAllRevisionsForOrgStatus
-} from 'app/entities/revisions/revision.selectors';
-import { Revision } from 'app/entities/revisions/revision.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/revisions/revision.selectors';
+import { Revision } from '../../../entities/revisions/revision.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-revision-id',

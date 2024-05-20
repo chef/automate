@@ -3,10 +3,10 @@ import { Component, Input, Output, EventEmitter,
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
+import { TimeFromNowPipe } from '../../../pipes/time-from-now.pipe';
 import {
   DayPercentage
-} from 'app/entities/desktop/desktop.model';
+} from '../../../entities/desktop/desktop.model';
 
 @Component({
   selector: 'app-check-in-time-series',
@@ -26,7 +26,8 @@ export class CheckInTimeSeriesComponent implements OnInit, OnDestroy, OnChanges 
 
   constructor() {}
 
-  dateChanged(selectedDaysAgo: number) {
+  dateChanged(e) {
+    const selectedDaysAgo = e.target.value;
     this.daysAgoChanged.emit(selectedDaysAgo);
   }
 

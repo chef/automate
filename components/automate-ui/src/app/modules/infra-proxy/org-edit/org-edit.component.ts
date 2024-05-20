@@ -2,16 +2,16 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
 import { filter, takeUntil } from 'rxjs/operators';
 import { isNil, xor } from 'lodash/fp';
-import { EntityStatus, allLoaded, pending } from 'app/entities/entities';
-import { Org } from 'app/entities/orgs/org.model';
+import { EntityStatus, allLoaded, pending } from '../../../entities/entities';
+import { Org } from '../../../entities/orgs/org.model';
 import {
   getStatus, updateStatus, orgFromRoute
-} from 'app/entities/orgs/org.selectors';
-import { GetOrg, UpdateOrg } from 'app/entities/orgs/org.actions';
+} from '../../../entities/orgs/org.selectors';
+import { GetOrg, UpdateOrg } from '../../../entities/orgs/org.actions';
 
 @Component({
   selector: 'app-org-edit',
@@ -38,8 +38,8 @@ export class OrgEditComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService
   ) {
       this.updateOrgForm = this.fb.group({
-        name: new FormControl({value: ''}, [Validators.required]),
-        admin_user: new FormControl({value: ''}, [Validators.required]),
+        name: new FormControl({value: '', validators: [Validators.required]}),
+        admin_user: new FormControl({value: '', validators: [Validators.required]}),
         projects: [[]]
       });
    }
@@ -61,7 +61,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(orgFromRoute)
+      this.store.select(orgFromRoute as any)
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
@@ -96,7 +96,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
     }));
   }
 
-  onProjectDropdownClosing(selectedProjects: string[]): void {
+  onProjectDropdownClosing(selectedProjects: string[] | any): void {
 
     this.updateOrgForm.controls.projects.setValue(selectedProjects);
 

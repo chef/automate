@@ -2,40 +2,40 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams, routeURL } from 'app/route.selectors';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { routeParams, routeURL } from '../../../route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { infraRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
-import { GetRole } from 'app/entities/infra-roles/infra-role.action';
-import { GetRecipes } from 'app/entities/recipes/recipe.action';
-import { GetRoleEnvironments } from 'app/entities/role-environments/role-environments.action';
-import { GetRunlists } from 'app/entities/runlists/runlists.action';
-import { Org } from 'app/entities/orgs/org.model';
-import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
-import { GetOrg } from 'app/entities/orgs/org.actions';
+import { infraRoleFromRoute } from '../../../entities/infra-roles/infra-role-details.selectors';
+import { GetRole } from '../../../entities/infra-roles/infra-role.action';
+import { GetRecipes } from '../../../entities/recipes/recipe.action';
+import { GetRoleEnvironments } from '../../../entities/role-environments/role-environments.action';
+import { GetRunlists } from '../../../entities/runlists/runlists.action';
+import { Org } from '../../../entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from '../../../entities/orgs/org.selectors';
+import { GetOrg } from '../../../entities/orgs/org.actions';
 import {
   allRecipes,
   getAllStatus as getAllRecipesForOrgStatus
-} from 'app/entities/recipes/recipe.selectors';
+} from '../../../entities/recipes/recipe.selectors';
 import {
   allRoleEnvironments,
   getAllStatus as getAllRoleEnvironmentsForOrgStatus
-} from 'app/entities/role-environments/role-environments.selectors';
+} from '../../../entities/role-environments/role-environments.selectors';
 import {
   allRunlist,
   getAllStatus as getAllRunlistForOrgStatus
-} from 'app/entities/runlists/runlists.selectors';
+} from '../../../entities/runlists/runlists.selectors';
 import { isNil } from 'lodash/fp';
 import {
   InfraRole,
    RoleAttributes
-} from 'app/entities/infra-roles/infra-role.model';
-import { EntityStatus } from 'app/entities/entities';
+} from '../../../entities/infra-roles/infra-role.model';
+import { EntityStatus } from '../../../entities/entities';
 import { Node, Options } from '../tree-table/models';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
-import { List, ExpandedChildList, Runlist } from 'app/entities/runlists/runlists.model';
+import { List, ExpandedChildList, Runlist } from '../../../entities/runlists/runlists.model';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 export type InfraRoleTabName = 'runList' | 'attributes';
 
@@ -125,7 +125,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(gtStatus),
-      this.store.select(orgFromRoute)
+      this.store.select(orgFromRoute as any)
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
@@ -151,7 +151,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.loadRecipes();
     this.loadRoleEnvironments();
     this.loadRunlists(this.env_id);
-    this.store.select(infraRoleFromRoute).pipe(
+    this.store.select(infraRoleFromRoute as any).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(role => {
@@ -216,7 +216,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.openEnvironmentModal.emit(true);
   }
 
-  onSelectedTab(event: { target: { value: InfraRoleTabName } }) {
+  onSelectedTab(event: { target: { value: InfraRoleTabName } } | any) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
     this.filter(this.selected_level);

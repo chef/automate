@@ -9,7 +9,7 @@ import {
 import { NodeAttributes } from '../../types/types';
 import { AttributesService } from '../../services/attributes/attributes.service';
 import { JsonTreeComponent } from '../json-tree/json-tree.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-attributes',

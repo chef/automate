@@ -34,7 +34,7 @@
         <app-chef-notifications></app-chef-notifications>
       </div>
       <app-manual-upgrade-banner *ngIf="upgradeBanner" (close)="closeBanner()"></app-manual-upgrade-banner>
-      <chef-loading-spinner [hidden]="!(layoutFacade.showPageLoading$ | async)" size='50' fixed></chef-loading-spinner>
+      <chef-loading-spinner [hidden]="!(layoutFacade.showPageLoading$ | async)" size='50' fixed>{{!(layoutFacade.showPageLoading$ | async)}}</chef-loading-spinner>
       <router-outlet></router-outlet>
     </div>
     <!-- App Sidebar -->
@@ -46,7 +46,7 @@
   
   <!-- User Notifications -->
   <div [hidden]="!layoutFacade.layout.userNotifications.display">
-    <app-process-progress-bar></app-process-progress-bar>
-    <app-pending-edits-bar></app-pending-edits-bar>
+    <!-- <app-process-progress-bar></app-process-progress-bar>
+    <app-pending-edits-bar></app-pending-edits-bar> -->
   </div>
 </div>

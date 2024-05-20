@@ -416,7 +416,7 @@ export class NodeRun {
   resources: Resource[];
   deprecations: Deprecation[];
   runId: string;
-  runList: string[];
+  runList: string[] | null;
   startTime: Date;
   endTime: Date;
   source: string;
@@ -454,7 +454,7 @@ export class NodeRun {
   expandedRunList: {
     id: string;
     run_list: ExpandedRunListItem[];
-  };
+  } | null;
   versionedCookbooks: VersionedCookbook[];
   ip6address?: string;
   timezone?: string;
@@ -476,7 +476,7 @@ export class NodeRun {
     this.organization = respNodeRun.organization;
     this.resources = respNodeRun.resources;
     this.runId = respNodeRun.id;
-    this.runList = respNodeRun.run_list;
+    this.runList = respNodeRun.run_list || null;
     this.startTime = respNodeRun.start_time;
     this.endTime = respNodeRun.end_time;
     this.source = respNodeRun.source;
@@ -502,7 +502,7 @@ export class NodeRun {
     this.timestamp = respNodeRun.timestamp;
     this.version = respNodeRun.version;
     this.error = respNodeRun.error;
-    this.expandedRunList = respNodeRun.expanded_run_list;
+    this.expandedRunList = respNodeRun.expanded_run_list || null;
     this.uptimeSeconds = respNodeRun.uptime_seconds;
     this.deprecations = respNodeRun.deprecations;
     this.versionedCookbooks = respNodeRun.versioned_cookbooks;

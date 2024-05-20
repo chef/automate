@@ -7,22 +7,22 @@ import {
   OnDestroy,
   Output
 } from '@angular/core';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
+import { IdMapper } from '../../../helpers/auth/id-mapper';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import {
   updateStatus
-} from 'app/entities/infra-roles/infra-role-details.selectors';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
+} from '../../../entities/infra-roles/infra-role-details.selectors';
+import { EntityStatus, pending } from '../../../entities/entities';
+import { InfraRole } from '../../../entities/infra-roles/infra-role.model';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
-import { UpdateRole } from 'app/entities/infra-roles/infra-role.action';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { UpdateRole } from '../../../entities/infra-roles/infra-role.action';
+import { Utilities } from '../../../helpers/utilities/utilities';
 import { AvailableType } from '../infra-roles/infra-roles.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-edit-infra-role-modal',
@@ -142,7 +142,7 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
     }
   }
 
-  onChangeDefaultJson(event: { target: { value: string } } ) {
+  onChangeDefaultJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);
@@ -152,7 +152,7 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
     }
   }
 
-  onChangeOverrideJson(event: { target: { value: string } } ) {
+  onChangeOverrideJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);

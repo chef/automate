@@ -3,9 +3,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
-import { HttpStatus } from 'app/types/types';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
+import { HttpStatus } from '../../types/types';
 
 import {
   GetClients,
@@ -138,7 +138,7 @@ export class ClientEffects {
     ofType(ClientActionTypes.RESETKEY),
     mergeMap(( { payload: { server_id, org_id, name } }: ResetKeyClient) =>
       this.requests.resetKeyClient(server_id, org_id, name).pipe(
-        map((resp: ResetKeySuccessPayload) => new ResetKeyClientSuccess(resp)),
+        map((resp: ResetKeySuccessPayload | any) => new ResetKeyClientSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new ResetKeyClientFailure(error)))))));
 

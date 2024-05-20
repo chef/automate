@@ -1,44 +1,36 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "lib": [
-      "es2020",
-      "dom"
-    ],
-    "module": "commonjs",
-    "target": "es2019",
-    "downlevelIteration": true,
-    "importHelpers": true,
     "outDir": "./dist/out-tsc",
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "typeRoots": [
-      "node_modules/@types"
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "useDefineForClassFields": false,
+    "lib": [
+      "ES2022",
+      "dom"
     ],
-    "baseUrl": "./src",
-    "allowJs": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "strictNullChecks":false,
   },
   "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
-    "strictInputTypes": false,
-    "strictNullInputTypes": true,
-    "strictAttributeTypes": true,
-    "strictSafeNavigationTypes": true,
-    "strictDomLocalRefTypes": true,
-    "strictOutputEventTypes": true,
-    "strictDomEventTypes": false,
-    "strictContextGenerics": true,
-    "strictLiteralTypes": true,
-    "fullTemplateTypeCheck": true
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   },
-  "exclude": [
-    "**/node_modules/*",
-    "dist/*",
-    "src/assets/*"
-  ]
+  
 }

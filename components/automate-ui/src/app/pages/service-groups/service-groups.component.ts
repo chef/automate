@@ -3,18 +3,18 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store, createSelector } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import {
   Chicklet,
   RollupServiceStatus,
   SearchBarCategoryItem,
   SortDirection
-} from 'app/types/types';
-import { EntityStatus } from 'app/entities/entities';
+} from '../../types/types';
+import { EntityStatus } from '../../entities/entities';
 import {
   GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG
-} from 'app/entities/service-groups/service-groups.actions';
+} from '../../entities/service-groups/service-groups.actions';
 import {
   ServiceGroup,
   ServiceGroupsFilters,
@@ -31,7 +31,7 @@ import {
   selectedServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { ServiceGroupsRequests } from '../../entities/service-groups/service-groups.requests';
 
 @Component({
@@ -41,7 +41,7 @@ import { ServiceGroupsRequests } from '../../entities/service-groups/service-gro
 })
 
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
-  public serviceGroupsList$: Observable<ServiceGroup[]>;
+  public serviceGroupsList$: Observable<ServiceGroup[] | any>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
   public serviceGroupsError$: Observable<HttpErrorResponse>;
   public sgHealthSummary: ServiceGroupsHealthSummary;
@@ -376,11 +376,11 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.shareDropdownVisible = false;
   }
 
-  onSuggestValues(event: CustomEvent): void {
+  onSuggestValues(event: CustomEvent | any): void {
     this.store.dispatch(new GetServiceGroupsSuggestions( event.detail ));
   }
 
-  onFilterAdded(event: CustomEvent): void {
+  onFilterAdded(event: CustomEvent | any): void {
     const {type, text} = event.detail;
 
     if (some({type}, this.categoryTypes) ) {
@@ -396,7 +396,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFilterRemoved(event: CustomEvent): void {
+  onFilterRemoved(event: CustomEvent | any): void {
     const {type, text} = event.detail;
     const {queryParamMap} = this.route.snapshot;
     const queryParams = {...this.route.snapshot.queryParams};
@@ -413,7 +413,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams});
   }
 
-  onFiltersClear(_event: CustomEvent): void {
+  onFiltersClear(_event: CustomEvent | any): void {
     const queryParams = {...this.route.snapshot.queryParams};
 
     const filteredParams = pickBy((_value, key) => {
@@ -471,7 +471,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  onPageChange(pageNumber: number): void {
+  onPageChange(pageNumber: number | any): void {
     const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
     const totalPages = Math.ceil(this.totalServiceGroups / this.pageSize) || 1;
     this.telemetryService.track('applicationsPageChange',

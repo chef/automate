@@ -159,7 +159,7 @@ export interface RouterState {
   url: string;
   queryParams: Params;
   params: Params;
-  fragment: string;
+  fragment: string | null;
   path: UrlSegment[];
 }
 

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import {
   Credentials
-} from 'app/entities/cds/cds.model';
+} from '../../../entities/cds/cds.model';
 
 @Component({
   selector: 'app-enable-content-modal',

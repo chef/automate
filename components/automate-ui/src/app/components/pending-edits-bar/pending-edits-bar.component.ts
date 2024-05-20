@@ -2,16 +2,16 @@ import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { interval as observableInterval, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { get } from 'lodash/fp';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { ProjectService } from 'app/entities/projects/project.service';
-import { Project } from 'app/entities/projects/project.model';
-import { allProjects } from 'app/entities/projects/project.selectors';
-import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
-import { allPerms } from 'app/entities/userperms/userperms.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { LayoutFacadeService } from '../../entities/layout/layout.facade';
+import { ProjectService } from '../../entities/projects/project.service';
+import { Project } from '../../entities/projects/project.model';
+import { allProjects } from '../../entities/projects/project.selectors';
+import { ApplyRulesStatus } from '../../entities/projects/project.reducer';
+import { allPerms } from '../../entities/userperms/userperms.selectors';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-pending-edits-bar',

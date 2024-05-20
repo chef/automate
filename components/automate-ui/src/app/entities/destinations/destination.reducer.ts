@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { pipe, set, unset } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { DestinationActionTypes, DestinationActions } from './destination.actions';
 import { Destination } from './destination.model';
 
@@ -43,7 +43,7 @@ export const DestinationEntityInitialState: DestinationEntityState =
 
 export function destinationEntityReducer(
   state: DestinationEntityState = DestinationEntityInitialState,
-  action: DestinationActions): DestinationEntityState {
+  action: DestinationActions | any): DestinationEntityState {
 
   switch (action.type) {
 

@@ -3,10 +3,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 import { DataBagsItemDetails } from './data-bags.model';
-import { HttpStatus } from 'app/types/types';
+import { HttpStatus } from '../../types/types';
 
 import {
   GetDataBagItems,
@@ -59,7 +59,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.CREATE),
     mergeMap(({ payload: { dataBagItem } }: CreateDataBagItem) =>
       this.requests.createDataBagItem(dataBagItem).pipe(
-        map((resp: CreateDataBagItemSuccessPayload) => new CreateDataBagItemSuccess(resp)),
+        map((resp: CreateDataBagItemSuccessPayload | any) => new CreateDataBagItemSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDataBagItemFailure(error)))))));
 

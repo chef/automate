@@ -62,7 +62,7 @@ export class TreeService {
     if (!f(root)) {
       return;
     }
-    root.children.forEach(c => this._traverse(c, f));
+    root.children.forEach(c => this._traverse(c as any, f));
   }
 
   /**

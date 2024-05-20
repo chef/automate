@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { UserPreferencesService } from '../../services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-time',

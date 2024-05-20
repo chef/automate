@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RoutePerms } from 'app/components/landing/landing.component';
+import { RoutePerms } from '../../components/landing/landing.component';
 
 @Component({
   selector: 'app-settings-landing',

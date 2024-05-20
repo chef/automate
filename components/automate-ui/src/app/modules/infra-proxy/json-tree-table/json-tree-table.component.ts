@@ -1,5 +1,5 @@
 import { Component, Input, ElementRef, OnChanges } from '@angular/core';
-import * as jsonTree from 'app/page-components/json-tree/vendor/json-tree';
+import * as jsonTree from '../../../page-components/json-tree/vendor/json-tree';
 
 @Component({
   selector: 'app-json-tree-table',

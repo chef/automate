@@ -3,9 +3,9 @@ import { Component, OnChanges, SimpleChange, Input, AfterContentInit,
 import {
   NodeDetailsService
 } from '../../services/node-details/node-details.service';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { NodeRun } from '../../types/types';
-import { DateTime } from 'app/helpers/datetime/datetime';
+import { DateTime } from '../../helpers/datetime/datetime';
 
 @Component({
   selector: 'app-run-summary',

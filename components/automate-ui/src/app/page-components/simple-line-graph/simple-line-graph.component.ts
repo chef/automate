@@ -4,7 +4,7 @@ import {
 import * as d3 from 'd3';
 import {
   DayPercentage
-} from 'app/entities/desktop/desktop.model';
+} from '../../entities/desktop/desktop.model';
 
 export interface MarginObject {
   top: number;

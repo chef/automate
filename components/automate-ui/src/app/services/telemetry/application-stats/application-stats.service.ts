@@ -6,13 +6,13 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats.model';
 
-import { environment } from 'environments/environment';
+import { environment } from '../../../../environments/environment';
 const APPLICATIONS_STATS_URL = environment.applications_url;
 
 @Injectable()
 export class ApplicationStatsService {
 
-  private applicationStatsSubscription: Subscription;
+  private applicationStatsSubscription: Subscription | null = null ;
   constructor(private httpClient: HttpClient) {}
 
   getApplicationStats(): Promise<ApplicationUsageStats>  {

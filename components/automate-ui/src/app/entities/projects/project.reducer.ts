@@ -2,7 +2,7 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset, mapKeys, camelCase } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { ProjectActionTypes, ProjectActions, GetApplyRulesStatusSuccessPayload } from './project.actions';
 import { Project } from './project.model';
 
@@ -61,7 +61,7 @@ export const ProjectEntityInitialState: ProjectEntityState = projectEntityAdapte
 
 export function projectEntityReducer(
   state: ProjectEntityState = ProjectEntityInitialState,
-  action: ProjectActions): ProjectEntityState {
+  action: ProjectActions | any): ProjectEntityState {
 
   switch (action.type) {
     case ProjectActionTypes.GET_ALL:
