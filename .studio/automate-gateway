@@ -58,6 +58,7 @@ function gateway_integration() {
   set +o pipefail # reset
 }
 
+
 document "get_service_versions" <<DOC
   Get all the service versions running in automate
 DOC

@@ -160,6 +160,7 @@ start_all_services() {
   if [[ -f "/src/dev/license.jwt" ]]; then
      chef-automate license apply "/src/dev/license.jwt"
   fi
+  
   chef-automate dev create-iam-dev-users
 }
 
