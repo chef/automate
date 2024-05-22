@@ -141,7 +141,7 @@ export class ResourceDropdownComponent implements OnInit, OnChanges {
     this.allFilteredResourcesCount = this.calculateAllFilteredResourcesCount();
   }
 
-  moveFocus(event: KeyboardEvent): void {
+  moveFocus(event: KeyboardEvent | any): void {
     event.preventDefault();
     let nextElement: HTMLElement;
 

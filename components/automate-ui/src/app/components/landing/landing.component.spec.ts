@@ -2,11 +2,11 @@ import { Router } from '@angular/router';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 
-import { runtimeChecks } from 'app/ngrx.reducers';
-import { IndexedEntities } from 'app/entities/entities';
-import { UserPermEntity } from 'app/entities/userperms/userperms.entity';
-import { AuthorizedChecker } from 'app/helpers/auth/authorized';
-import { PermEntityState, Status } from 'app/entities/userperms/userperms.reducer';
+import { runtimeChecks } from '../../ngrx.reducers';
+import { IndexedEntities } from '../../entities/entities';
+import { UserPermEntity } from '../../entities/userperms/userperms.entity';
+import { AuthorizedChecker } from '../../helpers/auth/authorized';
+import { PermEntityState, Status } from '../../entities/userperms/userperms.reducer';
 import { LandingComponent, RoutePerms } from './landing.component';
 
 describe('LandingComponent', () => {

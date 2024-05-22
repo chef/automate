@@ -7,29 +7,29 @@ import { identity } from 'lodash/fp';
 import { filter, pluck, takeUntil, distinctUntilChanged, map } from 'rxjs/operators';
 import { combineLatest, Subject, Observable } from 'rxjs';
 
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { Regex } from 'app/helpers/auth/regex';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
-import { EntityStatus, allLoadedSuccessfully, pending } from 'app/entities/entities';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { Regex } from '../../../helpers/auth/regex';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeParams } from '../../../route.selectors';
+import { EntityStatus, allLoadedSuccessfully, pending } from '../../../entities/entities';
 import {
   GetPolicy, AddPolicyMembers, PolicyMembersMgmtPayload
-} from 'app/entities/policies/policy.actions';
+} from '../../../entities/policies/policy.actions';
 import {
   policyFromRoute,
   getStatus as getPolicyStatus,
   addPolicyMembersStatus
-} from 'app/entities/policies/policy.selectors';
-import { Policy, Member, Type, stringToMember } from 'app/entities/policies/policy.model';
-import { allTeams, getAllStatus as getAllTeamsStatus } from 'app/entities/teams/team.selectors';
-import { Team } from 'app/entities/teams/team.model';
-import { GetTeams } from 'app/entities/teams/team.actions';
-import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
+} from '../../../entities/policies/policy.selectors';
+import { Policy, Member, Type, stringToMember } from '../../../entities/policies/policy.model';
+import { allTeams, getAllStatus as getAllTeamsStatus } from '../../../entities/teams/team.selectors';
+import { Team } from '../../../entities/teams/team.model';
+import { GetTeams } from '../../../entities/teams/team.actions';
+import { allUsers, getStatus as getAllUsersStatus } from '../../../entities/users/user.selectors';
 import {
   GetUsers
-} from 'app/entities/users/user.actions';
-import { User } from 'app/entities/users/user.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/users/user.actions';
+import { User } from '../../../entities/users/user.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 export type FieldName = 'type' | 'identityProvider' | 'name';
 
@@ -126,7 +126,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     combineLatest([
         this.store.select(allTeams),
         this.store.select(allUsers),
-        this.store.select(policyFromRoute),
+        this.store.select(policyFromRoute as any),
         this.loading$
       ]).pipe(
         takeUntil(this.isDestroyed),

@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { DataBagActionTypes, DataBagActions } from './data-bags.actions';
 import { DataBag } from './data-bags.model';
 
@@ -29,7 +29,7 @@ dataBagEntityAdapter.getInitialState(<DataBagEntityState>{
 
 export function dataBagEntityReducer(
   state: DataBagEntityState = DataBagEntityInitialState,
-  action: DataBagActions): DataBagEntityState {
+  action: DataBagActions | any): DataBagEntityState {
 
   switch (action.type) {
     case DataBagActionTypes.GET_ALL:

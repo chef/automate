@@ -1,6 +1,6 @@
-@import "~styles/variables";
+@import "../../../styles/variables";
 @import '../infra_shared/shared';
-@import '../../../../app/page-components/json-tree/json-tree.component.scss';
+@import '../../../page-components/json-tree/json-tree.component.scss';
 
 chef-page-header {
   padding-bottom: 0;

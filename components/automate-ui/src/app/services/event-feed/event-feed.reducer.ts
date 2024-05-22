@@ -27,7 +27,7 @@ import {
   GET_SUGGESTIONS_SUCCESS,
   GET_SUGGESTIONS_ERROR,
   EventFeedAction } from './event-feed.actions';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 import {
  set,
@@ -86,7 +86,7 @@ export const initialState: EventFeedState = {
 
 export function eventFeedReducer(
   state: EventFeedState = initialState,
-  action: EventFeedAction): EventFeedState {
+  action: EventFeedAction | any): EventFeedState {
 
   switch (action.type) {
 

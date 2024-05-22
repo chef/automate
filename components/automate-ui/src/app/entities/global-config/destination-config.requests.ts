@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 import { compact, concat } from 'lodash';
 import { GlobalConfig } from './destination-config.model';
 import { GlobalDataFeedConfigSuccess } from './destination-config.actions';

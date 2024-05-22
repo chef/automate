@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { mapKeys, snakeCase } from 'lodash/fp';
 
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { Server } from './server.model';
 import { CreateServerPayload, ServerSuccessPayload } from './server.actions';
 

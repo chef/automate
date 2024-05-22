@@ -7,7 +7,7 @@ import { getOr } from 'lodash/fp';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { ManagerSearchFields } from '../../entities/managers/manager.actions';
 import * as selectors from '../../entities/managers/manager.selectors';
-import { Manager } from 'app/entities/managers/manager.model';
+import { Manager } from '../../entities/managers/manager.model';
 @Component({
   selector: 'chef-job-nodes-form',
   templateUrl: './job-nodes-form.component.html',
@@ -146,6 +146,7 @@ export class JobNodesFormComponent implements OnInit {
         return `${dir}/logo-gcp.svg`;
       }
     }
+    return null;
   }
 
   isAwsApi(managerType: string): boolean {

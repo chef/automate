@@ -7,9 +7,9 @@ import { Component,
   SimpleChanges
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { ProjectConstants } from 'app/entities/projects/project.model';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { IdMapper } from '../../../helpers/auth/id-mapper';
+import { ProjectConstants } from '../../../entities/projects/project.model';
+import { Utilities } from '../../../helpers/utilities/utilities';
 
 @Component({
   selector: 'app-create-org-modal',
@@ -45,7 +45,7 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
     }
   }
 
-  onProjectDropdownClosing(projectsSelected: string[]): void {
+  onProjectDropdownClosing(projectsSelected: string[] | any): void {
     this.createForm.controls.projects.setValue(projectsSelected);
   }
 

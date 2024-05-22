@@ -55,7 +55,7 @@ export class JobListComponent {
     return column === this.sortBy ? this.orderBy : 'none';
   }
 
-  handleSortToggle({detail: sortParams}) {
+  handleSortToggle({detail: sortParams}: any) {
     this.store.dispatch(new SortJobList(sortParams));
   }
 

@@ -1,6 +1,6 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { InfraRoleEntityState, infraRoleEntityAdapter } from './infra-role.reducer';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { find } from 'lodash/fp';
 
 export const infraRoleState = createFeatureSelector<InfraRoleEntityState>('infraRoles');

@@ -99,7 +99,7 @@
                 (keydown)="preventNegatives($event.key)"
                 (keyup)="autoUpdateInputWidth($event.target)"
               />
-              <mat-form-field appearance="none">
+              <mat-form-field>
                 <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
@@ -130,7 +130,7 @@
                 (keydown)="preventNegatives($event.key)"
                 (keyup)="autoUpdateInputWidth($event.target)"
               />
-              <mat-form-field appearance="none">
+              <mat-form-field>
                 <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
@@ -186,7 +186,7 @@
                 (keydown)="preventNegatives($event.key)"
                 (keyup)="autoUpdateInputWidth($event.target)"
               />
-              <mat-form-field appearance="none">
+              <mat-form-field>
                 <mat-select aria-label="Time type" panelClass="chef-dropdown" formControlName="unit" [resetOrigin]="shouldResetValues">
                   <mat-option value="m">minutes</mat-option>
                   <mat-option value="h">hours</mat-option>
@@ -261,8 +261,8 @@
                 [resetOrigin]="shouldResetValues"
                 type="number"
                 min="0"
-                (keydown)="preventNegatives($event.key)"
-                (keyup)="autoUpdateInputWidth($event.target)"
+                (keydown)="preventNegatives($event?.key)"
+                (keyup)="autoUpdateInputWidth($event?.target)"
               />days
             </p>
           </div>

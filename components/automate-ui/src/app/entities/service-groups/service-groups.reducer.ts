@@ -66,7 +66,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
 
 export function serviceGroupsEntityReducer(
   state: ServiceGroupsEntityState = ServiceGroupEntityInitialState,
-  action: ServiceGroupsActions): ServiceGroupsEntityState {
+  action: ServiceGroupsActions | any): ServiceGroupsEntityState {
 
   switch (action.type) {
 

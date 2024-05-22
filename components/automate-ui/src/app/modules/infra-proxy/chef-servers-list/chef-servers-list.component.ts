@@ -1,25 +1,25 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store } from '@ngrx/store';
 import { filter, takeUntil } from 'rxjs/operators';
-import { Regex } from 'app/helpers/auth/regex';
+import { Regex } from '../../../helpers/auth/regex';
 import { Subject, combineLatest } from 'rxjs';
 import { isNil } from 'lodash/fp';
 
-import { HttpStatus } from 'app/types/types';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { Server } from 'app/entities/servers/server.model';
+import { HttpStatus } from '../../../types/types';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { EntityStatus, pending } from '../../../entities/entities';
+import { Server } from '../../../entities/servers/server.model';
 import {
   getAllStatus as getAllServersStatus,
   allServers,
   saveStatus,
   saveError
-} from 'app/entities/servers/server.selectors';
-import { CreateServer, GetServers, DeleteServer } from 'app/entities/servers/server.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/servers/server.selectors';
+import { CreateServer, GetServers, DeleteServer } from '../../../entities/servers/server.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-chef-servers-list',

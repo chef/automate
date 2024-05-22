@@ -10,13 +10,13 @@ import {
 import { Store } from '@ngrx/store';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { takeUntil, filter } from 'rxjs/operators';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { pending, EntityStatus } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { pending, EntityStatus } from '../../../entities/entities';
 import { Subject } from 'rxjs';
-import { UpdateDataBagItem } from 'app/entities/data-bags/data-bag-details.actions';
-import { updateStatus } from 'app/entities/data-bags/data-bag-details.selector';
-import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { UpdateDataBagItem } from '../../../entities/data-bags/data-bag-details.actions';
+import { updateStatus } from '../../../entities/data-bags/data-bag-details.selector';
+import { Utilities } from '../../../helpers/utilities/utilities';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-edit-data-bag-item-modal',
@@ -107,7 +107,7 @@ export class EditDataBagItemModalComponent implements OnChanges, OnInit, OnDestr
     this.telemetryService.track('InfraServer_Databags_Details_EditDatabagItem');
   }
 
-  onChangeJSON(event: { target: { value: string } }) {
+  onChangeJSON(event: { target: { value: string } } | any) {
     // get value from text area
     const newValue = event.target.value;
     try {

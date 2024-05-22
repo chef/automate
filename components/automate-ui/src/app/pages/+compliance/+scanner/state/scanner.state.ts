@@ -108,7 +108,7 @@ export const initialState: ScannerState = {
 };
 
 export function scannerReducer(state: ScannerState = initialState,
-                               action: actions.ScannerAction): ScannerState {
+                               action: actions.ScannerAction | any): ScannerState {
   switch (action.type) {
     case actions.GET_JOBS: {
       const {page, per_page, sort, order, filters} = action.payload;

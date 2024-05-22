@@ -7,13 +7,13 @@ import {
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { first } from 'rxjs/operators';
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../../environments/environment';
 import {
   CookbookDetails,
   RootFiles
-} from 'app/entities/cookbooks/cookbook-details.model';
-import { CookbookDetailsRequests } from 'app/entities/cookbooks/cookbook-details.requests';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/cookbooks/cookbook-details.model';
+import { CookbookDetailsRequests } from '../../../entities/cookbooks/cookbook-details.requests';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-cookbook-dependencies-details',

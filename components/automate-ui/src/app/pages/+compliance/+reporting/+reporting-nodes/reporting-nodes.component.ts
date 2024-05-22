@@ -3,10 +3,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { groupBy } from 'lodash';
 import { includes } from 'lodash/fp';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { FilterC } from '../types';
 import { paginationOverride } from '../shared';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 import {
   StatsService,
   ReportQueryService,

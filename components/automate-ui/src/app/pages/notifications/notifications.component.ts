@@ -1,20 +1,20 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Observable, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { takeUntil, map } from 'rxjs/operators';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
+import { NotificationRule, ServiceActionType } from '../../entities/notification_rules/notification_rule.model';
 import { SortDirection } from '../../types/types';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import {
   allRules
-} from 'app/entities/notification_rules/notification_rule.selectors';
+} from '../../entities/notification_rules/notification_rule.selectors';
 import {
   GetNotificationRules,
   DeleteNotificationRule
-} from 'app/entities/notification_rules/notification_rule.action';
+} from '../../entities/notification_rules/notification_rule.action';
 
 export interface FieldDirection {
   name: SortDirection;
@@ -38,7 +38,7 @@ enum UrlTestState {
 export class NotificationsComponent implements OnInit, OnDestroy {
   rules$: Observable<NotificationRule[]>;
   errorLoading = false;
-  currentPage = 1;
+  currentPage: any = 1;
   pageSize = 10;
   sortField: string;
   sortDir: FieldDirection;

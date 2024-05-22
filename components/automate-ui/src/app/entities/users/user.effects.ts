@@ -4,9 +4,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 
-import { HttpStatus } from 'app/types/types';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { HttpStatus } from '../../types/types';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 import {
   CreateUser,
   CreateUserSuccess,

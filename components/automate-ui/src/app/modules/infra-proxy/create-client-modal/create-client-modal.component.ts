@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
+import { IdMapper } from '../../../helpers/auth/id-mapper';
 import { Store } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
 import { takeUntil } from 'rxjs/operators';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { Regex } from '../../../helpers/auth/regex';
 import { Subject, combineLatest } from 'rxjs';
-import { CreateClient, GetClients } from 'app/entities/clients/client.action';
-import { saveError, createClient } from 'app/entities/clients/client.selectors';
+import { CreateClient, GetClients } from '../../../entities/clients/client.action';
+import { saveError, createClient } from '../../../entities/clients/client.selectors';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
-import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { Utilities } from '../../../helpers/utilities/utilities';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-client-modal',

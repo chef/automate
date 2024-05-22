@@ -7,11 +7,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { clamp, find, isEqual } from 'lodash/fp';
 import { RRule } from 'rrule';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Job } from '../../entities/jobs/job.model';
 import { Manager } from '../../entities/managers/manager.model';
@@ -225,7 +225,7 @@ export class JobEditComponent implements OnDestroy {
             }),
             distinctUntilChanged((a, b) => isEqual(a, b)),
             takeUntil(this.isDestroyed))
-            .subscribe(payload => {
+            .subscribe((payload: any) => {
               this.store.dispatch(new ManagerSearchNodes(payload));
             });
 

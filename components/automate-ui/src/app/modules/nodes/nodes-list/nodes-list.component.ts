@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { timer as observableTimer, Subject } from 'rxjs';
 import { takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { DateTime } from 'app/helpers/datetime/datetime';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { DateTime } from '../../../helpers/datetime/datetime';
 
 import * as actions from '../../../entities/nodes/nodes.actions';
 import * as selectors from '../../../entities/nodes/nodes.selectors';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { reject } from 'lodash';
 
 @Component({

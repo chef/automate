@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import * as moment from 'moment/moment';
 
 import { EntityStatus } from '../../entities/entities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 import * as fromServiceGroups from './service-groups.reducer';
 import {

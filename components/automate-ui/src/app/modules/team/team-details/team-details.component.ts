@@ -5,34 +5,34 @@ import { Store, select } from '@ngrx/store';
 import { keyBy, at, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
-import { tag } from 'rxjs-spy/operators/tag';
+import { tag } from 'rxjs-spy/operators';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { Regex } from 'app/helpers/auth/regex';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeURL, routeState } from 'app/route.selectors';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { User } from 'app/entities/users/user.model';
-import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
-import { GetUsers } from 'app/entities/users/user.actions';
-import { GetProjects } from 'app/entities/projects/project.actions';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { Regex } from '../../../helpers/auth/regex';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeURL, routeState } from '../../../route.selectors';
+import { EntityStatus, pending } from '../../../entities/entities';
+import { User } from '../../../entities/users/user.model';
+import { allUsers, getStatus as getAllUsersStatus } from '../../../entities/users/user.selectors';
+import { GetUsers } from '../../../entities/users/user.actions';
+import { GetProjects } from '../../../entities/projects/project.actions';
+import { ProjectConstants } from '../../../entities/projects/project.model';
 import {
   teamFromRoute,
   teamUsers,
   getStatus,
   getUsersStatus as getTeamUsersStatus,
   updateStatus
-} from 'app/entities/teams/team.selectors';
-import { Team } from 'app/entities/teams/team.model';
+} from '../../../entities/teams/team.selectors';
+import { Team } from '../../../entities/teams/team.model';
 import {
   GetTeam,
   GetTeamUsers,
   RemoveTeamUsers,
   UpdateTeam
-} from 'app/entities/teams/team.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/teams/team.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -87,7 +87,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map((state) => [state.params.id as string, state.url]),
+      map((state) => [state.params['id'] as string, state.url]),
       // Only fetch if we are on the team details route, otherwise
       // we'll trigger GetTeam with the wrong input on any route
       // away to a page that also uses the :id param.
@@ -121,20 +121,20 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         (uStatus === EntityStatus.loading) ||
         (usersStatus === EntityStatus.loading);
       if (this.isLoadingTeam) {
-        this.updateForm.controls.name.disable();
+        this.updateForm.controls['name'].disable();
       } else {
-        this.updateForm.controls.name.enable();
+        this.updateForm.controls['name'].enable();
       }
     });
 
-    this.store.select(teamFromRoute).pipe(
+    this.store.select(teamFromRoute as any).pipe(
       takeUntil(this.isDestroyed),
       filter(identity),
       tag('team-fromRoute')
     ).subscribe((team) => {
       this.teamId = team.id;
       this.team = team;
-      this.updateForm.controls.name.setValue(this.team.name);
+      this.updateForm.controls['name'].setValue(this.team.name);
       this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
       this.store.dispatch(new GetProjects());
     });
@@ -203,29 +203,29 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   saveTeam(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    this.updateForm.controls.name.disable();
-    const name: string = this.updateForm.controls.name.value.trim();
-    const projects: string[] = this.updateForm.controls.projects.value;
+    this.updateForm.controls['name'].disable();
+    const name: string = this.updateForm.controls['name'].value.trim();
+    const projects: string[] = this.updateForm.controls['projects'].value;
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
     this.telemetryService.track('Settings_Teams_Details_Save');
   }
 
-  onSelectedTab(event: { target: { value: TeamTabName } }): void {
+  onSelectedTab(event): void {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  onProjectDropdownClosing(selectedProjects: string[]): void {
+  onProjectDropdownClosing(selectedProjects): void {
 
-    this.updateForm.controls.projects.setValue(selectedProjects);
+    this.updateForm.controls['projects'].setValue(selectedProjects);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (xor(this.team.projects, this.updateForm.controls.projects.value).length === 0) {
-      this.updateForm.controls.projects.markAsPristine();
+    if (xor(this.team.projects, this.updateForm.controls['projects'].value).length === 0) {
+      this.updateForm.controls['projects'].markAsPristine();
     } else {
-      this.updateForm.controls.projects.markAsDirty();
+      this.updateForm.controls['projects'].markAsDirty();
     }
 
   }

@@ -1,4 +1,4 @@
-import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
+import { NgrxStateAtom, RouterState } from '../../ngrx.reducers';
 import { Store } from '@ngrx/store';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,7 +7,7 @@ import { NodeDetailsService, LogModalObject } from '../../services/node-details/
 import { NodeRun, RunInfo } from '../../types/types';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { previousRoute } from '../../route.selectors';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
   selector: 'app-node-details',
@@ -43,7 +43,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
     // Scroll to the top of the view
     window.scrollTo(0, 0);
     this.nodeId = this.getRouteParam('node-id');
-    this.route.data.subscribe((data: { nodeRun: NodeRun }) => {
+    this.route.data.subscribe((data: { nodeRun: NodeRun } | any) => {
       this.nodeRun = data.nodeRun;
       this.runId = this.getRouteParam('run-id');
       this.endTime = new Date(this.getRouteParam('end_time'));
@@ -74,7 +74,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateRunId(newRun: RunInfo): void {
+  updateRunId(newRun: RunInfo | any): void {
     this.router.navigate(
       [
         'infrastructure/client-runs', this.nodeId, 'runs', newRun.runId, {end_time: newRun.endTime}

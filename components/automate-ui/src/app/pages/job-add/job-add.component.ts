@@ -10,7 +10,7 @@ import * as moment from 'moment/moment';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Manager } from '../../entities/managers/manager.model';
 import { Profile } from '../../entities/profiles/profile.model';
@@ -260,7 +260,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
             }),
             distinctUntilChanged((a, b) => isEqual(a, b)),
             takeUntil(this.isDestroyed))
-            .subscribe(payload => {
+            .subscribe((payload: any) => {
               this.store.dispatch(new ManagerSearchNodes(payload));
             });
 

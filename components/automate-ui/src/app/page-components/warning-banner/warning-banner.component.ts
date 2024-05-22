@@ -1,5 +1,5 @@
 import { Component, OnInit, HostBinding, Output, EventEmitter } from '@angular/core';
-import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { AppConfigService } from '../../services/app-config/app-config.service';
 
 @Component({
   selector: 'app-warning-banner',

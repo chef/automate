@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, HostBinding } from '@angular/core';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
-import { PageSizeChangeEvent } from 'app/entities/desktop/desktop.model';
+import { MatOptionSelectionChange } from '@angular/material/core';
+import { PageSizeChangeEvent } from '../../entities/desktop/desktop.model';
 
 
 @Component({

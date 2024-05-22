@@ -28,9 +28,9 @@
 
     <code>
       <pre>
-import {{'{'}} Component {{'}'}} from '@angular/core';
+import {{'{'}} Component {{'}'}} from {{"'@angular/core'"}};
 
-@Component({{'{'}}
+{{'@Component'}}({{'{'}}
   selector: 'app-demo-projects-dropdown',
   templateUrl: './demo-projects-dropdown.component.html',
   styleUrls: []
@@ -78,12 +78,12 @@ export class DemoProjectsDropdownComponent {{'{'}}
     <h3>API</h3>
 
     <app-cl-api>
-      <api-prop name="projects" type="ProjectCheckedMap" required>
+      <api-prop name="projects" type="ProjectCheckedMap" [required]="true">
         The map of ProjectChecked by id. Any checked changes propagated via
         onProjectChecked. Updates should be applied to parent component state.
       </api-prop>
 
-      <api-prop name="onProjectChecked" type="Function(ProjectChecked): void" required>
+      <api-prop name="onProjectChecked" type="Function(ProjectChecked): void" [required]="true">
         Emits an updated project that has been checked or unchecked. Keep projects input
         up to date in parent.
       </api-prop>

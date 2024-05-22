@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RunlistActionTypes, RunlistActions } from './runlists.action';
 import { Runlist } from './runlists.model';
 
@@ -23,7 +23,7 @@ export const RunlistEntityInitialState: RunlistEntityState =
 
 export function runlistEntityReducer(
   state: RunlistEntityState = RunlistEntityInitialState,
-  action: RunlistActions): RunlistEntityState {
+  action: RunlistActions | any): RunlistEntityState {
 
   switch (action.type) {
     case RunlistActionTypes.GET_ALL:

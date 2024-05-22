@@ -1,5 +1,5 @@
 import { Component, Input, Output, OnChanges, SimpleChanges, EventEmitter } from '@angular/core';
-import { ContentItem } from 'app/entities/cds/cds.model';
+import { ContentItem } from '../../../entities/cds/cds.model';
 
 @Component({
   selector: 'app-card',

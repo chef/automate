@@ -6,26 +6,26 @@ import { keyBy, at, identity } from 'lodash/fp';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeState } from 'app/route.selectors';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { EntityStatus, allLoadedSuccessfully, pending } from 'app/entities/entities';
-import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
-import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
-import { GetUsers } from 'app/entities/users/user.actions';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeState } from '../../../route.selectors';
+import { LayoutFacadeService } from '../../../entities/layout/layout.facade';
+import { EntityStatus, allLoadedSuccessfully, pending } from '../../../entities/entities';
+import { User, HashMapOfUsers, userArrayToHash } from '../../../entities/users/user.model';
+import { allUsers, getStatus as getAllUsersStatus } from '../../../entities/users/user.selectors';
+import { GetUsers } from '../../../entities/users/user.actions';
 import {
   teamFromRoute,
   teamUsers,
   addUsersStatus,
   getUsersStatus as getTeamUsersStatus
-} from 'app/entities/teams/team.selectors';
-import { Team } from 'app/entities/teams/team.model';
+} from '../../../entities/teams/team.selectors';
+import { Team } from '../../../entities/teams/team.model';
 import {
   GetTeam,
   GetTeamUsers,
   AddTeamUsers
-} from 'app/entities/teams/team.actions';
+} from '../../../entities/teams/team.actions';
 
 const TEAM_ADD_USERS_ROUTE = /^\/settings\/teams\/.*\/add-users$/;
 
@@ -57,10 +57,10 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.dispatch(new GetUsers());
-    this.store.select(teamFromRoute).pipe(
+    this.store.select(teamFromRoute as any).pipe(
       takeUntil(this.isDestroyed),
       filter(identity),
-      map(team => [team, team ? team.id : null]),
+      map(team => [team, team ? team.id : null] as any),
       distinctUntilChanged(
         ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
         teamIdA === teamIdB)
@@ -72,7 +72,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
 
     this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map(state => [state.params.id as string, state.url]),
+      map(state => [state.params['id'] as string, state.url]),
       // Only fetch if we are on the team details route, otherwise
       // we'll trigger GetTeam with the wrong input on any route
       // away to a page that also uses the :id param.
@@ -180,7 +180,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   }
 
   getErrorMessage(): string {
-    return this.addUsersFailed.length > 0 ? this.addUsersFailed : undefined;
+    return this.addUsersFailed.length > 0 ? this.addUsersFailed : "";
   }
 
   openModal(): void {

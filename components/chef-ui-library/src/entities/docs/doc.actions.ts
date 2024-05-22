@@ -1,19 +1,22 @@
 import { fetchDocs } from './doc.requests';
+import { docsSlice } from "./doc.reducer";
+import { store } from "../../store";
 
-export const GET_DOCS = 'DOCS::GET';
-export const GET_DOCS_SUCCESS = 'DOCS::GET::SUCCESS';
-export const GET_DOCS_FAILED = 'DOCS::GET::FAILED';
 
-export const getDocs = () =>
-  async (dispatch) => {
-    dispatch({ type: GET_DOCS });
+const { getDocs: getDocsAction, getDocsSuccess, getDocsFailed } = docsSlice.actions;
 
-    const resp = await fetchDocs();
+export const getDocs = async () => {
 
-    if (resp.ok) {
-      const payload = await resp.json();
-      dispatch({ type: GET_DOCS_SUCCESS, payload });
-    } else {
-      dispatch({ type: GET_DOCS_FAILED, payload: resp.status });
-    }
-  };
+  store.dispatch(getDocsAction());
+
+  const resp = await fetchDocs();
+
+  if (resp.ok) {
+    const payload = await resp.json();
+    store.dispatch(getDocsSuccess({ children: payload && payload.children }));
+  } else {
+    store.dispatch(getDocsFailed());
+  }
+
+};
+

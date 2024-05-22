@@ -11,10 +11,10 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { of } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { IndexedEntities } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { IndexedEntities } from '../../entities/entities';
 import {
   UserPermsTypes,
   GetAllUserPermsSuccess,
@@ -57,23 +57,23 @@ export class UserPermEffects {
         catchError((error: HttpErrorResponse) => of(new GetAllUserPermsFailure(error))));
     })));
 
-  fetchSomePerms$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(UserPermsTypes.GET_SOME),
-    withLatestFrom(this.store.select(getlastFetchTime)),
-    withLatestFrom(this.store.select(allPerms)),
-    switchMap(
-      ([[action, lastTime], list]: [[GetSomeUserPerms, Date], IndexedEntities<UserPermEntity>]) => {
-        const isFresh = !!list && !this.stale(lastTime);
-        return isFresh ?
-          // TODO: This works, but it has extraneous 'id' property in the payload.
-          // Should strip that from each entry in the list.
-          of(new GetSomeUserPermsSuccess(list))
+  // fetchSomePerms$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //   ofType(UserPermsTypes.GET_SOME),
+  //   withLatestFrom(this.store.select(getlastFetchTime)),
+  //   withLatestFrom(this.store.select(allPerms)),
+  //   switchMap(
+  //     ([[action, lastTime], list]: [[GetSomeUserPerms, Date], IndexedEntities<UserPermEntity>]) => {
+  //       const isFresh = !!list && !this.stale(lastTime);
+  //       return isFresh ?
+  //         // TODO: This works, but it has extraneous 'id' property in the payload.
+  //         // Should strip that from each entry in the list.
+  //         of(new GetSomeUserPermsSuccess(list))
 
-          : this.requests.fetchSome(action.payload).pipe(
-            map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
-            catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))));
-      })));
+  //         : this.requests.fetchSome(action.payload).pipe(
+  //           map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
+  //           catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))));
+  //     })));
 
   fetchParameterizedPerms$ = createEffect(() =>
     this.actions$.pipe(

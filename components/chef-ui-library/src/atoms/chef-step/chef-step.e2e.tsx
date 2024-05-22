@@ -33,7 +33,7 @@ describe('chef-step', () => {
 
       await page.waitForChanges();
 
-      expect(element.hasAttribute('disabled')).toEqual(true);
+      expect(element.getAttribute('disabled')).toEqual(true);
     });
   });
 
@@ -47,7 +47,7 @@ describe('chef-step', () => {
 
       await page.waitForChanges();
 
-      expect(element.hasAttribute('disabled')).toEqual(false);
+      expect(element.getAttribute('disabled')).toEqual(false);
     });
   });
 
@@ -61,7 +61,7 @@ describe('chef-step', () => {
 
       await page.waitForChanges();
 
-      expect(element.hasAttribute('selected')).toEqual(true);
+      expect(element.getAttribute('selected')).toEqual(true);
     });
   });
 
@@ -75,7 +75,7 @@ describe('chef-step', () => {
 
       await page.waitForChanges();
 
-      expect(element.hasAttribute('selected')).toEqual(false);
+      expect(element.getAttribute('selected')).toEqual(false);
     });
   });
 });
