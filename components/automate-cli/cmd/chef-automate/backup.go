@@ -127,7 +127,9 @@ func init() {
 	cancelBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.cancelWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 	integrityBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.integrityWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 
-	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.baseBackupDir, "backup-dir", "b", "/var/opt/chef-automate/backups", "Directory used for backups")
+	// TODO: Set this to read from  /hab/a2_deploy_workspace/config.toml file
+	backup_dir := "/var/opt/chef-automate/backups"
+	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.baseBackupDir, "backup-dir", "b", backup_dir, "Directory used for backups")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.overrideOrigin, "override-origin", "o", "chef", "Habitat origin from which to install packages")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.hartifactsPath, "hartifacts", "", "", "The local path to search for override packages")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.channel, "channel", "c", "current", "The habitat channel from which to install packages")
@@ -994,7 +996,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	// In the case only the backup id was provided, default the path to
-	// baseBackupDir (/var/opt/chef-automate/backups)
+	// baseBackupDir as defined in config.toml
 	if location == "" {
 		location = backupCmdFlags.baseBackupDir
 	}
