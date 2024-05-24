@@ -13,7 +13,7 @@ pkg_deps=(
   core/bash
   core/glibc
   core/libevent
-  core/openssl11
+  core/openssl/3.0.9
 )
 
 pkg_build_deps=(
@@ -43,4 +43,5 @@ do_build() {
 #   make test
 # }
 
+ 
  

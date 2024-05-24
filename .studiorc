@@ -2,8 +2,8 @@
 #shellcheck disable=SC2034
 
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
-export HAB_BLDR_CHANNEL='LTS-2024'
-export HAB_FALLBACK_CHANNEL='stable'
+export HAB_BLDR_CHANNEL='stable'
+export HAB_FALLBACK_CHANNEL='LTS-2024'
 # Bring studio-common to life
 RECOMMENDED_HAB_VERSION="1.6.521"
 

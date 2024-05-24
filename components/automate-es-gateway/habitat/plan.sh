@@ -44,7 +44,7 @@ pkg_deps=(
   core/ncurses
   core/zlib
   core/bzip2
-  core/openssl
+  core/openssl/3.0.9/20240510201623
   core/pcre
 
   core/coreutils
@@ -134,4 +134,5 @@ do_install() {
 }
 
 
+ 
  
