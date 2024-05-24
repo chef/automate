@@ -157,3 +157,4 @@ bundle exec bin/workflow-ctl "\$@"
 EOF
   chmod +x "${pkg_prefix}/bin/workflow-ctl"
 }
+ 

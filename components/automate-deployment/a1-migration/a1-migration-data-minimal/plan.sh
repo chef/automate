@@ -52,3 +52,4 @@ do_install() {
     touch ${pkg_prefix}/var/opt/opscode/bootstrapped
   fi
 }
+ 
