@@ -2,6 +2,8 @@
 #shellcheck disable=SC2034
 
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
+export HAB_BLDR_CHANNEL='LTS-2024'
+export HAB_FALLBACK_CHANNEL='stable'
 # Bring studio-common to life
 RECOMMENDED_HAB_VERSION="1.6.521"
 
@@ -60,10 +62,10 @@ export GOFLAGS=""
 export GO_DEBUG_PORT=2345
 
 # Depot channel for Chef micro-services
-export CHEF_CHANNEL=dev
+export CHEF_CHANNEL='LTS-2024'
 
 # Flag that will allow us detect when are we in dev mode inside any a2 component
-export CHEF_DEV_ENVIRONMENT=true
+export CHEF_DEV_ENVIRONMENT=false
 
 # minimal(fast) hart compression level for dev
 export HAB_HART_COMPRESSION_LEVEL=0
