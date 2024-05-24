@@ -197,7 +197,7 @@ class PackageQuerier
     def get_latest(channel, origin, name)
       http = Net::HTTP.new(@host, 443)
       http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       req = Net::HTTP::Get.new("/v1/depot/channels/#{origin}/#{channel}/pkgs/#{name}/latest", {'User-Agent' => BLDR_API_USER_AGENT})
       response = http.request(req)
       case response
