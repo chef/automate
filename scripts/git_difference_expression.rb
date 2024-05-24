@@ -11,7 +11,7 @@ MANIFEST_URL = "/manifests/dev/automate/latest_semver.json".freeze
 def get_dev_manifest_sha
   http = Net::HTTP.new(MANIFEST_HOST, 443)
   http.use_ssl = true
-  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+  http.verify_mode = OpenSSL::SSL::VERIFY_NONE
   req = Net::HTTP::Get.new(MANIFEST_URL)
   response = http.request(req)
   latest_release = JSON.parse(response.body)
