@@ -13,6 +13,13 @@ log_section_start() {
     echo "--- [$(date -u)] $*"
 }
 
+get_hab_channel() {
+  case $1 in
+    'components/automate-load-balancer') echo 'LTS-2024';;
+    *) echo 'stable';;
+  esac
+}
+
 export HAB_NONINTERACTIVE=true
 export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
@@ -60,8 +67,10 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
+    local hab_channel=$(get_hab_channel($component))
     echo "component: $component"
-    component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
+    echo "hab_channel: $hab_channel"
+    component_build="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component"
     build_commands="${build_commands} $component_build;"
 done
 

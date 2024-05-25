@@ -29,8 +29,8 @@ pkg_deps=(
   core/ncurses
   core/zlib
   core/bzip2
-  core/openssl/3.0.9/20240510201623
-  core/pcre2/10.42/20240510192504
+  core/openssl
+  core/pcre2
   chef/mlsa
   core/bash
 )
