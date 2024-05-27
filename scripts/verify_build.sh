@@ -15,7 +15,7 @@ log_section_start() {
 
 get_hab_channel() {
   case $1 in
-    'components/automate-load-balancer'|'components/automate-backend-deployment'|'components/automate-backend-elasticsearch'|'components/automate-builder-memcached'|'components/automate-cluster-ctl'|'components/automate-es-gateway') echo 'LTS-2024';;
+    'components/automate-scaffolding'|'components/automate-load-balancer'|'components/automate-backend-deployment'|'components/automate-backend-elasticsearch'|'components/automate-builder-memcached'|'components/automate-cluster-ctl'|'components/automate-es-gateway') echo 'LTS-2024';;
     *) echo 'stable';;
   esac
 }
@@ -71,7 +71,7 @@ for component in "${changed_components[@]}"; do
     hab_channel=$(get_hab_channel $component)
     echo "component: $component"
     echo "hab_channel: $hab_channel"
-    component_build="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel;  build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component"
+    component_buil       d="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel;  build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component"
     build_commands="${build_commands} $component_build;"
 done
 
@@ -85,7 +85,11 @@ if [[ "$build_commands" != "" ]]; then
     HAB_STUDIO_SECRET_OPENSEARCH_ADMIN_KEY_PEM=$OPENSEARCH_ADMIN_KEY_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_NODE1_PEM=$OPENSEARCH_NODE1_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_NODE1_KEY_PEM=$OPENSEARCH_NODE1_KEY_PEM \
-    HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true hab studio run -D "source .studiorc; set -e; $build_commands"
+    HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true \
+    HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true
+
+    hab studio run -D "source .studiorc; set -e; $build_commands"
+    # hab studio rm
 fi
 
 # Generate a local A2 manifest. This manifest represents the total
