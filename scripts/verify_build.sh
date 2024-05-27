@@ -15,7 +15,7 @@ log_section_start() {
 
 get_hab_channel() {
   case $1 in
-    'components/automate-load-balancer') echo 'LTS-2024';;
+    'components/automate-load-balancer', 'components/automate-backend-deployment', 'components/automate-backend-elasticsearch', 'components/automate-builder-memcached', 'components/automate-cluster-ctl', 'components/automate-es-gateway') echo 'LTS-2024';;
     *) echo 'stable';;
   esac
 }
@@ -70,7 +70,7 @@ for component in "${changed_components[@]}"; do
     hab_channel=$(get_hab_channel $component)
     echo "component: $component"
     echo "hab_channel: $hab_channel"
-    component_build="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component"
+    component_build="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true; build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true; build $component"
     build_commands="${build_commands} $component_build;"
 done
 
