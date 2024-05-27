@@ -71,7 +71,7 @@ for component in "${changed_components[@]}"; do
     hab_channel=$(get_hab_channel $component)
     echo "component: $component"
     echo "hab_channel: $hab_channel"
-    component_buil       d="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel;  build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component"
+    component_build="echo \"--- [\$(date -u)] export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel;  build $component\"; export HAB_BLDR_CHANNEL=$hab_channel; export HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL=$hab_channel; build $component"
     build_commands="${build_commands} $component_build;"
 done
 
