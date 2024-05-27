@@ -85,7 +85,7 @@ if [[ "$build_commands" != "" ]]; then
     HAB_STUDIO_SECRET_OPENSEARCH_ADMIN_KEY_PEM=$OPENSEARCH_ADMIN_KEY_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_NODE1_PEM=$OPENSEARCH_NODE1_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_NODE1_KEY_PEM=$OPENSEARCH_NODE1_KEY_PEM \
-    HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio run -D "source .studiorc; set -e; $build_commands"
+    HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true hab studio run -D "source .studiorc; set -e; $build_commands"
 fi
 
 # Generate a local A2 manifest. This manifest represents the total
