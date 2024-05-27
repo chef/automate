@@ -15,7 +15,7 @@ log_section_start() {
 
 get_hab_channel() {
   case $1 in
-    'components/automate-load-balancer', 'components/automate-backend-deployment', 'components/automate-backend-elasticsearch', 'components/automate-builder-memcached', 'components/automate-cluster-ctl', 'components/automate-es-gateway') echo 'LTS-2024';;
+    'components/automate-load-balancer'|'components/automate-backend-deployment'|'components/automate-backend-elasticsearch'|'components/automate-builder-memcached'|'components/automate-cluster-ctl'|'components/automate-es-gateway') echo 'LTS-2024';;
     *) echo 'stable';;
   esac
 }
