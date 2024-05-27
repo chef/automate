@@ -23,7 +23,7 @@ pkg_deps=(
   core/curl
   core/terraform1
   core/hab/1.6.521/20220603154827
-  core/openssl/3.0.9/20240510201623
+  core/openssl
   core/rsync
   
 #   core/openssh ( core/openssh/7.9p1/20220311132702 core/openssh/7.9p1/20230816095218 )
@@ -131,5 +131,3 @@ do_strip() {
   return 0
 }
 
- 
- 

@@ -50,5 +50,3 @@ do_build() {
 do_install() {
   cp -R dist "$pkg_prefix"
 }
- 
- 

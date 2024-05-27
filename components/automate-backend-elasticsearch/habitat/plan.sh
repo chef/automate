@@ -11,7 +11,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   chef/mlsa
   core/bash
-  core/openssl/3.0.9
+  core/openssl
   core/procps-ng
   "${UPSTREAM_PKG_IDENT}"
 )
@@ -48,5 +48,3 @@ do_end() {
   return 0
 }
 
- 
- 

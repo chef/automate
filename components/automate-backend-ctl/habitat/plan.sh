@@ -100,5 +100,3 @@ EOF
   chmod -v 755 "$bin"
 }
 
- 
- 

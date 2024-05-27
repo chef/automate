@@ -18,7 +18,7 @@ pkg_deps=(
   core/gzip
   core/jq-static
   core/openssh
-  core/openssl/3.0.9
+  core/openssl
   core/make
   core/curl
   core/rsync
@@ -124,5 +124,3 @@ do_strip() {
 
 
 
- 
- 
