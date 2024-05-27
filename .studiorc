@@ -62,7 +62,7 @@ export GOFLAGS=""
 export GO_DEBUG_PORT=2345
 
 # Depot channel for Chef micro-services
-export CHEF_CHANNEL='LTS-2024'
+export CHEF_CHANNEL='stable'
 
 # Flag that will allow us detect when are we in dev mode inside any a2 component
 export CHEF_DEV_ENVIRONMENT=false
