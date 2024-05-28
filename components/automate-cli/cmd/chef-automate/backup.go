@@ -127,9 +127,7 @@ func init() {
 	cancelBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.cancelWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 	integrityBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.integrityWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 
-	// TODO: Set this to read from  /hab/a2_deploy_workspace/config.toml file
-	backup_dir := "/var/opt/chef-automate/backups"
-	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.baseBackupDir, "backup-dir", "b", backup_dir, "Directory used for backups")
+	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.baseBackupDir, "backup-dir", "b", "/var/opt/chef-automate/backups", "Directory used for backups")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.overrideOrigin, "override-origin", "o", "chef", "Habitat origin from which to install packages")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.hartifactsPath, "hartifacts", "", "", "The local path to search for override packages")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.channel, "channel", "c", "current", "The habitat channel from which to install packages")
@@ -268,6 +266,8 @@ var integrityBackupValidateCmd = &cobra.Command{
 }
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {
+	// Create a
+	// PreRun commands from Cobra framework
 	err := commandPrePersistent(cmd)
 	if err != nil {
 		return status.Wrap(err, status.BackupError, "unable to set command parent settings")
@@ -310,6 +310,38 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 	return commandString
 }
 
+func checkBackupConfigLocation(infra *AutomateHAInfraDetails) error {
+
+	path := ""
+	configType := ""
+	var configuration interface{}
+
+	configuration, err := readAnyConfig(path, configType)
+	backupMount := configuration.Architecture.ConfigInitials.BackupMount
+
+	if err != nil {
+		return err
+	}
+
+	openSearchConfig := getOpenSearchObjectStorageConfig(configuration)
+
+	/*
+		Read configuration
+		Get deployment type
+		getModeOfDeployment config path /hab/config/   config.toml (AWS or Existing Infra)
+
+		call readAnyConfig(path, config type)
+		once you have this config, find the backupMountPath
+		Check that path with the snapshot
+		call pullAndGenerateConfig.getOpensearchConfig
+		Curl to get snapshot for elasticsearch GET /_snapshot/_all
+		That snapshot will have a path that has to be parsed. Check that path matches
+		Check path actually exists
+		If all good, continue. Else, break with os.Exit(1) or return error
+	*/
+	return errors.New("Unable to validate backup location")
+}
+
 func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomateHAInfraDetails, subCommand string) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
 		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true, subCommand)
@@ -329,7 +361,11 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			}
 			commandString = commandString + " --yes"
 		}
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
+		err := checkBackupConfigLocation(infra)
+		if err != nil {
+			return err
+		}
+		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
 		if err != nil {
 			return err
 		}
