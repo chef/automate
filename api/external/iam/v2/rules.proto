@@ -53,7 +53,7 @@ service Rules {
 								fields {
 									key: "source";
 									value {
-                    string_value: '{"id": "example-rule", "project-id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'
+                    string_value: '{"id": "example-rule", "project_id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'
                   }
 								}
 							}
@@ -106,7 +106,7 @@ service Rules {
 								fields {
 									key: "source";
 									value {
-                    string_value: '{"id": "example-rule", "project-id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'
+                    string_value: '{"id": "example-rule", "project_id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'
                   }
 								}
 							}

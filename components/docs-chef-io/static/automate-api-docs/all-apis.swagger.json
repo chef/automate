@@ -9111,7 +9111,7 @@
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}]}"
+            "source": "{\"id\": \"example-rule\", \"project_id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}]}"
           }
         ]
       }
@@ -9203,7 +9203,7 @@
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}]}"
+            "source": "{\"id\": \"example-rule\", \"project_id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}]}"
           }
         ]
       },
@@ -15939,7 +15939,7 @@
         ],
         "id": "example-rule",
         "name": "My Example Rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "type": "NODE"
       }
     },
@@ -15963,7 +15963,7 @@
         ],
         "id": "example-rule",
         "name": "My Example Rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "status": "STAGED",
         "type": "NODE"
       }
@@ -16276,7 +16276,7 @@
         ],
         "id": "example-rule",
         "name": "My Applied Rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "status": "APPLIED",
         "type": "NODE"
       }
@@ -16562,7 +16562,7 @@
             ],
             "id": "example-rule",
             "name": "My Applied Rule",
-            "project-id": "example-project",
+            "project_id": "example-project",
             "status": "APPLIED",
             "type": "NODE"
           },
@@ -16579,7 +16579,7 @@
             ],
             "id": "example-rule-2",
             "name": "My 2nd Example Rule",
-            "project-id": "example-project",
+            "project_id": "example-project",
             "status": "APPLIED",
             "type": "EVENT"
           }
@@ -17298,7 +17298,7 @@
         ],
         "id": "example-rule",
         "name": "My Updated Rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "type": "NODE"
       }
     },
@@ -17321,7 +17321,7 @@
         ],
         "id": "example-rule",
         "name": "My Updated Rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "status": "STAGED",
         "type": "NODE"
       }
