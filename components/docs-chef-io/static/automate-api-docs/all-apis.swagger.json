@@ -21243,8 +21243,7 @@
         "ReportingService",
         "StatsService",
         "JobsService",
-        "ProfilesService",
-        "Comp_Assets"
+        "ProfilesService"
       ]
     },
     {
