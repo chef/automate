@@ -15,6 +15,16 @@ gh_repo = "automate"
 
 ## Index issues
 
+### Opensearch Authentication
+
+When using curl commands against an Automate system that has Opensearch installed,
+you will need to add the authentication parameters. You can find the USERNAME:PASS
+in your config.toml, if they have been customized, or use the defaults of admin:admin.
+
+```bash
+curl -u USERNAME:PASS -XDELETE localhost:10141/INDEX_NAME
+```
+
 ### Indices with bad default mappings
 
 Status of the root cause fix for this can be found at: https://chef-software.ideas.aha.io/ideas/AUTO-I-91
