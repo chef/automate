@@ -49,6 +49,21 @@ curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </
 
 ## Create an Airgap Installation Bundle
 
+{{< note >}}
+In case,you are unable to create airgap bundle using 
+```shell
+./chef-automate airgap bundle create
+```
+you can create airgap bundle using 
+```shell
+./chef-automate airgap bundle create --version 3.0.49
+```
+or, you can download the airgap bundle using
+```shell
+curl https://packages.chef.io/airgap_bundle/current/automate/3.0.49.aib -o </path/to/airgap-install-bundle>
+```
+{{< /note >}}
+
 Download the Chef Automate command-line tool on an internet-connected host, and use it to prepare an Airgap Installation Bundle.
 
 ### Prepare Airgap Installation Bundle
