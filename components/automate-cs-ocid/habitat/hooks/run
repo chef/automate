@@ -6,9 +6,9 @@ exec 2>&1
 
 # Copying this file into oc_id application directory so that this file
 # can be executed as a rake task in the later stage of the application lifecycle.
-cp "{{pkg.svc_config_path}}/tasks/oauth_application.rake" $(hab pkg path "chef/oc_id")/oc_id/lib/tasks
+cp "{{pkg.svc_config_path}}/tasks/oauth_application.rake" $(hab pkg path "shroy/oc_id")/oc_id/lib/tasks
 
-cd {{pkgPathFor "chef/oc_id"}}/oc_id
+cd {{pkgPathFor "shroy/oc_id"}}/oc_id
 
 bundle config path "vendor/bundle"
 
@@ -29,7 +29,7 @@ fi
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
 
-export OCID_PKG_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+export OCID_PKG_CONFIG_FOLDER_PATH="{{pkgPathFor "shroy/oc_id"}}/oc_id/config"
 
 # Setting the secret_key_base for OCID rails application
 source "{{pkg.svc_config_path}}/scripts/set_secret_key_base.sh"

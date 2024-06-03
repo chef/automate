@@ -447,7 +447,7 @@ document "test_if_env_vars_are_configured" <<DOC
   test if default ENV variables are configured for OCID
 DOC
 test_if_env_vars_are_configured() {
-  ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
+  ocid_config_file_path="$(hab pkg path shroy/oc_id)/oc_id/config/settings/production.yml"
 
   # Get values from in settings/production.yml
   endpoint=$(awk '/endpoint:/ {print $2}' "$ocid_config_file_path")
@@ -500,7 +500,7 @@ test_if_webui_key_is_patched() {
   install_if_missing core/jq-static jq
 
   # Extract webui_key from private-chef-secrets.json
-  ocid_secrets_file_path="$(hab pkg path chef/oc_id)/oc_id/config/private-chef-secrets.json"
+  ocid_secrets_file_path="$(hab pkg path shroy/oc_id)/oc_id/config/private-chef-secrets.json"
 
   # elem variable hold the value 'chef-server', we opted for this syntax becz chef-server needs to be
   # to be treated as string as it contains `-`, which is not a valid JSON character
@@ -546,7 +546,7 @@ document "test_if_env_vars_are_configured_after_patch" <<DOC
   test if OCID ENV variables are configured after patch
 DOC
 test_if_env_vars_are_configured_after_patch() {
-  ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
+  ocid_config_file_path="$(hab pkg path shroy/oc_id)/oc_id/config/settings/production.yml"
 
   # Get values from in settings/production.yml
   endpoint=$(awk '/endpoint:/ {print $2}' "$ocid_config_file_path")
