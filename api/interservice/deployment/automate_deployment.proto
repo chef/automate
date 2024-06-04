@@ -404,6 +404,7 @@ message LicenseStatusResponse {
 	string deployment_type=6;
 	string license_type = 7;
 	google.protobuf.Timestamp deployment_at=8;
+	bool grace_period = 9;
 
 
 }

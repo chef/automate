@@ -66,6 +66,7 @@ type LicenseStatus struct {
 	LicenseType    string         `json:"license_type"`
 	LicenseId      string         `json:"license_id"`
 	ExpirationDate ExpirationDate `json:"expiration_date"`
+	GracePeriod    bool           `json:"grace_period"`
 }
 
 type ExpirationDate struct {
@@ -151,10 +152,22 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	}
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) //gives unix time stamp in utc
 
-	//If the license type is commercial, adding grace period of 1 week
+	//If the license type is commercial, adding grace period of 1 month
+	licenseResult.Result.GracePeriod = false
 	if licenseResult.Result.LicenseType == commercial {
-		//Adding grace period for 7 days i.e. one week
-		licenseValidDate = licenseValidDate.AddDate(0, 0, 7)
+		if licenseValidDate.Before(time.Now()) {
+			// License expired, check if within grace period
+			//Adding grace period for 30 days i.e. one month
+			//licenseValidDate = licenseValidDate.AddDate(0, 0, 30)
+			gracePeriodEnd := licenseValidDate.AddDate(0, 0, 30)
+
+			if gracePeriodEnd.After(time.Now()) {
+				licenseResult.Result.GracePeriod = true
+				licenseValidDate = gracePeriodEnd
+			}
+
+		}
+
 	}
 
 	if licenseValidDate.Before(time.Now()) {
