@@ -116,6 +116,16 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Deployment id and type not available: %s", err.Error())
 		}
+
+		//calculate Grace period status
+		gracePeriod := false
+		if lic.Type == "commercial" {
+			licenseValidDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 30)
+			if time.Now().Before(licenseValidDate) {
+				gracePeriod = true
+			}
+		}
+
 		response := &lc.StatusResponse{
 			LicenseId:    lic.Id,
 			CustomerName: lic.Customer,
@@ -128,6 +138,7 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 			DeploymentType: deploymentResponse.DeploymentType,
 			LicenseType:    lic.Type,
 			DeploymentAt:   deploymentResponse.DeploymentAt,
+			GracePeriod:    gracePeriod,
 		}
 
 		return response, nil
