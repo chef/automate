@@ -207,7 +207,7 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 
 		// Add notice if grace period is active
 		if response.GracePeriod {
-			fmt.Println("Warning: This license is in the grace period. Please contact sales@chef.io to renew your Chef Automate license.")
+			writer.Warn("This license is in the grace period. Please contact sales@chef.io to renew your Chef Automate license.")
 
 		}
 

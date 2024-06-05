@@ -164,6 +164,7 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 			if gracePeriodEnd.After(time.Now()) {
 				//if the condition is true make the grace_period as true
 				licenseResult.Result.GracePeriod = true
+				licenseValidDate = gracePeriodEnd
 			}
 
 		}
