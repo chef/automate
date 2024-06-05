@@ -161,7 +161,9 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 			//licenseValidDate = licenseValidDate.AddDate(0, 0, 30)
 			gracePeriodEnd := licenseValidDate.AddDate(0, 0, 30)
 
+			//checks if current date and time is before the end of grace period
 			if gracePeriodEnd.After(time.Now()) {
+				//if the condition is true make the grace_period as true
 				licenseResult.Result.GracePeriod = true
 				licenseValidDate = gracePeriodEnd
 			}
