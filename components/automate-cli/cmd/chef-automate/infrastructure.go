@@ -152,10 +152,22 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	}
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) //gives unix time stamp in utc
 
-	//If the license type is commercial, adding grace period of 1 week
+	//If the license type is commercial, adding grace period of 1 month
+	licenseResult.Result.GracePeriod = false
 	if licenseResult.Result.LicenseType == commercial {
-		//Adding grace period for 7 days i.e. one week
-		licenseValidDate = licenseValidDate.AddDate(0, 0, 7)
+		if licenseValidDate.Before(time.Now()) {
+			// License expired, check if within grace period
+			//Adding grace period for 30 days i.e. one month
+			//licenseValidDate = licenseValidDate.AddDate(0, 0, 30)
+			gracePeriodEnd := licenseValidDate.AddDate(0, 0, 30)
+
+			//checks if current date and time is before the end of grace period
+			if gracePeriodEnd.After(time.Now()) {
+				//if the condition is true make the grace_period as true
+				licenseResult.Result.GracePeriod = true
+				licenseValidDate = gracePeriodEnd
+			}
+		}
 	}
 
 	if licenseValidDate.Before(time.Now()) {
