@@ -3177,6 +3177,7 @@ type LicenseStatusResponse struct {
 	DeploymentType string                 `protobuf:"bytes,6,opt,name=deployment_type,json=deploymentType,proto3" json:"deployment_type,omitempty" toml:"deployment_type,omitempty" mapstructure:"deployment_type,omitempty"`
 	LicenseType    string                 `protobuf:"bytes,7,opt,name=license_type,json=licenseType,proto3" json:"license_type,omitempty" toml:"license_type,omitempty" mapstructure:"license_type,omitempty"`
 	DeploymentAt   *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=deployment_at,json=deploymentAt,proto3" json:"deployment_at,omitempty" toml:"deployment_at,omitempty" mapstructure:"deployment_at,omitempty"`
+	GracePeriod    bool                   `protobuf:"varint,9,opt,name=grace_period,json=gracePeriod,proto3" json:"grace_period,omitempty" toml:"grace_period,omitempty" mapstructure:"grace_period,omitempty"`
 }
 
 func (x *LicenseStatusResponse) Reset() {
@@ -3265,6 +3266,13 @@ func (x *LicenseStatusResponse) GetDeploymentAt() *timestamppb.Timestamp {
 		return x.DeploymentAt
 	}
 	return nil
+}
+
+func (x *LicenseStatusResponse) GetGracePeriod() bool {
+	if x != nil {
+		return x.GracePeriod
+	}
+	return false
 }
 
 type LicenseApplyRequest struct {
