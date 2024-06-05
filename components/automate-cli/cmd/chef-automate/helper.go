@@ -7,12 +7,7 @@ import (
 
 // WarnIfLicenseNearExpiry checks the license status and warns if the license is near expiry or in the grace period.
 
-func WarnIfLicenseNearExpiry(licens *LicenseResult) error {
-
-	licenseResult, err := readFileAndMarshal(fileName)
-	if err != nil {
-		return err
-	}
+func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) error {
 	if licenseResult.Result.GracePeriod {
 		licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0)
 		gracePeriodDays := 30

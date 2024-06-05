@@ -70,8 +70,9 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		RunE: runAirgapCreateInstallBundle,
-		Args: cobra.RangeArgs(0, 1),
+		PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE:              runAirgapCreateInstallBundle,
+		Args:              cobra.RangeArgs(0, 1),
 	}
 
 	bundleCreateCmd.PersistentFlags().StringVarP(
