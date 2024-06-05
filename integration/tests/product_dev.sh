@@ -16,4 +16,6 @@ do_deploy() {
         --admin-password chefautomate \
         --accept-terms-and-mlsa \
         --debug
+
+    do_apply_license    
 }

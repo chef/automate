@@ -161,22 +161,29 @@ steps:
   - label: "automate-load-balancer"
     command:
       - . scripts/verify_setup.sh
+      - echo "\$A2_LICENSE" > dev/license.jwt
       - |
-        hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deploy-some chef/automate-load-balancer --with-deps &&
+        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
+          start_deployment_service && 
+          chef-automate dev deploy-some chef/automate-load-balancer --with-deps && chef-automate license apply /src/dev/license.jwt &&
           automate_load_balancer_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
         limit: 1
     expeditor:
+      accounts:
+        - aws/chef-cd
       executor:
         docker:
           privileged: true
           environment:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license       
 
   - label: "applications-service"
     command:
@@ -296,6 +303,9 @@ steps:
         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY:
           path: secret/a2/testing/target_key
           field: data
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license  
       executor:
         docker:
           privileged: true
@@ -307,9 +317,9 @@ steps:
     command:
       - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init.sh &&
+        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
           start_deployment_service &&
-          chef-automate dev deployinate &&
+          chef-automate dev deployinate && chef-automate license apply /src/dev/license.jwt &&
           gateway_integration"
     timeout_in_minutes: 20
     retry:
@@ -322,6 +332,10 @@ steps:
           environment:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license       
 
   - label: "secrets-service"
     command:
@@ -633,6 +647,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "product airgap"
     command:
@@ -642,6 +660,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "product dev"
     command:
@@ -651,6 +673,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "airgap upgrade"
     command:
@@ -660,6 +686,11 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license 
+
   - label: "airgap ow upgrade"
     command:
       - integration/run_test integration/tests/airgap_ow_upgrade.sh
@@ -668,6 +699,11 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license 
+
   - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
@@ -676,6 +712,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "chef server"
     command:
@@ -685,6 +725,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "chef server only"
     command:
@@ -694,6 +738,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "ha chef server"
     command:
@@ -704,6 +752,11 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
+
 
   - label: "workflow"
     command:
@@ -765,6 +818,11 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license    
+          
 
   - label: "upgrade dev -> master"
     command:
@@ -774,6 +832,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license    
 
   - label: "upgrade acceptance -> master"
     command:
@@ -783,6 +845,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license    
 
   - label: "upgrade current -> master"
     command:
@@ -792,6 +858,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "upgrade current -> master (with latest hab)"
     command:
@@ -802,6 +872,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "manual upgrade current -> master"
     command:
@@ -811,6 +885,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "deep upgrades"
     command:
@@ -820,6 +898,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "deep migrate upgrade"
     command:
@@ -830,6 +912,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "deep upgrade backup restore"
     command:
@@ -839,6 +925,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "backups"
     command:
@@ -861,6 +951,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "security"
     command:
@@ -871,6 +965,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "shellcheck hooks"
     command:
@@ -880,6 +978,10 @@ steps:
       executor:
         linux:
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "ha cluster"
     command:
@@ -890,6 +992,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license     
 
   - label: "builder smoke"
     command:

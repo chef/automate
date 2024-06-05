@@ -39,7 +39,15 @@ do_deploy_gcs_default() {
       --manifest-dir "$test_manifest_path" \
       --admin-password chefautomate \
       --accept-terms-and-mlsa
+
+  do_apply_license 
+
 }
+
+do_apply_license(){
+   chef-automate license apply "$A2_LICENSE"
+}
+
 
 do_test_deploy_gcs_default() {
     do_test_deploy_default

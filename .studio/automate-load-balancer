@@ -4,6 +4,7 @@ document "automate_load_balancer_integration" <<DOC
   Runs some integration tests for automate-load-balancer
 DOC
 automate_load_balancer_integration() {
+
   local target=${1:-"https://127.0.0.1"}
   local output
 
@@ -24,4 +25,3 @@ automate_load_balancer_integration() {
   status="$(curl -fsS --insecure -H "api-token: ${api_token}" "${target}/api/v0/status")"
   jq -ne --argjson status "$status" '$status.ok' || return 1
 }
-

@@ -63,6 +63,9 @@ func NewCmdResult(err error) *CmdResult {
 	cr.ErrorStackTrace = fmt.Sprintf("Stack trace: %+v", StackTrace(err))
 	cr.ErrorRecovery = Recovery(err)
 	cr.ErrorType = ErrorType(err)
+	if GlobalResult != nil {
+		cr.Result = GlobalResult
+	}
 	return cr
 }
 
