@@ -118,6 +118,11 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	err = WarnIfLicenseNearExpiry(licenseResult)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
