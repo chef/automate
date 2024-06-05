@@ -66,6 +66,7 @@ type LicenseStatus struct {
 	LicenseType    string         `json:"license_type"`
 	LicenseId      string         `json:"license_id"`
 	ExpirationDate ExpirationDate `json:"expiration_date"`
+	GracePeriod    bool           `json:"grace_period"`
 }
 
 type ExpirationDate struct {
