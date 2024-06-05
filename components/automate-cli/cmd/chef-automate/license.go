@@ -142,7 +142,7 @@ Deployment ID:   %s
 Deployment Type: %s
 Deployment Date: %s
 License Type:    %s
-Grace Period: %t
+Grace Period:    %t
 `
 
 var startTimeFormat = "start time of the report in yyyy-mm-dd format"
@@ -207,10 +207,8 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 
 		// Add notice if grace period is active
 		if response.GracePeriod {
-			return status.New(
-				status.LicenseError,
-				"This license is in the grace period. Please contact sales@chef.io to renew your Chef Automate license.",
-			)
+			fmt.Println("Warning: This license is in the grace period. Please contact sales@chef.io to renew your Chef Automate license.")
+
 		}
 
 		return nil

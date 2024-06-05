@@ -120,8 +120,8 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 		//calculate Grace period status
 		gracePeriod := false
 		if lic.Type == "commercial" {
-			licenseValidDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 30)
-			if time.Now().Before(licenseValidDate) {
+			gracePeriodDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 30)
+			if time.Now().Before(gracePeriodDate) {
 				gracePeriod = true
 			}
 		}
