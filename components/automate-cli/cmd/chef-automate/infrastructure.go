@@ -118,10 +118,8 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = WarnIfLicenseNearExpiry(licenseResult)
-	if err != nil {
-		return err
-	}
+	// if grace period active, executes below function to give warnings
+    WarnIfLicenseNearExpiry(licenseResult);
 
 	return nil
 }
@@ -175,11 +173,11 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 		}
 
 	}
-
+    // Check if the license (including the grace period) is expired
 	if licenseValidDate.Before(time.Now()) {
 		return status.New(
 			status.LicenseError,
-			"This license has expired. Please contact sales@chef.io to renew your Chef Automate license.",
+			"This license and grace period has expired. Please contact sales@chef.io to renew your Chef Automate license.",
 		)
 	}
 
