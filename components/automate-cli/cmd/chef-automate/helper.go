@@ -108,10 +108,10 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	return nil
 
 }
-// WarnIfLicenseNearExpiry checks the license status and warns if the license is near expiry or in the grace period.
 
+// WarnIfLicenseNearExpiry checks the license status and warns if the license is near expiry or in the grace period.
 func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) {
-    // Calculate the license valid date
+    // Calculate the license valid date, which includes the grace period also
     licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0)
 
     // Check if the license is expired
@@ -119,11 +119,12 @@ func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) {
         // If the license is expired, check if it's within the grace period
         if licenseResult.Result.GracePeriod {
             // Calculate days left until the grace period ends
-            daysLeft := int(time.Until(licenseValidDate.AddDate(0, 0, 30)).Hours() / 24)
+            daysLeft := int(time.Until(licenseValidDate).Hours() / 24)
 
             if daysLeft > 0 {
                 // Warning during the grace period
-                writer.Warn("Your license expired %d days ago, but you are now in the grace period. Please apply a new license.\n", -daysLeft)
+                daysIntoGracePeriod := 30 - daysLeft
+                writer.Warn("Your license expired %d days ago, but you are now in the grace period. Please apply a new license.\n", daysIntoGracePeriod)
             } else {
                 // Error if the grace period has ended
                 writer.Warn("Your license and grace period have expired. Please apply a new license to continue using the software.")
