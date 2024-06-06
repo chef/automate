@@ -126,7 +126,7 @@ func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) {
                 daysIntoGracePeriod := 30 - daysLeft
                 writer.Warn("Your license expired %d days ago, but you are now in the grace period. Please apply a new license.\n", daysIntoGracePeriod)
             } else {
-                // Error if the grace period has ended
+                // Warning if the grace period has ended
                 writer.Warn("Your license and grace period have expired. Please apply a new license to continue using the software.")
             }
         }
