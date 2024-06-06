@@ -66,6 +66,7 @@ type LicenseStatus struct {
 	LicenseType    string         `json:"license_type"`
 	LicenseId      string         `json:"license_id"`
 	ExpirationDate ExpirationDate `json:"expiration_date"`
+	GracePeriod    bool           `json:"grace_period"`
 }
 
 type ExpirationDate struct {
@@ -151,16 +152,28 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	}
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) //gives unix time stamp in utc
 
-	//If the license type is commercial, adding grace period of 1 week
+	//If the license type is commercial, adding grace period of 1 month
+	licenseResult.Result.GracePeriod = false
 	if licenseResult.Result.LicenseType == commercial {
-		//Adding grace period for 7 days i.e. one week
-		licenseValidDate = licenseValidDate.AddDate(0, 0, 7)
+		// Check if the license is expired
+		if licenseValidDate.Before(time.Now()) {
+			// Calculate the end date of the grace period (30 days after the license expiry)
+			gracePeriodEnd := licenseValidDate.AddDate(0, 0, 30)
+
+			//checks if current date and time is within the grace period
+			if gracePeriodEnd.After(time.Now()) {
+				//If within the grace period, set GracePeriod to true and extend license validity
+				licenseResult.Result.GracePeriod = true
+				licenseValidDate = gracePeriodEnd
+			}
+		}
 	}
 
+	// Check if the license (including the grace period) is expired
 	if licenseValidDate.Before(time.Now()) {
 		return status.New(
 			status.LicenseError,
-			"This license has expired. Please contact sales@chef.io to renew your Chef Automate license.",
+			"This license has expired and grace period is also got over. Please contact sales@chef.io to renew your Chef Automate license.",
 		)
 	}
 
