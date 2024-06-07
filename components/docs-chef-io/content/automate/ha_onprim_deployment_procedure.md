@@ -63,7 +63,7 @@ Make sure you have all resources either on existing infrastructure or on existin
 
 ## Generate Chef Automate configuration file
 
-1. Generate config.
+1. Generate `config`.
 
     ```bash
     sudo chef-automate config gen config.toml
