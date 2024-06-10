@@ -1,9 +1,29 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"os/exec"
 	"time"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/spf13/cobra"
 )
+
+var nodeDeleteCmd = &cobra.Command{
+	Use:               "node-delete [uuid]",
+	Short:             "Delete node by node uuid",
+	Long:              "",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runDeleteNodeCmd,
+	Args:              cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
+
 type LicenseResult struct {
 	Result           LicenseStatus `json:"result"`
 	ErrorType        string        `json:"error_type"`
@@ -21,6 +41,7 @@ type LicenseStatus struct {
 type ExpirationDate struct {
 	Seconds int64 `json:"seconds"`
 }
+
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	fileName := "/tmp/license"
 	err := commandPrePersistent(cmd)
@@ -29,7 +50,7 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	}
 
 	cmd1 := exec.Command("chef-automate", "license", "status", "--result-json", fileName)
-	//Not checking for error, as if the license is expired it will still return error and for commercial license a grace period is required
+	// Not checking for error, as if the license is expired it will still return error and for commercial license a grace period is required
 	cmd1.Output()
 
 	licenseResult, err := readFileAndMarshal(fileName)
@@ -43,7 +64,7 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	}
 
 	// if grace period active, executes below function to give warnings
-    WarnIfLicenseNearExpiry(licenseResult);
+	WarnIfLicenseNearExpiry(licenseResult)
 
 	return nil
 }
@@ -57,10 +78,9 @@ func readFileAndMarshal(fileName string) (*LicenseResult, error) {
 	}
 
 	defer os.Remove(fileName)
-	json.Unmarshal([]byte(byteValue), &result)
+	json.Unmarshal(byteValue, &result)
 
 	return &result, nil
-
 }
 
 func checkLicenseExpiry(licenseResult *LicenseResult) error {
@@ -74,22 +94,22 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 		}
 		return status.New(
 			status.LicenseError,
-			"Please apply a license.Please contact sales@chef.io to have your Chef Automate license.",
+			"Please apply a license. Please contact sales@chef.io to have your Chef Automate license.",
 		)
 	}
-	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) //gives unix time stamp in utc
+	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
 
-	//If the license type is commercial, adding grace period of 1 month
+	// If the license type is commercial, adding grace period of 1 month
 	licenseResult.Result.GracePeriod = false
 	if licenseResult.Result.LicenseType == commercial {
 		if licenseValidDate.Before(time.Now()) {
 			// License expired, check if within grace period
-			//Adding grace period for 30 days i.e. one month
+			// Adding grace period for 30 days i.e. one month
 			gracePeriodEnd := licenseValidDate.AddDate(0, 0, 30)
 
-			//checks if current date and time is before the end of grace period
+			// checks if current date and time is before the end of grace period
 			if gracePeriodEnd.After(time.Now()) {
-				//if the condition is true make the grace_period as true
+				// if the condition is true make the grace_period as true
 				licenseResult.Result.GracePeriod = true
 				licenseValidDate = gracePeriodEnd
 			}
@@ -97,38 +117,36 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 		}
 
 	}
-    // Check if the license (including the grace period) is expired
+	// Check if the license (including the grace period) is expired
 	if licenseValidDate.Before(time.Now()) {
 		return status.New(
 			status.LicenseError,
-			"This license and grace period has expired. Please contact sales@chef.io to renew your Chef Automate license.",
+			"This license and grace period have expired. Please contact sales@chef.io to renew your Chef Automate license.",
 		)
 	}
 
 	return nil
-
 }
 
-// WarnIfLicenseNearExpiry checks the license status and warns if the license is near expiry or in the grace period.
 func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) {
-    // Calculate the license valid date, which includes the grace period also
-    licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0)
+	// Calculate the license valid date, which includes the grace period also
+	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0)
 
-    // Check if the license is expired
-    if licenseValidDate.Before(time.Now()) {
-        // If the license is expired, check if it's within the grace period
-        if licenseResult.Result.GracePeriod {
-            // Calculate days left until the grace period ends
-            daysLeft := int(time.Until(licenseValidDate).Hours() / 24)
+	// Check if the license is expired
+	if licenseValidDate.Before(time.Now()) {
+		// If the license is expired, check if it's within the grace period
+		if licenseResult.Result.GracePeriod {
+			// Calculate days left until the grace period ends
+			daysLeft := int(time.Until(licenseValidDate).Hours() / 24)
 
-            if daysLeft > 0 {
-                // Warning during the grace period
-                daysIntoGracePeriod := 30 - daysLeft
-                writer.Warn("Your license expired %d days ago, but you are now in the grace period. Please apply a new license.\n", daysIntoGracePeriod)
-            } else {
-                // Warning if the grace period has ended
-                writer.Warn("Your license and grace period have expired. Please apply a new license to continue using the software.")
-            }
-        }
-    }
+			if daysLeft > 0 {
+				// Warning during the grace period
+				daysIntoGracePeriod := 30 - daysLeft
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d days ago, but you are now in the grace period. Please apply a new license.\n", daysIntoGracePeriod))
+			} else {
+				// Warning if the grace period has ended
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your license and grace period have expired. Please apply a new license to continue using the software.")
+			}
+		}
+	}
 }

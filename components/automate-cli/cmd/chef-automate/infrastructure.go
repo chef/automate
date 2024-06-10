@@ -2,10 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"os"
-	"os/exec"
-	"time"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
@@ -28,18 +25,6 @@ var infrastructureCmd = &cobra.Command{
 	Short:             "Chef Automate infrastructure",
 	Long:              "Commands for automation infrastructure management, for data related to chef-client runs and chef-server actions.",
 	PersistentPreRunE: preInfrastructureCmd,
-	Annotations: map[string]string{
-		docs.Tag: docs.BastionHost,
-	},
-}
-
-var nodeDeleteCmd = &cobra.Command{
-	Use:               "node-delete [uuid]",
-	Short:             "Delete node by node uuid",
-	Long:              "",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runDeleteNodeCmd,
-	Args:              cobra.ExactArgs(1),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
