@@ -14,6 +14,18 @@ import (
 	"google.golang.org/grpc"
 )
 
+var nodeDeleteCmd = &cobra.Command{
+	Use:               "node-delete [uuid]",
+	Short:             "Delete node by node uuid",
+	Long:              "",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runDeleteNodeCmd,
+	Args:              cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
+
 func init() {
 	infrastructureCmd.AddCommand(nodeDeleteCmd)
 
@@ -95,3 +107,4 @@ func isValidUUID(id string) bool {
 	_, err := uuid.FromString(id)
 	return err == nil
 }
+

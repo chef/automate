@@ -12,18 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var nodeDeleteCmd = &cobra.Command{
-	Use:               "node-delete [uuid]",
-	Short:             "Delete node by node uuid",
-	Long:              "",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runDeleteNodeCmd,
-	Args:              cobra.ExactArgs(1),
-	Annotations: map[string]string{
-		docs.Tag: docs.BastionHost,
-	},
-}
-
 type LicenseResult struct {
 	Result           LicenseStatus `json:"result"`
 	ErrorType        string        `json:"error_type"`
@@ -57,14 +45,15 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-
+    
 	err = checkLicenseExpiry(licenseResult)
-	if err != nil {
-		return err
-	}
 
 	// if grace period active, executes below function to give warnings
 	WarnIfLicenseNearExpiry(licenseResult)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -93,7 +82,7 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 			)
 		}
 		return status.New(
-			status.LicenseError,
+			status.LicenseWarning,
 			"Please apply a license. Please contact sales@chef.io to have your Chef Automate license.",
 		)
 	}
@@ -134,6 +123,9 @@ func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 
 	// Check if the license is expired
 	if licenseValidDate.Before(time.Now()) {
+
+		daysAgo := int(time.Since(licenseValidDate).Hours() / 24)
+
 		// If the license is expired, check if it's within the grace period
 		if licenseResult.Result.GracePeriod {
 			// Calculate days left until the grace period ends
@@ -142,11 +134,12 @@ func WarnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 			if daysLeft > 0 {
 				// Warning during the grace period
 				daysIntoGracePeriod := 30 - daysLeft
-				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d days ago, but you are now in the grace period. Please apply a new license.\n", daysIntoGracePeriod))
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d days ago, but you are now in the grace period of %d. Please apply a new license.\n", daysAgo,daysIntoGracePeriod))
 			} else {
 				// Warning if the grace period has ended
-				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your license and grace period have expired. Please apply a new license to continue using the software.")
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d ago and you are out of 30 days of grace period . Please apply a new license to continue using the software.",daysAgo))
 			}
 		}
 	}
 }
+
