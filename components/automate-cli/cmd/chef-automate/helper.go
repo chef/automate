@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"time"
-	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/spf13/cobra"

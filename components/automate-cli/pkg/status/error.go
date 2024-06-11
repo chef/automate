@@ -77,6 +77,7 @@ const (
 	DiagnosticsError                  = 91
 	FileAccessError                   = 90
 	LicenseError                      = 89
+	LicenseWarning                    = 129
 	MarshalError                      = 88
 	UpgradeError                      = 87
 	BackupError                       = 86
