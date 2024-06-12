@@ -81,10 +81,8 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 				licenseResult.ErrorDescription,
 			)
 		}
-		return status.New(
-			status.LicenseError,
-			"Please apply a license. Please contact sales@chef.io to have your Chef Automate license.",
-		)
+		cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Please apply a license. Please contact sales@chef.io to have your Chef Automate license.")
+
 	}
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
 
