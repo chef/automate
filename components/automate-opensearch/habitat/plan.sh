@@ -24,6 +24,7 @@ pkg_deps=(
   core/curl # health_check
   chef/automate-openjdk
   chef/automate-platform-tools
+  core/jq-static
 )
 pkg_bin_dirs=(os/bin)
 pkg_lib_dirs=(lib)
