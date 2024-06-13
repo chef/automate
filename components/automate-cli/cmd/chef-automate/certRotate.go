@@ -216,7 +216,7 @@ func init() {
 
 	RootCmd.AddCommand(certRotateCmd)
 	certRotateCmd.AddCommand(certTemplateGenerateCmd)
-	markGlobalFlagsHiddenExcept(certRotateCmd, "certificate-config")
+	markGlobalFlagsHiddenExcept(certRotateCmd, "certificate-config", "cc")
 }
 
 func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args []string) error {
@@ -1368,13 +1368,15 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	if templateCerts != nil {
 		// rotating PG certs
 		start := time.Now()
+		errors := make(chan error, 0)
 		c.log.Debug("Started executing at %s \n", start.String())
 		c.writer.Println("Rotating PostgreSQL certificates")
 		pgRootCA := templateCerts.PostgreSQL.RootCA
 		c.writer.Printf("Fetching PostgreSQL RootCA from template %s \n", pgRootCA)
 		for _, pgIp := range templateCerts.PostgreSQL.IPS {
 			c.writer.Println("Rotating PostgreSQL follower node certificates")
-			err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, true)
+			go c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, true, errors)
+			err := <-errors
 			if err != nil {
 				return err
 			}
@@ -1384,7 +1386,8 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		// rotating OS certs
 		for i, osIp := range templateCerts.OpenSearch.IPS {
 			c.writer.Printf("Rotating OpenSearch node %d certificates \n", i)
-			err := c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false)
+			go c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, errors)
+			err := <-errors
 			if err != nil {
 				return err
 			}
@@ -1436,12 +1439,14 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	return nil
 }
 
-func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool) error {
+func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool, chErr chan error) error {
 	start := time.Now()
 	c.log.Debug("Roating PostgreSQL node %s certificate at %s \n", pgIps.IP, start.Format(time.ANSIC))
 	if len(pgIps.PrivateKey) == 0 || len(pgIps.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for PostgerSQL node %s \n", pgIps.IP)
-		return errors.New(fmt.Sprintf("Empty certificate for PostgerSQL node %s \n", pgIps.IP))
+		err := errors.New(fmt.Sprintf("Empty certificate for PostgerSQL node %s \n", pgIps.IP))
+		chErr <- err
+		return err
 	}
 	flagsObj := certRotateFlags{
 		postgres:        true,
@@ -1453,11 +1458,14 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 	certs, err := c.getCerts(infra, &flagsObj)
 	if err != nil {
+		chErr <- err
 		return err
 	}
 
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, POSTGRESQL)
+		err := status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, POSTGRESQL)
+		chErr <- err
+		return err
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
@@ -1484,6 +1492,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	// patching on PG
 	err = c.patchConfig(patchFnParam)
 	if err != nil {
+		chErr <- err
 		return err
 	}
 	timeElapsed := time.Since(start)
@@ -1491,12 +1500,14 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	return nil
 }
 
-func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool) error {
+func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool, chErr chan error) error {
 	start := time.Now()
 	c.log.Debug("Roating opensearch node %s certificate at %s \n", osIp.IP, start.Format(time.ANSIC))
 	if len(osIp.PrivateKey) == 0 || len(osIp.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for OpenSearch node %s \n", osIp.IP)
-		return errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
+		err := errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
+		chErr <- err
+		return err
 	}
 	writer.Printf("Admin cert path : %s \n", oss.AdminPublickey)
 	flagsObj := certRotateFlags{
@@ -1511,32 +1522,39 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 	certs, err := c.getCerts(infra, &flagsObj)
 	if err != nil {
+		chErr <- err
 		return err
 	}
 
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, OPENSEARCH)
+		err := status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, OPENSEARCH)
+		chErr <- err
+		return err
 	}
 	fileName := "cert-rotate-os.toml"
 	timestamp := time.Now().Format("20060102150405")
 	remoteService := OPENSEARCH
 	adminPublicCert, err := c.getCertFromFile(oss.AdminPublickey, infra)
 	if err != nil {
+		chErr <- err
 		return err
 	}
 	adminPublicCertString := strings.TrimSpace(string(adminPublicCert))
 	adminPrivateCert, err := c.getCertFromFile(oss.AdminPrivateKey, infra)
 	if err != nil {
+		chErr <- err
 		return err
 	}
 	adminDn, err := getDistinguishedNameFromKey(adminPublicCertString)
 	if err != nil {
 		c.writer.Printf("Error in decoding admin cert, not able to get adminDn")
+		chErr <- err
 		return err
 	}
 	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
 		c.writer.Printf("Error in decoding node cert, not able to get nodeDn")
+		chErr <- err
 		return err
 	}
 	existingNodesDN := strings.TrimSpace(currentCertsInfo.OpensearchCertsByIP[0].NodesDn)
@@ -1572,6 +1590,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 	err = c.patchConfig(patchFnParam)
 	if err != nil {
+		chErr <- err
 		return err
 	}
 
@@ -1583,6 +1602,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 		err := patchOSNodeDN(&flagsObj, patchFnParam, c, nodesDn)
 		if err != nil {
+			chErr <- err
 			return err
 		}
 
