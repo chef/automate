@@ -28,6 +28,7 @@ type MockNodeUtilsImpl struct {
 	executeCustomCmdOnEachNodeTypeFunc           func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastionFunc                      func() error
 	syncConfigToAllNodesFunc                     func(unreachableNodes map[string][]string) error
+	restartHabSupOnBackendFunc                   func(service string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -117,4 +118,8 @@ func (mnu *MockNodeUtilsImpl) saveConfigToBastion() error {
 
 func (mnu *MockNodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][]string) error {
 	return mnu.syncConfigToAllNodesFunc(unreachableNodes)
+}
+
+func (mnu *MockNodeUtilsImpl) restartHabSupOnBackend(service string) error {
+	return mnu.restartHabSupOnBackendFunc(service)
 }

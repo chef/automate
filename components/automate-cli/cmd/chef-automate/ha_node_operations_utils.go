@@ -75,6 +75,7 @@ type NodeOpUtils interface {
 	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastion() error
 	syncConfigToAllNodes(unreachableNodes map[string][]string) error
+	restartHabSupOnBackend(service string) error
 }
 
 type NodeUtilsImpl struct {
@@ -928,4 +929,31 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		}
 		return srcString, nil
 	}
+}
+
+func (nu *NodeUtilsImpl) restartHabSupOnBackend(service string) error {
+	remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
+	infra, _, err := nu.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	var flags *RestartCmdFlags
+	switch service {
+	case POSTGRESQL:
+		flags = &RestartCmdFlags{
+			postgresql: true,
+		}
+	case OPENSEARCH:
+		flags = &RestartCmdFlags{
+			opensearch: true,
+		}
+	default:
+		return fmt.Errorf("wrong service, accepting only PostgreSQL and OpenSearch. Current service: %s", service)
+	}
+
+	restartCmdResults := make(chan restartCmdResult, 4)
+	runRestartCmdForBackend(infra, flags, remoteExcecutor, restartCmdResults)
+
+	return getChannelValue(restartCmdResults, printRestartOutput)
 }

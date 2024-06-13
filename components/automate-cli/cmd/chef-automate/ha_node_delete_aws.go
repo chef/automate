@@ -265,6 +265,15 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 		}
 		return syncErr
 	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if dna.nodeType == POSTGRESQL {
+		err := dna.nodeUtils.restartHabSupOnBackend(POSTGRESQL)
+		if err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 

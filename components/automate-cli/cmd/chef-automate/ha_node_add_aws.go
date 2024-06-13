@@ -189,6 +189,15 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 		}
 		return syncErr
 	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if len(ani.flags.postgresqlIp) > 0 {
+		err := ani.nodeUtils.restartHabSupOnBackend(POSTGRESQL)
+		if err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 

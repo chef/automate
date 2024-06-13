@@ -1,0 +1,3 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+echo "PGLeaderChk reconfigure hook running..."

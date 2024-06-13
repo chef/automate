@@ -276,6 +276,14 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 		}
 		return syncErr
 	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if dni.nodeType == POSTGRESQL {
+		err := dni.nodeUtils.restartHabSupOnBackend(POSTGRESQL)
+		if err != nil {
+			return err
+		}
+	}
 	return err
 }
 
