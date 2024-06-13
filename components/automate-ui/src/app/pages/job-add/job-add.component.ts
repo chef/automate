@@ -14,7 +14,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Manager } from '../../entities/managers/manager.model';
 import { Profile } from '../../entities/profiles/profile.model';
-import { allManagers, fieldsByManager, nodesByManager, totalcountNode } from '../../entities/managers/manager.selectors';
+import { allManagers, nodesByManager, totalcountNode } from '../../entities/managers/manager.selectors';
 import { allProfiles } from '../../entities/profiles/profile.selectors';
 import {
   ManagerSearchFields,
@@ -65,7 +65,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public notFirstTime = false;
   public managersList: any;
   public managersArray: any;
-  public fieldCounter = 0;
   public appendDataOnscrollLater: boolean;
   public managerId = [];
   public searchName: [];
@@ -74,7 +73,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public checked: any;
   public counter: number;
   public nodeCount = 10;
-  public fieldCount = 20;
   public model = { search: '', nodearray: '' };
   public earlierManagers: Manager[] = [];
   constructor(
@@ -120,24 +118,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
       })
     );
     this.store.pipe(
-      select(fieldsByManager),
-      takeUntil(this.isDestroyed)
-    ).subscribe(res => {
-      this.fieldCounter = 0 ;
-      this.nodeManagerArray.forEach((manager) => {
-        if (manager.id in res) {
-          if (!res[manager.id].loadingAllTotalFields) {
-            this.fieldCounter++;
-          }
-        }
-      });
-      if (this.nodeManagerArray.length === this.nodeCount &&
-        this.counter + this.fieldCounter === this.fieldCount ) {
-        this.loadMore = true;
-      }
-    });
-
-    this.store.pipe(
       select(nodesByManager),
       takeUntil(this.isDestroyed)
     ).subscribe(res => {
@@ -146,14 +126,11 @@ export class JobAddComponent implements OnDestroy , OnInit {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
             this.counter++;
-            if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
-              this.fieldCounter = this.fieldCounter + 1;
-            }
           }
         }
       });
       if (this.nodeManagerArray.length === this.nodeCount &&
-        this.counter + this.fieldCounter === this.fieldCount ) {
+        this.counter >= this.nodeCount ) {
         this.loadMore = true;
       }
     });
