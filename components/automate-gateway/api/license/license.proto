@@ -43,6 +43,7 @@ message GetStatusResp {
   google.protobuf.Timestamp configured_at = 2;
   DateRange licensed_period = 3;
   string customer_name = 4;
+  bool grace_period = 5;
 
   message DateRange {
     google.protobuf.Timestamp start = 1;
