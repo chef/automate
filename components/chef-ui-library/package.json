@@ -33,7 +33,7 @@
     "marked": "^4.0.10",
     "material-design-icons": "^3.0.1",
     "prismjs": "^1.29.0",
-    "puppeteer": "^14.0.0",
+    "puppeteer": "^22.6.4",
     "redux": "^4.0.4",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
