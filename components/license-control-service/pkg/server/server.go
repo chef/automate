@@ -120,20 +120,14 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 		//calculate Grace period status
 		gracePeriod := false
 		licensedEndTime := time.Unix(licensedPeriod.end.Seconds, 0)
-		currentTime := time.Now()
-		log.Printf("LicensedPeriod end: %v", licensedEndTime)
-		log.Printf("Current time: %v", currentTime)
 		if lic.Type == "commercial" {
 			if licensedEndTime.Before(time.Now()) {
-				log.Printf("checking expiry date and adding 30 days of grace period")
+				//adding 30 days of grace period if license got expired
 				gracePeriodDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 30)
-				log.Printf("Grace period end: %v", gracePeriodDate)
+				//checks if current date and time is within the grace period
 				if time.Now().Before(gracePeriodDate) {
 					gracePeriod = true
 					licensedEndTime = gracePeriodDate
-					log.Printf("Grace period is active")
-				} else {
-					log.Printf("Grace period is not active")
 				}
 			}
 		}
