@@ -15,6 +15,7 @@ type ILicense interface {
 type LicenseDetails struct {
 	LicenseType string
 	ExpiryDate  time.Time
+	GracePeriod bool
 }
 
 type License struct {
@@ -26,6 +27,7 @@ func (l *License) GetLicenseDetails(ctx context.Context) (*LicenseDetails, error
 
 	var licenseDetails *LicenseDetails
 	var expiryDate time.Time
+	var gracePeriod bool
 	//Getting the license details for license service
 	licenseDetailsResponse, err := l.licenseClient.Status(ctx, &license_control.StatusRequest{})
 	if err != nil {
@@ -36,9 +38,11 @@ func (l *License) GetLicenseDetails(ctx context.Context) (*LicenseDetails, error
 		if licenseDetailsResponse.LicensedPeriod.End.GetSeconds() != int64(0) {
 			expiryDate = time.Unix(licenseDetailsResponse.LicensedPeriod.End.GetSeconds(), 0).UTC()
 		}
+		gracePeriod = licenseDetailsResponse.GracePeriod
 		licenseDetails = &LicenseDetails{
 			LicenseType: licenseDetailsResponse.LicenseType,
 			ExpiryDate:  expiryDate,
+			GracePeriod: gracePeriod,
 		}
 	}
 
