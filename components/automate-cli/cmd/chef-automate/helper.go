@@ -30,6 +30,8 @@ type ExpirationDate struct {
 	Seconds int64 `json:"seconds"`
 }
 
+const commercial = "commercial"
+
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	err := commandPrePersistent(cmd)
 	if err != nil {
@@ -88,7 +90,7 @@ func readFileAndMarshal(fileName string) (*LicenseResult, error) {
 }
 
 func checkLicenseExpiry(licenseResult *LicenseResult) error {
-	commercial := "commercial"
+
 	if licenseResult.Result.LicenseId == "" {
 		if licenseResult.ErrorType != "" {
 			return status.New(
@@ -104,30 +106,16 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
 
 	// If the license type is commercial, adding grace period of 1 month
-	licenseResult.Result.GracePeriod = false
 	if licenseValidDate.Before(time.Now()) {
 		if licenseResult.Result.LicenseType == commercial {
-			// License expired, check if within grace period
-			// Adding grace period for 30 days i.e. one month
-			gracePeriodEnd := licenseValidDate.AddDate(0, 0, 30)
-
-			// checks if current date and time is before the end of grace period
-			if gracePeriodEnd.After(time.Now()) {
-				// if the condition is true make the grace_period as true
-				licenseResult.Result.GracePeriod = true
-				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your license has expired and you are under grace period. Please contact sales@chef.io to renew your Chef Automate license.")
-			}
 			// Check if the license (including the grace period) is expired
-			if gracePeriodEnd.Before(time.Now()) && licenseResult.Result.GracePeriod {
-				return status.New(
-					status.LicenseError,
-					"This license has expired and is under grace period. Please contact sales@chef.io to renew your Chef Automate license.",
-				)
-			} else if gracePeriodEnd.Before(time.Now()) && !licenseResult.Result.GracePeriod {
+			if !licenseResult.Result.GracePeriod {
 				return status.New(
 					status.LicenseError,
 					"This license and grace period have expired. Please contact sales@chef.io to renew your Chef Automate license.",
 				)
+			} else {
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired is expired,Please apply a new license.\n"))
 			}
 
 		} else {
@@ -146,17 +134,19 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0)
 	// Check if the license is expired
 	if licenseValidDate.Before(time.Now()) {
-
 		daysAgo := int(time.Since(licenseValidDate).Hours() / 24)
+		if licenseResult.Result.LicenseType == commercial {
+			// If the license is expired, check if it's within the grace period
+			if licenseResult.Result.GracePeriod {
+				// Warning during the grace period
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d days ago,Please apply a license.Please contact sales@chef.io to have your Chef Automate license.\n", daysAgo))
 
-		// If the license is expired, check if it's within the grace period
-		if licenseResult.Result.GracePeriod {
-			// Warning during the grace period
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d days ago,Please apply a new license.\n", daysAgo))
-
+			} else {
+				// Warning if the grace period has ended
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d ago and you are out of 30 days of grace period . Please apply a new license to continue using the software.", daysAgo))
+			}
 		} else {
-			// Warning if the grace period has ended
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d ago and you are out of 30 days of grace period . Please apply a new license to continue using the software.", daysAgo))
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your license expired %d days ago,Please apply a license.Please contact sales@chef.io to have your Chef Automate license.\n", daysAgo))
 		}
 	}
 }
