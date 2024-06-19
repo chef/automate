@@ -41,8 +41,9 @@ func init() {
 
 func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "applications COMMAND",
-		Short: "Manage applications observability features",
+		Use:     "applications COMMAND",
+		Short:   "Manage applications observability features",
+		PreRunE: WarnLicenseStatusForExpiry,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -172,7 +173,8 @@ func newApplicationsShowSvcsCmd() *cobra.Command {
 		Long: `
 Display a list of the habitat services stored in the applications database.
 `,
-		RunE: runApplicationsShowSvcsCmd,
+		PreRunE: WarnLicenseStatusForExpiry,
+		RunE:    runApplicationsShowSvcsCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -202,7 +204,8 @@ the VM or container, or by using 'hab svc unload', before using the
 a health-check at the appointed time and Automate will re-add them to the
 services database.
 `,
-		RunE: runApplicationsRemoveSvcsCmd,
+		PreRunE: WarnLicenseStatusForExpiry,
+		RunE:    runApplicationsRemoveSvcsCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},

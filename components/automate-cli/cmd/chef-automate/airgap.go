@@ -57,11 +57,13 @@ chef-automate deploy --airgap-bundle </path/to/bundle>
 
 func newAirgapCmd() *cobra.Command {
 	var airgapCmd = &cobra.Command{
-		Use: "airgap COMMAND",
+		Use:     "airgap COMMAND",
+		PreRunE: WarnLicenseStatusForExpiry,
 	}
 
 	var bundleCmd = &cobra.Command{
-		Use: "bundle COMMAND",
+		Use:     "bundle COMMAND",
+		PreRunE: WarnLicenseStatusForExpiry,
 	}
 
 	var bundleCreateCmd = &cobra.Command{
@@ -140,9 +142,10 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		RunE:   runAirgapUnpackInstallBundle,
-		Args:   cobra.ExactArgs(1),
-		Hidden: true,
+		PreRunE: WarnLicenseStatusForExpiry,
+		RunE:    runAirgapUnpackInstallBundle,
+		Args:    cobra.ExactArgs(1),
+		Hidden:  true,
 	}
 
 	bundleUnpackCmd.PersistentFlags().BoolVar(
@@ -155,8 +158,9 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		RunE: runAirgapInfoInstallBundle,
-		Args: cobra.ExactArgs(1),
+		PreRunE: WarnLicenseStatusForExpiry,
+		RunE:    runAirgapInfoInstallBundle,
+		Args:    cobra.ExactArgs(1),
 	}
 
 	bundleInfoCmd.PersistentFlags().BoolVar(
