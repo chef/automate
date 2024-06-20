@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -395,10 +396,26 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 		return errors.New("discrepancy between backup paths")
 	}
 
-	// TODO: Check if file on that path in opensearch instance exists
-	// and if the size of the file > 5 MB (arbitrary number)
+	// Get the path repo value of OpenSearch
+	osPath, err := pc.getOpensearchPathRepo()
+	if err != nil {
+		// TODO: Wrap the error
+		return err
+	}
 
-	// TODO: Run curl command on the snapshot
+	if habp != osPath {
+		return errors.New("discrepancy between backup paths")
+	}
+
+	// TODO: That request should probably be executed from Automate node
+	resp, err := http.Get("http://localhost:10144/_snapshot/_all")
+	if err != nil {
+		// TODO: Wrap the error
+		return err
+	}
+
+	// TODO: Handle GET response...
+	_ = resp
 
 	return nil
 }

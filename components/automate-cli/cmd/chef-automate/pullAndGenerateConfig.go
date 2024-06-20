@@ -204,6 +204,7 @@ type PullConfigs interface {
 	setExceptionIps(ips []string)
 	getOsCertsByIp(map[string]*ConfigKeys) []CertByIP
 	setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil)
+	getOpensearchPathRepo() (string, error)
 }
 
 type PullConfigsImpl struct {
@@ -230,6 +231,26 @@ func (p *PullConfigsImpl) setInfraAndSSHUtil(infra *AutomateHAInfraDetails, sshU
 
 func (p *PullConfigsImpl) setExceptionIps(ips []string) {
 	p.exceptionIps = ips
+}
+
+// getOpensearchPathRepo fetches OpenSearch's configuration,
+// decodes it into TOML, and returns only the path repo value.
+func (p *PullConfigsImpl) getOpensearchPathRepo() (string, error) {
+	if len(p.infra.Outputs.OpensearchPrivateIps.Value) == 0 {
+		return "", errors.New("opensearch private ips are 0")
+	}
+	ip := p.infra.Outputs.OpensearchPrivateIps.Value[0]
+	p.sshUtil.getSSHConfig().hostIP = ip
+	scriptCommands := fmt.Sprintf(GET_CONFIG, opensearch_const)
+	rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+	if err != nil {
+		return "", err
+	}
+	var src OpensearchConfig
+	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
+		return "", err
+	}
+	return src.Path.Repo, nil
 }
 
 func (p *PullConfigsImpl) pullOpensearchConfigs(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error) {
