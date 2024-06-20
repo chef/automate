@@ -327,7 +327,13 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			}
 			commandString = commandString + " --yes"
 		}
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
+
+		err := compareBackupPaths(infra)
+		if err != nil {
+			return errors.Wrap(err, "error in handleBackupCommands")
+		}
+
+		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
 		if err != nil {
 			return err
 		}
@@ -346,6 +352,54 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func compareBackupPaths(infra *AutomateHAInfraDetails) error {
+	sshConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+	}
+	sshUtil := NewSSHUtil(sshConfig)
+
+	pc := NewPullConfigs(infra, sshUtil)
+
+	aCfg, _, err := pc.pullAutomateConfigs(false)
+	if err != nil {
+		// TODO: Wrap the error
+		return err
+	}
+
+	if len(aCfg) == 0 {
+		return errors.New("no automate configs")
+	}
+
+	// Automate's backup path
+	var abp string
+	for _, v := range aCfg {
+		abp = v.Global.V1.Backups.Filesystem.Path.GetValue()
+		break
+	}
+
+	haCfg, err := getExistingHAConfig()
+	if err != nil {
+		// TODO: Wrap the error
+		return err
+	}
+
+	// Bastion config.toml backup_mount path
+	var habp = haCfg.Architecture.ConfigInitials.BackupMount
+
+	if abp != habp {
+		return errors.New("discrepancy between backup paths")
+	}
+
+	// TODO: Check if file on that path in opensearch instance exists
+	// and if the size of the file > 5 MB (arbitrary number)
+
+	// TODO: Run curl command on the snapshot
+
 	return nil
 }
 
