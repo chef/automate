@@ -23,37 +23,41 @@ var caCmdFlags = struct {
 }{}
 
 var caCmd = &cobra.Command{
-	Use:   "internal-ca COMMAND",
-	Short: "Manage Chef Automate's internal certificate authority",
-	Long:  "Manage Chef Automate's internal certificate authority. Used for inter-service encryption and authentication.",
+	Use:     "internal-ca COMMAND",
+	Short:   "Manage Chef Automate's internal certificate authority",
+	Long:    "Manage Chef Automate's internal certificate authority. Used for inter-service encryption and authentication.",
+	PreRunE: WarnLicenseStatusForExpiry,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
 }
 
 var caInfo = &cobra.Command{
-	Use:   "info",
-	Short: "Print information of the root certificate for the internal certificate authority",
-	RunE:  runCAInfoCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:     "info",
+	Short:   "Print information of the root certificate for the internal certificate authority",
+	PreRunE: WarnLicenseStatusForExpiry,
+	RunE:    runCAInfoCmd,
+	Args:    cobra.MaximumNArgs(0),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
 }
 
 var regen = &cobra.Command{
-	Use:   "regenerate",
-	Short: "Commands to regenerate certificates issued by the internal certificate authority",
+	Use:     "regenerate",
+	Short:   "Commands to regenerate certificates issued by the internal certificate authority",
+	PreRunE: WarnLicenseStatusForExpiry,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
 }
 
 var regenRoot = &cobra.Command{
-	Use:   "root",
-	Short: "Regenerate the root certificate for the internal certificate authority",
-	RunE:  runRegenRootCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:     "root",
+	Short:   "Regenerate the root certificate for the internal certificate authority",
+	PreRunE: WarnLicenseStatusForExpiry,
+	RunE:    runRegenRootCmd,
+	Args:    cobra.MaximumNArgs(0),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},

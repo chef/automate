@@ -15,17 +15,19 @@ import (
 )
 
 var nodeDelCmd = &cobra.Command{
-	Use:   "node-delete [uuid]",
-	Short: "Delete node by node uuid",
-	Long:  "",
-	RunE:  runDeleteNodeCmd,
-	Args:  cobra.ExactArgs(1),
+	Use:     "node-delete [uuid]",
+	Short:   "Delete node by node uuid",
+	Long:    "",
+	PreRunE: WarnLicenseStatusForExpiry,
+	RunE:    runDeleteNodeCmd,
+	Args:    cobra.ExactArgs(1),
 }
 
 var infrastructureCmdTest = &cobra.Command{
 	Use:               "infrastructure COMMAND",
 	Short:             "Chef Automate infrastructure",
 	Long:              "Test for infra cmd",
+	PreRunE:           WarnLicenseStatusForExpiry,
 	PersistentPreRunE: preInfrastructureCmd,
 }
 
