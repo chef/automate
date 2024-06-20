@@ -5,6 +5,7 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
+
     title = "AWS Deployment with AWS Managed Database"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_aws_managed_deploy_steps.md AWS Deployment with AWS Managed Database"
@@ -15,18 +16,17 @@ gh_repo = "automate"
  {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services. Please see the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisites/) page and move ahead with the following sections of this page.
+Follow the steps below to deploy Chef Automate High Availability (HA) on the AWS (Amazon Web Services) cloud with Managed AWS Services. Please see the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
 
 - Do not modify the workspace path. It should always be `/hab/a2_deploy_workspace`
 - We currently don't support AD managed users in nodes. We only support local Linux users.
 - If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
-- If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
-
+- If SELinux is enabled, deployment will configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 {{< /warning >}}
 
-## Run these steps on Bastion Host Machine
+## Run these steps on the Bastion Host Machine
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
@@ -44,9 +44,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    ```
 
    {{< note spaces=3 >}}
-
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
-
    {{< /note >}}
 
 ## Steps to Generate Config
@@ -57,14 +55,11 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
     chef-automate config gen config.toml
     ```
 
-    To know more about on how to generate config, refer to the [Automate HA Config Generation](/automate/ha_config_gen) page.
+    To learn more about generating config, refer to the [Automate HA Config Generation](/automate/ha_config_gen) page.
 
     {{< note spaces=4 >}}
-
     You can also generate a configuration file using the `init-config` subcommand. The command is as shown below:
-
     chef-automate init-config-ha aws
-
     {{< /note >}}
 
     {{< warning spaces=4 >}}
@@ -93,19 +88,20 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
     sudo chef-automate verify -c config.toml
     ```
 
-    To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    You can check [Config Verify Doc page](/automate/ha_verification_check/) to learn more about config verify.
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
+    Once the verification is completed, proceed with deployment; in case of failure, please fix the issue and re-run the verify command.
 
 ## Steps to deploy
 
-1. The following command will run the deployment. The deploy command will first run the verify command internally, to skip verification process during deploy command use `--skip-verify` flag
+1. The following command will run the deployment. The deploy command will first run the verify command internally. To skip the verification process during the deploy command, use `--skip-verify` flag
 
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib
     ```
 
    To skip verification in the deployment command, use `--skip-verify` flag
+
     ```bash
      chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
     ```
@@ -127,7 +123,7 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 1. Post Deployment, you can run the verification command
 
     ```bash
-     chef-automate verfiy
+     chef-automate verify
     ```
 
 1. Get the cluster Info
@@ -137,7 +133,7 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
     ```
 
 1. After the deployment is completed. To view the Automate UI, run the command `chef-automate info`, and you will get the `automate_url`.
-  If you want to change the FQDN URL from the load balancer URL to some other FQDN URL, then use the below template.
+  If you want to change the FQDN URL from the load balancer URL to another FQDN URL, use the template below.
 
     - Create a file `a2.fqdn.toml`
 
@@ -180,23 +176,22 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 After successful deployment, proceed with the following:
 
-   1. To know moe about the user and organization creation, check the [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section in Node Bootstrapping page.
-   1. To know more about Workstation setup, see the [Workstation Setup](/automate/ha_node_bootstraping/#workstation-setup) section.
-   1. To know more about Node bootstrapping, see the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section.
+   1. To know more about the user and organization creation, check the [Create Users and Organization](/automate/ha_node_bootstraping/#create-users-and-organization) section on the Node Bootstrapping page.
+   1. seelearn [Workstatioworkstationutomate/ha_node_bootstraping/#workstation-setup) section to learn more about Workstation setup.
+   1. see the [Bootstraping a Node](/automate/ha_node_bootstraping/#bootstraping-a-node) section to learn more about node bootstrapping.
 
 ## Sample Config
 
 {{< note >}}
-
 Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, Managed RDS Postgresql, and Managed OpenSearch)
-
 {{< /note >}}
 
 {{< note >}}
 
-- User only needs to create/set up **the bastion node**, a **user** with IAM role of Admin access and the S3 bucket access attached to it.
+The user only needs to create/set up **the bastion node**, a **user** with the IAM role of Admin access and the S3 bucket access attached to it.
+
 - The following config will create an S3 bucket for backup.
-- To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
+- To provide multiline certificates, use triple quotes like `""" multiline certificate contents"""`.
 
 {{< /note >}}
 
@@ -236,7 +231,7 @@ Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, 
     instance_count = "0"
 [aws]
   [aws.config]
-    profile = "default"   # This should be commented incase if IAM role is attached
+    profile = "default"   # This should be commented on if the IAM role is attached
     region = "us-east-2"
     aws_vpc_id = "vpc12318h"
     private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
@@ -271,7 +266,7 @@ Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, 
 
 ## Minimum Changes required in the Sample Config
 
-- Provide `ssh_user` which has access to all the machines. E.g., `ec2-user`
+- Provide `ssh_user` with access to all the machines. E.g., `ec2-user`
 - Provide a `ssh_key_file` path; this key should have access to all the Machines or VMs. E.g.: `~/.ssh/user-key.pem`.
 - Provide `region` Eg: `ap-southeast-2`.
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`.
@@ -288,7 +283,6 @@ Assuming 8+1 nodes (1 bastion, 1 for Chef Automate UI, 1 for Chef Infra Server, 
 {{< danger >}}
 
 The `cleanup` command will remove all AWS resources created by the `provision-infra` command
-
 Adding the `--force` flag will remove object storage if it was created with the `provision-infra` command.
 
 {{< /danger >}}
@@ -305,7 +299,7 @@ OR
 chef-automate cleanup --aws-deployment
 ```
 
-Following the `cleanup` command the following command can be used to remove the deployment workspace in the Bastion machine. This will also remove the logs file inside the workspace.
+Following the `cleanup` command, the deployment workspace in the Bastion machine can be removed. This will also remove the logs file inside the workspace.
 
 ```bash
 hab pkg uninstall chef/automate-ha-deployment

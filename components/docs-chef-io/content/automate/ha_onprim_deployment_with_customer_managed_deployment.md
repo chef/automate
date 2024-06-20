@@ -5,6 +5,7 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
+
     title = "On-Prem Deployment with Customer Managed Database"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_with_customer_managed_deployment.md On-premise Deployment with Customer Managed Database"
@@ -18,13 +19,10 @@ gh_repo = "automate"
 This section will discuss deploying Chef Automate HA on-premise machines with a customer-managed database. Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_prerequisites/) page and move ahead with the following sections of this page.
 
 {{< warning >}}
-
-If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
-
+If SELinux is enabled, deployment will configure it to `permissive` (Usually, in the case of RHEL, SELinux is enabled)
 {{< /warning >}}
 
-- Before proceeding with deployment steps make sure to [provision](/automate/ha_onprim_deployment_procedure/#provisioning).
-
+- Before proceeding with deployment steps, make sure to [provision](/automate/ha_onprim_deployment_procedure/#provisioning).
 - [Run on the Bastion host](/automate/ha_onprim_deployment_procedure/#deploy-the-bastion-host) to download the latest Automate CLI and Airgapped Bundle.
 
 ## Generate Chef Automate config
@@ -36,13 +34,9 @@ If SELinux is enabled, deployment with configure it to `permissive` (Usually in 
     ```
 
     You can also view the [Sample Config](#sample-config-to-setup-on-premises-deployment-with-self-managed-services).
-
     {{< note spaces=4 >}}
-
-    You can also generate config using the `init-config-ha` subcommand and to generate init config for existing infrastructure.
-
+    You can also generate config using the `init-config-ha` subcommand and generate init config for existing infrastructure.
     `chef-automate init-config-ha existing_infra`
-
     {{< /note >}}
 
 ## Verify
@@ -53,9 +47,9 @@ If SELinux is enabled, deployment with configure it to `permissive` (Usually in 
     sudo chef-automate verify -c config.toml
     ```
 
-    To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
+    To learn more about config verify, visit the [Config Verify Doc page](/automate/ha_verification_check/).
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
+    Once the verification is completed, proceed with deployment. If the deployment fails, please fix the issue and re-run the verify command.
 
 ## Steps to Deploy
 
@@ -73,7 +67,7 @@ chef-automate deploy config.toml --airgap-bundle automate.aib --skip-verify
 
 ## Verify Deployment
 
-1. Once the deployment is successful, get the consolidate status of the cluster.
+1. Once the deployment is successful, get the consolidated status of the cluster.
 
     ```bash
      chef-automate status summary
@@ -107,17 +101,17 @@ After successful deployment, proceed with the following:
 
 ## Backup/Restore
 
-A shared file system is always required to create OpenSearch snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. To know more about the backup and restore configuration, see On-Premise Deployment using [Filesystem](/automate/ha_backup_restore_file_system) or using [Object Storage](/automate/ha_backup_restore_object_storage).
+A shared file system is always required to create OpenSearch snapshots. To register the snapshot repository using OpenSearch, the same shared filesystem must be mounted to the exact location on all master and data nodes. To learn more about the backup and restore configuration, see On-Premise Deployment using [Filesystem](/automate/ha_backup_restore_file_system) or using [Object Storage](/automate/ha_backup_restore_object_storage).
 
 ## Add/Remove Nodes
 
-The Chef Automate commands require some arguments so that it can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To know more see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
+The Chef Automate commands require some arguments so that they can determine which types of nodes you want to add or remove to/from your HA setup from your bastion host. To learn more, see [Add Nodes to the Deployment](/automate/ha_add_nodes_to_the_deployment) to add nodes and [Remove Single Node from Cluster](/automate/ha_remove_single_node_from_cluster) to remove nodes.
 
 ## Patch Configs
 
-The bastion server can patch new configurations in all nodes. To know more see [Patch Configuration](/automate/ha_config/#patch-configuration) section.
+The bastion server can patch new configurations in all nodes. See the [Patch Configuration](/automate/ha_config/#patch-configuration) section to learn more.
 
-## sample config to set up on-premises deployment with self managed services
+## Sample config to set up on-premises deployment with self-managed services
 
 ```toml
 [architecture]
