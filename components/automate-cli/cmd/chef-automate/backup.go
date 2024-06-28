@@ -89,9 +89,26 @@ var backupCmdFlags = struct {
 
 	sha256 string
 
-	patchConfigPath string
-	setConfigPath   string
+	patchConfigPath   string
+	setConfigPath     string
+	verifyBackupPaths bool
 }{}
+
+type osSnapshot struct {
+	EventFeed  caXservice `json:"chef-automate-es6-event-feed-service"`
+	Compliance caXservice `json:"chef-automate-es6-compliance-service"`
+	Ingest     caXservice `json:"chef-automate-es6-ingest-service"`
+	Erchef     caXservice `json:"chef-automate-es6-automate-cs-oc-erchef"`
+}
+
+type caXservice struct {
+	Typ      string   `json:"type"`
+	Settings settings `json:"settings"`
+}
+
+type settings struct {
+	Loc string `json:"location"`
+}
 
 func init() {
 	integrityBackupCmd.AddCommand(integrityBackupValidateCmd)
@@ -142,6 +159,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.setConfigPath, "set-config", "", "Path to set config if required")
+	restoreBackupCmd.PersistentFlags().BoolVar(&backupCmdFlags.verifyBackupPaths, "verify-backup-paths", false, "Verify that all backups paths are the same")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
 	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
@@ -329,12 +347,20 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			commandString = commandString + " --yes"
 		}
 
-		err := compareBackupPaths(infra)
-		if err != nil {
-			return errors.Wrap(err, "error in handleBackupCommands")
+		if backupCmdFlags.verifyBackupPaths {
+			err := compareBackupPaths(infra)
+			if err != nil {
+				agree, err := writer.Confirm(fmt.Sprintf(continueOnFailedBackup, err))
+				if err != nil {
+					return status.Wrap(err, status.BackupError, "error while comparing backup paths")
+				}
+				if !agree {
+					return status.New(status.BackupError, "error while comparing backup paths")
+				}
+			}
 		}
 
-		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
 		if err != nil {
 			return err
 		}
@@ -356,7 +382,31 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 	return nil
 }
 
+var continueOnFailedBackup = `
+Backup failed with the following error: %v
+
+Do you wish to continue the backup?
+`
+
+func pathDiscrepancyErr(osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc string) error {
+	return fmt.Errorf(`discrepancy between backup paths. All backup paths should point to the same location:
+		path_repo: %s
+		backup_mount: %s
+		path: %s
+		event-feed-service location: %s
+		compliance-service location: %s
+		ingest-service location: %s
+		erchef-service location: %s
+		Edit the above to be the same and try again`, osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc)
+}
+
 func compareBackupPaths(infra *AutomateHAInfraDetails) error {
+	var (
+		err error
+		// Automate's backup path
+		abp        string
+		backupType string
+	)
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
@@ -368,7 +418,6 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 
 	aCfg, _, err := pc.pullAutomateConfigs(false)
 	if err != nil {
-		// TODO: Wrap the error
 		return err
 	}
 
@@ -376,46 +425,60 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 		return errors.New("no automate configs")
 	}
 
-	// Automate's backup path
-	var abp string
 	for _, v := range aCfg {
-		abp = v.Global.V1.Backups.Filesystem.Path.GetValue()
-		break
+		backupType = v.Global.V1.Backups.Location.GetValue()
+
+		switch backupType {
+		case "filesystem":
+			abp = v.Global.V1.Backups.Filesystem.Path.GetValue()
+
+		case "s3":
+			// Should maybe use the bucket instead, since base_path is optional
+			abp = v.Global.V1.Backups.S3.Bucket.BasePath.GetValue()
+
+		case "gcs":
+			abp = v.Global.V1.Backups.Gcs.Bucket.BasePath.GetValue()
+
+		default:
+			return fmt.Errorf("not supported backup type: %v", backupType)
+		}
+
+		if abp != "" {
+			break
+		}
 	}
 
 	haCfg, err := getExistingHAConfig()
 	if err != nil {
-		// TODO: Wrap the error
 		return err
 	}
 
 	// Bastion config.toml backup_mount path
 	var habp = haCfg.Architecture.ConfigInitials.BackupMount
 
-	if abp != habp {
-		return errors.New("discrepancy between backup paths")
-	}
-
 	// Get the path repo value of OpenSearch
 	osPath, err := pc.getOpensearchPathRepo()
 	if err != nil {
-		// TODO: Wrap the error
 		return err
 	}
 
-	if habp != osPath {
-		return errors.New("discrepancy between backup paths")
-	}
-
-	// TODO: That request should probably be executed from Automate node
-	resp, err := http.Get("http://localhost:10144/_snapshot/_all")
+	resp, err := http.Get("http://localhost:10144/_snapshot?pretty")
 	if err != nil {
-		// TODO: Wrap the error
+		return err
+	}
+	defer resp.Body.Close()
+
+	var oss osSnapshot
+	err = json.NewDecoder(resp.Body).Decode(&oss)
+	if err != nil {
 		return err
 	}
 
-	// TODO: Handle GET response...
-	_ = resp
+	if abp != "" || !strings.Contains(habp, abp) || habp != osPath ||
+		!strings.Contains(oss.EventFeed.Settings.Loc, abp) || !strings.Contains(oss.Compliance.Settings.Loc, abp) ||
+		!strings.Contains(oss.Ingest.Settings.Loc, abp) || !strings.Contains(oss.Erchef.Settings.Loc, abp) {
+		return pathDiscrepancyErr(osPath, habp, abp, oss.EventFeed.Settings.Loc, oss.Compliance.Settings.Loc, oss.Ingest.Settings.Loc, oss.Erchef.Settings.Loc)
+	}
 
 	return nil
 }
