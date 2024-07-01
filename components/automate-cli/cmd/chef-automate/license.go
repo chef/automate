@@ -27,8 +27,9 @@ import (
 )
 
 var licenseCmd = &cobra.Command{
-	Use:               "license COMMAND",
-	Short:             "Chef Automate license management",
+	Use:   "license COMMAND",
+	Short: "Chef Automate license management",
+	//PreRunE:           WarnLicenseStatusForExpiry,
 	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
@@ -36,8 +37,9 @@ var licenseCmd = &cobra.Command{
 }
 
 var licenseStatusCmd = &cobra.Command{
-	Use:               "status",
-	Short:             "Retrieve Chef Automate license status",
+	Use:   "status",
+	Short: "Retrieve Chef Automate license status",
+	//PreRunE: WarnLicenseStatusForExpiry,
 	RunE:              runLicenseStatusCmd,
 	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
@@ -50,9 +52,10 @@ var licenseApplyLong = `Apply Chef Automate license token.
 `
 
 var licenseApplyCmd = &cobra.Command{
-	Use:               "apply LICENSE",
-	Short:             "Apply Chef Automate license",
-	Long:              licenseApplyLong,
+	Use:   "apply LICENSE",
+	Short: "Apply Chef Automate license",
+	Long:  licenseApplyLong,
+	//PreRunE:           WarnLicenseStatusForExpiry,
 	RunE:              runLicenseApplyCmd,
 	PersistentPreRunE: preLicenseCmd,
 	Args:              cobra.ExactArgs(1),
@@ -62,9 +65,10 @@ var licenseApplyCmd = &cobra.Command{
 }
 
 var licenseUsageCmd = &cobra.Command{
-	Use:    "usage",
-	Short:  "Display node usage info for billing.",
-	Long:   "Show usage for billing.",
+	Use:   "usage",
+	Short: "Display node usage info for billing.",
+	Long:  "Show usage for billing.",
+	//PreRunE: WarnLicenseStatusForExpiry,
 	RunE:   runLicenseUsageCmd,
 	Args:   cobra.RangeArgs(0, 1),
 	Hidden: true,
@@ -73,6 +77,7 @@ var licenseUsageCmd = &cobra.Command{
 var uniqueNodeCounterCmd = &cobra.Command{
 	Use:   "uniqNodeRunReport",
 	Short: "Generates the unique count of reported Infra Client nodes on hourly basis between the time duration",
+	//PreRunE: WarnLicenseStatusForExpiry,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
@@ -86,6 +91,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 var nodeUsageCommand = &cobra.Command{
 	Use:   "nodeRunReport",
 	Short: "Generates daily Infra Client Run reports for a span of time duration",
+	//PreRunE: WarnLicenseStatusForExpiry,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
@@ -99,6 +105,7 @@ var nodeUsageCommand = &cobra.Command{
 var complianceUniqueResourceCounterCmd = &cobra.Command{
 	Use:   "complianceResourceRunCount",
 	Short: "Generates the unique count of reported Compliance scans on hourly basis between the time duration",
+	//PreRunE: WarnLicenseStatusForExpiry,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
@@ -112,6 +119,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 var complianceResourceUsageCmd = &cobra.Command{
 	Use:   "complianceResourceRunReport",
 	Short: "Generates daily Compliance scan reports for a span of time duration",
+	//PreRunE: WarnLicenseStatusForExpiry,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
@@ -472,6 +480,7 @@ func preLicenseCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 	}
+
 	if isA2HARBFileExist() {
 		output, err := RunCmdOnSingleAutomateNode(cmd, args)
 		if err != nil {
