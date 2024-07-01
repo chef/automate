@@ -123,7 +123,7 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 		if lic.Type == "commercial" {
 			if licensedEndTime.Before(time.Now()) {
 				//adding 30 days of grace period if license got expired
-				gracePeriodDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 30)
+				gracePeriodDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 60)
 				//checks if current date and time is within the grace period
 				if time.Now().Before(gracePeriodDate) {
 					gracePeriod = true

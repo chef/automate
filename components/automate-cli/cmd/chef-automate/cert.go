@@ -42,21 +42,20 @@ func init() {
 
 func certCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "external-cert COMMAND",
-		Short:   "Manage Chef Automate's external certificate",
-		Long:    "Manage Chef Automate's external certificate authority. Used for establishing TLS/SSL communication with automate.",
-		PreRunE: WarnLicenseStatusForExpiry,
+		Use:   "external-cert COMMAND",
+		Short: "Manage Chef Automate's external certificate",
+		Long:  "Manage Chef Automate's external certificate authority. Used for establishing TLS/SSL communication with automate.",
 		Annotations: map[string]string{
 			docs.Tag: docs.FrontEnd,
 		},
 	}
 
 	certShow := &cobra.Command{
-		Use:     "show",
-		Short:   "Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.",
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runCertShowCmd,
-		Args:    cobra.MaximumNArgs(2),
+		Use:               "show",
+		Short:             "Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.",
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runCertShowCmd,
+		Args:              cobra.MaximumNArgs(2),
 		Annotations: map[string]string{
 			docs.Tag: docs.FrontEnd,
 		},

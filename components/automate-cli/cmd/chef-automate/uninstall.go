@@ -20,8 +20,8 @@ var uninstallCmd = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithStandalone,
 	},
-	PreRunE: WarnLicenseStatusForExpiry,
-	RunE:    runUninstallCmd,
+	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	RunE:              runUninstallCmd,
 }
 
 func runUninstallCmd(cmd *cobra.Command, args []string) error {

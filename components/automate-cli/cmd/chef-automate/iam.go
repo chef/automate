@@ -33,7 +33,6 @@ func newIAMCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:               "iam COMMAND",
 		Short:             "Chef Automate iam commands",
-		PreRunE:           WarnLicenseStatusForExpiry,
 		PersistentPreRunE: preIAMCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
@@ -43,9 +42,8 @@ func newIAMCommand() *cobra.Command {
 
 func newIAMAdminAccessCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:     "admin-access COMMAND",
-		Short:   "Manage and restore default admin access",
-		PreRunE: WarnLicenseStatusForExpiry,
+		Use:   "admin-access COMMAND",
+		Short: "Manage and restore default admin access",
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -54,9 +52,8 @@ func newIAMAdminAccessCommand() *cobra.Command {
 
 func newIAMTokensCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:     "token COMMAND",
-		Short:   "Manage tokens",
-		PreRunE: WarnLicenseStatusForExpiry,
+		Use:   "token COMMAND",
+		Short: "Manage tokens",
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -65,11 +62,11 @@ func newIAMTokensCommand() *cobra.Command {
 
 func newIAMCreateTokenCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "create NAME",
-		Short:   "Generate a token",
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runCreateTokenCmd,
-		Args:    cobra.ExactArgs(1),
+		Use:               "create NAME",
+		Short:             "Generate a token",
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runCreateTokenCmd,
+		Args:              cobra.ExactArgs(1),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -93,9 +90,9 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 		Short: "Restore the factory default admin user, team, and access",
 		Long: "Recreate the admin user, admin team, and related admin policy as needed " +
 			"to restore to factory default and update the admin user's password",
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runRestoreDefaultAdminAccessAdminCmd,
-		Args:    cobra.ExactArgs(1),
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runRestoreDefaultAdminAccessAdminCmd,
+		Args:              cobra.ExactArgs(1),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -110,11 +107,11 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 
 func newIAMVersionCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     "version",
-		Short:   "Retrieve IAM version in use",
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runIAMVersionCmd,
-		Args:    cobra.ExactArgs(0),
+		Use:               "version",
+		Short:             "Retrieve IAM version in use",
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runIAMVersionCmd,
+		Args:              cobra.ExactArgs(0),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},

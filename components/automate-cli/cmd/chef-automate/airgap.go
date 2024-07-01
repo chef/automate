@@ -57,13 +57,11 @@ chef-automate deploy --airgap-bundle </path/to/bundle>
 
 func newAirgapCmd() *cobra.Command {
 	var airgapCmd = &cobra.Command{
-		Use:     "airgap COMMAND",
-		PreRunE: WarnLicenseStatusForExpiry,
+		Use: "airgap COMMAND",
 	}
 
 	var bundleCmd = &cobra.Command{
-		Use:     "bundle COMMAND",
-		PreRunE: WarnLicenseStatusForExpiry,
+		Use: "bundle COMMAND",
 	}
 
 	var bundleCreateCmd = &cobra.Command{
@@ -72,9 +70,9 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runAirgapCreateInstallBundle,
-		Args:    cobra.RangeArgs(0, 1),
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runAirgapCreateInstallBundle,
+		Args:              cobra.RangeArgs(0, 1),
 	}
 
 	bundleCreateCmd.PersistentFlags().StringVarP(
@@ -142,10 +140,10 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runAirgapUnpackInstallBundle,
-		Args:    cobra.ExactArgs(1),
-		Hidden:  true,
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runAirgapUnpackInstallBundle,
+		Args:              cobra.ExactArgs(1),
+		Hidden:            true,
 	}
 
 	bundleUnpackCmd.PersistentFlags().BoolVar(
@@ -158,9 +156,9 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runAirgapInfoInstallBundle,
-		Args:    cobra.ExactArgs(1),
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runAirgapInfoInstallBundle,
+		Args:              cobra.ExactArgs(1),
 	}
 
 	bundleInfoCmd.PersistentFlags().BoolVar(

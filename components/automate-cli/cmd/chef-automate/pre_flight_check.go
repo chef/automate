@@ -114,8 +114,8 @@ var preflightCheckCmd = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Tag:                 docs.BastionHost,
 	},
-	PreRunE: WarnLicenseStatusForExpiry,
-	RunE:    runPreflightCheckCmd,
+	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	RunE:              runPreflightCheckCmd,
 }
 
 func loadMergedConfigForPreflight() (*deployment.AutomateConfig, error) {
@@ -182,11 +182,11 @@ var migratePreflightCmdFlags = migrateCmdFlagSet{}
 
 func newMigratePreflightCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "migrate-from-v1",
-		PreRunE: WarnLicenseStatusForExpiry,
-		RunE:    runMigratePreflight,
-		Short:   "Run preflight checks specific to migrating from Chef Automate v1",
-		Aliases: []string{"upgrade-from-v1"},
+		Use:               "migrate-from-v1",
+		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE:              runMigratePreflight,
+		Short:             "Run preflight checks specific to migrating from Chef Automate v1",
+		Aliases:           []string{"upgrade-from-v1"},
 		Annotations: map[string]string{
 			docs.Compatibility: docs.CompatiblewithStandalone,
 		},
