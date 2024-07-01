@@ -28,7 +28,6 @@ directories:
   - ./components/automate-ui
   - ./components/automate-ui-devproxy
   - ./components/automate-workflow-ctl
-  - ./components/automate-workflow-web
   - ./components/automate-workflow-nginx
   - ./components/automate-workflow-server
   - ./components/backup-gateway

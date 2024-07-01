@@ -61,7 +61,6 @@ automate-cs-oc-erchef components/automate-cs-oc-erchef
 automate-cs-ocid components/automate-cs-ocid
 automate-cs-nginx components/automate-cs-nginx
 # automate-workflow-nginx components/automate-workflow-nginx
-# automate-workflow-web components/automate-workflow-web
 # Not managed by generator until we solve cross-dependency issue more
 # smoothly
 # automate-workflow-server components/automate-workflow-server

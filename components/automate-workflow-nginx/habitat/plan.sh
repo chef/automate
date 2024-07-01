@@ -12,7 +12,6 @@ vendor_origin=${vendor_origin:-"chef"}
 pkg_deps=(
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/openresty-noroot"
-  # "${vendor_origin}/automate-workflow-web"
   chef/mlsa
   core/bash
   core/curl
@@ -42,7 +41,6 @@ do_build() {
 
 do_install() {
     mkdir -pv "$pkg_prefix/www/workflow" "$pkg_prefix/www/loading"
-    cp -Rv "$(pkg_path_for "${vendor_origin}/automate-workflow-web")"/dist/* "${pkg_prefix}/www/workflow"
     cp -v "$SRC_PATH/loading.html" "$pkg_prefix/www/loading/index.html"
 }
 
