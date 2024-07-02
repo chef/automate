@@ -15,6 +15,7 @@ scaffolding_no_platform=true # Don't inject automate platform scaffolding
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"
+
 scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/secrets-helper"
   "${scaffolding_go_import_path}/cmd/service-health"

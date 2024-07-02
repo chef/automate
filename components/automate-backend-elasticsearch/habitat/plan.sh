@@ -1,4 +1,5 @@
 # shellcheck disable=SC2148
+
 UPSTREAM_PKG_IDENT="chef/elasticsearch-odfe/0.10.22.0"
 pkg_name="automate-ha-elasticsearch"
 pkg_description="Wrapper package for elasticsearch-odfe"

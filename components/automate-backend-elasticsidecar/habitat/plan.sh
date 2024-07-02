@@ -1,6 +1,7 @@
 # shellcheck disable=SC2148
 # stable channel
 
+
 pkg_name="automate-ha-elasticsidecar"
 pkg_description="Sidecar for HA Opensearch"
 pkg_origin="chef"

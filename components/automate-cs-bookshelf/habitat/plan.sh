@@ -6,6 +6,7 @@
 pkg_name="automate-cs-bookshelf"
 pkg_description="Wrapper package for chef/bookshelf"
 pkg_origin="chef"
+
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.4.0"
 vendor_origin="chef"

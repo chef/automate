@@ -14,6 +14,7 @@ pkg_deps=(
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/mlsa
 )
+
 pkg_exports=(
   [port]=service.port # default service is grpc
 )
