@@ -45,9 +45,14 @@ or all services are down (chef-automate stop) before retrying the restore.`
 var allPassedFlags string = ""
 
 const (
-	AUTOMATE_CMD_STOP  = "sudo systemctl stop chef-automate"
-	AUTOMATE_CMD_START = "sudo systemctl start chef-automate"
-	BACKUP_CONFIG      = "file_system"
+	AUTOMATE_CMD_STOP         = "sudo systemctl stop chef-automate"
+	AUTOMATE_CMD_START        = "sudo systemctl start chef-automate"
+	BACKUP_CONFIG             = "file_system"
+	CONTINUE_ON_FAILED_BACKUP = `
+Backup failed with the following error: %v
+
+Do you wish to continue the backup?
+`
 )
 
 type BackupFromBashtion interface {
@@ -89,9 +94,9 @@ var backupCmdFlags = struct {
 
 	sha256 string
 
-	patchConfigPath   string
-	setConfigPath     string
-	verifyBackupPaths bool
+	patchConfigPath     string
+	setConfigPath       string
+	skipRestorePrecheck bool
 }{}
 
 type osSnapshot struct {
@@ -107,7 +112,9 @@ type caXservice struct {
 }
 
 type settings struct {
-	Loc string `json:"location"`
+	Loc      string `json:"location"`
+	BasePath string `json:"base_path"`
+	Bucket   string `json:"bucket"`
 }
 
 func init() {
@@ -159,7 +166,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.setConfigPath, "set-config", "", "Path to set config if required")
-	restoreBackupCmd.PersistentFlags().BoolVar(&backupCmdFlags.verifyBackupPaths, "verify-backup-paths", false, "Verify that all backups paths are the same")
+	restoreBackupCmd.PersistentFlags().BoolVar(&backupCmdFlags.skipRestorePrecheck, "skip-restore-pre-check", false, "Skip the verification for all backup paths")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
 	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
@@ -347,10 +354,12 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			commandString = commandString + " --yes"
 		}
 
-		if backupCmdFlags.verifyBackupPaths {
+		if !backupCmdFlags.skipRestorePrecheck {
+			writer.Println("Comparing backup paths and bucket names...")
+
 			err := compareBackupPaths(infra)
 			if err != nil {
-				agree, err := writer.Confirm(fmt.Sprintf(continueOnFailedBackup, err))
+				agree, err := writer.Confirm(fmt.Sprintf(CONTINUE_ON_FAILED_BACKUP, err))
 				if err != nil {
 					return status.Wrap(err, status.BackupError, "error while comparing backup paths")
 				}
@@ -382,14 +391,21 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 	return nil
 }
 
-var continueOnFailedBackup = `
-Backup failed with the following error: %v
+func bucketDiscrepancyErr(automateBucket, efBucket, complBucket, ingestBucket, erchefBucket string) error {
+	err := fmt.Errorf(`discrepancy between bucket names. All bucket names should be the same:
+		Automate bucket name: %s
+		event-feed-service bucket name: %s
+		compliance-service bucket name: %s
+		ingest-service bucket name: %s
+		erchef-service bucket name: %s
+		Please check the bucket names listed above, and please provide correct bucket names`, automateBucket, efBucket, complBucket, ingestBucket, erchefBucket)
 
-Do you wish to continue the backup?
-`
+	logrus.WithError(err).Debugln("bucketDiscrepancyErr output")
+	return err
+}
 
 func pathDiscrepancyErr(osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc string) error {
-	return fmt.Errorf(`discrepancy between backup paths. All backup paths should point to the same location:
+	err := fmt.Errorf(`discrepancy between backup paths. All backup paths should point to the same location:
 		path_repo: %s
 		backup_mount: %s
 		path: %s
@@ -397,7 +413,10 @@ func pathDiscrepancyErr(osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc
 		compliance-service location: %s
 		ingest-service location: %s
 		erchef-service location: %s
-		Edit the above to be the same and try again`, osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc)
+		Please check the paths listed above, and please provide correct path`, osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc)
+
+	logrus.WithError(err).Debugln("pathDiscrepancyErr output")
+	return err
 }
 
 func compareBackupPaths(infra *AutomateHAInfraDetails) error {
@@ -406,15 +425,20 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 		// Automate's backup path
 		abp        string
 		backupType string
+		bucketName string
 	)
+
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 		sshPort:    infra.Outputs.SSHPort.Value,
 	}
+
 	sshUtil := NewSSHUtil(sshConfig)
 
 	pc := NewPullConfigs(infra, sshUtil)
+
+	writer.Println("Pulling Automate configurations...")
 
 	aCfg, _, err := pc.pullAutomateConfigs(false)
 	if err != nil {
@@ -425,29 +449,7 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 		return errors.New("no automate configs")
 	}
 
-	for _, v := range aCfg {
-		backupType = v.Global.V1.Backups.Location.GetValue()
-
-		switch backupType {
-		case "filesystem":
-			abp = v.Global.V1.Backups.Filesystem.Path.GetValue()
-
-		case "s3":
-			// Should maybe use the bucket instead, since base_path is optional
-			abp = v.Global.V1.Backups.S3.Bucket.BasePath.GetValue()
-
-		case "gcs":
-			abp = v.Global.V1.Backups.Gcs.Bucket.BasePath.GetValue()
-
-		default:
-			return fmt.Errorf("not supported backup type: %v", backupType)
-		}
-
-		if abp != "" {
-			break
-		}
-	}
-
+	logrus.Debugln("Getting existing HA configuration...")
 	haCfg, err := getExistingHAConfig()
 	if err != nil {
 		return err
@@ -456,28 +458,68 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 	// Bastion config.toml backup_mount path
 	var habp = haCfg.Architecture.ConfigInitials.BackupMount
 
+	logrus.Debugln("Fetching Opensearch path repo...")
 	// Get the path repo value of OpenSearch
 	osPath, err := pc.getOpensearchPathRepo()
 	if err != nil {
 		return err
 	}
 
+	logrus.Debugln("Send a GET request for the snapshot...")
 	resp, err := http.Get("http://localhost:10144/_snapshot?pretty")
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
+	logrus.Debugln("Unmarshalling GET response...")
 	var oss osSnapshot
 	err = json.NewDecoder(resp.Body).Decode(&oss)
 	if err != nil {
 		return err
 	}
 
-	if abp != "" || !strings.Contains(habp, abp) || habp != osPath ||
-		!strings.Contains(oss.EventFeed.Settings.Loc, abp) || !strings.Contains(oss.Compliance.Settings.Loc, abp) ||
-		!strings.Contains(oss.Ingest.Settings.Loc, abp) || !strings.Contains(oss.Erchef.Settings.Loc, abp) {
-		return pathDiscrepancyErr(osPath, habp, abp, oss.EventFeed.Settings.Loc, oss.Compliance.Settings.Loc, oss.Ingest.Settings.Loc, oss.Erchef.Settings.Loc)
+	for _, v := range aCfg {
+		backupType = v.Global.V1.Backups.Location.GetValue()
+
+		switch backupType {
+		case "filesystem":
+			abp = v.Global.V1.Backups.Filesystem.Path.GetValue()
+			logrus.Debugf("Entered filesystem case. Backup path: %s\n", abp)
+
+			// Compare backup paths
+			if abp == "" || !strings.Contains(habp, abp) || habp != osPath ||
+				!strings.Contains(oss.EventFeed.Settings.Loc, abp) || !strings.Contains(oss.Compliance.Settings.Loc, abp) ||
+				!strings.Contains(oss.Ingest.Settings.Loc, abp) || !strings.Contains(oss.Erchef.Settings.Loc, abp) {
+				return pathDiscrepancyErr(osPath, habp, abp, oss.EventFeed.Settings.Loc, oss.Compliance.Settings.Loc, oss.Ingest.Settings.Loc, oss.Erchef.Settings.Loc)
+			}
+
+		case "s3", "gcs":
+			abp = v.Global.V1.Backups.S3.Bucket.BasePath.GetValue()
+			bucketName = v.Global.V1.Backups.S3.Bucket.BasePath.GetValue()
+			logrus.Debugf("Entered %s case. Backup path: %s. Bucket name: %s\n", backupType, abp, bucketName)
+
+			// Compare backup paths
+			if abp == "" || !strings.Contains(habp, abp) || habp != osPath ||
+				!strings.Contains(oss.EventFeed.Settings.BasePath, abp) || !strings.Contains(oss.Compliance.Settings.BasePath, abp) ||
+				!strings.Contains(oss.Ingest.Settings.BasePath, abp) || !strings.Contains(oss.Erchef.Settings.BasePath, abp) {
+				return pathDiscrepancyErr(osPath, habp, abp, oss.EventFeed.Settings.BasePath, oss.Compliance.Settings.BasePath, oss.Ingest.Settings.BasePath, oss.Erchef.Settings.BasePath)
+			}
+
+			// Compare bucket names
+			if bucketName == "" || bucketName != oss.EventFeed.Settings.Bucket || bucketName != oss.Compliance.Settings.Bucket ||
+				bucketName != oss.Ingest.Settings.Bucket || bucketName != oss.Erchef.Settings.Bucket {
+				return bucketDiscrepancyErr(bucketName, oss.EventFeed.Settings.Bucket, oss.Compliance.Settings.Bucket, oss.Ingest.Settings.Bucket, oss.Erchef.Settings.Bucket)
+			}
+
+		default:
+			logrus.Debugln("Entered default case")
+			return fmt.Errorf("not supported backup type: %v", backupType)
+		}
+
+		if abp != "" {
+			break
+		}
 	}
 
 	return nil
