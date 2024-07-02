@@ -1,5 +1,6 @@
 #stable channel
 
+
 pkg_name="automate-ha-ctl"
 pkg_origin="chef"
 pkg_version="0.1.0"

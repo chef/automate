@@ -6,6 +6,7 @@
 pkg_name="automate-cs-ocid"
 pkg_description="Wrapper package for chef/ocid"
 pkg_origin="chef"
+
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.8.0"
 vendor_origin="chef"
