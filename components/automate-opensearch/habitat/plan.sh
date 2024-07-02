@@ -25,6 +25,7 @@ pkg_deps=(
   chef/automate-openjdk
   chef/automate-platform-tools
 )
+
 pkg_bin_dirs=(os/bin)
 pkg_lib_dirs=(lib)
 

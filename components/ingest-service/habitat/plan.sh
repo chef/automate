@@ -9,6 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/ingest-service"
 pkg_version="0.1.0"
+
 pkg_binds=(
   [automate-es-gateway]="http-port"
   [authz-service]="port"

@@ -23,16 +23,14 @@ pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
 pkg_dirname="nginx-${nginx_version}"
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_shasum=760729901acbaa517996e681ee6ea259032985e37c2768beef80df3a877deed9
+
 pkg_deps=(
-  core/glibc
-  core/libedit
-  core/ncurses
-  core/zlib
-  core/bzip2
+  core/glibc/2.35/20240105171810
+  core/libedit/20210910-3.1/20240106023704
+  core/zlib/1.3/20240105173710
   core/openssl
   core/pcre
   chef/mlsa
-  core/bash
 )
 
 pkg_build_deps=(

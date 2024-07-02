@@ -21,6 +21,7 @@ pkg_exports=(
   [gateway_port]=service.gateway_port
   [host]=service.host
 )
+
 pkg_exposes=(
   port
   gateway_port

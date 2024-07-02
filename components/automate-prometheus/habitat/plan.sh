@@ -9,6 +9,7 @@ pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache 2')
 pkg_upstream_url="https://www.chef.io/automate"
+
 pkg_deps=(
   core/prometheus
   core/bash

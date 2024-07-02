@@ -8,6 +8,7 @@ pkg_description="Proxy that provides normalized access to internal or external e
 pkg_origin="chef"
 pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
+
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 

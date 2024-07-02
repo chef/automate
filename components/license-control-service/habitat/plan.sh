@@ -9,6 +9,7 @@ pkg_version="1.0.0"
 pkg_bin_dirs=(bin)
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
+
 pkg_deps=(
   chef/mlsa
   chef/automate-platform-tools

@@ -9,7 +9,7 @@ pkg_build_deps=(core/go19 core/git core/gcc)
 pkg_bin_dirs=(bin)
 
 pkg_deps=(
-  core/cacerts
+ core/cacerts/2021.10.26/20240105224256
   chef/automate-platform-tools
   core/curl
 )
@@ -18,6 +18,7 @@ pkg_deps=(
 pkg_exports=(
   [port]=service.port
 )
+
 pkg_exposes=(port)
 
 do_before() {

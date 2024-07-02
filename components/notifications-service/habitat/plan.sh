@@ -16,6 +16,7 @@ pkg_deps=(
   ${local_platform_tools_origin:-chef}/automate-platform-tools
   core/busybox-static
 )
+
 pkg_build_deps=(
   core/git
 

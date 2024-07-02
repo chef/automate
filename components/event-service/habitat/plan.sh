@@ -9,6 +9,7 @@ pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/event-service"
+
 pkg_deps=(
   core/bash
   chef/automate-platform-tools

@@ -1,5 +1,6 @@
 #stable channel
 
+
 pkg_name="automate-postgresql"
 pkg_description="Wrapper package for core/postgresql"
 pkg_origin="chef"
@@ -13,7 +14,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pg_version="13.14"
 
 # pinned PG version. We need to also update components/automate-cli/cmd/chef-automate/migration_pg.go (line)
-ident="20240312092803"
+ident="20240511030936"
 
 pkg_deps=(
   core/coreutils

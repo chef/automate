@@ -10,6 +10,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_version="2.2.14"
 pkg_build_deps=("${UPSTREAM_PKG_IDENT}")
+
 pkg_deps=(
   chef/mlsa
   core/bash

@@ -9,6 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache-2.0' 'BSD')
 pkg_source="http://www.memcached.org/files/${pkg_distname}-${pkg_version}.tar.gz"
 pkg_shasum=f291a35f82ef9756ed1d952879ef5f4be870f932bdfcb2ab61356609abf82346
+
 pkg_deps=(
   core/bash
   core/glibc

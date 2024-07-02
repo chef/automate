@@ -26,6 +26,7 @@ pkg_deps=(
   core/busybox-static  
   chef/automate-ha-cluster-ctl
 )
+
 #core/aws-cli ( core/aws-cli/1.21.11/20231020110846 core/aws-cli/1.21.11/20220817123642 )
    # core/openssl11 ( core/openssl11/1.1.1w/20231020105352 core/openssl11/1.1.1k/20220311131131 )
    # core/python ( core/python/3.10.0/20231020105702 core/python/3.10.0/20220817121853 )

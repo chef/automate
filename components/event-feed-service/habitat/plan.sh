@@ -9,6 +9,7 @@ pkg_version="1.0.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/event-feed-service"
+
 pkg_deps=(
   chef/mlsa
   core/glibc # for zoneinfo

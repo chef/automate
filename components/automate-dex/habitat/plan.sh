@@ -20,10 +20,10 @@ pkg_binds=(
 pkg_bin_dirs=(bin)
 
 pkg_deps=(
-  core/glibc
+  
   chef/mlsa
   ${local_platform_tools_origin:-chef}/automate-platform-tools
-  core/bash
+  
   core/curl # health_check hook
 )
 

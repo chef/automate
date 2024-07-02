@@ -17,6 +17,7 @@ pkg_deps=(
   # in-repo dependencies.
   #${local_platform_tools_origin:-chef}/automate-platform-tools
 )
+
 pkg_build_deps=(
   core/gcc
   core/git

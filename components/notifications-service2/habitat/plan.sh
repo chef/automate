@@ -9,6 +9,7 @@ pkg_origin=chef
 pkg_version="2.0.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
+
 pkg_upstream_url="http://github.com/chef/automate"
 
 

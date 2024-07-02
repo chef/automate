@@ -18,6 +18,7 @@ pkg_build_deps=(
   core/node14/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
   core/phantomjs
 )
+
 pkg_description="Web interface for Chef Automate Workflow"
 pkg_upstream_url="https://www.chef.io/automate/"
 

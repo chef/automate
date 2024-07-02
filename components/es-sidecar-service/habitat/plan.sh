@@ -19,6 +19,7 @@ pkg_binds=(
 pkg_binds_optional=(
   [automate-opensearch]="deprecated_external_os"
 )
+
 pkg_exports=(
   [port]=service.port
 )

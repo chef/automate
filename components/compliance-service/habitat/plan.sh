@@ -10,6 +10,7 @@ pkg_license=('Chef-MLSA')
 pkg_version="1.11.1"
 pkg_upstream_url="http://github.com/chef/automate/components/compliance-service"
 pkg_bin_dirs=(bin)
+
 pkg_exports=(
   [port]=service.port
   [host]=service.host

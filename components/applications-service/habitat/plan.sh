@@ -12,6 +12,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
 )
+
 pkg_exports=(
   [port]=service.port
   [host]=service.host

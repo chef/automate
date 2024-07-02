@@ -20,6 +20,7 @@ pkg_exposes=(port)
 pkg_exports=(
     [port]=service.port
 )
+
 pkg_binds=(
   [automate-postgresql]="port"
 )

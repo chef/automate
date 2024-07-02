@@ -12,6 +12,7 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
+
 pkg_deps=(
   core/bash
   "${local_platform_tools_origin:-chef}/automate-platform-tools"

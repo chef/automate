@@ -7,6 +7,7 @@ pkg_maintainer="The Chef Server Maintainers <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_description="Provides automate-backend-ctl for Automate HA Backend Services"
 
+
 do_before() {
   update_pkg_version
 }

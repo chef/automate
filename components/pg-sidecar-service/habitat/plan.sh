@@ -9,6 +9,7 @@ pkg_version="0.0.1"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/pg-sidecar-service"
+
 pkg_binds=(
   [automate-pg-gateway]="port"
 )

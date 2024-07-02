@@ -6,6 +6,7 @@ pkg_version="2.0.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_svc_user="root" # so we can start nginx properly
+
 pkg_deps=(
   core/coreutils
   core/curl
