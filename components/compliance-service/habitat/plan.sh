@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=compliance-service
 pkg_description="Compliance API service"
 pkg_origin=chef

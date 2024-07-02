@@ -1,6 +1,7 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
 #stable channel
+
 pkg_name=applications-service
 pkg_description="Applications API Service"
 pkg_origin=chef

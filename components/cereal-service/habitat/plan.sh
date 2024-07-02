@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=cereal-service
 pkg_description="Automate Cereal Service"
 pkg_origin=chef

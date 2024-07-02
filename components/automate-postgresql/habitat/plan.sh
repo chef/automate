@@ -1,5 +1,6 @@
 #stable channel
 
+
 pkg_name="automate-postgresql"
 pkg_description="Wrapper package for core/postgresql"
 pkg_origin="chef"

@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name="automate-ha-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"

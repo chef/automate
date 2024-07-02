@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=event-service
 pkg_description="Event Service"
 pkg_origin=chef
