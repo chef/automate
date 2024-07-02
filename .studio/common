@@ -202,7 +202,7 @@ EOF
 function build() {
   local hab_build
   #set HAB_BLDR_CHANNEL to dev as part of the hab package refresh
-  local HAB_BLDR_CHANNEL=dev
+  local HAB_BLDR_CHANNEL=curl8
   
   # Support for hab v.0.63.0
   if [ -f /bin/build ]; then
@@ -217,7 +217,7 @@ function build() {
   if [ -z "$hab_build" ]; then
     exit_with "Hab build binary not found. Verify the 'build' wrapper inside the studio." 22
   else
-    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:-dev} $hab_build "$@"
+    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:-curl8} $hab_build "$@"
   fi
 }
 
