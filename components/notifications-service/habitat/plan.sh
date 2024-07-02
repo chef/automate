@@ -1,5 +1,6 @@
 #stable channel
 
+
 pkg_repo=a2
 pkg_name=notifications-service
 pkg_origin=chef

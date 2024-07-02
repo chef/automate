@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=trial-license-service
 pkg_origin=chef
 pkg_description="A2 trial license service"

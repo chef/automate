@@ -7,6 +7,7 @@ pkg_origin=chef
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
+
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.4.0"
 pkg_deps=(

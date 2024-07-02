@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=automate-scaffolding-go
 pkg_origin=chef
 pkg_description="Scaffolding for Automate Go Applications internally at Chef Software Inc."
