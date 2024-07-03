@@ -2936,7 +2936,7 @@ func TestRotatePGNodeCerts(t *testing.T) {
 				writer:  getMockWriterImpl(),
 				log:     log,
 			}
-			output := c.rotatePGNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml.PostgreSQL.RootCA, &testCase.certToml.PostgreSQL.IPS[0], true)
+			output := c.rotatePGNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml.PostgreSQL.RootCA, &testCase.certToml.PostgreSQL.IPS[0], true, nil)
 			fmt.Println(output)
 			if testCase.isError {
 				assert.Error(t, output, testCase.ExpectedError)
@@ -3005,7 +3005,7 @@ func TestRotateOSNodeCerts(t *testing.T) {
 			c := certRotateFlow{fileUtils: mockFS(),
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl(), log: log}
-			output := c.rotateOSNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, &testCase.certToml.OpenSearch, &testCase.certToml.OpenSearch.IPS[0], false)
+			output := c.rotateOSNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, &testCase.certToml.OpenSearch, &testCase.certToml.OpenSearch.IPS[0], false, nil)
 			fmt.Println(output)
 			if testCase.isError {
 				assert.Error(t, output, testCase.ExpectedError)

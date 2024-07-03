@@ -47,6 +47,7 @@ type StatusSummary interface {
 	ShowBEStatus() string
 	GetPGLeaderNode() (string, string)
 	GetPGMaxLagAmongFollowers() int64
+	GetPGFollwerNodes() map[string]string
 }
 
 type Summary struct {
@@ -686,6 +687,18 @@ func (ss *Summary) GetPGLeaderNode() (string, string) {
 		}
 	}
 	return "", ""
+}
+
+func (ss *Summary) GetPGFollwerNodes() map[string]string {
+	m := make(map[string]string)
+	if len(ss.beStatus) != 0 {
+		for _, status := range ss.beStatus {
+			if status.role != "Leader" && status.serviceName == "postgresql" {
+				m[status.ipAddress] = status.health
+			}
+		}
+	}
+	return m
 }
 
 func (ss *Summary) GetPGMaxLagAmongFollowers() int64 {

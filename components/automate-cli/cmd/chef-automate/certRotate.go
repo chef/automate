@@ -98,6 +98,10 @@ const (
 	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
 	sudo systemctl start hab-sup.service`
 
+	COPY_USER_CONFIG_NO_RESTART = `
+	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
+	`
+
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
 	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certificate rotation for externally configured %s is not supported."
@@ -147,6 +151,11 @@ type certRotateFlow struct {
 	writer      *cli.Writer
 	pullConfigs PullConfigs
 	log         logger.Logger
+}
+
+type NodeIpHealth struct {
+	IP     string
+	Health string
 }
 
 func NewCertRotateFlow(fileUtils fileutils.FileUtils, sshUtil sshutils.SSHUtil, writer *cli.Writer, pullConfigs PullConfigs, log logger.Logger) *certRotateFlow {
@@ -721,12 +730,77 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	return nil
 }
 
+// patchConfig will patch the configurations to required nodes.
+func (c *certRotateFlow) patchBackendConfigWithOutRestart(param *patchFnParameters) error {
+	f, err := os.Create(param.fileName)
+	if err != nil {
+		return err
+	}
+	_, err = f.Write([]byte(param.config))
+	if err != nil {
+		return err
+	}
+	f.Close()
+	var ips []string
+	if param.flagsObj.node != "" && param.remoteService != "frontend" {
+		isValid := c.validateEachIp(param.remoteService, param.infra, param.flagsObj)
+		if !isValid {
+			return errors.New(fmt.Sprintf("Please Enter Valid %s IP", param.remoteService))
+		}
+		ips = append(ips, param.flagsObj.node)
+	} else {
+		ips = c.getIps(param.remoteService, param.infra)
+	}
+	if len(ips) == 0 {
+		return errors.New(fmt.Sprintf("No %s IPs are found", param.remoteService))
+	}
+
+	//collect ips on which need to perform action/cert-rotation
+	filteredIps := c.getFilteredIps(ips, param.skipIpsList)
+	filteredIpsString := strings.Join(filteredIps, ", ")
+	sshConfig := c.getSshDetails(param.infra)
+	sshConfig.hostIP = filteredIpsString
+	sshConfig.timeout = param.flagsObj.timeout
+	configRes := sshutils.SSHConfig{
+		SshUser:    sshConfig.sshUser,
+		SshPort:    sshConfig.sshPort,
+		SshKeyFile: sshConfig.sshKeyFile,
+		HostIP:     sshConfig.hostIP,
+		Timeout:    sshConfig.timeout,
+	}
+
+	var scriptCommands string
+	command := getScriptCommandsNoRestart(param, scriptCommands)
+	if !param.concurrent {
+		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(filteredIps, configRes, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Defining set of commands which run on particular remoteservice nodes
 func getScriptCommands(param *patchFnParameters, scriptCommands string) string {
 	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
 		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, DATE_FORMAT)
 	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
+	}
+	return scriptCommands
+}
+
+func getScriptCommandsNoRestart(param *patchFnParameters, scriptCommands string) string {
+	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
+		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, DATE_FORMAT)
+	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
+		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG_NO_RESTART, param.remoteService+param.timestamp, param.remoteService)
 	}
 	return scriptCommands
 }
@@ -1227,8 +1301,13 @@ func getStatusSummary(infra *AutomateHAInfraDetails, sshUtil SSHUtil) (StatusSum
 	return statusSummary, nil
 }
 
-func getPGLeader(statusSummary StatusSummary) (string, string) {
-	return statusSummary.GetPGLeaderNode()
+func getPGLeader(statusSummary StatusSummary) *NodeIpHealth {
+	ip, health := statusSummary.GetPGLeaderNode()
+	nodeIpHealth := NodeIpHealth{
+		IP:     ip,
+		Health: health,
+	}
+	return &nodeIpHealth
 }
 
 func getMaxPGLag(log logger.Logger, statusSummary StatusSummary) (int64, error) {
@@ -1239,8 +1318,14 @@ func getMaxPGLag(log logger.Logger, statusSummary StatusSummary) (int64, error) 
 	return lag, nil
 }
 
-func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, onOFFSwitch string, hostIps []string, log logger.Logger) error {
-	sshConfig.Timeout = 1000
+func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, onOFFSwitch string, hostIps []string, log logger.Logger, writer *cli.Writer) error {
+	sshConfig.Timeout = 30
+	if onOFFSwitch == ON {
+		writer.Println("turning ON maintenace mode")
+	}
+	if onOFFSwitch == OFF {
+		writer.Println("turning OFF maintenace mode")
+	}
 	command := fmt.Sprintf(MAINTENANCE_ON_OFF, onOFFSwitch)
 	log.Debug("========================== MAINTENANCE_ON_OFF ========================")
 	log.Debug(command)
@@ -1252,25 +1337,25 @@ func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshu
 	return nil
 }
 
-func startTrafficOnAutomateNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger) error {
+func startTrafficOnAutomateNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer) error {
 	hostIps := infra.Outputs.AutomatePrivateIps.Value
-	err := frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log)
+	err := frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func startTrafficOnChefServerNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger) error {
+func startTrafficOnChefServerNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer) error {
 	hostIps := infra.Outputs.ChefServerPrivateIps.Value
-	err := frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log)
+	err := frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtils sshutils.SSHUtil, log logger.Logger, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
+func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtils sshutils.SSHUtil, log logger.Logger, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration, writer *cli.Writer) error {
 	fontendIps := infra.Outputs.AutomatePrivateIps.Value
 	fontendIps = append(fontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
 	lag, err := getMaxPGLag(log, statusSummary)
@@ -1287,7 +1372,7 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 			return status.New(status.InvalidCommandArgsError, errMLSA)
 		}
 	}
-	err = frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtils, ON, fontendIps, log)
+	err = frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtils, ON, fontendIps, log, writer)
 	if err != nil {
 		return err
 	}
@@ -1307,6 +1392,7 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 				return status.Wrap(errors.New(""), status.UnhealthyStatusError, fmt.Sprintf("Follower node is still behind the leader by %d bytes\n", lag))
 			}
 		}
+		writer.Println("retrying again...")
 		time.Sleep(10 * time.Second)
 	}
 	return nil
@@ -1336,6 +1422,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		HostIP:     sshConfig.hostIP,
 		Timeout:    sshConfig.timeout,
 	}
+	c.writer.Println("fetching certificates...")
 	templateCerts, err := getCertsFromTemplate(clusterCertificateFile)
 	if err != nil {
 		return err
@@ -1352,7 +1439,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	c.log.Debug("==========================================================")
 	c.log.Debug("Stopping traffic MAINTENANICE MODE ON")
 	c.log.Debug("==========================================================")
-	err = checkLagAndStopTraffic(infra, configRes, c.sshUtil, c.log, statusSummary, userConsent, waitTime, totalWaitTimeOut)
+	err = checkLagAndStopTraffic(infra, configRes, c.sshUtil, c.log, statusSummary, userConsent, waitTime, totalWaitTimeOut, c.writer)
 	if err != nil {
 		return err
 	}
@@ -1361,33 +1448,30 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		c.log.Debug("==========================================================")
 		c.log.Debug("Defer Starting traffic MAINTENANICE MODE OFF")
 		c.log.Debug("==========================================================")
-		startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log)
-		startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log)
+		startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, c.writer)
+		startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, c.writer)
 	}()
 
 	if templateCerts != nil {
 		// rotating PG certs
 		start := time.Now()
-		errors := make(chan error, 0)
 		c.log.Debug("Started executing at %s \n", start.String())
 		c.writer.Println("Rotating PostgreSQL certificates")
 		pgRootCA := templateCerts.PostgreSQL.RootCA
 		c.writer.Printf("Fetching PostgreSQL RootCA from template %s \n", pgRootCA)
-		for _, pgIp := range templateCerts.PostgreSQL.IPS {
-			c.writer.Println("Rotating PostgreSQL follower node certificates")
-			go c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, true, errors)
-			err := <-errors
-			if err != nil {
-				return err
-			}
+		c.writer.Println("Rotating PostgreSQL follower node certificates")
+		err := c.rotatePGCertAndRestartPGNode(templateCerts.PostgreSQL.IPS, statusSummary, infra, sshUtil, currentCertsInfo, pgRootCA, true, errors)
+		if err != nil {
+			return err
 		}
+		c.writer.Println("PG certificate rotated and node restared")
 		timeElapsed := time.Since(start)
 		c.log.Debug("Time Elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
 		// rotating OS certs
+		c.writer.Println("rotating opensearch node certificates")
 		for i, osIp := range templateCerts.OpenSearch.IPS {
 			c.writer.Printf("Rotating OpenSearch node %d certificates \n", i)
-			go c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, errors)
-			err := <-errors
+			err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, errors)
 			if err != nil {
 				return err
 			}
@@ -1405,13 +1489,17 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 			}
 		}
 
+		if err != nil {
+			return err
+		}
+
 		timeElapsed = time.Since(start)
 		c.log.Debug("Time Elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
 		c.log.Debug("==========================================================")
 		c.log.Debug("Starting traffic on Autoamate nodes MAINTENANICE MODE OFF")
 		c.log.Debug("==========================================================")
-		err = startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log)
+		err = startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, writer)
 		if err != nil {
 			return err
 		}
@@ -1430,11 +1518,62 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		c.log.Debug("==========================================================")
 		c.log.Debug("Starting traffic on chef server nodes MAINTENANICE MODE OFF")
 		c.log.Debug("==========================================================")
-		err = startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log)
+		err = startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer)
 		if err != nil {
 			return err
 		}
 
+	}
+	return nil
+}
+
+func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary StatusSummary, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
+	pgLeaderIpAndHealth := getPGLeader(statusSummary)
+	c.writer.Printf("rotating follower node certificate")
+	err := c.rotatePGFollowerNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, concurrent, chErr)
+	if err != nil {
+		return err
+	}
+	c.writer.Printf("rotating leader node certificate")
+	err = c.rotatePGLeaderNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, false, nil)
+	if err != nil {
+		return err
+	}
+	c.writer.Printf("restarting pg nodes")
+	nodeOpUtils := &NodeUtilsImpl{
+		writer: c.writer,
+	}
+	err = nodeOpUtils.restartPgNodes(*pgLeaderIpAndHealth, pgIps, infra, statusSummary)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
+	if pgLeaderIpAndHealth.Health == "ok" {
+		for _, pgIp := range pgIps {
+			if strings.EqualFold(pgIp.IP, pgLeaderIpAndHealth.IP) {
+				err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent, chErr)
+				if err != nil {
+					return err
+				}
+				break
+			}
+		}
+	}
+	return nil
+}
+
+func (c *certRotateFlow) rotatePGFollowerNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
+	for _, pgIp := range pgIps {
+		if !strings.EqualFold(pgIp.IP, pgLeaderIpAndHealth.IP) {
+			go c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent, chErr)
+			err := <-chErr
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -1490,7 +1629,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 
 	// patching on PG
-	err = c.patchConfig(patchFnParam)
+	err = c.patchBackendConfigWithOutRestart(patchFnParam)
 	if err != nil {
 		chErr <- err
 		return err
