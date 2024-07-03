@@ -21,7 +21,7 @@ pkg_deps=(
   core/jq-static
   core/openssh
   core/make
-  core/curl
+  core/curl/7.79.1/20240105235730
   core/terraform1
   core/hab/1.6.521/20220603154827
   core/openssl/1.0.2zi
