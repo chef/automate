@@ -21,7 +21,7 @@ pkg_deps=(
   core/openssh
   core/openssl/1.0.2zi
   core/make
-  core/curl
+  core/curl/7.79.1/20240105235730
   core/rsync
   core/terraform1
   core/busybox-static  
