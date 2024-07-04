@@ -150,8 +150,8 @@ func (l *licenseInterceptor) isValidLicense() bool {
 
 	//If the license type is commercial, adding grace period of 1 week
 	if l.licenseStatus.LicenseDetails.LicenseType == commercial {
-		//Adding grace period for 7 days i.e. one week
-		licenseValidDate = licenseValidDate.AddDate(0, 0, 7)
+		//Adding grace period for 60 days i.e. one week
+		licenseValidDate = licenseValidDate.AddDate(0, 0, 60)
 	}
 
 	if licenseValidDate.Before(time.Now()) {
