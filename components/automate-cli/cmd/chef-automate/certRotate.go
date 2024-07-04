@@ -340,7 +340,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 		skipIpsList:   skipIpsList,
 	}
 
-	err := c.patchConfig(patchFnParam)
+	err := c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -381,7 +381,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	}
 
 	// patching on PG
-	err := c.patchConfig(patchFnParam)
+	err := c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -422,7 +422,7 @@ func (c *certRotateFlow) certRotateFrontendForPG(sshUtil SSHUtil, certs *certifi
 	}
 
 	// patching frontend
-	err = c.patchConfig(patchFnParam)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -509,7 +509,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		skipIpsList:   skipIpsList,
 	}
 
-	err = c.patchConfig(patchFnParam)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -568,7 +568,7 @@ func (c *certRotateFlow) certRotateFrontendForOS(sshUtil SSHUtil, certs *certifi
 		skipIpsList:   skipIpsList,
 	}
 
-	err = c.patchConfig(patchFnParam)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -613,7 +613,7 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	patchFnParam.timestamp = time.Now().Format("20060102150405")
 	patchFnParam.skipIpsList = []string{flagsObj.node}
 	patchFnParam.concurrent = false
-	err := c.patchConfig(patchFnParam)
+	err := c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}
@@ -675,7 +675,7 @@ func (c *certRotateFlow) getFrontendIPsToSkipRootCAPatchingForPg(automatesConfig
 }
 
 // patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
+func (c *certRotateFlow) patchConfig(param *patchFnParameters, restartService bool) error {
 	f, err := os.Create(param.fileName)
 	if err != nil {
 		return err
@@ -714,63 +714,12 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	}
 
 	var scriptCommands string
-	command := getScriptCommands(param, scriptCommands)
-	if !param.concurrent {
-		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
-		if err != nil {
-			return err
-		}
+	var command string
+	if restartService {
+		command = getScriptCommands(param, scriptCommands)
 	} else {
-		err = c.copyAndExecuteConcurrentlyToFrontEndNodes(filteredIps, configRes, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
-		if err != nil {
-			return err
-		}
+		command = getScriptCommandsNoRestart(param, scriptCommands)
 	}
-
-	return nil
-}
-
-// patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchBackendConfigWithOutRestart(param *patchFnParameters) error {
-	f, err := os.Create(param.fileName)
-	if err != nil {
-		return err
-	}
-	_, err = f.Write([]byte(param.config))
-	if err != nil {
-		return err
-	}
-	f.Close()
-	var ips []string
-	if param.flagsObj.node != "" && param.remoteService != "frontend" {
-		isValid := c.validateEachIp(param.remoteService, param.infra, param.flagsObj)
-		if !isValid {
-			return errors.New(fmt.Sprintf("Please Enter Valid %s IP", param.remoteService))
-		}
-		ips = append(ips, param.flagsObj.node)
-	} else {
-		ips = c.getIps(param.remoteService, param.infra)
-	}
-	if len(ips) == 0 {
-		return errors.New(fmt.Sprintf("No %s IPs are found", param.remoteService))
-	}
-
-	//collect ips on which need to perform action/cert-rotation
-	filteredIps := c.getFilteredIps(ips, param.skipIpsList)
-	filteredIpsString := strings.Join(filteredIps, ", ")
-	sshConfig := c.getSshDetails(param.infra)
-	sshConfig.hostIP = filteredIpsString
-	sshConfig.timeout = param.flagsObj.timeout
-	configRes := sshutils.SSHConfig{
-		SshUser:    sshConfig.sshUser,
-		SshPort:    sshConfig.sshPort,
-		SshKeyFile: sshConfig.sshKeyFile,
-		HostIP:     sshConfig.hostIP,
-		Timeout:    sshConfig.timeout,
-	}
-
-	var scriptCommands string
-	command := getScriptCommandsNoRestart(param, scriptCommands)
 	if !param.concurrent {
 		err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, command, param.flagsObj)
 		if err != nil {
@@ -1453,6 +1402,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	}()
 
 	if templateCerts != nil {
+		errors := make(chan error)
 		// rotating PG certs
 		start := time.Now()
 		c.log.Debug("Started executing at %s \n", start.String())
@@ -1629,7 +1579,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 
 	// patching on PG
-	err = c.patchBackendConfigWithOutRestart(patchFnParam)
+	err = c.patchConfig(patchFnParam, false)
 	if err != nil {
 		chErr <- err
 		return err
@@ -1727,7 +1677,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 		skipIpsList:   skipIpsList,
 	}
 
-	err = c.patchConfig(patchFnParam)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		chErr <- err
 		return err
@@ -1847,7 +1797,7 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 		flagsObj:      &flagsObj,
 		skipIpsList:   skipIpsList,
 	}
-	err = c.patchConfig(patchFnParam)
+	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
 		return err
 	}

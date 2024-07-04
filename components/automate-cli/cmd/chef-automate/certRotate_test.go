@@ -2465,7 +2465,7 @@ func TestPatchConfig(t *testing.T) {
 			testDir := t.TempDir()
 			fPath := filepath.Join(testDir, testCase.param.fileName)
 			testCase.param.fileName = fPath
-			output := c.patchConfig(testCase.param)
+			output := c.patchConfig(testCase.param, true)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {
