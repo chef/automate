@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -34,14 +33,11 @@ type ExpirationDate struct {
 const commercial = "commercial"
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
-	log.Println("****************** checkLicenseStatusForExpiry *********************")
 	err := commandPrePersistent(cmd)
 	if err != nil {
 		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 	}
 	licenseResult, err := getLicenseResult(cmd)
-	fmt.Printf("licenseResult: %v\n", licenseResult)
-	fmt.Println(err)
 	if err != nil {
 		return err
 	}
@@ -155,10 +151,7 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 	aboutToExpire := 60
 
 	gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
-	fmt.Println("Warn function")
-	fmt.Println(licenseResult)
 	if licenseResult.Result.LicenseType == commercial {
-		log.Println("****commercial*****")
 		licenseDate := licenseValidDate.Format("02-01-2006")
 		graceDate := gracePeriodDate.Format("02-01-2006")
 		if !licenseResult.Result.GracePeriod {
