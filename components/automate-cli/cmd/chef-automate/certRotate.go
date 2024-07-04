@@ -1402,77 +1402,83 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	}()
 
 	if templateCerts != nil {
-		errors := make(chan error)
-		// rotating PG certs
-		start := time.Now()
-		c.log.Debug("Started executing at %s \n", start.String())
-		c.writer.Println("Rotating PostgreSQL certificates")
-		pgRootCA := templateCerts.PostgreSQL.RootCA
-		c.writer.Printf("Fetching PostgreSQL RootCA from template %s \n", pgRootCA)
-		c.writer.Println("Rotating PostgreSQL follower node certificates")
-		err := c.rotatePGCertAndRestartPGNode(templateCerts.PostgreSQL.IPS, statusSummary, infra, sshUtil, currentCertsInfo, pgRootCA, true, errors)
+		err = c.handleTemplateCertificateRotation(templateCerts, configRes, sshUtil, infra, currentCertsInfo, statusSummary, userConsent, waitTime, totalWaitTimeOut)
 		if err != nil {
 			return err
 		}
-		c.writer.Println("PG certificate rotated and node restared")
-		timeElapsed := time.Since(start)
-		c.log.Debug("Time Elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
-		// rotating OS certs
-		c.writer.Println("rotating opensearch node certificates")
-		for i, osIp := range templateCerts.OpenSearch.IPS {
-			c.writer.Printf("Rotating OpenSearch node %d certificates \n", i)
-			err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, errors)
-			if err != nil {
-				return err
-			}
-		}
-		timeElapsed = time.Since(start)
-		c.log.Debug("Time Elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
-
-		// rotate AutomateCerts
-
-		for i, a2Ip := range templateCerts.Automate.IPS {
-			c.writer.Printf("Rotating Automate node %d certificates \n", i)
-			err := c.rotateAutomateNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &a2Ip)
-			if err != nil {
-				return err
-			}
-		}
-
+	}
+	return nil
+}
+func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *CertificateToml, configRes sshutils.SSHConfig, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
+	errors := make(chan error)
+	// rotating PG certs
+	start := time.Now()
+	c.log.Debug("Started executing at %s \n", start.String())
+	c.writer.Println("Rotating PostgreSQL certificates")
+	pgRootCA := templateCerts.PostgreSQL.RootCA
+	c.writer.Printf("Fetching PostgreSQL RootCA from template %s \n", pgRootCA)
+	c.writer.Println("Rotating PostgreSQL follower node certificates")
+	err := c.rotatePGCertAndRestartPGNode(templateCerts.PostgreSQL.IPS, statusSummary, infra, sshUtil, currentCertsInfo, pgRootCA, true, errors)
+	if err != nil {
+		return err
+	}
+	c.writer.Println("PG certificate rotated and node restared")
+	timeElapsed := time.Since(start)
+	c.log.Debug("Time Elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
+	// rotating OS certs
+	c.writer.Println("rotating opensearch node certificates")
+	for i, osIp := range templateCerts.OpenSearch.IPS {
+		c.writer.Printf("Rotating OpenSearch node %d certificates \n", i)
+		err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, errors)
 		if err != nil {
 			return err
 		}
+	}
+	timeElapsed = time.Since(start)
+	c.log.Debug("Time Elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
 
-		timeElapsed = time.Since(start)
-		c.log.Debug("Time Elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
+	// rotate AutomateCerts
 
-		c.log.Debug("==========================================================")
-		c.log.Debug("Starting traffic on Autoamate nodes MAINTENANICE MODE OFF")
-		c.log.Debug("==========================================================")
-		err = startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, writer)
+	for i, a2Ip := range templateCerts.Automate.IPS {
+		c.writer.Printf("Rotating Automate node %d certificates \n", i)
+		err := c.rotateAutomateNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &a2Ip)
 		if err != nil {
 			return err
 		}
+	}
 
-		for i, csIp := range templateCerts.ChefServer.IPS {
-			c.writer.Printf("Rotating Chef Server node %d certificates \n", i)
-			err := c.rotateChefServerNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &csIp)
-			if err != nil {
-				return err
-			}
-		}
+	if err != nil {
+		return err
+	}
 
-		timeElapsed = time.Since(start)
-		c.log.Debug("Time Elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
+	timeElapsed = time.Since(start)
+	c.log.Debug("Time Elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
-		c.log.Debug("==========================================================")
-		c.log.Debug("Starting traffic on chef server nodes MAINTENANICE MODE OFF")
-		c.log.Debug("==========================================================")
-		err = startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer)
+	c.log.Debug("==========================================================")
+	c.log.Debug("Starting traffic on Autoamate nodes MAINTENANICE MODE OFF")
+	c.log.Debug("==========================================================")
+	err = startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, writer)
+	if err != nil {
+		return err
+	}
+
+	for i, csIp := range templateCerts.ChefServer.IPS {
+		c.writer.Printf("Rotating Chef Server node %d certificates \n", i)
+		err := c.rotateChefServerNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &csIp)
 		if err != nil {
 			return err
 		}
+	}
 
+	timeElapsed = time.Since(start)
+	c.log.Debug("Time Elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
+
+	c.log.Debug("==========================================================")
+	c.log.Debug("Starting traffic on chef server nodes MAINTENANICE MODE OFF")
+	c.log.Debug("==========================================================")
+	err = startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer)
+	if err != nil {
+		return err
 	}
 	return nil
 }

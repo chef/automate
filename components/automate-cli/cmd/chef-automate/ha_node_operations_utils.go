@@ -475,39 +475,7 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []IP, inf
 	sshUtil := NewSSHUtil(sshconfig)
 	// restart followers
 	nu.writer.Println("restaring leader node")
-	for _, pgIp := range pgIps {
-		if !strings.EqualFold(pgIp.IP, leaderNode.IP) {
-			sshUtil.getSSHConfig().hostIP = pgIp.IP
-			res, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(RESTART_BACKEND_COMMAND)
-			if err != nil {
-				writer.Errorf("error in executing restart backend supervisor command")
-				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
-			}
-		}
-	}
-	nu.writer.Println("polling follower node health")
-	followerHealth := statusSummary.GetPGFollwerNodes()
-	start := time.Now()
-	for true {
-		nu.writer.Println("loop....")
-		healthy := false
-		for k, v := range followerHealth {
-			if v == SERVICE_HEALTH_OK {
-				nu.writer.Println(fmt.Sprintf("follower node %s health %s", k, v))
-				healthy = true
-			}
-		}
-		if healthy {
-			nu.writer.Println("all pg follower nodes are healthy")
-			break
-		}
-		time.Sleep(time.Second * SERVICE_HEALTH_CHECK_INTERVAL)
-		timeElaspsed := time.Since(start)
-		if timeElaspsed.Seconds() > MAX_TIMEOUT_THRESHOLD {
-			nu.writer.Println("follower nodes are still un-helathy timeed out")
-			break
-		}
-	}
+	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
 	//restart leader
 	for _, pgIp := range pgIps {
 		nu.writer.Println("looking for leader node to restart")
@@ -519,6 +487,42 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []IP, inf
 				writer.Errorf("error in executing restart backend supervisor command")
 				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
 			}
+			break
+		}
+	}
+	return nil
+}
+
+func restartFollowerNodeAndWaitForhealthy(leaderNode NodeIpHealth, pgIps []IP, infra *AutomateHAInfraDetails, statusSummary StatusSummary, sshUtil SSHUtil, writer *cli.Writer) error {
+	for _, pgIp := range pgIps {
+		if !strings.EqualFold(pgIp.IP, leaderNode.IP) {
+			sshUtil.getSSHConfig().hostIP = pgIp.IP
+			res, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(RESTART_BACKEND_COMMAND)
+			if err != nil {
+				writer.Errorf("error in executing restart backend supervisor command")
+				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
+			}
+		}
+	}
+	writer.Println("polling follower node health")
+	followerHealth := statusSummary.GetPGFollwerNodes()
+	start := time.Now()
+	for {
+		healthy := false
+		for k, v := range followerHealth {
+			if v == SERVICE_HEALTH_OK {
+				writer.Println(fmt.Sprintf("follower node %s health %s", k, v))
+				healthy = true
+			}
+		}
+		if healthy {
+			writer.Println("all pg follower nodes are healthy")
+			break
+		}
+		time.Sleep(time.Second * SERVICE_HEALTH_CHECK_INTERVAL)
+		timeElaspsed := time.Since(start)
+		if timeElaspsed.Seconds() > MAX_TIMEOUT_THRESHOLD {
+			writer.Println("follower nodes are still un-helathy timeed out")
 			break
 		}
 	}
