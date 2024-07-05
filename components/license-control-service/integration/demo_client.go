@@ -240,6 +240,8 @@ func fetchStatus(conn *grpc.ClientConn) {
 			"licensed_period_start": licensedPeriodStart,
 			"licensed_period_end":   licensedPeriodEnd,
 			"customer_name":         response.CustomerName,
+			"grace_period":          response.GracePeriod,
+			"license_type":          response.LicenseType,
 		},
 	).Info("Service status")
 }
