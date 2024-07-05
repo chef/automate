@@ -59,6 +59,7 @@ func (t *LicenseServer) ApplyLicense(ctx context.Context,
 		CustomerName:   st.CustomerName,
 		LicensedPeriod: st.LicensedPeriod,
 		GracePeriod:    st.GracePeriod,
+		LicenseType:    st.LicenseType,
 	}
 	return &license.ApplyLicenseResp{Status: &status}, nil
 }
@@ -84,6 +85,7 @@ func (t *LicenseServer) GetStatus(ctx context.Context,
 			End:   lcResp.LicensedPeriod.End,
 		},
 		GracePeriod: lcResp.GracePeriod,
+		LicenseType: lcResp.LicenseType,
 	}
 	return &resp, nil
 }
@@ -131,6 +133,7 @@ func (t *LicenseServer) RequestLicense(ctx context.Context,
 		CustomerName:   st.CustomerName,
 		LicensedPeriod: st.LicensedPeriod,
 		GracePeriod:    st.GracePeriod,
+		LicenseType:    st.LicenseType,
 	}
 	return &resp, nil
 }

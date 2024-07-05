@@ -127,7 +127,6 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 				//checks if current date and time is within the grace period
 				if time.Now().Before(gracePeriodDate) {
 					gracePeriod = true
-					licensedEndTime = gracePeriodDate
 				}
 			}
 		}
