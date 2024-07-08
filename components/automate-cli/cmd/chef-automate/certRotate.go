@@ -1524,8 +1524,8 @@ func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth 
 func (c *certRotateFlow) rotatePGFollowerNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
 	for _, pgIp := range pgIps {
 		if !strings.EqualFold(pgIp.IP, pgLeaderIpAndHealth.IP) {
-			go c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent, chErr)
-			err := <-chErr
+			err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent, chErr)
+			//err := <-chErr
 			if err != nil {
 				return err
 			}

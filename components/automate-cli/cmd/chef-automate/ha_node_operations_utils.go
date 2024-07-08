@@ -468,11 +468,12 @@ func (nu *NodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 }
 
 func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []IP, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
-	sshconfig := &SSHConfig{}
-	sshconfig.sshUser = infra.Outputs.SSHUser.Value
-	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
-	sshconfig.sshPort = infra.Outputs.SSHPort.Value
-	sshUtil := NewSSHUtil(sshconfig)
+	newSSHConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	}
+	sshUtil := NewSSHUtil(newSSHConfig)
 	// restart followers
 	nu.writer.Println("tyring to restaring follower node")
 	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
