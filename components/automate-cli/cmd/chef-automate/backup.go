@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -404,7 +403,7 @@ func bucketDiscrepancyErr(automateBucket, efBucket, complBucket, ingestBucket, e
 	return err
 }
 
-func pathDiscrepancyErr(osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc string) error {
+func pathDiscrepancyCheck(osPath, habp, abp, efPath, complPath, ingestPath, erchefPath string) error {
 	err := fmt.Errorf(`discrepancy between backup paths. All backup paths should point to the same location:
 		path_repo: %s
 		backup_mount: %s
@@ -413,10 +412,23 @@ func pathDiscrepancyErr(osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc
 		compliance-service location: %s
 		ingest-service location: %s
 		erchef-service location: %s
-		Please check the paths listed above, and please provide correct path`, osPath, habp, abp, efLoc, complLoc, ingestLoc, erchefLoc)
+		Please check the paths listed above, and please provide correct path`, osPath, habp, abp, efPath, complPath, ingestPath, erchefPath)
 
-	logrus.WithError(err).Debugln("pathDiscrepancyErr output")
-	return err
+	// Check if backup_mount is contained in the rest of the paths
+	if habp == "" || !strings.Contains(osPath, habp) || !strings.Contains(abp, habp) || !strings.Contains(efPath, habp) ||
+		!strings.Contains(complPath, habp) || !strings.Contains(ingestPath, habp) || !strings.Contains(erchefPath, habp) {
+		logrus.WithError(err).Debugln("Some of the paths do not contain backup_mount path or backup_mount is an empty string")
+		return err
+	}
+
+	// Check if path_repo is contained in the service paths
+	if osPath == "" || !strings.Contains(efPath, osPath) || !strings.Contains(complPath, osPath) ||
+		!strings.Contains(ingestPath, osPath) || !strings.Contains(erchefPath, osPath) {
+		logrus.WithError(err).Debugln("Some of the paths do not contain the path_repo or path_repo is an empty string")
+		return err
+	}
+
+	return nil
 }
 
 func compareBackupPaths(infra *AutomateHAInfraDetails) error {
@@ -465,45 +477,55 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 		return err
 	}
 
-	logrus.Debugln("Send a GET request for the snapshot...")
-	resp, err := http.Get("http://localhost:10144/_snapshot?pretty")
+	// Get Automate private IPs
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	if automateIps == nil || len(automateIps) < 1 {
+		return errors.New("Automate private IPs are empty")
+	}
+	sshUtil.getSSHConfig().hostIP = automateIps[0]
+
+	// Execute curl command for OS snapshots on Automate server
+	resp, err := sshUtil.connectAndExecuteCommandOnRemote("curl -s http://localhost:10144/_snapshot?pretty", false)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	writer.Println("Response from curl:")
+	writer.Println(resp)
 
 	logrus.Debugln("Unmarshalling GET response...")
 	var oss osSnapshot
-	err = json.NewDecoder(resp.Body).Decode(&oss)
+	err = json.Unmarshal([]byte(resp), &oss)
 	if err != nil {
 		return err
 	}
 
-	for _, v := range aCfg {
-		backupType = v.Global.V1.Backups.Location.GetValue()
+	backupType, err = determineBkpConfig(aCfg, haCfg.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
+	if err != nil {
+		return errors.New("error while determining backup type")
+	}
 
+	for _, v := range aCfg {
 		switch backupType {
-		case "filesystem":
+		case "file_system":
 			abp = v.Global.V1.Backups.Filesystem.Path.GetValue()
-			logrus.Debugf("Entered filesystem case. Backup path: %s\n", abp)
+			logrus.Debugf("Entered file_system case. Backup path: %s\n", abp)
 
 			// Compare backup paths
-			if abp == "" || !strings.Contains(habp, abp) || habp != osPath ||
-				!strings.Contains(oss.EventFeed.Settings.Loc, abp) || !strings.Contains(oss.Compliance.Settings.Loc, abp) ||
-				!strings.Contains(oss.Ingest.Settings.Loc, abp) || !strings.Contains(oss.Erchef.Settings.Loc, abp) {
-				return pathDiscrepancyErr(osPath, habp, abp, oss.EventFeed.Settings.Loc, oss.Compliance.Settings.Loc, oss.Ingest.Settings.Loc, oss.Erchef.Settings.Loc)
+			err = pathDiscrepancyCheck(osPath, habp, abp, oss.EventFeed.Settings.Loc, oss.Compliance.Settings.Loc, oss.Ingest.Settings.Loc, oss.Erchef.Settings.Loc)
+			if err != nil {
+				return err
 			}
 
-		case "s3", "gcs":
+		case "object_storage":
 			abp = v.Global.V1.Backups.S3.Bucket.BasePath.GetValue()
 			bucketName = v.Global.V1.Backups.S3.Bucket.BasePath.GetValue()
-			logrus.Debugf("Entered %s case. Backup path: %s. Bucket name: %s\n", backupType, abp, bucketName)
+			logrus.Debugf("Entered object_storage case. Backup path: %s. Bucket name: %s\n", abp, bucketName)
 
 			// Compare backup paths
-			if abp == "" || !strings.Contains(habp, abp) || habp != osPath ||
-				!strings.Contains(oss.EventFeed.Settings.BasePath, abp) || !strings.Contains(oss.Compliance.Settings.BasePath, abp) ||
-				!strings.Contains(oss.Ingest.Settings.BasePath, abp) || !strings.Contains(oss.Erchef.Settings.BasePath, abp) {
-				return pathDiscrepancyErr(osPath, habp, abp, oss.EventFeed.Settings.BasePath, oss.Compliance.Settings.BasePath, oss.Ingest.Settings.BasePath, oss.Erchef.Settings.BasePath)
+			err = pathDiscrepancyCheck(osPath, habp, abp, oss.EventFeed.Settings.BasePath, oss.Compliance.Settings.BasePath, oss.Ingest.Settings.BasePath, oss.Erchef.Settings.BasePath)
+			if err != nil {
+				return err
 			}
 
 			// Compare bucket names
