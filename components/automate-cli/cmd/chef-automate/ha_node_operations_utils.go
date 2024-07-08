@@ -474,15 +474,16 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []IP, inf
 	sshconfig.sshPort = infra.Outputs.SSHPort.Value
 	sshUtil := NewSSHUtil(sshconfig)
 	// restart followers
-	nu.writer.Println("restaring leader node")
+	nu.writer.Println("tyring to restaring follower node")
 	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
 	//restart leader
+	nu.writer.Println("tyring to restaring leader node")
 	for _, pgIp := range pgIps {
 		nu.writer.Println("looking for leader node to restart")
 		if strings.EqualFold(pgIp.IP, leaderNode.IP) {
 			nu.writer.Println("Restaring leader node")
 			sshUtil.getSSHConfig().hostIP = pgIp.IP
-			res, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(RESTART_BACKEND_COMMAND)
+			res, err := sshUtil.connectAndExecuteCommandOnRemote(RESTART_BACKEND_COMMAND, true)
 			if err != nil {
 				writer.Errorf("error in executing restart backend supervisor command")
 				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
@@ -497,7 +498,7 @@ func restartFollowerNodeAndWaitForhealthy(leaderNode NodeIpHealth, pgIps []IP, i
 	for _, pgIp := range pgIps {
 		if !strings.EqualFold(pgIp.IP, leaderNode.IP) {
 			sshUtil.getSSHConfig().hostIP = pgIp.IP
-			res, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(RESTART_BACKEND_COMMAND)
+			res, err := sshUtil.connectAndExecuteCommandOnRemote(RESTART_BACKEND_COMMAND, true)
 			if err != nil {
 				writer.Errorf("error in executing restart backend supervisor command")
 				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)

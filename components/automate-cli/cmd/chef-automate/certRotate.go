@@ -1485,17 +1485,17 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 
 func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary StatusSummary, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
 	pgLeaderIpAndHealth := getPGLeader(statusSummary)
-	c.writer.Printf("rotating follower node certificate")
+	c.writer.Println("rotating follower node certificate")
 	err := c.rotatePGFollowerNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, concurrent, chErr)
 	if err != nil {
 		return err
 	}
-	c.writer.Printf("rotating leader node certificate")
+	c.writer.Println("rotating leader node certificate")
 	err = c.rotatePGLeaderNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, false, nil)
 	if err != nil {
 		return err
 	}
-	c.writer.Printf("restarting pg nodes")
+	c.writer.Println("restarting pg nodes")
 	nodeOpUtils := &NodeUtilsImpl{
 		writer: c.writer,
 	}
@@ -1642,13 +1642,13 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 	adminDn, err := getDistinguishedNameFromKey(adminPublicCertString)
 	if err != nil {
-		c.writer.Printf("Error in decoding admin cert, not able to get adminDn")
+		c.writer.Printf("Error in decoding admin cert, not able to get adminDn \n")
 		chErr <- err
 		return err
 	}
 	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
-		c.writer.Printf("Error in decoding node cert, not able to get nodeDn")
+		c.writer.Printf("Error in decoding node cert, not able to get nodeDn \n")
 		chErr <- err
 		return err
 	}
