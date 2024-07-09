@@ -1,6 +1,6 @@
 module github.com/chef/automate
 
-go 1.19
+go 1.22.5
 
 require (
 	github.com/Azure/azure-sdk-for-go v57.2.0+incompatible
@@ -11,7 +11,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Masterminds/squirrel v1.1.0
 	github.com/alexedwards/scs v1.4.1
-	github.com/apache/thrift v0.12.0 // indirect
+	github.com/apache/thrift v0.20.0 // indirect
 	github.com/apoydence/onpar v0.0.0-20190519213022-ee068f8ea4d1 // indirect
 	github.com/armon/go-metrics v0.3.2 // indirect
 	github.com/aws/aws-sdk-go v1.40.32
