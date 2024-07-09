@@ -17,9 +17,10 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -126,7 +127,7 @@ func Read(license string, publicKey []byte) (*License, error) {
 	l.Generator = p.Generator
 	l.KeySha256 = p.KeySha256
 	l.GenerationDate = p.GenerationDate
-	l.Customer = p.V1CustomerId
+	l.Customer = p.Customer
 	l.CustomerId = p.V0CustomerId
 	if l.CustomerId == "" {
 		l.CustomerId = p.V1CustomerId
