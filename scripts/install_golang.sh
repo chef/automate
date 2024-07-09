@@ -13,7 +13,7 @@ desired_golang_version() {
 
 install_hab_go() {
     local ident
-    ident="core/go22/$(desired_golang_version)"
+    ident="core/go22/1.22.4/20240625061400"
     hab pkg install "$ident"
     hab pkg binlink "$ident" go --force
     hab pkg binlink "$ident" gofmt --force
