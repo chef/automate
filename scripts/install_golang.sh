@@ -4,7 +4,7 @@ set -euo pipefail
 export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
-export GOPROXY=direct
+export GOPROXY="direct"
 
 desired_golang_version() {
     local top_level
