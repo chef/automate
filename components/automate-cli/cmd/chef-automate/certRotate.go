@@ -1410,7 +1410,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	return nil
 }
 func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *CertificateToml, configRes sshutils.SSHConfig, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
-	errors := make(chan error)
+
 	// rotating PG certs
 	start := time.Now()
 	c.log.Debug("Started executing at %s \n", start.String())
@@ -1418,24 +1418,24 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	pgRootCA := templateCerts.PostgreSQL.RootCA
 	c.writer.Printf("Fetching PostgreSQL RootCA from template %s \n", pgRootCA)
 	c.writer.Println("Rotating PostgreSQL follower node certificates")
-	err := c.rotatePGCertAndRestartPGNode(templateCerts.PostgreSQL.IPS, statusSummary, infra, sshUtil, currentCertsInfo, pgRootCA, true, errors)
+	err := c.rotatePGCertAndRestartPGNode(templateCerts.PostgreSQL.IPS, statusSummary, infra, sshUtil, currentCertsInfo, pgRootCA, true)
 	if err != nil {
 		return err
 	}
-	c.writer.Println("PG certificate rotated and node restared")
+	c.writer.Println("PG certificate rotated and node restarted")
 	timeElapsed := time.Since(start)
-	c.log.Debug("Time Elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
+	c.log.Debug("Time elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
 	// rotating OS certs
 	c.writer.Println("rotating opensearch node certificates")
 	for i, osIp := range templateCerts.OpenSearch.IPS {
 		c.writer.Printf("Rotating OpenSearch node %d certificates \n", i)
-		err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, errors)
+		err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false)
 		if err != nil {
 			return err
 		}
 	}
 	timeElapsed = time.Since(start)
-	c.log.Debug("Time Elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
+	c.log.Debug("Time elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
 
 	// rotate AutomateCerts
 
@@ -1452,7 +1452,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	}
 
 	timeElapsed = time.Since(start)
-	c.log.Debug("Time Elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
+	c.log.Debug("Time elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
 	c.log.Debug("==========================================================")
 	c.log.Debug("Starting traffic on Autoamate nodes MAINTENANICE MODE OFF")
@@ -1471,7 +1471,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	}
 
 	timeElapsed = time.Since(start)
-	c.log.Debug("Time Elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
+	c.log.Debug("Time elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
 
 	c.log.Debug("==========================================================")
 	c.log.Debug("Starting traffic on chef server nodes MAINTENANICE MODE OFF")
@@ -1483,15 +1483,15 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	return nil
 }
 
-func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary StatusSummary, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
+func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary StatusSummary, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {
 	pgLeaderIpAndHealth := getPGLeader(statusSummary)
 	c.writer.Println("rotating follower node certificate")
-	err := c.rotatePGFollowerNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, concurrent, chErr)
+	err := c.rotatePGFollowerNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, concurrent)
 	if err != nil {
 		return err
 	}
 	c.writer.Println("rotating leader node certificate")
-	err = c.rotatePGLeaderNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, false, nil)
+	err = c.rotatePGLeaderNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, false)
 	if err != nil {
 		return err
 	}
@@ -1506,11 +1506,11 @@ func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary 
 	return nil
 }
 
-func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
+func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {
 	if pgLeaderIpAndHealth.Health == "ok" {
 		for _, pgIp := range pgIps {
 			if strings.EqualFold(pgIp.IP, pgLeaderIpAndHealth.IP) {
-				err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent, chErr)
+				err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent)
 				if err != nil {
 					return err
 				}
@@ -1521,10 +1521,10 @@ func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth 
 	return nil
 }
 
-func (c *certRotateFlow) rotatePGFollowerNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool, chErr chan error) error {
+func (c *certRotateFlow) rotatePGFollowerNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {
 	for _, pgIp := range pgIps {
 		if !strings.EqualFold(pgIp.IP, pgLeaderIpAndHealth.IP) {
-			err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent, chErr)
+			err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent)
 			//err := <-chErr
 			if err != nil {
 				return err
@@ -1534,13 +1534,12 @@ func (c *certRotateFlow) rotatePGFollowerNodeCert(pgIps []IP, pgLeaderIpAndHealt
 	return nil
 }
 
-func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool, chErr chan error) error {
+func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool) error {
 	start := time.Now()
 	c.log.Debug("Roating PostgreSQL node %s certificate at %s \n", pgIps.IP, start.Format(time.ANSIC))
 	if len(pgIps.PrivateKey) == 0 || len(pgIps.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for PostgerSQL node %s \n", pgIps.IP)
 		err := errors.New(fmt.Sprintf("Empty certificate for PostgerSQL node %s \n", pgIps.IP))
-		chErr <- err
 		return err
 	}
 	flagsObj := certRotateFlags{
@@ -1553,13 +1552,11 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 	certs, err := c.getCerts(infra, &flagsObj)
 	if err != nil {
-		chErr <- err
 		return err
 	}
 
 	if isManagedServicesOn() {
 		err := status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, POSTGRESQL)
-		chErr <- err
 		return err
 	}
 	fileName := "cert-rotate-pg.toml"
@@ -1587,7 +1584,6 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	// patching on PG
 	err = c.patchConfig(patchFnParam, false)
 	if err != nil {
-		chErr <- err
 		return err
 	}
 	timeElapsed := time.Since(start)
@@ -1595,13 +1591,12 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	return nil
 }
 
-func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool, chErr chan error) error {
+func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool) error {
 	start := time.Now()
 	c.log.Debug("Roating opensearch node %s certificate at %s \n", osIp.IP, start.Format(time.ANSIC))
 	if len(osIp.PrivateKey) == 0 || len(osIp.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for OpenSearch node %s \n", osIp.IP)
 		err := errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
-		chErr <- err
 		return err
 	}
 	writer.Printf("Admin cert path : %s \n", oss.AdminPublickey)
@@ -1617,13 +1612,11 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	}
 	certs, err := c.getCerts(infra, &flagsObj)
 	if err != nil {
-		chErr <- err
 		return err
 	}
 
 	if isManagedServicesOn() {
 		err := status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, OPENSEARCH)
-		chErr <- err
 		return err
 	}
 	fileName := "cert-rotate-os.toml"
@@ -1631,25 +1624,21 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	remoteService := OPENSEARCH
 	adminPublicCert, err := c.getCertFromFile(oss.AdminPublickey, infra)
 	if err != nil {
-		chErr <- err
 		return err
 	}
 	adminPublicCertString := strings.TrimSpace(string(adminPublicCert))
 	adminPrivateCert, err := c.getCertFromFile(oss.AdminPrivateKey, infra)
 	if err != nil {
-		chErr <- err
 		return err
 	}
 	adminDn, err := getDistinguishedNameFromKey(adminPublicCertString)
 	if err != nil {
 		c.writer.Printf("Error in decoding admin cert, not able to get adminDn \n")
-		chErr <- err
 		return err
 	}
 	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
 		c.writer.Printf("Error in decoding node cert, not able to get nodeDn \n")
-		chErr <- err
 		return err
 	}
 	existingNodesDN := strings.TrimSpace(currentCertsInfo.OpensearchCertsByIP[0].NodesDn)
@@ -1685,7 +1674,6 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 	err = c.patchConfig(patchFnParam, true)
 	if err != nil {
-		chErr <- err
 		return err
 	}
 
@@ -1697,7 +1685,6 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 		err := patchOSNodeDN(&flagsObj, patchFnParam, c, nodesDn)
 		if err != nil {
-			chErr <- err
 			return err
 		}
 

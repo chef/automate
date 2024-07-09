@@ -475,10 +475,10 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []IP, inf
 	}
 	sshUtil := NewSSHUtil(newSSHConfig)
 	// restart followers
-	nu.writer.Println("tyring to restaring follower node")
+	nu.writer.Println("trying to restaring follower node")
 	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
 	//restart leader
-	nu.writer.Println("tyring to restaring leader node")
+	nu.writer.Println("trying to restaring leader node")
 	for _, pgIp := range pgIps {
 		nu.writer.Println("looking for leader node to restart")
 		if strings.EqualFold(pgIp.IP, leaderNode.IP) {
