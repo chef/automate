@@ -52,6 +52,7 @@ Backup failed with the following error: %v
 
 Do you wish to continue the backup?
 `
+	OS_SNAPSHOT_URL = "http://localhost:10144/_snapshot?pretty"
 )
 
 type BackupFromBashtion interface {
@@ -405,9 +406,9 @@ func bucketDiscrepancyErr(automateBucket, efBucket, complBucket, ingestBucket, e
 
 func pathDiscrepancyCheck(osPath, habp, abp, efPath, complPath, ingestPath, erchefPath string) error {
 	err := fmt.Errorf(`discrepancy between backup paths. All backup paths should point to the same location:
-		path_repo: %s
+		opensearch path_repo: %s
 		backup_mount: %s
-		path: %s
+		backup path: %s
 		event-feed-service location: %s
 		compliance-service location: %s
 		ingest-service location: %s
@@ -485,7 +486,7 @@ func compareBackupPaths(infra *AutomateHAInfraDetails) error {
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
 
 	// Execute curl command for OS snapshots on Automate server
-	resp, err := sshUtil.connectAndExecuteCommandOnRemote("curl -s http://localhost:10144/_snapshot?pretty", false)
+	resp, err := sshUtil.connectAndExecuteCommandOnRemote(fmt.Sprintf("curl -s %s", OS_SNAPSHOT_URL), false)
 	if err != nil {
 		return err
 	}
