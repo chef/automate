@@ -27,7 +27,7 @@ pkg_deps=(
   core/curl # health_check hook
 )
 
-pkg_build_deps=(core/go19 core/git core/gcc)
+pkg_build_deps=(core/go22 core/git core/gcc)
 
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
