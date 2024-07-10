@@ -2,7 +2,7 @@ name: Build
 on:
   push:
     branches:
-      - main
+    - main
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
@@ -10,19 +10,19 @@ jobs:
     name: SonarQube
     runs-on: ip-range-controlled
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Setup Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.19.3'
-      - name: Test and coverage
-        run: tools/go_coverage_report.sh
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.22.4'
+    - name: Test and coverage
+      run: tools/go_coverage_report.sh
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
 

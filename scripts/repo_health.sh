@@ -9,7 +9,7 @@ desired_golang_version() {
 }
 
 hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
-hab pkg install -b "core/go19/$(desired_golang_version)"
+hab pkg install -b "core/go22/1.22.4/20240625061400"
 
 echo "Checking Go Dependencies And Vendored Protos"
 go mod verify
