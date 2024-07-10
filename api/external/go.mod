@@ -1,6 +1,6 @@
 module github.com/chef/automate/api/external
 
-go 1.19
+go 1.22.4
 
 require (
 	github.com/golang/mock v1.4.4
