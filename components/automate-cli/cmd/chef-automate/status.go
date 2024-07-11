@@ -79,7 +79,7 @@ func newStatusCmd() *cobra.Command {
 		Use:               "status",
 		Short:             "Retrieve Chef Automate status",
 		Long:              "Retrieve Chef Automate status. Includes status of Automate services.",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runStatusCmdGetter(&statusCmdFlag),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
@@ -138,7 +138,7 @@ func newStatusSummaryCmd() *cobra.Command {
 		Use:               "summary",
 		Short:             "Retrieve Chef Automate status-summary",
 		Long:              "Retrieve Chef Automate status node summary for HA deployment",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runStatusSummaryCmdFunc(&statusSummaryCmdFlags),
 	}
 	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isAutomate, "automate", "a", false, "Get only automate Status")

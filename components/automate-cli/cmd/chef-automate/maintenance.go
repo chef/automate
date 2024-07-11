@@ -26,7 +26,7 @@ var maintenanceCmd = &cobra.Command{
 	Short:             "Put Chef Automate into or out of maintenance mode",
 	Long:              "Chef Automate maintenance mode keeps all services running but rejects new connections at the load balancer so that maintenance operations can be performed.",
 	Args:              cobra.ExactArgs(1),
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runMaintenanceCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.FrontEnd,
