@@ -22,7 +22,8 @@ var workspaceCmd = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithHA,
 	},
-	RunE: runWorkspaceCmd,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runWorkspaceCmd,
 }
 
 func runWorkspaceCmd(cmd *cobra.Command, args []string) error {

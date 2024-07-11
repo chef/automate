@@ -52,7 +52,8 @@ var infoCmd = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithHA,
 	},
-	RunE: runInfoConfigCmd,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runInfoConfigCmd,
 }
 
 func runInfoConfigCmd(cmd *cobra.Command, args []string) error {

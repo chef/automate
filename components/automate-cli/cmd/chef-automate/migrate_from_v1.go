@@ -70,7 +70,7 @@ var migrateFrom1Cmd = &cobra.Command{
 	Short:             "Migrate from Chef Automate v1",
 	Long:              migrateFrom1Long,
 	Args:              cobra.MaximumNArgs(3),
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runMigrateFromV1Cmd,
 	Aliases:           []string{"upgrade-from-v1"},
 	Annotations: map[string]string{
@@ -81,7 +81,7 @@ var migrateFrom1Cmd = &cobra.Command{
 var migrateFrom1StatusCmd = &cobra.Command{
 	Use:               "migrate-from-v1-status",
 	Short:             "Watch the status of the migration to Chef Automate 2",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runMigrationFromV1StatusCmd,
 	Annotations: map[string]string{
 		docs.Compatibility: docs.CompatiblewithStandalone,
@@ -92,7 +92,7 @@ var generateCfgCmd = &cobra.Command{
 	Use:               "gen-config",
 	Short:             "Generate a config file",
 	Long:              "Generate a Chef Automate v2 configuration file from Chef Automate v1",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runGenerateCfgCmd,
 	Annotations: map[string]string{
 		docs.Compatibility: docs.CompatiblewithStandalone,

@@ -46,7 +46,7 @@ func init() {
 		Use:               "restart-services",
 		Short:             "restart deployment services",
 		Long:              "Restart services for a deployment",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runRestartServicesCmd(&restartCmdFlags),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,

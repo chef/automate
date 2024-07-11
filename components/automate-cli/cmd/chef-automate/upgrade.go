@@ -61,7 +61,7 @@ var upgradeRunCmd = &cobra.Command{
 	Use:               "run",
 	Short:             "Run an upgrade of Chef Automate",
 	Long:              "Run an upgrade of Chef Automate",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runUpgradeCmd,
 	Args:              cobra.MaximumNArgs(0),
 }
@@ -74,7 +74,7 @@ var upgradeStatusCmd = &cobra.Command{
 	Use:               "status",
 	Short:             "Get upgrade status of Chef Automate",
 	Long:              "Get upgrade status of Chef Automate",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              statusUpgradeCmd,
 	Args:              cobra.MaximumNArgs(0),
 	Annotations: map[string]string{

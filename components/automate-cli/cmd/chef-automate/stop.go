@@ -35,7 +35,7 @@ func init() {
 		Use:               "stop",
 		Short:             "Stop deployment",
 		Long:              "Stop a running deployment of Automate.",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runStopCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,

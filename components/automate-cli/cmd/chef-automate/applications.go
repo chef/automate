@@ -172,7 +172,7 @@ func newApplicationsShowSvcsCmd() *cobra.Command {
 		Long: `
 Display a list of the habitat services stored in the applications database.
 `,
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runApplicationsShowSvcsCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
@@ -203,7 +203,7 @@ the VM or container, or by using 'hab svc unload', before using the
 a health-check at the appointed time and Automate will re-add them to the
 services database.
 `,
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runApplicationsRemoveSvcsCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
