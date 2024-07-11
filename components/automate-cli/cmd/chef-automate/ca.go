@@ -34,7 +34,7 @@ var caCmd = &cobra.Command{
 var caInfo = &cobra.Command{
 	Use:               "info",
 	Short:             "Print information of the root certificate for the internal certificate authority",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runCAInfoCmd,
 	Args:              cobra.MaximumNArgs(0),
 	Annotations: map[string]string{
@@ -53,7 +53,7 @@ var regen = &cobra.Command{
 var regenRoot = &cobra.Command{
 	Use:               "root",
 	Short:             "Regenerate the root certificate for the internal certificate authority",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runRegenRootCmd,
 	Args:              cobra.MaximumNArgs(0),
 	Annotations: map[string]string{

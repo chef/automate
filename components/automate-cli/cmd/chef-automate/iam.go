@@ -64,7 +64,7 @@ func newIAMCreateTokenCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "create NAME",
 		Short:             "Generate a token",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runCreateTokenCmd,
 		Args:              cobra.ExactArgs(1),
 		Annotations: map[string]string{
@@ -90,7 +90,7 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 		Short: "Restore the factory default admin user, team, and access",
 		Long: "Recreate the admin user, admin team, and related admin policy as needed " +
 			"to restore to factory default and update the admin user's password",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runRestoreDefaultAdminAccessAdminCmd,
 		Args:              cobra.ExactArgs(1),
 		Annotations: map[string]string{
@@ -109,7 +109,7 @@ func newIAMVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:               "version",
 		Short:             "Retrieve IAM version in use",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runIAMVersionCmd,
 		Args:              cobra.ExactArgs(0),
 		Annotations: map[string]string{

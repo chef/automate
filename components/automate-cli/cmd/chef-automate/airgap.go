@@ -70,7 +70,7 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runAirgapCreateInstallBundle,
 		Args:              cobra.RangeArgs(0, 1),
 	}
@@ -140,7 +140,7 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runAirgapUnpackInstallBundle,
 		Args:              cobra.ExactArgs(1),
 		Hidden:            true,
@@ -156,7 +156,7 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
+		PersistentPreRunE: checkLicenseStatusForExpiry,
 		RunE:              runAirgapInfoInstallBundle,
 		Args:              cobra.ExactArgs(1),
 	}

@@ -24,8 +24,9 @@ var secretsCmd = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithHA,
 	},
-	Args: cobra.RangeArgs(0, 2),
-	RunE: runSecretsConfigCmd,
+	Args:              cobra.RangeArgs(0, 2),
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runSecretsConfigCmd,
 }
 
 func runSecretsConfigCmd(cmd *cobra.Command, args []string) error {

@@ -31,7 +31,7 @@ var versionCmd = &cobra.Command{
 	Use:               "version",
 	Short:             "Show CLI version",
 	Long:              "Show the CLI version.",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runVersionCmd,
 	Annotations: map[string]string{
 		NoRequireRootAnnotation: NoRequireRootAnnotation,

@@ -206,7 +206,8 @@ var sshCommand = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithHA,
 	},
-	RunE: runSshCommand,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runSshCommand,
 }
 
 func runSshCommand(_ *cobra.Command, _ []string) error {

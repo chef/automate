@@ -36,7 +36,7 @@ var startCmdFlags = struct {
 var startCommand = &cobra.Command{
 	Use:               "start",
 	Short:             "Start Chef Automate",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE:              runStartCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
