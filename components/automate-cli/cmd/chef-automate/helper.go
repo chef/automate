@@ -56,7 +56,7 @@ func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
 }
 
 func generateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) string {
-	return "chef-automate license status --result-json /tmp/license"
+	return "sudo chef-automate license status --result-json /hab/tmp/license.json"
 }
 
 func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
