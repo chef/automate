@@ -52,7 +52,14 @@ func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
 		return err
 	}
 	writer.Print(output)
-	return nil
+
+	licenseResult := &LicenseResult{}
+	err = json.Unmarshal([]byte(output), &licenseResult)
+	if err != nil {
+		return err
+	}
+
+	return checkLicenseExpiry(licenseResult)
 }
 
 func generateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) string {
