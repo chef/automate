@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -51,14 +53,33 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 }
 
 func getLicenseResult(cmd *cobra.Command) (*LicenseResult, error) {
-	fileName := "/tmp/license"
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp("", "license-*.json")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile.Name())
 
-	cmd1 := exec.Command("chef-automate", "license", "status", "--result-json", fileName)
-	// Not checking for error, as if the license is expired it will still return error and for commercial license a grace period is required
-	cmd1.Output()
+	cmd1 := exec.Command("chef-automate", "license", "status", "--result-json", tmpFile.Name())
+	var stderr bytes.Buffer
+	cmd1.Stderr = &stderr
 
-	licenseResult, err := readFileAndMarshal(fileName)
-	return licenseResult, err
+	if err := cmd1.Run(); err != nil {
+		log.Printf("Command error output: %s", stderr.String())
+		return nil, err
+	}
+
+	output, err := os.ReadFile(tmpFile.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	var licenseResult LicenseResult
+	err = json.Unmarshal(output, &licenseResult)
+	if err != nil {
+		return nil, err
+	}
+	return &licenseResult, nil
 }
 
 func readFileAndMarshal(fileName string) (*LicenseResult, error) {
@@ -121,7 +142,7 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
 		} else {
 			return status.New(
-				status.LicenseError, fmt.Sprintf("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."))
+				status.LicenseError, "Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
 		}
 	}
 
