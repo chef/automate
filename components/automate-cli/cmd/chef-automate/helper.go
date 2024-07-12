@@ -14,7 +14,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type LicenseResult struct {
@@ -38,7 +37,6 @@ type ExpirationDate struct {
 const commercial = "commercial"
 
 type LExecutor interface {
-	execCommand(string) (string, error)
 	runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error)
 }
 
@@ -46,10 +44,6 @@ type LicenseExecutor struct{}
 
 func (e LicenseExecutor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
 	return RunLicenseCmdOnSingleAutomateNode(cmd, args)
-}
-
-func (e LicenseExecutor) execCommand(str string) (string, error) {
-	return "", nil
 }
 
 func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
@@ -62,17 +56,7 @@ func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
 }
 
 func generateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) string {
-	fullCommand := cmd.CommandPath()
-	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		if flag.Changed {
-			if flag.Value.Type() != "bool" {
-				fullCommand += " --" + flag.Name + " " + flag.Value.String()
-			} else {
-				fullCommand += " --" + flag.Name
-			}
-		}
-	})
-	return fmt.Sprint("sudo " + fullCommand + " " + strings.Join(args, " "))
+	return "chef-automate license status --result-json /tmp/license"
 }
 
 func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
