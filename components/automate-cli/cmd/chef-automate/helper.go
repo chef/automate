@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -51,7 +50,6 @@ func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
 	if err != nil {
 		return err
 	}
-	writer.Print(output)
 
 	licenseResult := &LicenseResult{}
 	err = json.Unmarshal([]byte(output), &licenseResult)
@@ -62,12 +60,7 @@ func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
 	return checkLicenseExpiry(licenseResult)
 }
 
-func generateOriginalAutomateCLICommand() string {
-	return "sudo chef-automate license status --result-json /hab/tmp/license.json"
-}
-
 func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
-	script := generateOriginalAutomateCLICommand()
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return "", err
@@ -84,19 +77,14 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		timeout:    10,
 	}
 	sshUtil := NewSSHUtil(sshConfig)
-	output, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+	script := "sudo chef-automate license status --result-json /hab/tmp/license.json"
+	_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
-		if len(strings.TrimSpace(output)) != 0 {
-			printErrorMessage("Automate", ips[0], writer, err.Error())
-		}
 		return "", err
 	}
 	script = "sudo cat /hab/tmp/license.json"
 	readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
-		if len(strings.TrimSpace(readLicense)) != 0 {
-			printErrorMessage("Automate", ips[0], writer, err.Error())
-		}
 		return "", err
 	}
 	return readLicense, nil
