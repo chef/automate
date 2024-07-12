@@ -76,11 +76,11 @@ func newStatusCmd() *cobra.Command {
 	statusCmdFlag := StatusCmdFlags{}
 
 	var statusCmd = &cobra.Command{
-		Use:   "status",
-		Short: "Retrieve Chef Automate status",
-		Long:  "Retrieve Chef Automate status. Includes status of Automate services.",
-		// PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE: runStatusCmdGetter(&statusCmdFlag),
+		Use:               "status",
+		Short:             "Retrieve Chef Automate status",
+		Long:              "Retrieve Chef Automate status. Includes status of Automate services.",
+		PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE:              runStatusCmdGetter(&statusCmdFlag),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
