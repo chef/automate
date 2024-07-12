@@ -87,7 +87,19 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		}
 		return "", err
 	}
-	return output, nil
+
+	script = "sudo cat /hab/tmp/license.json"
+	readLicense, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
+	if err != nil {
+		if len(strings.TrimSpace(output)) != 0 {
+			printErrorMessage("Automate", ips[0], writer, output)
+		}
+		return "", err
+	}
+
+	fmt.Printf("readLicense: %v\n", readLicense)
+
+	return readLicense, nil
 }
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
