@@ -463,7 +463,7 @@ func stopSpinnerIfRequired(spinner bool) {
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSuppressLog(remoteCommands string, spinner bool, suppressLog bool) (string, error) {
 	if !suppressLog {
 		logrus.Debug("Executing command ......")
-		// logrus.Debug(remoteCommands)
+		logrus.Debug(remoteCommands)
 	}
 	// Add sudo password if required
 	remoteCommands = AddSudoPassword(remoteCommands)
@@ -475,14 +475,19 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSuppressLog(remoteCommands
 	// Open session
 	session, err := conn.NewSession()
 	if err != nil {
-		writer.Errorf("session failed:%v\n", err)
+		if !suppressLog {
+			writer.Errorf("session failed:%v\n", err)
+		}
 		return "", err
 	}
+
 	defer session.Close()
 	startSpinnerIfRequired(spinner)
 	var output string
 	errCh := make(chan error)
 	go func() {
+		// Redirecting command output to /dev/null to suppress it
+		// remoteCommandsWithRedirection := fmt.Sprintf("%s > /dev/null 2>&1", remoteCommands)
 		outputByte, err := session.CombinedOutput(remoteCommands)
 		output = string(outputByte)
 		if isSudoPasswordEnabled() {
@@ -517,5 +522,6 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSuppressLog(remoteCommands
 	if !suppressLog {
 		logrus.Debug("Execution of command done......")
 	}
+
 	return output, nil
 }
