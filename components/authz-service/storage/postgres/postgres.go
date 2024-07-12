@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"io/fs"
+	"os"
 	"strings"
 	"sync"
 
@@ -18,16 +20,32 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
+const filePath = "/hab/.skip_migration"
+
 // New returns a new sql.DB connector with the automatic default migrations applied.
-func New(ctx context.Context, migConf migration.Config, dataMigConf datamigration.Config) (*sql.DB, error) {
+func New(ctx context.Context, migConf migration.Config, dataMigConf datamigration.Config, l logger.Logger) (*sql.DB, error) {
 	pgURL := migConf.PGURL.String()
 
-	if err := migConf.Migrate(dataMigConf); err != nil {
-		return nil, errors.Wrapf(
-			err,
-			"apply database migrations from %s",
-			migConf.Path,
-		)
+	// add the below changes for Automate HA
+	// Below code is running the migration, which will acquire the lock on the db
+	// In case of Automate HA if mulitple A2-FE are there and if we restart the one of the A2-FE,
+	// there is a chance that the authz service will be up and in the critical state
+	// If A2(restarted-one) will try to put the lock on the database and other A2-FE is serving the traffic
+	// In that case restated machine won't able to take the lock.
+	_, err := os.Stat(filePath)
+	if err == nil {
+		l.Infof("File '%s' exists, so skipping migration \n", filePath)
+	} else if errors.Is(err, fs.ErrNotExist) {
+		l.Infof("File '%s' does not exist\n", filePath)
+		if err := migConf.Migrate(dataMigConf); err != nil {
+			return nil, errors.Wrapf(
+				err,
+				"apply database migrations from %s",
+				migConf.Path,
+			)
+		}
+	} else {
+		l.Infof("Error while checking the file: %v\n", err)
 	}
 
 	db, err := initPostgresDB(ctx, pgURL, migConf.MaxConnections, migConf.MaxIdleConnections)
@@ -138,7 +156,7 @@ func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf m
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
 		var db *sql.DB
-		db, err = New(ctx, migConf, dataMigConf)
+		db, err = New(ctx, migConf, dataMigConf, l)
 		singletonInstance = &pg{
 			db:           db,
 			engine:       e,
