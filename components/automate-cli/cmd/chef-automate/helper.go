@@ -7,11 +7,14 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 type LicenseResult struct {
@@ -34,25 +37,100 @@ type ExpirationDate struct {
 
 const commercial = "commercial"
 
-func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
-	err := commandPrePersistent(cmd)
-	if err != nil {
-		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
-	}
-	licenseResult, err := getLicenseResult(cmd)
+type LExecutor interface {
+	execCommand(string) (string, error)
+	runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error)
+}
+
+type LicenseExecutor struct{}
+
+func (e LicenseExecutor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
+	return RunLicenseCmdOnSingleAutomateNode(cmd, args)
+}
+
+func (e LicenseExecutor) execCommand(str string) (string, error) {
+	return "", nil
+}
+
+func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
+	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
 	if err != nil {
 		return err
+	}
+	writer.Print(output)
+	return nil
+}
+
+func generateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) string {
+	fullCommand := cmd.CommandPath()
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if flag.Changed {
+			if flag.Value.Type() != "bool" {
+				fullCommand += " --" + flag.Name + " " + flag.Value.String()
+			} else {
+				fullCommand += " --" + flag.Name
+			}
+		}
+	})
+	return fmt.Sprint("sudo " + fullCommand + " " + strings.Join(args, " "))
+}
+
+func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
+	script := generateOriginalAutomateCLICommand(cmd, args)
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return "", err
 	}
 
-	err = checkLicenseExpiry(licenseResult)
+	ips := infra.Outputs.AutomatePrivateIps.Value
+	if len(ips) == 0 {
+		return "", errors.New("No automate IPs are found")
+	}
+
+	sshConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		hostIP:     ips[0],
+		timeout:    10,
+	}
+	sshUtil := NewSSHUtil(sshConfig)
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
-		return err
+		if len(strings.TrimSpace(output)) != 0 {
+			printErrorMessage("Automate", ips[0], writer, output)
+		}
+		return "", err
+	}
+	return output, nil
+}
+
+func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
+			return err
+		}
+	} else {
+		err := commandPrePersistent(cmd)
+		if err != nil {
+			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+		}
+		licenseResult, err := getLicenseResult()
+		if err != nil {
+			return err
+		}
+
+		err = checkLicenseExpiry(licenseResult)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func getLicenseResult(cmd *cobra.Command) (*LicenseResult, error) {
+func getLicenseResult() (*LicenseResult, error) {
 	// Create a temporary file
 	tmpFile, err := os.CreateTemp("", "license-*.json")
 	if err != nil {
