@@ -189,6 +189,11 @@ steps:
     command:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_set_service_seq_to_int_max && applications_integration"
+      - |
+        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
+          start_deployment_service && 
+          chef-automate dev deploy-some chef/automate-load-balancer --with-deps && chef-automate license apply /src/dev/license.jwt &&
+          automate_load_balancer_integration"
     timeout_in_minutes: 20
     expeditor:
       executor:
@@ -203,6 +208,11 @@ steps:
       - . scripts/verify_setup.sh
       - source integration/helpers/setup_minio.sh && start_minio_background
       - source integration/helpers/setup_minio.sh && TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live && hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
+      - |
+        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
+          start_deployment_service && 
+          chef-automate dev deploy-some chef/automate-load-balancer --with-deps && chef-automate license apply /src/dev/license.jwt &&
+          automate_load_balancer_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -237,6 +247,11 @@ steps:
           start_deployment_service &&
           chef-automate dev deploy-some chef/compliance-service --with-deps &&
           nodemanager_scans_integration"
+      - |
+        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
+          start_deployment_service && 
+          chef-automate dev deploy-some chef/automate-load-balancer --with-deps && chef-automate license apply /src/dev/license.jwt &&
+          automate_load_balancer_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
