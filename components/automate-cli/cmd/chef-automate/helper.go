@@ -62,12 +62,12 @@ func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
 	return checkLicenseExpiry(licenseResult)
 }
 
-func generateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) string {
+func generateOriginalAutomateCLICommand() string {
 	return "sudo chef-automate license status --result-json /hab/tmp/license.json"
 }
 
 func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
-	script := generateOriginalAutomateCLICommand(cmd, args)
+	script := generateOriginalAutomateCLICommand()
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return "", err
@@ -103,8 +103,6 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		}
 		return "", err
 	}
-
-	fmt.Printf("readLicense: %v\n", readLicense)
 
 	return readLicense, nil
 }
