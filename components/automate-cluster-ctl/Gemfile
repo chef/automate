@@ -16,7 +16,7 @@ gem 'rspec'
 gem 'tomlrb'
 gem 'bcrypt_pbkdf'
 
-if ruby_version <= Gem::Version.new("3.1.0")
+if Gem::Version.new("3.0.6") <= Gem::Version.new("3.1.0")
   gem "ffi", "< 1.17.0"
   gem "train-core", "< 3.12.5"
 end
