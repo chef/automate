@@ -82,9 +82,9 @@ func newDeployCmd() *cobra.Command {
 		Annotations: map[string]string{
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		},
-		Args:              cobra.RangeArgs(0, 1),
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runDeployCmd,
+		Args: cobra.RangeArgs(0, 1),
+		// PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE: runDeployCmd,
 	}
 
 	// flags for Deploy Command
