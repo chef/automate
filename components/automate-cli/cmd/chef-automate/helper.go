@@ -90,7 +90,7 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
 		if len(strings.TrimSpace(output)) != 0 {
-			printErrorMessage("Automate", ips[0], writer, output)
+			printErrorMessage("Automate", ips[0], writer, err.Error())
 		}
 		return "", err
 	}
@@ -99,7 +99,7 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 	readLicense, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
 		if len(strings.TrimSpace(output)) != 0 {
-			printErrorMessage("Automate", ips[0], writer, output)
+			printErrorMessage("Automate", ips[0], writer, err.Error())
 		}
 		return "", err
 	}
