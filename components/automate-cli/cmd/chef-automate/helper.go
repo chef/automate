@@ -72,12 +72,10 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 	if err != nil {
 		return "", err
 	}
-
 	ips := infra.Outputs.AutomatePrivateIps.Value
 	if len(ips) == 0 {
 		return "", errors.New("No automate IPs are found")
 	}
-
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshPort:    infra.Outputs.SSHPort.Value,
@@ -86,24 +84,21 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		timeout:    10,
 	}
 	sshUtil := NewSSHUtil(sshConfig)
-
-	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
+	output, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
 		if len(strings.TrimSpace(output)) != 0 {
 			printErrorMessage("Automate", ips[0], writer, err.Error())
 		}
 		return "", err
 	}
-
 	script = "sudo cat /hab/tmp/license.json"
-	readLicense, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
+	readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
-		if len(strings.TrimSpace(output)) != 0 {
+		if len(strings.TrimSpace(readLicense)) != 0 {
 			printErrorMessage("Automate", ips[0], writer, err.Error())
 		}
 		return "", err
 	}
-
 	return readLicense, nil
 }
 
