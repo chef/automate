@@ -197,6 +197,10 @@ steps:
           automate_load_balancer_integration"
     timeout_in_minutes: 20
     expeditor:
+      secrets:
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license 
       executor:
         docker:
           privileged: true
@@ -231,6 +235,9 @@ steps:
         HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
           account: aws/chef-cd
           field: session_token
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license    
       executor:
         docker:
           privileged: true
@@ -277,6 +284,9 @@ steps:
         HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
           account: aws/chef-cd
           field: session_token
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license    
       executor:
         docker:
           privileged: true
@@ -502,6 +512,10 @@ steps:
       automatic:
         limit: 1
     expeditor:
+      secrets:
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license 
       executor:
         docker:
           privileged: true
@@ -539,6 +553,9 @@ steps:
         CYPRESS_AUTOMATE_INFRA_ADMIN_KEY:
           path: secret/a2/testing/infra_admin_key
           field: data
+        HAB_STUDIO_SECRET_A2_LICENSE:
+          path: secret/a2/license
+          field: license   
       executor:
         linux:
           privileged: true
