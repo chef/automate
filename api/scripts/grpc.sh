@@ -2,6 +2,7 @@
 # set -x
 
 echo "Annotate authorization actions"
+export GOPROXY="https://proxy.golang.org,direct"
 
 doc_action() { awk -f ./scripts/add_action_doc_to_proto.awk "$1" > data.tmp && mv data.tmp "$1" ; }
 export -f doc_action

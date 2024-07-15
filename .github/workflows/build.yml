@@ -16,7 +16,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: '1.22.4'
+        go-version: '1.22.5'
     - name: Test and coverage
       run: tools/go_coverage_report.sh
     - name: SonarQube Scan
