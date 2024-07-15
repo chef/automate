@@ -185,10 +185,11 @@ steps:
           path: secret/a2/license
           field: license       
 
+
   - label: "applications-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_set_service_seq_to_int_max && applications_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt && start_applications_service_deps && chef-automate license apply /src/dev/license.jwt && applications_set_service_seq_to_int_max && applications_integration"
       - |
         hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
           start_deployment_service && 
@@ -243,9 +244,9 @@ steps:
     command:
       - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deploy-some chef/compliance-service --with-deps &&
+        hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt
+          start_deployment_service && 
+          chef-automate dev deploy-some chef/compliance-service --with-deps && chef-automate license apply /src/dev/license.jwt &&
           nodemanager_scans_integration"
       - |
         hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt &&
@@ -288,7 +289,7 @@ steps:
   - label: "gateway-integration"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test ./components/automate-gateway/integration/..."
+      - hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt && start_all_services && chef-automate license apply /src/dev/license.jwt  && go_test ./components/automate-gateway/integration/..."
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -369,8 +370,8 @@ steps:
     command:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deploy-some chef/event-feed-service --with-deps &&
+          start_deployment_service && echo "\$A2_LICENSE" > /src/dev/license.jwt
+          chef-automate dev deploy-some chef/event-feed-service --with-deps &&  
           event_feed_integration"
     timeout_in_minutes: 10
     expeditor:
@@ -384,7 +385,7 @@ steps:
   - label: "es-sidecar-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/es-sidecar-service --with-deps && es_sidecar_service_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && echo "\$A2_LICENSE" > /src/dev/license.jwt && && start_deployment_service && chef-automate dev deploy-some chef/es-sidecar-service --with-deps && chef-automate license apply /src/dev/license.jwt && es_sidecar_service_integration"
     timeout_in_minutes: 20
     retry:
       automatic:

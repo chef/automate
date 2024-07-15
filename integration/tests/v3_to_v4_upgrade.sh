@@ -31,6 +31,8 @@ do_deploy() {
         --accept-terms-and-mlsa \
         --skip-preflight \
         --debug
+
+      do_apply_license    
 }
 
 do_prepare_upgrade() {
