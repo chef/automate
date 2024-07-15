@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export GOPROXY="https://proxy.golang.org,direct"
 pushd /src/api >> /dev/null || exit 1
 printf 'GEN: %s\n' api/external/annotations/iam/*.proto
 protoc -I /src/api --go_out=paths=source_relative:/src/api \
