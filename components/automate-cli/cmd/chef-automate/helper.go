@@ -138,7 +138,6 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 }
 
 func getexpiredLicense() (*LicenseResult, error) {
-	var licenseResult LicenseResult
 	// Create a temporary file
 	tmpFile, err := os.CreateTemp("", "license-*.json")
 	if err != nil {
@@ -153,15 +152,7 @@ func getexpiredLicense() (*LicenseResult, error) {
 	err = cmd1.Run()
 	if err != nil {
 		if strings.Contains(stderr.String(), "This license has expired") {
-			output, err := os.ReadFile(tmpFile.Name())
-			if err != nil {
-				return nil, err
-			}
-
-			err = json.Unmarshal(output, &licenseResult)
-			if err != nil {
-				return nil, err
-			}
+			return readFileAndMarshal(tmpFile.Name())
 		} else {
 			return nil, err
 		}
@@ -169,7 +160,6 @@ func getexpiredLicense() (*LicenseResult, error) {
 	}
 
 	return getLicenseResult()
-
 }
 
 func getLicenseResult() (*LicenseResult, error) {
@@ -189,17 +179,7 @@ func getLicenseResult() (*LicenseResult, error) {
 		return nil, err
 	}
 
-	output, err := os.ReadFile(tmpFile.Name())
-	if err != nil {
-		return nil, err
-	}
-
-	var licenseResult LicenseResult
-	err = json.Unmarshal(output, &licenseResult)
-	if err != nil {
-		return nil, err
-	}
-	return &licenseResult, nil
+	return readFileAndMarshal(tmpFile.Name())
 }
 
 func readFileAndMarshal(fileName string) (*LicenseResult, error) {
@@ -280,10 +260,10 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 	licenseDate := licenseValidDate.Format("02-01-2006")
 	graceDate := gracePeriodDate.Format("02-01-2006")
 
-	// if daysUntilExpiration > aboutToExpire {
-	// 	// If the license is not about to expire within 60 days, do nothing.
-	// 	//return nil
-	// }
+	if daysUntilExpiration > aboutToExpire {
+		// If the license is not about to expire within 60 days, do nothing.
+		return
+	}
 	// If the license type is commercial, adding grace period of 60 days
 	if licenseResult.Result.LicenseType == commercial {
 		if !licenseResult.Result.GracePeriod {
