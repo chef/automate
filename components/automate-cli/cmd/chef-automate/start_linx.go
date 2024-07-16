@@ -34,10 +34,9 @@ var startCmdFlags = struct {
 }{}
 
 var startCommand = &cobra.Command{
-	Use:               "start",
-	Short:             "Start Chef Automate",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runStartCmd,
+	Use:   "start",
+	Short: "Start Chef Automate",
+	RunE:  runStartCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},

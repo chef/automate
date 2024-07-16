@@ -184,7 +184,7 @@ var genConfigCmd = &cobra.Command{
 var patchConfigCmd = &cobra.Command{
 	Use:   "patch path/to/config.toml",
 	Short: "patch the Chef Automate configuration", Long: "Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
+	PersistentPreRunE: WarnLicenseStatusForExpiry,
 	RunE:              runPatchCommand,
 	Args:              cobra.ExactArgs(1),
 	Annotations: map[string]string{

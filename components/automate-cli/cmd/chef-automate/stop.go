@@ -32,11 +32,10 @@ var stopCmdFlags = struct {
 
 func init() {
 	var stopCmd = &cobra.Command{
-		Use:               "stop",
-		Short:             "Stop deployment",
-		Long:              "Stop a running deployment of Automate.",
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runStopCmd,
+		Use:   "stop",
+		Short: "Stop deployment",
+		Long:  "Stop a running deployment of Automate.",
+		RunE:  runStopCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
