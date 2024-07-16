@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -125,7 +126,7 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 		}
 
-		licenseResult, err := getLicenseResult()
+		licenseResult, err := getexpiredLicense()
 		if err != nil {
 			return err
 		}
@@ -134,6 +135,41 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 	return nil
+}
+
+func getexpiredLicense() (*LicenseResult, error) {
+	var licenseResult LicenseResult
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp("", "license-*.json")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile.Name())
+
+	cmd1 := exec.Command("chef-automate", "license", "status", "--result-json", tmpFile.Name())
+	var stderr bytes.Buffer
+	cmd1.Stderr = &stderr
+
+	err = cmd1.Run()
+	if err != nil {
+		if strings.Contains(stderr.String(), "This license has expired") {
+			output, err := os.ReadFile(tmpFile.Name())
+			if err != nil {
+				return nil, err
+			}
+
+			err = json.Unmarshal(output, &licenseResult)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+
+	}
+
+	return getLicenseResult()
+
 }
 
 func getLicenseResult() (*LicenseResult, error) {
@@ -244,10 +280,10 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 	licenseDate := licenseValidDate.Format("02-01-2006")
 	graceDate := gracePeriodDate.Format("02-01-2006")
 
-	if daysUntilExpiration > aboutToExpire {
-		// If the license is not about to expire within 60 days, do nothing.
-		//return nil
-	}
+	// if daysUntilExpiration > aboutToExpire {
+	// 	// If the license is not about to expire within 60 days, do nothing.
+	// 	//return nil
+	// }
 	// If the license type is commercial, adding grace period of 60 days
 	if licenseResult.Result.LicenseType == commercial {
 		if !licenseResult.Result.GracePeriod {
@@ -264,7 +300,7 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 		if daysUntilExpiration > 0 {
 			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
 		} else {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."))
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
 		}
 	}
 }
