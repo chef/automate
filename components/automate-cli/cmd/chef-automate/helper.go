@@ -114,6 +114,28 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
+			return err
+		}
+	} else {
+		err := commandPrePersistent(cmd)
+		if err != nil {
+			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+		}
+
+		licenseResult, err := getLicenseResult()
+		if err != nil {
+			return err
+		}
+
+		warnIfLicenseNearExpiry(licenseResult)
+		return nil
+	}
+	return nil
+}
+
 func getLicenseResult() (*LicenseResult, error) {
 	// Create a temporary file
 	tmpFile, err := os.CreateTemp("", "license-*.json")
@@ -182,7 +204,7 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	graceDate := gracePeriodDate.Format("02-01-2006")
 
 	if daysUntilExpiration > aboutToExpire {
-		// If the trial and internal license is not about to expire within 60 days, do nothing.
+		// If the license is not about to expire within 60 days, do nothing.
 		return nil
 	}
 
@@ -209,4 +231,40 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	}
 
 	return nil
+}
+
+func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
+	// Calculate the license valid date
+	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
+	gracePeriodDuration := 60
+	aboutToExpire := 60
+	currentTime := time.Now()
+	daysUntilExpiration := int(licenseValidDate.Sub(currentTime).Hours() / 24)
+	gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
+	licenseDate := licenseValidDate.Format("02-01-2006")
+	graceDate := gracePeriodDate.Format("02-01-2006")
+
+	if daysUntilExpiration > aboutToExpire {
+		// If the license is not about to expire within 60 days, do nothing.
+		//return nil
+	}
+	// If the license type is commercial, adding grace period of 60 days
+	if licenseResult.Result.LicenseType == commercial {
+		if !licenseResult.Result.GracePeriod {
+			if daysUntilExpiration <= aboutToExpire && daysUntilExpiration > 0 {
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! To avoid any future disruption to your DevOps processes, update your license! Please contact the Account Team or email us at chef-account-team@progress.com for further assistance.", licenseDate))
+			} else {
+				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com ", graceDate))
+			}
+		} else {
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com", licenseDate))
+
+		}
+	} else { // for trail and internal licenses
+		if daysUntilExpiration > 0 {
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
+		} else {
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."))
+		}
+	}
 }

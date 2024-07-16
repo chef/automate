@@ -139,10 +139,9 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runAirgapUnpackInstallBundle,
-		Args:              cobra.ExactArgs(1),
-		Hidden:            true,
+		RunE:   runAirgapUnpackInstallBundle,
+		Args:   cobra.ExactArgs(1),
+		Hidden: true,
 	}
 
 	bundleUnpackCmd.PersistentFlags().BoolVar(
@@ -155,9 +154,8 @@ func newAirgapCmd() *cobra.Command {
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runAirgapInfoInstallBundle,
-		Args:              cobra.ExactArgs(1),
+		RunE: runAirgapInfoInstallBundle,
+		Args: cobra.ExactArgs(1),
 	}
 
 	bundleInfoCmd.PersistentFlags().BoolVar(

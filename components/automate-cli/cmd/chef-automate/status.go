@@ -76,11 +76,10 @@ func newStatusCmd() *cobra.Command {
 	statusCmdFlag := StatusCmdFlags{}
 
 	var statusCmd = &cobra.Command{
-		Use:               "status",
-		Short:             "Retrieve Chef Automate status",
-		Long:              "Retrieve Chef Automate status. Includes status of Automate services.",
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runStatusCmdGetter(&statusCmdFlag),
+		Use:   "status",
+		Short: "Retrieve Chef Automate status",
+		Long:  "Retrieve Chef Automate status. Includes status of Automate services.",
+		RunE:  runStatusCmdGetter(&statusCmdFlag),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -135,11 +134,10 @@ func runStatusCmdGetter(flags *StatusCmdFlags) func(cmd *cobra.Command, args []s
 func newStatusSummaryCmd() *cobra.Command {
 	var statusSummaryCmdFlags = StatusSummaryCmdFlags{}
 	var statusSummaryCmd = &cobra.Command{
-		Use:               "summary",
-		Short:             "Retrieve Chef Automate status-summary",
-		Long:              "Retrieve Chef Automate status node summary for HA deployment",
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runStatusSummaryCmdFunc(&statusSummaryCmdFlags),
+		Use:   "summary",
+		Short: "Retrieve Chef Automate status-summary",
+		Long:  "Retrieve Chef Automate status node summary for HA deployment",
+		RunE:  runStatusSummaryCmdFunc(&statusSummaryCmdFlags),
 	}
 	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isAutomate, "automate", "a", false, "Get only automate Status")
 	statusSummaryCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
