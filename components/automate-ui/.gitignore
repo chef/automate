@@ -74,3 +74,6 @@ src/assets/bower_components
 
 # Github Token
 .secrets
+
+.nx/cache
+.nx/workspace-data

@@ -14,7 +14,7 @@ import { SigninUiSetting } from './signin-ui-settings';
 @Injectable({ providedIn: 'root'})
 export class UserPreferencesService {
   public apiEndpoint: string = "";
-  public uiSettings: SigninUiSetting = {} as SigninUiSetting;
+  public uiSettings: SigninUiSetting | null = null;
 
   constructor(
     private store: Store<NgrxStateAtom>

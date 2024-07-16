@@ -12,6 +12,16 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "moment",
+              "lodash",
+              "lodash/fp",
+              "file-saver",
+              "sniffr",
+              "fp-ts/lib/Option",
+              "fp-ts/lib/pipeable",
+              "hogan.js"
+            ],
             "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
@@ -23,7 +33,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
-              "src/favicon.ico"              
+              "src/favicon.ico"
             ],
             "styles": [
               "src/styles.scss"
@@ -49,7 +59,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "3mb"
+                  "maximumWarning": "4mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -121,6 +131,15 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
@@ -138,6 +157,9 @@
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

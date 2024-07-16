@@ -173,14 +173,15 @@ export class DestinationEffects {
       });
     })));
 
-  // testDestination$ = createEffect(() =>
-  //   this.actions$.pipe(
-  //   ofType(DestinationActionTypes.SEND_TEST),
-  //   mergeMap(({ payload: { destination } }: TestDestination) =>
-  //     this.requests.testDestination(destination).pipe(
-  //       map(() => new TestDestinationSuccess(destination)),
-  //       catchError(() =>
-  //         observableOf(new TestDestinationFailure(destination)))))));
+  testDestination$ = createEffect((): any =>
+    this.actions$.pipe(
+    ofType(DestinationActionTypes.SEND_TEST),
+    mergeMap(({ payload: { destination } }: TestDestination) =>
+      this.requests.testDestination(destination).pipe(
+        map(() => new TestDestinationSuccess(destination)),
+        catchError(() =>
+          observableOf(new TestDestinationFailure(destination)))))));
+
 
   testDestinationSuccess$ = createEffect(() =>
     this.actions$.pipe(

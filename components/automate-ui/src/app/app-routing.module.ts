@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, mapToCanActivate } from '@angular/router';
 
-// // Views
+// Views
 import {
   ApiTokenDetailsComponent
 } from './modules/token/token-details/api-token-details.component';
@@ -26,7 +26,7 @@ import { NotificationDetailsComponent } from './pages/notification-details/notif
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
-// // Components
+// Components
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
@@ -54,7 +54,7 @@ import { UIComponent } from './ui.component';
 import { UserDetailsComponent } from './modules/user/user-details/user-details.component';
 import { UserDetailsNonAdminResolve } from './modules/user/user-details/user-details.resolver';
 
-// // Services
+// Services
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { NodeDetailsResolverService } from './services/node-details/node-details-resolver.service';
 import {
@@ -64,7 +64,7 @@ import {
   NodeNoRunIdResolverService
 } from './services/node-details/node-norunid-resolver.service';
 
-// // Other
+// Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 
