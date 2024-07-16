@@ -358,4 +358,8 @@ export class SearchBarComponent implements OnChanges {
   hasStaticSuggestions(): boolean {
     return this.selectedCategoryType.providedValues !== undefined;
   }
+
+  trackCatergory(category) {
+    return category.text
+  }
 }

@@ -261,6 +261,16 @@ input {
   }
 }
 
+div.chef-dropdown.mat-mdc-select-panel {
+  min-width: max-content;
+  position: absolute;
+  top: -2.5rem;
+  padding: 0;
+  border-radius: 5px !important;
+  right: 0.8rem;
+  font-size: 14px;
+}
+
 .three-dot-column {
   position: relative;
   text-align: right;
@@ -275,6 +285,9 @@ input {
   &:focus:not(.mat-mdc-option-disabled) {
     background: $chef-primary-bright !important;
     color: $chef-white;
+    .mdc-list-item__primary-text {
+      color: $chef-white !important;
+    }
   }
 
   &:hover:not(.mat-mdc-option-disabled):not(.mat-mdc-option-active) {
@@ -392,6 +405,7 @@ input {
 // mat-select dropdown menu
 
 [panelClass="chef-dropdown"] {
+  display: flex !important;
   height: 45px;
   background-color: $chef-white;
   padding: 1em;

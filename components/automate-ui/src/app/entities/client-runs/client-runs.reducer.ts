@@ -36,7 +36,7 @@ export const ClientRunsEntityInitialState: ClientRunsEntityState = {
     sortDirection: 'ASC',
     sortField: 'name'
   },
-  errorResp: {} as HttpErrorResponse,
+  errorResp: null,
   columns: {
     check_in: true,
     uptime: true,
