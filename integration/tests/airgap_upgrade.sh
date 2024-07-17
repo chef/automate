@@ -56,3 +56,7 @@ do_deploy() {
 do_upgrade() {
     run_upgrade update.aib
 }
+
+do_apply_license(){
+    chef-automate license apply "$A2_LICENSE"
+}

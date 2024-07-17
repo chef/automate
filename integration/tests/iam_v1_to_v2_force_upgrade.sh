@@ -37,9 +37,7 @@ do_deploy() {
     # we make sure to use the CLI for the old version of Automate we want to deploy
     local cli_bin="/bin/chef-automate-${OLD_VERSION}"
 
-    download_cli "${OLD_VERSION}" "${cli_bin}"
-
-    do_apply_license
+    download_cli "${OLD_VERSION}" "${cli_bin}"    
 
     #shellcheck disable=SC2154
     "${cli_bin}" deploy "$test_config_path" \
@@ -50,9 +48,15 @@ do_deploy() {
         --accept-terms-and-mlsa \
         --skip-preflight \
         --debug
+
+     do_apply_license
 }
 
 do_prepare_upgrade() {
   # use latest current here
   prepare_upgrade_milestone "current" "20220329091442"
+}
+
+do_apply_license(){
+    chef-automate license apply "$A2_LICENSE"
 }
