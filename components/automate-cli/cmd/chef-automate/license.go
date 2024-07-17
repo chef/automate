@@ -198,7 +198,7 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 		)
 
 		// Add notice if license is expired
-		if time.Now().Unix() > response.ExpirationDate.GetSeconds() {
+		if !response.GracePeriod && time.Now().Unix() > response.ExpirationDate.GetSeconds() {
 			return status.New(
 				status.LicenseError,
 				"This license has expired. Please contact sales@chef.io to renew your Chef Automate license.",

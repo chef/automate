@@ -80,10 +80,9 @@ func init() {
 }
 
 var initConfigCmd = &cobra.Command{
-	Use:               "init-config",
-	Short:             "Initialize default config",
-	Long:              "Initialize default configuration and save it to a file.",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
+	Use:   "init-config",
+	Short: "Initialize default config",
+	Long:  "Initialize default configuration and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithStandalone,
