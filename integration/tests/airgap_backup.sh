@@ -35,5 +35,7 @@ do_restore() {
 }
 
 do_apply_license(){
+    echo "Printing license"
+    echo $A2_LICENSE
     chef-automate license apply "$A2_LICENSE"
 }
