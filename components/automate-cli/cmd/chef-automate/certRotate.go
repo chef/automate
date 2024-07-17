@@ -1499,7 +1499,7 @@ func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary 
 	nodeOpUtils := &NodeUtilsImpl{
 		writer: c.writer,
 	}
-	err = nodeOpUtils.restartPgNodes(*pgLeaderIpAndHealth, pgIps, infra, statusSummary)
+	err = nodeOpUtils.restartPgNodes(*pgLeaderIpAndHealth, infra.Outputs.PostgresqlPrivateIps.Value, infra, statusSummary)
 	if err != nil {
 		return err
 	}
