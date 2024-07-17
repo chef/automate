@@ -157,26 +157,26 @@ func Test_licenseInterceptor_isValidLicense(t *testing.T) {
 			},
 			want: false,
 		}, {
-			name:          "Checking grace period for commercial license for 7 days",
+			name:          "Checking grace period for commercial license for 60 days",
 			licenseClient: &license_middleware.MockLicense{WantError: false},
 			licenseStatus: &LicenseStatus{
 				LicenseDetails: &license_middleware.LicenseDetails{
 					LicenseType: "commercial",
 					ExpiryDate:  time.Now().AddDate(0, 0, -1),
 				},
-				DetailsValidity:       time.Now().Add(time.Hour * time.Duration(7)),
+				DetailsValidity:       time.Now().Add(time.Hour * time.Duration(60)),
 				LicenseDetailsRefresh: true,
 			},
 			want: true,
 		}, {
-			name:          "Checking grace period for commercial license for 7 days is expired",
+			name:          "Checking grace period for commercial license for 60 days is expired",
 			licenseClient: &license_middleware.MockLicense{WantError: false},
 			licenseStatus: &LicenseStatus{
 				LicenseDetails: &license_middleware.LicenseDetails{
 					LicenseType: "commercial",
-					ExpiryDate:  time.Now().AddDate(0, 0, -15),
+					ExpiryDate:  time.Now().AddDate(0, 0, -65),
 				},
-				DetailsValidity:       time.Now().Add(time.Hour * time.Duration(7)),
+				DetailsValidity:       time.Now().Add(time.Hour * time.Duration(60)),
 				LicenseDetailsRefresh: true,
 			},
 			want: false,
