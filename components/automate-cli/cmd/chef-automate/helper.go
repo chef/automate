@@ -154,6 +154,7 @@ func getexpiredLicense() (*LicenseResult, error) {
 		if strings.Contains(stderr.String(), "This license has expired") {
 			return readFileAndMarshal(tmpFile.Name())
 		} else {
+			log.Printf("Command error output: %s", stderr.String())
 			return nil, err
 		}
 
@@ -175,8 +176,13 @@ func getLicenseResult() (*LicenseResult, error) {
 	cmd1.Stderr = &stderr
 
 	if err := cmd1.Run(); err != nil {
-		log.Printf("Command error output: %s", stderr.String())
-		return nil, err
+		if strings.Contains(stderr.String(), "This license has expired") {
+			return readFileAndMarshal(tmpFile.Name())
+		} else {
+			log.Printf("Command error output: %s", stderr.String())
+			return nil, err
+		}
+
 	}
 
 	return readFileAndMarshal(tmpFile.Name())
