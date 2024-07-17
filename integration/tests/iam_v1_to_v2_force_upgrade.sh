@@ -39,6 +39,8 @@ do_deploy() {
 
     download_cli "${OLD_VERSION}" "${cli_bin}"
 
+    do_apply_license
+
     #shellcheck disable=SC2154
     "${cli_bin}" deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
