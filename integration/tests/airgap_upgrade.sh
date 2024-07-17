@@ -45,12 +45,12 @@ do_build() {
 }
 
 do_deploy() {
-    do_apply_license
-    
     chef-automate deploy config.toml \
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
+
+    do_apply_license
 }
 
 do_upgrade() {
