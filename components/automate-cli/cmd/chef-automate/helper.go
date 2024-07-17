@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -105,7 +104,6 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-
 		err = checkLicenseExpiry(licenseResult)
 		if err != nil {
 			return err
@@ -175,8 +173,13 @@ func getLicenseResult() (*LicenseResult, error) {
 	cmd1.Stderr = &stderr
 
 	if err := cmd1.Run(); err != nil {
-		log.Printf("Command error output: %s", stderr.String())
-		return nil, err
+
+		if strings.Contains(stderr.String(), "This license has expired") {
+			return readFileAndMarshal(tmpFile.Name())
+		} else {
+			return nil, err
+		}
+
 	}
 
 	return readFileAndMarshal(tmpFile.Name())
@@ -209,7 +212,6 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 			"Please apply a license.Please contact sales@chef.io to have your Chef Automate license.",
 		)
 	}
-
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
 	gracePeriodDuration := 60
 	aboutToExpire := 60
@@ -218,12 +220,10 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
 	licenseDate := licenseValidDate.Format("02-01-2006")
 	graceDate := gracePeriodDate.Format("02-01-2006")
-
 	if daysUntilExpiration > aboutToExpire {
 		// If the license is not about to expire within 60 days, do nothing.
 		return nil
 	}
-
 	// If the license type is commercial, adding grace period of 60 days
 	if licenseResult.Result.LicenseType == commercial {
 		if !licenseResult.Result.GracePeriod {
@@ -235,7 +235,6 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 			}
 		} else {
 			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com", licenseDate))
-
 		}
 	} else { // for trail and internal licenses
 		if daysUntilExpiration > 0 {
