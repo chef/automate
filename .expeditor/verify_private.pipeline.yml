@@ -555,6 +555,7 @@ steps:
 
   - label: "iam v1 to v2 force-upgrade"
     command:
+      - echo "\$A2_LICENSE" > dev/license.jwt
       - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
     timeout_in_minutes: 25
     expeditor:
