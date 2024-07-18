@@ -85,11 +85,10 @@ var migrateCmd = &cobra.Command{
 
 func newClearDataCmd() *cobra.Command {
 	var clearDataCmd = &cobra.Command{
-		Use:               "clear-data",
-		Short:             "Chef Automate post-major-upgrade clear-data",
-		Long:              "Chef Automate post-major-upgrade to clear old pg data",
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runCleanup,
+		Use:   "clear-data",
+		Short: "Chef Automate post-major-upgrade clear-data",
+		Long:  "Chef Automate post-major-upgrade to clear old pg data",
+		RunE:  runCleanup,
 		Annotations: map[string]string{
 			docs.Compatibility: docs.CompatiblewithStandalone,
 		},
@@ -102,11 +101,10 @@ func newClearDataCmd() *cobra.Command {
 
 func newMigrateDataCmd() *cobra.Command {
 	var migrateDataCmd = &cobra.Command{
-		Use:               "migrate",
-		Short:             "Chef Automate post-major-upgrade migrate",
-		Long:              "Chef Automate migrate. migrate can be used to migrate pg or migrate es",
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runMigrateDataCmd,
+		Use:   "migrate",
+		Short: "Chef Automate post-major-upgrade migrate",
+		Long:  "Chef Automate migrate. migrate can be used to migrate pg or migrate es",
+		RunE:  runMigrateDataCmd,
 		Annotations: map[string]string{
 			docs.Compatibility: docs.CompatiblewithStandalone,
 		},

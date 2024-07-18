@@ -76,10 +76,6 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
 
             #shellcheck disable=SC2154
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
-           
-            echo "checking license status before migration"
-            chef-automate license status
-           
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade"

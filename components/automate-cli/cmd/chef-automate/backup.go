@@ -177,12 +177,11 @@ type createBackupResult struct {
 }
 
 var listBackupCmd = &cobra.Command{
-	Use:               "list",
-	Short:             "list all Chef Automate backups",
-	Long:              "List all Chef Automate backups",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runListBackupCmd,
-	Args:              cobra.MaximumNArgs(1),
+	Use:   "list",
+	Short: "list all Chef Automate backups",
+	Long:  "List all Chef Automate backups",
+	RunE:  runListBackupCmd,
+	Args:  cobra.MaximumNArgs(1),
 }
 
 var showBackupCmd = &cobra.Command{
