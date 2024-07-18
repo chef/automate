@@ -88,7 +88,6 @@ func Execute() {
 }
 
 func commandPrePersistent(cmd *cobra.Command) error {
-
 	if globalOpts.debug {
 		logrus.SetLevel(logrus.DebugLevel)
 		logrus.Debugf("chef-automate %s (%s)", version.Version, version.GitSHA)

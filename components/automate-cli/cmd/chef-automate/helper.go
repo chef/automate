@@ -92,6 +92,8 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 }
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
+	fmt.Printf("err cmd.CommandPath() *******: %v\n", cmd.CommandPath())
+	fmt.Printf("err args *******: %v\n", args)
 	if isA2HARBFileExist() {
 		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
 			return err
@@ -116,6 +118,9 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 }
 
 func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
+	fmt.Printf("warn cmd.CommandPath() *******: %v\n", cmd.CommandPath())
+	fmt.Printf("warn args *******: %v\n", args)
+
 	if isA2HARBFileExist() {
 		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
 			return err
