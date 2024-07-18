@@ -72,6 +72,7 @@ EOF
         --admin-password chefautomate \
         --skip-preflight \
         --debug
+
 }
 
 do_upgrade() {

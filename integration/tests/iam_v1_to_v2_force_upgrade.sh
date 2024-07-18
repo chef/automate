@@ -49,17 +49,12 @@ do_deploy() {
         --skip-preflight \
         --debug
 
+  do_apply_license
 }
 
 do_prepare_upgrade() {
-  do_apply_license
 
   # use latest current here
   prepare_upgrade_milestone "current" "20220329091442"
 }
 
-do_apply_license(){
-    echo "Printing license"
-    echo $A2_LICENSE
-    chef-automate license apply "$A2_LICENSE"
-}

@@ -33,6 +33,8 @@ do_deploy() {
         --accept-terms-and-mlsa \
         --skip-preflight \
         --debug
+
+    do_apply_license
 }
 
 do_prepare_upgrade() {
@@ -81,4 +83,10 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
         fi
     fi
+}
+
+do_apply_license(){
+    echo "Printing license"
+    echo $A2_LICENSE
+    chef-automate license apply "$A2_LICENSE"
 }
