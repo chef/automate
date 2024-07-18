@@ -4,7 +4,8 @@
     <ng-container *ngIf="!fetchStatusInternalError">
       <ng-container *ngIf="!trialLicenseApplied">
         <h2 id="license-lockout-label" class="title">Welcome to Chef Automate!</h2>
-        <div class="subtitle">Register to get started with a 60-day trial or <a href="https://www.chef.io/contact-us/" target="_blank" rel="noopener">contact Chef</a>.</div>
+        <div class="subtitle">In order to use Chef Automate, you will require a license</div>
+        <div class="subtitle">Please select an option to proceed.</div>
         <div class="error-container">
           <chef-alert type="error" *ngIf="fetchStatusInternalError">
             <span>
@@ -29,50 +30,27 @@
             </span>
           </chef-alert>
         </div>
+        <div class="border-box">
+          <a tertiary (click)="backToLicenseApply(); false">I have a license</a>
+          <p>Enter the License key and proceed.</p>
+          <a tertiary (click)="backToLicenseApply(); false">
+            <chef-icon class="icon-right">chevron_right</chef-icon>
+          </a>
+        </div>
+        <br>
+        <div class="border-box">
+          <a href="https://www.chef.io/license-generation-free-trial" target="_blank" rel="noopener">I don't have a license</a>
+          <p>Generate a license key.</p>
+          <a href="https://www.chef.io/license-generation-free-trial" target="_blank" rel="noopener">
+            <chef-icon class="icon-right">chevron_right</chef-icon>
+          </a>
 
-        <form class="trial" [formGroup]="trialForm" (ngSubmit)="onTrialLicenseFormSubmit()" novalidate>
-          <div class="name-container">
-            <chef-form-field>
-              <label for="firstName">First Name <span aria-hidden="true">*</span></label>
-              <div class="suggester-input-wrapper">
-                <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus>
-              </div>
-              <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required.</chef-error>
-            </chef-form-field>
-            <chef-form-field>
-              <label for="lastName">Last Name <span aria-hidden="true">*</span></label>
-              <div class="suggester-input-wrapper">
-                <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text">
-              </div>
-                <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required.</chef-error>
-            </chef-form-field>
-          </div>
-          <div class="email-container">
-            <chef-form-field>
-              <label for="email">Email <span aria-hidden="true">*</span></label>
-              <div class="suggester-input-wrapper">
-                <input chefInput name="email" id="email" formControlName="email" type="text">
-              </div>
-              <chef-error *ngIf="trialForm.get('email').hasError('email') && trialForm.get('email').dirty">Valid email required.</chef-error>
-            </chef-form-field>
-          </div>
-          <chef-checkbox (change)="updateGDPR($event.detail)" [checked]="gdprAgree">I would like to receive email communications from Chef</chef-checkbox>
-          <chef-checkbox (change)="updateMLSA($event.detail)" [checked]="mlsaAgree">
-            * I agree to the
-            <a href="https://www.chef.io/terms-of-service" target="_blank">Terms of Service</a>
-            and the
-            <a href="https://www.chef.io/online-master-agreement" target="_blank">Master License and Services Agreement</a>
-          </chef-checkbox>
-          <div class="button">
-            <chef-button primary type="submit" [disabled]="!(trialForm.valid && mlsaAgree) || requestingLicense">Register</chef-button>
-          </div>
-        </form>
+        </div>
         <div class="spinner-container">
           <chef-loading-spinner *ngIf="requestingLicense" size="30"></chef-loading-spinner>
         </div>
         <div class="footer">
-          <chef-button tertiary (click)="backToLicenseApply(); false">Already have a license?</chef-button>
-          <chef-button tertiary (click)="logout()">Sign Out</chef-button>
+          <chef-button tertiary (click)="logout()">Sign out and do it later.</chef-button>
         </div>
       </ng-container>
 
