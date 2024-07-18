@@ -40,14 +40,6 @@ type ParsedLicense struct {
 	Entitlements      []*Entitlement         `json:"entitlements,omitempty"`
 }
 
-type ParsedEntitlement struct {
-	Name    string                 `json:"name,omitempty"`    // ReticulateSplines
-	Measure string                 `json:"measure,omitempty"` // nodes
-	Limit   int64                  `json:"limit,omitempty"`   // 10
-	Start   *timestamppb.Timestamp `json:"start,omitempty"`   // date the entitlement becomes active
-	End     *timestamppb.Timestamp `json:"end,omitempty"`     // last date the entitlement is active
-}
-
 type licenseWithClaims struct {
 	ParsedLicense
 	jwt.StandardClaims
