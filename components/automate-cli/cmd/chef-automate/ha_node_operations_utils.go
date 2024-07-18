@@ -522,10 +522,11 @@ func restartFollowerNodeAndWaitForhealthy(leaderNode NodeIpHealth, pgIps []strin
 		}
 
 		for _, v := range followers {
-			if v == true {
+			if v {
 				healthy = true
 			} else {
 				healthy = false
+				break
 			}
 		}
 		if healthy {
