@@ -215,21 +215,20 @@ var restoreBackupCmd = &cobra.Command{
 }
 
 var fixBackupRepoPermissionsCmd = &cobra.Command{
-	Use:               "fix-repo-permissions PATH",
-	Short:             "Ensure the hab user has the required permissions on the given path",
-	Long:              "Ensure the hab user has the required permissions on the given path",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runFixBackupRepoPermissionsCmd,
-	Args:              cobra.ExactArgs(1),
+	Use:   "fix-repo-permissions PATH",
+	Short: "Ensure the hab user has the required permissions on the given path",
+	Long:  "Ensure the hab user has the required permissions on the given path",
+	RunE:  runFixBackupRepoPermissionsCmd,
+	Args:  cobra.ExactArgs(1),
 }
 
 var statusBackupCmd = &cobra.Command{
-	Use:               "status",
-	Short:             "show the Chef Automate backup runner status",
-	Long:              "Show the Chef Automate backup runner status",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runBackupStatusCmd,
-	Args:              cobra.ExactArgs(0),
+	Use:   "status",
+	Short: "show the Chef Automate backup runner status",
+	Long:  "Show the Chef Automate backup runner status",
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runBackupStatusCmd,
+	Args: cobra.ExactArgs(0),
 }
 
 var streamStatusBackupCmd = &cobra.Command{

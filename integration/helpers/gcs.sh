@@ -75,6 +75,7 @@ do_prepare_restore_gcs_default() {
 }
 
 do_restore_gcs_default() {
+  do_apply_license
   #shellcheck disable=SC2154
   chef-automate backup restore \
       --debug \
