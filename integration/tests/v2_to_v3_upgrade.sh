@@ -35,6 +35,8 @@ do_deploy() {
         --debug
 
     do_apply_license
+    echo "applying license after deployment"
+    # chef-automate license status
 }
 
 do_prepare_upgrade() {
@@ -74,6 +76,10 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
 
             #shellcheck disable=SC2154
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+           
+            echo "checking license status before migration"
+            chef-automate license status
+           
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade"
@@ -83,10 +89,4 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
         fi
     fi
-}
-
-do_apply_license(){
-    echo "Printing license"
-    echo $A2_LICENSE
-    chef-automate license apply "$A2_LICENSE"
 }
