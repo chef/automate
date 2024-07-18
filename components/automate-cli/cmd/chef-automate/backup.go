@@ -206,12 +206,12 @@ var deleteBackupCmd = &cobra.Command{
 }
 
 var restoreBackupCmd = &cobra.Command{
-	Use:               "restore [ID_OR_PATH]",
-	Short:             "restore a Chef Automate backup",
-	Long:              "Restore a Chef Automate backup. If no ID or path is given the latest found backup will be restored.",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runRestoreBackupCmd,
-	Args:              cobra.MaximumNArgs(1),
+	Use:   "restore [ID_OR_PATH]",
+	Short: "restore a Chef Automate backup",
+	Long:  "Restore a Chef Automate backup. If no ID or path is given the latest found backup will be restored.",
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runRestoreBackupCmd,
+	Args: cobra.MaximumNArgs(1),
 }
 
 var fixBackupRepoPermissionsCmd = &cobra.Command{

@@ -76,7 +76,6 @@ do_prepare_restore_s3_default() {
 }
 
 do_restore_s3_default() {
-  do_apply_license
   #shellcheck disable=SC2154
   chef-automate backup restore \
       --debug \
