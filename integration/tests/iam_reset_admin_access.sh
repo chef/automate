@@ -39,6 +39,7 @@ export AUTOMATE_API_DEFAULT_PASSWORD="reset-admin-password"
 
 do_test_deploy() {
     hab svc stop chef/automate-gateway
+    sleep 5
     hab svc start chef/automate-gateway
     sleep 30
     log_info "Deleting local admin user"
