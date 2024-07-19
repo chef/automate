@@ -43,6 +43,7 @@ type SSHUtil interface {
 	connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error)
 	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
 	copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error)
+	connectAndExecuteCommandOnRemoteSuppressLog(remoteCommands string, spinner bool, suppressLog bool) (string, error)
 }
 
 type SSHUtilImpl struct {
@@ -457,4 +458,70 @@ func stopSpinnerIfRequired(spinner bool) {
 	if spinner {
 		writer.StopSpinner()
 	}
+}
+
+func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSuppressLog(remoteCommands string, spinner bool, suppressLog bool) (string, error) {
+	if !suppressLog {
+		logrus.Debug("Executing command ......")
+		logrus.Debug(remoteCommands)
+	}
+	// Add sudo password if required
+	remoteCommands = AddSudoPassword(remoteCommands)
+	conn, err := s.getConnection()
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	// Open session
+	session, err := conn.NewSession()
+	if err != nil {
+		if !suppressLog {
+			writer.Errorf("session failed:%v\n", err)
+		}
+		return "", err
+	}
+
+	defer session.Close()
+	startSpinnerIfRequired(spinner)
+	var output string
+	errCh := make(chan error)
+	go func() {
+		// Redirecting command output to /dev/null to suppress it
+		// remoteCommandsWithRedirection := fmt.Sprintf("%s > /dev/null 2>&1", remoteCommands)
+		outputByte, err := session.CombinedOutput(remoteCommands)
+		output = string(outputByte)
+		if isSudoPasswordEnabled() {
+			if strings.Contains(output, "Sorry, try again.") || strings.Contains(output, "sudo: a password is required") {
+				errCh <- errors.New("sudo password is incorrect")
+				return
+			}
+			// if sudo password is correct then replace password prompt with empty string from output
+			pattern := regexp.MustCompile(`^\[sudo\] password for .+: `)
+			output = pattern.ReplaceAllString(output, "")
+		}
+		if err != nil {
+			if strings.Contains(output, "sudo: no tty present and no askpass program specified") {
+				errCh <- errors.New("The sudo password is missing. Make sure to provide sudo_password as environment variable and pass -E option while running command.")
+				return
+			}
+			errCh <- err
+			return
+		}
+		errCh <- nil
+	}()
+	select {
+	case <-time.After(time.Duration(s.SshConfig.timeout) * time.Second):
+		return "", errors.New("command timed out")
+	case err := <-errCh:
+		if err != nil {
+			stopSpinnerIfRequired(spinner)
+			return output, err
+		}
+	}
+	stopSpinnerIfRequired(spinner)
+	if !suppressLog {
+		logrus.Debug("Execution of command done......")
+	}
+
+	return output, nil
 }

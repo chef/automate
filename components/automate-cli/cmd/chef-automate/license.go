@@ -142,6 +142,7 @@ Deployment ID:   %s
 Deployment Type: %s
 Deployment Date: %s
 License Type:    %s
+Grace Period:    %t
 `
 
 var startTimeFormat = "start time of the report in yyyy-mm-dd format"
@@ -193,14 +194,20 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 			time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339), response.DeploymentId, response.DeploymentType,
 			time.Unix(response.DeploymentAt.GetSeconds(), 0).UTC().Format(time.RFC3339),
 			response.LicenseType,
+			response.GracePeriod,
 		)
 
 		// Add notice if license is expired
-		if time.Now().Unix() > response.ExpirationDate.GetSeconds() {
+		if !response.GracePeriod && time.Now().Unix() > response.ExpirationDate.GetSeconds() {
 			return status.New(
 				status.LicenseError,
 				"This license has expired. Please contact sales@chef.io to renew your Chef Automate license.",
 			)
+		}
+
+		// Add notice if grace period is active
+		if response.GracePeriod {
+			writer.Warn("This license is in the grace period. Please contact sales@chef.io to renew your Chef Automate license.")
 		}
 
 		return nil

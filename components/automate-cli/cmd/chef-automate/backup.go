@@ -163,11 +163,12 @@ var backupCmd = &cobra.Command{
 }
 
 var createBackupCmd = &cobra.Command{
-	Use:   "create",
-	Short: "create a backup of Chef Automate",
-	Long:  "Create a backup of Chef Automate",
-	RunE:  runCreateBackupCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:               "create",
+	Short:             "create a backup of Chef Automate",
+	Long:              "Create a backup of Chef Automate",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runCreateBackupCmd,
+	Args:              cobra.MaximumNArgs(0),
 }
 
 type createBackupResult struct {
@@ -184,11 +185,12 @@ var listBackupCmd = &cobra.Command{
 }
 
 var showBackupCmd = &cobra.Command{
-	Use:   "show ID",
-	Short: "show the Chef Automate backup details",
-	Long:  "Show the details of a Chef Automate backup",
-	RunE:  runShowBackupCmd,
-	Args:  cobra.ExactArgs(1),
+	Use:               "show ID",
+	Short:             "show the Chef Automate backup details",
+	Long:              "Show the details of a Chef Automate backup",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runShowBackupCmd,
+	Args:              cobra.ExactArgs(1),
 }
 
 var backupDeleteCmdFlags = struct {
@@ -196,18 +198,20 @@ var backupDeleteCmdFlags = struct {
 }{}
 
 var deleteBackupCmd = &cobra.Command{
-	Use:   "delete ID [ID2 IDN...]",
-	Short: "delete backups of Chef Automate",
-	Long:  "Delete one or many backups of Chef Automate that match the space separated strings of backup IDs",
-	RunE:  runDeleteBackupCmd,
+	Use:               "delete ID [ID2 IDN...]",
+	Short:             "delete backups of Chef Automate",
+	Long:              "Delete one or many backups of Chef Automate that match the space separated strings of backup IDs",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runDeleteBackupCmd,
 }
 
 var restoreBackupCmd = &cobra.Command{
 	Use:   "restore [ID_OR_PATH]",
 	Short: "restore a Chef Automate backup",
 	Long:  "Restore a Chef Automate backup. If no ID or path is given the latest found backup will be restored.",
-	RunE:  runRestoreBackupCmd,
-	Args:  cobra.MaximumNArgs(1),
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runRestoreBackupCmd,
+	Args: cobra.MaximumNArgs(1),
 }
 
 var fixBackupRepoPermissionsCmd = &cobra.Command{
@@ -222,27 +226,30 @@ var statusBackupCmd = &cobra.Command{
 	Use:   "status",
 	Short: "show the Chef Automate backup runner status",
 	Long:  "Show the Chef Automate backup runner status",
-	RunE:  runBackupStatusCmd,
-	Args:  cobra.ExactArgs(0),
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runBackupStatusCmd,
+	Args: cobra.ExactArgs(0),
 }
 
 var streamStatusBackupCmd = &cobra.Command{
-	Use:   "stream-status",
-	Short: "Stream the Chef Automate backup runner status",
-	Long:  "Stream the Chef Automate backup runner status",
-	RunE:  runStreamBackupStatus,
-	Args:  cobra.ExactArgs(1),
+	Use:               "stream-status",
+	Short:             "Stream the Chef Automate backup runner status",
+	Long:              "Stream the Chef Automate backup runner status",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runStreamBackupStatus,
+	Args:              cobra.ExactArgs(1),
 	Annotations: map[string]string{
 		docs.Tag: docs.Automate,
 	},
 }
 
 var cancelBackupCmd = &cobra.Command{
-	Use:   "cancel",
-	Short: "cancel the running backup operation",
-	Long:  "Cancel the currently running backup create, delete, or restore operation",
-	RunE:  runCancelBackupCmd,
-	Args:  cobra.ExactArgs(0),
+	Use:               "cancel",
+	Short:             "cancel the running backup operation",
+	Long:              "Cancel the currently running backup create, delete, or restore operation",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runCancelBackupCmd,
+	Args:              cobra.ExactArgs(0),
 }
 
 var integrityBackupCmd = &cobra.Command{
@@ -251,18 +258,20 @@ var integrityBackupCmd = &cobra.Command{
 }
 
 var integrityBackupShowCmd = &cobra.Command{
-	Use:   "show",
-	Short: "show the shared object integrity metadata",
-	Long:  "Show the shared object integrity metadata",
-	RunE:  runBackupIntegrityShowCmd,
-	Args:  cobra.ExactArgs(0),
+	Use:               "show",
+	Short:             "show the shared object integrity metadata",
+	Long:              "Show the shared object integrity metadata",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runBackupIntegrityShowCmd,
+	Args:              cobra.ExactArgs(0),
 }
 
 var integrityBackupValidateCmd = &cobra.Command{
-	Use:   "validate [ID IDN]",
-	Short: "validate the shared object integrity",
-	Long:  "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
-	RunE:  runValidateBackupIntegrity,
+	Use:               "validate [ID IDN]",
+	Short:             "validate the shared object integrity",
+	Long:              "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runValidateBackupIntegrity,
 }
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {

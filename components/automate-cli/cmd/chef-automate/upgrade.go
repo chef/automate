@@ -58,11 +58,12 @@ var upgradeRunCmdFlags = struct {
 }{}
 
 var upgradeRunCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run an upgrade of Chef Automate",
-	Long:  "Run an upgrade of Chef Automate",
-	RunE:  runUpgradeCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:               "run",
+	Short:             "Run an upgrade of Chef Automate",
+	Long:              "Run an upgrade of Chef Automate",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runUpgradeCmd,
+	Args:              cobra.MaximumNArgs(0),
 }
 
 var upgradeStatusCmdFlags = struct {
@@ -73,8 +74,9 @@ var upgradeStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get upgrade status of Chef Automate",
 	Long:  "Get upgrade status of Chef Automate",
-	RunE:  statusUpgradeCmd,
-	Args:  cobra.MaximumNArgs(0),
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: statusUpgradeCmd,
+	Args: cobra.MaximumNArgs(0),
 	Annotations: map[string]string{
 		docs.Tag: docs.FrontEnd,
 	},

@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"os"
 	"testing"
+	"time"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/majorupgrade_utils"
@@ -124,4 +126,171 @@ func TestRunDeleteNodeFailedForInvaliUUID(t *testing.T) {
 	err := i.RunDeleteNode(nodeId)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "argument in not a valid node UUID")
+}
+
+func Test_readFileAndMarshal(t *testing.T) {
+
+	tests := []struct {
+		name       string
+		fileData   string
+		want       *LicenseResult
+		wantErr    bool
+		fileCreate bool
+	}{
+		{
+			name: "Success File Parsing",
+			fileData: `
+			{
+				"command": "chef-automate license status --result-json output.jso",
+				"status": "OK",
+				"error_code": 0,
+				"error_description": "",
+				"error_cause": "",
+				"error_stack_trace": "",
+				"error_recovery": "",
+				"error_type": "",
+				"result":
+				{
+					"set": true,
+					"license_id": "test-license-Id",
+					"customer_name": "test-customer",
+					"expiration_date":
+					{
+						"seconds": 1738281599
+					},
+					"deployment_id": "test-deployment-id",
+					"deployment_type": "Standalone",
+					"license_type": "internal"
+				}	
+			}`,
+			want: &LicenseResult{
+				Result: LicenseStatus{
+					CustomerName: "test-customer",
+					LicenseType:  "internal",
+					ExpirationDate: ExpirationDate{
+						Seconds: int64(1738281599),
+					},
+					LicenseId: "test-license-Id",
+				},
+				ErrorType:        "",
+				ErrorDescription: "",
+			},
+			wantErr:    false,
+			fileCreate: true,
+		}, {
+			name:       "Success File Parsing",
+			fileData:   "",
+			want:       nil,
+			wantErr:    true,
+			fileCreate: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.fileCreate {
+				f, _ := os.Create("test.txt")
+				f.WriteString(tt.fileData)
+				defer f.Close()
+			}
+
+			got, err := readFileAndMarshal("test.txt")
+			if tt.wantErr {
+				assert.NotNil(t, err)
+			}
+
+			assert.Equal(t, tt.want, got)
+
+		})
+	}
+}
+
+func Test_checkLicenseExpiry(t *testing.T) {
+	tests := []struct {
+		name          string
+		licenseResult *LicenseResult
+		wantErr       error
+	}{
+		{
+			name: "Valid license",
+			licenseResult: &LicenseResult{
+				Result: LicenseStatus{
+					LicenseType: "internal",
+					LicenseId:   "test-id",
+					ExpirationDate: ExpirationDate{
+						Seconds: int64(time.Now().AddDate(0, 0, 1).Unix()),
+					},
+				},
+			},
+			wantErr: errors.New("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."),
+		},
+		{
+			name: "Invalid license",
+			licenseResult: &LicenseResult{
+				Result: LicenseStatus{
+					LicenseType: "internal",
+					LicenseId:   "test-id",
+					ExpirationDate: ExpirationDate{
+						Seconds: int64(time.Now().AddDate(0, 0, -1).Unix()),
+					},
+				},
+				ErrorType:        "license error",
+				ErrorDescription: "license is invalid",
+			},
+			wantErr: errors.New("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."),
+		},
+		{
+			name: "Grace Period for commercial license",
+			licenseResult: &LicenseResult{
+				Result: LicenseStatus{
+					LicenseType: "commercial",
+					LicenseId:   "test-id",
+					ExpirationDate: ExpirationDate{
+						Seconds: int64(time.Now().AddDate(0, 0, -2).Unix()),
+					},
+				},
+			},
+			wantErr: errors.New("Your Progress® Chef® Automate™ license expired on 15-09-2024 and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com."),
+		},
+		{
+			name: "No License is applied",
+			licenseResult: &LicenseResult{
+				Result:           LicenseStatus{},
+				ErrorType:        "",
+				ErrorDescription: "",
+			},
+			wantErr: errors.New("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."),
+		},
+		{
+			name: "Received Error from deployment service",
+			licenseResult: &LicenseResult{
+				Result:           LicenseStatus{},
+				ErrorType:        "DeploymentServiceError",
+				ErrorDescription: "Unable to connect to license service",
+			},
+			wantErr: errors.New("Unable to connect to license service"),
+		},
+		{
+			name: "License isn't expired",
+			licenseResult: &LicenseResult{
+				Result: LicenseStatus{
+					CustomerName: "customer 1",
+					LicenseType:  commercial,
+					LicenseId:    "id 1",
+					ExpirationDate: ExpirationDate{
+						Seconds: time.Now().AddDate(0, 0, 365).Unix(),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkLicenseExpiry(tt.licenseResult)
+			if tt.wantErr != nil {
+				assert.Equal(t, err.Error(), tt.wantErr.Error())
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
 }

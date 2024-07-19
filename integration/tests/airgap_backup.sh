@@ -23,6 +23,8 @@ do_deploy() {
 }
 
 do_restore() {
+    do_apply_license
+    
     #shellcheck disable=SC2154
     chef-automate backup restore \
         --airgap-bundle bundle.aib \
@@ -30,4 +32,8 @@ do_restore() {
         --override-origin "$HAB_ORIGIN" \
         --debug \
         "${test_backup_id}"
+}
+
+do_apply_license(){
+    chef-automate license apply "$A2_LICENSE"
 }

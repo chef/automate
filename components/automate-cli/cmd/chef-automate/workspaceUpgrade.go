@@ -36,8 +36,9 @@ var workspaceUpgrdeCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
-	RunE:   worspaceUpgradeCmdExecute,
-	Hidden: true,
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              worspaceUpgradeCmdExecute,
+	Hidden:            true,
 }
 
 func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {

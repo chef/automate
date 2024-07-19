@@ -51,10 +51,11 @@ func certCmd() *cobra.Command {
 	}
 
 	certShow := &cobra.Command{
-		Use:   "show",
-		Short: "Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.",
-		RunE:  runCertShowCmd,
-		Args:  cobra.MaximumNArgs(2),
+		Use:               "show",
+		Short:             "Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.",
+		PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE:              runCertShowCmd,
+		Args:              cobra.MaximumNArgs(2),
 		Annotations: map[string]string{
 			docs.Tag: docs.FrontEnd,
 		},

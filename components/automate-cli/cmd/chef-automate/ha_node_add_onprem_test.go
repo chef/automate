@@ -51,6 +51,10 @@ func (msu *MockSSHUtilsImpl) copyFileFromRemote(remoteFilePath string, outputFil
 	return msu.copyFileFromRemoteFunc(remoteFilePath, outputFileName)
 }
 
+func (msu *MockSSHUtilsImpl) connectAndExecuteCommandOnRemoteSuppressLog(remoteCommands string, spinner bool, suppressLog bool) (string, error) {
+	return msu.connectAndExecuteCommandOnRemoteFunc(remoteCommands, spinner)
+}
+
 func TestAddnodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{

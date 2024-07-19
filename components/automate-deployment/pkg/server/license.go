@@ -118,6 +118,7 @@ func (s *server) LicenseStatus(ctx context.Context, req *api.LicenseStatusReques
 		DeploymentType: response.DeploymentType,
 		LicenseType:    response.LicenseType,
 		DeploymentAt:   response.DeploymentAt,
+		GracePeriod:    response.GracePeriod,
 	}, nil
 }
 

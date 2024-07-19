@@ -66,31 +66,34 @@ type migrateCmdFlagSet struct {
 var migrateCmdFlags = migrateCmdFlagSet{}
 
 var migrateFrom1Cmd = &cobra.Command{
-	Use:     "migrate-from-v1 [/path/to/automate-deploy.toml]",
-	Short:   "Migrate from Chef Automate v1",
-	Long:    migrateFrom1Long,
-	Args:    cobra.MaximumNArgs(3),
-	RunE:    runMigrateFromV1Cmd,
-	Aliases: []string{"upgrade-from-v1"},
+	Use:               "migrate-from-v1 [/path/to/automate-deploy.toml]",
+	Short:             "Migrate from Chef Automate v1",
+	Long:              migrateFrom1Long,
+	Args:              cobra.MaximumNArgs(3),
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runMigrateFromV1Cmd,
+	Aliases:           []string{"upgrade-from-v1"},
 	Annotations: map[string]string{
 		docs.Compatibility: docs.CompatiblewithStandalone,
 	},
 }
 
 var migrateFrom1StatusCmd = &cobra.Command{
-	Use:   "migrate-from-v1-status",
-	Short: "Watch the status of the migration to Chef Automate 2",
-	RunE:  runMigrationFromV1StatusCmd,
+	Use:               "migrate-from-v1-status",
+	Short:             "Watch the status of the migration to Chef Automate 2",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runMigrationFromV1StatusCmd,
 	Annotations: map[string]string{
 		docs.Compatibility: docs.CompatiblewithStandalone,
 	},
 }
 
 var generateCfgCmd = &cobra.Command{
-	Use:   "gen-config",
-	Short: "Generate a config file",
-	Long:  "Generate a Chef Automate v2 configuration file from Chef Automate v1",
-	RunE:  runGenerateCfgCmd,
+	Use:               "gen-config",
+	Short:             "Generate a config file",
+	Long:              "Generate a Chef Automate v2 configuration file from Chef Automate v1",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runGenerateCfgCmd,
 	Annotations: map[string]string{
 		docs.Compatibility: docs.CompatiblewithStandalone,
 	},
