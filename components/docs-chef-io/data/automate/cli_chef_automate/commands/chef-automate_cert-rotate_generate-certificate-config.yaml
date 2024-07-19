@@ -10,6 +10,8 @@ options:
       default_value: "false"
       usage: help for generate-certificate-config
 inherited_options:
+    - name: cc
+      usage: Cluster certificate file
     - name: certificate-config
       usage: Cluster certificate file
     - name: debug
