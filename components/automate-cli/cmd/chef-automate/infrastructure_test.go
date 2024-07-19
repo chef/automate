@@ -258,7 +258,7 @@ func Test_checkLicenseExpiry(t *testing.T) {
 				ErrorType:        "",
 				ErrorDescription: "",
 			},
-			wantErr: errors.New("Please apply a license.Please contact sales@chef.io to have your Chef Automate license."),
+			wantErr: errors.New("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."),
 		},
 		{
 			name: "Received Error from deployment service",
