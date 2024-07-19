@@ -7,7 +7,7 @@ import (
 	elastic "github.com/olivere/elastic/v7"
 )
 
-//GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
+// GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
 func (es Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
 
 	var rangeQueryThreshold *elastic.RangeQuery
@@ -16,7 +16,7 @@ func (es Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelemetryRepo
 	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
 
 	// if daysSinceLastPost >= three months then take the unique nodes count from last three months
-	// and if daysSinceLastPost > 30 and < three months then take unique nodes count from lastTelemetryReportedDate to yesterday EOD
+	// and if daysSinceLastPost > 30 and < three months then take unique nodes count from lastTelemetryReportedDate to current time
 	// else take the unique nodes count from last 30 days
 	if daysSinceLastPost >= 90 {
 		startTimeStamp := startDayTimeStamp.AddDate(0, 0, -91)

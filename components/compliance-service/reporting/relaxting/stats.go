@@ -406,7 +406,7 @@ func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelem
 	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
 
 	// if daysSinceLastPost >= three months then take the unique nodes count from last three months
-	// and if daysSinceLastPost > 30 and < three months then take unique nodes count from lastTelemetryReportedDate to today EOD
+	// and if daysSinceLastPost > 30 and < three months then take unique nodes count from lastTelemetryReportedDate to current time
 	// else take the unique nodes count from last 30 days
 	if daysSinceLastPost >= 90 {
 		startTimeStamp := startDayTimeStamp.AddDate(0, 0, -91)
