@@ -7,10 +7,6 @@ test_deploy_inspec_profiles=(a2-deploy-integration)
 test_skip_diagnostics=true
 
 do_test_deploy() {
-    hab svc stop chef/automate-gateway
-    sleep 5
-    hab svc start chef/automate-gateway
-    sleep 30
     do_test_deploy_default
 
     # make sure we can set the log level while things are running
