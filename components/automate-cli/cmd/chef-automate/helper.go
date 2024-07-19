@@ -2,11 +2,15 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -97,22 +101,91 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		err := commandPrePersistent(cmd)
-		if err != nil {
-			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
-		}
-		licenseResult, err := getLicenseResult()
-		if err != nil {
-			return err
-		}
+		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+			err := commandPrePersistent(cmd)
+			if err != nil {
+				return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+			}
+			licenseResult, err := getLicenseResult()
+			if err != nil {
+				return err
+			}
 
-		err = checkLicenseExpiry(licenseResult)
-		if err != nil {
-			return err
+			err = checkLicenseExpiry(licenseResult)
+			if err != nil {
+				return err
+			}
 		}
 	}
-
 	return nil
+}
+
+func AllowLicenseEnforcement() (bool, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return false, err
+	}
+
+	response, err := connection.ManifestVersion(context.Background(), &api.ManifestVersionRequest{})
+	if err != nil {
+		return false, status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request for Chef Automate package manifest failed",
+		)
+	}
+	return compareVersions(response.BuildTimestamp, "4.12.69"), nil
+}
+
+// compare version check the v1 version is greater than or equal to v2 version
+// if v1 <= v2 => false
+// if v1 > v2 => true
+func compareVersions(v1, v2 string) bool {
+
+	v2Slice := strings.Split(v2, ".")
+
+	// write the logic
+	if strings.Contains(v1, ".") {
+		v1Slice := strings.Split(v1, ".")
+
+		//if len(v1Slice) != len(v2Slice) {
+		//	return false
+		//}
+
+		if toInt(v1Slice[0]) > toInt(v2Slice[0]) {
+			return true
+		} else if toInt(v1Slice[0]) < toInt(v2Slice[0]) {
+			return false
+		}
+
+		if toInt(v1Slice[1]) > toInt(v2Slice[1]) {
+			return true
+		} else if toInt(v1Slice[1]) < toInt(v2Slice[1]) {
+			return false
+		}
+
+		if toInt(v1Slice[2]) > toInt(v2Slice[2]) {
+			return true
+		}
+	}
+	// Check if v1 is timestamp and v2 is version
+	return false
+}
+
+func toInt(str string) int {
+	v1int, err := strconv.Atoi(str)
+	if err != nil {
+		fmt.Println("cannot parse v1Slice[0]")
+	}
+	return v1int
+}
+
+func timeStampToTime(ts string) (time.Time, error) {
+	i, err := strconv.ParseInt(ts, 10, 64)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.Unix(i, 0), nil
 }
 
 func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
@@ -121,20 +194,21 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		err := commandPrePersistent(cmd)
-		if err != nil {
-			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
-		}
+		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+			err := commandPrePersistent(cmd)
+			if err != nil {
+				return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+			}
 
-		licenseResult, err := getexpiredLicense()
-		if err != nil {
-			return err
-		}
+			licenseResult, err := getexpiredLicense()
+			if err != nil {
+				return err
+			}
 
-		warnIfLicenseNearExpiry(licenseResult)
-		return nil
+			warnIfLicenseNearExpiry(licenseResult)
+			return nil
+		}
 	}
-
 	return nil
 }
 
