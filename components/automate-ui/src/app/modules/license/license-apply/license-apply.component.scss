@@ -21,7 +21,7 @@
   }
 
   .subtitle {
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 10px;
   }
 
@@ -74,7 +74,7 @@
 
   textarea {
     font-size: 12px;
-    min-width: 500px;
+    min-width: 636px;
     max-width: 600px;
     min-height: 175px;
   }
@@ -114,6 +114,9 @@
   .note {
     font-style: italic;
     font-size: 12px;
+    position: relative;
+    top: 1.5rem;
+    right: -11rem;
   }
 
   app-telemetry-checkbox {
