@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -735,6 +736,9 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
+		restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+			return nil
+		},
 	}
 	flagsArr := []AddDeleteNodeHACmdFlags{
 		{
@@ -752,7 +756,13 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 	}
 
 	for _, flags := range flagsArr {
+		fmt.Println(flags)
 		w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+		getAutomateHAInfraDetailsFunc = func() (*AutomateHAInfraDetails, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+			return infra, nil
+		}
 		nodeDelete := NewDeleteNodeAWS(
 			w.CliWriter,
 			flags,
