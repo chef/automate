@@ -7,25 +7,25 @@ import (
 	elastic "github.com/olivere/elastic/v7"
 )
 
-//GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
+// GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
 func (es Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
 
 	var rangeQueryThreshold *elastic.RangeQuery
-	t := time.Now().AddDate(0, 0, -1)
-	yesterdayEODTimeStamp := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, t.Nanosecond(), t.Location())
+	t := time.Now()
+	startDayTimeStamp := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, t.Nanosecond(), t.Location())
 	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
 
 	// if daysSinceLastPost >= three months then take the unique nodes count from last three months
-	// and if daysSinceLastPost > 15 and < three months then take unique nodes count from lastTelemetryReportedDate to yesterday EOD
-	// else take the unique nodes count from last 15 days
+	// and if daysSinceLastPost > 30 and < three months then take unique nodes count from lastTelemetryReportedDate to current time
+	// else take the unique nodes count from last 30 days
 	if daysSinceLastPost >= 90 {
-		startTimeStamp := yesterdayEODTimeStamp.AddDate(0, 0, -91)
-		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(yesterdayEODTimeStamp)
-	} else if daysSinceLastPost > 15 {
-		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(lastTelemetryReportedDate).To(yesterdayEODTimeStamp)
+		startTimeStamp := startDayTimeStamp.AddDate(0, 0, -91)
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(time.Now())
+	} else if daysSinceLastPost > 30 {
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(lastTelemetryReportedDate).To(time.Now())
 	} else {
-		startTimeStamp := yesterdayEODTimeStamp.AddDate(0, 0, -16)
-		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(yesterdayEODTimeStamp)
+		startTimeStamp := startDayTimeStamp.AddDate(0, 0, -31)
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(time.Now())
 	}
 	boolQuery := elastic.NewBoolQuery().
 		Must(rangeQueryThreshold)
