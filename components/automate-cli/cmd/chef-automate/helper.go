@@ -78,12 +78,12 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		timeout:    10,
 	}
 	sshUtil := NewSSHUtil(sshConfig)
-	script := "sudo chef-automate license status --result-json /hab/tmp/license.json"
+	script := "sudo chef-automate license status --result-json /hab/license.json"
 	_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
 		return "", err
 	}
-	script = "sudo cat /hab/tmp/license.json"
+	script = "sudo cat /hab/license.json"
 	readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
 		return "", err
@@ -92,8 +92,6 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 }
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
-	fmt.Printf("err cmd.CommandPath() *******: %v\n", cmd.CommandPath())
-	fmt.Printf("err args *******: %v\n", args)
 	if isA2HARBFileExist() {
 		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
 			return err
@@ -118,9 +116,6 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 }
 
 func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
-	fmt.Printf("warn cmd.CommandPath() *******: %v\n", cmd.CommandPath())
-	fmt.Printf("warn args *******: %v\n", args)
-
 	if isA2HARBFileExist() {
 		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
 			return err
@@ -144,7 +139,7 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 
 func getexpiredLicense() (*LicenseResult, error) {
 	// Create a temporary file
-	tmpFile, err := os.CreateTemp("", "license-*.json")
+	tmpFile, err := os.CreateTemp("/habf", "license-*.json")
 	if err != nil {
 		return nil, err
 	}
