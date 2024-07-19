@@ -34,9 +34,13 @@ if [ "$S3_STATE" == "module.s3[0].aws_s3_bucket.createS3bucket" ]; then
 terraform state rm $S3_STATE
 fi`
 
-	AWS_AUTO_TFVARS    = "aws.auto.tfvars"
-	DESTROY_AWS_FOLDER = "destroy/aws/"
-	TF_ARCH_FILE       = ".tf_arch"
+	AWS_AUTO_TFVARS               = "aws.auto.tfvars"
+	DESTROY_AWS_FOLDER            = "destroy/aws/"
+	TF_ARCH_FILE                  = ".tf_arch"
+	SERVICE_HEALTH_OK             = "OK"
+	SERVICE_HEALTH_WARN           = "WARN"
+	SERVICE_HEALTH_CHECK_INTERVAL = 5
+	MAX_TIMEOUT_THRESHOLD         = 120
 )
 
 type HAModifyAndDeploy interface {
@@ -75,6 +79,7 @@ type NodeOpUtils interface {
 	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastion() error
 	syncConfigToAllNodes(unreachableNodes map[string][]string) error
+	restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error
 }
 
 type NodeUtilsImpl struct {
@@ -460,6 +465,82 @@ func (nu *NodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	}
 
 	return count, nil
+}
+
+func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+	newSSHConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	}
+	sshUtil := NewSSHUtil(newSSHConfig)
+	// restart followers
+	nu.writer.Println("trying to restaring follower node")
+	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
+	//restart leader
+	nu.writer.Println("trying to restaring leader node")
+	for _, pgIp := range pgIps {
+		nu.writer.Println("looking for leader node to restart")
+		if strings.EqualFold(pgIp, leaderNode.IP) {
+			nu.writer.Println("Restaring leader node")
+			sshUtil.getSSHConfig().hostIP = pgIp
+			res, err := sshUtil.connectAndExecuteCommandOnRemote(RESTART_BACKEND_COMMAND, true)
+			if err != nil {
+				writer.Errorf("error in executing restart backend supervisor command")
+				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
+			}
+			break
+		}
+	}
+	return nil
+}
+
+func restartFollowerNodeAndWaitForhealthy(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary, sshUtil SSHUtil, writer *cli.Writer) error {
+	for _, pgIp := range pgIps {
+		if !strings.EqualFold(pgIp, leaderNode.IP) {
+			sshUtil.getSSHConfig().hostIP = pgIp
+			res, err := sshUtil.connectAndExecuteCommandOnRemote(RESTART_BACKEND_COMMAND, true)
+			if err != nil {
+				writer.Errorf("error in executing restart backend supervisor command")
+				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
+			}
+		}
+	}
+	writer.Println("polling follower node health")
+	start := time.Now()
+	followers := make(map[string]bool)
+	for _, followerNodes := range pgIps {
+		followers[followerNodes] = false
+	}
+	for {
+		healthy := false
+		for k, v := range statusSummary.GetPGFollwerNodes() {
+			if strings.EqualFold(v, SERVICE_HEALTH_OK) {
+				writer.Println(fmt.Sprintf("follower node %s health %s", k, v))
+				followers[k] = true
+			}
+		}
+
+		for _, v := range followers {
+			if v {
+				healthy = true
+			} else {
+				healthy = false
+				break
+			}
+		}
+		if healthy {
+			writer.Println("all pg follower nodes are healthy")
+			break
+		}
+		time.Sleep(time.Second * SERVICE_HEALTH_CHECK_INTERVAL)
+		timeElaspsed := time.Since(start)
+		if timeElaspsed.Seconds() > MAX_TIMEOUT_THRESHOLD {
+			writer.Println("follower nodes are still un-helathy timeed out")
+			break
+		}
+	}
+	return nil
 }
 
 func getIPsFromOSClusterResponse(output string) string {

@@ -2465,7 +2465,7 @@ func TestPatchConfig(t *testing.T) {
 			testDir := t.TempDir()
 			fPath := filepath.Join(testDir, testCase.param.fileName)
 			testCase.param.fileName = fPath
-			output := c.patchConfig(testCase.param)
+			output := c.patchConfig(testCase.param, true)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {
@@ -3368,4 +3368,54 @@ func TestValidateCertificateTemplate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetScriptCommandsNoRestart(t *testing.T) {
+	type testCaseInfo struct {
+		patchParams *patchFnParameters
+		expectedRes string
+	}
+	testCases := []testCaseInfo{
+		{
+			patchParams: &patchFnParameters{
+				remoteService: AUTOMATE,
+				timestamp:     "test-time_automate",
+			},
+			expectedRes: "\n\tsudo chef-automate config patch /tmp/automatetest-time_automate;\n\texport TIMESTAMP=$(date +'%Y%m%d%H%M%S');\n\tsudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;\n\tsudo chef-automate config show > sudo /etc/chef-automate/config.toml",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: CHEF_SERVER,
+				timestamp:     "test-time_chef_server",
+			},
+			expectedRes: "\n\tsudo chef-automate config patch /tmp/chef_servertest-time_chef_server;\n\texport TIMESTAMP=$(date +'%Y%m%d%H%M%S');\n\tsudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;\n\tsudo chef-automate config show > sudo /etc/chef-automate/config.toml",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: "frontend",
+				timestamp:     "test-time_frontend",
+			},
+			expectedRes: "\n\tsudo chef-automate config patch /tmp/frontendtest-time_frontend;\n\texport TIMESTAMP=$(date +'%Y%m%d%H%M%S');\n\tsudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;\n\tsudo chef-automate config show > sudo /etc/chef-automate/config.toml",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: POSTGRESQL,
+				timestamp:     "test-time_postgresql",
+			},
+			expectedRes: "\n\techo \"y\" | sudo cp /tmp/postgresqltest-time_postgresql /hab/user/automate-ha-postgresql/config/user.toml\n\t",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: OPENSEARCH,
+				timestamp:     "test-time_opensearch",
+			},
+			expectedRes: "\n\techo \"y\" | sudo cp /tmp/opensearchtest-time_opensearch /hab/user/automate-ha-opensearch/config/user.toml\n\t",
+		},
+	}
+
+	for _, tests := range testCases {
+		command := getScriptCommandsNoRestart(tests.patchParams, "")
+		assert.Equal(t, tests.expectedRes, command)
+	}
+
 }
