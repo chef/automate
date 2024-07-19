@@ -134,6 +134,7 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 		warnIfLicenseNearExpiry(licenseResult)
 		return nil
 	}
+
 	return nil
 }
 
