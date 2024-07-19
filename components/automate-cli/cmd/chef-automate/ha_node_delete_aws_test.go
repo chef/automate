@@ -68,7 +68,7 @@ func TestDeletenodeAWSValidateIsManagedServicesOnError(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -119,7 +119,7 @@ func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -172,7 +172,7 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -222,7 +222,7 @@ func TestDeletenodeAWSModifyA2(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -275,7 +275,7 @@ func TestDeletenodeAWSModifyCS(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 
@@ -329,7 +329,7 @@ func TestDeletenodeAWSModifyPG(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -382,7 +382,7 @@ func TestDeletenodeAWSModifyOS(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -435,7 +435,7 @@ func TestDeleteAwsnodePrompt(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.validate()
 	assert.NoError(t, err)
 	err = nodeDelete.modifyConfig()
@@ -528,7 +528,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.validate()
 	assert.NoError(t, err)
 	err = nodeDelete.modifyConfig()
@@ -571,7 +571,7 @@ func TestDeletenodeWithExecuteA2haRbNotExist(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeDelete.Execute(nil, nil)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `Invalid bastion, to run this command use automate bastion`)
@@ -657,7 +657,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.Execute(nil, nil)
 	assert.True(t, tfArchModified)
 	assert.True(t, ipAddres)
@@ -763,7 +763,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 					return "", nil
 				},
-			})
+			}, getMockStatusSummary())
 		err := nodeDelete.Execute(nil, nil)
 		assert.NoError(t, err)
 		assert.True(t, tfArchModified)
@@ -958,5 +958,5 @@ func createNewDeleteNodeAWS(mockNodeUtilsImpl *MockNodeUtilsImpl, mockSSHUtilsIm
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 }

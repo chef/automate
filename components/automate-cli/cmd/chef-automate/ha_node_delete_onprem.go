@@ -34,9 +34,10 @@ type DeleteNodeOnPremImpl struct {
 	fileUtils               fileutils.FileUtils
 	sshUtil                 SSHUtil
 	unreachableIpMap        map[string][]string
+	statusSummary           StatusSummary
 }
 
-func NewDeleteNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
+func NewDeleteNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil, statusSummary StatusSummary) HAModifyAndDeploy {
 	return &DeleteNodeOnPremImpl{
 		flags:         flags,
 		writer:        writer,
@@ -45,6 +46,7 @@ func NewDeleteNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, node
 		terraformPath: filepath.Join(haDirPath, "terraform"),
 		fileUtils:     fileutils,
 		sshUtil:       sshUtil,
+		statusSummary: statusSummary,
 	}
 }
 
@@ -275,6 +277,19 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 			return errors.Wrap(err, syncErr.Error())
 		}
 		return syncErr
+	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if dni.nodeType == POSTGRESQL {
+		leader := getPGLeader(dni.statusSummary)
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		err = dni.nodeUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, dni.statusSummary)
+		if err != nil {
+			return err
+		}
 	}
 	return err
 }

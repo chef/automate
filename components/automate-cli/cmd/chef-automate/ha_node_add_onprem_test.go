@@ -71,7 +71,7 @@ func TestAddnodeValidateError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "IP address validation failed: \nIncorrect Automate IP address format for ip ewewedw")
@@ -100,7 +100,7 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
@@ -134,7 +134,7 @@ func TestAddnodeReadfileError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
@@ -166,7 +166,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
@@ -199,7 +199,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
@@ -225,7 +225,7 @@ func TestAddnodeModifyAutomate(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -256,7 +256,7 @@ func TestAddnodeModifyInfra(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -287,7 +287,7 @@ func TestAddnodeModifyPostgresql(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -318,7 +318,7 @@ func TestAddnodeModifyOpensearch(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -349,7 +349,7 @@ func TestAddnodePrompt(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -409,7 +409,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -467,7 +467,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -552,7 +552,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -620,7 +620,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -772,5 +772,5 @@ func createNewAddNodeOnprem(mockNodeUtilsImpl *MockNodeUtilsImpl, mockSSHUtilsIm
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 }
