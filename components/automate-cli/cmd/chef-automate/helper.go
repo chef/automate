@@ -139,7 +139,7 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 
 func getexpiredLicense() (*LicenseResult, error) {
 	// Create a temporary file
-	tmpFile, err := os.CreateTemp("/habf", "license-*.json")
+	tmpFile, err := os.CreateTemp("/hab", "license-*.json")
 	if err != nil {
 		return nil, err
 	}
