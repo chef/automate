@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/chef/automate/api/interservice/license_control"
@@ -49,7 +50,7 @@ var allowApiList = []string{"/chef.automate.api.event_feed.EventFeedService/GetE
 	"/chef.automate.api.legacy.LegacyDataCollector/Status"}
 
 // refreshLicenseList consists of api endpoints after which the license details needs to be fetchef again
-var refreshLicenseList = []string{"/chef.automate.api.license.License/RequestLicense", "/chef.automate.api.license.License/ApplyLicense"}
+var refreshLicenseList = []string{"/chef.automate.api.license.License/RequestLicense", "/chef.automate.api.license.License/ApplyLicense", "/chef.automate.api.iam.v2.Tokens/CreateToken", "/chef.automate.api.iam.v2.Teams/GetTeam", "/chef.automate.api.iam.v2.Teams/GetTeamMembership", " /chef.automate.api.iam.v2.Policies/ListPolicyMembers"}
 
 type LicenseStatus struct {
 	//LicenseDetails information regarding license
@@ -67,6 +68,8 @@ func (l *licenseInterceptor) UnaryServerInterceptor() grpc.UnaryServerIntercepto
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler) (interface{}, error) {
+
+		fmt.Println("---------------------------grpcfunctioniam we got---------------------", info.FullMethod)
 
 		if contains(refreshLicenseList, info.FullMethod) {
 			l.licenseStatus = &LicenseStatus{
