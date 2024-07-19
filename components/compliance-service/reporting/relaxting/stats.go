@@ -17,7 +17,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 )
 
-//GetStatsSummary - Report #16
+// GetStatsSummary - Report #16
 func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.ReportSummary, error) {
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
@@ -68,7 +68,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	return depth.getStatsSummaryResult(searchResult), nil
 }
 
-//GetStatsSummaryNodes - Gets summary stats, node centric, aggregate data for the given set of filters
+// GetStatsSummaryNodes - Gets summary stats, node centric, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
@@ -120,7 +120,7 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	return depth.getStatsSummaryNodesResult(searchResult), nil
 }
 
-//GetStatsSummaryControlsRange - Gets summary stats, control centric, aggregate data for the given set of filters with date range
+// GetStatsSummaryControlsRange - Gets summary stats, control centric, aggregate data for the given set of filters with date range
 func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControlsRange"
 
@@ -169,7 +169,7 @@ func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]stri
 	return backend.getStatsSummaryControlsResult(searchResult), nil
 }
 
-//GetStatsSummaryControls - Gets summary stats, control centric, aggregate data for the given set of filters
+// GetStatsSummaryControls - Gets summary stats, control centric, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
@@ -232,7 +232,7 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 	return depth.getStatsSummaryControlsResult(searchResult), nil
 }
 
-//GetStatsFailures - Gets top failures, aggregate data for the given set of filters
+// GetStatsFailures - Gets top failures, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filters map[string][]string) (*stats.Failures, error) {
 	myName := "GetStatsFailures"
 	var failures *stats.Failures
@@ -295,8 +295,8 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 	return depth.getStatsTopFailuresResult(searchResult, reportTypes)
 }
 
-//GetProfileListWithAggregatedComplianceSummaries - Report #6
-//todo - Where in A2 UI is this being called? It now works with deep filtering but not sure if we need it.
+// GetProfileListWithAggregatedComplianceSummaries - Report #6
+// todo - Where in A2 UI is this being called? It now works with deep filtering but not sure if we need it.
 func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	filters map[string][]string, size int32) ([]*stats.ProfileList, error) {
 	myName := "GetProfileListWithAggregatedComplianceSummaries"
@@ -339,7 +339,7 @@ func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	return depth.getProfileListWithAggregatedComplianceSummariesResults(searchResult, filters), nil
 }
 
-//GetControlListStatsByProfileID returns the control list for a given profile or profile and a child control
+// GetControlListStatsByProfileID returns the control list for a given profile or profile and a child control
 // the data retrieved from this appears at the bottom of the a2 page when you select a profile from list
 func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from int, size int,
 	filters map[string][]string, sortField string, sortAsc bool) ([]*stats.ControlStats, error) {
@@ -392,7 +392,7 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 	return depth.getControlListStatsByProfileIdResults(&backend, searchResult, profileID)
 }
 
-//GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
+// GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
 func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
 	client, err := backend.ES2Client()
 	if err != nil {
@@ -406,8 +406,8 @@ func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelem
 	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
 
 	// if daysSinceLastPost >= three months then take the unique nodes count from last three months
-	// and if daysSinceLastPost > 15 and < three months then take unique nodes count from lastTelemetryReportedDate to yesterday EOD
-	// else take the unique nodes count from last 15 days
+	// and if daysSinceLastPost > 30 and < three months then take unique nodes count from lastTelemetryReportedDate to today EOD
+	// else take the unique nodes count from last 30 days
 	if daysSinceLastPost >= 90 {
 		startTimeStamp := startDayTimeStamp.AddDate(0, 0, -91)
 		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(time.Now())
@@ -448,7 +448,7 @@ func (backend ES2Backend) getStatsSummaryControlsAggs() map[string]elastic.Aggre
 	return aggs
 }
 
-//getStatsSummaryControlsResult get the aggregations result for the control summary query
+// getStatsSummaryControlsResult get the aggregations result for the control summary query
 func (backend ES2Backend) getStatsSummaryControlsResult(aggRoot *elastic.SearchResult) *stats.ControlsSummary {
 	summary := &stats.ControlsSummary{}
 
