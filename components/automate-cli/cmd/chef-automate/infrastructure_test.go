@@ -205,7 +205,6 @@ func Test_readFileAndMarshal(t *testing.T) {
 }
 
 func Test_checkLicenseExpiry(t *testing.T) {
-
 	tests := []struct {
 		name          string
 		licenseResult *LicenseResult
@@ -222,7 +221,9 @@ func Test_checkLicenseExpiry(t *testing.T) {
 					},
 				},
 			},
-		}, {
+			wantErr: errors.New("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."),
+		},
+		{
 			name: "Invalid license",
 			licenseResult: &LicenseResult{
 				Result: LicenseStatus{
@@ -235,8 +236,9 @@ func Test_checkLicenseExpiry(t *testing.T) {
 				ErrorType:        "license error",
 				ErrorDescription: "license is invalid",
 			},
-			wantErr: errors.New("This license has expired"),
-		}, {
+			wantErr: errors.New("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License."),
+		},
+		{
 			name: "Grace Period for commercial license",
 			licenseResult: &LicenseResult{
 				Result: LicenseStatus{
@@ -247,15 +249,18 @@ func Test_checkLicenseExpiry(t *testing.T) {
 					},
 				},
 			},
-		}, {
+			wantErr: errors.New("Your Progress® Chef® Automate™ license expired on 15-09-2024 and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com."),
+		},
+		{
 			name: "No License is applied",
 			licenseResult: &LicenseResult{
 				Result:           LicenseStatus{},
 				ErrorType:        "",
 				ErrorDescription: "",
 			},
-			wantErr: errors.New("Please apply a license"),
-		}, {
+			wantErr: errors.New("Please apply a license.Please contact sales@chef.io to have your Chef Automate license."),
+		},
+		{
 			name: "Received Error from deployment service",
 			licenseResult: &LicenseResult{
 				Result:           LicenseStatus{},
@@ -264,12 +269,25 @@ func Test_checkLicenseExpiry(t *testing.T) {
 			},
 			wantErr: errors.New("Unable to connect to license service"),
 		},
+		{
+			name: "License isn't expired",
+			licenseResult: &LicenseResult{
+				Result: LicenseStatus{
+					CustomerName: "customer 1",
+					LicenseType:  commercial,
+					LicenseId:    "id 1",
+					ExpirationDate: ExpirationDate{
+						Seconds: time.Now().AddDate(0, 0, 365).Unix(),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := checkLicenseExpiry(tt.licenseResult)
 			if tt.wantErr != nil {
-				assert.Contains(t, err.Error(), tt.wantErr.Error())
+				assert.Equal(t, err.Error(), tt.wantErr.Error())
 			} else {
 				assert.Nil(t, err)
 			}
