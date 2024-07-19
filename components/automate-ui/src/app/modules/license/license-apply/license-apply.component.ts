@@ -41,6 +41,8 @@ export class LicenseApplyComponent implements AfterViewInit {
   public modalVisible = false;
   public modalLocked = true;
 
+  public mlsaAgree = false;
+
   ngAfterViewInit(): void {
     // Set locale-aware date/time formats
     // Per https://stackoverflow.com/a/50460605, navigator.language
@@ -148,6 +150,13 @@ export class LicenseApplyComponent implements AfterViewInit {
 
   private setExpirationDate(license: LicenseStatus): void {
     this.expirationDate = parsedExpirationDate(license);
+  }
+
+  // Similarly, we must manually add this to the valid logic
+  // in the submit button since chef-button doesn't play nice
+  // with FormBuilder.
+  public updateMLSA(event): void {
+    this.mlsaAgree = event;
   }
 
   public logout() {

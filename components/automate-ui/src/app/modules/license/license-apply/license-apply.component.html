@@ -50,8 +50,15 @@
           <textarea name="licenseKey" id="licenseKey" formControlName="licenseKey" cols="65" rows="10" autofocus></textarea>
           <chef-error *ngIf="applyForm.get('licenseKey').hasError('required') && applyForm.get('licenseKey').dirty">License key required</chef-error>
         </chef-form-field>
+        <br>
+        <chef-checkbox (change)="updateMLSA($event.detail)" [checked]="mlsaAgree">
+          * I agree to the
+          <a href="https://www.chef.io/terms-of-service" target="_blank">Terms of Service</a>
+          and the
+          <a href="https://www.chef.io/online-master-agreement" target="_blank">Master License and Services Agreement</a>
+        </chef-checkbox>
         <div class="button">
-          <chef-button type="submit" primary [disabled]="!applyForm.valid || applyingLicense">Apply License</chef-button>
+          <chef-button type="submit" primary [disabled]="!(applyForm.valid && mlsaAgree) || applyingLicense">Apply License</chef-button>
           <chef-button tertiary (click)="logout()">Sign Out</chef-button>
         </div>
       </form>

@@ -62,7 +62,7 @@
 
 
   .footer {
-    margin-top: 80px;
+    margin-top: 0px;
   }
 
   label {
@@ -79,6 +79,10 @@
     min-height: 175px;
   }
 
+  textarea#licenseKey {
+    width: 100%;
+  }
+
   textarea,
   chef-error {
     display: block;
@@ -88,7 +92,7 @@
     display: flex;
     justify-content: flex-start;
     margin-top: 10px;
-    height: 50px;
+    height: 20px;
   }
 
   ::ng-deep chef-alert {
