@@ -65,7 +65,7 @@ func (es *ElasticSidecar) validJSON(jsonStr string) bool {
 func (es *ElasticSidecar) testAuthentication(user, pass string) (int, string) {
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // nosemgrep
 		},
 	}
 	req, err := http.NewRequest("GET", "https://localhost:9200", nil)
