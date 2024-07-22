@@ -90,9 +90,8 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 		Short: "Restore the factory default admin user, team, and access",
 		Long: "Recreate the admin user, admin team, and related admin policy as needed " +
 			"to restore to factory default and update the admin user's password",
-		PersistentPreRunE: checkLicenseStatusForExpiry,
-		RunE:              runRestoreDefaultAdminAccessAdminCmd,
-		Args:              cobra.ExactArgs(1),
+		RunE: runRestoreDefaultAdminAccessAdminCmd,
+		Args: cobra.ExactArgs(1),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},

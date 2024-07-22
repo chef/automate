@@ -22,12 +22,11 @@ func init() {
 }
 
 var maintenanceCmd = &cobra.Command{
-	Use:               "maintenance [on|off]",
-	Short:             "Put Chef Automate into or out of maintenance mode",
-	Long:              "Chef Automate maintenance mode keeps all services running but rejects new connections at the load balancer so that maintenance operations can be performed.",
-	Args:              cobra.ExactArgs(1),
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runMaintenanceCmd,
+	Use:   "maintenance [on|off]",
+	Short: "Put Chef Automate into or out of maintenance mode",
+	Long:  "Chef Automate maintenance mode keeps all services running but rejects new connections at the load balancer so that maintenance operations can be performed.",
+	Args:  cobra.ExactArgs(1),
+	RunE:  runMaintenanceCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.FrontEnd,
 	},

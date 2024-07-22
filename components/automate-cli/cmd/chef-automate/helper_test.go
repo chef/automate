@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_compareVersions(t *testing.T) {
@@ -27,4 +28,9 @@ func Test_compareVersions(t *testing.T) {
 		isNew := compareVersions("5.0.0", v2)
 		require.True(t, isNew)
 	})
+	t.Run("Test 5", func(t *testing.T) {
+		isNew := compareVersions("4.12.123", v2)
+		require.True(t, isNew)
+	})
+
 }

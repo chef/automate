@@ -249,7 +249,7 @@ func Test_checkLicenseExpiry(t *testing.T) {
 					},
 				},
 			},
-			wantErr: errors.New("Your Progress® Chef® Automate™ license expired on 15-09-2024 and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com."),
+			wantErr: errors.New("Your Progress® Chef® Automate™ license expired on 20-07-2024 and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com."),
 		},
 		{
 			name: "No License is applied",
