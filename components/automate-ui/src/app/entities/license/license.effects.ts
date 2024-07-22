@@ -127,7 +127,7 @@ export class LicenseStatusEffects {
     }
     if (licenseStatus?.grace_period === true){
       return `Your Progress® Chef® Automate™ license expired on ${moment(licenseStatus && licenseStatus.licensed_period.end).format('ddd, DD MMM YYYY')}! 
-      and you are currently on a limited extension period! Contact the Account Team or email  chef-account-team@progress.com for help `
+      and you are currently on a limited extension period! Contact the Account Team or email chef-account-team@progress.com for help `
     }
     if (licenseStatus?.license_type === "commercial") {
       return `Your Progress® Chef® Automate™ license is set to expire on ${moment(licenseStatus && licenseStatus.licensed_period.end).format('ddd, DD MMM YYYY')}! Contact the Account Team or email  chef-account-team@progress.com for help `
