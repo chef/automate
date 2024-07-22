@@ -59,17 +59,17 @@ type ExpirationDate struct {
 const commercial = "commercial"
 
 type LExecutor interface {
-	runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error)
+	runCommandOnSingleAutomateNodeForErr(cmd *cobra.Command, args []string) (string, error)
 }
 
 type LicenseExecutor struct{}
 
-func (e LicenseExecutor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args []string) (string, error) {
+func (e LicenseExecutor) runCommandOnSingleAutomateNodeForErr(cmd *cobra.Command, args []string) (string, error) {
 	return RunLicenseCmdOnSingleAutomateNode(cmd, args)
 }
 
 func runTheCommandOnHAErr(cmd *cobra.Command, args []string, e LExecutor) error {
-	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
+	output, err := e.runCommandOnSingleAutomateNodeForErr(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -127,10 +127,7 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 	}
 
 	script = "sudo chef-automate license status --result-json /hab/license.json"
-	_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
-	if err != nil {
-		return "", err
-	}
+	sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 
 	script = "sudo cat /hab/license.json"
 	readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
@@ -142,7 +139,7 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 }
 
 func runTheCommandOnHAWarn(cmd *cobra.Command, args []string, e LExecutor) error {
-	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
+	output, err := e.runCommandOnSingleAutomateNodeForErr(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -382,7 +379,7 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 		}
 	} else { // for trail and internal licenses
 		if daysUntilExpiration > 0 {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! or does not exist! Please get in touch with the Account Team for further assistance.", licenseDate))
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
 		} else {
 			return status.New(
 				status.LicenseError, "Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
@@ -432,7 +429,7 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 		}
 	} else { // for trail and internal licenses
 		if daysUntilExpiration > 0 {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! or does not exist! Please get in touch with the Account Team for further assistance.", licenseDate))
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
 		} else {
 			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
 		}
