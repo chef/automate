@@ -30,7 +30,7 @@ func TestAddnodeAWSValidateError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
@@ -54,7 +54,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	assert.Equal(t, "6", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
@@ -78,7 +78,7 @@ func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
@@ -104,7 +104,7 @@ func TestAddnodeModifyAws(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -124,12 +124,15 @@ func TestAddAwsnodePrompt(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
+		restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+			return nil
+		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -209,7 +212,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
@@ -251,7 +254,7 @@ func TestAddnodeWithExecuteA2haRbNotExist(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `Invalid bastion, to run this command use automate bastion`)
@@ -309,7 +312,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.Contains(t, w.Output(), `Existing node count:
 ================================================
@@ -385,7 +388,7 @@ func TestAddnodeWithSaveConfigToBasionErr(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "error removing header")
@@ -456,7 +459,7 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 
 	err := nodeAdd.Execute(nil, nil)
 	assert.Error(t, err)
@@ -532,7 +535,7 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 
 	err := nodeAdd.Execute(nil, nil)
 	assert.Error(t, err)
@@ -612,7 +615,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing node count:

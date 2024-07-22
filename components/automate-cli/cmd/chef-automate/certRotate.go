@@ -256,8 +256,12 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		if err != nil {
 			return errors.WithStack(err)
 		}
-
-		statusSummary, err := getStatusSummary(infra, sshUtil)
+		infra, err = getAutomateHAInfraDetails()
+		if err != nil {
+			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
+			return err
+		}
+		statusSummary, err := getStatusSummary(infra)
 		if err != nil {
 			return err
 		}
@@ -1237,7 +1241,15 @@ func uniqueIps(ips []string) []string {
 	return uniqueIps
 }
 
-func getStatusSummary(infra *AutomateHAInfraDetails, sshUtil SSHUtil) (StatusSummary, error) {
+func getStatusSummary(infra *AutomateHAInfraDetails) (StatusSummary, error) {
+	sshConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	}
+	sshUtil := NewSSHUtil(sshConfig)
+	sshConfig.timeout = 30
+	sshUtil.setSSHConfig(sshConfig)
 	var statusSummaryCmdFlags = StatusSummaryCmdFlags{
 		isPostgresql: true,
 	}
@@ -1248,15 +1260,6 @@ func getStatusSummary(infra *AutomateHAInfraDetails, sshUtil SSHUtil) (StatusSum
 		return nil, err
 	}
 	return statusSummary, nil
-}
-
-func getPGLeader(statusSummary StatusSummary) *NodeIpHealth {
-	ip, health := statusSummary.GetPGLeaderNode()
-	nodeIpHealth := NodeIpHealth{
-		IP:     ip,
-		Health: health,
-	}
-	return &nodeIpHealth
 }
 
 func getMaxPGLag(log logger.Logger, statusSummary StatusSummary) (int64, error) {

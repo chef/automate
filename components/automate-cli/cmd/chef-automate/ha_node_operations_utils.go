@@ -1010,3 +1010,27 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		return srcString, nil
 	}
 }
+
+func (nu *NodeUtilsImpl) restartHabSupOnBackend(service string) error {
+	remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
+	infra, _, err := nu.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	flags := &RestartCmdFlags{
+		postgresql: true,
+	}
+	restartCmdResults := make(chan restartCmdResult, 4)
+	runRestartCmdForBackend(infra, flags, remoteExcecutor, restartCmdResults)
+
+	return getChannelValue(restartCmdResults, printRestartOutput)
+}
+
+func getPGLeader(statusSummary StatusSummary) *NodeIpHealth {
+	ip, health := statusSummary.GetPGLeaderNode()
+	nodeIpHealth := NodeIpHealth{
+		IP:     ip,
+		Health: health,
+	}
+	return &nodeIpHealth
+}

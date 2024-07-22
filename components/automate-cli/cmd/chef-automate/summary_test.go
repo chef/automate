@@ -457,3 +457,17 @@ func TestGetFollowerLag(t *testing.T) {
 		}
 	}
 }
+
+func getMockStatusSummary() StatusSummary {
+	infra := &AutomateHAInfraDetails{}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{"192.168.0.1", "192.168.0.2", "192.168.0.3"}
+	beOutput := make(map[string][]*CmdResult)
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
+		isPostgresql: true,
+	}, &MockRemoteCmdExecutor{
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return beOutput, nil
+		},
+	})
+	return ss
+}

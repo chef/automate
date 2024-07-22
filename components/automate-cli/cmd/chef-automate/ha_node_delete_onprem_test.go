@@ -50,7 +50,7 @@ func TestDeleteNodeValidateError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `
@@ -77,7 +77,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
@@ -104,7 +104,7 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -141,7 +141,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
@@ -174,7 +174,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), multipleNodeError)
@@ -200,7 +200,7 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.")
@@ -233,7 +233,7 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -264,7 +264,7 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
@@ -297,7 +297,7 @@ func TestDeleteNodePrompt(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -362,7 +362,7 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -428,7 +428,7 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.Execute(nil, nil)
 	assert.Error(t, err, "error on removing output header in fetched config")
 }
@@ -474,7 +474,7 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -539,8 +539,7 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	},
-	)
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -605,8 +604,7 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	},
-	)
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -666,7 +664,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
@@ -706,7 +704,7 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -801,7 +799,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -879,7 +877,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -957,7 +955,7 @@ func TestRemovenodeExecuteWithProvisionError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:

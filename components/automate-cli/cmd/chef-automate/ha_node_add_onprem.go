@@ -52,9 +52,10 @@ type AddNodeOnPremImpl struct {
 	fileutils               fileutils.FileUtils
 	sshUtil                 SSHUtil
 	unreachableIpMap        map[string][]string
+	statusSummary           StatusSummary
 }
 
-func NewAddNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
+func NewAddNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil, statusSummary StatusSummary) HAModifyAndDeploy {
 	return &AddNodeOnPremImpl{
 		flags:         flags,
 		writer:        writer,
@@ -63,6 +64,7 @@ func NewAddNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUti
 		terraformPath: filepath.Join(haDirPath, "terraform"),
 		fileutils:     fileUtils,
 		sshUtil:       sshUtil,
+		statusSummary: statusSummary,
 	}
 }
 
@@ -229,6 +231,20 @@ func (ani *AddNodeOnPremImpl) runDeploy() error {
 		}
 		return syncErr
 	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if len(ani.postgresqlIp) > 0 {
+		leader := getPGLeader(ani.statusSummary)
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		err = ani.nodeUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, ani.statusSummary)
+		if err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 

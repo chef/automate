@@ -29,6 +29,7 @@ type DeleteNodeAWSImpl struct {
 	sshUtil       SSHUtil
 	AWSConfigIp
 	unreachableIpMap map[string][]string
+	statusSummary    StatusSummary
 }
 
 type AWSConfigIp struct {
@@ -53,7 +54,7 @@ var (
 	moveStateCommand = `terraform state mv "module.aws.aws_instance.%[1]s[%[2]d]" "module.aws.aws_instance.%[1]s[%[3]d]"`
 )
 
-func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
+func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil, statusSummary StatusSummary) HAModifyAndDeploy {
 	return &DeleteNodeAWSImpl{
 		config:        AwsConfigToml{},
 		nodeUtils:     nodeUtils,
@@ -63,6 +64,7 @@ func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUti
 		writer:        writer,
 		fileUtils:     fileutils,
 		sshUtil:       sshUtil,
+		statusSummary: statusSummary,
 	}
 }
 
@@ -265,6 +267,20 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 		}
 		return syncErr
 	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if dna.nodeType == POSTGRESQL {
+		leader := getPGLeader(dna.statusSummary)
+		infra, err := getAutomateHAInfraDetailsFunc()
+		if err != nil {
+			return err
+		}
+		err = dna.nodeUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, dna.statusSummary)
+		if err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 

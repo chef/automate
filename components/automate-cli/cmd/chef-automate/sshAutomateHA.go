@@ -239,6 +239,8 @@ func runSshCommand(_ *cobra.Command, _ []string) error {
 	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
+var getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error) = getAutomateHAInfraDetails
+
 func getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
 
 	infraConfigFile, err := FileContainingAutomateHAInfraDetails()
