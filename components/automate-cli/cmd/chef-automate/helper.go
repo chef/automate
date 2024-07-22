@@ -51,7 +51,7 @@ func (e LicenseExecutor) runCommandOnSingleAutomateNode(cmd *cobra.Command, args
 	return RunLicenseCmdOnSingleAutomateNode(cmd, args)
 }
 
-func runTheCommandOnHA(cmd *cobra.Command, args []string, e LExecutor) error {
+func runTheCommandOnHAErr(cmd *cobra.Command, args []string, e LExecutor) error {
 	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
 	if err != nil {
 		return err
@@ -82,26 +82,45 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		hostIP:     ips[0],
 		timeout:    10,
 	}
-	sshUtil := NewSSHUtil(sshConfig)
-	script := "sudo chef-automate license status --result-json /hab/license.json"
-	_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
-	if err != nil {
-		return "", err
+
+	if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+		sshUtil := NewSSHUtil(sshConfig)
+		script := "sudo chef-automate license status --result-json /hab/license.json"
+		_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+		if err != nil {
+			return "", err
+		}
+		script = "sudo cat /hab/license.json"
+		readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+		if err != nil {
+			return "", err
+		}
+		return readLicense, nil
 	}
-	script = "sudo cat /hab/license.json"
-	readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+
+	return "", nil
+}
+
+func runTheCommandOnHAWarn(cmd *cobra.Command, args []string, e LExecutor) error {
+	output, err := e.runCommandOnSingleAutomateNode(cmd, args)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return readLicense, nil
+
+	licenseResult := &LicenseResult{}
+	err = json.Unmarshal([]byte(output), &licenseResult)
+	if err != nil {
+		return err
+	}
+
+	warnIfLicenseNearExpiry(licenseResult)
+	return nil
 }
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
-			if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
-				return err
-			}
+		if err := runTheCommandOnHAWarn(cmd, args, LicenseExecutor{}); err != nil {
+			return err
 		}
 	} else {
 		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
@@ -185,10 +204,8 @@ func toInt(str string) int {
 
 func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
-			if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
-				return err
-			}
+		if err := runTheCommandOnHAWarn(cmd, args, LicenseExecutor{}); err != nil {
+			return err
 		}
 	} else {
 		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
