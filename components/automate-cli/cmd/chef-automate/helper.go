@@ -56,6 +56,9 @@ func runTheCommandOnHAErr(cmd *cobra.Command, args []string, e LExecutor) error 
 	if err != nil {
 		return err
 	}
+	if output == "" {
+		return nil
+	}
 
 	licenseResult := &LicenseResult{}
 	err = json.Unmarshal([]byte(output), &licenseResult)
@@ -107,6 +110,10 @@ func runTheCommandOnHAWarn(cmd *cobra.Command, args []string, e LExecutor) error
 		return err
 	}
 
+	if output == "" {
+		return nil
+	}
+
 	licenseResult := &LicenseResult{}
 	err = json.Unmarshal([]byte(output), &licenseResult)
 	if err != nil {
@@ -119,7 +126,7 @@ func runTheCommandOnHAWarn(cmd *cobra.Command, args []string, e LExecutor) error
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if err := runTheCommandOnHAWarn(cmd, args, LicenseExecutor{}); err != nil {
+		if err := runTheCommandOnHAErr(cmd, args, LicenseExecutor{}); err != nil {
 			return err
 		}
 	} else {
