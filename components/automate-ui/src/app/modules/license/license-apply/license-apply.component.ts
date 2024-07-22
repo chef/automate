@@ -40,6 +40,8 @@ export class LicenseApplyComponent implements AfterViewInit {
 
   public modalVisible = false;
   public modalLocked = true;
+  public licenseExpiredDate = null;
+  public licenseType = null;
 
   public mlsaAgree = false;
 
@@ -63,10 +65,17 @@ export class LicenseApplyComponent implements AfterViewInit {
         }
       });
       this.licenseFacade.fetchLicense$.pipe(
-        filter(state =>
-          this.modalVisible
+        filter(state => {
+          let gracePeriod = false
+          if (state?.license?.licensed_period) {
+            this.licenseExpiredDate = moment(state?.license?.licensed_period?.end).format('ddd, DD MMM YYYY');
+            this.licenseType = state?.license?.license_type;
+            gracePeriod = state?.license?.grace_period;
+          }
+          return this.modalVisible
           && state.status === EntityStatus.loadingSuccess
-          && !moment().isAfter(state.license.licensed_period.end)))
+          && (gracePeriod || !moment().isAfter(state.license.licensed_period.end));
+        }))
         .subscribe(() => this.closeModal());
 
       this.applyForm = fb.group({

@@ -14,9 +14,15 @@
 
       <ng-container *ngIf="licenseApplyReason === 2">
         <div class="title alert">
-          <chef-icon>warning</chef-icon> Your Chef Automate license has expired. </div>
-        <div class="subtitle">
-          <a href="https://www.chef.io/contact-us/" target="_blank">Contact us</a> to get a license. If you already have one, enter it now.
+          <chef-icon>warning</chef-icon>{{licenseType === 'commercial' ? 'Your Enterprise License Has Expired!' : 'Your Trial License Has Expired!'}}
+        </div>
+        <div class="subtitle" *ngIf="licenseType !== 'commercial'">
+          We hope that you found Progress® Chef® Automate™ valuable during the trial period. Unfortunately, your trial license has expired, and you can no longer access Chef Automate.<br/><br/>
+          To continue using Chef Automate, upgrade to an Enterprise License now. Please contact the Account Team for further assistance.
+        </div>
+        <div class="subtitle" *ngIf="licenseType === 'commercial'">
+          Your Progress® Chef® Automate™ license expired on {{licenseExpiredDate}}. Unfortunately, you no longer have access to Chef Automate.<br/><br/>
+          To restore your Chef Automate usage, please update your enterprise license now. Please contact the Account Team or email <strong>chef-account-team@progress.com</strong> for further assistance.
         </div>
       </ng-container>
 
@@ -28,7 +34,7 @@
         </div>
       </ng-container>
 
-      <div class="error-container">
+      <div class="error-container" *ngIf="applyLicenseInternalError || permissionDenied || badRequestReason">
         <chef-alert type="error" *ngIf="applyLicenseInternalError">
           <span>
           Sorry, we're unable to apply this license. Check your logs or
@@ -62,8 +68,8 @@
           <chef-button tertiary (click)="logout()">Sign Out</chef-button>
         </div>
       </form>
-      <div class="spinner-container">
-        <chef-loading-spinner *ngIf="applyingLicense" size="30"></chef-loading-spinner>
+      <div *ngIf="applyingLicense" class="spinner-container">
+        <chef-loading-spinner size="30"></chef-loading-spinner>
       </div>
 
       <!-- Only show footer to get trial if this is the initial apply -->

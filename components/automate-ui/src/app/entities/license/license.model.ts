@@ -24,6 +24,8 @@ export interface LicenseStatus {
     start: string; // timestamp
     end: string; // timestamp
   };
+  grace_period: boolean
+  license_type: string
 }
 
 export interface LicenseApplyReason {

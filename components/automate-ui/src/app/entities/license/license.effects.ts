@@ -87,14 +87,14 @@ export class LicenseStatusEffects {
         catchError((error) => of(new RequestLicenseFailure(error))))
     )));
 
-  private getResponseAction$(): Observable<LicenseStatusAction> {
-    return this.requests.fetchLicenseStatus().pipe(
-      withLatestFrom(this.store.select(notificationState)),
-      map(([licenseStatus, notifications]) =>
-        this.getActionAndNotify(licenseStatus, notifications)
-      ),
-      catchError((error: HttpErrorResponse) => of(new GetLicenseStatusFailure(error))));
-  }
+    private getResponseAction$(): Observable<LicenseStatusAction> {
+      return this.requests.fetchLicenseStatus().pipe(
+        withLatestFrom(this.store.select(notificationState)),
+        map(([licenseStatus, notifications]) =>
+          this.getActionAndNotify(licenseStatus, notifications)
+        ),
+        catchError((error: HttpErrorResponse) => of(new GetLicenseStatusFailure(error))));
+    }
 
   private getActionAndNotify(
     licenseStatus: LicenseStatus,
@@ -102,7 +102,7 @@ export class LicenseStatusEffects {
   ): LicenseStatusAction {
     const oldNote = find(notifications, ['type', Type.license]);
     const oldMessage = oldNote ? oldNote.message : '';
-    const newMessage = this.expiringSoonMessage(licenseStatus.licensed_period.end);
+    const newMessage = this.expiringSoonMessage(licenseStatus);
     if (oldNote && oldMessage !== newMessage) {
       this.store.dispatch(new DeleteNotification({ id: oldNote.id }));
     }
@@ -115,15 +115,23 @@ export class LicenseStatusEffects {
 
   // expiringSoonMessage returns the proper message string
   // or '' if the license is not yet in expiry warning period.
-  private expiringSoonMessage(end: string): string {
-    const daysRemaining = moment(end).diff(moment(), 'days');
+  private expiringSoonMessage(licenseStatus): string {
+
+    const daysRemaining = moment(licenseStatus && licenseStatus.licensed_period.end).diff(moment(), 'days');
     // this.testIndex = (this.testIndex + 1) % this.testData.length; // TEST ONLY
     // const daysRemaining = this.testData[this.testIndex]; // TEST ONLY
 
     // Do nothing if license is already expired. Modal will pop up in that case.
-    if (daysRemaining > this.LICENSE_WARNING_PERIOD || daysRemaining < 0) {
+    if (daysRemaining > this.LICENSE_WARNING_PERIOD || (daysRemaining < 0 && licenseStatus?.grace_period !== true)) {
       return '';
     }
-    return `There are ${daysRemaining} days remaining on your license.`;
+    if (licenseStatus?.grace_period === true){
+      return `Your Progress® Chef® Automate™ license expired on ${moment(licenseStatus && licenseStatus.licensed_period.end).format('ddd, DD MMM YYYY')}! 
+      and you are currently on a limited extension period! Contact the Account Team or email chef-account-team@progress.com for help `
+    }
+    if (licenseStatus?.license_type === "commercial") {
+      return `Your Progress® Chef® Automate™ license is set to expire on ${moment(licenseStatus && licenseStatus.licensed_period.end).format('ddd, DD MMM YYYY')}! Contact the Account Team or email  chef-account-team@progress.com for help `
+    }
+    return `Your Progress® Chef® Automate™ trial license is set to expire on ${moment(licenseStatus && licenseStatus.licensed_period.end).format('ddd, DD MMM YYYY')}! Contact the Account Team for help `;
   }
 }
