@@ -86,7 +86,12 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		timeout:    10,
 	}
 
-	if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+	allow, err := AllowLicenseEnforcement()
+	if err != nil {
+		return "", err
+	}
+
+	if allow {
 		sshUtil := NewSSHUtil(sshConfig)
 		script := "sudo chef-automate license status --result-json /hab/license.json"
 		_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
@@ -130,7 +135,12 @@ func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+		allow, err := AllowLicenseEnforcement()
+		if err != nil {
+			return err
+		}
+
+		if allow {
 			err := commandPrePersistent(cmd)
 			if err != nil {
 				return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
@@ -163,6 +173,7 @@ func AllowLicenseEnforcement() (bool, error) {
 			"Request for Chef Automate package manifest failed",
 		)
 	}
+
 	return compareVersions(response.BuildTimestamp, "4.12.69"), nil
 }
 
@@ -170,16 +181,11 @@ func AllowLicenseEnforcement() (bool, error) {
 // if v1 <= v2 => false
 // if v1 > v2 => true
 func compareVersions(v1, v2 string) bool {
-
 	v2Slice := strings.Split(v2, ".")
 
 	// write the logic
 	if strings.Contains(v1, ".") {
 		v1Slice := strings.Split(v1, ".")
-
-		//if len(v1Slice) != len(v2Slice) {
-		//	return false
-		//}
 
 		if toInt(v1Slice[0]) > toInt(v2Slice[0]) {
 			return true
@@ -215,7 +221,12 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+		allow, err := AllowLicenseEnforcement()
+		if err != nil {
+			return err
+		}
+
+		if allow {
 			err := commandPrePersistent(cmd)
 			if err != nil {
 				return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
@@ -230,6 +241,7 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 			return nil
 		}
 	}
+
 	return nil
 }
 
