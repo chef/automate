@@ -98,8 +98,10 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 
 func checkLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
-			return err
+		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+			if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
+				return err
+			}
 		}
 	} else {
 		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
@@ -181,18 +183,12 @@ func toInt(str string) int {
 	return v1int
 }
 
-func timeStampToTime(ts string) (time.Time, error) {
-	i, err := strconv.ParseInt(ts, 10, 64)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return time.Unix(i, 0), nil
-}
-
 func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
-			return err
+		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
+			if err := runTheCommandOnHA(cmd, args, LicenseExecutor{}); err != nil {
+				return err
+			}
 		}
 	} else {
 		if allow, err := AllowLicenseEnforcement(); err != nil && allow {
