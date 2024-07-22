@@ -371,7 +371,7 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 		if daysUntilExpiration > 0 {
 			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! or does not exist! Please get in touch with the Account Team for further assistance.", licenseDate))
 		} else {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
 		}
 	}
 }
