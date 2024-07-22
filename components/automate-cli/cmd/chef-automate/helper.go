@@ -21,6 +21,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type VersionCommand struct {
+	Command          string `json:"command"`
+	Status           string `json:"status"`
+	ErrorCode        int    `json:"error_code"`
+	ErrorDescription string `json:"error_description"`
+	ErrorCause       string `json:"error_cause"`
+	ErrorStackTrace  string `json:"error_stack_trace"`
+	ErrorRecovery    string `json:"error_recovery"`
+	ErrorType        string `json:"error_type"`
+	Result           struct {
+		ClientVersion   string `json:"client_version"`
+		ClientGitSha    string `json:"client_git_sha"`
+		ManifestVersion string `json:"manifest_version"`
+		ManifestGitSha  string `json:"manifest_git_sha"`
+	} `json:"result"`
+}
+
 type LicenseResult struct {
 	Result           LicenseStatus `json:"result"`
 	ErrorType        string        `json:"error_type"`
@@ -86,27 +103,42 @@ func RunLicenseCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) (strin
 		timeout:    10,
 	}
 
-	allow, err := AllowLicenseEnforcement()
+	sshUtil := NewSSHUtil(sshConfig)
+
+	script := "sudo chef-automate version --result-json /hab/version.json"
+	_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
 	if err != nil {
 		return "", err
 	}
 
-	if allow {
-		sshUtil := NewSSHUtil(sshConfig)
-		script := "sudo chef-automate license status --result-json /hab/license.json"
-		_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
-		if err != nil {
-			return "", err
-		}
-		script = "sudo cat /hab/license.json"
-		readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
-		if err != nil {
-			return "", err
-		}
-		return readLicense, nil
+	script = "sudo cat /hab/version.json"
+	readVersion, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+	if err != nil {
+		return "", err
 	}
 
-	return "", nil
+	var versionCMD VersionCommand
+	if err = json.Unmarshal([]byte(readVersion), &versionCMD); err != nil {
+		return "", err
+	}
+
+	if !compareVersions(versionCMD.Result.ManifestVersion, "4.12.69") {
+		return "", nil
+	}
+
+	script = "sudo chef-automate license status --result-json /hab/license.json"
+	_, err = sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+	if err != nil {
+		return "", err
+	}
+
+	script = "sudo cat /hab/license.json"
+	readLicense, err := sshUtil.connectAndExecuteCommandOnRemoteSuppressLog(script, true, true)
+	if err != nil {
+		return "", err
+	}
+	return readLicense, nil
+
 }
 
 func runTheCommandOnHAWarn(cmd *cobra.Command, args []string, e LExecutor) error {
@@ -361,6 +393,18 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 }
 
 func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
+	if licenseResult.Result.LicenseId == "" {
+		if licenseResult.ErrorType != "" {
+			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(status.New(
+				status.DeploymentServiceCallError,
+				licenseResult.ErrorDescription,
+			).Error())
+
+		}
+		cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
+		return
+	}
+
 	// Calculate the license valid date
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
 	gracePeriodDuration := 60
