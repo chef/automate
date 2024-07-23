@@ -170,12 +170,12 @@ var showConfigCmd = &cobra.Command{
 }
 
 var genConfigCmd = &cobra.Command{
-	Use:               "gen [/path/to/write/config.toml]",
-	Short:             "generate the Automate HA configuration",
-	Long:              "Prompt based Config Generation command. It will output the config in the provided file, if file path is not provided then it will print on STDOUT.",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runGenCmd,
-	Args:              cobra.RangeArgs(0, 2),
+	Use:   "gen [/path/to/write/config.toml]",
+	Short: "generate the Automate HA configuration",
+	Long:  "Prompt based Config Generation command. It will output the config in the provided file, if file path is not provided then it will print on STDOUT.",
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runGenCmd,
+	Args: cobra.RangeArgs(0, 2),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
