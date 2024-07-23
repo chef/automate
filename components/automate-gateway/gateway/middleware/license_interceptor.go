@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chef/automate/api/interservice/license_control"
@@ -47,10 +46,14 @@ var allowApiList = []string{"/chef.automate.api.event_feed.EventFeedService/GetE
 	"/chef.automate.api.iam.v2.Teams/GetTeam",
 	"/chef.automate.api.iam.v2.Teams/GetTeamMembership",
 	"/chef.automate.api.iam.v2.Teams/AddTeamMembers",
-	"/chef.automate.api.legacy.LegacyDataCollector/Status"}
+	"/chef.automate.api.legacy.LegacyDataCollector/Status",
+	"/chef.automate.api.iam.v2.Users/UpdateUser",
+	"/chef.automate.api.iam.v2.Teams/GetTeam",
+	"/chef.automate.api.iam.v2.Teams/GetTeamMembership",
+	"/chef.automate.api.iam.v2.Policies/ListPolicyMembers"}
 
 // refreshLicenseList consists of api endpoints after which the license details needs to be fetchef again
-var refreshLicenseList = []string{"/chef.automate.api.license.License/RequestLicense", "/chef.automate.api.license.License/ApplyLicense", "/chef.automate.api.iam.v2.Tokens/CreateToken", "/chef.automate.api.iam.v2.Teams/GetTeam", "/chef.automate.api.iam.v2.Teams/GetTeamMembership", "/chef.automate.api.iam.v2.Policies/AddPolicyMembers", "/chef.automate.api.iam.v2.Policies/ListPolicyMembers", "/chef.automate.api.Gateway/GetVersion", "/chef.automate.api.ingest.ChefIngester/GetVersion", "/chef.automate.api.cfgmgmt.ConfigMgmt/GetVersion", " /chef.automate.api.compliance.reporting.v1.ReportingService/GetVersion", "/chef.automate.api.iam.v2.Users/DeleteUser"}
+var refreshLicenseList = []string{"/chef.automate.api.license.License/RequestLicense", "/chef.automate.api.license.License/ApplyLicense", "/chef.automate.api.iam.v2.Tokens/CreateToken", "/chef.automate.api.iam.v2.Policies/AddPolicyMembers", "/chef.automate.api.Gateway/GetVersion", "/chef.automate.api.ingest.ChefIngester/GetVersion", "/chef.automate.api.cfgmgmt.ConfigMgmt/GetVersion", " /chef.automate.api.compliance.reporting.v1.ReportingService/GetVersion", "/chef.automate.api.iam.v2.Users/DeleteUser"}
 
 type LicenseStatus struct {
 	//LicenseDetails information regarding license
@@ -68,8 +71,6 @@ func (l *licenseInterceptor) UnaryServerInterceptor() grpc.UnaryServerIntercepto
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler) (interface{}, error) {
-
-		fmt.Println("hulmehtod-----", info.FullMethod)
 
 		if contains(refreshLicenseList, info.FullMethod) {
 			l.licenseStatus = &LicenseStatus{
