@@ -1,7 +1,5 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
-
 exec 2>&1
 
-
 echo "starting elastic sidecar"
-GEM_PATH={{pkg.path}}/lib/gems exec {{pkgPathFor "core/ruby30"}}/bin/ruby {{pkg.path}}/bin/elastic_sidecar.rb
+exec automate-backend-elasticsidecar    
