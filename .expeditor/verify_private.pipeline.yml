@@ -55,7 +55,7 @@ steps:
   - label: build
     command:
       - scripts/verify_build.sh
-    timeout_in_minutes: 60
+    timeout_in_minutes: 120
     env:
       ALLOW_LOCAL_PACKAGES: true
       HAB_STUDIO_SUP: false
