@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -249,7 +250,7 @@ func Test_checkLicenseExpiry(t *testing.T) {
 					},
 				},
 			},
-			wantErr: errors.New("Your Progress® Chef® Automate™ license expired on 20-07-2024 and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com."),
+			wantErr: errors.New(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %v and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", time.Unix(int64(time.Now().AddDate(0, 0, -2).Unix()), 0).Format("02-01-2006"))),
 		},
 		{
 			name: "No License is applied",
