@@ -1760,9 +1760,6 @@ func (c *certRotateFlow) patchOSRootCAOnFrontend(infra *AutomateHAInfraDetails, 
 		timeout:         1000,
 	}
 	opensearchCerts, err := c.getCerts(infra, &opensearchFlagsObj)
-	if err != nil {
-		return err
-	}
 	nodeDn := pkix.Name{}
 	patchConfig := ""
 	nodeDn, err = getDistinguishedNameFromKey(opensearchCerts.publicCert)
