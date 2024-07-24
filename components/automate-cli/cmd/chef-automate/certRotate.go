@@ -1412,9 +1412,11 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	if err != nil {
 		return err
 	}
-	err = c.patchPgRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
-	if err != nil {
-		return err
+	if len(templateCerts.PostgreSQL.RootCA) != 0 {
+		err = c.patchPgRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
+		if err != nil {
+			return err
+		}
 	}
 	c.writer.Println("PG certificate rotated and node restarted")
 	timeElapsed := time.Since(start)
@@ -1428,9 +1430,11 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 			return err
 		}
 	}
-	err = c.patchOSRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
-	if err != nil {
-		return err
+	if len(templateCerts.OpenSearch.RootCA) != 0 {
+		err = c.patchOSRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
+		if err != nil {
+			return err
+		}
 	}
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
