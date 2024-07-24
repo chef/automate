@@ -510,7 +510,9 @@ func restartFollowerNodeAndWaitForhealthy(leaderNode NodeIpHealth, pgIps []strin
 	start := time.Now()
 	followers := make(map[string]bool)
 	for _, followerNodes := range pgIps {
-		followers[followerNodes] = false
+		if !strings.EqualFold(followerNodes, leaderNode.IP) {
+			followers[followerNodes] = false
+		}
 	}
 	for {
 		healthy := false

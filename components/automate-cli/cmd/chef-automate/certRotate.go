@@ -267,7 +267,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		}
 
 		if len(flagsObj.cluster) > 0 {
-			err = c.certRotateFromTemplate(flagsObj.cluster, sshUtil, infra, currentCertsInfo, statusSummary, true, 10, 60)
+			err = c.certRotateFromTemplate(flagsObj.cluster, sshUtil, infra, currentCertsInfo, statusSummary, true, 10, flagsObj)
 			if err != nil {
 				return err
 			}
@@ -1270,8 +1270,8 @@ func getMaxPGLag(log logger.Logger, statusSummary StatusSummary) (int64, error) 
 	return lag, nil
 }
 
-func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, onOFFSwitch string, hostIps []string, log logger.Logger, writer *cli.Writer) error {
-	sshConfig.Timeout = 30
+func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, onOFFSwitch string, hostIps []string, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
+	sshConfig.Timeout = int(totalWaitTimeOut.Seconds())
 	if onOFFSwitch == ON {
 		writer.Println("turning ON maintenace mode")
 	}
@@ -1286,25 +1286,12 @@ func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshu
 	for _, result := range excuteResults {
 		printCertRotateOutput(result, "frontend", writer)
 	}
-	return nil
 }
 
-func startTrafficOnAutomateNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer) error {
+func startTrafficOnFrontendNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
 	hostIps := infra.Outputs.AutomatePrivateIps.Value
-	err := frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func startTrafficOnChefServerNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer) error {
-	hostIps := infra.Outputs.ChefServerPrivateIps.Value
-	err := frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer)
-	if err != nil {
-		return err
-	}
-	return nil
+	hostIps = append(hostIps, infra.Outputs.ChefServerPrivateIps.Value...)
+	frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer, totalWaitTimeOut)
 }
 
 func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtils sshutils.SSHUtil, log logger.Logger, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration, writer *cli.Writer) error {
@@ -1324,10 +1311,7 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 			return status.New(status.InvalidCommandArgsError, errMLSA)
 		}
 	}
-	err = frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtils, ON, fontendIps, log, writer)
-	if err != nil {
-		return err
-	}
+	frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtils, ON, fontendIps, log, writer, totalWaitTimeOut)
 
 	waitingStart := time.Now()
 	time.Sleep(waitTime * time.Second)
@@ -1365,7 +1349,11 @@ func getCertsFromTemplate(clusterCertificateFile string) (*CertificateToml, erro
 	return certifiacates, nil
 }
 
-func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
+func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, flagsObj *certRotateFlags) error {
+	totalWaitTimeOut := time.Duration(1000)
+	if flagsObj.timeout > 0 {
+		totalWaitTimeOut = time.Duration(flagsObj.timeout)
+	}
 	sshConfig := c.getSshDetails(infra)
 	configRes := sshutils.SSHConfig{
 		SshUser:    sshConfig.sshUser,
@@ -1400,8 +1388,7 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		c.log.Debug("==========================================================")
 		c.log.Debug("Defer Starting traffic MAINTENANICE MODE OFF")
 		c.log.Debug("==========================================================")
-		startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, c.writer)
-		startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, c.writer)
+		startTrafficOnFrontendNode(infra, configRes, c.sshUtil, c.log, c.writer, totalWaitTimeOut)
 	}()
 
 	if templateCerts != nil {
@@ -1425,6 +1412,10 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	if err != nil {
 		return err
 	}
+	err = c.patchPgRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
+	if err != nil {
+		return err
+	}
 	c.writer.Println("PG certificate rotated and node restarted")
 	timeElapsed := time.Since(start)
 	c.log.Debug("Time elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
@@ -1436,6 +1427,10 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 		if err != nil {
 			return err
 		}
+	}
+	err = c.patchOSRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
+	if err != nil {
+		return err
 	}
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
@@ -1457,14 +1452,6 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
-	c.log.Debug("==========================================================")
-	c.log.Debug("Starting traffic on Autoamate nodes MAINTENANICE MODE OFF")
-	c.log.Debug("==========================================================")
-	err = startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, writer)
-	if err != nil {
-		return err
-	}
-
 	for i, csIp := range templateCerts.ChefServer.IPS {
 		c.writer.Printf("Rotating Chef Server node %d certificates \n", i)
 		err := c.rotateChefServerNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &csIp)
@@ -1477,12 +1464,10 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	c.log.Debug("Time elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
 
 	c.log.Debug("==========================================================")
-	c.log.Debug("Starting traffic on chef server nodes MAINTENANICE MODE OFF")
+	c.log.Debug("Starting traffic on frontend nodes MAINTENANICE MODE OFF")
 	c.log.Debug("==========================================================")
-	err = startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer)
-	if err != nil {
-		return err
-	}
+
+	startTrafficOnFrontendNode(infra, configRes, c.sshUtil, c.log, writer, totalWaitTimeOut)
 	return nil
 }
 
@@ -1590,7 +1575,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 		return err
 	}
 	timeElapsed := time.Since(start)
-	c.log.Debug("Time taken to roate PostgreSQL node %s certificate at %f \n", pgIps.IP, timeElapsed.Seconds())
+	c.log.Debug("Time taken to rotate PostgreSQL node %s certificate at %f \n", pgIps.IP, timeElapsed.Seconds())
 	return nil
 }
 
@@ -1729,6 +1714,94 @@ func (c *certRotateFlow) rotateChefServerNodeCerts(infra *AutomateHAInfraDetails
 	return c.rotateClusterFrontendCertificates(infra, sshUtil, flagsObj, currentCertsInfo, certToml)
 }
 
+func (c *certRotateFlow) patchPgRootCAOnFrontend(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
+	postgreSQLRootCA, err := c.getCertFromFile(certToml.PostgreSQL.RootCA, infra)
+	if err != nil {
+		return err
+	}
+	frontendIps := infra.Outputs.AutomatePrivateIps.Value
+	frontendIps = append(frontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
+	fileName := "cert-rotate-pg-fe.toml"
+	patchConfig := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, string(postgreSQLRootCA))
+	for _, fIp := range frontendIps {
+		flagsObj := certRotateFlags{
+			node:    fIp,
+			timeout: 1000,
+		}
+		timestamp := time.Now().Format("20060102150405")
+		patchFnParam := &patchFnParameters{
+			sshUtil:       sshUtil,
+			config:        patchConfig,
+			fileName:      fileName,
+			timestamp:     timestamp,
+			remoteService: FRONTEND,
+			concurrent:    true,
+			infra:         infra,
+			flagsObj:      &flagsObj,
+			skipIpsList:   []string{},
+		}
+		err = c.patchConfig(patchFnParam, true)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *certRotateFlow) patchOSRootCAOnFrontend(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
+	opensearchFlagsObj := certRotateFlags{
+		opensearch:      true,
+		rootCAPath:      certToml.OpenSearch.RootCA,
+		adminKeyPath:    certToml.OpenSearch.AdminPrivateKey,
+		adminCertPath:   certToml.OpenSearch.AdminPublickey,
+		privateCertPath: certToml.OpenSearch.IPS[0].PrivateKey,
+		publicCertPath:  certToml.OpenSearch.IPS[0].Publickey,
+		node:            certToml.OpenSearch.IPS[0].IP,
+		timeout:         1000,
+	}
+	opensearchCerts, err := c.getCerts(infra, &opensearchFlagsObj)
+	if err != nil {
+		return err
+	}
+	nodeDn := pkix.Name{}
+	patchConfig := ""
+	nodeDn, err = getDistinguishedNameFromKey(opensearchCerts.publicCert)
+	if err != nil {
+		return err
+	}
+	opensearchRootCA, err := c.getCertFromFile(certToml.OpenSearch.RootCA, infra)
+	if err != nil {
+		return err
+	}
+	patchConfig = patchConfig + "\n" + fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, string(opensearchRootCA), nodeDn.CommonName)
+	frontendIps := infra.Outputs.AutomatePrivateIps.Value
+	frontendIps = append(frontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
+	fileName := "cert-rotate-os-fe.toml"
+	for _, fIp := range frontendIps {
+		flagsObj := certRotateFlags{
+			node:    fIp,
+			timeout: 1000,
+		}
+		timestamp := time.Now().Format("20060102150405")
+		patchFnParam := &patchFnParameters{
+			sshUtil:       sshUtil,
+			config:        patchConfig,
+			fileName:      fileName,
+			timestamp:     timestamp,
+			remoteService: FRONTEND,
+			concurrent:    true,
+			infra:         infra,
+			flagsObj:      &flagsObj,
+			skipIpsList:   []string{},
+		}
+		err = c.patchConfig(patchFnParam, true)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfraDetails, sshUtil SSHUtil, flagsObj certRotateFlags, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
 	certs, err := c.getCerts(infra, &flagsObj)
 	if err != nil {
@@ -1781,6 +1854,7 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 
 	// Creating and patching the required configurations.
 	patchConfig = patchConfig + "\n" + fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
+
 	concurrent := true
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
@@ -1879,6 +1953,9 @@ func getIPS(infra *AutomateHAInfraDetails, nodeType string) []IP {
 
 func (c *certRotateFlow) validateCertificateTemplate(template *CertificateToml, infra *AutomateHAInfraDetails) []error {
 	errs := []error{}
+	// if len(template.Automate.IPS) == 0 || len(template.ChefServer.IPS) == 0 {
+	// 	errs = append(errs, errors.New("Frontend node entry is mandatory in certificate template please don't remove it."))
+	// }
 	if len(template.Automate.RootCA) != 0 {
 		RootCA, err := c.getCertFromFile(template.Automate.RootCA, infra)
 		if err != nil {
