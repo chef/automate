@@ -278,11 +278,11 @@ func checkConfigGenFileExist(outFile string, fsu fileutils.FileUtils) error {
 }
 
 var ocIdShowAppCmd = &cobra.Command{
-	Use:   "oc-id-show-app",
-	Short: "Get the details of the oauth applications registered with OC-ID",
-	Long:  "Get the details of the oauth applications registered with OC-ID",
-	// PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE: runOcIdShowAppCommand,
+	Use:               "oc-id-show-app",
+	Short:             "Get the details of the oauth applications registered with OC-ID",
+	Long:              "Get the details of the oauth applications registered with OC-ID",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runOcIdShowAppCommand,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
