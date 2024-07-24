@@ -352,13 +352,13 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	}
 
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
-	gracePeriodDuration := 60
+	//gracePeriodDuration := 60
 	aboutToExpire := 60
 	currentTime := time.Now()
 	daysUntilExpiration := int(licenseValidDate.Sub(currentTime).Hours() / 24)
-	gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
+	//gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
 	licenseDate := licenseValidDate.Format("02-01-2006")
-	graceDate := gracePeriodDate.Format("02-01-2006")
+	//graceDate := gracePeriodDate.Format("02-01-2006")
 
 	if daysUntilExpiration > aboutToExpire {
 		// If the license is not about to expire within 60 days, do nothing.
@@ -369,17 +369,20 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	if licenseResult.Result.LicenseType == commercial {
 		if !licenseResult.Result.GracePeriod {
 			if daysUntilExpiration <= aboutToExpire && daysUntilExpiration > 0 {
-				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! To avoid any future disruption to your DevOps processes, update your license! Please contact the Account Team or email us at chef-account-team@progress.com for further assistance.", licenseDate))
+				// cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! To avoid any future disruption to your DevOps processes, update your license! Please contact the Account Team or email us at chef-account-team@progress.com for further assistance.", licenseDate))
+				return nil
 			} else {
 				return status.New(
 					status.LicenseError, fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", licenseDate))
 			}
-		} else {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", graceDate))
+		} else { // on grade period
+			//	cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", graceDate))
+			return nil
 		}
 	} else { // for trail and internal licenses
 		if daysUntilExpiration > 0 {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
+			// cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
+			return nil
 		} else {
 			return status.New(
 				status.LicenseError, "Your Progress® Chef® Automate™ license has expired! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
@@ -404,13 +407,13 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 
 	// Calculate the license valid date
 	licenseValidDate := time.Unix(licenseResult.Result.ExpirationDate.Seconds, 0) // gives unix time stamp in utc
-	gracePeriodDuration := 60
+	//gracePeriodDuration := 60
 	aboutToExpire := 60
 	currentTime := time.Now()
 	daysUntilExpiration := int(licenseValidDate.Sub(currentTime).Hours() / 24)
-	gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
-	licenseDate := licenseValidDate.Format("02-01-2006")
-	graceDate := gracePeriodDate.Format("02-01-2006")
+	//gracePeriodDate := licenseValidDate.AddDate(0, 0, gracePeriodDuration)
+	//licenseDate := licenseValidDate.Format("02-01-2006")
+	//graceDate := gracePeriodDate.Format("02-01-2006")
 
 	if daysUntilExpiration > aboutToExpire {
 		// If the license is not about to expire within 60 days, do nothing.
@@ -420,18 +423,23 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 	if licenseResult.Result.LicenseType == commercial {
 		if !licenseResult.Result.GracePeriod {
 			if daysUntilExpiration <= aboutToExpire && daysUntilExpiration > 0 {
-				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! To avoid any future disruption to your DevOps processes, update your license! Please contact the Account Team or email us at chef-account-team@progress.com for further assistance.", licenseDate))
+				//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! To avoid any future disruption to your DevOps processes, update your license! Please contact the Account Team or email us at chef-account-team@progress.com for further assistance.", licenseDate))
+				return
 			} else {
-				cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", licenseDate))
+				//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", licenseDate))
+				return
 			}
 		} else {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", graceDate))
+			//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", graceDate))
+			return
 		}
 	} else { // for trail and internal licenses
 		if daysUntilExpiration > 0 {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
+			// cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
+			return
 		} else {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
+			//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
+			return
 		}
 	}
 }

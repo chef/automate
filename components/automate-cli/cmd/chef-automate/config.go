@@ -158,12 +158,12 @@ var configCmd = &cobra.Command{
 }
 
 var showConfigCmd = &cobra.Command{
-	Use:               "show [/path/to/write/config.toml]",
-	Short:             "show the Chef Automate configuration",
-	Long:              "Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runShowCmd,
-	Args:              cobra.RangeArgs(0, 2),
+	Use:   "show [/path/to/write/config.toml]",
+	Short: "show the Chef Automate configuration",
+	Long:  "Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runShowCmd,
+	Args: cobra.RangeArgs(0, 2),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
