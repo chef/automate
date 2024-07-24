@@ -3420,74 +3420,7 @@ func TestGetScriptCommandsNoRestart(t *testing.T) {
 
 }
 
-func TestRotateClusterOSRootFrontendCertificates(t *testing.T) {
-	_, infra := getMockCertRotateFlowAndInfra()
-	type testCaseInfo struct {
-		description      string
-		inf              *AutomateHAInfraDetails
-		flagsObj         certRotateFlags
-		currentCertsInfo *certShowCertificates
-		certToml         *CertificateToml
-		MockSSHUtil      sshutils.SSHUtil
-		sshutil          SSHUtil
-		isError          bool
-		ExpectedError    string
-	}
-	testCases := []testCaseInfo{
-		{
-			description: "Rotate OS Root Frontend Certs",
-			inf:         infra,
-			flagsObj: certRotateFlags{
-				timeout: 1000,
-			},
-			currentCertsInfo: mockCertShowCertificates(),
-			certToml:         mockCertifiateTemplate(),
-			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
-			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
-					return []sshutils.Result{
-						{
-							HostIP: "",
-							Error:  nil,
-							Output: "",
-						},
-					}
-				},
-				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
-					return []sshutils.Result{
-						{
-							HostIP: "",
-							Error:  nil,
-							Output: "",
-						},
-					}
-				},
-				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
-					return "", nil
-				},
-			},
-			isError:       false,
-			ExpectedError: "No  IPs are found",
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.description, func(t *testing.T) {
-			c := certRotateFlow{fileUtils: mockFS(),
-				sshUtil: testCase.MockSSHUtil,
-				writer:  getMockWriterImpl()}
-			output := c.patchOSRootCAOnFrontend(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml)
-			fmt.Println(output)
-			if testCase.isError {
-				assert.Error(t, output, testCase.ExpectedError)
-			} else {
-				assert.NoError(t, output)
-			}
-		})
-	}
-}
-
-func TestRotateClusterPGRootFrontendCertificates(t *testing.T) {
+func TestRotateClusterPGOSRootFrontendCertificates(t *testing.T) {
 	_, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
 		description      string
@@ -3543,7 +3476,7 @@ func TestRotateClusterPGRootFrontendCertificates(t *testing.T) {
 			c := certRotateFlow{fileUtils: mockFS(),
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl()}
-			output := c.patchPgRootCAOnFrontend(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml)
+			output := c.patchPGOSRootCAOnFrontend(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml)
 			fmt.Println(output)
 			if testCase.isError {
 				assert.Error(t, output, testCase.ExpectedError)
