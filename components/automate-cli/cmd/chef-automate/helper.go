@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -154,7 +153,10 @@ func runTheCommandOnHAWarn(cmd *cobra.Command, args []string, e LExecutor) error
 		return err
 	}
 
-	warnIfLicenseNearExpiry(licenseResult)
+	err = warnIfLicenseNearExpiry(licenseResult)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -266,7 +268,10 @@ func WarnLicenseStatusForExpiry(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			warnIfLicenseNearExpiry(licenseResult)
+			err = warnIfLicenseNearExpiry(licenseResult)
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 	}
@@ -392,17 +397,16 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 	return nil
 }
 
-func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
+func warnIfLicenseNearExpiry(licenseResult *LicenseResult) error {
 	if licenseResult.Result.LicenseId == "" {
 		if licenseResult.ErrorType != "" {
-			cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(status.New(
+			return status.New(
 				status.DeploymentServiceCallError,
 				licenseResult.ErrorDescription,
-			).Error())
-
+			)
 		}
-		cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
-		return
+		return status.New(
+			status.LicenseError, "Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
 	}
 
 	// Calculate the license valid date
@@ -417,29 +421,29 @@ func warnIfLicenseNearExpiry(licenseResult *LicenseResult) {
 
 	if daysUntilExpiration > aboutToExpire {
 		// If the license is not about to expire within 60 days, do nothing.
-		return
+		return nil
 	}
 	// If the license type is commercial, adding a grace period of 60 days
 	if licenseResult.Result.LicenseType == commercial {
 		if !licenseResult.Result.GracePeriod {
 			if daysUntilExpiration <= aboutToExpire && daysUntilExpiration > 0 {
 				//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! To avoid any future disruption to your DevOps processes, update your license! Please contact the Account Team or email us at chef-account-team@progress.com for further assistance.", licenseDate))
-				return
+				return nil
 			} else {
 				//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you no longer have access to Chef Automate! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", licenseDate))
-				return
+				return nil
 			}
 		} else {
 			//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license expired on %s and you are currently on a limited extension period! To get a new license, please contact the Account Team or email us at chef-account-team@progress.com.", graceDate))
-			return
+			return nil
 		}
 	} else { // for trail and internal licenses
 		if daysUntilExpiration > 0 {
 			// cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn(fmt.Sprintf("Your Progress® Chef® Automate™ license is set to expire on %s! Please get in touch with the Account Team for further assistance.", licenseDate))
-			return
+			return nil
 		} else {
 			//cli.NewWriter(os.Stdout, os.Stderr, os.Stdin).Warn("Your Progress® Chef® Automate™ license has expired or does not exist! You no longer have access to Chef Automate. Please contact the Account Team to upgrade to an Enterprise License.")
-			return
+			return nil
 		}
 	}
 }
