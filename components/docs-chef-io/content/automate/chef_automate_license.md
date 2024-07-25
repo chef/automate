@@ -53,7 +53,7 @@ To apply for the license, follow the steps:
 1. If you already have a license key, paste it in the popup box and check the I agree to the Terms and Service box.
 1. Select **Apply License**.
 
-IMAGE
+{{< figure src="/images/automate/trial-license-expire-popup.png" alt="Chef Automate Trial License Expire Popup">}}
 
 ## When the enterprise license is about to expire
 
@@ -97,7 +97,7 @@ IMAGE
 
 Once an enterprise license expires, the web UI throws the following popup:
 
-IMAGE
+{{< figure src="/images/automate/enterprise-license-expire-popup.png" alt="Chef Automate Enterprise License Expire Popup">}}
 
 You cannot use Chef Automate features and capabilities. To continue using Chef Automate, apply again for the Chef Automate license using the following steps:
 
