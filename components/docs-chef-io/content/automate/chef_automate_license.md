@@ -22,11 +22,9 @@ Chef Automate is built around a web user interface that provides visibility into
 
 For more information on Chef licenses, see [Chef’s licensing documentation](https://docs.chef.io/licensing/).
 
-## Web User Interface
-
 Following are some of the scenarios that will occur when you use the Chef Automate web user interface:
 
-### When the trial license is about to expire
+## When the trial license is about to expire
 
 If you are using a trial license, Chef Automate web UI will notify you when your license is about to expire.
 
@@ -45,7 +43,7 @@ To apply new Chef Automate license, follow the steps:
 
 IMAGE
 
-### When the trial license is expired
+## When the trial license is expired
 
 Once a license expires, you cannot use Chef Automate features and capabilities. All trial licenses will cease to operate once the expiry date has elapsed. To continue using Chef Automate, you have to upgrade to an Enterprise License.
 
@@ -57,7 +55,7 @@ To apply for the license, follow the steps:
 
 IMAGE
 
-### When the enterprise license is about the expire
+## When the enterprise license is about the expire
 
 In the new version of Chef Automate, capabilities and features will be restricted according to the tenure and purpose of the existing license. This will help us better serve both community and commercial users.
 
@@ -78,7 +76,7 @@ To apply new Chef Automate license, follow the steps:
 
 IMAGE
 
-### When the enterprise license is expired
+## When the enterprise license is expired
 
 On expiry of the license, you can continue to use the product for a grace period of 60 days. You can apply for the new license at the tenure of the grace period.
 
