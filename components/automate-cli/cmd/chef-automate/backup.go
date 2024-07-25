@@ -163,12 +163,12 @@ var backupCmd = &cobra.Command{
 }
 
 var createBackupCmd = &cobra.Command{
-	Use:               "create",
-	Short:             "create a backup of Chef Automate",
-	Long:              "Create a backup of Chef Automate",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runCreateBackupCmd,
-	Args:              cobra.MaximumNArgs(0),
+	Use:   "create",
+	Short: "create a backup of Chef Automate",
+	Long:  "Create a backup of Chef Automate",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runCreateBackupCmd,
+	Args: cobra.MaximumNArgs(0),
 }
 
 type createBackupResult struct {
@@ -319,7 +319,13 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 
 func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomateHAInfraDetails, subCommand string) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true, subCommand)
+		// Enforce license on backup create command
+		err := checkLicenseStatusForExpiry(cmd, args)
+		if err != nil {
+			return err
+		}
+
+		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true, subCommand)
 		if err != nil {
 			return err
 		}
@@ -343,6 +349,12 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 		os.Exit(1)
 	}
 	if strings.Contains(cmd.CommandPath(), "delete") {
+		// Enforce license on backup delete command
+		err := checkLicenseStatusForExpiry(cmd, args)
+		if err != nil {
+			return err
+		}
+
 		affirmation, err := takeDeleteAffirmation(args)
 		if err != nil {
 			return err
