@@ -43,11 +43,11 @@ func init() {
 	var restartCmdFlags = RestartCmdFlags{}
 	var restartServicesCmd = &cobra.Command{
 
-		Use:               "restart-services",
-		Short:             "restart deployment services",
-		Long:              "Restart services for a deployment",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
-		RunE:              runRestartServicesCmd(&restartCmdFlags),
+		Use:   "restart-services",
+		Short: "restart deployment services",
+		Long:  "Restart services for a deployment",
+		//PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE: runRestartServicesCmd(&restartCmdFlags),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
