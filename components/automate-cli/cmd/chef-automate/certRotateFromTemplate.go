@@ -14,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var automateStartedChan = make(chan bool)
+
 func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, flagsObj *certRotateFlags) error {
 	totalWaitTimeOut := time.Duration(1000)
 	if flagsObj.timeout > 0 {
@@ -53,7 +55,8 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		c.log.Debug("==========================================================")
 		c.log.Debug("Defer Starting traffic MAINTENANICE MODE OFF")
 		c.log.Debug("==========================================================")
-		startTrafficOnFrontendNode(infra, configRes, c.sshUtil, c.log, c.writer, totalWaitTimeOut)
+		startTrafficOnAutomateNode(infra, configRes, c.sshUtil, c.log, c.writer, totalWaitTimeOut)
+		startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, c.writer, totalWaitTimeOut)
 	}()
 
 	if templateCerts != nil {
@@ -62,10 +65,6 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 			return err
 		}
 	}
-	return nil
-}
-func (c *certRotateFlow) hanndleTemplateCertRotation(templateCerts *CertificateToml, configRes sshutils.SSHConfig, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
-
 	return nil
 }
 func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *CertificateToml, configRes sshutils.SSHConfig, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
@@ -95,7 +94,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	}
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
-
+	automateIps := map[string]bool{}
 	filterIps := []IP{}
 	// rotate AutomateCerts
 	for i, a2Ip := range templateCerts.Automate.IPS {
@@ -105,22 +104,25 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 			return err
 		}
 		filterIps = append(filterIps, a2Ip)
+		automateIps[a2Ip.IP] = true
 	}
-
-	if err != nil {
-		return err
-	}
+	automateStartedChan <- true
 
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
 	for i, csIp := range templateCerts.ChefServer.IPS {
-		c.writer.Printf("Rotating Chef Server node %d certificates \n", i)
-		err := c.rotateChefServerNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &csIp)
-		if err != nil {
-			return err
+		if _, ok := automateIps[csIp.IP]; !ok {
+			c.writer.Printf("Rotating Chef Server node %d certificates \n", i)
+			err := c.rotateChefServerNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &csIp)
+			if err != nil {
+				return err
+			}
+			filterIps = append(filterIps, csIp)
+		} else {
+
 		}
-		filterIps = append(filterIps, csIp)
+
 	}
 
 	timeElapsed = time.Since(start)
@@ -138,7 +140,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	c.log.Debug("Starting traffic on frontend nodes MAINTENANICE MODE OFF")
 	c.log.Debug("==========================================================")
 
-	startTrafficOnFrontendNode(infra, configRes, c.sshUtil, c.log, writer, totalWaitTimeOut)
+	startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer, totalWaitTimeOut)
 	return nil
 }
 

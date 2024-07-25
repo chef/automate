@@ -126,9 +126,13 @@ func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshu
 	}
 }
 
-func startTrafficOnFrontendNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
+func startTrafficOnAutomateNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
 	hostIps := infra.Outputs.AutomatePrivateIps.Value
-	hostIps = append(hostIps, infra.Outputs.ChefServerPrivateIps.Value...)
+	frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer, totalWaitTimeOut)
+}
+
+func startTrafficOnChefServerNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
+	hostIps := infra.Outputs.ChefServerPrivateIps.Value
 	frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer, totalWaitTimeOut)
 }
 
@@ -150,6 +154,13 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 		}
 	}
 	frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtils, ON, fontendIps, log, writer, totalWaitTimeOut)
+
+	go func(automateStarted chan bool) {
+		isAutomateStarted := <-automateStarted
+		if isAutomateStarted {
+			startTrafficOnAutomateNode(infra, sshConfig, sshUtils, log, writer, totalWaitTimeOut)
+		}
+	}(automateStartedChan)
 
 	waitingStart := time.Now()
 	time.Sleep(waitTime * time.Second)
