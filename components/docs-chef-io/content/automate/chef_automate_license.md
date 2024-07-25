@@ -28,7 +28,7 @@ Following are some of the scenarios that will occur when you use the Chef Automa
 
 If you are using a trial license, Chef Automate web UI will notify you when your license is about to expire.
 
-IMAGE
+{{< figure src="/images/automate/trial-license-expire-banner.png" alt="Chef Automate Trial License Expire Banner">}}
 
 The banner in the above image says:
 
@@ -41,11 +41,11 @@ To apply for a new Chef Automate license, follow the steps:
 1. Paste the license key in the box and check the I agree to the Terms and Service box.
 1. Select **Apply License**.
 
-IMAGE
+{{< figure src="/images/automate/trial-license-about-to-expire-popup.png" alt="Chef Automate Trial License about to Expire Popup">}}
 
 ## When the trial license is expired
 
-Once a license expires, you cannot use Chef Automate features and capabilities. All trial licenses will cease to operate once the expiry date has elapsed. To continue using Chef Automate, you myst upgrade to an Enterprise License.
+Once a license expires, you cannot use Chef Automate features and capabilities. All trial licenses will cease to operate once the expiry date has elapsed. To continue using Chef Automate, you must upgrade to an Enterprise License.
 
 To apply for the license, follow the steps:
 
@@ -61,7 +61,7 @@ In the new version of Chef Automate, capabilities, and features will be restrict
 
 If you are using an enterprise license, Chef Automate web UI will notify you when your license is about to expire.
 
-IMAGE
+{{< figure src="/images/automate/enterprise-license-about-to-expire-banner.png" alt="Chef Automate Enterprise License Expire Banner">}}
 
 The banner in the above image says:
 
@@ -74,13 +74,13 @@ To apply for a new Chef Automate license, follow the steps:
 1. Paste the license key in the box and check the I agree to the Terms and Service box.
 1. Select **Apply License**.
 
-IMAGE
+{{< figure src="/images/automate/enterprise-license-about-to-expire-popup.png" alt="Chef Automate Enterprise License about to Expire Popup">}}
 
 ## When the enterprise license is expired
 
 On expiry of the license, you can continue to use the product for a grace period of 60 days. You can apply for the new license during the grace period.
 
-IMAGE
+{{< figure src="/images/automate/enterprise-license-expire-grace-period-banner.png" alt="Chef Automate Enterprise License Grace Period Banner">}}
 
 The banner in the above image says:
 
@@ -93,7 +93,7 @@ To apply again for the Chef Automate license, follow the steps:
 1. Paste the license key in the box and check the I agree to the Terms and Service box.
 1. Select **Apply License**.
 
-IMAGE
+{{< figure src="/images/automate/enterprise-license-expire-grace-period-popup.png" alt="Chef Automate Enterprise License Grace Period Popup">}}
 
 Once an enterprise license expires, the web UI throws the following popup:
 
