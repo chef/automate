@@ -394,7 +394,6 @@ func checkLicenseExpiry(licenseResult *LicenseResult) error {
 		}
 	}
 
-	return nil
 }
 
 func warnIfLicenseNearExpiry(licenseResult *LicenseResult) error {
