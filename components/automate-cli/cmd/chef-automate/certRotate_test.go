@@ -3432,6 +3432,31 @@ func TestRotateClusterPGOSRootFrontendCertificates(t *testing.T) {
 		sshutil          SSHUtil
 		isError          bool
 		ExpectedError    string
+		FilterIps        []IP
+		ExpectedPatch    []string
+	}
+	mocksshUtils := &sshutils.MockSSHUtilsImpl{
+		CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+			return "", nil
+		},
 	}
 	testCases := []testCaseInfo{
 		{
@@ -3443,31 +3468,52 @@ func TestRotateClusterPGOSRootFrontendCertificates(t *testing.T) {
 			currentCertsInfo: mockCertShowCertificates(),
 			certToml:         mockCertifiateTemplate(),
 			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
-			MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
-					return []sshutils.Result{
-						{
-							HostIP: "",
-							Error:  nil,
-							Output: "",
-						},
-					}
-				},
-				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
-					return []sshutils.Result{
-						{
-							HostIP: "",
-							Error:  nil,
-							Output: "",
-						},
-					}
-				},
-				Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
-					return "", nil
+			MockSSHUtil:      mocksshUtils,
+			isError:          false,
+			ExpectedError:    "No  IPs are found",
+			FilterIps:        []IP{},
+			ExpectedPatch:    []string{ValidIP, ValidIP1, ValidIP2, ValidIP3},
+		},
+		{
+			description: "Rotate PG Root Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				timeout: 1000,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil:      mocksshUtils,
+			isError:          false,
+			ExpectedError:    "No  IPs are found",
+			FilterIps: []IP{
+				{
+					IP: ValidIP1,
 				},
 			},
-			isError:       false,
-			ExpectedError: "No  IPs are found",
+			ExpectedPatch: []string{ValidIP, ValidIP2, ValidIP3},
+		},
+		{
+			description: "Rotate PG Root Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				timeout: 1000,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil:      mocksshUtils,
+			isError:          false,
+			ExpectedError:    "No  IPs are found",
+			FilterIps: []IP{
+				{
+					IP: ValidIP1,
+				},
+				{
+					IP: ValidIP3,
+				},
+			},
+			ExpectedPatch: []string{ValidIP, ValidIP2},
 		},
 	}
 
@@ -3476,12 +3522,13 @@ func TestRotateClusterPGOSRootFrontendCertificates(t *testing.T) {
 			c := certRotateFlow{fileUtils: mockFS(),
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl()}
-			output := c.patchPGOSRootCAOnFrontend(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml)
+			filteredIps, output := c.patchPGOSRootCAOnFrontend(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml, testCase.FilterIps)
 			fmt.Println(output)
 			if testCase.isError {
 				assert.Error(t, output, testCase.ExpectedError)
 			} else {
 				assert.NoError(t, output)
+				assert.EqualValues(t, testCase.ExpectedPatch, filteredIps)
 			}
 		})
 	}

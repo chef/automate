@@ -64,6 +64,10 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 	}
 	return nil
 }
+func (c *certRotateFlow) hanndleTemplateCertRotation(templateCerts *CertificateToml, configRes sshutils.SSHConfig, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
+
+	return nil
+}
 func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *CertificateToml, configRes sshutils.SSHConfig, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration) error {
 
 	// rotating PG certs
@@ -92,13 +96,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
 
-	//patch pg and opensearch root ca in frontend nodes
-	if len(templateCerts.OpenSearch.RootCA) != 0 || len(templateCerts.PostgreSQL.RootCA) != 0 {
-		err = c.patchPGOSRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts)
-		if err != nil {
-			return err
-		}
-	}
+	filterIps := []IP{}
 	// rotate AutomateCerts
 	for i, a2Ip := range templateCerts.Automate.IPS {
 		c.writer.Printf("Rotating Automate node %d certificates \n", i)
@@ -106,6 +104,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 		if err != nil {
 			return err
 		}
+		filterIps = append(filterIps, a2Ip)
 	}
 
 	if err != nil {
@@ -121,10 +120,19 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 		if err != nil {
 			return err
 		}
+		filterIps = append(filterIps, csIp)
 	}
 
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
+
+	//patch pg and opensearch root ca in frontend nodes
+	if len(templateCerts.OpenSearch.RootCA) != 0 || len(templateCerts.PostgreSQL.RootCA) != 0 {
+		_, err = c.patchPGOSRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts, filterIps)
+		if err != nil {
+			return err
+		}
+	}
 
 	c.log.Debug("==========================================================")
 	c.log.Debug("Starting traffic on frontend nodes MAINTENANICE MODE OFF")
@@ -377,38 +385,7 @@ func (c *certRotateFlow) rotateChefServerNodeCerts(infra *AutomateHAInfraDetails
 	return c.rotateClusterFrontendCertificates(infra, sshUtil, flagsObj, currentCertsInfo, certToml)
 }
 
-// func (c *certRotateFlow) patchPgRootCAOnFrontend(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
-
-// 	frontendIps := infra.Outputs.AutomatePrivateIps.Value
-// 	frontendIps = append(frontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
-// 	fileName := "cert-rotate-pg-fe.toml"
-
-// 	for _, fIp := range frontendIps {
-// 		flagsObj := certRotateFlags{
-// 			node:    fIp,
-// 			timeout: 1000,
-// 		}
-// 		timestamp := time.Now().Format("20060102150405")
-// 		patchFnParam := &patchFnParameters{
-// 			sshUtil:       sshUtil,
-// 			config:        patchConfig,
-// 			fileName:      fileName,
-// 			timestamp:     timestamp,
-// 			remoteService: FRONTEND,
-// 			concurrent:    true,
-// 			infra:         infra,
-// 			flagsObj:      &flagsObj,
-// 			skipIpsList:   []string{},
-// 		}
-// 		err = c.patchConfig(patchFnParam, true)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// 	return nil
-// }
-
-func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
+func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, certToml *CertificateToml, filterIps []IP) ([]string, error) {
 	patchConfig := ""
 	if len(certToml.OpenSearch.RootCA) != 0 {
 		opensearchFlagsObj := certRotateFlags{
@@ -425,26 +402,32 @@ func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails
 		nodeDn := pkix.Name{}
 		nodeDn, err = getDistinguishedNameFromKey(opensearchCerts.publicCert)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		opensearchRootCA, err := c.getCertFromFile(certToml.OpenSearch.RootCA, infra)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		patchConfig = patchConfig + "\n" + fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, string(opensearchRootCA), nodeDn.CommonName)
 	}
 	if len(certToml.PostgreSQL.RootCA) != 0 {
 		postgreSQLRootCA, err := c.getCertFromFile(certToml.PostgreSQL.RootCA, infra)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		patchConfig = patchConfig + "\n" + fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, string(postgreSQLRootCA))
 	}
 
 	frontendIps := infra.Outputs.AutomatePrivateIps.Value
 	frontendIps = append(frontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
+	ipsTobeSkiped := []string{}
+	for _, filterIp := range filterIps {
+		ipsTobeSkiped = append(ipsTobeSkiped, filterIp.IP)
+	}
+	filteredIps := c.getFilteredIps(frontendIps, ipsTobeSkiped)
+
 	fileName := "cert-rotate-pg-os-fe.toml"
-	for _, fIp := range frontendIps {
+	for _, fIp := range filteredIps {
 		flagsObj := certRotateFlags{
 			node:    fIp,
 			timeout: 1000,
@@ -463,10 +446,10 @@ func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails
 		}
 		err := c.patchConfig(patchFnParam, true)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return filteredIps, nil
 }
 
 func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfraDetails, sshUtil SSHUtil, flagsObj certRotateFlags, currentCertsInfo *certShowCertificates, certToml *CertificateToml) error {
@@ -543,25 +526,6 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 
 func (c *certRotateFlow) validateCertificateTemplate(template *CertificateToml, infra *AutomateHAInfraDetails) []error {
 	errs := []error{}
-	// if len(template.Automate.IPS) == 0 || len(template.ChefServer.IPS) == 0 {
-	// 	errs = append(errs, errors.New("Frontend node entry is mandatory in certificate template please don't remove it."))
-	// }
-	if len(template.Automate.RootCA) != 0 {
-		RootCA, err := c.getCertFromFile(template.Automate.RootCA, infra)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "Automate RootCA file not exist."))
-		}
-		errsNodes := c.validateNodeCerts(template.Automate.IPS, infra, RootCA)
-		errs = append(errs, errsNodes...)
-	}
-	if len(template.ChefServer.RootCA) != 0 {
-		RootCA, err := c.getCertFromFile(template.ChefServer.RootCA, infra)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "Chef Server RootCA file not exist."))
-		}
-		errsNodes := c.validateNodeCerts(template.ChefServer.IPS, infra, RootCA)
-		errs = append(errs, errsNodes...)
-	}
 	if len(template.PostgreSQL.RootCA) != 0 {
 		RootCA, err := c.getCertFromFile(template.PostgreSQL.RootCA, infra)
 		if err != nil {
