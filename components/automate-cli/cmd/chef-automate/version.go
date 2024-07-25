@@ -28,11 +28,11 @@ import (
 )
 
 var versionCmd = &cobra.Command{
-	Use:               "version",
-	Short:             "Show CLI version",
-	Long:              "Show the CLI version.",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
-	RunE:              runVersionCmd,
+	Use:   "version",
+	Short: "Show CLI version",
+	Long:  "Show the CLI version.",
+	// PersistentPreRunE: WarnLicenseStatusForExpiry,
+	RunE: runVersionCmd,
 	Annotations: map[string]string{
 		NoRequireRootAnnotation: NoRequireRootAnnotation,
 		docs.Tag:                docs.BastionHost,
