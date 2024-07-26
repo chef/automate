@@ -185,12 +185,12 @@ var listBackupCmd = &cobra.Command{
 }
 
 var showBackupCmd = &cobra.Command{
-	Use:               "show ID",
-	Short:             "show the Chef Automate backup details",
-	Long:              "Show the details of a Chef Automate backup",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runShowBackupCmd,
-	Args:              cobra.ExactArgs(1),
+	Use:   "show ID",
+	Short: "show the Chef Automate backup details",
+	Long:  "Show the details of a Chef Automate backup",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runShowBackupCmd,
+	Args: cobra.ExactArgs(1),
 }
 
 var backupDeleteCmdFlags = struct {
@@ -198,11 +198,11 @@ var backupDeleteCmdFlags = struct {
 }{}
 
 var deleteBackupCmd = &cobra.Command{
-	Use:               "delete ID [ID2 IDN...]",
-	Short:             "delete backups of Chef Automate",
-	Long:              "Delete one or many backups of Chef Automate that match the space separated strings of backup IDs",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runDeleteBackupCmd,
+	Use:   "delete ID [ID2 IDN...]",
+	Short: "delete backups of Chef Automate",
+	Long:  "Delete one or many backups of Chef Automate that match the space separated strings of backup IDs",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runDeleteBackupCmd,
 }
 
 var restoreBackupCmd = &cobra.Command{
@@ -232,24 +232,24 @@ var statusBackupCmd = &cobra.Command{
 }
 
 var streamStatusBackupCmd = &cobra.Command{
-	Use:               "stream-status",
-	Short:             "Stream the Chef Automate backup runner status",
-	Long:              "Stream the Chef Automate backup runner status",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runStreamBackupStatus,
-	Args:              cobra.ExactArgs(1),
+	Use:   "stream-status",
+	Short: "Stream the Chef Automate backup runner status",
+	Long:  "Stream the Chef Automate backup runner status",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runStreamBackupStatus,
+	Args: cobra.ExactArgs(1),
 	Annotations: map[string]string{
 		docs.Tag: docs.Automate,
 	},
 }
 
 var cancelBackupCmd = &cobra.Command{
-	Use:               "cancel",
-	Short:             "cancel the running backup operation",
-	Long:              "Cancel the currently running backup create, delete, or restore operation",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runCancelBackupCmd,
-	Args:              cobra.ExactArgs(0),
+	Use:   "cancel",
+	Short: "cancel the running backup operation",
+	Long:  "Cancel the currently running backup create, delete, or restore operation",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runCancelBackupCmd,
+	Args: cobra.ExactArgs(0),
 }
 
 var integrityBackupCmd = &cobra.Command{
@@ -258,20 +258,20 @@ var integrityBackupCmd = &cobra.Command{
 }
 
 var integrityBackupShowCmd = &cobra.Command{
-	Use:               "show",
-	Short:             "show the shared object integrity metadata",
-	Long:              "Show the shared object integrity metadata",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runBackupIntegrityShowCmd,
-	Args:              cobra.ExactArgs(0),
+	Use:   "show",
+	Short: "show the shared object integrity metadata",
+	Long:  "Show the shared object integrity metadata",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runBackupIntegrityShowCmd,
+	Args: cobra.ExactArgs(0),
 }
 
 var integrityBackupValidateCmd = &cobra.Command{
-	Use:               "validate [ID IDN]",
-	Short:             "validate the shared object integrity",
-	Long:              "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runValidateBackupIntegrity,
+	Use:   "validate [ID IDN]",
+	Short: "validate the shared object integrity",
+	Long:  "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runValidateBackupIntegrity,
 }
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {
@@ -349,12 +349,6 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 		os.Exit(1)
 	}
 	if strings.Contains(cmd.CommandPath(), "delete") {
-		// Enforce license on backup delete command
-		err := checkLicenseStatusForExpiry(cmd, args)
-		if err != nil {
-			return err
-		}
-
 		affirmation, err := takeDeleteAffirmation(args)
 		if err != nil {
 			return err
@@ -363,7 +357,13 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			commandString = commandString + " --yes"
 		}
 	}
-	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false, subCommand)
+
+	// Enforce license on backup command
+	err := checkLicenseStatusForExpiry(cmd, args)
+	if err != nil {
+		return err
+	}
+	err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false, subCommand)
 	if err != nil {
 		return err
 	}
