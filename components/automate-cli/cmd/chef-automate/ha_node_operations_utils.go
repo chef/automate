@@ -11,10 +11,12 @@ import (
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/remotescripts"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
@@ -491,6 +493,43 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string,
 			}
 			break
 		}
+	}
+	return nil
+}
+
+func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileUtils fileutils.FileUtils, sshUtilPkg sshutils.SSHUtil) error {
+
+	content, err := fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
+	if err != nil {
+		return fmt.Errorf("failed to get manifest auto tfvars: %v", err)
+	}
+
+	contentStr := string(content)
+
+	pgIdentVal, err := findIdentValue(contentStr, PG_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", PG_IDENT, err)
+	}
+	pgLeaderIdentVal, err := findIdentValue(contentStr, PG_LEADER_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", PG_LEADER_IDENT, err)
+	}
+	haProxyIdentVal, err := findIdentValue(contentStr, HA_PROXY_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", HA_PROXY_IDENT, err)
+	}
+
+	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
+
+	conf := sshutils.SSHConfig{
+		SshUser:    sshUtil.getSSHConfig().sshUser,
+		SshPort:    sshUtil.getSSHConfig().sshPort,
+		SshKeyFile: sshUtil.getSSHConfig().sshKeyFile,
+		Timeout:    sshUtil.getSSHConfig().timeout,
+	}
+	excuteResults := sshUtilPkg.ExecuteConcurrently(conf, scriptContent, pgIps)
+	for _, result := range excuteResults {
+		printCertRotateOutput(result, POSTGRESQL, writer)
 	}
 	return nil
 }

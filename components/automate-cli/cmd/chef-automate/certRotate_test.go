@@ -2493,7 +2493,7 @@ func NewMockInfra() *AutomateHAInfraDetails {
 
 func NewCertRotate() *certRotateFlow {
 	log, _ := logger.NewLogger("text", "debug")
-	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log)
+	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log, &NodeUtilsImpl{})
 	return c
 }
 

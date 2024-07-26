@@ -1,7 +1,6 @@
 package remotescripts
 
-const POST_CERT_ROTATE_PG = `#!/bin/bash
-set -Eeuo pipefail
+const POST_CERT_ROTATE_PG = `set -Eeuo pipefail
 HAB_NONINTERACTIVE=true
 HAB_NOCOLORING=true
 HAB_LICENSE=accept-no-persist

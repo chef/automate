@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/components/automate-cli/pkg/remotescripts"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
@@ -159,44 +158,7 @@ func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary 
 	}
 	c.writer.Println("restarting postgres service and reloading ha proxy")
 
-	return c.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, infra, sshUtil)
-}
-
-func (c *certRotateFlow) postPGCertRotate(pgIps []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
-
-	content, err := c.fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
-	if err != nil {
-		return fmt.Errorf("failed to get manifest auto tfvars: %v", err)
-	}
-
-	contentStr := string(content)
-
-	pgIdentVal, err := findIdentValue(contentStr, PG_IDENT)
-	if err != nil {
-		return fmt.Errorf("failed to get %s: %v", PG_IDENT, err)
-	}
-	pgLeaderIdentVal, err := findIdentValue(contentStr, PG_LEADER_IDENT)
-	if err != nil {
-		return fmt.Errorf("failed to get %s: %v", PG_LEADER_IDENT, err)
-	}
-	haProxyIdentVal, err := findIdentValue(contentStr, HA_PROXY_IDENT)
-	if err != nil {
-		return fmt.Errorf("failed to get %s: %v", HA_PROXY_IDENT, err)
-	}
-
-	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
-
-	conf := sshutils.SSHConfig{
-		SshUser:    sshUtil.getSSHConfig().sshUser,
-		SshPort:    sshUtil.getSSHConfig().sshPort,
-		SshKeyFile: sshUtil.getSSHConfig().sshKeyFile,
-		Timeout:    sshUtil.getSSHConfig().timeout,
-	}
-	excuteResults := c.sshUtil.ExecuteConcurrently(conf, scriptContent, pgIps)
-	for _, result := range excuteResults {
-		printCertRotateOutput(result, POSTGRESQL, writer)
-	}
-	return nil
+	return c.nodeUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, sshUtil, c.fileUtils, c.sshUtil)
 }
 
 func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {
