@@ -1,6 +1,11 @@
 locals {
   configsync = templatefile("${path.module}/templates/postgres_configsync.sh.tpl", {
-    tmp_path                    = var.tmp_path
+    postgresql_pkg_ident      = var.postgresql_pkg_ident,
+    pgleaderchk_pkg_ident     = var.pgleaderchk_pkg_ident,
+    pgleaderchk_svc_load_args = var.pgleaderchk_svc_load_args,
+    proxy_pkg_ident           = var.proxy_pkg_ident,
+    proxy_svc_load_args       = var.proxy_svc_load_args,
+    tmp_path                  = var.tmp_path
   })
 }
 
