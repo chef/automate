@@ -214,6 +214,20 @@ module "postgresql" {
   postgresql_certs_by_ip          = var.postgresql_certs_by_ip
 }
 
+module "postgresql_config_sync" {
+  count                           = var.setup_managed_services ? 0 : 1
+  source                          = "./modules/postgresqlconfigsync"
+  postgresql_instance_count       = var.postgresql_instance_count
+  private_ips                     = var.existing_postgresql_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
+  tmp_path                        = var.tmp_path
+  depends_on                      = [module.postgresql]
+}
+
 module "bootstrap_automate" {
   source                             = "./modules/automate"
   airgap_info                        = module.airgap_bundle-frontend.airgap_info
