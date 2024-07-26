@@ -347,6 +347,7 @@ module "postgresql_config_sync" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
+  tmp_path                        = var.tmp_path
   depends_on                      = [module.postgresql]
 }
 

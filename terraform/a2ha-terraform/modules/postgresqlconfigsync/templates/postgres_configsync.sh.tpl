@@ -8,7 +8,6 @@ export HAB_LICENSE=accept-no-persist
 LOCKFILE=".postgres.deployment.done"
 if [ ! -f ${tmp_path}/$LOCKFILE ] ; then
     echo "Restarting the Postgres cluster to make the config sync for HA proxy" 
-    echo "$tmp_path"
     sudo systemctl stop hab-sup
     sudo systemctl start hab-sup
     sudo touch ${tmp_path}/$LOCKFILE
