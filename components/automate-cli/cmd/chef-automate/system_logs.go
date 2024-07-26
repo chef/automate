@@ -15,11 +15,11 @@ import (
 )
 
 var systemLogsCmd = &cobra.Command{
-	Use:               "system-logs",
-	Short:             "Tail Chef Automate logs",
-	Long:              "Start streaming logs from the Chef Automate server. Ctrl + c to stop.",
-	PersistentPreRunE: WarnLicenseStatusForExpiry,
-	RunE:              runSystemLogsCmd,
+	Use:   "system-logs",
+	Short: "Tail Chef Automate logs",
+	Long:  "Start streaming logs from the Chef Automate server. Ctrl + c to stop.",
+	//PersistentPreRunE: WarnLicenseStatusForExpiry,
+	RunE: runSystemLogsCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.FrontEnd,
 	},

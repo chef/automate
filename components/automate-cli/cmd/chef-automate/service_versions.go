@@ -43,11 +43,11 @@ type ServiceVersionsCmdResult struct {
 
 func init() {
 	var serviceVersionsCmd = &cobra.Command{
-		Use:               "service-versions",
-		Short:             "Retrieve the versions of the individual Chef Automate services",
-		Long:              "Retrieve the versions of the individual Chef Automate services",
-		PersistentPreRunE: WarnLicenseStatusForExpiry,
-		RunE:              runServiceVersionsCmd,
+		Use:   "service-versions",
+		Short: "Retrieve the versions of the individual Chef Automate services",
+		Long:  "Retrieve the versions of the individual Chef Automate services",
+		//PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE: runServiceVersionsCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
