@@ -32,7 +32,7 @@ If you are using a trial license, Chef Automate web UI will notify you when your
 
 The banner in the above image says:
 
-`Your Progress® Chef® Automate™ trial license is set to expire on 31st July 2024! Contact the Account Team or email chef-account-team@progress.com for help or update with the new license key.`
+`Your Progress® Chef® Automate™ trial license is set to expire on DD/MM/YYYY! Contact the Account Team or email chef-account-team@progress.com for help or update with the new license key.`
 
 To apply for a new Chef Automate license, follow the steps:
 
@@ -65,7 +65,7 @@ If you are using an enterprise license, Chef Automate web UI will notify you whe
 
 The banner in the above image says:
 
-`Your Progress® Chef® Automate™ license is set to expire on 31st July 2024! Contact the Account Team or email chef-account-team@progress.com for help or update with the new license key.`
+`Your Progress® Chef® Automate™ license is set to expire on DD/MM/YYYY! Contact the Account Team or email chef-account-team@progress.com for help or update with the new license key.`
 
 To apply for a new Chef Automate license, follow the steps:
 
@@ -84,7 +84,7 @@ On expiry of the license, you can continue to use the product for a grace period
 
 The banner in the above image says:
 
-`Your Progress® Chef® Automate™ license expired on Mon, 31st Jul 2024! and you are currently on a limited extension period. Contact the Account Team or email chef-account-team@progress.com for help or update with the new license key.`
+`Your Progress® Chef® Automate™ license expired on DD/MM/YYYY! and you are currently on a limited extension period. Contact the Account Team or email chef-account-team@progress.com for help or update with the new license key.`
 
 To apply again for the Chef Automate license, follow the steps:
 
