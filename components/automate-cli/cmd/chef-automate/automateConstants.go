@@ -23,6 +23,8 @@ const PG_IDENT = "postgresql_pkg_ident"
 const PG_LEADER_IDENT = "pgleaderchk_pkg_ident"
 const HA_PROXY_IDENT = "proxy_pkg_ident"
 const MANIFEST_AUTO_TFVARS = "/hab/a2_deploy_workspace/terraform/a2ha_manifest.auto.tfvars"
+const PG_SCRIPT_NAME = "pg-restart-script.sh"
+const PG_SCRIPT_PATH = "/hab/var/automate-ha"
 
 const frontendAutotfvarsTemplate = `
 frontend_aib_dest_file = "/var/tmp/{{ .bundleName }}"

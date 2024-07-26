@@ -111,10 +111,10 @@ func getMaxPGLag(log logger.Logger, statusSummary StatusSummary) (int64, error) 
 func frontendMaintainenceModeOnOFF(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, onOFFSwitch string, hostIps []string, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
 	sshConfig.Timeout = int(totalWaitTimeOut.Seconds())
 	if onOFFSwitch == ON {
-		writer.Println("turning ON maintenace mode")
+		writer.Println("turning ON maintenance mode")
 	}
 	if onOFFSwitch == OFF {
-		writer.Println("turning OFF maintenace mode")
+		writer.Println("turning OFF maintenance mode")
 	}
 	command := fmt.Sprintf(MAINTENANCE_ON_OFF, onOFFSwitch)
 	log.Debug("========================== MAINTENANCE_ON_OFF ========================")

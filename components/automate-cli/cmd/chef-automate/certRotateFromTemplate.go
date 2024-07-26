@@ -162,7 +162,7 @@ func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary 
 }
 
 func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {
-	if pgLeaderIpAndHealth.Health == "ok" {
+	if pgLeaderIpAndHealth.Health == "OK" {
 		for _, pgIp := range pgIps {
 			if strings.EqualFold(pgIp.IP, pgLeaderIpAndHealth.IP) {
 				err := c.rotatePGNodeCerts(infra, sshUtil, currentCertsInfo, pgRootCA, &pgIp, concurrent)

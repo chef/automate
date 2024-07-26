@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -521,13 +522,34 @@ func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileU
 
 	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
 
+	file, err := os.CreateTemp(HAB_TMP_DIR, "pg-restart-*.sh")
+	if err != nil {
+		return fmt.Errorf("failed to create file %v", err)
+	}
+	defer os.Remove(file.Name())
+
+	_, err = file.WriteString(scriptContent)
+	if err != nil {
+		return fmt.Errorf("failed to write to temporary file %v", err)
+	}
+
 	conf := sshutils.SSHConfig{
 		SshUser:    sshUtil.getSSHConfig().sshUser,
 		SshPort:    sshUtil.getSSHConfig().sshPort,
 		SshKeyFile: sshUtil.getSSHConfig().sshKeyFile,
 		Timeout:    sshUtil.getSSHConfig().timeout,
 	}
-	excuteResults := sshUtilPkg.ExecuteConcurrently(conf, scriptContent, pgIps)
+
+	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, file.Name(), PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
+
+	for _, result := range excuteResults {
+		if result.Error != nil {
+			return fmt.Errorf("failed to copy to remote %v", err)
+		}
+	}
+
+	command := fmt.Sprintf(`sudo bash -s < %s`, path.Join(PG_SCRIPT_PATH, PG_SCRIPT_NAME))
+	excuteResults = sshUtilPkg.ExecuteConcurrently(conf, command, pgIps)
 	for _, result := range excuteResults {
 		printCertRotateOutput(result, POSTGRESQL, writer)
 	}
