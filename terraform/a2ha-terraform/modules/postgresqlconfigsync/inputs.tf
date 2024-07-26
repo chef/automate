@@ -7,9 +7,38 @@ variable "postgresql_instance_count" {
   default = 3
 }
 
+variable "postgresql_listen_port" {
+  default = 5432
+}
 
+variable "pgleaderchk_listen_port" {
+  default = 6432
+}
+
+variable "pgleaderchk_pkg_ident" {
+}
+
+variable "pgleaderchk_svc_load_args" {
+}
+
+variable "postgresql_pkg_ident" {
+}
+
+
+variable "postgresql_svc_load_args" {
+}
 variable "private_ips" {
   default = []
+}
+
+variable "proxy_listen_port" {
+  default = 7432
+}
+
+variable "proxy_pkg_ident" {
+}
+
+variable "proxy_svc_load_args" {
 }
 
 variable "public_ips" {
