@@ -14,6 +14,7 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	"github.com/chef/automate/components/automate-cli/pkg/remotescripts"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	chefToml "github.com/chef/automate/components/automate-deployment/pkg/toml"
@@ -1505,6 +1506,57 @@ func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary 
 	err = nodeOpUtils.restartPgNodes(*pgLeaderIpAndHealth, infra.Outputs.PostgresqlPrivateIps.Value, infra, statusSummary)
 	if err != nil {
 		return err
+	}
+	return c.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, infra, sshUtil)
+}
+
+func findIdentValue(content, val string) (string, error) {
+	re := regexp.MustCompile(fmt.Sprintf(`%s\s*=\s*"([^"]+)"`, val))
+	matches := re.FindStringSubmatch(content)
+	if len(matches) > 1 {
+		return matches[1], nil
+	} else {
+		return "", fmt.Errorf("failed to find value")
+	}
+}
+
+func (c *certRotateFlow) getManifestAutoTfvars() ([]byte, error) {
+	return c.fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
+}
+
+func (c *certRotateFlow) postPGCertRotate(pgIps []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+
+	content, err := c.getManifestAutoTfvars()
+	if err != nil {
+		return fmt.Errorf("failed to get manifest auto tfvars: %v", err)
+	}
+
+	contentStr := string(content)
+
+	pgIdentVal, err := findIdentValue(contentStr, PG_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", PG_IDENT, err)
+	}
+	pgLeaderIdentVal, err := findIdentValue(contentStr, PG_LEADER_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", PG_LEADER_IDENT, err)
+	}
+	haProxyIdentVal, err := findIdentValue(contentStr, HA_PROXY_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", HA_PROXY_IDENT, err)
+	}
+
+	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
+
+	conf := sshutils.SSHConfig{
+		SshUser:    sshUtil.getSSHConfig().sshUser,
+		SshPort:    sshUtil.getSSHConfig().sshPort,
+		SshKeyFile: sshUtil.getSSHConfig().sshKeyFile,
+		Timeout:    sshUtil.getSSHConfig().timeout,
+	}
+	excuteResults := c.sshUtil.ExecuteConcurrently(conf, scriptContent, pgIps)
+	for _, result := range excuteResults {
+		printCertRotateOutput(result, POSTGRESQL, writer)
 	}
 	return nil
 }
