@@ -109,6 +109,7 @@ Once the command executes, it will add the supplied nodes to your automate setup
 - The new node will be configured with the certificates already configured in your HA setup.
 - If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
 - If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
+- Certificate rotation should be done in down-time window as service will restart.
 
 {{< /note >}}
 
@@ -170,7 +171,7 @@ Once the command executes, it will add the supplied nodes to your automated setu
 - If you want to change the certificates for the new nodes, you can manually run the chef-automate cert-rotate [options] command.
 - Removing unreachable nodes while adding nodes is not supported in AWS mode of deployment; you have to use [remove node commands page](/automate/ha_remove_single_node_from_cluster/)
  to remove unreachable nodes first before adding new nodes
-
+- Certificate rotation should be done in down-time window as service will restart.
 {{< /note >}}
 
 {{< warning >}}
