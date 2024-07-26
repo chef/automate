@@ -542,16 +542,28 @@ func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileU
 
 	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, file.Name(), PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
 
+	var isErr bool
 	for _, result := range excuteResults {
+		printCertRotateOutput(result, POSTGRESQL, writer)
 		if result.Error != nil {
-			return fmt.Errorf("failed to copy to remote %v", err)
+			isErr = true
 		}
+	}
+
+	if isErr {
+		return fmt.Errorf("failed to copy file to remote")
 	}
 
 	command := fmt.Sprintf(`sudo bash -s < %s`, path.Join(PG_SCRIPT_PATH, PG_SCRIPT_NAME))
 	excuteResults = sshUtilPkg.ExecuteConcurrently(conf, command, pgIps)
 	for _, result := range excuteResults {
 		printCertRotateOutput(result, POSTGRESQL, writer)
+		if result.Error != nil {
+			isErr = true
+		}
+	}
+	if isErr {
+		return fmt.Errorf("failed to execute post rotate pg script on remote")
 	}
 	return nil
 }
