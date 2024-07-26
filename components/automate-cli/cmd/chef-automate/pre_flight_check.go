@@ -114,8 +114,8 @@ var preflightCheckCmd = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Tag:                 docs.BastionHost,
 	},
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runPreflightCheckCmd,
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runPreflightCheckCmd,
 }
 
 func loadMergedConfigForPreflight() (*deployment.AutomateConfig, error) {
