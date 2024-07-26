@@ -220,6 +220,7 @@ module "postgresql_config_sync" {
   postgresql_instance_count       = var.postgresql_instance_count
   private_ips                     = var.existing_postgresql_private_ips
   postgresql_pkg_ident            = var.postgresql_pkg_ident
+  postgresql_svc_load_args        = var.postgresql_svc_load_args
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   pgleaderchk_pkg_ident           = var.pgleaderchk_pkg_ident
   pgleaderchk_svc_load_args       = var.pgleaderchk_svc_load_args
