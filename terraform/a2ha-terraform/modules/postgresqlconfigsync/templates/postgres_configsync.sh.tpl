@@ -11,7 +11,7 @@ if [ ! -f ${tmp_path}/$LOCKFILE ] ; then
     echo "$tmp_path"
     sudo systemctl stop hab-sup
     sudo systemctl start hab-sup
-    sudo touch ${tmp_path}/$PostDeploymentPostRestat
+    sudo touch ${tmp_path}/$LOCKFILE
 else
     echo "Postgres cluster restart not required"  
 fi  
