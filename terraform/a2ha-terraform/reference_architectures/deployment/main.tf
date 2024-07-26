@@ -341,7 +341,8 @@ module "postgresql_config_sync" {
   count                           = var.setup_managed_services ? 0 : 1
   source                          = "./modules/postgresqlconfigsync"
   postgresql_instance_count       = var.postgresql_instance_count
-  private_ips                     = var.existing_postgresql_private_ips
+  private_ips                     = var.postgresql_private_ips
+  postgresql_svc_load_args        = var.postgresql_svc_load_args
   postgresql_pkg_ident            = var.postgresql_pkg_ident
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   pgleaderchk_pkg_ident           = var.pgleaderchk_pkg_ident
