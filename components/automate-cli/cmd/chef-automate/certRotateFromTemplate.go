@@ -119,8 +119,6 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 				return err
 			}
 			filterIps = append(filterIps, csIp)
-		} else {
-
 		}
 
 	}
