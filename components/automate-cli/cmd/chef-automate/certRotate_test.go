@@ -3126,6 +3126,12 @@ func TestCertRotateFromTemplate(t *testing.T) {
 					fu := fileutils.FileSystemUtils{}
 					return fu.ReadFile(filepath)
 				},
+				CreateTempFileFunc: func(content, filename, dir string) (string, error) {
+					return filename, nil
+				},
+				RemoveFileFunc: func(filename string) error {
+					return nil
+				},
 			},
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl(), log: log}

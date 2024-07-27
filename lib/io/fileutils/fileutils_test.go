@@ -58,13 +58,13 @@ func TestCreateTempFile(t *testing.T) {
 	content := "abc"
 	filename := "file-name"
 	t.Run("It creates the file", func(t *testing.T) {
-		res1, err := fileutils.CreateTempFile(content, filename)
+		res1, err := fileutils.CreateTempFile(content, filename, "")
 		require.NoError(t, err)
-		res2, err := fileutils.CreateTempFile(content, filename)
+		res2, err := fileutils.CreateTempFile(content, filename, "")
 		require.NoError(t, err)
-		res3, err := fileutils.CreateTempFile(content, filename)
+		res3, err := fileutils.CreateTempFile(content, filename, "")
 		require.NoError(t, err)
-		res4, err := fileutils.CreateTempFile(content, filename)
+		res4, err := fileutils.CreateTempFile(content, filename, "")
 		require.NoError(t, err)
 		assert.Contains(t, res1, "file-name")
 		assert.Contains(t, res2, "file-name")
@@ -93,7 +93,7 @@ func TestMove(t *testing.T) {
 	defer os.RemoveAll(destinationDir)
 
 	t.Run("Move a file to new directory", func(t *testing.T) {
-		srcFile, err := fileutils.CreateTempFile(content, filename)
+		srcFile, err := fileutils.CreateTempFile(content, filename, "")
 		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
 		defer fileutils.DeleteFile(srcFile)
@@ -107,7 +107,7 @@ func TestMove(t *testing.T) {
 	})
 
 	t.Run("Move a file to a directory and overwrite the existing file", func(t *testing.T) {
-		srcFile, err := fileutils.CreateTempFile(content, filename)
+		srcFile, err := fileutils.CreateTempFile(content, filename, "")
 		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
 		defer fileutils.DeleteFile(srcFile)
@@ -120,7 +120,7 @@ func TestMove(t *testing.T) {
 	})
 
 	t.Run("Invalid destinationfile", func(t *testing.T) {
-		srcFile, err := fileutils.CreateTempFile(content, filename)
+		srcFile, err := fileutils.CreateTempFile(content, filename, "")
 		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
 		defer fileutils.DeleteFile(srcFile)
@@ -149,7 +149,7 @@ func TestRemoveFirstLine(t *testing.T) {
 	os.Setenv("TMPDIR", fileutils.HAB_TMP_DIR)
 
 	t.Run("Remove first line", func(t *testing.T) {
-		res, err := fileutils.CreateTempFile(content, filename)
+		res, err := fileutils.CreateTempFile(content, filename, "")
 		assert.Contains(t, res, "file-name")
 		require.NoError(t, err)
 		err = fileutils.RemoveFirstLine(res)

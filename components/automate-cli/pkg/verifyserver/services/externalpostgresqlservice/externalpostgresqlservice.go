@@ -33,7 +33,7 @@ func (pg *ExternalPostgresqlServiceImpl) GetPgConnection(req *models.ExternalPgR
 	pg.Req = req
 
 	//creating a temp file to copy the content of a rootcert into a file
-	rootcert, err := pg.fileUtils.CreateTempFile(req.PostgresqlRootCert, "root-cert")
+	rootcert, err := pg.fileUtils.CreateTempFile(req.PostgresqlRootCert, "root-cert", "")
 	if err != nil {
 		return nil, err
 	}

@@ -16,12 +16,13 @@ type MockFileSystemUtils struct {
 	WriteToFileFunc            func(filepath string, data []byte) error
 	ReadFileFunc               func(filepath string) ([]byte, error)
 	WriteFileFunc              func(filepath string, data []byte, perm os.FileMode) error
-	CreateTempFileFunc         func(content string, filename string) (string, error)
+	CreateTempFileFunc         func(content string, filename string, dir string) (string, error)
 	DeleteTempFileFunc         func(tempFile string) error
 	MoveFunc                   func(sourceFile string, destinationFile string) error
 	RemoveFirstLineFunc        func(filePath string) error
 	GetFilePermissionFunc      func(filePath string) (int64, error)
 	StatFunc                   func(name string) (os.FileInfo, error)
+	RemoveFileFunc             func(filename string) error
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -51,8 +52,8 @@ func (fsu *MockFileSystemUtils) ReadFile(filepath string) ([]byte, error) {
 func (fsu *MockFileSystemUtils) WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return fsu.WriteFileFunc(filepath, data, perm)
 }
-func (fsu *MockFileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
-	return fsu.CreateTempFileFunc(content, filename)
+func (fsu *MockFileSystemUtils) CreateTempFile(content string, filename string, dir string) (string, error) {
+	return fsu.CreateTempFileFunc(content, filename, dir)
 }
 func (fsu *MockFileSystemUtils) DeleteFile(tempFile string) error {
 	return fsu.DeleteTempFileFunc(tempFile)
@@ -68,6 +69,9 @@ func (fsu *MockFileSystemUtils) GetFilePermission(filePath string) (int64, error
 }
 func (fsu *MockFileSystemUtils) Stat(name string) (os.FileInfo, error) {
 	return fsu.StatFunc(name)
+}
+func (fsu *MockFileSystemUtils) RemoveFile(name string) error {
+	return fsu.RemoveFileFunc(name)
 }
 
 type MockFileInfo struct {

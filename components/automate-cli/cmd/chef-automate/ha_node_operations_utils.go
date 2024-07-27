@@ -526,17 +526,11 @@ func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, f
 	}
 
 	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
-
-	file, err := os.CreateTemp(HAB_TMP_DIR, "pg-restart-*.sh")
+	filename, err := fileUtils.CreateTempFile(scriptContent, "pg-restart-*.sh", HAB_TMP_DIR)
 	if err != nil {
 		return fmt.Errorf("failed to create file %v", err)
 	}
-	defer os.Remove(file.Name())
-
-	_, err = file.WriteString(scriptContent)
-	if err != nil {
-		return fmt.Errorf("failed to write to temporary file %v", err)
-	}
+	defer fileUtils.RemoveFile(filename)
 
 	conf := sshutils.SSHConfig{
 		SshUser:    sshconfig.sshUser,
@@ -546,7 +540,7 @@ func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, f
 	}
 	sshUtilPkg := sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor())
 
-	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, file.Name(), PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
+	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, filename, PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
 
 	var isErr bool
 	for _, result := range excuteResults {

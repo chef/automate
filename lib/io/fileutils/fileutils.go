@@ -33,12 +33,13 @@ type FileUtils interface {
 	WriteToFile(filepath string, data []byte) error
 	ReadFile(filename string) ([]byte, error)
 	WriteFile(filepath string, data []byte, perm os.FileMode) error
-	CreateTempFile(content string, filename string) (string, error)
+	CreateTempFile(content string, filename string, dir string) (string, error)
 	DeleteFile(fileName string) error
 	Move(sourceFile string, destinationFile string) error
 	RemoveFirstLine(filePath string) error
 	GetFilePermission(filePath string) (int64, error)
 	Stat(name string) (os.FileInfo, error)
+	RemoveFile(filename string) error
 }
 
 type FileSystemUtils struct{}
@@ -74,8 +75,8 @@ func (fsu *FileSystemUtils) ReadFile(filename string) ([]byte, error) {
 func (fsu *FileSystemUtils) WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return WriteFile(filepath, data, perm)
 }
-func (fsu *FileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
-	return CreateTempFile(content, filename)
+func (fsu *FileSystemUtils) CreateTempFile(content string, filename string, dir string) (string, error) {
+	return CreateTempFile(content, filename, dir)
 }
 func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
 	return DeleteFile(filePath)
@@ -94,6 +95,10 @@ func (fsu *FileSystemUtils) GetFilePermission(filePath string) (int64, error) {
 
 func (fsu *FileSystemUtils) Stat(name string) (os.FileInfo, error) {
 	return os.Stat(name)
+}
+
+func (fsu *FileSystemUtils) RemoveFile(filename string) error {
+	return os.Remove(filename)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -192,8 +197,8 @@ func WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return os.WriteFile(filepath, data, perm)
 }
 
-func CreateTempFile(content string, filename string) (string, error) {
-	tempFile, err := os.CreateTemp("", filename)
+func CreateTempFile(content string, filename string, dir string) (string, error) {
+	tempFile, err := os.CreateTemp(dir, filename)
 	if err != nil {
 		return "", errors.Wrap(err, "file creation failed ")
 	}
