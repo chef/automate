@@ -83,7 +83,15 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 	if isA2HARBFileExist() {
 		nodeOpUtils := &NodeUtilsImpl{}
 		remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
-		return runRestartFromBastion(flags, remoteExcecutor, nodeOpUtils, printRestartOutput)
+		infra, _, err := nodeOpUtils.getHaInfraDetails()
+		if err != nil {
+			return err
+		}
+		statusSummary, err := getStatusSummary(infra)
+		if err != nil {
+			return err
+		}
+		return runRestartFromBastion(flags, remoteExcecutor, nodeOpUtils, printRestartOutput, statusSummary)
 	}
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
@@ -112,7 +120,7 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 	return nil
 }
 
-func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu NodeOpUtils, printRestartOutput func(map[string][]*CmdResult, string, *cli.Writer)) error {
+func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu NodeOpUtils, printRestartOutput func(map[string][]*CmdResult, string, *cli.Writer), statusSummary StatusSummary) error {
 	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
@@ -144,7 +152,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu Node
 		return handleManagedServices(flags)
 	}
 
-	runRestartCmdForBackend(infra, flags, rs, restartCmdResults)
+	runRestartCmdForBackend(infra, flags, rs, restartCmdResults, nu, statusSummary)
 
 	return getChannelValue(restartCmdResults, printRestartOutput)
 }
@@ -164,11 +172,11 @@ func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFl
 	}
 }
 
-func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult, nu NodeOpUtils, statusSummary StatusSummary) {
 	flags.automate = false
 	flags.chefServer = false
 	if flags.postgresql {
-		restartAndReloadPgConfig(restartCmdResults)
+		restartAndReloadPgConfig(restartCmdResults, nu, statusSummary)
 	} else {
 		restartCmdResults <- restartCmdResult{}
 	}
@@ -180,8 +188,8 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 	}
 }
 
-func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult) {
-	infra, err := getAutomateHAInfraDetails()
+func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult, nu NodeOpUtils, statusSummary StatusSummary) {
+	infra, sshConfig, err := nu.getHaInfraDetails()
 	if err != nil {
 		restartCmdResults <- restartCmdResult{
 			err: err,
@@ -199,23 +207,11 @@ func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult) {
 		}
 	}
 	fileUtils := &fileutils.FileSystemUtils{}
-	nodeOpUtils := &NodeUtilsImpl{}
-	conf := SSHConfig{
-		sshUser:    infra.Outputs.SSHUser.Value,
-		sshPort:    infra.Outputs.SSHPort.Value,
-		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
-		timeout:    DEFAULT_TIMEOUT,
-	}
-	statusSummary, err := getStatusSummary(infra)
-	if err != nil {
-		restartCmdResults <- restartCmdResult{
-			err: err,
-		}
-	}
+	sshConfig.timeout = DEFAULT_TIMEOUT
 
 	// restart pg nodes in a sequence of follower nodes first and then leader node
-	leader := getPGLeader(statusSummary)
-	err = nodeOpUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, statusSummary)
+	leader := getPGLeaderFunc(statusSummary)
+	err = nu.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, statusSummary)
 	if err != nil {
 		restartCmdResults <- restartCmdResult{
 			err: err,
@@ -224,11 +220,27 @@ func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult) {
 	// restart done
 
 	// reloading the pg config to make sure all nodes of pg have correct config
-	err = nodeOpUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, conf, fileUtils, log)
+	err = nu.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *sshConfig, fileUtils, log)
 	if err != nil {
 		restartCmdResults <- restartCmdResult{
 			err: err,
 		}
+	}
+	cmdResult := []*CmdResult{}
+	for _, v := range infra.Outputs.PostgresqlPrivateIps.Value {
+		cmdResult = append(cmdResult, &CmdResult{
+			ScriptName: "restart and reload pg",
+			HostIP:     v,
+			Output:     "successfully restared and reloaded postgresql node",
+		})
+	}
+	restartCmdResults <- restartCmdResult{
+		cmdResult: map[string][]*CmdResult{
+			POSTGRESQL: cmdResult,
+		},
+		writer:   writer,
+		nodeType: POSTGRESQL,
+		err:      err,
 	}
 	// config reload done
 }
