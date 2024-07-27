@@ -271,7 +271,7 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 
 	// Restart all PostgreSQL nodes in order to apply the new configuration
 	if dna.nodeType == POSTGRESQL {
-		infra, err := getAutomateHAInfraDetails()
+		infra, err := getAutomateHAInfraDetailsFunc()
 		if err != nil {
 			return err
 		}
