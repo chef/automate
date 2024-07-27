@@ -1018,7 +1018,7 @@ func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
 			cert = ""
 `
 
-	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML, "/tmp")
+	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML, "")
 	assert.NoError(t, err)
 
 	t.Run("No error", func(t *testing.T) {
