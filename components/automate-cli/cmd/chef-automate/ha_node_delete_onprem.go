@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -281,12 +282,20 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 
 	// Restart all PostgreSQL nodes in order to apply the new configuration
 	if dni.nodeType == POSTGRESQL {
-		leader := getPGLeader(dni.statusSummary)
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
-		err = dni.nodeUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, dni.statusSummary)
+		level := "info"
+		if globalOpts.debug {
+			level = "debug"
+		}
+		log, err := logger.NewLogger("text", level)
+		if err != nil {
+			return err
+		}
+		fileUtils := &fileutils.FileSystemUtils{}
+		err = dni.nodeUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *dni.sshUtil.getSSHConfig(), fileUtils, log)
 		if err != nil {
 			return err
 		}

@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
@@ -83,6 +84,7 @@ type NodeOpUtils interface {
 	saveConfigToBastion() error
 	syncConfigToAllNodes(unreachableNodes map[string][]string) error
 	restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error
+	postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error
 }
 
 type NodeUtilsImpl struct {
@@ -498,7 +500,7 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string,
 	return nil
 }
 
-func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileUtils fileutils.FileUtils, sshUtilPkg sshutils.SSHUtil) error {
+func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
 
 	content, err := fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
 	if err != nil {
@@ -534,11 +536,12 @@ func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileU
 	}
 
 	conf := sshutils.SSHConfig{
-		SshUser:    sshUtil.getSSHConfig().sshUser,
-		SshPort:    sshUtil.getSSHConfig().sshPort,
-		SshKeyFile: sshUtil.getSSHConfig().sshKeyFile,
-		Timeout:    sshUtil.getSSHConfig().timeout,
+		SshUser:    sshconfig.sshUser,
+		SshPort:    sshconfig.sshPort,
+		SshKeyFile: sshconfig.sshKeyFile,
+		Timeout:    sshconfig.timeout,
 	}
+	sshUtilPkg := sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor())
 
 	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, file.Name(), PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
 

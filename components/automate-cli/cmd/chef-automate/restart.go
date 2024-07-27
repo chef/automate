@@ -13,6 +13,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 )
 
 const (
@@ -167,6 +169,8 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 	flags.chefServer = false
 	if flags.postgresql {
 		restartOnGivenNode(flags, POSTGRESQL, infra, rs, restartCmdResults)
+		reloadPgConfig(restartCmdResults)
+
 	} else {
 		restartCmdResults <- restartCmdResult{}
 	}
@@ -175,6 +179,39 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 		restartOnGivenNode(flags, OPENSEARCH, infra, rs, restartCmdResults)
 	} else {
 		restartCmdResults <- restartCmdResult{}
+	}
+}
+
+func reloadPgConfig(restartCmdResults chan restartCmdResult) {
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	level := "info"
+	if globalOpts.debug {
+		level = "debug"
+	}
+	log, err := logger.NewLogger("text", level)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	fileUtils := &fileutils.FileSystemUtils{}
+	nodeOpUtils := &NodeUtilsImpl{}
+	conf := SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		timeout:    DEFAULT_TIMEOUT,
+	}
+	err = nodeOpUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, conf, fileUtils, log)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
 	}
 }
 

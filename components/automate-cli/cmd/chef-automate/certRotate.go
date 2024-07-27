@@ -230,7 +230,11 @@ func init() {
 
 func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		log, err := logger.NewLogger("text", "info")
+		level := "info"
+		if globalOpts.debug {
+			level = "debug"
+		}
+		log, err := logger.NewLogger("text", level)
 		if err != nil {
 			return err
 		}
