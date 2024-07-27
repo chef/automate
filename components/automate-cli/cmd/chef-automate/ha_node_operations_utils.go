@@ -455,7 +455,7 @@ func (nu *NodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *
 func (nu *NodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	cmd := `
         a2csCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module.automate|module.bootstrap_automate|module.chef_server" | wc -l)
-        pgosCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module.opensearch|module.postgresql" | wc -l)
+        pgosCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module\.(opensearch|postgresql\[0\])" | wc -l)
         echo $(($a2csCount/2 + $pgosCount))
     `
 

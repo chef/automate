@@ -1020,7 +1020,6 @@ func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
 
 	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML, "")
 	assert.NoError(t, err)
-	defer fileutils.DeleteFile(filePath)
 
 	t.Run("No error", func(t *testing.T) {
 		err = mnu.parseAndMoveConfigFileToWorkspaceDir([]string{filePath}, "")
@@ -1033,4 +1032,5 @@ func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
 		err = mnu.parseAndMoveConfigFileToWorkspaceDir([]string{AUTOMATE_TOML}, "")
 		assert.Error(t, err, "error on removing output header in fetched config")
 	})
+	fileutils.DeleteFile(filePath)
 }
