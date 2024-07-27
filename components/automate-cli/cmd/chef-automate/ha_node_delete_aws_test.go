@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -739,6 +740,9 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
 			return nil
 		},
+		postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+			return nil
+		},
 	}
 	flagsArr := []AddDeleteNodeHACmdFlags{
 		{
@@ -770,6 +774,15 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			CONFIG_TOML_PATH_AWS,
 			&fileutils.MockFileSystemUtils{},
 			&MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{
+						sshUser:    "ubuntu",
+						sshPort:    "22",
+						sshKeyFile: "/rt.pem",
+						hostIP:     "12.12.12.12",
+						timeout:    30,
+					}
+				},
 				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 					return "", nil
 				},
