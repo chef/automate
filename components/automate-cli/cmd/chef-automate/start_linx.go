@@ -124,7 +124,7 @@ func runStartCommandHA(infra *AutomateHAInfraDetails, args []string, isManagedSe
 		startCommandImplHA(args, *sshConfig, backendIps, POSTGRES_SERVICE, writer, errorList)
 		err := nodeUtils.postPGCertRotate(backendIps, *sshConfig, fileUtils, log)
 		if err != nil {
-			return err
+			errorList.PushBack(err.Error())
 		}
 	}
 	if errorList.Len() > 0 {
