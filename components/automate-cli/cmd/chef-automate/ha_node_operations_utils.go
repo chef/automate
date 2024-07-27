@@ -481,7 +481,10 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string,
 	sshUtil := NewSSHUtil(newSSHConfig)
 	// restart followers
 	nu.writer.Println("trying to restaring follower node")
-	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
+	err := restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
+	if err != nil {
+		return err
+	}
 	//restart leader
 	nu.writer.Println("trying to restaring leader node")
 	for _, pgIp := range pgIps {
