@@ -4,7 +4,7 @@ const POST_CERT_ROTATE_PG = `#!/bin/bash
 set -Eeuo pipefail
 HAB_NONINTERACTIVE=true
 HAB_NOCOLORING=true
-HAB_LICENSE=accept-no-persist
+export HAB_LICENSE=accept-no-persist
 PG_PKG_NAME=$(echo "%[1]s" | awk -F/ '{print $2}')
 PGLEADERCHK_PKG_NAME=$(echo "%[2]s" | awk -F/ '{print $2}')
 
