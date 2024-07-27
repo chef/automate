@@ -5,6 +5,8 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -98,6 +100,23 @@ func TestRunRestartFromBastion(t *testing.T) {
 		errorWant            error
 	}
 	printRestartOutput := func(m map[string][]*CmdResult, s string, w *cli.Writer) {}
+	mockNodeUtils := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return getMockInfra(), &SSHConfig{}, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+			return nil
+		},
+		getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
+			return &MockPullConfigs{}, nil
+		},
+		restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+			return nil
+		},
+	}
 	testCases := []testCase{
 		{
 			description: "Error when wait timeout is less than default timeout",
@@ -106,14 +125,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				restartCmdFlags.timeout = 120
 				return restartCmdFlags
 			}(),
-			mockRestartCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
-				},
-				isManagedServicesOnFunc: func() bool {
-					return false
-				},
-			},
+			mockRestartCmdHelper: mockNodeUtils,
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
@@ -128,14 +140,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				restartCmdFlags.node = "1"
 				return restartCmdFlags
 			}(),
-			mockRestartCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
-				},
-				isManagedServicesOnFunc: func() bool {
-					return false
-				},
-			},
+			mockRestartCmdHelper: mockNodeUtils,
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
@@ -156,6 +161,15 @@ func TestRunRestartFromBastion(t *testing.T) {
 				isManagedServicesOnFunc: func() bool {
 					return false
 				},
+				postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+					return nil
+				},
+				getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
+					return &MockPullConfigs{}, nil
+				},
+				restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+					return nil
+				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
@@ -170,14 +184,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				restartCmdFlags := newDefaultRestartCmdFlag()
 				return restartCmdFlags
 			}(),
-			mockRestartCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
-				},
-				isManagedServicesOnFunc: func() bool {
-					return false
-				},
-			},
+			mockRestartCmdHelper: mockNodeUtils,
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
@@ -192,17 +199,10 @@ func TestRunRestartFromBastion(t *testing.T) {
 				restartCmdFlags := newDefaultRestartCmdFlag()
 				return restartCmdFlags
 			}(),
-			mockRestartCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
-				},
-				isManagedServicesOnFunc: func() bool {
-					return false
-				},
-			},
+			mockRestartCmdHelper: mockNodeUtils,
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-					return map[string][]*CmdResult{}, nil
+					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
@@ -214,14 +214,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				restartCmdFlags := newDefaultRestartCmdFlag()
 				return restartCmdFlags
 			}(),
-			mockRestartCmdHelper: &MockNodeUtilsImpl{
-				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
-				},
-				isManagedServicesOnFunc: func() bool {
-					return false
-				},
-			},
+			mockRestartCmdHelper: mockNodeUtils,
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
@@ -239,10 +232,19 @@ func TestRunRestartFromBastion(t *testing.T) {
 			}(),
 			mockRestartCmdHelper: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
+					return getMockInfra(), &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
 					return true
+				},
+				postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+					return nil
+				},
+				getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
+					return &MockPullConfigs{}, nil
+				},
+				restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+					return nil
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -262,10 +264,19 @@ func TestRunRestartFromBastion(t *testing.T) {
 			}(),
 			mockRestartCmdHelper: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
+					return getMockInfra(), &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
 					return true
+				},
+				postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+					return nil
+				},
+				getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
+					return &MockPullConfigs{}, nil
+				},
+				restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+					return nil
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -280,9 +291,20 @@ func TestRunRestartFromBastion(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			err := runRestartFromBastion(testCase.flags, testCase.mockRemoteCmdExec, testCase.mockRestartCmdHelper, printRestartOutput)
-			if err != nil {
-				assert.EqualError(t, testCase.errorWant, err.Error())
+			getAutomateHAInfraDetailsFunc = func() (*AutomateHAInfraDetails, error) {
+				infra := &AutomateHAInfraDetails{}
+				infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+				return infra, nil
+			}
+			getPGLeaderFunc = func(StatusSummary) *NodeIpHealth {
+				return &NodeIpHealth{
+					IP:     ValidIP7,
+					Health: "OK",
+				}
+			}
+			err := runRestartFromBastion(testCase.flags, testCase.mockRemoteCmdExec, testCase.mockRestartCmdHelper, printRestartOutput, getMockStatusSummary())
+			if testCase.errorWant != nil {
+				assert.EqualError(t, err, testCase.errorWant.Error())
 			} else {
 				assert.Nil(t, err)
 			}

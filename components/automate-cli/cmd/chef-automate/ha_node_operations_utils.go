@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
@@ -83,6 +84,7 @@ type NodeOpUtils interface {
 	saveConfigToBastion() error
 	syncConfigToAllNodes(unreachableNodes map[string][]string) error
 	restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error
+	postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error
 }
 
 type NodeUtilsImpl struct {
@@ -479,7 +481,10 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string,
 	sshUtil := NewSSHUtil(newSSHConfig)
 	// restart followers
 	nu.writer.Println("trying to restaring follower node")
-	restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
+	err := restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
+	if err != nil {
+		return err
+	}
 	//restart leader
 	nu.writer.Println("trying to restaring leader node")
 	for _, pgIp := range pgIps {
@@ -498,7 +503,7 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string,
 	return nil
 }
 
-func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileUtils fileutils.FileUtils, sshUtilPkg sshutils.SSHUtil) error {
+func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
 
 	content, err := fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
 	if err != nil {
@@ -521,26 +526,21 @@ func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshUtil SSHUtil, fileU
 	}
 
 	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
-
-	file, err := os.CreateTemp(HAB_TMP_DIR, "pg-restart-*.sh")
+	filename, err := fileUtils.CreateTempFile(scriptContent, "pg-restart-*.sh", HAB_TMP_DIR)
 	if err != nil {
 		return fmt.Errorf("failed to create file %v", err)
 	}
-	defer os.Remove(file.Name())
-
-	_, err = file.WriteString(scriptContent)
-	if err != nil {
-		return fmt.Errorf("failed to write to temporary file %v", err)
-	}
+	defer fileUtils.RemoveFile(filename)
 
 	conf := sshutils.SSHConfig{
-		SshUser:    sshUtil.getSSHConfig().sshUser,
-		SshPort:    sshUtil.getSSHConfig().sshPort,
-		SshKeyFile: sshUtil.getSSHConfig().sshKeyFile,
-		Timeout:    sshUtil.getSSHConfig().timeout,
+		SshUser:    sshconfig.sshUser,
+		SshPort:    sshconfig.sshPort,
+		SshKeyFile: sshconfig.sshKeyFile,
+		Timeout:    sshconfig.timeout,
 	}
+	sshUtilPkg := sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor())
 
-	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, file.Name(), PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
+	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, filename, PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
 
 	var isErr bool
 	for _, result := range excuteResults {
@@ -1086,21 +1086,6 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	}
 }
 
-func (nu *NodeUtilsImpl) restartHabSupOnBackend(service string) error {
-	remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
-	infra, _, err := nu.getHaInfraDetails()
-	if err != nil {
-		return err
-	}
-	flags := &RestartCmdFlags{
-		postgresql: true,
-	}
-	restartCmdResults := make(chan restartCmdResult, 4)
-	runRestartCmdForBackend(infra, flags, remoteExcecutor, restartCmdResults)
-
-	return getChannelValue(restartCmdResults, printRestartOutput)
-}
-
 func getPGLeader(statusSummary StatusSummary) *NodeIpHealth {
 	ip, health := statusSummary.GetPGLeaderNode()
 	nodeIpHealth := NodeIpHealth{
@@ -1109,3 +1094,5 @@ func getPGLeader(statusSummary StatusSummary) *NodeIpHealth {
 	}
 	return &nodeIpHealth
 }
+
+var getPGLeaderFunc func(statusSummary StatusSummary) *NodeIpHealth = getPGLeader

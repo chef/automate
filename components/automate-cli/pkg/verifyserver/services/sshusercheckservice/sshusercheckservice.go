@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/sshutils"
@@ -34,7 +34,7 @@ func NewSshUserCheckService(logger logger.Logger, fileutils fileutils.FileUtils,
 func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequest) (*models.ChecksResponse, error) {
 	ssu.logger.Debugf("The Request value entered by the user ip: %v, port: %v, userName: %v ", req.Ip, req.Port, req.UserName)
 
-	filePath, err := ssu.FileUtils.CreateTempFile(req.PrivateKey, constants.PEM_FILE_NAME)
+	filePath, err := ssu.FileUtils.CreateTempFile(req.PrivateKey, constants.PEM_FILE_NAME, "")
 	if err != nil {
 		ssu.logger.Error("Error while creating the key file on the desired file path: ", err)
 		return nil, err

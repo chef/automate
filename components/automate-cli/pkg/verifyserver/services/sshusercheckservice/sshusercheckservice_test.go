@@ -52,7 +52,7 @@ func TestCheckSshUserDetails(t *testing.T) {
 					SudoPassword: sudoPassword,
 				},
 				MockFileUtils: &fileutils.MockFileSystemUtils{
-					CreateTempFileFunc: func(content, filename string) (string, error) {
+					CreateTempFileFunc: func(content, filename string, dir string) (string, error) {
 						return "", nil
 					},
 					DeleteTempFileFunc: func(tempFile string) error {
@@ -97,7 +97,7 @@ func TestCheckSshUserDetails(t *testing.T) {
 					SudoPassword: sudoPassword,
 				},
 				MockFileUtils: &fileutils.MockFileSystemUtils{
-					CreateTempFileFunc: func(content, filename string) (string, error) {
+					CreateTempFileFunc: func(content, filename string, dir string) (string, error) {
 						return "", errors.New("file creation failed ")
 					},
 					DeleteTempFileFunc: func(tempFile string) error {

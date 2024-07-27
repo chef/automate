@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	cli "github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/spf13/cobra"
 )
@@ -234,12 +235,19 @@ func (ani *AddNodeOnPremImpl) runDeploy() error {
 
 	// Restart all PostgreSQL nodes in order to apply the new configuration
 	if len(ani.postgresqlIp) > 0 {
-		leader := getPGLeader(ani.statusSummary)
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
-		err = ani.nodeUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, ani.statusSummary)
+		level := "info"
+		if globalOpts.debug {
+			level = "debug"
+		}
+		log, err := logger.NewLogger("text", level)
+		if err != nil {
+			return err
+		}
+		err = ani.nodeUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *ani.sshUtil.getSSHConfig(), ani.fileutils, log)
 		if err != nil {
 			return err
 		}

@@ -907,7 +907,7 @@ func TestPrePatchForFrontendNodes(t *testing.T) {
 			[[load_balancer.v1.sys.frontend_tls]]
 			cert = ""`
 
-	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML)
+	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML, "")
 	assert.NoError(t, err)
 	defer fileutils.DeleteFile(filePath)
 
@@ -930,7 +930,7 @@ func TestPrePatchForFrontendNodes(t *testing.T) {
 	t.Run("with invalid toml file content", func(t *testing.T) {
 		tomlFileContent := `
 	[deploy`
-		filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML)
+		filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML, "")
 		assert.NoError(t, err)
 		cmpInput := &CmdInputs{
 			InputFiles: []string{AUTOMATE_TOML},
@@ -946,7 +946,7 @@ func TestPrePatchForOsNodes(t *testing.T) {
 	tomlFileContent := `[cluster]
 	max_shards_per_node = "2000"`
 
-	filePath, err := fileutils.CreateTempFile(tomlFileContent, OPENSEARCH_TOML)
+	filePath, err := fileutils.CreateTempFile(tomlFileContent, OPENSEARCH_TOML, "")
 	assert.NoError(t, err)
 	defer fileutils.DeleteFile(filePath)
 
@@ -961,7 +961,7 @@ func TestPrePatchForOsNodes(t *testing.T) {
 	t.Run("with invalid toml file content", func(t *testing.T) {
 		tomlFileContent := `
 	[cluster`
-		filePath, err := fileutils.CreateTempFile(tomlFileContent, OPENSEARCH_TOML)
+		filePath, err := fileutils.CreateTempFile(tomlFileContent, OPENSEARCH_TOML, "")
 		assert.NoError(t, err)
 		cmpInput := &CmdInputs{
 			InputFiles: []string{OPENSEARCH_TOML},
@@ -1018,7 +1018,7 @@ func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
 			cert = ""
 `
 
-	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML)
+	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML, "")
 	assert.NoError(t, err)
 	defer fileutils.DeleteFile(filePath)
 
