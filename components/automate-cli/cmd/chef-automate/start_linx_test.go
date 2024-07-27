@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -280,7 +282,8 @@ func TestStartCommandHA(t *testing.T) {
 			startCmdFlags.opensearch = tc.isForOS
 			startCmdFlags.postgresql = tc.isForPG
 			infra := getMockInfra()
-			err := runStartCommandHA(infra, tc.arguments, tc.isManaged)
+			log, _ := logger.NewLogger("text", "debug")
+			err := runStartCommandHA(infra, tc.arguments, tc.isManaged, getMockNodeUtilsImpl(), &fileutils.FileSystemUtils{}, log)
 			if tc.isErrorExpected {
 				assert.Error(t, err)
 				assert.EqualError(t, err, tc.errorMessage)
