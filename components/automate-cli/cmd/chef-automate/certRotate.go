@@ -149,7 +149,7 @@ type certRotateFlow struct {
 	writer      *cli.Writer
 	pullConfigs PullConfigs
 	log         logger.Logger
-	nodeUtils   *NodeUtilsImpl
+	nodeUtils   NodeOpUtils
 }
 
 type NodeIpHealth struct {
