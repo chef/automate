@@ -168,9 +168,7 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 	flags.automate = false
 	flags.chefServer = false
 	if flags.postgresql {
-		restartOnGivenNode(flags, POSTGRESQL, infra, rs, restartCmdResults)
-		reloadPgConfig(restartCmdResults)
-
+		restartAndReloadPgConfig(restartCmdResults)
 	} else {
 		restartCmdResults <- restartCmdResult{}
 	}
@@ -182,7 +180,7 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 	}
 }
 
-func reloadPgConfig(restartCmdResults chan restartCmdResult) {
+func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult) {
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		restartCmdResults <- restartCmdResult{
@@ -193,6 +191,7 @@ func reloadPgConfig(restartCmdResults chan restartCmdResult) {
 	if globalOpts.debug {
 		level = "debug"
 	}
+
 	log, err := logger.NewLogger("text", level)
 	if err != nil {
 		restartCmdResults <- restartCmdResult{
@@ -207,12 +206,31 @@ func reloadPgConfig(restartCmdResults chan restartCmdResult) {
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 		timeout:    DEFAULT_TIMEOUT,
 	}
+	statusSummary, err := getStatusSummary(infra)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+
+	// restart pg nodes in a sequence of follower nodes first and then leader node
+	leader := getPGLeader(statusSummary)
+	err = nodeOpUtils.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, statusSummary)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	// restart done
+
+	// reloading the pg config to make sure all nodes of pg have correct config
 	err = nodeOpUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, conf, fileUtils, log)
 	if err != nil {
 		restartCmdResults <- restartCmdResult{
 			err: err,
 		}
 	}
+	// config reload done
 }
 
 func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {
