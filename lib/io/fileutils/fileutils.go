@@ -202,7 +202,7 @@ func CreateTempFile(content string, filename string, dir string) (string, error)
 	if err != nil {
 		return "", errors.Wrap(err, "file creation failed ")
 	}
-	_, err = tempFile.WriteString((content))
+	_, err = tempFile.WriteString(content)
 	if err != nil {
 		return "", errors.Wrap(err, "writing to a file failed ")
 	}

@@ -11,6 +11,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 )
 
 const (
@@ -65,7 +68,17 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		if err = runStartCommandHA(infra, args, isManagedServicesOn()); err != nil {
+
+		nodeutils := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer)
+		level := "info"
+		if globalOpts.debug {
+			level = "debug"
+		}
+		log, err := logger.NewLogger("text", level)
+		if err != nil {
+			return err
+		}
+		if err = runStartCommandHA(infra, args, isManagedServicesOn(), nodeutils, &fileutils.FileSystemUtils{}, log); err != nil {
 			return err
 		}
 	} else if isDevMode() {
@@ -81,7 +94,7 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runStartCommandHA(infra *AutomateHAInfraDetails, args []string, isManagedServices bool) error {
+func runStartCommandHA(infra *AutomateHAInfraDetails, args []string, isManagedServices bool, nodeUtils NodeOpUtils, fileUtils fileutils.FileUtils, log logger.Logger) error {
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
@@ -109,6 +122,10 @@ func runStartCommandHA(infra *AutomateHAInfraDetails, args []string, isManagedSe
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
 		startCommandImplHA(args, *sshConfig, backendIps, POSTGRES_SERVICE, writer, errorList)
+		err := nodeUtils.postPGCertRotate(backendIps, *sshConfig, fileUtils, log)
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
 	}
 	if errorList.Len() > 0 {
 		return status.New(status.ServiceStartError, getSingleErrorFromList(errorList).Error())
