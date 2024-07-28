@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 )
 
 const (
@@ -81,7 +82,7 @@ func runRestartServicesCmd(flags *RestartCmdFlags) func(cmd *cobra.Command, args
 
 func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlags) error {
 	if isA2HARBFileExist() {
-		nodeOpUtils := &NodeUtilsImpl{}
+		nodeOpUtils := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer)
 		remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
 		infra, _, err := nodeOpUtils.getHaInfraDetails()
 		if err != nil {
