@@ -101,6 +101,7 @@ func (l *licenseInterceptor) UnaryServerInterceptor() grpc.UnaryServerIntercepto
 
 func (l *licenseInterceptor) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(req interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+
 		if contains(refreshLicenseList, info.FullMethod) {
 			l.licenseStatus = &LicenseStatus{
 				LicenseDetailsRefresh: true,
@@ -108,7 +109,7 @@ func (l *licenseInterceptor) StreamServerInterceptor() grpc.StreamServerIntercep
 		}
 
 		if contains(allowApiList, info.FullMethod) {
-			i := interceptedServerStream{ServerStream: ss}
+			i := interceptedServerStream{ctx: context.Background(), ServerStream: ss}
 			return handler(req, &i)
 		}
 
@@ -121,7 +122,7 @@ func (l *licenseInterceptor) StreamServerInterceptor() grpc.StreamServerIntercep
 			return status.Errorf(codes.PermissionDenied, "License is expired, please apply a new license")
 		}
 
-		i := interceptedServerStream{ServerStream: ss}
+		i := interceptedServerStream{ctx: context.Background(), ServerStream: ss}
 		return handler(req, &i)
 
 	}
