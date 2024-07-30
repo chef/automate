@@ -5,7 +5,7 @@ pkg_version="0.1.0"
 pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache-2.0')
-pkg_build_deps=(core/go19 core/git core/gcc)
+pkg_build_deps=(core/go22 core/git core/gcc)
 pkg_bin_dirs=(bin)
 
 pkg_deps=(
