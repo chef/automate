@@ -213,13 +213,6 @@ func init() {
 		panic(":(")
 	}
 
-	// a1 migration with Workflow Server will be hidden until it is fully completed
-	//err = migrateFrom1Cmd.PersistentFlags().MarkHidden("enable-workflow")
-	//if err != nil {
-	//	fmt.Printf("failed configuring cobra: %s\n", err.Error())
-	//	panic(":(")
-	//}
-
 	// migrate-from-v1 gen-config flags
 	generateCfgCmd.PersistentFlags().StringVarP(
 		&migrateCmdFlags.migrateTomlPath,

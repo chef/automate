@@ -68,7 +68,7 @@ if [[ "$ARTIFACT_TYPE" = "minimal" ]]; then
   install_from_results_or_depot automate-postgresql dev
   install_from_results_or_depot automate-cli dev
   chef-automate init-config
-  chef-automate dev a1-dump-pg -c config.toml --enable-chef-server --enable-workflow
+  chef-automate dev a1-dump-pg -c config.toml --enable-chef-server
 fi
 
 # Make sure state isn't changing when we create the backup

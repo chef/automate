@@ -163,11 +163,6 @@ func newDeployCmd() *cobra.Command {
 		"enable-deploy-order-stress-mode",
 		false,
 		"Deploy services in the order that stresses hab the most")
-	//cmd.PersistentFlags().BoolVar(
-	//	&deployCmdFlags.enableWorkflow,
-	//	"enable-workflow",
-	//	false,
-	//	"Deploy Workflow services along with Chef Automate")
 	cmd.PersistentFlags().StringSliceVar(
 		&deployCmdFlags.products,
 		"product",

@@ -12,7 +12,6 @@ do_deploy() {
         --override-origin "$HAB_ORIGIN" \
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
-        --product workflow \
         --product automate-dev \
         --product chef-server \
         --product builder \
