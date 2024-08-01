@@ -180,7 +180,7 @@ func TestBinlinksLoad(t *testing.T) {
 }
 
 func TestAllPackagesUniq(t *testing.T) {
-	packageIDs, err := ServicesInCollections([]string{"automate-full", "chef-server", "workflow"})
+	packageIDs, err := ServicesInCollections([]string{"automate-full", "chef-server"})
 	require.NoError(t, err)
 	assert.True(t, len(packageIDs) > 0)
 
@@ -224,7 +224,7 @@ func TestAutomateFullAliases(t *testing.T) {
 }
 
 func TestListProducts(t *testing.T) {
-	assert.Subset(t, ListProducts(), []string{"automate", "chef-server", "workflow"})
+	assert.Subset(t, ListProducts(), []string{"automate", "chef-server"})
 	assert.NotContains(t, ListProducts(), "monitoring")
 }
 
@@ -237,18 +237,18 @@ func TestValidateProductDeployment(t *testing.T) {
 		assert.Error(t, ValidateProductDeployment([]string{"automate", "core"}))
 	})
 	t.Run("specified product dependencies", func(t *testing.T) {
-		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
-		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow"}))
-		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "chef-server"}))
 	})
 	t.Run("we support these for sure", func(t *testing.T) {
 		assert.NoError(t, ValidateProductDeployment([]string{"automate", "monitoring"}))
-		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
-		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "chef-server"}))
 		assert.NoError(t, ValidateProductDeployment([]string{"automate", "chef-server"}))
 		assert.NoError(t, ValidateProductDeployment([]string{"chef-server"}))
-		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow"}))
-		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "chef-server"}))
 		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "chef-server"}))
 	})
 }
@@ -265,7 +265,6 @@ func TestContainsCollection(t *testing.T) {
 		assert.False(t, ContainsCollection("core", nil))
 	})
 	t.Run("returns true when product is in the list", func(t *testing.T) {
-		assert.True(t, ContainsCollection("workflow", []string{"workflow"}))
 		assert.True(t, ContainsCollection("automate", []string{"automate"}))
 		assert.True(t, ContainsCollection("automate-full", []string{"automate"}))
 		assert.True(t, ContainsCollection("automate-full", []string{"automate-full"}))
@@ -281,7 +280,7 @@ func TestContainsCollection(t *testing.T) {
 }
 
 func TestRequiredProducts(t *testing.T) {
-	assert.Equal(t, []string{"automate", "desktop", "workflow"}, RequiredProducts([]string{"desktop", "workflow"}))
+	assert.Equal(t, []string{"automate", "desktop"}, RequiredProducts([]string{"desktop"}))
 	assert.Equal(t, []string{"automate", "desktop"}, RequiredProducts([]string{"desktop"}))
 	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "builder"}))
 	assert.Equal(t, []string{"automate", "builder", "desktop"}, RequiredProducts([]string{"desktop", "depot"}))

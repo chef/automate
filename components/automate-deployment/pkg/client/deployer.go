@@ -589,7 +589,6 @@ func (d *deployer) upgradePreflight() {
 		d.upgrade.DeliveryRunning,
 		d.upgrade.DeliverySecrets,
 		d.upgrade.EnableChefServer,
-		d.upgrade.EnableWorkflow,
 	)
 
 	if err := p.Run(); err != nil {
@@ -1703,13 +1702,13 @@ func (d *deployer) validateUpgradableA1Config() {
 		ExternalESCheck:       u.SkipExternalESCheck,
 		FIPSCheck:             u.SkipFIPSCheck,
 		SAMLCheck:             u.SkipSAMLCheck,
-		WorkflowCheck:         u.SkipWorkflowCheck,
+		//WorkflowCheck:         u.SkipWorkflowCheck,
 	}
 
 	// @afiune delete me when workflow feature is completed, as well as the skip flags
-	if d.upgrade.EnableWorkflow {
-		skips.SkipWorkflowCheck()
-	}
+	//if d.upgrade.EnableWorkflow {
+	//	skips.SkipWorkflowCheck()
+	//}
 
 	err := checker.RunAutomateChecks(u.A1Config, skips)
 	if err != nil {
