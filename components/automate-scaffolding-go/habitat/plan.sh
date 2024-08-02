@@ -12,7 +12,7 @@ pkg_license=('Chef-MLSA')
 pkg_source=nosuchfile.tar.gz
 pkg_deps=(
  core/go19/1.19.3/20240106044515 # This is only pinned to force a scaffolding rebuild to this version
- core/git/2.33.1/20240106041223
+ core/git
  
 )
 
