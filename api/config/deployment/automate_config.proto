@@ -39,8 +39,6 @@ import "config/secrets/config_request.proto";
 import "config/session/config_request.proto";
 import "config/teams/config_request.proto";
 import "config/ui/config_request.proto";
-import "config/workflow_nginx/config_request.proto";
-import "config/workflow_server/config_request.proto";
 import "config/event_gateway/config_request.proto";
 import "config/data_feed/config_request.proto";
 import "config/event_feed/config_request.proto";
@@ -87,9 +85,6 @@ message AutomateConfig {
 	chef.automate.domain.bifrost.ConfigRequest bifrost = 23;
 	chef.automate.domain.erchef.ConfigRequest erchef = 24;
 	chef.automate.domain.cs_nginx.ConfigRequest cs_nginx = 25;
-
-	chef.automate.domain.workflow_server.ConfigRequest workflow = 27;
-	chef.automate.domain.workflow_nginx.ConfigRequest workflow_nginx = 28;
 
 	chef.automate.domain.event.ConfigRequest event_service = 30;
 	chef.automate.domain.nodemanager.ConfigRequest nodemanager = 33;

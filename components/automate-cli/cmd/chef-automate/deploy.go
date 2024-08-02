@@ -59,12 +59,12 @@ var deployCmdFlags = struct {
 	acceptMLSA                      bool
 	enableChefServer                bool
 	enableDeploymentOrderStressMode bool
-	enableWorkflow                  bool
-	products                        []string
-	bootstrapBundlePath             string
-	userAuth                        bool
-	saas                            bool
-	skipVerify                      bool
+	// enableWorkflow                  bool
+	products            []string
+	bootstrapBundlePath string
+	userAuth            bool
+	saas                bool
+	skipVerify          bool
 }{}
 
 // deployCmd represents the new command
@@ -163,11 +163,6 @@ func newDeployCmd() *cobra.Command {
 		"enable-deploy-order-stress-mode",
 		false,
 		"Deploy services in the order that stresses hab the most")
-	cmd.PersistentFlags().BoolVar(
-		&deployCmdFlags.enableWorkflow,
-		"enable-workflow",
-		false,
-		"Deploy Workflow services along with Chef Automate")
 	cmd.PersistentFlags().StringSliceVar(
 		&deployCmdFlags.products,
 		"product",
@@ -203,7 +198,6 @@ func newDeployCmd() *cobra.Command {
 			"admin-password",
 			"enable-chef-server",
 			"enable-deploy-order-stress-mode",
-			"enable-workflow",
 			"bootstrap-bundle",
 		} {
 			err := cmd.PersistentFlags().MarkHidden(flagName)
@@ -386,9 +380,9 @@ func mergeFlagOverrides(conf *dc.AutomateConfig) error {
 		overrideOpts = append(overrideOpts, dc.WithDeploymentOrderStressMode(true))
 	}
 
-	if deployCmdFlags.enableWorkflow {
-		overrideOpts = append(overrideOpts, dc.WithWorkflowEnabled(true))
-	}
+	//if deployCmdFlags.enableWorkflow {
+	//	overrideOpts = append(overrideOpts, dc.WithWorkflowEnabled(true))
+	//}
 
 	if len(deployCmdFlags.products) > 0 {
 		overrideOpts = append(overrideOpts, dc.WithProducts(deployCmdFlags.products))

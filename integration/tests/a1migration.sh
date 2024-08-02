@@ -34,7 +34,6 @@ do_deploy() {
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
         --enable-chef-server \
-        --enable-workflow \
         --skip-preflight \
         --self-test \
         --debug \

@@ -55,8 +55,7 @@ var devCmdFlags = struct {
 	withDeps         bool
 	manifestDir      string
 	enableChefServer bool
-	enableWorkflow   bool
-
+	//enableWorkflow   bool
 	// service-deps option
 	reverse bool
 }{}
@@ -483,11 +482,6 @@ func newDumpA1PGCmd() *cobra.Command {
 		"enable-chef-server",
 		false,
 		"Enable integrated Chef Server migration and deployment; only valid for all-in-one topology")
-	cmd.PersistentFlags().BoolVar(
-		&migrateCmdFlags.enableWorkflow,
-		"enable-workflow",
-		false,
-		"Enable integrated Workflow Server migration and deployment; only valid for all-in-one topology")
 	cmd.PersistentFlags().IntVar(
 		&migrateCmdFlags.pgDumpSeconds,
 		"postgres-dump-wait-seconds",

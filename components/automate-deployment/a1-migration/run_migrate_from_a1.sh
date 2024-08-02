@@ -35,6 +35,5 @@ chef-automate migrate-from-v1 \
 	--override-origin "${HAB_ORIGIN}" \
 	--hartifacts "${HARTIFACT_DIR}" \
 	--enable-chef-server \
-	--enable-workflow \
 	--skip-backup-check \
 	--yes

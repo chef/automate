@@ -436,7 +436,11 @@ lint:
     - external/habitat/event.proto # this file is owned by habitat and copied here
 breaking:
   use:
-    - PACKAGE
+    - FILE
+  except:
+    # This linter requires your proto package names to end with .v1 or similar.
+    # Adopting this for existing code would break anyone using our protos
+    - FILE_NO_DELETE
   ignore:
     # Changes to interservice APIs are okay until (if ever) we support clusters
     # of interconnected internal services that would not upgrade in unison
@@ -457,4 +461,10 @@ breaking:
     - config/postgresql/config_request.proto
     # elasticsearch to opensearch movemnt changes
     - config/es_sidecar/config_request.proto
+    - config/deployment/automate_config.proto
+    - config/deployment/config_request.proto
+    - config/workflow_nginx/config_request.proto
+    - config/workflow_server/config_request.proto
+    - config/workflow_nginx/config_request.proto
+    - config/workflow_server/config_request.proto
 

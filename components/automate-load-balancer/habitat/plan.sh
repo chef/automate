@@ -60,7 +60,6 @@ pkg_binds_optional=(
   [automate-ui]="port"
   [session-service]="port"
   [automate-cs-nginx]="port"
-  [automate-workflow-nginx]="port"
   [automate-builder-api-proxy]="port"
 )
 

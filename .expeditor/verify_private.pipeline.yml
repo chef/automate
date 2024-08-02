@@ -756,17 +756,7 @@ steps:
       secrets:
         A2_LICENSE:
           path: secret/a2/license
-          field: license     
-
-
-  - label: "workflow"
-    command:
-      - integration/run_test integration/tests/workflow.sh
-    timeout_in_minutes: 30 # longer timeout for workflow
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+          field: license
 
   - label: "backup to s3"
     command:
