@@ -1023,6 +1023,8 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: core/ruby30
     reason: Ruby license (previously shipped in Automate 1)
+  - name: core/ruby31
+    reason: Ruby license (previously shipped in Automate 1)
   - name: core/ruby27
     reason: Exception made for chef server upgrade
 
