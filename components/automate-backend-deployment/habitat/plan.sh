@@ -18,13 +18,13 @@ pkg_deps=(
   core/gzip
   core/jq-static
   core/openssh
-  core/openssl
+  core/openssl/1.0.2zi
   core/make
   core/curl
   core/rsync
   core/terraform1
   core/busybox-static  
-  chef/automate-ha-cluster-ctl
+  sahiba3108/automate-ha-cluster-ctl/0.1.0/20240805062838
 )
 #core/aws-cli ( core/aws-cli/1.21.11/20231020110846 core/aws-cli/1.21.11/20220817123642 )
    # core/openssl11 ( core/openssl11/1.1.1w/20231020105352 core/openssl11/1.1.1k/20220311131131 )
