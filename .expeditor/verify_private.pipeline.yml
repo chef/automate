@@ -650,10 +650,10 @@ steps:
         linux:
           single-use: true
           privileged: true
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license     
+      # secrets:
+      #   A2_LICENSE:
+      #     path: secret/a2/license
+      #     field: license     
 
   - label: "product airgap"
     command:
