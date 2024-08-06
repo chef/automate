@@ -1,4 +1,4 @@
-<chef-modal label="license-lockout-label" [locked]="modalLocked" [visible]="modalVisible" (closeModal)="closeModal()">
+<chef-modal label="license-apply-label" [locked]="modalLocked" [visible]="modalVisible" (closeModal)="closeModal()">
   <div class="license-wrapper">
     <ng-container *ngIf="!licenseApplied">
 
@@ -8,8 +8,21 @@
         LICENSE_ABOUT_TO_EXPIRE = 3
       -->
       <ng-container *ngIf="licenseApplyReason === 1">
-        <div class="title">Welcome to Chef Automate!</div>
-        <div class="subtitle">Enter your license key.</div>
+        <div class="full-width">
+          <div class="left-fixed">
+            <h2 class="title">
+              <a left tertiary (click)="backToLicenseLockout(); false">
+                <chef-icon class="icon-left">chevron_left</chef-icon>
+              </a>
+            </h2>
+          </div>
+          <div class="right-flexible">
+            <h2 id="license-apply-label" class="title">
+              Welcome to Chef Automate!</h2>
+          </div>
+          <div class="right-fixed">
+          </div>
+        </div>
       </ng-container>
 
       <ng-container *ngIf="licenseApplyReason === 2">
@@ -49,11 +62,10 @@
         </chef-alert>
       </div>
 
-      <div class="note">Required fields are marked with an asterisk (*).</div>
       <form class="apply" [formGroup]="applyForm" (ngSubmit)="onApplyLicenseFormSubmit()" novalidate>
         <chef-form-field>
-          <label for="licenseKey">License Key <span aria-hidden="true">*</span></label>
-          <textarea name="licenseKey" id="licenseKey" formControlName="licenseKey" cols="65" rows="10" autofocus></textarea>
+          <label for="licenseKey"><h3 class="subtitle">Enter License Key</h3></label>
+          <textarea name="licenseKey" id="licenseKey" formControlName="licenseKey" cols="65" rows="7" placeholder="Enter here" autofocus></textarea>
           <chef-error *ngIf="applyForm.get('licenseKey').hasError('required') && applyForm.get('licenseKey').dirty">License key required</chef-error>
         </chef-form-field>
         <br>
@@ -63,23 +75,16 @@
           and the
           <a href="https://www.chef.io/online-master-agreement" target="_blank">Master License and Services Agreement</a>
         </chef-checkbox>
-        <div class="button">
-          <chef-button type="submit" primary [disabled]="!(applyForm.valid && mlsaAgree) || applyingLicense">Apply License</chef-button>
-          <chef-button tertiary (click)="logout()">Sign Out</chef-button>
+        <div class="footer">
+          <chef-button type="submit" class="button" primary [disabled]="!(applyForm.valid && mlsaAgree) || applyingLicense">Apply License</chef-button>
+          <br>
+          <chef-button tertiary class="button" (click)="logout()">Sign out and do it later.</chef-button>
         </div>
       </form>
       <div *ngIf="applyingLicense" class="spinner-container">
         <chef-loading-spinner size="30"></chef-loading-spinner>
       </div>
 
-      <!-- Only show footer to get trial if this is the initial apply -->
-      <ng-container *ngIf="licenseApplyReason === 1 && !licenseExpired">
-        <div class="footer">
-          <a href="" (click)="backToLicenseLockout(); false" class="active bright-link">Sign up for the trial</a>.
-          Or
-          <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license.
-        </div>
-      </ng-container>
     </ng-container>
 
     <!-- display confirmation once license applied -->

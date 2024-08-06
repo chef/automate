@@ -31,8 +31,9 @@
   }
 
   .button {
-    margin-top: 1em;
+    margin-top: 0.5em;
     text-align: center;
+    width: 500px;
   }
 
   ul {
@@ -62,7 +63,14 @@
 
 
   .footer {
-    margin-top: 0px;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+
+    button:first-of-type {
+      margin-right: 60px;
+    }
   }
 
   label {
@@ -73,10 +81,14 @@
   }
 
   textarea {
-    font-size: 12px;
-    min-width: 636px;
+    font-size: 14px;
+    min-width: 600px;
     max-width: 600px;
-    min-height: 175px;
+    min-height: 100px;
+    padding: 8px;
+    border-radius: 4px;
+    border-color: #7D868C47;
+    resize: none;
   }
 
   textarea#licenseKey {
@@ -85,6 +97,7 @@
 
   textarea,
   chef-error {
+    font-size: 14px;
     display: block;
   }
 
@@ -92,7 +105,6 @@
     display: flex;
     justify-content: flex-start;
     margin-top: 10px;
-    height: 20px;
   }
 
   ::ng-deep chef-alert {
@@ -111,6 +123,35 @@
     width: 210px;
   }
 
+  chef-icon.icon-left {
+    float: left;
+    margin-left: 13px;
+    font-size: 32px;
+    color: #3864F2;
+    cursor: pointer;
+  }
+
+  .full-width {
+    width: 100%;
+    display: flex;
+  }
+
+  .left-fixed {
+    width: 32px;
+    float: left;
+    text-align: left;
+  }
+
+  .right-fixed {
+    width: 32px;
+    float: right;
+  }
+
+  .right-flexible {
+    flex-grow: 1;
+    text-align: center;
+  }
+
   .note {
     font-style: italic;
     font-size: 12px;
@@ -122,4 +163,5 @@
   app-telemetry-checkbox {
     margin: 20px 50px 0;
   }
+
 }
