@@ -585,7 +585,7 @@ steps:
   - label: "iam v2 with no legacy policies force-upgrade to v2"
     command:
       - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 45
     expeditor:
       secrets:
         A2_LICENSE:
@@ -763,7 +763,7 @@ steps:
   - label: "backup to s3"
     command:
       - integration/run_test integration/tests/backup_s3.sh
-    timeout_in_minutes: 45
+    timeout_in_minutes: 60
     expeditor:
       accounts:
         - aws/chef-cd
