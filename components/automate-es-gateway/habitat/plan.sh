@@ -3,6 +3,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name="automate-es-gateway"
 pkg_description="Proxy that provides normalized access to internal or external elasticsearch database for a2"
 pkg_origin="chef"

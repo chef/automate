@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=secrets-service
 pkg_description="Secrets API Service"
 pkg_origin=chef

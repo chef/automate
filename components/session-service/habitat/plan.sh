@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=session-service
 pkg_description="A2 session service"
 pkg_origin=chef

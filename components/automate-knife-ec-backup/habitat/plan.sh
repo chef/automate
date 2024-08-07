@@ -11,6 +11,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_build_deps=("${UPSTREAM_PKG_IDENT}")
 pkg_svc_user=root
 pkg_svc_group=root
+
 pkg_deps=(
   chef/mlsa
   "${UPSTREAM_PKG_IDENT}"

@@ -23,6 +23,7 @@ pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
 pkg_dirname="nginx-${nginx_version}"
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_shasum=760729901acbaa517996e681ee6ea259032985e37c2768beef80df3a877deed9
+
 pkg_deps=(
   core/glibc
   core/libedit

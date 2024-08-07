@@ -9,6 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/automate-gateway"
 pkg_version="0.1.0"
+
 pkg_deps=(
   core/cacerts # communicate with license service over HTTPS
   core/curl

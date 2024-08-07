@@ -1,5 +1,6 @@
 # stable channel
 
+
 pkg_name=automate-ui
 pkg_origin=chef
 pkg_version="2.0.0"

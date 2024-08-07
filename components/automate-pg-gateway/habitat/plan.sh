@@ -15,6 +15,7 @@ pkg_deps=(
     core/haproxy
 )
 
+
 chef_automate_hab_binding_mode="relaxed"
 pkg_exposes=(port)
 pkg_exports=(

@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=sample-data-service
 pkg_description="Automate sample data service"
 pkg_origin=chef
