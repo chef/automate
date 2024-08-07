@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=user-settings-service
 pkg_description="Chef User Settings Service"
 pkg_origin=chef

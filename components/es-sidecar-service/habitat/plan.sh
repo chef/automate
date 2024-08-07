@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=es-sidecar-service
 pkg_description="A service providing common functionality to Automate's Elasticsearch consumers"
 pkg_origin=chef

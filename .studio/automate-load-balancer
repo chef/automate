@@ -14,7 +14,7 @@ automate_load_balancer_integration() {
     log_error "non-zero exit code from curl: ${output}"
     return 1
   fi
-  if ! grep -q "ALPN, server accepted to use h2" <<< "${output}"; then
+  if ! grep -q "ALPN: server accepted h2" <<< "${output}"; then
     log_error "server did NOT accept to use HTTP/2"
     return 1
   fi

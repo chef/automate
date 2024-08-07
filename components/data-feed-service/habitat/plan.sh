@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=data-feed-service
 pkg_description="Data Feed Service"
 pkg_origin=chef

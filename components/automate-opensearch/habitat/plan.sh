@@ -12,6 +12,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.14/opensearch-1.3.14-linux-x64.tar.gz"
 pkg_shasum=5d7c0188a393d5d9035e5e81f03bcd00be76e3702750b43b2231a2f428c3187e
 
+
 pkg_build_deps=(
   core/patchelf
 )
