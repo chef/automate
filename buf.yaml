@@ -463,8 +463,4 @@ breaking:
     - config/es_sidecar/config_request.proto
     - config/deployment/automate_config.proto
     - config/deployment/config_request.proto
-    - config/workflow_nginx/config_request.proto
-    - config/workflow_server/config_request.proto
-    - config/workflow_nginx/config_request.proto
-    - config/workflow_server/config_request.proto
 
