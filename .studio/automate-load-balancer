@@ -10,8 +10,6 @@ automate_load_balancer_integration() {
 
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
-
-
   if ! output=$(curl --http2 -vk "$target" 2>&1); then
     log_error "non-zero exit code from curl: ${output}"
     return 1

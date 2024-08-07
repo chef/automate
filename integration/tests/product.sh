@@ -7,39 +7,28 @@ test_deploy_inspec_profiles=(a2-deploy-integration)
 test_skip_diagnostics=true
 
 do_test_deploy() {
-    echo "do test deploy default 1"
     do_test_deploy_default
 
-    echo "set log level 2"
     # make sure we can set the log level while things are running
     chef-automate debug set-log-level automate-gateway debug
     chef-automate debug set-log-level deployment-service debug
 
-    echo "debug line 3"
     #shellcheck disable=SC2154
     #shellcheck source=integration/helpers/cert_auth_tests.sh
     source "${source_dir}/helpers/cert_auth_tests.sh"
     cert_auth_tests
 
-    echo "debug line 4"
     world_writable_files_test
 
-    echo "debug line 5"
     # We cannot use 'chef-automate stop' yet because
     # there is no way for that command to return successfully
     # I'd rather not jam a fix in
     log_info "Restarting chef-automate via chef-automate start/stop"
-
-    echo "debug line stop 7"
     chef-automate -d stop
-    echo "debug line start 8"
     chef-automate -d start
-
-    echo "debug line health 9"
     wait_for_healthy
     log_info "Done restarting chef-automate"
 
-    echo "debug line 6"
     verify_packages
 }
 
