@@ -1009,6 +1009,8 @@ exceptions:
     reason: Ruby license (previously shipped in Automate 1)
   - name: core/ruby27
     reason: Exception made for chef server upgrade
+  - name: core/ruby31
+    reason: Ruby license (Adding to test inspec)
 
   ruby:
   - name: highline

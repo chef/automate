@@ -32,7 +32,7 @@ pkg_binds_optional=(
 )
 #Adding it to use compliance with firejail
 pkg_svc_user=root
-inspec_release="chef/inspec/4.56.60/20240710062255"
+inspec_release="pappuk/inspec/4.56.60/20240808062108"
 pkg_deps=(
   core/coreutils
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
@@ -66,7 +66,7 @@ scaffolding_go_binary_list=(
 do_prepare() {
   do_default_prepare
    
-  GO_LDFLAGS="${GO_LDFLAGS} -X main.EXECUTABLE_PATH=$(pkg_path_for chef/inspec)/bin/inspec"
+  GO_LDFLAGS="${GO_LDFLAGS} -X main.EXECUTABLE_PATH=$(pkg_path_for pappuk/inspec)/bin/inspec"
  export GO_LDFLAGS
   
 }
