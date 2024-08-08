@@ -32,21 +32,21 @@ steps:
 
   # license scout requires github account access because we currently
   # rely on at least 2 private repositories.
-  - label: license scout
-    command:
-      # here we reuse the license_scout.sh script used by expeditor to publish the manifest
-      - .expeditor/license_scout.sh
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        GITHUB_TOKEN:
-          account: github/chef
-          field: token
-      executor:
-        docker:
+  # - label: license scout
+  #   command:
+  #     # here we reuse the license_scout.sh script used by expeditor to publish the manifest
+  #     - .expeditor/license_scout.sh
+  #   timeout_in_minutes: 20
+  #   retry:
+  #     automatic:
+  #       limit: 1
+  #   expeditor:
+  #     secrets:
+  #       GITHUB_TOKEN:
+  #         account: github/chef
+  #         field: token
+  #     executor:
+  #       docker:
 
   # We need to build in order to run the
   # integration tests.
