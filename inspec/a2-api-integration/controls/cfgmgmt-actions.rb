@@ -57,8 +57,8 @@ control 'config-mgmt-action-1' do
       let(:api_request) do
         automate_api_request(
           '/data-collector/v0',
-          http_method: 'POST',
-          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")
+          {http_method: 'POST',
+          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")}
         )
       end
 

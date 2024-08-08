@@ -12,7 +12,7 @@ class AutomateApiRequest < Inspec.resource(1)
     end
   "
 
-  attr_accessor :url, :user, :pass, :request_headers, :request_body, :request_params, :http_method
+  attr_accessor :user, :pass
 
   def initialize(endpoint, http_method: 'GET', request_body: nil, request_headers: {}, request_params: nil,
                  user: 'admin',
