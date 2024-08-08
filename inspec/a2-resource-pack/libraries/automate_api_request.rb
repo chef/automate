@@ -14,7 +14,7 @@ class AutomateApiRequest < Inspec.resource(1)
 
   attr_accessor :user, :pass
 
-  def initialize(endpoint, http_method: 'GET', request_body: nil, request_headers: {}, request_params: nil,
+  def initialize(endpoint: '/api/v0/_status' , http_method: 'GET', request_body: nil, request_headers: {}, request_params: nil,
                  user: 'admin',
                  pass: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate')
     endpoint = "/#{endpoint}" unless endpoint.start_with?('/')
