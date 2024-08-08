@@ -44,5 +44,6 @@ do_test_deploy() {
     log_info "Restoring default admin access"
     chef-automate iam admin-access restore $AUTOMATE_API_DEFAULT_PASSWORD || return 1
 
-    do_test_deploy_default
+    declare -a inspec_tests=(a2-api-integration a2-iam-no-legacy-integration);
+    run_inspec_tests "${A2_ROOT_DIR}" "${inspec_tests[@]}"
 }
