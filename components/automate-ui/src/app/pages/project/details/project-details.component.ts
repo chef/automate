@@ -6,22 +6,22 @@ import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams, routeURL } from 'app/route.selectors';
-import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, allLoaded, pending } from 'app/entities/entities';
-import { getStatus, updateStatus, projectFromRoute } from 'app/entities/projects/project.selectors';
-import { Project } from 'app/entities/projects/project.model';
-import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
-import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
-import { Rule } from 'app/entities/rules/rule.model';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeParams, routeURL } from '../../../route.selectors';
+import { Regex } from '../../../helpers/auth/regex';
+import { EntityStatus, allLoaded, pending } from '../../../entities/entities';
+import { getStatus, updateStatus, projectFromRoute } from '../../../entities/projects/project.selectors';
+import { Project } from '../../../entities/projects/project.model';
+import { GetProject, UpdateProject } from '../../../entities/projects/project.actions';
+import { GetRulesForProject, DeleteRule } from '../../../entities/rules/rule.actions';
+import { Rule } from '../../../entities/rules/rule.model';
 import {
   allRules,
   getAllStatus as getAllRulesForProjectStatus,
   deleteStatus as deleteRuleStatus
-} from 'app/entities/rules/rule.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/rules/rule.selectors';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 export type ProjectTabName = 'rules' | 'details';
 
@@ -96,7 +96,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getStatus),
       this.store.select(getAllRulesForProjectStatus),
-      this.store.select(projectFromRoute),
+      this.store.select(projectFromRoute as any),
       this.store.select(allRules)
     ]).pipe(
         filter(([getProjectSt, getRulesSt, _projectState, _allRulesState]) =>
@@ -133,7 +133,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       });
 
     // when project becomes applied need to also mark rules applied
-    this.store.select(projectFromRoute).pipe(
+    this.store.select(projectFromRoute as any).pipe(
       distinctUntilChanged(),
       filter(project => project && project.status === 'RULES_APPLIED'),
       takeUntil(this.isDestroyed))
@@ -147,7 +147,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onSelectedTab(event: { target: { value: ProjectTabName } }) {
+  onSelectedTab(event) {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });

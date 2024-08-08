@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
+import { IdMapper } from '../../../helpers/auth/id-mapper';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import {
   updateAttributesStatus
-} from 'app/entities/infra-nodes/infra-nodes.selectors';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { InfraNodeAttribute } from 'app/entities/infra-nodes/infra-nodes.model';
-import { UpdateNodeAttributes, GetNode } from 'app/entities/infra-nodes/infra-nodes.actions';
-import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/infra-nodes/infra-nodes.selectors';
+import { EntityStatus, pending } from '../../../entities/entities';
+import { InfraNodeAttribute } from '../../../entities/infra-nodes/infra-nodes.model';
+import { UpdateNodeAttributes, GetNode } from '../../../entities/infra-nodes/infra-nodes.actions';
+import { Utilities } from '../../../helpers/utilities/utilities';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-edit-infra-node-attribute-modal',
@@ -104,7 +104,7 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
     }
   }
 
-  onChangeDefaultJson(event: { target: { value: string } } ) {
+  onChangeDefaultJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);

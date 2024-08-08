@@ -3,7 +3,7 @@ import { ComplianceStatsService } from '../telemetry/compliance-stats/compliance
 import { ClientRunsStatsService } from '../telemetry/client-runs-stats/client-runs-stats.service';
 import { ApplicationStatsService } from '../telemetry/application-stats/application-stats.service';
 import { ConfigService } from '../config/config.service';
-import { LicenseStatus } from 'app/entities/license/license.model';
+import { LicenseStatus } from '../../entities/license/license.model';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from '../../../environments/environment';
 import { BehaviorSubject } from 'rxjs';
@@ -24,7 +24,7 @@ export class LicenseUsageService {
   public totalNodesSubject = new BehaviorSubject(null);
   public totalScansSubject = new BehaviorSubject(null);
   public totalServiceSubject = new BehaviorSubject(null);
-  public initCountFetch = new BehaviorSubject(null);
+  public initCountFetch = new BehaviorSubject<any>(null);
   private expiration;
   private daysSinceLasPost;
   private periodStartDate;

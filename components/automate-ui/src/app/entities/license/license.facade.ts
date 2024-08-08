@@ -25,9 +25,9 @@ import {
     TriggerWelcome
   } from './license.actions';
 
-import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { Notification } from 'app/entities/notifications/notification.model';
-import { DeleteNotification } from 'app/entities/notifications/notification.actions';
+import { notificationState } from '../../entities/notifications/notification.selectors';
+import { Notification } from '../../entities/notifications/notification.model';
+import { DeleteNotification } from '../../entities/notifications/notification.actions';
 
 export enum LicenseApplyReason {
     INITIAL_INSTALL = 1,
@@ -54,7 +54,7 @@ export class LicenseFacadeService {
         this.applyLicense$ = store.select(applyLicense);
         this.requestLicense$ = store.select(requestLicense);
         this.triggerWelcome$ = store.select(triggerWelcome);
-        this.licenseApplyReason$ = new BehaviorSubject(LicenseApplyReason.INITIAL_INSTALL);
+        this.licenseApplyReason$ = new BehaviorSubject(LicenseApplyReason.INITIAL_INSTALL as LicenseApplyReason);
     }
 
     dispatch(action: Action) {

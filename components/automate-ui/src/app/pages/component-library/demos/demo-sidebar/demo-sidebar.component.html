@@ -81,15 +81,16 @@
     <h3>Typescript Code Example</h3>
 
     <pre>doSomethingClever(item: string) {{'{'}}
-  // . . .
-}</pre>
+      // . . .
+    {{'}'}}   
+    </pre>
   </app-cl-code-section>
 
   <app-cl-section>
     <h3>API</h3>
 
     <app-cl-api for="chef-sidebar">
-      <api-prop name="Content Model" type="DOM nodes" required>
+      <api-prop name="Content Model" type="DOM nodes" [required]="true">
         <p>The <token>chef-sidebar</token> element takes one or two children.</p>
         <p>For a sidebar with navigation-only elements, include a <token>div</token> with
         a <token>nav-items</token> class.
@@ -104,7 +105,7 @@
     </app-cl-api>
 
     <app-cl-api for="chef-sidebar-entry">
-      <api-prop name="route" type="String" required>
+      <api-prop name="route" type="String" [required]="true">
         This specifies the path to navigate to when the entry is selected.
         For more technical details, it is passed to the
         <a href="https://angular.io/api/router/RouterLink">RouterLink</a>
@@ -129,12 +130,12 @@
         [Used only in the <token>nav-items</token> section;
         ignored in the <token>select-items</token> section.]
       </api-prop>
-      <api-prop name="icon" type="String" required>
+      <api-prop name="icon" type="String" [required]="true">
         The name of the <a href="/component_library/icon">chef-icon</a> element.
         [Required only when used in the <token>nav-items</token> section;
         ignored in the <token>select-items</token> section.]
       </api-prop>
-      <api-prop name="Content Model" type="DOM nodes" required>
+      <api-prop name="Content Model" type="DOM nodes" [required]="true">
         Specify text that comprises the rendered label of the
         <token>&lt;chef-sidebar-entry&gt;</token>.
       </api-prop>

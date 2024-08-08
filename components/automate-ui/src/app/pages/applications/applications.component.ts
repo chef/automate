@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
   selector: 'app-applications-dashboard',

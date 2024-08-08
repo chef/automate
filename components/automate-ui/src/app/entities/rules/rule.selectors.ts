@@ -1,7 +1,7 @@
 
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { RuleEntityState, ruleEntityAdapter } from './rule.reducer';
 
 export const ruleState = createFeatureSelector<RuleEntityState>('rules');

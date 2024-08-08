@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { MenuItemGroup } from 'app/entities/layout/layout.model';
+import { LayoutFacadeService } from '../../entities/layout/layout.facade';
+import { MenuItemGroup } from '../../entities/layout/layout.model';
 
 @Component({
   selector: 'chef-sidebar',

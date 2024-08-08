@@ -1,7 +1,8 @@
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from '../entities';
-import { FetchStatus, ApplyStatus, RequestStatus, TriggerWelcomeStatus } from './license.model';
+import { FetchStatus, ApplyStatus, RequestStatus, TriggerWelcomeStatus, LicenseStatus } from './license.model';
 import { LicenseStatusActionTypes, LicenseStatusAction } from './license.actions';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface LicenseStatusEntityState {
   fetch: FetchStatus;
@@ -12,10 +13,10 @@ export interface LicenseStatusEntityState {
 
 export const LicenseStatusEntityInitialState: LicenseStatusEntityState = {
   fetch: {
-    license: null,
+    license: {} as LicenseStatus,
     status: EntityStatus.notLoaded,
     expiryMessage: '',
-    errorResp: null
+    errorResp: {} as HttpErrorResponse
   },
   apply: {
     status: EntityStatus.notLoaded,
@@ -32,7 +33,7 @@ export const LicenseStatusEntityInitialState: LicenseStatusEntityState = {
 
 export function licenseStatusEntityReducer(
   state: LicenseStatusEntityState = LicenseStatusEntityInitialState,
-  action: LicenseStatusAction): LicenseStatusEntityState  {
+  action: any): LicenseStatusEntityState  {
 
   switch (action.type) {
 

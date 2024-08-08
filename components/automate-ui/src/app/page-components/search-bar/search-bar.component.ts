@@ -12,7 +12,7 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact, isEmpty } from 'lodash';
-import { SearchBarCategoryItem, Chicklet, SuggestionItem } from 'app/types/types';
+import { SearchBarCategoryItem, Chicklet, SuggestionItem } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
@@ -116,7 +116,7 @@ export class SearchBarComponent implements OnChanges {
   }
 
   // This is triggered when a user clicks on an item in the dropdown.
-  handleCategoryItemClick(type: SearchBarCategoryItem, event: Event): void {
+  handleCategoryItemClick(type: SearchBarCategoryItem | any, event: Event): void {
     event.stopPropagation();
     if (!this.selectedCategoryType) {
       this.categorySelected(type);
@@ -357,5 +357,9 @@ export class SearchBarComponent implements OnChanges {
 
   hasStaticSuggestions(): boolean {
     return this.selectedCategoryType.providedValues !== undefined;
+  }
+
+  trackCatergory(category) {
+    return category.text
   }
 }

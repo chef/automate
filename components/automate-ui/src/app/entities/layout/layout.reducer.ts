@@ -12,9 +12,10 @@ export const InitialState: LayoutEntityState = {
   sidebars: {}
 };
 
+// Need to check : why Any for action
 export function layoutEntityReducer(
   state: LayoutEntityState = InitialState,
-  action: LayoutActions): LayoutEntityState {
+  action: any): LayoutEntityState {
 
   switch (action.type) {
 

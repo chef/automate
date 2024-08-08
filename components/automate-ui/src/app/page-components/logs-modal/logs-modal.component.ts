@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChange } from '@angular/core';
 import { NodeDetailsService } from '../../services/node-details/node-details.service';
 import { NodeRun, Resource } from '../../types/types';
 import { saveAs } from 'file-saver';
-import { DateTime } from 'app/helpers/datetime/datetime';
+import { DateTime } from '../../helpers/datetime/datetime';
 
 @Component({
   selector: 'app-logs-modal',
@@ -77,6 +77,7 @@ export class LogsModalComponent implements OnChanges {
         return this.nodeRun.error.backtrace.join('\n');
       }
     }
+    return null;
   }
 
   closeModal() {

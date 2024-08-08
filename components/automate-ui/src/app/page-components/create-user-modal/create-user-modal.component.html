@@ -26,7 +26,7 @@
             Username is required.
           </chef-error>
           <chef-error *ngIf="createUserForm.get('username').hasError('pattern') && hasAttemptedInput('username')">
-            Only letters, numbers, and these characters (<strong>_@.+-</strong>) allowed.
+            Only letters, numbers, and these characters (<strong>{{'_@.+-'}}</strong>) allowed.
           </chef-error>
           <chef-error *ngIf="conflictError">
             Username "{{createUserForm.get('username').value}}" already exists.

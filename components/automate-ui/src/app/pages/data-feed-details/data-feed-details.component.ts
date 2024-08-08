@@ -5,18 +5,18 @@ import { identity, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
-import { Regex } from 'app/helpers/auth/regex';
-import { pending, EntityStatus } from 'app/entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { routeParams } from '../../route.selectors';
+import { Regex } from '../../helpers/auth/regex';
+import { pending, EntityStatus } from '../../entities/entities';
 import {
   GetDestination,
   UpdateDestination,
   TestDestination ,
   EnableDisableDestination,
   DeleteDestination
-} from 'app/entities/destinations/destination.actions';
+} from '../../entities/destinations/destination.actions';
 
 import {
   destinationFromRoute,
@@ -25,12 +25,12 @@ import {
   destinationEnableStatus,
   deleteStatus,
   testConnectionStatus
-} from 'app/entities/destinations/destination.selectors';
-import { Destination, regions } from 'app/entities/destinations/destination.model';
+} from '../../entities/destinations/destination.selectors';
+import { Destination, regions } from '../../entities/destinations/destination.model';
 import { Router } from '@angular/router';
 import { trigger, state, animate, transition, style, keyframes } from '@angular/animations';
-import { KVData } from 'app/entities/node-credentials/node-credential.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { KVData } from '../../entities/node-credentials/node-credential.model';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 const fadeEnable = trigger('fadeEnable', [
    state('inactive', style({})),
@@ -132,7 +132,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(destinationFromRoute)
+      this.store.select(destinationFromRoute as any)
     ]).pipe(
       filter(([status, destination]) =>
       status === EntityStatus.loadingSuccess && !isNil(destination)),
@@ -178,7 +178,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   selectChangeHandlers(region: string): void {
     this.regionSelected = region;
   }
-  metaDataValue(): Array<KVData> {
+  metaDataValue(): Array<KVData> | any {
     if (this.destination.integration_types === IntegrationTypes.STORAGE ) {
       if (this.destination.services === StorageIntegrationTypes.AMAZON_S3 ) {
         return Array<KVData>(

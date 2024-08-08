@@ -40,7 +40,7 @@ export const ApiTokenEntityInitialState: ApiTokenEntityState =
 
 export function apiTokenEntityReducer(
   state: ApiTokenEntityState = ApiTokenEntityInitialState,
-  action: ApiTokenActions): ApiTokenEntityState {
+  action: ApiTokenActions | any): ApiTokenEntityState {
 
   switch (action.type) {
 

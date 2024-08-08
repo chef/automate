@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 @Component({
   selector: 'app-demo-calendar',
@@ -10,7 +10,8 @@ export class DemoCalendarComponent {
 
   date = moment();
 
-  handleMonthClick([month, year]) {
+  handleMonthClick(e: any) {
+    const [month, year] = e;
     this.date.month(month);
     this.date.year(year);
   }

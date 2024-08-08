@@ -1,7 +1,7 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { find } from 'lodash/fp';
 import { PolicyFileEntityState, policyFileEntityAdapter } from './policy-file.reducer';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 
 export const policyFileState = createFeatureSelector<PolicyFileEntityState>('policyFiles');
 export const {

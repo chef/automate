@@ -5,16 +5,16 @@ import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { HttpStatus } from 'app/types/types';
-import { Regex } from 'app/helpers/auth/regex';
-import { UsernameMapper } from 'app/helpers/auth/username-mapper';
-import { ChefValidators } from 'app/helpers/auth/validator';
-import { EntityStatus } from 'app/entities/entities';
-import { Utilities } from 'app/helpers/utilities/utilities';
-import { CreateUserPayload, CreateUser } from 'app/entities/users/user.actions';
-import { createStatus, createError } from 'app/entities/users/user.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { HttpStatus } from '../../types/types';
+import { Regex } from '../../helpers/auth/regex';
+import { UsernameMapper } from '../../helpers/auth/username-mapper';
+import { ChefValidators } from '../../helpers/auth/validator';
+import { EntityStatus } from '../../entities/entities';
+import { Utilities } from '../../helpers/utilities/utilities';
+import { CreateUserPayload, CreateUser } from '../../entities/users/user.actions';
+import { createStatus, createError } from '../../entities/users/user.selectors';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';

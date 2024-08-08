@@ -10,10 +10,10 @@ import split from 'lodash/fp/split';
 import nth from 'lodash/fp/nth';
 
 const getTagList: (json: object) => object[] =
-  getOr([], ['comment', 'tags']);
+  getOr([], ['comment', 'blockTags']);
 
 const getTagText: (tag: object) => string =
-  pipe(get('text'), trim);
+  pipe(get('content[0].text'), replace("```ts", ""), replace("```", ""), trim);
 
 /**
  * @param name  The tag name to search for.
@@ -22,8 +22,8 @@ const getTagText: (tag: object) => string =
  */
 export const findTag: (name: string, json: object) => string =
   (name, json) => pipe(getTagList,
-                       find(['tag', name]),
-                       getTagText)(json);
+    find(['tag', name]),
+    getTagText)(json);
 
 /**
  * @param name  The tag name to search for.
@@ -32,39 +32,39 @@ export const findTag: (name: string, json: object) => string =
  */
 export const filterTags: (name: string, json: object) => string[] =
   (name, json) => pipe(getTagList,
-                       filter(['tag', name]),
-                       map(getTagText))(json);
+    filter(['tag', name]),
+    map(getTagText))(json);
 
 const getDecorators =
   getOr([], 'decorators');
 
 const parseObjectString =
   pipe(replace(/(\w+):/ig, '"$1":'),
-       replace(/'/ig, '"'),
-       (s) => s ? JSON.parse(s) : {});
+    replace(/'/ig, '"'),
+    (s) => s ? JSON.parse(s) : {});
 
 /**
  * @param json The json object to extract metadata from.
  * @returns    An object containing the components metadata.
  */
-export const getComponentMetaData: (json: object) => {tag: string, styleUrl: string, shadow: boolean} =
+export const getComponentMetaData: (json: object) => { tag: string, styleUrl: string, shadow: boolean } =
   pipe(getDecorators,
-       find(['name', 'Component']),
-       getOr('', ['arguments', 'opts']),
-       parseObjectString);
+    find(['name', 'Component']),
+    getOr('', ['arguments', 'opts']),
+    parseObjectString);
 
 export function getComponentProps(children: object[]) {
   const filterer = (child) => {
     return child['kind'] === 1024 &&
       child['decorators'] &&
-      child['decorators'][0]['name'] === 'Prop';
+      child['decorators'][0] && child['decorators'][0]['name'] === 'Prop';
   };
 
   const properties = filter(filterer, children);
   return map((prop) => {
     return {
       name: prop['name'],
-      description: getOr('', ['comment', 'shortText'], prop),
+      description: getOr('', ['comment', "summary", "0", 'text'], prop),
       defaultValue: prop['defaultValue']
     };
   }, properties);
@@ -78,5 +78,5 @@ export function getComponentProps(children: object[]) {
  */
 export const getType: (json: object) => string =
   pipe(get(['sources', 0, 'fileName']),
-       split('/'),
-       nth(1));
+    split('/'),
+    nth(1));

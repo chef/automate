@@ -5,12 +5,13 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class IamTypePipe implements PipeTransform {
 
-  transform(value: string): 'Chef-managed' | 'Custom' {
+  transform(value: string | undefined): 'Chef-managed' | 'Custom' | null {
     switch (value) {
       case 'CHEF_MANAGED':
         return 'Chef-managed';
       case 'CUSTOM':
         return 'Custom';
     }
+    return null
   }
 }

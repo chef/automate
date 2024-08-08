@@ -9,7 +9,7 @@ import { DailyCheckInCountCollection, DailyCheckInCount,
   CountedDurationCollection, CountedDurationItem, Desktop, Filter,
   NodeMetadataCount, NodeMetadataCountType, TermFilter } from './desktop.model';
 
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 interface RespDailyCheckInCountCollection {

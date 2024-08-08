@@ -19,7 +19,7 @@ export const JobEditInitialState: JobEditState = {
 };
 
 export function jobEditReducer(state: JobEditState = JobEditInitialState,
-                               action: JobActions | RouterAction<any>): JobEditState {
+                               action: JobActions | RouterAction<any> | any): JobEditState {
   switch (action.type) {
     case JobActionTypes.JOB_UPDATE:
       return set('status', Status.saving, state);

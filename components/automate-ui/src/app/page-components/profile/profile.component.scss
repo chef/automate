@@ -1,6 +1,7 @@
-@import "~styles/variables";
-@import "~styles/mixins";
-@import "@carbon/layout/scss/layout";
+@use "@carbon/grid" as cg;
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
 
 $dropdown-width: 196px;
 
@@ -55,7 +56,7 @@ a, button:not(.dropdown-toggle) {
   font-size: 30px;
   line-height: 10px;
 
-  @include carbon--breakpoint-down(lg) {
+  @include cg.breakpoint-down(lg) {
     font-size: 20px;
   }
 }

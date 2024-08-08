@@ -1,8 +1,11 @@
 module.exports = {
-  "mode": "file",
+  // "mode": "file",
   "json": "src/assets/docs.json",
-  "ignoreCompilerErrors": true,
-  "experimentalDecorators": true,
-  "emitDecoratorMetadata": true,
-  "exclude": "**/*.+(spec|e2e).tsx"
+  // "ignoreCompilerErrors": true,
+  // "experimentalDecorators": true,
+  // "emitDecoratorMetadata": true,
+  "excludeNotDocumented": true,
+  "exclude": "**/*+(index|.spec|.e2e).tsx",
+  "skipErrorChecking": true,
+  "plugin": "./typeDocPlugin.js"
 };

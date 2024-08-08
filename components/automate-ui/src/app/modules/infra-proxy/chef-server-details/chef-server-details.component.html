@@ -141,7 +141,7 @@
         </form>
       </section>
       <section class="page-body" *ngIf="tabValue === 'orgs'">
-        <chef-toolbar>
+        <chef-toolbar *ngIf="server?.id">
           <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', server?.id]">
             <chef-button id="create-button" primary (click)="openCreateModal()" data-cy="add-org-button">Add Chef Organization
             </chef-button>

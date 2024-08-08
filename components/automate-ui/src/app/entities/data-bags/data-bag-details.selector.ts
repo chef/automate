@@ -1,5 +1,5 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { find } from 'lodash/fp';
 import { DataBagItemsEntityState, dataBagItemsEntityAdapter } from './data-bag-details.reducer';
 

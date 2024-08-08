@@ -4,7 +4,8 @@ import { LicenseUsageService } from './services/license-usage/license-usage.serv
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   library_url: string;
@@ -21,7 +22,7 @@ export class AppComponent {
     });
   }
 
-  loadScript(path, callback) {
+  loadScript(path: any, callback: any) {
     const scriptTag = document.createElement('script');
     scriptTag.src = path;
     scriptTag.onload = callback;

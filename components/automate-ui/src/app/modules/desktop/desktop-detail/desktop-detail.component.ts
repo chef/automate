@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Desktop, DailyNodeRuns, DailyNodeRunsStatus } from 'app/entities/desktop/desktop.model';
+import { Desktop, DailyNodeRuns, DailyNodeRunsStatus } from '../../../entities/desktop/desktop.model';
 import { finalize } from 'rxjs/operators';
 import * as moment from 'moment/moment';
 import { saveAs } from 'file-saver';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { NodeRunsService } from 'app/services/node-details/node-runs.service';
-import { RunHistoryStore } from 'app/services/run-history-store/run-history.store';
-import { NodeRun } from 'app/types/types';
+import { DateTime } from '../../../helpers/datetime/datetime';
+import { NodeRunsService } from '../../../services/node-details/node-runs.service';
+import { RunHistoryStore } from '../../../services/run-history-store/run-history.store';
+import { NodeRun } from '../../../types/types';
 
 @Component({
   selector: 'app-desktop-detail',

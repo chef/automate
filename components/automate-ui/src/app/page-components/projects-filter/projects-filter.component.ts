@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ProjectsFilterService } from 'app/services/projects-filter/projects-filter.service';
+import { ProjectsFilterService } from '../../services/projects-filter/projects-filter.service';
 
 @Component({
   selector: 'app-projects-filter',

@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { NotificationRuleActionTypes, NotificationRuleActions } from './notification_rule.action';
 import { NotificationRule } from './notification_rule.model';
 
@@ -37,7 +37,7 @@ export const NotificationRuleEntityInitialState: NotificationRuleEntityState =
 
 export function notificationRuleEntityReducer(
   state: NotificationRuleEntityState = NotificationRuleEntityInitialState,
-  action: NotificationRuleActions): NotificationRuleEntityState {
+  action: NotificationRuleActions | any): NotificationRuleEntityState {
 
   switch (action.type) {
     case NotificationRuleActionTypes.GET_ALL:

@@ -19,7 +19,7 @@ import {
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { find, filter as fpFilter, pickBy, some, includes } from 'lodash/fp';
-import { DateTime } from 'app/helpers/datetime/datetime';
+import { DateTime } from '../../helpers/datetime/datetime';
 import {
   clientRunsLoading,
   clientRunsNodes,
@@ -36,14 +36,14 @@ import {
   UpdateNodeFilters, GetWorkflowEnabled, GetNodeSuggestions, DeleteNodes, UpdateColumns
 } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { saveAs } from 'file-saver';
-import { AuthorizedChecker } from 'app/helpers/auth/authorized';
+import { AuthorizedChecker } from '../../helpers/auth/authorized';
 import {
   ClientRunsRequests
 } from '../../entities/client-runs/client-runs.requests';
 import { EntityStatus } from '../../entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
   selector: 'app-client-runs',
@@ -485,7 +485,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPageChange(pageNumber: number) {
+  onPageChange(pageNumber: number | any) {
     if (pageNumber > 1 ) {
       const queryParams = {...this.route.snapshot.queryParams, page: [pageNumber]};
 
@@ -498,7 +498,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onUpdateColumns(columns: ColumnsPreference) {
+  onUpdateColumns(columns: ColumnsPreference | any) {
     this.store.dispatch(new UpdateColumns(columns));
   }
 

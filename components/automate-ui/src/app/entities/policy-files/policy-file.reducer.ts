@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { PolicyFileActionTypes, PolicyFileActions } from './policy-file.action';
 import { PolicyFile } from './policy-file.model';
 
@@ -25,7 +25,7 @@ export const PolicyFileEntityInitialState: PolicyFileEntityState =
 
 export function policyFileEntityReducer(
   state: PolicyFileEntityState = PolicyFileEntityInitialState,
-  action: PolicyFileActions): PolicyFileEntityState {
+  action: PolicyFileActions | any): PolicyFileEntityState {
 
   switch (action.type) {
     case PolicyFileActionTypes.GET_ALL:

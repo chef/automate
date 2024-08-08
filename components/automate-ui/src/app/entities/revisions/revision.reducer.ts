@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RevisionActionTypes, RevisionActions } from './revision.action';
 import { Revision } from './revision.model';
 
@@ -23,7 +23,7 @@ export const RevisionEntityInitialState: RevisionEntityState =
 
 export function revisionEntityReducer(
   state: RevisionEntityState = RevisionEntityInitialState,
-  action: RevisionActions): RevisionEntityState {
+  action: RevisionActions | any): RevisionEntityState {
 
   switch (action.type) {
     case RevisionActionTypes.GET_ALL:

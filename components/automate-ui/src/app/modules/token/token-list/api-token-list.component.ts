@@ -1,32 +1,32 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
-import { HttpStatus } from 'app/types/types';
-import { loading, EntityStatus, pending } from 'app/entities/entities';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { Type } from 'app/entities/notifications/notification.model';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { ApiToken } from 'app/entities/api-tokens/api-token.model';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { Regex } from '../../../helpers/auth/regex';
+import { HttpStatus } from '../../../types/types';
+import { loading, EntityStatus, pending } from '../../../entities/entities';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { Type } from '../../../entities/notifications/notification.model';
+import { CreateNotification } from '../../../entities/notifications/notification.actions';
+import { ApiToken } from '../../../entities/api-tokens/api-token.model';
 import {
   allApiTokens, totalApiTokens, apiTokenStatus
-} from 'app/entities/api-tokens/api-token.selectors';
+} from '../../../entities/api-tokens/api-token.selectors';
 import {
   GetAllTokens, DeleteToken, ToggleTokenActive
-} from 'app/entities/api-tokens/api-token.actions';
-import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
-import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { ProjectConstants } from 'app/entities/projects/project.model';
-import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
-import { stringToMember } from 'app/entities/policies/policy.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/api-tokens/api-token.actions';
+import { CreateToken } from '../../../entities/api-tokens/api-token.actions';
+import { saveStatus, saveError } from '../../../entities/api-tokens/api-token.selectors';
+import { ProjectConstants } from '../../../entities/projects/project.model';
+import { AddPolicyMembers, PolicyMembersMgmtPayload } from '../../../entities/policies/policy.actions';
+import { stringToMember } from '../../../entities/policies/policy.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-api-tokens',
@@ -134,17 +134,17 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public createToken(): void {
     this.creatingToken = true;
     const tok = {
-      id: this.createTokenForm.controls.id.value,
-      name: this.createTokenForm.controls.name.value.trim(),
-      projects: this.createTokenForm.controls.projects.value
+      id: this.createTokenForm.controls['id'].value,
+      name: this.createTokenForm.controls['name'].value.trim(),
+      projects: this.createTokenForm.controls['projects'].value
     };
     this.store.dispatch(new CreateToken(tok));
     this.telemetryService.track('Settings_APItokens_Create');
   }
 
   private assignPolicies(): void {
-    const member = stringToMember(`token:${this.createTokenForm.controls.id.value}`);
-    const policies: string[] = this.createTokenForm.controls.policies.value || [];
+    const member = stringToMember(`token:${this.createTokenForm.controls['id'].value}`);
+    const policies: string[] = this.createTokenForm.controls['policies'].value || [];
     policies.forEach(id => this.store.dispatch(new AddPolicyMembers(<PolicyMembersMgmtPayload>{
       id,
       members: [member]

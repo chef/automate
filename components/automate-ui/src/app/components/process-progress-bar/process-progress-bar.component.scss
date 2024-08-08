@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../styles/variables";
 
 #process-progress-bar {
   background-color: $chef-primary-bright;
@@ -21,6 +21,7 @@
     position: absolute;
     right: 0;
     top: 0;
+    color: inherit;
   }
 
   button:hover,
@@ -35,11 +36,11 @@
     // 175px allows space for the button
     width: calc(100% - 175px);
 
-    .mat-progress-bar-fill::after {
-      background-color: rgba($chef-white, .7);
+    .mdc-linear-progress__bar-inner {
+      border-color: rgba($chef-white, .7);
     }
 
-    .mat-progress-bar-buffer {
+    .mdc-linear-progress__buffer {
       background-color: rgba($chef-white, .5);
     }
 

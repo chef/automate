@@ -1,7 +1,7 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 
 import { ApiTokenEntityState, apiTokenEntityAdapter } from './api-token.reducer';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { find } from 'lodash/fp';
 
 export const apiTokenState = createFeatureSelector<ApiTokenEntityState>('apiTokens');

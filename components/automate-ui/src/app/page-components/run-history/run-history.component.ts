@@ -7,17 +7,17 @@ import {
   NodeHistoryFilter,
   NodeHistoryCountsFilter,
   RunInfo } from '../../types/types';
-import { DateTime } from 'app/helpers/datetime/datetime';
+import { DateTime } from '../../helpers/datetime/datetime';
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
 import { HistorySelection } from '../../helpers/history-selection/history-selection';
 import { RunHistoryStore } from '../../services/run-history-store/run-history.store';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { saveAs } from 'file-saver';
 import {
   finalize
 } from 'rxjs/operators';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-run-history',

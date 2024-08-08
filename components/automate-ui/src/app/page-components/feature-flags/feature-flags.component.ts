@@ -6,9 +6,9 @@ import {
 } from '@angular/core';
 import { sortBy } from 'lodash/fp';
 
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { Feature } from 'app/services/feature-flags/types';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
+import { Feature } from '../../services/feature-flags/types';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 const codeLength = 4;
 

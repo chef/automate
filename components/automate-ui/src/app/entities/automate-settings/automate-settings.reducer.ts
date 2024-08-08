@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from '../entities';
 import { JobSchedulerStatus } from './automate-settings.model';
@@ -17,18 +17,18 @@ export interface ChangeSettingsStatus {
 }
 
 export const AutomateSettingsEntityInitialState: AutomateSettingsEntityState = {
-  jobSchedulerStatus: null,
+  jobSchedulerStatus: {} as JobSchedulerStatus,
   changeConfiguration: {
     status: EntityStatus.notLoaded,
-    errorResp: null
+    errorResp: {} as HttpErrorResponse
   },
   status: EntityStatus.notLoaded,
-  errorResp: null
+  errorResp: {} as HttpErrorResponse
 };
 
 export function automateSettingsEntityReducer(
       state: AutomateSettingsEntityState = AutomateSettingsEntityInitialState,
-      action: AutomateSettingsActions): AutomateSettingsEntityState {
+      action: AutomateSettingsActions | any): AutomateSettingsEntityState {
 
   switch (action.type) {
 

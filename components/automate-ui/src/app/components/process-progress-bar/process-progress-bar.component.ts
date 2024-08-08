@@ -2,9 +2,9 @@ import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
-import { ProjectService } from 'app/entities/projects/project.service';
+import { LayoutFacadeService } from '../../entities/layout/layout.facade';
+import { ApplyRulesStatus, ApplyRulesStatusState } from '../../entities/projects/project.reducer';
+import { ProjectService } from '../../entities/projects/project.service';
 
 @Component({
   selector: 'app-process-progress-bar',
@@ -15,7 +15,7 @@ import { ProjectService } from 'app/entities/projects/project.service';
 export class ProcessProgressBarComponent implements OnInit, OnDestroy {
   public confirmApplyStopModalVisible = false;
   public cancelRulesInProgress = false;
-  public mode = 'determinate';
+  public mode: any = 'determinate';
   public bufferValue = 0;
   public percentageComplete = 0;
   private isDestroyed = new Subject<boolean>();

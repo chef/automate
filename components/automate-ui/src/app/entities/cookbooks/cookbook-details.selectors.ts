@@ -3,7 +3,7 @@ import {
   CookbookDetailsEntityState,
   cookbookDetailsEntityAdapter
 } from './cookbook-details.reducer';
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { find } from 'lodash/fp';
 
 export const cookbookDetailsState = createFeatureSelector<CookbookDetailsEntityState>('cookbookDetails');

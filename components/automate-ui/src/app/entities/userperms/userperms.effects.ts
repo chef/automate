@@ -11,10 +11,10 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { of } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { IndexedEntities } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { IndexedEntities } from '../../entities/entities';
 import {
   UserPermsTypes,
   GetAllUserPermsSuccess,
@@ -61,7 +61,7 @@ export class UserPermEffects {
     this.actions$.pipe(
     ofType(UserPermsTypes.GET_SOME),
     withLatestFrom(this.store.select(getlastFetchTime)),
-    withLatestFrom(this.store.select(allPerms)),
+    withLatestFrom(this.store.select(allPerms as any)),
     switchMap(
       ([[action, lastTime], list]: [[GetSomeUserPerms, Date], IndexedEntities<UserPermEntity>]) => {
         const isFresh = !!list && !this.stale(lastTime);

@@ -9,8 +9,8 @@ import { environment as env } from '../../../../../environments/environment';
 import { ScannerState } from './scanner.state';
 import * as actions from './scanner.actions';
 import * as selectors from './scanner.selectors';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { CreateNotification } from '../../../../entities/notifications/notification.actions';
+import { Type } from '../../../../entities/notifications/notification.model';
 
 @Injectable()
 export class ScannerEffects {

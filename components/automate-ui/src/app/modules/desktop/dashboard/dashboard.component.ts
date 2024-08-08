@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
-import * as moment from 'moment/moment';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { NodeRun } from 'app/types/types';
+import moment from 'moment';
+import { LayoutFacadeService } from '../../../entities/layout/layout.facade';
+import { NodeRun } from '../../../types/types';
 
 import {
   GetDailyCheckInTimeSeries,
@@ -29,7 +29,7 @@ import {
   UpdateDesktopsFilterPageSizeAndCurrentPage,
   GetDailyNodeRunsStatusTimeSeries,
   GetDesktopColumnOptionsDefaults
-} from 'app/entities/desktop/desktop.actions';
+} from '../../../entities/desktop/desktop.actions';
 import {
   dailyCheckInCountCollection,
   getSelectedDaysAgo,
@@ -46,13 +46,13 @@ import {
   desktopsPageSize,
   desktopsFilterTerms,
   getSelectedNodeRun
-} from 'app/entities/desktop/desktop.selectors';
+} from '../../../entities/desktop/desktop.selectors';
 import {
   DailyCheckInCount, DailyCheckInCountCollection, DayPercentage,
   TopErrorsItem, CountedDurationItem, Desktop, TermFilter, Terms,
   NodeMetadataCount, DailyNodeRuns, PageSizeChangeEvent, DesktopColumnOption,
   DesktopColumnOptionUpdate
-} from 'app/entities/desktop/desktop.model';
+} from '../../../entities/desktop/desktop.model';
 
 @Component({
   selector: 'app-desktop-dashboard',

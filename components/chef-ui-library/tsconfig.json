@@ -14,7 +14,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",
-    "jsxFactory": "h"
+    "jsxFactory": "h",
+    "types": [
+      "jest"
+    ],
+    "skipLibCheck": true
   },
   "include": [
     "src",

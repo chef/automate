@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { AdminKeyActionTypes, AdminKeyActions } from './reset-admin-key.actions';
 import { AdminKey } from './reset-admin-key.model';
 
@@ -20,7 +20,7 @@ export const AdminKeyEntityInitialState: AdminKeyEntityState =
 
 export function adminKeyEntityReducer(
   state: AdminKeyEntityState = AdminKeyEntityInitialState,
-  action: AdminKeyActions): AdminKeyEntityState {
+  action: AdminKeyActions | any): AdminKeyEntityState {
 
   switch (action.type) {
     case AdminKeyActionTypes.UPDATE:

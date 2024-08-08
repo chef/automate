@@ -1,0 +1,56 @@
+@use '@angular/material' as mat;
+@import './_chef_material_palettes.scss';
+@import './mixins';
+
+mat.$theme-ignore-duplication-warnings: true;
+
+@include mat.core();
+
+// This is a theme for our components wrapping Angular Material.
+
+// Currently we are passing accent colors in for both primary
+// and accent colors because we are actually not using the
+// chef primary colors much in the micro actions. If that changes,
+// we should revist
+
+$chef-primary: mat.define-palette($chef-mat-primary);
+$chef-accent:  mat.define-palette($chef-mat-primary);
+
+// The warn palette is pink and yellow
+$chef-warn:    mat.define-palette($chef-mat-warn);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$chef-theme: mat.define-light-theme((
+  color: (
+    primary: $chef-primary,
+    accent: $chef-accent, 
+    warm: $chef-warn
+  )
+));
+
+// Define a custom typography config that overrides the font-family as well as the
+// `headlines` and `body-1` levels.
+$custom-typography: mat.define-legacy-typography-config(
+  $font-family:   'Muli',
+  $display-4:     mat.define-typography-level(112px, 112px, 300),
+  $display-3:     mat.define-typography-level(56px, 56px, 400),
+  $display-2:     mat.define-typography-level(45px, 48px, 400),
+  $display-1:     mat.define-typography-level(34px, 40px, 400),
+  $headline:      mat.define-typography-level(24px, 32px, 400),
+  $title:         mat.define-typography-level(20px, 32px, 500),
+  $subheading-2:  mat.define-typography-level(16px, 28px, 400),
+  $subheading-1:  mat.define-typography-level(15px, 24px, 400),
+  $body-2:        mat.define-typography-level(14px, 24px, 500),
+  $body-1:        mat.define-typography-level(14px, 20px, 400),
+  $caption:       mat.define-typography-level(12px, 20px, 400),
+  $button:        mat.define-typography-level(14px, 14px, 500),
+  $input:         mat.define-typography-level(inherit, 1.125, 400)
+);
+
+// Override typography for all Angular Material, including mat-base-typography and all components.
+@include mat.typography-hierarchy($custom-typography);
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($chef-theme);
+@include mat.button-theme($chef-theme);

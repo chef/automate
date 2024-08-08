@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
+import { IdMapper } from '../../../helpers/auth/id-mapper';
 import { FormGroup } from '@angular/forms';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { Utilities } from '../../../helpers/utilities/utilities';
 
 @Component({
   selector: 'app-create-chef-server-modal',

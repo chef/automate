@@ -7,7 +7,7 @@ import { ReportingComponent } from './reporting.component';
 import { ReportingSearchbarComponent } from './reporting-searchbar/reporting-searchbar.component';
 import { ReportingRoutingModule } from './reporting.routing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { ChefPipesModule } from '../../../pipes/chef-pipes.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({

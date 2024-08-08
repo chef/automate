@@ -1,6 +1,6 @@
 import { Component, Input, HostBinding, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Type } from 'app/entities/notifications/notification.model';
+import { Type } from '../../entities/notifications/notification.model';
 
 const slideDownAnim = trigger('slideDownAnim', [
   transition(':enter', [
@@ -28,7 +28,7 @@ const slideDownAnim = trigger('slideDownAnim', [
 })
 export class ChefNotificationComponent implements AfterViewInit {
 
-  @Input() type: Type = Type.info;
+  @Input() type: Type | string = Type.info;
   @Input() timeout = 8;
   @Output() dismissed = new EventEmitter();
 
