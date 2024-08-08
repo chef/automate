@@ -229,12 +229,23 @@ do_test_deploy() {
 }
 
 do_test_deploy_default() {
+    log_info "Checking test skip diagnostics *** 1"
     if [ $test_skip_diagnostics = false ]; then
+        log_info "Performs some diagnostic checks before the upgrad *** 2"
         run_diagnostics_pre_upgrade $test_loadbalancer_url "$test_diagnostics_filters" "$test_diagnostics_pre_upgrade_filters" \
             "$test_diagnostics_opts"
     fi
 
+    log_info "printing profiles *** 5"
+    for profile in "${test_deploy_inspec_profiles[@]}"; do
+        log_info "profile *** here"
+        echo "$profile"
+    done
+
+    log_info "executes Inspec tests *** 3"
     run_inspec_tests "$A2_ROOT_DIR" "${test_deploy_inspec_profiles[@]}"
+
+    log_info "No panic check *** 4"
     no_panic_check
 }
 
