@@ -110,11 +110,12 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 	if err != nil {
 		return "", "", errors.Wrap(err, "assembleRemoteJobConfigAndScript unable to marshal config information")
 	}
-
+	jsonConfString := string(jsonConf)
 	logrus.Infof("assembling script info with instance_id: %s for node_uuid: %s with node_name: %s and profiles: %s for reporting to: %s with report_uuid %s, using %s backend", job.SourceID, job.NodeID, job.NodeName, job.Profiles, automateUrl.String(), job.Reporter.ReportUUID, job.TargetConfig.Backend)
 
 	switch job.TargetConfig.Backend {
 	case inspec.BackendSSM, inspec.BackendAZ:
+		jsonConfString = strings.ReplaceAll(jsonConfString, `'`, `'\''`)
 		return fmt.Sprintf(`#!/bin/bash
 
 			# make sure inspec is installed
@@ -132,8 +133,9 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 			}
 			echo '%s' | sudo CHEF_LICENSE="accept-no-persist" inspec exec %s --config=-
 
-			modify_exit_code $?`, job.RemoteInspecVersion, string(jsonConf), profilesString), inspec.BashScript, nil
+			modify_exit_code $?`, job.RemoteInspecVersion, jsonConfString, profilesString), inspec.BashScript, nil
 	case inspec.BackendSSMWindows, inspec.BackendAZWindows:
+		jsonConfString = strings.ReplaceAll(jsonConfString, `'`, `''''`)
 		return fmt.Sprintf(`
 				$global:InspecBinaryLocation = "$env:systemdrive\opscode\inspec\bin\inspec"
 				Function Ensure-InspecInstalled {
@@ -153,7 +155,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 				}
 				$env:CHEF_LICENSE="accept-no-persist"
 				Ensure-InspecInstalled
-				Invoke-InspecCommand -Command exec -Path "%s" -JsonConfig '%s'`, job.RemoteInspecVersion, profilesString, string(jsonConf)), inspec.PowershellScript, nil
+				Invoke-InspecCommand -Command exec -Path "%s" -JsonConfig '%s'`, job.RemoteInspecVersion, profilesString, jsonConfString), inspec.PowershellScript, nil
 	}
 	// we really shouldn't ever get here, since this function is only called for ssm jobs
 	return "", "", fmt.Errorf("invalid job target config backend: %s", job.TargetConfig.Backend)
