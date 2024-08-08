@@ -30,7 +30,11 @@ run_inspec_tests() {
     for test_name in "${test_names[@]}"
     do
         log_info "Running inspec profile ${test_name}"
-        HAB_LICENSE="accept-no-persist" CHEF_LICENSE="accept-no-persist" hab pkg exec chef/inspec inspec exec --no-backend-cache "${root_dir}/inspec/${test_name}" || errcode=$? && true;
+        output=$(HAB_LICENSE="accept-no-persist" CHEF_LICENSE="accept-no-persist" hab pkg exec chef/inspec inspec exec --no-backend-cache "${root_dir}/inspec/${test_name}" 2>&1)
+        errcode=$?
+
+        echo "Inspec output for ${test_name}:"
+        echo "Output* $output"
 
         if [[ $errcode -ne 0 && $errcode -ne 101  ]]
         then
