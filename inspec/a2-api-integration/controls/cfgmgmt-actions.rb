@@ -54,18 +54,21 @@ control 'config-mgmt-action-1' do
     version_cookbook_update
   ).each do |action|
     describe "POST /data-collector/v0 for action #{action}" do
-      let(:api_request) do
-        automate_api_request(
-          '/data-collector/v0',
-          {http_method: 'POST',
-          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")}
-        )
-      end
-
-      it 'should ingest the data successfully' do
-        expect(api_request.http_status).to eq 200
-      end
+    let(:api_request) do
+      automate_api_request(
+        {
+          path: '/data-collector/v0',
+          http_method: 'POST',
+          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")
+        }
+      )
     end
+
+    it 'should ingest the data successfully' do
+      expect(api_request.http_status).to eq 200
+    end
+end
+
   end
 
   # Wait for data to be indexed
