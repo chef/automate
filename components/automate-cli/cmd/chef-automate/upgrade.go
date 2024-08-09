@@ -122,11 +122,18 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
 	}
 
-	if airgap.AirgapInUse() {
-		res, err := client.GetAutomateConfig(configCmdFlags.timeout)
-		if err != nil {
-			return err
+	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+	if err != nil {
+		return err
+	}
+
+	for _, product := range res.Config.Deployment.GetV1().GetSvc().Products {
+		if product == "workflow" {
+			return status.New(status.InvalidCommandArgsError, "Automate does not support the `workflow` as product, please remove the `workflow` from the configuration and run the upgrade")
 		}
+	}
+
+	if airgap.AirgapInUse() {
 		if res.Config.Deployment.GetV1().GetSvc().GetUpgradeStrategy().GetValue() != "none" {
 			return status.New(status.InvalidCommandArgsError, "Before running the upgrade, set upgrade_strategy = 'none' and patch the config.")
 		}
