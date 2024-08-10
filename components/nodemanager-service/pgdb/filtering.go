@@ -276,7 +276,8 @@ func whereProjectsMatch(_ string, arr []string, tableAbbrev string) (string, err
 		if err != nil {
 			return "", err
 		}
-		condition = fmt.Sprintf("exists (select 1 from projects p join nodes_projects np on p.id = np.project_id where np.node_id = %s.id and p.project_id = ANY('%s'::text[]))", tableAbbrev, value)
+		quoted := strings.ReplaceAll(fmt.Sprintf("%s", value), `'`, `''`)
+		condition = fmt.Sprintf("exists (select 1 from projects p join nodes_projects np on p.id = np.project_id where np.node_id = %s.id and p.project_id = ANY('%s'::text[]))", tableAbbrev, quoted)
 	}
 
 	if stringutils.SliceContains(arr, authzConstants.UnassignedProjectID) {
