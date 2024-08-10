@@ -35,10 +35,6 @@ options:
       default_value: "false"
       usage: |
         Optionally do not check if your Chef Automate v1 installation has SAML configured (default = false)
-    - name: skip-workflow-check
-      default_value: "false"
-      usage: |
-        Optionally do not check if your Chef Automate v1 installation has workflow configured (default = false)
 inherited_options:
     - name: a2
       default_value: "false"
