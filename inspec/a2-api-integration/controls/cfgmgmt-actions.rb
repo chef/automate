@@ -56,7 +56,7 @@ control 'config-mgmt-action-1' do
     describe "POST /data-collector/v0 for action #{action}" do
       let(:api_request) do
         automate_api_request({
-        '/data-collector/v0',
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")
         })
@@ -83,11 +83,10 @@ control 'config-mgmt-action-2' do
   describe 'GET /api/v0/eventfeed' do
     let(:api_request) do
       automate_api_request({
-        '/api/v0/eventfeed',
+        endpoint: '/api/v0/eventfeed',
         request_params: request_params,
         http_method: 'GET'
-      }
-      )
+      })
     end
 
     let(:request_params) do
@@ -102,7 +101,7 @@ control 'config-mgmt-action-2' do
 
     let(:api_runs_request) do
       automate_api_request({
-      "/api/v0/eventfeed",
+      endpoint: "/api/v0/eventfeed",
       http_method: 'GET'
       })
     end
@@ -122,7 +121,7 @@ control 'config-mgmt-action-2' do
   describe 'GET /api/v0/eventstrings' do
     let(:api_request) do
       automate_api_request({
-        '/api/v0/eventstrings',
+        endpoint: '/api/v0/eventstrings',
         request_params: request_params,
         http_method: 'GET'
       })

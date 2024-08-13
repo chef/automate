@@ -12,12 +12,13 @@ control 'ingest-status' do
       INGEST_TOKEN_ID = "ingest_test_token-#{TIMESTAMP}"
 
       test_token_resp = automate_api_request(
-        '/apis/iam/v2/tokens',
+        {endpoint: '/apis/iam/v2/tokens',
         http_method: 'POST',
         request_body: {
           'id': INGEST_TOKEN_ID,
           'name': 'ingest_test_token'
         }.to_json
+      }
       )
       expect(test_token_resp.http_status).to eq(200)
 
@@ -25,11 +26,13 @@ control 'ingest-status' do
 
       expect(
         automate_api_request(
-          "/apis/iam/v2/policies/#{INGEST_POLICY_ID}/members:add",
+         {
+          endpoint: "/apis/iam/v2/policies/#{INGEST_POLICY_ID}/members:add",
           http_method: 'POST',
           request_body: {
             'members': ["token:#{INGEST_TOKEN_ID}"]
           }.to_json
+         }
         ).http_status
       ).to eq(200)
     end
