@@ -52,15 +52,16 @@ control 'iam-project-filtering-1' do
     before(:all) do
       Projects.each do|project|
         resp = automate_api_request({
-          "/apis/iam/v2/projects",
+          endpoint: "/apis/iam/v2/projects",
           http_method: 'POST',
           request_body: project.to_json
-        )
+      })
         expect(resp.http_status).to eq 200
       end
 
       CUSTOM_ROLES.each do|role|
-        resp = automate_api_request({endpoint: "/apis/iam/v2/roles",
+        resp = automate_api_request({
+          endpoint: "/apis/iam/v2/roles",
           http_method: 'POST',
           request_body: role.to_json
         })
@@ -153,7 +154,8 @@ control 'iam-project-filtering-1' do
       POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
 
       before(:all) do
-        resp = automate_api_request({endpoint: "/apis/iam/v2/roles",
+        resp = automate_api_request({
+          endpoint: "/apis/iam/v2/roles",
           http_method: 'POST',
           request_body: {
             id: POLICY_ROLE_ID,
@@ -163,7 +165,8 @@ control 'iam-project-filtering-1' do
         })
         expect(resp.http_status).to eq 200
 
-        resp = automate_api_request({endpoint: "/apis/iam/v2/policies",
+        resp = automate_api_request({
+          endpoint: "/apis/iam/v2/policies",
           http_method: 'POST',
           request_body: {
             id: DENY_POLICY_ID,
@@ -206,8 +209,8 @@ control 'iam-project-filtering-1' do
       describe 'ListRoles' do
 
         it 'returns roles for allowed projects' do
-          resp = automate_api_request({endpoint: 
-            "/apis/iam/v2/roles",
+          resp = automate_api_request({
+            endpoint: "/apis/iam/v2/roles",
             request_headers: { projects: CUSTOM_PROJECT_ID_2 },
         })
           expect(resp.http_status).to eq 200

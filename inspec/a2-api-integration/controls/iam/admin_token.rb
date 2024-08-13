@@ -19,7 +19,7 @@ control 'iam-admin-token-1' do
       expect(
         automate_client_api_request({
           endpoint: '/apis/iam/v2/policies',
-          token,
+          api_token: token,
           http_method: 'GET',
         }).http_status
       ).to eq(200)
