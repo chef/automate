@@ -47,7 +47,7 @@ control 'ingest-status' do
       expect(
         automate_client_api_request({
           endpoint: '/data-collector/v0',
-          INGEST_TOKEN,
+          token: INGEST_TOKEN,
           http_method: 'GET',
         }).parsed_response_body[:status]
       ).to eq('ok')
