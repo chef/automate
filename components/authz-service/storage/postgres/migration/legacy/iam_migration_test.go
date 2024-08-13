@@ -9,12 +9,12 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
-	_ "github.com/golang-migrate/migrate/source/file"       // make source available
+	_ "github.com/golang-migrate/migrate/v4/database/postgres" // make driver available
+	_ "github.com/golang-migrate/migrate/v4/source/file"       // make source available
 
 	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/chef/automate/lib/logger"
-	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
