@@ -51,7 +51,8 @@ control 'iam-project-filtering-1' do
   describe 'project filtering' do
     before(:all) do
       Projects.each do|project|
-        resp = automate_api_request("/apis/iam/v2/projects",
+        resp = automate_api_request({
+          "/apis/iam/v2/projects",
           http_method: 'POST',
           request_body: project.to_json
         )
@@ -59,21 +60,21 @@ control 'iam-project-filtering-1' do
       end
 
       CUSTOM_ROLES.each do|role|
-        resp = automate_api_request("/apis/iam/v2/roles",
+        resp = automate_api_request({endpoint: "/apis/iam/v2/roles",
           http_method: 'POST',
           request_body: role.to_json
-        )
+        })
         expect(resp.http_status).to eq 200
       end
     end
 
     after(:all) do
       CUSTOM_ROLES.each do|role|
-        resp = automate_api_request("/apis/iam/v2/roles/#{role[:id]}", http_method: 'delete')
+        resp = automate_api_request({endpoint: "/apis/iam/v2/roles/#{role[:id]}", http_method: 'delete'})
         expect(resp.http_status.to_s).to match(/200|404/)
       end
       Projects.each do|project|
-        resp = automate_api_request("/apis/iam/v2/projects/#{project[:id]}", http_method: 'delete')
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{project[:id]}", http_method: 'delete'})
         # TODO (tc) remove 500 after API bug fixed: https://github.com/chef/automate/issues/2126
         expect(resp.http_status.to_s).to match(/200|404|500/)
       end
@@ -152,17 +153,17 @@ control 'iam-project-filtering-1' do
       POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
 
       before(:all) do
-        resp = automate_api_request("/apis/iam/v2/roles",
+        resp = automate_api_request({endpoint: "/apis/iam/v2/roles",
           http_method: 'POST',
           request_body: {
             id: POLICY_ROLE_ID,
             name: "display name !#$#",
             actions: ["iam:roles:*"]
           }.to_json
-        )
+        })
         expect(resp.http_status).to eq 200
 
-        resp = automate_api_request("/apis/iam/v2/policies",
+        resp = automate_api_request({endpoint: "/apis/iam/v2/policies",
           http_method: 'POST',
           request_body: {
             id: DENY_POLICY_ID,
@@ -181,23 +182,23 @@ control 'iam-project-filtering-1' do
               }
             ]
           }.to_json()
-        )
+        })
         expect(resp.http_status).to eq 200
       end
 
       after(:all) do
-        resp = automate_api_request("/apis/iam/v2/policies/#{DENY_POLICY_ID}", http_method: 'delete')
+        resp = automate_api_request({endpoint: "/apis/iam/v2/policies/#{DENY_POLICY_ID}", http_method: 'delete'})
         expect(resp.http_status).to eq 200
-        resp = automate_api_request("/apis/iam/v2/roles/#{POLICY_ROLE_ID}", http_method: 'delete')
+        resp = automate_api_request({endpoint: "/apis/iam/v2/roles/#{POLICY_ROLE_ID}", http_method: 'delete'})
         expect(resp.http_status).to eq 200
         CUSTOM_ROLES.each do|role|
           if role[:id] != CUSTOM_ROLE_ID_1
-            resp = automate_api_request("/apis/iam/v2/roles/#{role[:id]}", http_method: 'delete')
+            resp = automate_api_request({endpoint: "/apis/iam/v2/roles/#{role[:id]}", http_method: 'delete'})
             expect(resp.http_status).to eq 200
           end
         end
         Projects.each do|project|
-          resp = automate_api_request("/apis/iam/v2/projects/#{project[:id]}", http_method: 'delete')
+          resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{project[:id]}", http_method: 'delete'})
           expect(resp.http_status).to eq 200
         end
       end
@@ -205,10 +206,10 @@ control 'iam-project-filtering-1' do
       describe 'ListRoles' do
 
         it 'returns roles for allowed projects' do
-          resp = automate_api_request(
+          resp = automate_api_request({endpoint: 
             "/apis/iam/v2/roles",
             request_headers: { projects: CUSTOM_PROJECT_ID_2 },
-            )
+        })
           expect(resp.http_status).to eq 200
           expect(resp.parsed_response_body[:roles].length).to eq 2
           expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_2 }).to_not be_nil
@@ -216,10 +217,10 @@ control 'iam-project-filtering-1' do
         end
 
         it 'returns 403 due to explicitly denied project' do
-          resp = automate_api_request(
-            "/apis/iam/v2/roles",
+          resp = automate_api_request({
+            endpoint: "/apis/iam/v2/roles",
             request_headers: { projects: CUSTOM_PROJECT_ID_1 },
-            )
+          })
           expect(resp.http_status).to eq 403
         end
 

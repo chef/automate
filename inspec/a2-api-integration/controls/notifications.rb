@@ -16,47 +16,47 @@ control 'notifications-crud-rule' do
 
   describe "when creating a rule" do
     after(:context) do
-      all_rules = automate_api_request(
-        "/api/v0/notifications/rules",
+      all_rules = automate_api_request({
+        endpoint: "/api/v0/notifications/rules",
         http_method: 'GET'
-      )
+    })
       all_rules.parsed_response_body[:rules].each do |rule|
         if rule[:name].start_with?(TEST_RULE_NAME_PREFIX)
-          automate_api_request(
-            "/api/v0/notifications/rules/#{rule[:id]}",
+          automate_api_request({
+            endpoint: "/api/v0/notifications/rules/#{rule[:id]}",
             http_method: 'DELETE'
-          ).http_status
+          }).http_status
         end
       end
     end
 
     let(:create_request) do
-      automate_api_request(
-        '/api/v0/notifications/rules',
+      automate_api_request({
+        endpoint: '/api/v0/notifications/rules',
         http_method: 'POST',
         request_body: rule_body
-      )
+    })
     end
 
     let(:get_request) do
-      automate_api_request(
-        "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
+      automate_api_request({
+        endpoint: "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
         http_method: 'GET'
-      )
+    })
     end
 
     let(:list_request) do
-      automate_api_request(
-        "/api/v0/notifications/rules",
+      automate_api_request({
+        endpoint:  "/api/v0/notifications/rules",
         http_method: 'GET'
-      )
+    })
     end
 
     let(:delete_request) do
-      automate_api_request(
-        "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
+      automate_api_request({
+        endpoint: "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
         http_method: 'DELETE'
-      )
+    })
     end
 
     let(:rule_body) do
@@ -129,19 +129,19 @@ control 'notifications-crud-rule' do
 
     shared_examples "rule update tests" do
       let(:update_request) do
-        automate_api_request(
-          "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
+        automate_api_request({
+          endpoint: "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
           http_method: 'PUT',
           request_body: updated_rule_body
-        )
+      })
       end
 
       let(:updated_get_request) do
         expect(update_request.http_status).to eq(200)
-        automate_api_request(
-          "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
+        automate_api_request({
+          endpoint: "/api/v0/notifications/rules/#{create_request.parsed_response_body[:id]}",
           http_method: 'GET'
-        )
+      })
       end
 
       let(:updated_rule_body) do
@@ -361,11 +361,11 @@ control 'notifications-crud-rule' do
 
           context "when the rule already exists" do
             before do
-              req = automate_api_request(
-                '/api/v0/notifications/rules',
+              req = automate_api_request({
+                endpoint: '/api/v0/notifications/rules',
                 http_method: 'POST',
                 request_body: rule_body
-              )
+            })
               expect(req.http_status).to eq(200)
             end
 
@@ -413,11 +413,11 @@ control 'notifications-crud-rule' do
 
           context "when the rule already exists" do
             before do
-              req = automate_api_request(
-                '/api/v0/notifications/rules',
+              req = automate_api_request({
+                endpoint: '/api/v0/notifications/rules',
                 http_method: 'POST',
                 request_body: rule_body
-              )
+            })
               expect(req.http_status).to eq(200)
             end
 
@@ -437,10 +437,10 @@ control 'notifications-crud-rule' do
 
     context "and a get request is performed on it" do
       let(:get_request) do
-        automate_api_request(
-          "/api/v0/notifications/rules/#{rule_id}",
+        automate_api_request({
+          endpoint: "/api/v0/notifications/rules/#{rule_id}",
           http_method: 'GET'
-        )
+      })
       end
 
       it "404s" do
@@ -450,10 +450,10 @@ control 'notifications-crud-rule' do
 
     context "and a delete operation is performed on it" do
       let(:delete_request) do
-        automate_api_request(
-          "/api/v0/notifications/rules/#{rule_id}",
+        automate_api_request({
+          endpoint: "/api/v0/notifications/rules/#{rule_id}",
           http_method: 'DELETE'
-        )
+      })
       end
 
       it "404s" do
@@ -476,11 +476,11 @@ control 'notifications-crud-rule' do
       end
 
       let(:update_request) do
-        automate_api_request(
-          "/api/v0/notifications/rules/#{rule_id}",
+        automate_api_request({
+          endpoint: "/api/v0/notifications/rules/#{rule_id}",
           http_method: 'PUT',
           request_body: rule_body
-        )
+      })
       end
 
       it "404s" do

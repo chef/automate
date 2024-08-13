@@ -11,14 +11,14 @@ control 'iam-introspection-1' do
 
   describe 'introspect all' do
     it 'returns what we expect' do
-      resp = automate_api_request('/apis/iam/v2/introspect')
+      resp = automate_api_request({endpoint: '/apis/iam/v2/introspect'})
       expect(resp.http_status).to eq 200
     end
   end
 
   describe 'introspect some' do
     it 'returns what we expect' do
-      resp = automate_api_request('/apis/iam/v2/introspect_some',
+      resp = automate_api_request({endpoint: '/apis/iam/v2/introspect_some',
                                   http_method: 'POST',
                                   request_body:  {
                                     paths: [
@@ -26,7 +26,7 @@ control 'iam-introspection-1' do
                                       '/api/v0/compliance/reporting/stats/failures',
                                       '/api/v0/compliance/reporting/stats/trend',
                                     ]
-                                  }.to_json)
+                                  }.to_json})
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:endpoints]).to eq(
         {
@@ -58,11 +58,11 @@ control 'iam-introspection-1' do
 
   describe 'introspect with parameterized endpoint' do
     it 'returns what we expect' do
-      resp = automate_api_request('/apis/iam/v2/introspect',
+      resp = automate_api_request({endpoint: '/apis/iam/v2/introspect',
                                   http_method: 'POST',
                                   request_body:  {
                                     path: '/apis/iam/v2/policies/foo'
-                                  }.to_json)
+                                  }.to_json})
       # The parameter is "foo" because the matching path is '/iam/v2/policies/{id}'
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:endpoints]).to eq(

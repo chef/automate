@@ -15,11 +15,11 @@ control 'compliance-1' do
   ).each do |report|
     describe "POST inspec report to /data-collector/v0 : #{report}" do
       let(:api_request) do
-        automate_api_request(
-          '/data-collector/v0',
+        automate_api_request({
+          endpoint: '/data-collector/v0',
           http_method: 'POST',
           request_body: inspec.profile.file("fixtures/compliance/#{report}.json")
-        )
+        })
       end
 
       it 'should ingest the data successfully' do
@@ -38,11 +38,11 @@ control 'compliance-nodes' do
 
   describe 'POST /api/v0/nodes/search' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/nodes/search',
+      automate_api_request({
+        endpoint: '/api/v0/nodes/search',
         http_method: 'POST',
         request_body: '{}'
-      )
+    })
     end
 
     describe 'nodes call' do
@@ -65,11 +65,11 @@ control 'compliance-jobs' do
 
   describe 'POST /api/v0/compliance/scanner/jobs/search' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/compliance/scanner/jobs/search',
+      automate_api_request({
+        endpoint: '/api/v0/compliance/scanner/jobs/search',
         http_method: 'POST',
         request_body: '{}'
-      )
+    })
     end
 
     describe 'jobs call' do
@@ -85,11 +85,11 @@ control 'nodemanagers' do
 
   describe 'POST /api/v0/nodemanagers/search' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/nodemanagers/search',
+      automate_api_request({
+        endpoint: '/api/v0/nodemanagers/search',
         http_method: 'POST',
         request_body: '{}'
-      )
+    })
     end
 
     describe 'nodemanagers call' do
@@ -105,11 +105,11 @@ control 'compliance-stats-summary' do
 
   describe 'POST /api/v0/compliance/reporting/stats/summary' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/compliance/reporting/stats/summary',
+      automate_api_request({
+        endpoint: '/api/v0/compliance/reporting/stats/summary',
         http_method: 'POST',
         request_body: '{}'
-      )
+    })
     end
 
     describe 'stats summary' do
@@ -125,11 +125,11 @@ control 'compliance-reporting-nodes' do
 
   describe 'POST /api/v0/compliance/reporting/nodes/search' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/compliance/reporting/nodes/search',
+      automate_api_request({
+        endpoint: '/api/v0/compliance/reporting/nodes/search',
         http_method: 'POST',
         request_body: '{"filters":[{"type":"end_time","values":["2017-11-14T23:59:59Z"]}]}'
-      )
+    })
     end
 
     describe 'reporting nodes' do
