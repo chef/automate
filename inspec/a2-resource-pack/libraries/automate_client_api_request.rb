@@ -14,24 +14,44 @@ class AutomateClientApiRequest < Inspec.resource(1)
 
   attr_accessor :http, :api_token
 
-  def initialize(endpoint, api_token, http_method: 'GET', request_body: nil, request_headers: {}, request_params: nil)
-    endpoint = "/#{endpoint}" unless endpoint.start_with?('/')
+  # def initialize(endpoint, api_token, http_method: 'GET', request_body: nil, request_headers: {}, request_params: nil)
+  #   endpoint = "/#{endpoint}" unless endpoint.start_with?('/')
+  #   url = "https://#{target_hostname}#{endpoint}"
+
+  #   @api_token = api_token
+
+  #   request_headers['x-data-collector-token'] = api_token
+
+  #   @http = inspec.http(
+  #     url,
+  #     default_opts.merge({
+  #       data: request_body,
+  #       headers: request_headers,
+  #       method: http_method,
+  #       params: request_params
+  #     })
+  #   )
+  # end
+  def initialize(opts = {})
+    endpoint = opts[:endpoint] || "/#{opts[:endpoint]}"
     url = "https://#{target_hostname}#{endpoint}"
 
-    @api_token = api_token
+    @api_token = opts[:api_token]
 
-    request_headers['x-data-collector-token'] = api_token
+    request_headers = opts[:request_headers] || {}
+    request_headers['x-data-collector-token'] = @api_token
 
     @http = inspec.http(
       url,
       default_opts.merge({
-        data: request_body,
+        data: opts[:request_body] || nil,
         headers: request_headers,
-        method: http_method,
-        params: request_params
+        method: opts[:http_method] || 'GET',
+        params: opts[:request_params] || nil
       })
-    )
+  )
   end
+
 
   def http_status
     http.status
