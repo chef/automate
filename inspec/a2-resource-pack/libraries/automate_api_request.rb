@@ -17,7 +17,7 @@ class AutomateApiRequest < Inspec.resource(1)
   def initialize(opts = {})
     endpoint = "/#{opts[:endpoint]}" unless opts[:endpoint].start_with?('/')
 
-    @url = "https://#{opts[:target_hostname]}#{opts[:endpoint]}"
+    @url = "https://#{target_hostname}}#{opts[:endpoint]}"
     @user = opts[:user] || 'admin'
     @pass = opts[:pass] || ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate'
     @request_headers = opts[:request_headers] || {}
