@@ -62,7 +62,7 @@ title 'Automate 2.0 Smoke Tests'
     },
   },
 }.each_with_index do |(service_name, opts), index|
-  control "automate-smoke-#{index}" do
+  control "automate-smoke-#{index.to_s}" do
     title "GET #{opts[:path]}"
     desc "Checks the version endpoint of #{service_name} to make sure it's up and running"
 
