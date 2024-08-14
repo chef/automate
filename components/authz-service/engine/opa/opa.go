@@ -232,20 +232,23 @@ func (s *State) ProjectsAuthorized(
 	resource engine.Resource,
 	projects engine.Projects) ([]string, error) {
 
-	subs := make(ast.Array, len(subjects))
-	for i, sub := range subjects {
-		subs[i] = ast.NewTerm(ast.String(sub))
+	subs := ast.NewArray()
+	for _, sub := range subjects {
+		subs = subs.Append(ast.NewTerm(ast.String(sub)))
 	}
-	projs := make(ast.Array, len(projects))
-	for i, proj := range projects {
-		projs[i] = ast.NewTerm(ast.String(proj))
+
+	projs := ast.NewArray()
+	for _, proj := range projects {
+		projs = projs.Append(ast.NewTerm(ast.String(proj)))
 	}
+
 	input := ast.NewObject(
-		[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
-		[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
-		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
-		[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
+		ast.Item(ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)),
+		ast.Item(ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))),
+		ast.Item(ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))),
+		ast.Item(ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)),
 	)
+
 	resultSet, err := s.preparedEvalProjects.Eval(ctx, rego.EvalParsedInput(input))
 	if err != nil {
 		return []string{}, &EvaluationError{e: err}
