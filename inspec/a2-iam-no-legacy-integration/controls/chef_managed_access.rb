@@ -271,8 +271,8 @@ control 'iam-chef-managed-access-1' do
                 endpoint: "/api/v0/#{url}",
                 http_method: method,
                 user: VIEWER_USER_ID
-              ).http_status
-            }).to eq 403
+              }).http_status
+            ).to eq 403
           end
 
           [ADMIN_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
