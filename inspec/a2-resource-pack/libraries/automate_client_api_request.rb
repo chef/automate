@@ -33,7 +33,7 @@ class AutomateClientApiRequest < Inspec.resource(1)
   #   )
   # end
   def initialize(opts = {})
-    endpoint = opts[:endpoint] || "/#{opts[:endpoint]}"
+    endpoint = "/#{opts[:endpoint]}" unless opts[:endpoint].start_with?('/')
     url = "https://#{target_hostname}#{endpoint}"
 
     @api_token = opts[:api_token]

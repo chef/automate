@@ -62,11 +62,11 @@ title 'Automate 2.0 Smoke Tests'
     },
   },
 }.each_with_index do |(service_name, opts), index|
-  control "automate-smoke-#{index.to_s}" do
+  control "automate-smoke-#{index}" do
     title "GET #{opts[:path]}"
     desc "Checks the version endpoint of #{service_name} to make sure it's up and running"
 
-    describe automate_api_request(opts[:path]) do
+    describe automate_api_request({endpoint: opts[:path]}) do
       its('http_status') { should eq(opts[:expected_status] || 200) }
       its('parsed_response_body') { should include(opts[:response_match]) }
     end
