@@ -6,7 +6,7 @@ class AutomateApiRequest < Inspec.resource(1)
   name 'automate_api_request'
   desc 'Simple wrapper around the http inspec resource with some presets for Automate 2.0'
   example "
-    describe automate_api_request('/api/v0/_status') do
+    describe automate_api_request({endpoint: '/api/v0/_status'}) do
       its('http_status') { should cmp 200 }
       its('raw_response_body') { should cmp 'pong' }
     end

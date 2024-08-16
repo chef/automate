@@ -22,26 +22,26 @@ control 'iam-migrated-custom-legacy-policies-1' do
     # so we don't need to recreate them here
 
     after(:all) do
-      delete_user_resp = automate_api_request(
-        "/apis/iam/v2/users/#{MIGRATED_TEAM_VIEWER}",
+      delete_user_resp = automate_api_request({
+        endpoint: "/apis/iam/v2/users/#{MIGRATED_TEAM_VIEWER}",
         http_method: 'DELETE'
-      )
+      })
       expect(delete_user_resp.http_status.to_s).to match(/200|404/)
 
 
-      delete_token_resp = automate_api_request(
-        "/apis/iam/v2/tokens/#{MIGRATED_TOKEN_ID}",
+      delete_token_resp = automate_api_request({
+        endpoint: "/apis/iam/v2/tokens/#{MIGRATED_TOKEN_ID}",
         http_method: 'DELETE'
-      )
+      })
       expect(delete_token_resp.http_status.to_s).to match(/200|404/)
     end
 
     describe 'v1 admin token policy' do
 
       it 'token has been added as a member of the chef-managed admin policy' do
-        admin_policy_resp = automate_api_request(
-            '/apis/iam/v2/policies/administrator-access'
-          )
+        admin_policy_resp = automate_api_request({
+            endpoint: '/apis/iam/v2/policies/administrator-access'
+          })
         expect(admin_policy_resp.http_status).to eq 200
 
         members = admin_policy_resp.parsed_response_body[:policy][:members]
@@ -50,10 +50,10 @@ control 'iam-migrated-custom-legacy-policies-1' do
 
       it 'the v1 admin token can still access policies (admin-only resource)' do
         expect(
-          automate_client_api_request(
-            '/apis/iam/v2/policies',
-            MIGRATED_TOKEN
-          ).http_status
+          automate_client_api_request({
+            endpoint: '/apis/iam/v2/policies',
+            api_token: MIGRATED_TOKEN
+          }).http_status
         ).to eq 200
       end
     end
@@ -61,9 +61,9 @@ control 'iam-migrated-custom-legacy-policies-1' do
     describe 'v1 user team-viewer policy' do
 
       it 'v1 custom policy has been migrated as a legacy policy on v2' do
-        get_policies_resp = automate_api_request(
-          '/apis/iam/v2/policies',
-        )
+        get_policies_resp = automate_api_request({
+          endpoint: '/apis/iam/v2/policies',
+        })
         expect(get_policies_resp.http_status).to eq 200
 
         all_policies = get_policies_resp.parsed_response_body[:policies]
@@ -85,11 +85,11 @@ control 'iam-migrated-custom-legacy-policies-1' do
 
       it 'the team-viewer user can still access the team list' do
         expect(
-          automate_api_request(
-            '/apis/iam/v2/teams',
+          automate_api_request({
+            endpoint: '/apis/iam/v2/teams',
             http_method: 'GET',
             user: MIGRATED_TEAM_VIEWER
-          ).http_status
+          }).http_status
         ).to eq 200
       end
     end
