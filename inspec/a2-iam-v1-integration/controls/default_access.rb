@@ -648,7 +648,7 @@ control 'authz-access-control-iam-v1' do
   describe 'AuthZ access control' do
     before(:all) do
       create_non_admin_request = automate_api_request({
-        '/api/v0/auth/users',
+        endpoint: '/api/v0/auth/users',
         http_method: 'POST',
         request_body: {
           'name': NON_ADMIN_USERNAME,
