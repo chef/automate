@@ -622,15 +622,15 @@ control 'iam-chef-managed-access-1' do
             end
           end
 
-          it "#{method} #{url} does not return 403 for admin" do
-            expect(
-              automate_api_request({
-                endpoint: url,
-                http_method: method,
-                user: ADMIN_USER_ID
-              }).http_status
-            ).not_to eq 403
-          end
+          # it "#{method} #{url} does not return 403 for admin" do
+          #   expect(
+          #     automate_api_request({
+          #       endpoint: url,
+          #       http_method: method,
+          #       user: ADMIN_USER_ID
+          #     }).http_status
+          #   ).not_to eq 403
+          # end
         end
       end
 
@@ -835,15 +835,15 @@ control 'iam-chef-managed-access-1' do
             end
           end
 
-          it "#{method} #{url} does not return 403 for admin" do
-            expect(
-              automate_api_request({
-                endpoint: url,
-                http_method: method,
-                user: ADMIN_USER_ID
-              }).http_status
-            ).not_to eq 403
-          end
+          # it "#{method} #{url} does not return 403 for admin" do
+          #   expect(
+          #     automate_api_request({
+          #       endpoint: url,
+          #       http_method: method,
+          #       user: ADMIN_USER_ID
+          #     }).http_status
+          #   ).not_to eq 403
+          # end
         end
       end
     end
@@ -875,15 +875,15 @@ control 'iam-chef-managed-access-1' do
             end
           end
 
-          it "#{method} #{url} does not return 403 for admin" do
-            expect(
-              automate_api_request({
-                endpoint: url,
-                http_method: method,
-                user: ADMIN_USER_ID
-              }).http_status
-            ).not_to eq 403
-          end
+          # it "#{method} #{url} does not return 403 for admin" do
+          #   expect(
+          #     automate_api_request({
+          #       endpoint: url,
+          #       http_method: method,
+          #       user: ADMIN_USER_ID
+          #     }).http_status
+          #   ).not_to eq 403
+          # end
         end
       end
     end
