@@ -43,14 +43,14 @@ control 'ingest-status' do
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
     end
 
-    # it 'GET /data-collector/v0 returns the correct response for client' do
-    #   expect(
-    #     automate_client_api_request({
-    #       endpoint: '/data-collector/v0',
-    #       api_token: INGEST_TOKEN,
-    #       http_method: 'GET',
-    #     }).parsed_response_body[:status]
-    #   ).to eq('ok')
-    # end
+    it 'GET /data-collector/v0 returns the correct response for client' do
+      expect(
+        automate_client_api_request({
+          endpoint: '/data-collector/v0',
+          api_token: INGEST_TOKEN,
+          http_method: 'GET',
+        }).parsed_response_body[:status]
+      ).to eq('ok')
+    end
   end
 end

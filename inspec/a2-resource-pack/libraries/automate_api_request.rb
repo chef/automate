@@ -15,7 +15,7 @@ class AutomateApiRequest < Inspec.resource(1)
   attr_accessor :user, :pass
 
   def initialize(opts = {})
-    endpoint = "/#{opts[:endpoint]}" unless opts[:endpoint].start_with?('/')
+    opts[:endpoint] = "/#{opts[:endpoint]}" unless opts[:endpoint].start_with?('/')
 
     @url = "https://#{target_hostname}#{opts[:endpoint]}"
     @user = opts[:user] || 'admin'
