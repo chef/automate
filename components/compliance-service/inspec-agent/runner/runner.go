@@ -775,6 +775,8 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 	timeout := time.Duration(job.Timeout) * time.Second
 	// inputs are not required here, as detect has no need for them
 	env, _, genericErr := cloudEnvVars(&job.TargetConfig)
+	
+	env["CHEF_LICENSE_KEY"] = "tmns-1cee0361-a42a-4ae6-9a7a-1428a3738cc5-4023"
 	defer func() {
 		cleanupCreds(env)
 	}()
@@ -787,7 +789,7 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 		if err == nil {
 			break
 		}
-		logrus.Errorf("%s(%s) connection attempt # %d failed for node %s(%s) with error: %s", job.JobType, job.JobID, i+1, job.NodeName, job.NodeID, err.Message)
+		logrus.Errorf("dmaddu-1 %s(%s) connection attempt # %d failed for node %s(%s) with error: %s", job.JobType, job.JobID, i+1, job.NodeName, job.NodeID, err.Message)
 	}
 	if err != nil {
 		return nil, err
@@ -806,13 +808,13 @@ func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 	if genericErr != nil {
 		return nil, inspec.NewInspecError(inspec.UNKNOWN_ERROR, genericErr.Error())
 	}
-
+	env["CHEF_LICENSE_KEY"] = "tmns-1cee0361-a42a-4ae6-9a7a-1428a3738cc5-4023"
 	for i, tc := range potentialTargetConfigs(job) {
 		jsonBytes, _, err = inspec.Scan(job.InternalProfiles, &tc, timeout, env, inputs, job.FireJailExecProfilePath)
 		if err == nil {
 			break
 		}
-		logrus.Errorf("%s(%s) connection attempt # %d failed for node(%s) with error: %s", job.JobType, job.JobID, i+1, job.NodeID, err.Message)
+		logrus.Errorf("dmaddu-2 %s(%s) connection attempt # %d failed for node(%s) with error: %s", job.JobType, job.JobID, i+1, job.NodeID, err.Message)
 	}
 	if err != nil {
 		return nil, err

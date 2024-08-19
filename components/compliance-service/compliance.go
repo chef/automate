@@ -715,7 +715,8 @@ func (conf *ServiceInfo) serveCustomRoutes() error {
 	r := http.NewServeMux()
 
 	r.HandleFunc("/profiles/tar", conf.ProfileTarHandler)
-
+	r.HandleFunc("/inspec6/license/{version}/{path}", conf.Inspec6LicenseHandler)
+	//http://127.0.0.1:2133/inspec6/license/
 	return http.ListenAndServe(serveAddress, r)
 }
 
@@ -727,6 +728,13 @@ func NewServiceConfig(cfg *config.Compliance, connFactory *secureconn.Factory) *
 
 		connFactory: connFactory,
 	}
+}
+
+// Inspec6LicenseHandler is the http handler for handling inspec-6 license APIS
+func (conf *ServiceInfo) Inspec6LicenseHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("--------------*********************------------------")
+
+	fmt.Println("--------------*********************------------------")
 }
 
 // ProfileTarHandler is the http handler for profile tarballs, used by the inspec-agent
