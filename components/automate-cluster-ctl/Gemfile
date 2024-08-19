@@ -19,4 +19,5 @@ gem 'bcrypt_pbkdf'
 if Gem::Version.new(RUBY_VERSION) <= Gem::Version.new("3.1.0")
   gem "ffi", "< 1.17.0"
   gem "train-core", "< 3.12.5"
+  gem "activesupport", "< 7.2.0"
 end
