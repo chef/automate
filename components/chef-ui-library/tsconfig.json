@@ -6,11 +6,11 @@
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es2017"
+      "ES2022"
     ],
     "moduleResolution": "node",
     "module": "esnext",
-    "target": "es2017",
+    "target": "ES2022",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",

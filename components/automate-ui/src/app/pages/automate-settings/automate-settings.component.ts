@@ -172,7 +172,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   // This prevents a user from being allowed to enter negative numbers
   // or other actions that we don't want to allow
-  public preventNegatives(key: string  = "") {
+  public preventNegatives(key: string = "") {
     const allowedKeys = [
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
       'Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'
@@ -243,7 +243,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       const jobForm = this[jobName].getRawValue();
 
       const isNested = jobForm.nested_name ? true : false;
-      const job = new IngestJob({} as JobCategories, {} as RespJob);
+      const job = new IngestJob(null, null);
       job.category = jobForm.category;
       job.name = jobForm.name;
       job.disabled = jobForm.disabled;
@@ -293,7 +293,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     //   "code":3,
     //   "details":[]
     // }
-    if (error.error.error) {
+    if (error?.error?.error) {
       msg = msg + ' [' + error.error.error + ']';
     }
     console.error(error.message);

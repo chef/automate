@@ -1,6 +1,5 @@
 import { Config } from '@stencil/core';
 import { sass } from '@stencil/sass';
-import sassLib from 'node-sass'; //Anees: Need to remove this.
 
 const copy = [
   { src: 'global/variables.css', dest: 'styles/variables.example.css' },

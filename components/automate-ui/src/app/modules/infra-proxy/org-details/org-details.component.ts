@@ -64,7 +64,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.redirect = data.redirect);
       // condition for breadcrumb to select specific tab
       this.previousRoute$.subscribe((params: Params) => {
-        const path: string[] = params.path;
+        const path: string[] = params.url;
         if (path.includes('roles')) {
           this.resetTabs();
           this.rolesTab = true;

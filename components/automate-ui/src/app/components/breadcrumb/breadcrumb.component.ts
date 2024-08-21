@@ -9,6 +9,7 @@ export class BreadcrumbComponent {
   // The link value is passed to an Angular routerLink (https://angular.io/api/router/RouterLink)
   // so it must use the same type.
   @Input() link: any[] | string;
+  @Input() routerLink: any[] | string;
 
   constructor() { }
 }

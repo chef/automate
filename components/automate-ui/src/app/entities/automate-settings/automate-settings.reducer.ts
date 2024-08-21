@@ -17,13 +17,13 @@ export interface ChangeSettingsStatus {
 }
 
 export const AutomateSettingsEntityInitialState: AutomateSettingsEntityState = {
-  jobSchedulerStatus: {} as JobSchedulerStatus,
+  jobSchedulerStatus: null as JobSchedulerStatus,
   changeConfiguration: {
     status: EntityStatus.notLoaded,
-    errorResp: {} as HttpErrorResponse
+    errorResp: null as HttpErrorResponse
   },
   status: EntityStatus.notLoaded,
-  errorResp: {} as HttpErrorResponse
+  errorResp: null as HttpErrorResponse
 };
 
 export function automateSettingsEntityReducer(

@@ -17,7 +17,7 @@ import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { create, CyclePlugin } from 'rxjs-spy';
 
-import { applyPolyfills, defineCustomElements } from './assets/chef-ui-library/loader';
+import { defineCustomElements } from './assets/chef-ui-library/loader';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
@@ -44,6 +44,5 @@ if (environment.production) {
 
 platformBrowserDynamic().bootstrapModule(AppModule, { preserveWhitespaces: true });
 
-applyPolyfills().then(() => {
-  defineCustomElements(window);
-});
+
+defineCustomElements(window);
