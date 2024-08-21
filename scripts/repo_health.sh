@@ -9,6 +9,7 @@ desired_golang_version() {
 }
 
 export GOPROXY="https://proxy.golang.org,direct"
+export GOSUMDB="sum.golang.org"
 
 hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
 hab pkg install -b "core/go22/$(desired_golang_version)"

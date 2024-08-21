@@ -9,6 +9,7 @@ env:
   # Use the Go module mirror and checksum database by default.
   # See https://proxy.golang.org for details.
   GOPROXY: "https://proxy.golang.org,direct"
+  GOSUMDB: "sum.golang.org"
 
 expeditor:
   defaults:
