@@ -59,7 +59,7 @@ fix_interpreters() {
 do_build() {
   # Disabling Usage Analytics
   export NG_CLI_ANALYTICS=false
-  export IBM_TELEMETRY_DISABLED=true
+  export IBM_TELEMETRY_DISABLED='true'
 
   echo "Building $CACHE_PATH/chef-ui-library"
   pushd "$CACHE_PATH/chef-ui-library"
