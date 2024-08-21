@@ -76,6 +76,7 @@ do_build() {
     npm_install @angular/cli
 
     fix_interpreters
+    npm run install:ui-library
     npm run build:prod
 
     npm uninstall @angular/cli --no-save
