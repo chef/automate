@@ -1,18 +1,3 @@
-// import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
-// import { applyPolyfills, defineCustomElements } from './assets/chef-ui-library/loader';
-
-// import { AppModule } from './app/app.module';
-
-
-// platformBrowserDynamic().bootstrapModule(AppModule)
-//   .catch(err => console.error(err));
-
-// applyPolyfills().then(() => {
-//   defineCustomElements(window);
-// });
-
-
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { create, CyclePlugin } from 'rxjs-spy';
