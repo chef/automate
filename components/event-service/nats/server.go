@@ -47,6 +47,7 @@ func (m *multiEmbeddedServer) waitForErrors() error {
 	err := <-m.errchan
 	log.WithError(err).Error("shutting down embedded server")
 	for _, s := range m.servers {
+		log.Info("In nats server go code")
 		s.Shutdown()
 	}
 	return err
