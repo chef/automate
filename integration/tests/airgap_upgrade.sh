@@ -30,7 +30,7 @@ do_build() {
         --override-origin "$HAB_ORIGIN" \
         --versions-file "$versionsFile" \
         bundle.aib
-        
+
     log_info "Creating update airgap bundle"
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
@@ -46,6 +46,10 @@ do_build() {
 }
 
 do_deploy() {
+    log_info chef-automate deploy config.toml \
+        --airgap-bundle bundle.aib \
+        --admin-password chefautomate \
+        --accept-terms-and-mlsa
     chef-automate deploy config.toml \
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \
