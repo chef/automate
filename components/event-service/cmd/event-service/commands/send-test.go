@@ -39,6 +39,11 @@ func newSendTestCmd() *cobra.Command {
 			if err != nil {
 				return errors.Wrap(err, "connecting to NATS server")
 			}
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("recovered from panic", r)
+				}
+			}()
 			defer externalNATS.Close()
 
 			internalURL := "nats://localhost:10140"
@@ -70,6 +75,11 @@ func newSendTestCmd() *cobra.Command {
 			if err != nil {
 				return errors.Wrap(err, "connecting to NATS server")
 			}
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("recovered from panic", r)
+				}
+			}()
 			defer internalNATS.Close()
 
 			// subscribe on internal side
@@ -124,12 +134,22 @@ func newSendTestCmd() *cobra.Command {
 			if err != nil {
 				return errors.Wrap(err, "connecting to NATS Streaming server")
 			}
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("recovered from panic", r)
+				}
+			}()
 			defer ncExternal.Close() // nolint: errcheck
 
 			ncInternal, err := streamc.Connect(clusterID, "cli-test-internal-sub", streamc.NatsConn(internalNATS))
 			if err != nil {
 				return errors.Wrap(err, "connecting to NATS Streaming server")
 			}
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("recovered from panic", r)
+				}
+			}()
 			defer ncInternal.Close() // nolint: errcheck
 
 			// Subscriber on internal side

@@ -158,6 +158,7 @@ start_all_services() {
   start_deployment_service
   chef-automate dev deployinate
   if [[ -f "/src/dev/license.jwt" ]]; then
+  log_info "entered start_all_servers 1"
      chef-automate license apply "/src/dev/license.jwt"
   fi
   
