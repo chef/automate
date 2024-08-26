@@ -17,11 +17,11 @@ control 'iam-admin-token-1' do
       token = ENV['INSPEC_UPGRADE_IAM_V2_3_ADMIN_TOKEN']
 
       expect(
-        automate_client_api_request(
-          '/apis/iam/v2/policies',
-          token,
+        automate_client_api_request({
+          endpoint: '/apis/iam/v2/policies',
+          api_token: token,
           http_method: 'GET',
-        ).http_status
+        }).http_status
       ).to eq(200)
     end
   end

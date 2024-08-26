@@ -11,16 +11,16 @@ control 'notifications-alert' do
   # To Run these test locally run 'go run integration/helpers/requestbin/requestbin.go' in the background
   describe "when creating an alert" do
     after(:context) do
-      all_rules = automate_api_request(
-        "/api/v0/notifications/rules",
+      all_rules = automate_api_request({
+        endpoint: "/api/v0/notifications/rules",
         http_method: 'GET'
-      )
+    })
       all_rules.parsed_response_body[:rules].each do |rule|
         if rule[:name].start_with?(TEST_RULE_NAME_PREFIX)
-          automate_api_request(
-            "/api/v0/notifications/rules/#{rule[:id]}",
+          automate_api_request({
+            endpoint: "/api/v0/notifications/rules/#{rule[:id]}",
             http_method: 'DELETE'
-          ).http_status
+          }).http_status
         end
       end
     end
@@ -40,67 +40,67 @@ control 'notifications-alert' do
     end
 
     let(:send_failed_ccr_with_ignored_failure) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: failed_ccr_message_with_ignored_failure
-      )
+    })
     end
 
     let(:send_failed_ccr) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: failed_ccr_message
-      )
+    })
     end
 
     let(:send_successful_ccr) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/converge/chefdk-debian-7-tester-2d206b_run_converge.json")
-      )
+    })
     end
 
     let(:send_failed_inspec_report) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/compliance/compliance-failure-big-report.json")
-      )
+    })
     end
 
     let(:send_failed_non_critical_inspec_report_1) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/compliance/non-critical-failure-report_1.json")
-      )
+    })
     end
 
     let(:send_failed_non_critical_inspec_report_2) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/compliance/non-critical-failure-report_2.json")
-      )
+    })
     end
 
     let(:send_failed_inspec_report_with_refs) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint: '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/compliance/scan_ref_bug.json")
-      )
+    })
     end
 
     let(:send_successful_inspec_report) do
-      automate_api_request(
-        '/data-collector/v0',
+      automate_api_request({
+        endpoint:  '/data-collector/v0',
         http_method: 'POST',
         request_body: inspec.profile.file("fixtures/compliance/runner-1604-1-delivered.cd.chef.co_inspec_report.json")
-      )
+    })
     end
 
     let(:requestbin_url) do
@@ -116,8 +116,8 @@ control 'notifications-alert' do
     end
 
     let(:create_ccr_rule) do
-      request = automate_api_request(
-        '/api/v0/notifications/rules',
+      request = automate_api_request({
+        endpoint: '/api/v0/notifications/rules',
         http_method: 'POST',
         request_body: {
           rule: {
@@ -128,12 +128,12 @@ control 'notifications-alert' do
             }
           }
         }.to_json
-      )
+      })
     end
 
     let(:create_inspec_service_now_rule) do
-      request = automate_api_request(
-        '/api/v0/notifications/rules',
+      request = automate_api_request({
+        endpoint:'/api/v0/notifications/rules',
         http_method: 'POST',
         request_body: {
           rule: {
@@ -144,13 +144,13 @@ control 'notifications-alert' do
               secret_id: "3705adff-c61c-4a09-ab56-c3aeed9659a8"
             }
           }
-        }.to_json
+      }}.to_json
       )
     end
 
     let(:create_inspec_rule) do
-      request = automate_api_request(
-        '/api/v0/notifications/rules',
+      request = automate_api_request({
+        endpoint: '/api/v0/notifications/rules',
         http_method: 'POST',
         request_body: {
           rule: {
@@ -161,7 +161,7 @@ control 'notifications-alert' do
             }
           }
         }.to_json
-      )
+      })
     end
 
     context "for failed CCRs" do

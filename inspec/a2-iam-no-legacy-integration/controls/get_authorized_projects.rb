@@ -22,24 +22,24 @@ control 'iam-global-projects-filter-1' do
 
     before(:all) do
       PROJECTS.each do|project|
-        resp = automate_api_request("/apis/iam/v2/projects",
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects",
           http_method: 'POST',
           request_body: project.to_json
-        )
+        })
         expect(resp.http_status).to eq 200
       end
     end
 
     after(:all) do
       PROJECTS.each do|project|
-        resp = automate_api_request("/apis/iam/v2/projects/#{project[:id]}", http_method: 'DELETE')
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{project[:id]}", http_method: 'DELETE'})
         expect(resp.http_status).to eq 200
       end
     end
 
     describe 'allowed projects for admin' do
       it 'returns list of all projects and unassigned' do
-        resp = automate_api_request("/apis/iam/v2/introspect_projects", http_method: 'GET')
+        resp = automate_api_request({endpoint: "/apis/iam/v2/introspect_projects", http_method: 'GET'})
 
         expect(resp.http_status).to eq 200
         expected_projects = [ PROJECT_1, PROJECT_2, PROJECT_3, UNASSIGNED ]
@@ -59,19 +59,19 @@ control 'iam-global-projects-filter-1' do
       non_admin_policy_id = 'non-admin-policy'
 
       before(:all) do
-        create_user_response = automate_api_request(
-          '/apis/iam/v2/users',
+        create_user_response = automate_api_request({
+          endpoint: '/apis/iam/v2/users',
           http_method: 'POST',
           request_body: {
             'name': non_admin_username,
             'id': non_admin_username,
             'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
           }.to_json
-        )
+        })
 
         expect(create_user_response.http_status.to_s).to match(/200|409/)
 
-        create_policy_response = automate_api_request("/apis/iam/v2/policies",
+        create_policy_response = automate_api_request({endpoint: "/apis/iam/v2/policies",
           http_method: 'POST',
           request_body: {
             id: non_admin_policy_id,
@@ -85,31 +85,31 @@ control 'iam-global-projects-filter-1' do
               }
             ]
           }.to_json()
-        )
+        })
         expect(create_policy_response.http_status.to_s).to match (/200|409/)
       end
 
       after(:all) do
-        delete_user_response = automate_api_request(
-          "/apis/iam/v2/users/#{non_admin_username}",
+        delete_user_response = automate_api_request({
+          endpoint: "/apis/iam/v2/users/#{non_admin_username}",
           http_method: 'DELETE',
-        )
+        })
 
         expect(delete_user_response.http_status.to_s).to match(/200|404/)
 
-        delete_policy_response = automate_api_request(
-          "/apis/iam/v2/policies/#{non_admin_policy_id}",
+        delete_policy_response = automate_api_request({
+          endpoint: "/apis/iam/v2/policies/#{non_admin_policy_id}",
           http_method: 'DELETE',
-        )
+        })
 
         expect(delete_policy_response.http_status.to_s).to match(/200|404/)
       end
 
       it 'returns list of allowed projects' do
-        resp = automate_api_request("/apis/iam/v2/introspect_projects",
+        resp = automate_api_request({endpoint: "/apis/iam/v2/introspect_projects",
           http_method: 'GET',
           user: non_admin_username,
-        )
+        })
 
         expect(resp.http_status).to eq 200
         expected_projects = [PROJECT_1, PROJECT_2]
