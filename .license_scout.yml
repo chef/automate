@@ -890,6 +890,9 @@ fallbacks:
   - name: rrule
     license_id: BSD-3-Clause
     license_content: https://raw.githubusercontent.com/jakubroztocil/rrule/master/LICENCE
+  - name: chownr
+    license_id: BlueOak-1.0.0
+    license_content: https://raw.githubusercontent.com/isaacs/chownr/main/LICENSE.md
   ruby:
   - name: syslog-logger
     license_id: MIT
@@ -1029,4 +1032,3 @@ exceptions:
   nodejs:
   - name: jschardet
     reason: Exception made by Chef Legal
-
