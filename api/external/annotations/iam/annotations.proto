@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package chef.automate.api.iam;
 
-import "external/annotations/iam/policy.proto";
-import "google/protobuf/descriptor.proto";
+import "api/external/annotations/iam/policy.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto";
 
 option go_package = "github.com/chef/automate/api/external/annotations/iam";
 

@@ -3,8 +3,8 @@ syntax = "proto3";
 package chef.automate.domain.license_control;
 option go_package = "github.com/chef/automate/api/interservice/license_control";
 
-import "google/protobuf/timestamp.proto";
-import "license/license.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/timestamp.proto";
+import "lib/license/license.proto";
 
 service LicenseControlService {
   rpc License (LicenseRequest) returns (LicenseResponse);

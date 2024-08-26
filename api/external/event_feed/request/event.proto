@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chef.automate.api.event_feed.request;
 option go_package = "github.com/chef/automate/api/external/event_feed/request";
-import "external/common/query/parameters.proto";
+import "api/external/common/query/parameters.proto";
 
 message GetEventTypeCountsRequest {
   // Filters to be applied to the request.

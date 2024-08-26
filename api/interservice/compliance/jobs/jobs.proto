@@ -4,10 +4,10 @@ package chef.automate.domain.compliance.jobs;
 option go_package = "github.com/chef/automate/api/interservice/compliance/jobs";
 
 import "google/protobuf/timestamp.proto";
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "interservice/compliance/common/common.proto";
+import "api/interservice/compliance/common/common.proto";
 
 service JobsService {
 	rpc Create(Job) returns (Id) {};
