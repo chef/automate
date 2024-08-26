@@ -55,11 +55,11 @@ control 'config-mgmt-action-1' do
   ).each do |action|
     describe "POST /data-collector/v0 for action #{action}" do
       let(:api_request) do
-        automate_api_request(
-          '/data-collector/v0',
-          http_method: 'POST',
-          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")
-        )
+        automate_api_request({
+        endpoint: '/data-collector/v0',
+        http_method: 'POST',
+        request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")
+        })
       end
 
       it 'should ingest the data successfully' do
@@ -82,11 +82,11 @@ control 'config-mgmt-action-2' do
   #######################################################################
   describe 'GET /api/v0/eventfeed' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/eventfeed',
+      automate_api_request({
+        endpoint: '/api/v0/eventfeed',
         request_params: request_params,
         http_method: 'GET'
-      )
+      })
     end
 
     let(:request_params) do
@@ -100,10 +100,10 @@ control 'config-mgmt-action-2' do
     end
 
     let(:api_runs_request) do
-      automate_api_request(
-        "/api/v0/eventfeed",
-        http_method: 'GET'
-      )
+      automate_api_request({
+      endpoint: "/api/v0/eventfeed",
+      http_method: 'GET'
+      })
     end
 
     describe 'return all bag type events' do
@@ -120,11 +120,11 @@ control 'config-mgmt-action-2' do
   #######################################################################
   describe 'GET /api/v0/eventstrings' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/eventstrings',
+      automate_api_request({
+        endpoint: '/api/v0/eventstrings',
         request_params: request_params,
         http_method: 'GET'
-      )
+      })
     end
 
     let(:request_params) do

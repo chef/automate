@@ -17,12 +17,12 @@ control 'local-user-migration-1' do
       'test-admin' => 'test-admin',
     }.each do |user, displayname|
       it "returns #{user}'s information" do
-        create_non_admin_request = automate_api_request(
-          "/apis/iam/v2/users/#{user}",
+        create_non_admin_request = automate_api_request({
+          endpoint: "/apis/iam/v2/users/#{user}",
           http_method: 'GET',
           user: user,
           pass: "#{user}-password",
-        )
+        })
 
         expect(create_non_admin_request.http_status).to eq(200)
         expect(create_non_admin_request.parsed_response_body[:user][:id]).to eq(user)
@@ -40,15 +40,15 @@ control 'local-user-migration-2' do
     admins_team_id = 'admins'
 
     it "exists and contains the admin users' IDs" do
-      admin_user = automate_api_request('apis/iam/v2/users/admin')
+      admin_user = automate_api_request({endpoint: 'apis/iam/v2/users/admin'})
       expect(admin_user.http_status).to eq(200)
       admin_membership_id = admin_user.parsed_response_body[:user][:membership_id]
 
-      test_admin_user = automate_api_request('apis/iam/v2/users/test-admin')
+      test_admin_user = automate_api_request({endpoint: 'apis/iam/v2/users/test-admin'})
       expect(test_admin_user.http_status).to eq(200)
       test_admin_membership_id = test_admin_user.parsed_response_body[:user][:membership_id]
 
-      admins_team = automate_api_request("apis/iam/v2/teams/#{admins_team_id}/users")
+      admins_team = automate_api_request({endpoint: "apis/iam/v2/teams/#{admins_team_id}/users"})
       expect(admins_team.http_status).to eq(200)
 
       [admin_membership_id, test_admin_membership_id].each do |id| 
@@ -64,12 +64,12 @@ control 'local-user-migration-3' do
 
   describe 'builder user' do
     it 'is migrated' do
-      builder_user_request = automate_api_request(
-        "apis/iam/v2/users/builder",
+      builder_user_request = automate_api_request({
+        endpoint: "apis/iam/v2/users/builder",
         http_method: 'GET',
         user: 'builder',
         pass: ENV['A1_BUILDER_PASSWORD'],
-      )
+      })
 
       expect(builder_user_request.http_status).to eq(200)
       expect(builder_user_request.parsed_response_body[:user][:id]).to eq('builder')

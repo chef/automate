@@ -6,7 +6,7 @@ class AutomateApiRequest < Inspec.resource(1)
   name 'automate_api_request'
   desc 'Simple wrapper around the http inspec resource with some presets for Automate 2.0'
   example "
-    describe automate_api_request('/api/v0/_status') do
+    describe automate_api_request({endpoint: '/api/v0/_status'}) do
       its('http_status') { should cmp 200 }
       its('raw_response_body') { should cmp 'pong' }
     end
@@ -14,38 +14,36 @@ class AutomateApiRequest < Inspec.resource(1)
 
   attr_accessor :user, :pass
 
-  def initialize(endpoint, http_method: 'GET', request_body: nil, request_headers: {}, request_params: nil,
-                 user: 'admin',
-                 pass: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate')
-    endpoint = "/#{endpoint}" unless endpoint.start_with?('/')
+  def initialize(opts = {})
+    opts[:endpoint] = "/#{opts[:endpoint]}" unless opts[:endpoint].start_with?('/')
 
-    @url = "https://#{target_hostname}#{endpoint}"
-    @user = user
-    @pass = pass
-    @request_headers = request_headers
-    @request_body = request_body
-    @request_params = request_params
-    @http_method = http_method
+    @url = "https://#{target_hostname}#{opts[:endpoint]}"
+    @user = opts[:user] || 'admin'
+    @pass = opts[:pass] || ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate'
+    @request_headers = opts[:request_headers] || {}
+    @request_body = opts[:request_body] || nil
+    @request_params = opts[:request_params] || nil
+    @http_method = opts[:http_method] || 'GET'
 
     # Invalidate @@id_token class variable if the user or password has changed.
     if (defined? @@previous_user).nil?
-      @@previous_user = user
+      @@previous_user = opts[:user]
     end
 
     if (defined? @@previous_pass).nil?
-      @@previous_pass = pass
+      @@previous_pass = opts[:pass] 
     end
 
     if @@previous_user != user
-      @@previous_user = user
+      @@previous_user = opts[:user]
       @@id_token = nil
     end
 
-    if @@previous_pass != pass
-      @@previous_pass = pass
+    if @@previous_pass != opts[:pass] 
+      @@previous_pass = opts[:pass] 
       @@id_token = nil
     end
-  end
+end
 
   def http
     @http ||= inspec.http(

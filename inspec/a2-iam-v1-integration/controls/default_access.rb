@@ -25,26 +25,26 @@ control 'authz-access-control-1' do
 
   describe 'AuthZ access control' do
     before(:all) do
-      create_non_admin_request = automate_api_request(
-        '/api/v0/auth/users',
+      create_non_admin_request = automate_api_request({
+        endpoint: '/api/v0/auth/users',
         http_method: 'POST',
         request_body: {
           'name': NON_ADMIN_USERNAME,
           'username': NON_ADMIN_USERNAME,
           'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
         }.to_json
-      )
+      })
 
       expect(create_non_admin_request.http_status.to_s).to match(/200|409/)
 
-      test_token_request = automate_api_request(
-        '/api/v0/auth/tokens',
+      test_token_request = automate_api_request({
+        endpoint: '/api/v0/auth/tokens',
         http_method: 'POST',
         request_body: {
           'description': 'inspec_test_token',
           'active': true
         }.to_json
-      )
+      })
       TEST_TOKEN = test_token_request.parsed_response_body[:value]
       TEST_TOKEN_ID = test_token_request.parsed_response_body[:id]
 
@@ -52,18 +52,18 @@ control 'authz-access-control-1' do
     end
 
     after(:all) do
-      delete_non_admin_request = automate_api_request(
-        "/api/v0/auth/users/#{NON_ADMIN_USERNAME}",
+      delete_non_admin_request = automate_api_request({
+        endpoint: "/api/v0/auth/users/#{NON_ADMIN_USERNAME}",
         http_method: 'DELETE',
-      )
+      })
 
       expect(delete_non_admin_request.http_status.to_s).to match(/200|404/)
 
 
-      delete_token_request = automate_api_request(
-        "/api/v0/auth/tokens/#{TEST_TOKEN_ID}",
+      delete_token_request = automate_api_request({
+        endpoint: "/api/v0/auth/tokens/#{TEST_TOKEN_ID}",
         http_method: 'DELETE',
-      )
+      })
 
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
     end
@@ -106,11 +106,11 @@ control 'authz-access-control-1' do
       it 'returns the correct response when GETing all objects' do
         if http_verbs.include?('GET_ALL')
           expect(
-            automate_api_request(
-              url,
+            automate_api_request({
+              endpoint: url,
               http_method: 'GET',
               user: user,
-            ).http_status == 403
+            }).http_status == 403
           ).to be(expect_403_response)
         end
       end
@@ -125,12 +125,12 @@ control 'authz-access-control-1' do
           end
 
           if http_verbs.include?('POST')
-            resp = automate_api_request(
-              url,
+            resp = automate_api_request({
+              endpoint: url,
               http_method: 'POST',
               request_body: test_object.to_json,
               user: user,
-            )
+            })
 
             expect(url + ":POST:" + resp.http_status.to_s == url + ":POST:403").to be(expect_403_response)
 
@@ -146,32 +146,32 @@ control 'authz-access-control-1' do
 
           if http_verbs.include?('POST') && http_verbs.include?('GET')
             expect(
-              url + ":GET:" + automate_api_request(
-                "#{url}/#{resp_id}",
+              url + ":GET:" + automate_api_request({
+                endpoint: "#{url}/#{resp_id}",
                 http_method: 'GET',
                 user: user,
-              ).http_status.to_s == url + ":GET:403"
+              }).http_status.to_s == url + ":GET:403"
             ).to be(expect_403_response)
           end
 
           if http_verbs.include?('POST') && http_verbs.include?('PUT')
             expect(
-              url + ":PUT:" + automate_api_request(
-                "#{url}/#{resp_id}",
+              url + ":PUT:" + automate_api_request({
+                endpoint: "#{url}/#{resp_id}",
                 http_method: 'PUT',
                 user: user,
                 request_body: test_update_object.to_json,
-              ).http_status.to_s == url + ":PUT:403"
+              }).http_status.to_s == url + ":PUT:403"
             ).to be(expect_403_response)
           end
 
           if http_verbs.include?('POST') && http_verbs.include?('DELETE')
             expect(
-              url + ":DELETE:" + automate_api_request(
-                "#{url}/#{resp_id}",
+              url + ":DELETE:" + automate_api_request({
+                endpoint: "#{url}/#{resp_id}",
                 http_method: 'DELETE',
                 user: user,
-              ).http_status.to_s == url + ":DELETE:403"
+              }).http_status.to_s == url + ":DELETE:403"
             ).to be(expect_403_response)
           end
 
@@ -270,40 +270,40 @@ control 'authz-access-control-1' do
 
       it "gateway/version returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/version",
+            automate_api_request({
+              endpoint: "/api/v0/version",
               http_method: 'GET',
               user: user,
-            ).http_status == 403
+            }).http_status == 403
           ).to eq(expect_403_for_all_apis)
       end
 
       it "gateway/policy_version returns the correct response code" do
-          policy_version_request = automate_api_request(
-            "/apis/iam/v2/policy_version", # V2 endpoint also used for v1
+          policy_version_request = automate_api_request({
+            endpoint: "/apis/iam/v2/policy_version", # V2 endpoint also used for v1
             http_method: 'GET',
             user: user,
-          )
+          })
           expect(policy_version_request.http_status == 403).to eq(expect_403_for_all_apis)
       end
 
       describe '/api/v0/cfgmgmt/' do
         before(:all) do
-          node_request = automate_api_request(
-            '/data-collector/v0',
+          node_request = automate_api_request({
+            endpoint: '/data-collector/v0',
             http_method: 'POST',
             request_body: {}
-          )
+          })
           # to save time on this test we don't post any data
           # this results int a bad request 
           # but we only care that it doesn't get a 403
           expect(node_request.http_status).to eq 400
 
-          policy_node_request = automate_api_request(
-            '/data-collector/v0',
+          policy_node_request = automate_api_request({
+            endpoint: '/data-collector/v0',
             http_method: 'POST',
             request_body: {}
-          )
+          })
           expect(policy_node_request.http_status).to eq 400
         end
 
@@ -322,11 +322,11 @@ control 'authz-access-control-1' do
         ).each do |url|
           it "#{url} returns the correct response code" do
               expect(
-                automate_api_request(
-                  "/api/v0/cfgmgmt/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/cfgmgmt/#{url}",
                   http_method: 'GET',
                   user: user,
-                ).http_status.to_s
+                }).http_status.to_s
 
                 # in travis, test nodes aren't always created in time, so might get authorized 404 response
               ).to match(/200|404/)
@@ -343,11 +343,11 @@ control 'authz-access-control-1' do
         ).each do |url|
           it "#{url} returns the correct response code" do
               expect(
-                automate_api_request(
-                  "/api/v0/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/#{url}",
                   http_method: 'GET',
                   user: user,
-                ).http_status.to_s
+                }).http_status.to_s
 
                 # eventstrings gives us a 400, but that's ok, it means we've passed authz
               ).to match(/200|400/)
@@ -371,11 +371,11 @@ control 'authz-access-control-1' do
           urls.each do |url|
             it "#{method} #{url} returns the correct response code" do
                 expect(
-                  automate_api_request(
-                    "/api/v0/#{url}",
+                  automate_api_request({
+                    endpoint: "/api/v0/#{url}",
                     http_method: method,
                     user: user,
-                  ).http_status == 403
+                  }).http_status == 403
                 ).to eq(expect_403_for_all_apis)
             end
           end
@@ -404,11 +404,11 @@ control 'authz-access-control-1' do
           urls.each do |url|
             it "#{url} returns the correct response code" do
                 expect(
-                  automate_api_request(
-                    "/api/v0/#{url}",
+                  automate_api_request({
+                    endpoint: "/api/v0/#{url}",
                     http_method: method,
                     user: user,
-                  ).http_status == 403
+                  }).http_status == 403
                 ).to eq(expect_403_for_all_apis)
             end
           end
@@ -435,11 +435,11 @@ control 'authz-access-control-1' do
           urls.each do |url|
             it "#{url} returns the correct response code" do
                 expect(
-                  automate_api_request(
-                    "/api/v0/#{url}",
+                  automate_api_request({
+                    endpoint: "/api/v0/#{url}",
                     http_method: method,
                     user: user,
-                  ).http_status == 403
+                  }).http_status == 403
                 ).to be(expect_403_for_all_apis)
             end
           end
@@ -486,11 +486,11 @@ control 'authz-access-control-1' do
           urls.each do |url|
             it "#{method} #{url} returns the correct response code" do
                 expect(
-                  automate_api_request(
-                    "/api/v0/compliance/#{url}",
+                  automate_api_request({
+                    endpoint: "/api/v0/compliance/#{url}",
                     http_method: method,
                     user: user,
-                  ).http_status == 403
+                  }).http_status == 403
                  # when adding requests, take good care that the URL is correct
                  # -- if it's not, the accepted 404 here can be deceiving
                 ).to be(expect_403_for_all_apis)
@@ -505,37 +505,37 @@ control 'authz-access-control-1' do
       describe 'compliance REST handlers' do
         it "GET reporting/export profiles returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/compliance/reporting/export",
+            automate_api_request({
+              endpoint: "/api/v0/compliance/reporting/export",
               http_method: 'GET',
               user: user,
-            ).http_status
+            }).http_status
 
           ).to eq(400)
         end
 
         it "POST profiles returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/compliance/profiles?owner=OWNER",
+            automate_api_request({
+              endpoint: "/api/v0/compliance/profiles?owner=OWNER",
               http_method: 'POST',
               user: user,
               request_headers: { "Content-type": "application/json" },
               request_body: { name: 'NAME', version: 'VER' }.to_json,
-            ).http_status
+            }).http_status
 
           ).to eq(400)
         end
 
         it "POST profiles/tar returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/compliance/profiles/tar",
+            automate_api_request({
+              endpoint: "/api/v0/compliance/profiles/tar",
               http_method: 'POST',
               user: user,
               request_headers: { "Content-type": "application/json" },
               request_body: { owner: 'OWNER', name: 'NAME', version: 'VER' }.to_json,
-            ).http_status
+            }).http_status
 
           ).to eq(404)
         end
@@ -544,11 +544,11 @@ control 'authz-access-control-1' do
       describe 'telemetry REST handlers' do
         it "GET telemetry/config returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/telemetry/config",
+            automate_api_request({
+              endpoint: "/api/v0/telemetry/config",
               http_method: 'GET',
               user: user,
-            ).http_status
+            }).http_status
 
           ).to eq(200)
         end
@@ -557,11 +557,11 @@ control 'authz-access-control-1' do
       describe '/api/v0/deployment' do
         it "GET deployment/service_versions returns the correct response code" do
             expect(
-              automate_api_request(
-                "/api/v0/deployment/service_versions",
+              automate_api_request({
+                endpoint: "/api/v0/deployment/service_versions",
                 http_method: 'GET',
                 user: user,
-              ).http_status
+              }).http_status
             ).to eq(200)
         end
       end
@@ -569,33 +569,33 @@ control 'authz-access-control-1' do
       describe 'license REST handlers' do
         it "POST license returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/license/apply",
+            automate_api_request({
+              endpoint: "/api/v0/license/apply",
               http_method: 'POST',
               user: user,
-            ).http_status == 403
+            }).http_status == 403
 
           ).to match(expect_403_for_admin_only_apis)
         end
 
         it "GET license/status returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/license/status",
+            automate_api_request({
+              endpoint: "/api/v0/license/status",
               http_method: 'GET',
               user: user,
-            ).http_status == 403
+            }).http_status == 403
 
           ).to match(expect_403_for_all_apis)
         end
 
         it "POST license/request returns the correct response code" do
           expect(
-            automate_api_request(
-              "/api/v0/license/request",
+            automate_api_request({
+              endpoint: "/api/v0/license/request",
               http_method: 'POST',
               user: user,
-            ).http_status == 403
+            }).http_status == 403
 
           ).to match(expect_403_for_admin_only_apis)
         end
@@ -608,13 +608,13 @@ control 'authz-access-control-1' do
     describe 'compliance REST handlers for client calls' do
       it "POST profiles returns the correct response code" do
         expect(
-          automate_client_api_request(
-            "/api/v0/compliance/profiles?owner=OWNER",
-            TEST_TOKEN,
+          automate_client_api_request({
+            endpoint: "/api/v0/compliance/profiles?owner=OWNER",
+            api_token: TEST_TOKEN,
             http_method: 'POST',
             request_headers: { "Content-type": "application/json" },
             request_body: { name: 'NAME', version: 'VER' }.to_json,
-          ).http_status.to_s
+          }).http_status.to_s
 
         ).to match(/400/)
       end
@@ -647,25 +647,25 @@ control 'authz-access-control-iam-v1' do
 
   describe 'AuthZ access control' do
     before(:all) do
-      create_non_admin_request = automate_api_request(
-        '/api/v0/auth/users',
+      create_non_admin_request = automate_api_request({
+        endpoint: '/api/v0/auth/users',
         http_method: 'POST',
         request_body: {
           'name': NON_ADMIN_USERNAME,
           'username': NON_ADMIN_USERNAME,
           'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
         }.to_json
-      )
+      })
       expect(create_non_admin_request.http_status.to_s).to match(/200|409/)
 
-      test_token_request = automate_api_request(
-        '/api/v0/auth/tokens',
+      test_token_request = automate_api_request({
+        endpoint: '/api/v0/auth/tokens',
         http_method: 'POST',
         request_body: {
           'description': 'inspec_test_token',
           'active': true
         }.to_json
-      )
+      })
       TEST_TOKEN_V1 = test_token_request.parsed_response_body[:value]
       TEST_TOKEN_ID_V1= test_token_request.parsed_response_body[:id]
 
@@ -673,16 +673,16 @@ control 'authz-access-control-iam-v1' do
     end
 
     after(:all) do
-      delete_non_admin_request = automate_api_request(
-        "/api/v0/auth/users/#{NON_ADMIN_USERNAME}",
+      delete_non_admin_request = automate_api_request({
+        endpoint: "/api/v0/auth/users/#{NON_ADMIN_USERNAME}",
         http_method: 'DELETE',
-      )
+      })
       expect(delete_non_admin_request.http_status.to_s).to match(/200|404/)
 
-      delete_token_request = automate_api_request(
-        "/api/v0/auth/tokens/#{TEST_TOKEN_ID_V1}",
+      delete_token_request = automate_api_request({
+        endpoint: "/api/v0/auth/tokens/#{TEST_TOKEN_ID_V1}",
         http_method: 'DELETE',
-      )
+      })
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
     end
 
@@ -690,11 +690,11 @@ control 'authz-access-control-iam-v1' do
     describe '/api/v0/compliance/profiles/search as client' do
       it "api/v0/compliance/profiles/search returns the correct response code for client" do
         expect(
-          automate_client_api_request(
-            "/api/v0/compliance/profiles/search",
-            TEST_TOKEN_V1,
+          automate_client_api_request({
+            endpoint: "/api/v0/compliance/profiles/search",
+            api_token: TEST_TOKEN_V1,
             http_method: 'POST'
-          ).http_status
+          }).http_status
         ).to eq(200)
       end
     end
@@ -707,11 +707,11 @@ control 'authz-access-control-iam-v1' do
         { 'GET': 200, 'POST': 400 }.each do |method, status|
           it "#{method} #{url} returns the correct response code for client" do
             expect(
-              automate_client_api_request(
-                url,
-                TEST_TOKEN_V1,
+              automate_client_api_request({
+                endpoint: url,
+                api_token: TEST_TOKEN_V1,
                 http_method: method,
-              ).http_status
+              }).http_status
             ).to eq(status)
           end
         end
@@ -726,12 +726,12 @@ control 'authz-access-control-iam-v1' do
       }.each do |url, body|
         it "#{url} returns the correct response code for client" do
           expect(
-            automate_client_api_request(
-              "/api/v0/ingest/events/chef/#{url}",
-              TEST_TOKEN_V1,
+            automate_client_api_request({
+              endpoint: "/api/v0/ingest/events/chef/#{url}",
+              api_token: TEST_TOKEN_V1,
               http_method: 'POST',
               request_body: body.to_json,
-            ).http_status
+            }).http_status
           ).not_to eq(403)
         end
       end
@@ -741,12 +741,12 @@ control 'authz-access-control-iam-v1' do
     describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
       it "returns the correct response code for client" do
         expect(
-            automate_client_api_request(
-              "/api/v0/ingest/events/chef/node-multiple-deletes",
-              TEST_TOKEN,
+            automate_client_api_request({
+              endpoint: "/api/v0/ingest/events/chef/node-multiple-deletes",
+              api_token: TEST_TOKEN,
               http_method: 'POST',
               request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
-            ).http_status
+            }).http_status
           ).not_to eq(403)
       end
     end
@@ -761,12 +761,12 @@ control 'authz-access-control-iam-v1' do
         }.each do |url, body|
           it "#{url} returns the correct response code for user" do
               expect(
-                automate_api_request(
-                  "/api/v0/ingest/events/chef/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/ingest/events/chef/#{url}",
                   http_method: 'POST',
                   user: user,
                   request_body: body.to_json,
-                ).http_status == 403
+                }).http_status == 403
               ).to be(expect_403_for_client_only_endpoints)
           end
         end
@@ -776,12 +776,12 @@ control 'authz-access-control-iam-v1' do
       describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
         it "returns the correct response code for user" do
             expect(
-              automate_api_request(
-                "/api/v0/ingest/events/chef/node-multiple-deletes",
+              automate_api_request({
+                endpoint: "/api/v0/ingest/events/chef/node-multiple-deletes",
                 http_method: 'POST',
                 user: user,
                 request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
-              ).http_status == 403
+              }).http_status == 403
             ).to be(expect_403_for_admin_only_apis)
         end
       end
@@ -795,11 +795,11 @@ control 'authz-access-control-iam-v1' do
           %w(GET POST).each do |method|
             it "#{method} #{url} returns the correct response code for user" do
                 expect(
-                  automate_api_request(
-                    url,
+                  automate_api_request({
+                    endpoint: url,
                     http_method: method,
                     user: user,
-                  ).http_status == 403
+                  }).http_status == 403
                 ).to be(expect_403_for_client_only_endpoints)
             end
           end
@@ -821,11 +821,11 @@ control 'authz-access-control-iam-v1' do
           urls.each do |url|
             it "#{url} returns the correct response code" do
                 expect(
-                  automate_api_request(
-                    "/api/v0/retention/nodes/#{url}",
+                  automate_api_request({
+                    endpoint: "/api/v0/retention/nodes/#{url}",
                     http_method: method,
                     user: user,
-                  ).http_status == 403
+                  }).http_status == 403
                 ).to be(expect_403_for_admin_only_apis)
             end
           end
@@ -854,3 +854,4 @@ control 'authz-access-control-iam-v1' do
     end
   end
 end
+
