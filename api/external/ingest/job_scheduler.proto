@@ -3,11 +3,11 @@ syntax = "proto3";
 package chef.automate.api.ingest;
 option go_package = "github.com/chef/automate/api/external/ingest";
 
-import "google/api/annotations.proto";
-import "external/annotations/iam/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
-import "external/ingest/response/job_scheduler.proto";
-import "external/ingest/request/job_scheduler.proto";
+import "api/external/ingest/response/job_scheduler.proto";
+import "api/external/ingest/request/job_scheduler.proto";
 
 service JobScheduler {
   rpc GetStatusJobScheduler (ingest.request.GetStatusJobScheduler) returns (ingest.response.JobSchedulerStatus) {

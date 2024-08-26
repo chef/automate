@@ -3,15 +3,15 @@ syntax = "proto3";
 package chef.automate.api.cds;
 option go_package = "github.com/chef/automate/api/external/cds";
 
-import "external/cds/request/root.proto";
-import "external/cds/response/root.proto";
-import "external/common/response.proto";
+import "api/external/cds/request/root.proto";
+import "api/external/cds/response/root.proto";
+import "api/external/common/response.proto";
 
-import "google/protobuf/struct.proto";
-import "google/api/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/struct.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 service Cds {
   /*

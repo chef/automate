@@ -4,10 +4,10 @@ syntax = "proto3";
 package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/interservice/deployment";
 
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
-import "config/deployment/config_request.proto";
-import "config/deployment/automate_config.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/timestamp.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/empty.proto";
+import "api/config/deployment/config_request.proto";
+import "api/config/deployment/automate_config.proto";
 
 service Deployment {
 	rpc Deploy (DeployRequest) returns (DeployResponse);

@@ -16,9 +16,9 @@ syntax = "proto3";
 
 package google.api.servicemanagement.v1;
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/api/client.proto";
-import "google/api/field_behavior.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/googleapis/google/api/field_behavior.proto";
 import "google/api/service.proto";
 import "google/api/servicemanagement/v1/resources.proto";
 import "google/longrunning/operations.proto";
