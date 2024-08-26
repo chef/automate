@@ -15,7 +15,6 @@ The following A2 components may need to be rebuilt depending on the scope of you
 - `components/automate-deployment`
 - `components/automate-workflow-ctl`
 - `components/automate-workflow-server`
-- `components/automate-workflow-web`
 - `components/automate-workflow-nginx`
 
 ## Creating an Enterprise
@@ -80,8 +79,6 @@ check that /etc/hosts has entries for a2-dev.test on both runner and a2 server.
 1. Set the origin for building the nginx package with `export
    vendor_origin=$HAB_ORIGIN` -- this will ensure we build against the
    packages built with your origin.
-
-1. Run `rebuild automate-workflow-web` to build your UI changes.
 
 1. Run `rebuild components/automate-workflow-nginx` to build and install the new UI for Automate 2.
 
