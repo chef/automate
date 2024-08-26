@@ -3,9 +3,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
-import { HttpStatus } from 'app/types/types';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
+import { HttpStatus } from '../../types/types';
 
 import {
   GetDataBags,

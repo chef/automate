@@ -5,19 +5,19 @@ import { identity, isNil, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
-import { Regex } from 'app/helpers/auth/regex';
-import { pending, EntityStatus } from 'app/entities/entities';
-import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeParams } from '../../../route.selectors';
+import { Regex } from '../../../helpers/auth/regex';
+import { pending, EntityStatus } from '../../../entities/entities';
+import { GetToken, UpdateToken } from '../../../entities/api-tokens/api-token.actions';
 import {
   apiTokenFromRoute, getStatus, updateStatus
-} from 'app/entities/api-tokens/api-token.selectors';
-import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { ProjectConstants } from 'app/entities/projects/project.model';
-import { GetProjects } from 'app/entities/projects/project.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/api-tokens/api-token.selectors';
+import { ApiToken } from '../../../entities/api-tokens/api-token.model';
+import { ProjectConstants } from '../../../entities/projects/project.model';
+import { GetProjects } from '../../../entities/projects/project.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
@@ -66,16 +66,16 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(apiTokenFromRoute)
+      this.store.select(apiTokenFromRoute as any)
     ]).pipe(
       filter(([status, token]) => status === EntityStatus.loadingSuccess && !isNil(token)),
       takeUntil(this.isDestroyed))
       .subscribe(([_, token]) => {
         this.token = { ...token };
-        this.updateForm.controls.name.setValue(this.token.name);
+        this.updateForm.controls['name'].setValue(this.token.name);
         this.status = this.token.active ? 'active' : 'inactive';
-        this.updateForm.controls.status.setValue(this.status);
-        this.updateForm.controls.projects.setValue(this.token.projects);
+        this.updateForm.controls['status'].setValue(this.status);
+        this.updateForm.controls['projects'].setValue(this.token.projects);
         this.store.dispatch(new GetProjects());
       });
 
@@ -100,27 +100,27 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public saveToken(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const name: string = this.updateForm.controls.name.value.trim();
-    const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
-    const projects: string[] = this.updateForm.controls.projects.value;
+    const name: string = this.updateForm.controls['name'].value.trim();
+    const active = <TokenStatus>this.updateForm.controls['status'].value === 'active';
+    const projects: string[] = this.updateForm.controls['projects'].value;
     this.store.dispatch(new UpdateToken({...this.token, name, active, projects }));
     this.telemetryService.track('Settings_APItokens_Details_Save');
   }
 
   public get nameCtrl(): FormControl {
-    return <FormControl>this.updateForm.controls.name;
+    return <FormControl>this.updateForm.controls['name'];
   }
 
-  onProjectDropdownClosing(selectedProjects: string[]): void {
+  onProjectDropdownClosing(selectedProjects): void {
 
-    this.updateForm.controls.projects.setValue(selectedProjects);
+    this.updateForm.controls['projects'].setValue(selectedProjects);
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    if (xor(this.token.projects, this.updateForm.controls.projects.value).length === 0) {
-      this.updateForm.controls.projects.markAsPristine();
+    if (xor(this.token.projects, this.updateForm.controls['projects'].value).length === 0) {
+      this.updateForm.controls['projects'].markAsPristine();
     } else {
-      this.updateForm.controls.projects.markAsDirty();
+      this.updateForm.controls['projects'].markAsDirty();
     }
   }
 }

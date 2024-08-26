@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../../styles/variables";
 
 .constraint-margin {
   display: flex;
@@ -198,18 +198,21 @@ span.example-text {
 
 .checkmark:before {
   display: inline-block;
-  content: 'L';
+  content: "L";
   font-family: arial;
   transform: scaleX(-1) rotate(-35deg);
   vertical-align: top;
   line-height: 1em;
-  width: 13.71px;
-  color: $chef-primary-dark;
-  height: 13.09px;
-  margin-right: 1.3em;
+  width: 2rem;
+  color: #fff;
+  height: 2rem;
+  margin-right: 1rem;
   text-align: center;
   position: absolute;
   right: 0;
+  top: 0.75rem;
+  z-index: 1;
+  font-size: 1rem;
 }
 
 
@@ -218,7 +221,8 @@ span.example-text {
 }
 
 ::ng-deep .chef-dropdown {
-  margin-top: 31px;
+  margin-top: 5px;
+  right: 0.125rem !important;
 
   .mat-option {
     line-height: 3em;

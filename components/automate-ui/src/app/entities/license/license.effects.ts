@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { find } from 'lodash';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';

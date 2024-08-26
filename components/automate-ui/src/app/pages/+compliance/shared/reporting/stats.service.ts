@@ -7,8 +7,8 @@ import * as moment from 'moment/moment';
 import { omitBy, isNil } from 'lodash';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
-import { AppConfigService } from 'app/services/app-config/app-config.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { AppConfigService } from '../../../../services/app-config/app-config.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 const CC_API_URL = environment.compliance_url;
 

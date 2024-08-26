@@ -7,10 +7,10 @@ export class ChefValidators {
   public static matchFieldValidator(otherField: string) {
     return (control: FormControl): { [key: string]: any } => {
       if (!control.root || !(<FormGroup>control.root).controls) {
-        return null;
+        return null as any;
       }
       const valid = control.value === (<FormGroup>control.root).controls[otherField].value;
-      return valid ? null : {
+      return valid ? null as any : {
         'noMatch': { value: control }
       };
     };
@@ -21,7 +21,7 @@ export class ChefValidators {
     return (control: FormControl): { [key: string]: any } => {
       // Don't error if we are in admin view.
       if (isAdminView) {
-        return null;
+        return null as any;
       }
       if (!control.value) {
         return { 'required': { value: control } };
@@ -29,7 +29,7 @@ export class ChefValidators {
       if (control.value.length < minLength) {
         return { 'minlength': { value: control } };
       }
-      return null;
+      return null as any;
     };
   }
 }

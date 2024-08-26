@@ -1,26 +1,26 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { HttpStatus } from 'app/types/types';
-import { loading, EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ProjectStatus } from 'app/entities/rules/rule.model';
-import { ProjectService } from 'app/entities/projects/project.service';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { Regex } from '../../../helpers/auth/regex';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { HttpStatus } from '../../../types/types';
+import { loading, EntityStatus } from '../../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { ProjectStatus } from '../../../entities/rules/rule.model';
+import { ProjectService } from '../../../entities/projects/project.service';
 import {
   allProjects, getAllStatus, createStatus, createError
-} from 'app/entities/projects/project.selectors';
-import { GetProjects, CreateProject, DeleteProject, ProjectPayload  } from 'app/entities/projects/project.actions';
-import { Project } from 'app/entities/projects/project.model';
-import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/projects/project.selectors';
+import { GetProjects, CreateProject, DeleteProject, ProjectPayload  } from '../../../entities/projects/project.actions';
+import { Project } from '../../../entities/projects/project.model';
+import { LoadOptions } from '../../../services/projects-filter/projects-filter.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-project-list',

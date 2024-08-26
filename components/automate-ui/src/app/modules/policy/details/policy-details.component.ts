@@ -1,22 +1,22 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store } from '@ngrx/store';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 import { Subject, combineLatest } from 'rxjs';
 
-import { EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeURL, routeState } from 'app/route.selectors';
-import { GetPolicy } from 'app/entities/policies/policy.actions';
-import { policyFromRoute, getStatus } from 'app/entities/policies/policy.selectors';
+import { EntityStatus } from '../../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeURL, routeState } from '../../../route.selectors';
+import { GetPolicy } from '../../../entities/policies/policy.actions';
+import { policyFromRoute, getStatus } from '../../../entities/policies/policy.selectors';
 import {
   Policy, Member, Type, stringToMember
-} from 'app/entities/policies/policy.model';
-import { RemovePolicyMembers } from 'app/entities/policies/policy.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/policies/policy.model';
+import { RemovePolicyMembers } from '../../../entities/policies/policy.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 export type PolicyTabName = 'definition' | 'members';
 
@@ -59,7 +59,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(policyFromRoute)
+      this.store.select(policyFromRoute as any)
     ]).pipe(
       filter(([status, _]) => status === EntityStatus.loadingSuccess),
       filter(([_, state]) => !isNil(state)),
@@ -93,7 +93,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map(state => [state.params.id as string, state.url]),
+      map(state => [state.params['id'] as string, state.url]),
       // Only fetch if we are on the policy details route, otherwise
       // we'll trigger GetPolicy with the wrong input on any route
       // away to a page that also uses the :id param.
@@ -123,7 +123,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
     this.telemetryService.track('Settings_Policies_Members_RemoveMember');
   }
 
-  onSelectedTab(event: { target: { value: PolicyTabName } } ): void {
+  onSelectedTab(event): void {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });

@@ -33,7 +33,7 @@ export class CalendarComponent {
   }
 
   @Input()
-  set date(input) {
+  set date(input: any) {
     const date = moment.isMoment(input) ? input : moment.utc(input);
     this._date = date;
     this._month = moment.months(date.month());
@@ -44,7 +44,7 @@ export class CalendarComponent {
   }
 
   @Input()
-  set selected(input) {
+  set selected(input: any) {
     const date = moment.isMoment(input) ? input : moment.utc(input);
     this._selected = date;
   }
@@ -65,7 +65,7 @@ export class CalendarComponent {
   }
 
   @Input()
-  set year(input: number) {
+  set year(input: number | string) {
     this._year = parseInt(input.toString(), 10);
     this.date.year(this._year);
   }

@@ -76,8 +76,8 @@ export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     this.setOriginalValue();
 
-    this.control.valueChanges
-      .pipe(
+    this.control?.valueChanges
+      ?.pipe(
         takeUntil(this.isDestroyed),
         distinctUntilChanged()
       )
@@ -101,8 +101,8 @@ export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.resetOrigin) {
-      const resetRequested: boolean = changes.resetOrigin.currentValue;
+    if (changes['resetOrigin']) {
+      const resetRequested: boolean = changes['resetOrigin'].currentValue;
       if (resetRequested) {
         this.setOriginalValue();
         this.control.reset(this.originalValue);

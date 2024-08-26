@@ -6,12 +6,12 @@ export const layoutState = createFeatureSelector<LayoutEntityState>('layout');
 
 export const sidebar = createSelector(
   layoutState,
-  (layout) => {
+  (layout: any) => {
     return layout.sidebars[layout.sidebars.active];
   }
 );
 
 export const showPageLoading = createSelector(
     layoutState,
-    (layout) => layout.showPageLoading
+    (layout) => layout?.showPageLoading
   );

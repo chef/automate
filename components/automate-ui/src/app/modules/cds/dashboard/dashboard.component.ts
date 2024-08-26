@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { LayoutFacadeService } from '../../../entities/layout/layout.facade';
+import { ChefSessionService } from '../../../services/chef-session/chef-session.service';
 
 import {
   IsContentEnabled,
@@ -12,17 +12,17 @@ import {
   InstallContentItem,
   DownloadContentItem,
   SubmitCredentials
-} from 'app/entities/cds/cds.actions';
+} from '../../../entities/cds/cds.actions';
 
 import {
   contentItems,
   contentEnabled
-} from 'app/entities/cds/cds.selectors';
+} from '../../../entities/cds/cds.selectors';
 
 import {
   ContentItem,
   Credentials
-} from 'app/entities/cds/cds.model';
+} from '../../../entities/cds/cds.model';
 
 @Component({
   selector: 'app-desktop-dashboard',

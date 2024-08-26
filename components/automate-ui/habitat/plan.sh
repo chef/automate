@@ -16,7 +16,7 @@ pkg_deps=(
 pkg_build_deps=(
   core/git
   core/make
-  core/node14/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  core/node18/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
   core/rsync
 )
 pkg_exports=(
@@ -59,6 +59,7 @@ fix_interpreters() {
 do_build() {
   # Disabling Usage Analytics
   export NG_CLI_ANALYTICS=false
+  export IBM_TELEMETRY_DISABLED='true'
 
   echo "Building $CACHE_PATH/chef-ui-library"
   pushd "$CACHE_PATH/chef-ui-library"
@@ -75,6 +76,7 @@ do_build() {
     npm_install @angular/cli
 
     fix_interpreters
+    npm run install:ui-library
     npm run build:prod
 
     npm uninstall @angular/cli --no-save

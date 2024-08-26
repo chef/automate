@@ -3,14 +3,14 @@ import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
-import { allUsers, getStatus } from 'app/entities/users/user.selectors';
-import { DeleteUser, GetUsers } from 'app/entities/users/user.actions';
-import { User } from 'app/entities/users/user.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { EntityStatus } from '../../../entities/entities';
+import { allUsers, getStatus } from '../../../entities/users/user.selectors';
+import { DeleteUser, GetUsers } from '../../../entities/users/user.actions';
+import { User } from '../../../entities/users/user.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-user-management',

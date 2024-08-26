@@ -4,19 +4,19 @@ import { Params } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams, previousRoute } from 'app/route.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { EntityStatus } from 'app/entities/entities';
-import { Org } from 'app/entities/orgs/org.model';
+import { NgrxStateAtom, RouterState } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { routeParams, previousRoute } from '../../../route.selectors';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from '../../../services/feature-flags/feature-flags.service';
+import { EntityStatus } from '../../../entities/entities';
+import { Org } from '../../../entities/orgs/org.model';
 import { ActivatedRoute } from '@angular/router';
 import {
   getStatus, orgFromRoute
-} from 'app/entities/orgs/org.selectors';
-import { GetOrg } from 'app/entities/orgs/org.actions';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+} from '../../../entities/orgs/org.selectors';
+import { GetOrg } from '../../../entities/orgs/org.actions';
+import { ProjectConstants } from '../../../entities/projects/project.model';
 
 const ORG_DETAILS_TAB_NAME = 'orgDetailsTab';
 
@@ -64,7 +64,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.redirect = data.redirect);
       // condition for breadcrumb to select specific tab
       this.previousRoute$.subscribe((params: Params) => {
-        const path: string[] = params.path;
+        const path: string[] = params.url;
         if (path.includes('roles')) {
           this.resetTabs();
           this.rolesTab = true;
@@ -115,7 +115,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(orgFromRoute)
+      this.store.select(orgFromRoute as any)
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),

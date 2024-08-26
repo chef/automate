@@ -1,6 +1,6 @@
 import { set, pipe } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { UserSelfActionTypes, UserSelfActions } from './userself.actions';
 import { SelfUser } from './userself.model';
 
@@ -19,7 +19,7 @@ export const UserSelfEntityInitialState: UserSelfEntityState = {
 };
 
 export function userSelfEntityReducer(state: UserSelfEntityState = UserSelfEntityInitialState,
-  action: UserSelfActions): UserSelfEntityState {
+  action: UserSelfActions | any): UserSelfEntityState {
 
   switch (action.type) {
     case UserSelfActionTypes.SET_ID:

@@ -1,6 +1,6 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 
-import { routeParams } from 'app/route.selectors';
+import { routeParams } from '../../route.selectors';
 import { OrgEntityState, orgEntityAdapter } from './org.reducer';
 
 export const orgState = createFeatureSelector<OrgEntityState>('orgs');

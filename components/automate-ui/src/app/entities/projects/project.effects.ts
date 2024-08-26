@@ -6,11 +6,11 @@ import { interval as observableInterval, of as observableOf, Observable } from '
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
 import { get } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { HttpStatus } from 'app/types/types';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
-import { allPerms } from 'app/entities/userperms/userperms.selectors';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { HttpStatus } from '../../types/types';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
+import { allPerms } from '../../entities/userperms/userperms.selectors';
 import { ProjectRequests } from './project.requests';
 
 import {
@@ -45,7 +45,7 @@ import {
 } from './project.actions';
 import {
   LoadOptions
-} from 'app/services/projects-filter/projects-filter.actions';
+} from '../../services/projects-filter/projects-filter.actions';
 import { applyRulesStatus } from './project.selectors';
 import { ApplyRulesStatusState } from './project.reducer';
 

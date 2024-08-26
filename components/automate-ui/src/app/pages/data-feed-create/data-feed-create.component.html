@@ -14,7 +14,7 @@
   <app-notification
     *ngIf="notificationShow"
     type="{{notificationType}}"
-    timeout="5"
+    [timeout]="5"
     (dismissed)="dismissNotification()">
     <span>{{notificationMessage}}</span>
   </app-notification>
@@ -109,7 +109,7 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showAuthDropdown()">
+        <div class="input-margin display-block" *ngIf="showAuthDropdown()">
           <div class="name-margin">
             <label for="version">Authentication</label>
             <div class="version-dropdown">
@@ -251,7 +251,7 @@
                     id="headers-input"
                     placeholder="key:value"
                     autocomplete="off"
-                    (input)="validateHeaders($event.target.value)"
+                    (input)="validateHeaders($event)"
                     rows="5"
                     ></textarea>
                 </div>

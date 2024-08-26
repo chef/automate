@@ -10,23 +10,23 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { GetRoles, DeleteRole } from 'app/entities/infra-roles/infra-role.action';
-import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { GetRoles, DeleteRole } from '../../../entities/infra-roles/infra-role.action';
+import { InfraRole } from '../../../entities/infra-roles/infra-role.model';
 import {
   getAllStatus,
   roleList,
   deleteStatus
-} from 'app/entities/infra-roles/infra-role.selectors';
-import { GetRecipes } from 'app/entities/recipes/recipe.action';
+} from '../../../entities/infra-roles/infra-role.selectors';
+import { GetRecipes } from '../../../entities/recipes/recipe.action';
 import {
   allRecipes,
   getAllStatus as getAllRecipesForOrgStatus
-} from 'app/entities/recipes/recipe.selectors';
-import { EntityStatus } from 'app/entities/entities';
-import { Regex } from 'app/helpers/auth/regex';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/recipes/recipe.selectors';
+import { EntityStatus } from '../../../entities/entities';
+import { Regex } from '../../../helpers/auth/regex';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 export interface AvailableType {
   name: string;
@@ -58,7 +58,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public roleToDelete: InfraRole;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
-  public openRoleModal = new EventEmitter<boolean>();
+  public openRoleModal = new EventEmitter<any>();
   public recipes: any;
   public deleting = true;
 
@@ -116,7 +116,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     this.telemetryService.track('InfraServer_Roles_Search');
   }
 
-  onPageChange(event: number): void {
+  onPageChange(event: number | any): void {
     this.currentPage = event;
     this.loading = true;
     this.getRolesData();

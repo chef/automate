@@ -1,6 +1,7 @@
-@import "~styles/variables";
-@import "@carbon/layout/scss/layout";
-@import "@carbon/grid/scss/grid";
+@use "@carbon/grid" as cg;
+@import "@carbon/layout";
+@import "../../styles/variables";
+@include cg.flex-grid();
 
 :host {
   display: flex;
@@ -12,22 +13,22 @@
 
   // desktop styles
   &.forDesktop {
-    @extend .bx--grid;
+    @extend .cds--grid;
     justify-content: space-between;
     background: $chef-white;
     padding-left: 0;
     padding-right: 0;
 
-    .bx--row {
+    .cds--row {
       margin-left: 0;
       margin-right: 0;
       width: 100%;
     }
 
     .column {
-      @extend .bx--col-lg-8;
-      @extend .bx--col-md-4;
-      @extend .bx--col-sm-4;
+      @extend .cds--col-lg-8;
+      @extend .cds--col-md-4;
+      @extend .cds--col-sm-4;
       display: flex;
       padding-left: 0;
       padding-right: 0;
@@ -35,7 +36,7 @@
       &--2 {
         justify-content: flex-end;
 
-        @include carbon--breakpoint-down(md) {
+        @include cg.breakpoint-down(md) {
           margin-top: 15px;
         }
       }
@@ -88,7 +89,7 @@
       .per-page-container {
         display: flex;
 
-        @include carbon--breakpoint-down(lg) {
+        @include cg.breakpoint-down(lg) {
           display: none;
         }
       }

@@ -4,9 +4,9 @@ import { isEmpty, isArray, pipe } from 'lodash/fp';
 import { takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { AuthorizedChecker, CheckObj } from 'app/helpers/auth/authorized';
-import { allPerms } from 'app/entities/userperms/userperms.selectors';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { AuthorizedChecker, CheckObj } from '../../helpers/auth/authorized';
+import { allPerms } from '../../entities/userperms/userperms.selectors';
 
 // Data arrives in this form for user convenience,
 // i.e. just [allOf]="['/apis/iam/v2/users', 'get']
@@ -29,17 +29,17 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
   private _anyOf: CheckObj[] = [];
 
   @Input()
-  set allOf(val: Check[] | Check) {
+  set allOf(val) {
     this._allOf = val ? this.normalizeInput(val) : [];
   }
 
   @Input()
-  set anyOf(val: Check[] | Check) {
+  set anyOf(val) {
     this._anyOf = val ? this.normalizeInput(val) : [];
   }
 
   // Include the bare `not` attribute in your HTML element to negate the check.
-  @Input() not?: boolean;
+  @Input() not?: any;
 
   // if you wish to output visible
   @Output() isAuthorized: EventEmitter<boolean> = new EventEmitter();
@@ -64,7 +64,7 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
       filter(perms => !isEmpty(perms)))
       .subscribe(perms => {
         const oldVisible = this.visible;
-        const newVisible = this.authorizedChecker.evalPerms(perms);
+        const newVisible = this.authorizedChecker.evalPerms(perms as any);
         this.visible = this.not === undefined ? newVisible : !newVisible;
         this.isAuthorized.emit(this.visible);
 

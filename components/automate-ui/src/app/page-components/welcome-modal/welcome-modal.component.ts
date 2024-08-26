@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LocalStorageService } from 'app/services/storage/localstorage.service';
-import { SessionStorageService } from 'app/services/storage/sessionstorage.service';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-import { pendingState } from 'app/entities/entities';
-import { TriggerWelcomeStatus } from 'app/entities/license/license.model';
-import { triggerWelcome } from 'app/entities/license/license.selectors';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { LocalStorageService } from '../../services/storage/localstorage.service';
+import { SessionStorageService } from '../../services/storage/sessionstorage.service';
+import { ChefSessionService } from '../../services/chef-session/chef-session.service';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { pendingState } from '../../entities/entities';
+import { TriggerWelcomeStatus } from '../../entities/license/license.model';
+import { triggerWelcome } from '../../entities/license/license.selectors';
 
 // Local storage keys
 //// Stores the value set by WelcomeModalComponent.showAtStartPref

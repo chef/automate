@@ -1,32 +1,32 @@
 import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subject } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
-import { HttpStatus, SortDirection } from 'app/types/types';
-import { loading, EntityStatus, pending } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { Destination } from 'app/entities/destinations/destination.model';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { Regex } from '../../helpers/auth/regex';
+import { HttpStatus, SortDirection } from '../../types/types';
+import { loading, EntityStatus, pending } from '../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
+import { Destination } from '../../entities/destinations/destination.model';
 import {
   allDestinations,
   getStatus,
   saveStatus,
   saveError
-} from 'app/entities/destinations/destination.selectors';
+} from '../../entities/destinations/destination.selectors';
 import {
   CreateDestination,
   GetDestinations,
   DeleteDestination,
   TestDestination,
   CreateDestinationPayload
-} from 'app/entities/destinations/destination.actions';
+} from '../../entities/destinations/destination.actions';
 
-import { DestinationRequests } from 'app/entities/destinations/destination.requests';
+import { DestinationRequests } from '../../entities/destinations/destination.requests';
 import {
   AuthTypes,
   DataFeedCreateComponent,
@@ -178,7 +178,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   }
 
 
-  public sendTestForDataFeed(event: {name: string, auth: string, region: string}): void {
+  public sendTestForDataFeed(event: {name: string, auth: string, region: string} | any): void {
     let testConnectionObservable: Observable<Object> = null;
 
     switch (event.name) {
@@ -280,7 +280,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.createChild.slidePanel();
   }
 
-  public saveDestination(event: {name: string, auth: string, region: string}) {
+  public saveDestination(event: {name: string, auth: string, region: string} | any) {
 
     let destinationObj: CreateDestinationPayload,
         headers: string,

@@ -2,12 +2,10 @@
 // cause side effects we need to disable that rule in this case.
 /* tslint:disable:no-import-side-effect */
 import '@stencil/router';
-import '@stencil/redux';
 /* tslint:enable:no-import-side-effect */
 
-import { Component, Prop, h } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 
-import { configureStore } from './store';
 import { getDocs } from './entities/docs/doc.actions';
 
 @Component({
@@ -15,19 +13,8 @@ import { getDocs } from './entities/docs/doc.actions';
 })
 export class ChefLibraryApp {
 
-  @Prop({ context: 'store' }) store;
-
-  getDocs: typeof getDocs;
-
-  componentWillLoad() {
-    this.store.setStore(configureStore({}));
-    this.store.mapDispatchToProps(this, {
-      getDocs
-    });
-  }
-
   componentDidLoad() {
-    this.getDocs();
+    getDocs();
   }
 
   render() {

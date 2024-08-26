@@ -67,6 +67,7 @@ allowed_licenses:
 - Apache-1.1
 - Apache-2.0
 - Artistic-2.0
+- BlueOak-1.0.0
 - BSD-2-Clause
 - BSD-3-Clause
 - BSD-3-Clause-Attribution
@@ -890,6 +891,21 @@ fallbacks:
   - name: rrule
     license_id: BSD-3-Clause
     license_content: https://raw.githubusercontent.com/jakubroztocil/rrule/master/LICENCE
+  - name: chownr
+    license_id: BlueOak-1.0.0
+    license_content: https://raw.githubusercontent.com/isaacs/chownr/main/LICENSE.md
+  - name: jackspeak
+    license_id: BlueOak-1.0.0
+    license_content: https://raw.githubusercontent.com/isaacs/jackspeak/main/LICENSE.md
+  - name: package-json-from-dist
+    license_id: BlueOak-1.0.0
+    license_content: https://raw.githubusercontent.com/isaacs/package-json-from-dist/main/LICENSE.md
+  - name: path-scurry
+    license_id: BlueOak-1.0.0
+    license_content: https://raw.githubusercontent.com/isaacs/path-scurry/main/LICENSE.md
+  - name: yallist
+    license_id: BlueOak-1.0.0
+    license_content: https://raw.githubusercontent.com/isaacs/yallist/main/LICENSE.md
   ruby:
   - name: syslog-logger
     license_id: MIT
@@ -1029,4 +1045,3 @@ exceptions:
   nodejs:
   - name: jschardet
     reason: Exception made by Chef Legal
-

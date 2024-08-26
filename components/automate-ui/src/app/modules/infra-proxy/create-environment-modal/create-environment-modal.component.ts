@@ -9,25 +9,25 @@ import { Subject, combineLatest } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
 import {  takeUntil, filter } from 'rxjs/operators';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { Regex } from '../../../helpers/auth/regex';
 import {
     saveStatus,
     saveError
-} from 'app/entities/environments/environment.selectors';
+} from '../../../entities/environments/environment.selectors';
 import { isNil } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
-import { HttpStatus } from 'app/types/types';
-import { Environment } from 'app/entities/environments/environment.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
-import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
+import { EntityStatus } from '../../../entities/entities';
+import { HttpStatus } from '../../../types/types';
+import { Environment } from '../../../entities/environments/environment.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { GetCookbooks } from '../../../entities/cookbooks/cookbook.actions';
+import { Cookbook } from '../../../entities/cookbooks/cookbook.model';
 import {
   allCookbooks,
   getAllStatus as getAllCookbooksForOrgStatus
-} from 'app/entities/cookbooks/cookbook.selectors';
-import { CreateEnvironment, GetEnvironments, GetEnvironmentsPayload, CreateEnvironmentPayload } from 'app/entities/environments/environment.action';
-import { Utilities } from 'app/helpers/utilities/utilities';
+} from '../../../entities/cookbooks/cookbook.selectors';
+import { CreateEnvironment, GetEnvironments, GetEnvironmentsPayload, CreateEnvironmentPayload } from '../../../entities/environments/environment.action';
+import { Utilities } from '../../../helpers/utilities/utilities';
 
 const CREATE_TAB_NAME = 'environmentTab';
 
@@ -204,7 +204,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.conflictError = false;
   }
 
-  onChangeDefaultJson(event: { target: { value: string } } ) {
+  onChangeDefaultJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);
@@ -214,7 +214,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  onChangeOverrideJson(event: { target: { value: string } } ) {
+  onChangeOverrideJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);

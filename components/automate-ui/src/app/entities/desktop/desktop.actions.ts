@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { NodeRun } from 'app/types/types';
+import { NodeRun } from '../../types/types';
 import { DailyCheckInCountCollection, NodeRunsDailyStatusCollection,
   TopErrorsCollection, CountedDurationCollection, Desktop, TermFilter,
   PageSizeChangeEvent, NodeMetadataCount, DesktopColumnOptionUpdate } from './desktop.model';

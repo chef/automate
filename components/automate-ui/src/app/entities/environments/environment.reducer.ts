@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe, unset } from 'lodash/fp';
 import { HttpErrorResponse } from '@angular/common/http';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { EnvironmentActionTypes, EnvironmentActions } from './environment.action';
 import { Environment } from './environment.model';
 
@@ -35,7 +35,7 @@ export const EnvironmentEntityInitialState: EnvironmentEntityState =
 
 export function environmentEntityReducer(
   state: EnvironmentEntityState = EnvironmentEntityInitialState,
-  action: EnvironmentActions): EnvironmentEntityState {
+  action: EnvironmentActions | any): EnvironmentEntityState {
 
   switch (action.type) {
     case EnvironmentActionTypes.GET_ALL:

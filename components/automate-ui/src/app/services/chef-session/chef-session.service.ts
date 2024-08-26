@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angular/common/http';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
 import { map, mergeMap, filter, retryWhen, delay, catchError } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 import { BroadcastChannel } from 'broadcast-channel';
 
-import { environment } from 'environments/environment';
-import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
-import { SetUserSelfID } from 'app/entities/users/userself.actions';
-import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { environment } from '../../../environments/environment';
+import { Jwt, IDToken } from '../../helpers/jwt/jwt';
+import { SetUserSelfID } from '../../entities/users/userself.actions';
+import { AppConfigService } from '../app-config/app-config.service';
 
 import { UserPreferencesService } from '../user-preferences/user-preferences.service';
 import { UISettings } from '../user-preferences/signin-ui-settings';
@@ -37,7 +37,7 @@ const HTTP_STATUS_UNAUTHORIZED = 401;
 // of a hack. Something created for the purpose of route-guarding alone would
 // be better, and a good refactoring opportunity.
 @Injectable()
-export class ChefSessionService implements CanActivate {
+export class ChefSessionService {
   private user: ChefSessionUser;
   private httpHandler: HttpClient;
   private isRefreshing: boolean;
@@ -140,7 +140,7 @@ export class ChefSessionService implements CanActivate {
 
   callIdleTimeout(): void {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
-    this.idleTimeout = this.appConfigService.idleTimeout;
+    this.idleTimeout = this.appConfigService.idleTimeout || 0;
 
     console.log(this.appConfigService.isIdleTimeoutEnabled, 'this.appConfigService.isIdleTimeoutEnabled');
 
@@ -186,8 +186,8 @@ export class ChefSessionService implements CanActivate {
     if (!this.hasSession()) {
       return;
     }
-    this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
-    this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey) || "");
+    this.user.telemetry_enabled = this.fetchTelemetryPreference() || false;
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
     this.initializeUserPreference(this.user);
   }
@@ -208,7 +208,7 @@ export class ChefSessionService implements CanActivate {
       id_token,
       isLocalUser
     };
-    this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.user.telemetry_enabled = this.fetchTelemetryPreference() || false;
     this.initializeUserPreference(this.user);
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
@@ -268,8 +268,15 @@ export class ChefSessionService implements CanActivate {
     let idleTime = 0;
     const broadcastChannel = new BroadcastChannel('tabsCheckForIdleTimeout');
 
+    const timerIncrement = () => {
+      idleTime = idleTime + 1;
+      if (idleTime === idleTimeout + 1) {
+          this.logout();
+      }
+    }
+
     // Increment the idle time counter after every minute.
-    setInterval(timerIncrement.bind(this), 60 * 1000);
+    setInterval(timerIncrement, 60 * 1000);
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
     window.onmousedown = resetTimer;  // catches touchscreen presses as well
@@ -289,12 +296,7 @@ export class ChefSessionService implements CanActivate {
       idleTime = 0;
     }
 
-    function timerIncrement() {
-      idleTime = idleTime + 1;
-      if (idleTime === idleTimeout + 1) {
-          this.logout();
-      }
-    }
+    
   }
 
   // TODO(sr) 2019/08/26: I don't think we should use these global variables.
@@ -324,11 +326,11 @@ export class ChefSessionService implements CanActivate {
     if (this.user) {
       return this.user.id_token;
     }
-    return null;
+    return "";
   }
 
   get connector(): string {
-    return this.user.connector;
+    return this.user?.connector || "";
   }
 
   get token_provider(): ReplaySubject<string> {
@@ -336,7 +338,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   get telemetry_enabled(): boolean {
-    return this.user.telemetry_enabled;
+    return this.user.telemetry_enabled || false;
   }
 
   get uuid(): string {
@@ -345,7 +347,7 @@ export class ChefSessionService implements CanActivate {
 
   public fetchTelemetryPreference(): boolean | null {
     let telemetryEnabled: boolean | null;
-    const telemStored = localStorage.getItem(this.userTelemetryStorageKey());
+    const telemStored = localStorage.getItem(this.userTelemetryStorageKey()) || "";
     if (isNull(telemStored)) {
       telemetryEnabled = null;
     } else {
@@ -355,7 +357,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   public userWelcomeModalSeenKey(): string {
-    return !isNil(this.user) ? `${this.uuid}-${this.MODAL_HAS_BEEN_SEEN_KEY}` : null;
+    return !isNil(this.user) ? `${this.uuid}-${this.MODAL_HAS_BEEN_SEEN_KEY}` : "";
   }
 
   private userTelemetryStorageKey(): string {
@@ -363,7 +365,7 @@ export class ChefSessionService implements CanActivate {
     if (isNull(telemetryStorage)) {
       localStorage.setItem(`${this.uuid}-telemetry-enabled`, this.booleanToString(true));
     }
-    return !isNil(this.user) ? `${this.uuid}-telemetry-enabled` : null;
+    return !isNil(this.user) ? `${this.uuid}-telemetry-enabled` : "";
   }
 
   private booleanToString(bool: boolean): string {
@@ -385,13 +387,13 @@ export class ChefSessionService implements CanActivate {
   }
 
   initializeUserPreference(user) {
-    const id: IDToken = Jwt.parseIDToken(user.id_token);
+    const id: IDToken | null = Jwt.parseIDToken(user.id_token);
     if (id && id.federated_claims) {
       user.connector = id.federated_claims.connector_id;
       this.userPrefService.apiEndpoint = '/' + user.username + '/' + user.connector;
       if (!this.userPrefService.uiSettings) {
         const uiSettings = new UISettings();
-        this.userPrefService.uiSettings = uiSettings[this.user.connector];
+        this.userPrefService.uiSettings = uiSettings[this.user.connector || ""];
       }
     }
   }

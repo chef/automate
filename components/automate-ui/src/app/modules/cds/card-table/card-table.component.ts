@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { ContentItem } from 'app/entities/cds/cds.model';
+import { ContentItem } from '../../../entities/cds/cds.model';
 import { reduce, first, tail, concat, isEmpty, reverse } from 'lodash/fp';
 
 @Component({

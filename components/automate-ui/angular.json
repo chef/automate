@@ -7,16 +7,30 @@
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
+      "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "moment",
+              "lodash",
+              "lodash/fp",
+              "file-saver",
+              "sniffr",
+              "fp-ts/lib/Option",
+              "fp-ts/lib/pipeable",
+              "hogan.js"
+            ],
             "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
+            "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
               "src/favicon.ico"
@@ -24,12 +38,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [
-              "src/modernizr-custom.js"
-            ],
-            "allowedCommonJsDependencies": [
-              "hogan.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "no_auth": {
@@ -49,132 +58,108 @@
             "production": {
               "budgets": [
                 {
+                  "type": "initial",
+                  "maximumWarning": "4mb"
+                },
+                {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "500kb"
                 }
               ],
-              "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
                 }
               ]
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "automate-ui:build"
+            "buildTarget": "automate-ui:build"
           },
           "configurations": {
             "prod": {
-              "browserTarget": "automate-ui:build:prod"
+              "buildTarget": "automate-ui:build:prod"
             },
             "no_auth": {
-              "browserTarget": "automate-ui:build:no_auth",
-              "baseHref": "/"
+              "buildTarget": "automate-ui:build:no_auth"
             },
             "production": {
-              "browserTarget": "automate-ui:build:production"
+              "buildTarget": "automate-ui:build:production"
             },
             "e2e": {
-              "browserTarget": "automate-ui:build:no_auth",
+              "buildTarget": "automate-ui:build:no_auth",
               "proxyConfig": "./proxy.conf.e2e.json"
+            },
+            "development": {
+              "buildTarget": "automate-ui:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "automate-ui:build"
+            "buildTarget": "automate-ui:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-              "src/modernizr-custom.js"
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
             ],
-            "assets": [
-              "src/assets",
-              "src/favicon.ico"
-            ]
-          },
-          "configurations": {
-            "no_auth": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.no_auth.ts"
-                }
-              ]
-            }
+            "scripts": []
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
-    "automate-ui-e2e": {
-      "root": "e2e",
-      "sourceRoot": "e2e",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "automate-ui:serve:e2e"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
       }
     }
   },
-  "defaultProject": "automate-ui",
   "schematics": {
     "@schematics/angular:component": {
-      "prefix": "app",
-      "style": "scss"
+      "style": "scss",
+      "standalone": false
     },
     "@schematics/angular:directive": {
-      "prefix": "app"
+      "standalone": false
+    },
+    "@schematics/angular:pipe": {
+      "standalone": false
     }
+  },
+  "cli": {
+    "analytics": false,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

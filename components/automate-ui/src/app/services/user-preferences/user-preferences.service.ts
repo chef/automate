@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Store } from '@ngrx/store';
 import { UserPreferenceTimeformat } from './user-preferences.model';
 import { userPreferenceTimeformatSelector } from './user-preferences.selector';
@@ -13,8 +13,8 @@ import { SigninUiSetting } from './signin-ui-settings';
 
 @Injectable({ providedIn: 'root'})
 export class UserPreferencesService {
-  public apiEndpoint: string;
-  public uiSettings: SigninUiSetting;
+  public apiEndpoint: string = "";
+  public uiSettings: SigninUiSetting | null = null;
 
   constructor(
     private store: Store<NgrxStateAtom>

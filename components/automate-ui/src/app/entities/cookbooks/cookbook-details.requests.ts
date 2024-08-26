@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { CookbookDetails, RespCookbookDetails } from './cookbook-details.model';
-import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
+import { InterceptorSkipHeader } from '../../services/http/http-client-auth.interceptor';
 
 @Injectable()
 export class CookbookDetailsRequests {
@@ -25,7 +25,7 @@ export class CookbookDetailsRequests {
   private createCookbookDetails(respCookbookDetails: RespCookbookDetails): CookbookDetails {
     return {
       cookbook_name: respCookbookDetails.cookbook_name,
-      name_and_version: name,
+      name_and_version: respCookbookDetails.name,
       version: respCookbookDetails.version,
       chef_type: respCookbookDetails.chef_type,
       frozen: respCookbookDetails.frozen,

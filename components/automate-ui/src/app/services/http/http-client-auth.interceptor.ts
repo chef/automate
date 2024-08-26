@@ -10,9 +10,9 @@ import { Store } from '@ngrx/store';
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { catchError, mergeMap, take } from 'rxjs/operators';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import * as selectors from 'app/services/projects-filter/projects-filter.selectors';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { ChefSessionService } from '../chef-session/chef-session.service';
+import * as selectors from '../projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from '../projects-filter/projects-filter.reducer';
 
 export const InterceptorSkipHeader = 'Skip-Interceptor';

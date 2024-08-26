@@ -41,7 +41,7 @@ export const NodeCredentialListInitialState: NodeCredentialListState = {
 
 export function nodeCredentialListReducer(
   state: NodeCredentialListState = NodeCredentialListInitialState,
-  action: NodeCredentialListActions): NodeCredentialListState {
+  action: NodeCredentialListActions | any): NodeCredentialListState {
   switch (action.type) {
 
     case NodeCredentialListActionTypes.SORT_NODECREDENTIAL:

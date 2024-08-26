@@ -1,5 +1,5 @@
 import { Component, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { DesktopColumnOption, DesktopColumnOptionUpdate } from 'app/entities/desktop/desktop.model';
+import { DesktopColumnOption, DesktopColumnOptionUpdate } from '../../entities/desktop/desktop.model';
 import { cloneDeep, isEqual } from 'lodash/fp';
 
 @Component({

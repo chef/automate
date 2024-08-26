@@ -22,7 +22,7 @@ import { ChefEvent,
 } from '../../types/types';
 import { initialState } from './event-feed.reducer';
 import { environment } from '../../../environments/environment';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 const GATEWAY_URL = environment.gateway_url;
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
 const ENTITY_TYPE_TAG = 'event-type';

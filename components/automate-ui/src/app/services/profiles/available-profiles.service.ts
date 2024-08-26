@@ -4,7 +4,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ChefSessionService } from '../chef-session/chef-session.service';
 
-import { environment } from 'environments/environment';
+import { environment } from '../../../environments/environment';
 
 const CC_API_URL = environment.compliance_url;
 

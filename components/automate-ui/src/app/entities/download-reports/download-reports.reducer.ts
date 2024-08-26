@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { DownloadReportsActionTypes, DownloadReportsActions } from './download-reports.actions';
 
 export interface DownloadReportsEntityState {
@@ -21,7 +21,7 @@ export const DownloadReportsEntityInitialState: DownloadReportsEntityState = {
 
 export function downloadReportsEntityReducer(
   state: DownloadReportsEntityState = DownloadReportsEntityInitialState,
-  action: DownloadReportsActions): DownloadReportsEntityState {
+  action: DownloadReportsActions | any): DownloadReportsEntityState {
   switch (action.type) {
     case DownloadReportsActionTypes.ADD:
       const ackId = action.payload;

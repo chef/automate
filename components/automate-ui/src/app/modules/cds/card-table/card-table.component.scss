@@ -1,6 +1,8 @@
-@import "~styles/variables";
-@import "@carbon/layout/scss/layout";
-@import "@carbon/grid/scss/grid";
+@use "@carbon/grid" as cg;
+@import "../../../styles/variables";
+@import "@carbon/layout";
+
+@include cg.flex-grid();
 
 :host {
   display: block;
@@ -19,34 +21,34 @@ h1 {
 }
 
 .dashboard-grid {
-  @extend .bx--grid;
+  @extend .cds--grid;
   height: 100%;
 }
 
 .dashboard-grid-row {
-  @extend .bx--row;
+  @extend .cds--row;
   height: 100%;
 }
 
 .dashboard-overview-column {
-  @extend .bx--col-lg-16;
+  @extend .cds--col-lg-16;
 }
 
 .dashboard-overview-grid {
-  @extend .bx--grid;
-  @extend .bx--no-gutter;
+  @extend .cds--grid;
+  @extend .cds--no-gutter;
 }
 
 .dashboard-overview-row {
-  @extend .bx--row;
+  @extend .cds--row;
 }
 
 .dashboard-overview-col {
-  @extend .bx--col-lg-8;
+  @extend .cds--col-lg-8;
 }
 
 .dashboard-overview-header {
-  @extend .bx--col-lg-16;
+  @extend .cds--col-lg-16;
 }
 
 app-card {
@@ -57,7 +59,7 @@ app-card {
   border: 1px solid $chef-grey;
   border-radius: $global-radius;
 
-  @include carbon--breakpoint-up(lg) {
+  @include cg.breakpoint-up(lg) {
     height: calc(100% - #{$spacing-07});
   }
 }

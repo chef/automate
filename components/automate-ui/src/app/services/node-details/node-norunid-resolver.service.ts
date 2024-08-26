@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot,
          ActivatedRouteSnapshot } from '@angular/router';
 
-import { NodeRun } from 'app/types/types';
+import { NodeRun } from '../../types/types';
 import { NodeRunsService } from './node-runs.service';
 
 @Injectable()

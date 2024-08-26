@@ -14,8 +14,8 @@ import {
   ServicesStats,
   GroupService
 } from './service-groups.model';
-import { Chicklet } from 'app/types/types';
-import { environment } from 'environments/environment';
+import { Chicklet } from '../../types/types';
+import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
 
 @Injectable()

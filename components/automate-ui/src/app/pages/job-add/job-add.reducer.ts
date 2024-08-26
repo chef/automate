@@ -19,7 +19,7 @@ export const JobAddInitialState: JobAddState = {
 };
 
 export function jobAddReducer(state: JobAddState = JobAddInitialState,
-                              action: JobActions | RouterAction<any>): JobAddState {
+                              action: JobActions | RouterAction<any> | any): JobAddState {
   switch (action.type) {
     case JobActionTypes.JOB_CREATE:
       return set('status', Status.saving, state);

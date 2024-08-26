@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { takeUntil } from 'rxjs/operators';
 import { getOr } from 'lodash/fp';
 
@@ -14,10 +14,10 @@ import {
   GroupServicesFilters,
   AllowedStatus
 } from '../../entities/service-groups/service-groups.model';
-import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { serviceDeletionStatus } from 'app/entities/service-groups/service-groups.selector';
+import { UpdateSelectedSG, DeleteServicesById } from '../../entities/service-groups/service-groups.actions';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { DateTime } from '../../helpers/datetime/datetime';
+import { serviceDeletionStatus } from '../../entities/service-groups/service-groups.selector';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -130,7 +130,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.refresh();
   }
 
-  public updatePageNumber(pageNumber: number) {
+  public updatePageNumber(pageNumber: number | any) {
     this.currentPage = pageNumber;
     this.serviceGroupsFacade
       .updatePageNumber(pageNumber, this.totalServices, this.currentPage, 'applicationsPageChange');

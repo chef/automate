@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { DataFeedGlobalConfigActionTypes, DestinationActions } from './destination-config.actions';
 import {  GlobalConfig } from './destination-config.model';
 
@@ -30,7 +30,7 @@ export const GlobalConfigEntityInitialState: GlobalConfigEntityState =
 
 export function globalConfigEntityReducer(
   state: GlobalConfigEntityState = GlobalConfigEntityInitialState,
-  action: DestinationActions): GlobalConfigEntityState {
+  action: DestinationActions | any): GlobalConfigEntityState {
     switch (action.type) {
       case DataFeedGlobalConfigActionTypes.GLOBAL_CONFIG: {
         return set(

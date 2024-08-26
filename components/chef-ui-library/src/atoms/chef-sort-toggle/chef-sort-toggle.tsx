@@ -50,7 +50,7 @@ export class ChefSortToggle {
   /**
    * Indicates whether sort button is displayed as `asc` ↑, `desc` ↓, or `none` ↕.
    */
-  @Prop({ mutable: true, reflectToAttr: true }) order: 'asc' | 'desc' | 'none' = 'none';
+  @Prop({ mutable: true, reflect: true }) order: 'asc' | 'desc' | 'none' = 'none';
 
   /**
    * Optionally assign a column sort name.

@@ -371,47 +371,47 @@ export class ChefButton {
   /**
    * The button type (either 'button', 'submit', or 'reset')
    */
-  @Prop({ reflectToAttr: true }) type: 'submit' | 'reset' | 'button' = 'button';
+  @Prop({ reflect: true }) type: 'submit' | 'reset' | 'button' = 'button';
 
   /**
    * Name for form to submit
    */
-  @Prop({ reflectToAttr: true }) form: string;
+  @Prop({ reflect: true }) form: string;
 
   /**
    * Create a primary button
    */
-  @Prop({ reflectToAttr: true }) primary = false;
+  @Prop({ reflect: true }) primary = false;
 
   /**
    * Create a secondary button
    */
-  @Prop({ reflectToAttr: true }) secondary = false;
+  @Prop({ reflect: true }) secondary = false;
 
   /**
    * Create a tertiary button
    */
-  @Prop({ reflectToAttr: true }) tertiary = false;
+  @Prop({ reflect: true }) tertiary = false;
 
   /**
    * Indicate button as potentially dangerous
    */
-  @Prop({ reflectToAttr: true }) caution = false;
+  @Prop({ reflect: true }) caution = false;
 
   /**
    * Indicate button as disabled
    */
-  @Prop({ reflectToAttr: true }) disabled = false;
+  @Prop({ reflect: true }) disabled = false;
 
   /**
    * Url for links that look like buttons
    */
-  @Prop({ reflectToAttr: true }) url: string;
+  @Prop({ reflect: true }) url: string;
 
   /**
    * Target for links
    */
-  @Prop({ reflectToAttr: true }) target: string;
+  @Prop({ reflect: true }) target: string;
 
   render() {
     const link = (

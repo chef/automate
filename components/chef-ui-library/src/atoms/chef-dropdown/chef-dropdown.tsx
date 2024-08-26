@@ -33,7 +33,7 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class ChefDropdown {
 
-  @Prop({ reflectToAttr: true }) visible = false;
+  @Prop({ reflect: true }) visible = false;
 
   render() {
     return (

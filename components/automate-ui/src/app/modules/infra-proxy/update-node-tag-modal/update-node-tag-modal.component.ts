@@ -3,16 +3,16 @@ import { combineLatest, Subject } from 'rxjs';
 import { isNil } from 'lodash/fp';
 import { takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import {
   updateTagsStatus,
   nodeTags
-} from 'app/entities/infra-nodes/infra-nodes.selectors';
+} from '../../../entities/infra-nodes/infra-nodes.selectors';
 import {
   UpdateNodeTags
-} from 'app/entities/infra-nodes/infra-nodes.actions';
-import { EntityStatus } from 'app/entities/entities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/infra-nodes/infra-nodes.actions';
+import { EntityStatus } from '../../../entities/entities';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-update-node-tag-modal',

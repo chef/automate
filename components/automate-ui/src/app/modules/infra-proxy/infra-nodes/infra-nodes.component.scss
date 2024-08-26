@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../../styles/variables";
 
 .search-create-container {
   display: flex;
@@ -84,7 +84,7 @@ img {
   }
 }
 
-::ng-deep .mat-select-panel .mat-option {
+::ng-deep .mat-mdc-select-panel .mat-mdc-option {
 
   &.primary {
     width: 158px;
@@ -108,6 +108,10 @@ img {
     }
 
   }
+  .mdc-list-item__primary-text {
+    margin-right: revert;
+    width: 100%;
+  }
 }
 
 // reest key
@@ -115,7 +119,7 @@ img {
 chef-icon.primary {
   color: $chef-primary-bright;
   float: right;
-  margin-top: 15px;
+  margin-top: 5px;
 
   &:hover {
     color: $chef-white;
@@ -128,7 +132,7 @@ chef-icon.primary {
 }
 
 ::ng-deep {
-  .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
+  .mat-mdc-option:hover:not(.mat-option-disabled):not(.mat-active) {
     background: #3864F2;
     color: #FFFFFF;
   }

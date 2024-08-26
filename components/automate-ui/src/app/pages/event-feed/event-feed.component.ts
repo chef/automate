@@ -18,12 +18,12 @@ import { Status } from '../../services/event-feed/event-feed.reducer';
 import { Chicklet, SearchBarCategoryItem } from '../../types/types';
 import { sumBy } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState
 } from '../../services/event-feed/event-feed.selectors';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
   selector: 'app-event-feed',
@@ -49,7 +49,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   loadedEmptySetOfEvents = false;
   permissionDenied = false; // not currently used
   guitarStringCollection: GuitarStringCollection = initialState.guitarStringCollection;
-  @ViewChild('guitarStrings', { static: true }) guitarStrings;
+  @ViewChild('guitarStrings', { static: true }) guitarStrings: any;
   resetTimescaleDisabled = true;
 
   // Should the search bar filter bar be displayed
@@ -238,7 +238,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     this.store.dispatch(eventFeedActions.loadMoreFeed());
   }
 
-  selectDateRange(dateRange: DateRange): void {
+  selectDateRange(dateRange): void {
     const start = moment(dateRange.start);
     const end = moment(dateRange.end);
 

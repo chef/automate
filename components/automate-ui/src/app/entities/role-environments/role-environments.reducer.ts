@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RoleEnvironmentActionTypes, RoleEnvironmentActions } from './role-environments.action';
 
 export interface RoleEnvironmentEntityState extends EntityState<string> {
@@ -22,7 +22,7 @@ export const RoleEnvironmentEntityInitialState: RoleEnvironmentEntityState =
 
 export function roleEnvironmentEntityReducer(
   state: RoleEnvironmentEntityState = RoleEnvironmentEntityInitialState,
-  action: RoleEnvironmentActions): RoleEnvironmentEntityState {
+  action: RoleEnvironmentActions | any): RoleEnvironmentEntityState {
 
   switch (action.type) {
     case RoleEnvironmentActionTypes.GET_ALL:

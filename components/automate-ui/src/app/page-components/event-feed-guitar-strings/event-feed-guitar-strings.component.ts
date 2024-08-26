@@ -10,7 +10,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { reduce } from 'lodash/fp';
 import * as d3 from 'd3';
 import { GuitarString,
@@ -18,7 +18,7 @@ import { GuitarString,
   GuitarStringItem,
   DateRange
 } from '../../types/types';
-import { DateTime } from 'app/helpers/datetime/datetime';
+import { DateTime } from '../../helpers/datetime/datetime';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
 
 export class GuitarStringDataContainer {

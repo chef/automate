@@ -1,5 +1,5 @@
-@import "~styles/variables";
-@import "@carbon/layout/scss/layout";
+@import "../../styles/variables";
+@import "@carbon/grid";
 
 :host {
   display: flex;
@@ -26,7 +26,7 @@
       a.logo img {
         display: block;
         width: 419px;
-        @include carbon--breakpoint-down(lg) {
+        @include breakpoint-down(lg) {
           height: 184px;
         }
       }
@@ -40,7 +40,7 @@
     position: relative;
     right: 15px;
     top: -62px;
-    @include carbon--breakpoint-down(lg) {
+    @include breakpoint-down(lg) {
       right: 5px;
     }
   }

@@ -8,6 +8,7 @@ the NgModule decorator metadata.
 import { BrowserModule } from '@angular/platform-browser';
 import { CookieModule } from 'ngx-cookie';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, APP_INITIALIZER } from '@angular/core';
 import { environment } from '../environments/environment';
@@ -36,11 +37,11 @@ import { IntegrationsModule } from './pages/integrations/integrations.module';
 import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
 import { RoleModule } from './modules/roles/roles.module';
-import { LicenseModule } from 'app/modules/license/license.module';
-import { TelemetryCheckboxModule } from 'app/page-components/telemetry-checkbox/telemetry-checkbox.module';
-import { UserModule } from 'app/modules/user/user.module';
-import { TeamModule } from 'app/modules/team/team.module';
-import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
+import { LicenseModule } from './modules/license/license.module';
+import { TelemetryCheckboxModule } from './page-components/telemetry-checkbox/telemetry-checkbox.module';
+import { UserModule } from './modules/user/user.module';
+import { TeamModule } from './modules/team/team.module';
+import { InfraProxyModule } from './modules/infra-proxy/infra-proxy.module';
 
 // Services
 import { ApplicationStatsService } from './services/telemetry/application-stats/application-stats.service';
@@ -52,7 +53,7 @@ import { ConfigService } from './services/config/config.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
 import { HttpClientAuthInterceptor } from './services/http/http-client-auth.interceptor';
-import { LayoutSidebarService } from 'app/entities/layout/layout-sidebar.service';
+import { LayoutSidebarService } from './entities/layout/layout-sidebar.service';
 import { LocalStorageService } from './services/storage/localstorage.service';
 import { MetadataService } from './services/metadata/metadata.service';
 import { NodeDetailsResolverService } from './services/node-details/node-details-resolver.service';
@@ -206,12 +207,12 @@ import {
   ServicesSidebarComponent
 } from './page-components/services-sidebar/services-sidebar.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
-import { UIComponent } from 'app/ui.component';
+import { UIComponent } from './ui.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
 // Warning Banner
 import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
-import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { AppConfigService } from './services/app-config/app-config.service';
 import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-create.component';
 import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details/data-feed-config-details.component';
 import {
@@ -293,9 +294,10 @@ import { MfeSessionService } from './services/mfe-session/mfe-session.service';
     BrowserModule,
     ChefComponentsModule,
     ChefPipesModule,
+    CommonModule,
     ComplianceModule,
     ComplianceSharedModule.forRoot(),
-    CookieModule.forRoot(),
+    CookieModule.withOptions(),
     FormsModule,
     HttpClientModule,
     InfiniteScrollModule,
@@ -404,8 +406,8 @@ import { MfeSessionService } from './services/mfe-session/mfe-session.service';
     UserRequests,
     SigninService
   ],
-  bootstrap: [ AppComponent ],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 
-export class AppModule {}
+export class AppModule { }

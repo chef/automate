@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { cloneDeep, isEqual } from 'lodash/fp';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { ProjectsFilterOption } from '../../services/projects-filter/projects-filter.reducer';
+import { ProjectConstants } from '../../entities/projects/project.model';
 
 const { ALL_PROJECTS_LABEL } = ProjectConstants;
 
@@ -99,7 +99,7 @@ export class ProjectsFilterDropdownComponent {
     this.checkInitialEquality();
   }
 
-  handleArrowUp(event: KeyboardEvent) {
+  handleArrowUp(event: KeyboardEvent | any) {
     event.preventDefault();
 
     const element = (event.target as Element).previousElementSibling;
@@ -108,7 +108,7 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
-  handleArrowDown(event: KeyboardEvent) {
+  handleArrowDown(event: KeyboardEvent | any) {
     event.preventDefault();
 
     const element = (event.target as Element).nextElementSibling;

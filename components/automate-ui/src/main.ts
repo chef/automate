@@ -2,7 +2,7 @@ import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { create, CyclePlugin } from 'rxjs-spy';
 
-import { applyPolyfills, defineCustomElements } from './assets/chef-ui-library/loader';
+import { defineCustomElements } from './assets/chef-ui-library/loader';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
@@ -16,7 +16,7 @@ if (environment.production) {
   // https://github.com/cartant/rxjs-spy#module-log
   (window as any).enableRxjsSpy = () => {
 
-    const spy = create();
+    const spy: any = create();
 
     // suppress "cycle-plugin.js:49 Cyclic next detected" warning in browser console
     // reference: https://github.com/cartant/rxjs-spy/issues/41
@@ -29,6 +29,5 @@ if (environment.production) {
 
 platformBrowserDynamic().bootstrapModule(AppModule, { preserveWhitespaces: true });
 
-applyPolyfills().then(() => {
-  defineCustomElements(window);
-});
+
+defineCustomElements(window);

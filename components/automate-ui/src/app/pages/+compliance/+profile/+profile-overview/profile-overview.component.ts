@@ -15,21 +15,22 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ProfilesService } from 'app/services/profiles/profiles.service';
-import { UploadService } from 'app/services/profiles/upload.service';
-import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout.facade';
+import { ProfilesService } from '../../../../services/profiles/profiles.service';
+import { UploadService } from '../../../../services/profiles/upload.service';
+import { AvailableProfilesService } from '../../../../services/profiles/available-profiles.service';
+import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
 import { find } from 'lodash';
-import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
-import { HttpStatus } from 'app/types/types';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ProductDeployedService } from '../../../../services/product-deployed/product-deployed.service';
+import { HttpStatus } from '../../../../types/types';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 interface Profile {
     name: String;
     version: String;
     latest_version?: String;
     installed_version?: String;
+    title?: string;
 }
 
 @Component({
@@ -189,6 +190,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
       if (profile.latest_version) {
         return { name: profile.name, version: profile.version, latest: profile.latest_version };
       }
+      return null;
     });
 
     // find profile from available profiles and push to array

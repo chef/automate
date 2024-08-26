@@ -1,18 +1,18 @@
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
-import { Manager } from 'app/entities/managers/manager.model';
-import { automateManager, cloudManagers, managerStatus } from 'app/entities/managers/manager.selectors';
-import { DeleteManager } from 'app/entities/managers/manager.actions';
-import { routeParams } from 'app/route.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { DateTime } from '../../../helpers/datetime/datetime';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { EntityStatus } from '../../../entities/entities';
+import { Manager } from '../../../entities/managers/manager.model';
+import { automateManager, cloudManagers, managerStatus } from '../../../entities/managers/manager.selectors';
+import { DeleteManager } from '../../../entities/managers/manager.actions';
+import { routeParams } from '../../../route.selectors';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations',
@@ -39,10 +39,10 @@ export class IntegrationsListComponent {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.managers$ = store.select(cloudManagers);
     this.managerStatus$ = store.select(managerStatus);
-    this.automateManager$ = store.select(automateManager);
+    this.automateManager$ = store.select(automateManager) as any;
     store.select(routeParams).subscribe((params) => {
-      this.sort = params.sort;
-      this.order = params.order;
+      this.sort = params['sort'];
+      this.order = params['order'];
     });
   }
 

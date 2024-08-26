@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { RoutePerms } from 'app/components/landing/landing.component';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+import { RoutePerms } from '../../components/landing/landing.component';
+import { LayoutFacadeService } from '../../entities/layout/layout.facade';
+import { ProductDeployedService } from '../../services/product-deployed/product-deployed.service';
 
 @Component({
   selector: 'app-top-nav-landing',

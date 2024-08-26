@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RoleActionTypes, RoleActions } from './role.actions';
 import { Role } from './role.model';
 
@@ -18,9 +18,9 @@ export const RoleEntityInitialState: RoleEntityState = roleEntityAdapter.getInit
   getStatus: EntityStatus.notLoaded,
   deleteStatus: EntityStatus.notLoaded
 });
-
+//Need to check: any
 export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialState,
-  action: RoleActions): RoleEntityState {
+  action: any): RoleEntityState {
 
   switch (action.type) {
     case RoleActionTypes.GET_ALL:

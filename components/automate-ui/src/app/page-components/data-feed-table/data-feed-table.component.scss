@@ -1,5 +1,5 @@
-@import "~styles/variables";
-@import "~styles/mixins";
+@import "../../styles/variables";
+@import "../../styles/mixins";
 
 // Table list styles
 .node-list {
@@ -113,7 +113,7 @@ chef-tr.row {
 .column-dropdown {
   position: relative;
 
-  ::ng-deep .mat-select-trigger {
+  ::ng-deep .mat-mdc-select-trigger {
     background: initial;
     border: solid 1px blue;
     margin-right: 3px;
@@ -293,7 +293,7 @@ a, a:visited {
 }
 
 .three-dot-column {
-  ::ng-deep .mat-select-trigger {
+  ::ng-deep .mat-mdc-select-trigger {
     background: initial;
   }
   }

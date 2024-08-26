@@ -1,5 +1,5 @@
-@import "../styles/variables";
-@import "@carbon/layout/scss/layout";
+@import "../styles.scss";
+@import "@carbon/grid";
 
 #app-container {
   height: 100vh;
@@ -41,7 +41,7 @@
     top: $navigation-height;
     width: calc(100% - 200px);
 
-    @include carbon--breakpoint-down(lg) {
+    @include breakpoint-down(lg) {
       width: calc(100% - 70px);
       left: 70px;
     }

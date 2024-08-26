@@ -37,7 +37,7 @@ export const TeamEntityInitialState: TeamEntityState = teamEntityAdapter.getInit
 });
 
 export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialState,
-  action: TeamActions): TeamEntityState {
+  action: any): TeamEntityState {
 
   switch (action.type) {
 

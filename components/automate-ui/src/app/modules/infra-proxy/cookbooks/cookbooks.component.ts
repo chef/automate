@@ -4,15 +4,15 @@ import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { EntityStatus } from 'app/entities/entities';
-import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
-import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { EntityStatus } from '../../../entities/entities';
+import { GetCookbooks } from '../../../entities/cookbooks/cookbook.actions';
+import { Cookbook } from '../../../entities/cookbooks/cookbook.model';
 import {
   allCookbooks,
   getAllStatus as getAllCookbooksForOrgStatus
-} from 'app/entities/cookbooks/cookbook.selectors';
+} from '../../../entities/cookbooks/cookbook.selectors';
 
 @Component({
   selector: 'app-cookbooks',

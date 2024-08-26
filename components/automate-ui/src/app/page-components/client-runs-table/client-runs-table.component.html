@@ -19,7 +19,7 @@
       <chef-th scope="col" class="node-name sort" (click)="onToggleSort('name')">
         Node Name <i class="sort-icon {{sortIcon('name')}}"></i>
       </chef-th>
-      <chef-th scope="col" class="check-in sort" (click)="onToggleSort('checkin')" [hidden]="!columns.check_in">
+      <chef-th scope="col" class="check-in sort" (click)="onToggleSort('checkin')" [hidden]="!columns?.check_in">
         Check-in<i class="sort-icon {{sortIcon('checkin')}}"></i>
       </chef-th>
       <chef-th scope="col" class="sort" (click)="onToggleSort('uptime_seconds')" [hidden]="!columns.uptime">

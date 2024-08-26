@@ -25,7 +25,7 @@ export const UserEntityInitialState: UserEntityState = userEntityAdapter.getInit
 });
 
 export function userEntityReducer(state: UserEntityState = UserEntityInitialState,
-  action: UserActions): UserEntityState {
+  action: any): UserEntityState {
 
   switch (action.type) {
 
