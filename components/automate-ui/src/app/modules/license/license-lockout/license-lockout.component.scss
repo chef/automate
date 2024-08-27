@@ -12,7 +12,6 @@
 
   chef-icon.icon-right {
     float: right;
-    margin-top: -36px;
     margin-right: 13px;
     font-size: 20px;
     color: #3864F2;
@@ -61,8 +60,9 @@
   }
 
   .button {
-    margin-top: 1em;
+    margin-top: 0.5em;
     text-align: center;
+    width: 500px;
   }
 
   .trial {
@@ -191,5 +191,21 @@
       text-decoration: none;
       cursor: pointer;
     }
+  }
+
+  .compact-table {
+    border-collapse: collapse;
+    padding: 0;
+    margin: 0;
+  }
+
+  .compact-cell {
+    vertical-align: middle;
+    padding: 0;
+    margin: 0;
+  }
+
+  .regular-text {
+    font-size: .875em;
   }
 }
