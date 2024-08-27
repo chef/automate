@@ -17,7 +17,7 @@ syntax = "proto3";
 package google.api.servicecontrol.v1;
 
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
-import "google/api/servicecontrol/v1/metric_value.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/servicecontrol/v1/metric_value.proto";
 
 option cc_enable_arenas = true;
 option go_package = "google.golang.org/genproto/googleapis/api/servicecontrol/v1;servicecontrol";
