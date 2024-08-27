@@ -2,7 +2,7 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { pipe, unset, set } from 'lodash/fp';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { PolicyActionTypes, PolicyActions } from './policy.actions';
 import { Policy } from './policy.model';
 
@@ -29,7 +29,7 @@ export const PolicyEntityInitialState: PolicyEntityState = policyEntityAdapter.g
 });
 
 export function policyEntityReducer(state: PolicyEntityState = PolicyEntityInitialState,
-  action: PolicyActions): PolicyEntityState {
+  action: any): PolicyEntityState {
 
   switch (action.type) {
 

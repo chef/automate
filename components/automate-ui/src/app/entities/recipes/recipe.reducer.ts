@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { RecipeActionTypes, RecipeActions } from './recipe.action';
 
 export interface RecipeEntityState extends EntityState<string> {
@@ -22,7 +22,7 @@ export const RecipeEntityInitialState: RecipeEntityState =
 
 export function recipeEntityReducer(
   state: RecipeEntityState = RecipeEntityInitialState,
-  action: RecipeActions): RecipeEntityState {
+  action: RecipeActions | any): RecipeEntityState {
 
   switch (action.type) {
     case RecipeActionTypes.GET_ALL:

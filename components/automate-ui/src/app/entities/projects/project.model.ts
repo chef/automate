@@ -1,5 +1,5 @@
-import { IAMType } from 'app/entities/policies/policy.model';
-import { ProjectStatus } from 'app/entities/rules/rule.model';
+import { IAMType } from '../../entities/policies/policy.model';
+import { ProjectStatus } from '../../entities/rules/rule.model';
 
 export interface Project {
   id: string;

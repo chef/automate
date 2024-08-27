@@ -1,5 +1,6 @@
-@import "~styles/variables";
-@import "@carbon/layout/scss/layout";
+@use "@carbon/grid" as cg;
+@import "../../styles/variables";
+
 
 .sidebar {
   display: block;
@@ -11,7 +12,7 @@
   background-color: $chef-white;
   border-right: 1px solid $chef-grey;
 
-  @include carbon--breakpoint-down(lg) {
+  @include cg.breakpoint-down(lg) {
     width: $sidebar-small-width;
   }
 
@@ -19,7 +20,7 @@
     display: none;
     transition-duration: 0.1s;
 
-    @include carbon--breakpoint-down(lg) {
+    @include cg.breakpoint-down(lg) {
       display: block;
     }
   }
@@ -143,7 +144,7 @@
         color: #6F7878;
       }
 
-      @include carbon--breakpoint-down(lg) {
+      @include cg.breakpoint-down(lg) {
         .menu-item-groups:not(:last-child) {
           border-bottom: 1px solid $chef-grey;
         }

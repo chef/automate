@@ -1,17 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { loading } from 'app/entities/entities';
-import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
-import { allPolicies, getAllStatus } from 'app/entities/policies/policy.selectors';
-import { Policy } from 'app/entities/policies/policy.model';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { loading } from '../../../entities/entities';
+import { DeletePolicy, GetPolicies } from '../../../entities/policies/policy.actions';
+import { allPolicies, getAllStatus } from '../../../entities/policies/policy.selectors';
+import { Policy } from '../../../entities/policies/policy.model';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-policy-list',

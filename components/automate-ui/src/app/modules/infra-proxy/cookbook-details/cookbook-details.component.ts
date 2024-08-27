@@ -5,29 +5,29 @@ import { Subject, combineLatest } from 'rxjs';
 import { first, filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
-import { environment as env } from 'environments/environment';
-import { CollapsibleListMapper } from 'app/helpers/infra-proxy/collapsible-list-mapper';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeURL, routeParams } from 'app/route.selectors';
-import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
-import { cookbookVersionsFromRoute, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
-import { GetCookbookVersions } from 'app/entities/cookbooks/cookbook-versions.actions';
-import { Org } from 'app/entities/orgs/org.model';
-import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
-import { GetOrg } from 'app/entities/orgs/org.actions';
+import { environment as env } from '../../../../environments/environment';
+import { CollapsibleListMapper } from '../../../helpers/infra-proxy/collapsible-list-mapper';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { EntityStatus } from '../../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { routeURL, routeParams } from '../../../route.selectors';
+import { CookbookVersions } from '../../../entities/cookbooks/cookbook-versions.model';
+import { cookbookVersionsFromRoute, getStatus } from '../../../entities/cookbooks/cookbook-versions.selectors';
+import { GetCookbookVersions } from '../../../entities/cookbooks/cookbook-versions.actions';
+import { Org } from '../../../entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from '../../../entities/orgs/org.selectors';
+import { GetOrg } from '../../../entities/orgs/org.actions';
 import {
   CookbookDetails,
   RootFiles,
   Menu,
   SubMenu
-} from 'app/entities/cookbooks/cookbook-details.model';
+} from '../../../entities/cookbooks/cookbook-details.model';
 import {
   cookbookDetailsFromRoute,
   getStatus as getAllCookbooksDetailsStatus
-} from 'app/entities/cookbooks/cookbook-details.selectors';
-import { GetCookbookDetails } from 'app/entities/cookbooks/cookbook-details.actions';
+} from '../../../entities/cookbooks/cookbook-details.selectors';
+import { GetCookbookDetails } from '../../../entities/cookbooks/cookbook-details.actions';
 export type CookbookDetailsTab = 'content' | 'details';
 
 @Component({
@@ -118,7 +118,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(gtStatus),
-      this.store.select(orgFromRoute)
+      this.store.select(orgFromRoute as any)
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
@@ -129,7 +129,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(cookbookVersionsFromRoute)
+      this.store.select(cookbookVersionsFromRoute as any)
     ]).pipe(
       filter(([getCookbookVersionSt, _cookbookVersionState]) =>
         getCookbookVersionSt === EntityStatus.loadingSuccess),
@@ -152,7 +152,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getAllCookbooksDetailsStatus),
-      this.store.select(cookbookDetailsFromRoute)
+      this.store.select(cookbookDetailsFromRoute as any)
     ]).pipe(
       filter(([getCookbooksSt, _cookbookDetailsState]) =>
         getCookbooksSt === EntityStatus.loadingSuccess),
@@ -235,7 +235,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSelectedTab(event: { target: { value: CookbookDetailsTab } }) {
+  onSelectedTab(event: { target: { value: CookbookDetailsTab } } | any) {
     this.tabValue = event.target.value;
   }
 

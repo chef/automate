@@ -3,7 +3,7 @@ import { ComplianceStatsService } from '../telemetry/compliance-stats/compliance
 import { ClientRunsStatsService } from '../telemetry/client-runs-stats/client-runs-stats.service';
 import { ApplicationStatsService } from '../telemetry/application-stats/application-stats.service';
 import { ConfigService } from '../config/config.service';
-import { LicenseStatus } from 'app/entities/license/license.model';
+import { LicenseStatus } from '../../entities/license/license.model';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from '../../../environments/environment';
 import { BehaviorSubject } from 'rxjs';
@@ -24,7 +24,7 @@ export class LicenseUsageService {
   public totalNodesSubject = new BehaviorSubject(null);
   public totalScansSubject = new BehaviorSubject(null);
   public totalServiceSubject = new BehaviorSubject(null);
-  public initCountFetch = new BehaviorSubject(null);
+  public initCountFetch = new BehaviorSubject<any>(null);
   private expiration;
   private daysSinceLasPost;
   private periodStartDate;
@@ -75,7 +75,10 @@ export class LicenseUsageService {
     this.totalScans = complianceUsageStats['node_cnt'];
     this.totalScansSubject.next(this.totalScans);
 
-    this.daysSinceLasPost = complianceUsageStats['days_since_last_post'];
+    // ignore complianceUsageStats['days_since_last_post'] to align with analytics cli
+    // set report period to 30 days
+    this.daysSinceLasPost = 30; //complianceUsageStats['days_since_last_post'];
+
 
     const nodeUsageStats = await this.clientRunsStatsService.getClientRunsStats();
     this.totalNodes = nodeUsageStats['node_cnt'];

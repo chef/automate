@@ -83,12 +83,6 @@ pushd components/notifications-service/server
 popd
 log "Finished installing Elixir dependencies"
 
-log_section_start "Installing Ruby dependencies"
-pushd components/automate-workflow-ctl/
-  bundle install
-popd
-log "Finished installing Ruby dependencies"
-
 log_section_start "Installing Go dependencies"
 go mod download
 log "Finished installing Go dependencies"

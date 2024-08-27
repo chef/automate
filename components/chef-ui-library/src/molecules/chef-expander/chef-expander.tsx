@@ -45,7 +45,7 @@ export class ChefExpander {
   /**
    * Indicates that the expander is opened.
    */
-  @Prop({ mutable: true, reflectToAttr: true }) opened = false;
+  @Prop({ mutable: true, reflect: true }) opened = false;
 
   @Method()
   async open() {

@@ -183,7 +183,7 @@ export const desktopEntityInitialState: DesktopEntityState = {
 };
 
 export function desktopEntityReducer(state: DesktopEntityState = desktopEntityInitialState,
-  action: DesktopActions): DesktopEntityState {
+  action: DesktopActions | any): DesktopEntityState {
 
   switch (action.type) {
     case DesktopActionTypes.SET_SELECTED_DESKTOP:

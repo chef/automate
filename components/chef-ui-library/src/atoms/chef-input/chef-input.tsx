@@ -54,7 +54,7 @@ export class ChefInput {
   /**
    * Indicate input as disabled
    */
-  @Prop({ reflectToAttr: true }) disabled = false;
+  @Prop({ reflect: true }) disabled = false;
 
   /**
    * Enable or disable autocomplete for input (defaults to "off").

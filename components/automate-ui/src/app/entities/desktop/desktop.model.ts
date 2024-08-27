@@ -1,4 +1,4 @@
-import { NodeRun } from 'app/types/types';
+import { NodeRun } from '../../types/types';
 
 export enum Terms {
   DesktopName = 'name',

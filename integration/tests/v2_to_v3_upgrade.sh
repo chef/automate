@@ -33,6 +33,10 @@ do_deploy() {
         --accept-terms-and-mlsa \
         --skip-preflight \
         --debug
+
+    do_apply_license
+    echo "applying license after deployment"
+    # chef-automate license status
 }
 
 do_prepare_upgrade() {

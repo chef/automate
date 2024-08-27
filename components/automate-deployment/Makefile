@@ -60,18 +60,6 @@ run-with-cs: guard-HAB_ORIGIN
       --accept-terms-and-mlsa
 	./bin/linux/chef-automate license apply ${LICENSE_TOKEN}
 
-run-with-workflow: guard-HAB_ORIGIN
-	@echo "Starting deployment service with --enable-workflow --hartifacts=${RESULT_DIR} and --override-origin=${HAB_ORIGIN}..."
-	./bin/linux/chef-automate deploy \
-      --enable-workflow \
-      --hartifacts ${RESULT_DIR} \
-      --override-origin ${HAB_ORIGIN} \
-      --channel dev \
-      --upgrade-strategy none \
-      --admin-password chefautomate \
-      --accept-terms-and-mlsa
-	./bin/linux/chef-automate license apply ${LICENSE_TOKEN}
-
 run-upgrade-self-test: guard-HAB_ORIGIN
 	@echo "Starting deployment service with --hartifacts=${RESULT_DIR} and --override-origin=${HAB_ORIGIN}..."
 	./bin/linux/chef-automate migrate-from-v1 \

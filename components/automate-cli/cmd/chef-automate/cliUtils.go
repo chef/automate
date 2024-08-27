@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -14,6 +15,7 @@ import (
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/pmt"
 	"github.com/chef/automate/lib/sshutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -158,4 +160,23 @@ func executeConfigVerifyAndPromptConfirmationOnError(configFile string) error {
 		}
 	}
 	return nil
+}
+
+func markGlobalFlagsHiddenExcept(command *cobra.Command, unhidden ...string) {
+	command.PersistentFlags().VisitAll(func(f *pflag.Flag) {
+		name := f.Name
+		if !stringutils.SliceContains(unhidden, name) {
+			f.Hidden = true
+		}
+	})
+}
+
+func findIdentValue(content, val string) (string, error) {
+	re := regexp.MustCompile(fmt.Sprintf(`%s\s*=\s*"([^"]+)"`, val))
+	matches := re.FindStringSubmatch(content)
+	if len(matches) > 1 {
+		return matches[1], nil
+	} else {
+		return "", fmt.Errorf("failed to find value")
+	}
 }

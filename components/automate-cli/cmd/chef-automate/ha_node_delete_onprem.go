@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -33,9 +34,11 @@ type DeleteNodeOnPremImpl struct {
 	writer                  *cli.Writer
 	fileUtils               fileutils.FileUtils
 	sshUtil                 SSHUtil
+	unreachableIpMap        map[string][]string
+	statusSummary           StatusSummary
 }
 
-func NewDeleteNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
+func NewDeleteNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil, statusSummary StatusSummary) HAModifyAndDeploy {
 	return &DeleteNodeOnPremImpl{
 		flags:         flags,
 		writer:        writer,
@@ -44,6 +47,7 @@ func NewDeleteNodeOnPrem(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, node
 		terraformPath: filepath.Join(haDirPath, "terraform"),
 		fileUtils:     fileutils,
 		sshUtil:       sshUtil,
+		statusSummary: statusSummary,
 	}
 }
 
@@ -162,7 +166,7 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 		return status.New(status.InvalidCommandArgsError, "Invalid IP address "+dni.ipToDelete)
 	}
 
-	updatedConfig, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, []string{dni.ipToDelete})
+	updatedConfig, unreachableNodes, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, []string{dni.ipToDelete}, dni.flags.removeUnreachableNode)
 	if err != nil {
 		return err
 	}
@@ -177,6 +181,7 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 	if errorList != nil && errorList.Len() > 0 {
 		return getSingleErrorFromList(errorList)
 	}
+	dni.unreachableIpMap = unreachableNodes
 	return nil
 }
 
@@ -190,6 +195,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
 			&dni.config.ExistingInfra.Config.AutomatePrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Automate.Config.CertsByIP,
+			dni.unreachableIpMap[AUTOMATE],
 		)
 	case CHEF_SERVER:
 		err = modifyConfigForDeleteNode(
@@ -197,6 +203,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
 			&dni.config.ExistingInfra.Config.ChefServerPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.ChefServer.Config.CertsByIP,
+			dni.unreachableIpMap[CHEF_SERVER],
 		)
 	case POSTGRESQL:
 		err = modifyConfigForDeleteNode(
@@ -204,6 +211,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
 			&dni.config.ExistingInfra.Config.PostgresqlPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Postgresql.Config.CertsByIP,
+			dni.unreachableIpMap[POSTGRESQL],
 		)
 	case OPENSEARCH:
 		err = modifyConfigForDeleteNode(
@@ -211,6 +219,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
 			&dni.config.ExistingInfra.Config.OpensearchPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Opensearch.Config.CertsByIP,
+			dni.unreachableIpMap[OPENSEARCH],
 		)
 	default:
 		return errors.New("Invalid node type")
@@ -236,6 +245,19 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 
 	dni.writer.Println(fmt.Sprintf("%s => %s", stringutils.TitleReplace(dni.nodeType, "_", "-"), dni.ipToDelete))
 
+	if dni.nodeType == AUTOMATE && dni.unreachableIpMap != nil && len(dni.unreachableIpMap[AUTOMATE]) > 0 {
+		dni.writer.Println("Unreachable Automate nodes will be removed => " + strings.Join(dni.unreachableIpMap[AUTOMATE], ", "))
+	}
+	if dni.nodeType == CHEF_SERVER && dni.unreachableIpMap != nil && len(dni.unreachableIpMap[CHEF_SERVER]) > 0 {
+		dni.writer.Println("Unreachable Chef-Server nodes will be removed => " + strings.Join(dni.unreachableIpMap[CHEF_SERVER], ", "))
+	}
+	if dni.nodeType == POSTGRESQL && dni.unreachableIpMap != nil && len(dni.unreachableIpMap[POSTGRESQL]) > 0 {
+		dni.writer.Println("Unreachable Postgresql nodes will be removed => " + strings.Join(dni.unreachableIpMap[POSTGRESQL], ", "))
+	}
+	if dni.nodeType == OPENSEARCH && dni.unreachableIpMap != nil && len(dni.unreachableIpMap[OPENSEARCH]) > 0 {
+		dni.writer.Println("Unreachable Opensearch nodes will be removed => " + strings.Join(dni.unreachableIpMap[OPENSEARCH], ", "))
+	}
+
 	dni.writer.Println("Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.")
 	return dni.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
@@ -250,12 +272,33 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 
 	// TODO : Remove this after fixing the following ticket
 	// https://chefio.atlassian.net/browse/CHEF-3630
-	syncErr := dni.nodeUtils.syncConfigToAllNodes()
+	syncErr := dni.nodeUtils.syncConfigToAllNodes(dni.unreachableIpMap)
 	if syncErr != nil {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())
 		}
 		return syncErr
+	}
+
+	// Restart all PostgreSQL nodes in order to apply the new configuration
+	if dni.nodeType == POSTGRESQL {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		level := "info"
+		if globalOpts.debug {
+			level = "debug"
+		}
+		log, err := logger.NewLogger("text", level)
+		if err != nil {
+			return err
+		}
+		fileUtils := &fileutils.FileSystemUtils{}
+		err = dni.nodeUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *dni.sshUtil.getSSHConfig(), fileUtils, log)
+		if err != nil {
+			return err
+		}
 	}
 	return err
 }

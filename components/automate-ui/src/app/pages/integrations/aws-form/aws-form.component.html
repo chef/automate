@@ -13,7 +13,7 @@
     <input type="checkbox" formControlName="no_creds">
   </label>
 
-  <ng-container *ngIf="showInstanceCreds()" [formGroup]="formGroup.controls.credentials | castFormGroup">
+  <ng-container *ngIf="showInstanceCreds()" [formGroup]="formGroup.controls['credentials'] | castFormGroup">
     <label class="form-field">
       <span class="label">Enter your AWS access key ID</span>
       <input chefInput type="password" formControlName="aws_access_key_id" />

@@ -1,21 +1,21 @@
 import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment, { locale } from 'moment';
 
-import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
+import { LicenseFacadeService, LicenseApplyReason } from '../../../entities/license/license.facade';
 
-import { environment } from 'environments/environment';
-import { HttpStatus } from 'app/types/types';
-import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { EntityStatus, pendingState } from 'app/entities/entities';
+import { environment } from '../../../../environments/environment';
+import { HttpStatus } from '../../../types/types';
+import { ChefSessionService } from '../../../services/chef-session/chef-session.service';
+import { EntityStatus, pendingState } from '../../../entities/entities';
 
 import {
   FetchStatus, RequestStatus
-} from 'app/entities/license/license.model';
-import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/license.model';
-import { SessionStorageService } from 'app/services/storage/sessionstorage.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/license/license.model';
+import { LicenseStatus, parsedExpirationDate } from '../../../entities/license/license.model';
+import { SessionStorageService } from '../../../services/storage/sessionstorage.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-license-lockout',
@@ -65,7 +65,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
     // Set locale-aware date/time formats
     // Per https://stackoverflow.com/a/50460605, navigator.language
     // seems to be the best source of truth for browser locale.
-    moment.locale(window.navigator.language);
+    locale(window.navigator.language);
 
     // ordinarily, chef-modal should autofocus on itself
     // this does not always work on the license-lockout component due to initial page load times
@@ -158,7 +158,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
     let noLicenseFound = false;
 
     if (state.status === EntityStatus.loadingSuccess) {
-      this.licenseExpired = moment().isAfter(state.license.licensed_period.end);
+      this.licenseExpired = moment().isAfter(state.license?.licensed_period.end);
       licenseCurrentlyExpired = this.licenseExpired;
       this.setExpirationDate(state.license);
     } else { // loadingFailure
@@ -200,7 +200,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
     }
 
     // loadingFailure:
-    switch (state.errorResp.status) {
+    switch (state.errorResp?.status) {
       case HttpStatus.FORBIDDEN:
         this.permissionDenied = true;
         break;

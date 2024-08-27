@@ -1,7 +1,7 @@
 <ng-container [formGroup]="formGroup">
 
   <!-- Unlike its siblings, gcp-form is rendered unconditionally -->
-  <ng-container [formGroup]="formGroup.controls.credentials | castFormGroup">
+  <ng-container [formGroup]="formGroup.controls['credentials'] | castFormGroup">
     <label class="form-field">
       <span class="label">Enter your service account JSON credentials</span>
       <textarea formControlName="google_credentials_json"></textarea>

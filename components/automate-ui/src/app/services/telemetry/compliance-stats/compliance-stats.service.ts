@@ -6,13 +6,13 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats.model';
 
-import { environment } from 'environments/environment';
+import { environment } from '../../../../environments/environment';
 const COMPLIANCE_STATS_URL = environment.compliance_stats_url;
 
 @Injectable()
 export class ComplianceStatsService {
 
-  private complianceStatsSubscription: Subscription;
+  private complianceStatsSubscription: Subscription | null = null;
   constructor(private httpClient: HttpClient) {}
 
   getComplianceStats(): Promise<NodeUsageStats>  {

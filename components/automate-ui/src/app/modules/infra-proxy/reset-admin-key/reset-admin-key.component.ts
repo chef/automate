@@ -1,16 +1,16 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { Subject } from 'rxjs';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
 import { filter, takeUntil } from 'rxjs/operators';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { AdminKey } from 'app/entities/reset-admin-key/reset-admin-key.model';
+import { EntityStatus, pending } from '../../../entities/entities';
+import { AdminKey } from '../../../entities/reset-admin-key/reset-admin-key.model';
 import {
    updateStatus
-} from 'app/entities/reset-admin-key/reset-admin-key.selectors';
-import { UpdateAdminKey } from 'app/entities/reset-admin-key/reset-admin-key.actions';
+} from '../../../entities/reset-admin-key/reset-admin-key.selectors';
+import { UpdateAdminKey } from '../../../entities/reset-admin-key/reset-admin-key.actions';
 
 @Component({
   selector: 'app-reset-admin-key',

@@ -28,6 +28,7 @@ func deleteNodeHACmd() *cobra.Command {
 	deleteNodeHACmd.PersistentFlags().BoolVar(&addDeleteNodeHACmdFlags.onPremMode, "onprem-mode", false, "Use this flag if the deployment type is on prem")
 	deleteNodeHACmd.PersistentFlags().BoolVar(&addDeleteNodeHACmdFlags.awsMode, "aws-mode", false, "Use this flag if the deployment type is AWS")
 	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
+	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.removeUnreachableNode, "remove-unreachable-node", "r", false, "remove unreachable nodes from cluster")
 
 	return deleteNodeHACmd
 }
@@ -35,7 +36,15 @@ func deleteNodeHACmd() *cobra.Command {
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
 		deployerType := getModeOfDeployment()
-		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		statusSummary, err := getStatusSummary(infra)
+		if err != nil {
+			return err
+		}
+		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType, statusSummary)
 		if err != nil {
 			return err
 		}
@@ -43,7 +52,7 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 	}
 }
 
-func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployerType string) (HAModifyAndDeploy, error) {
+func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployerType string, statusSummary StatusSummary) (HAModifyAndDeploy, error) {
 	if addDeleteNodeHACmdFlags.onPremMode && addDeleteNodeHACmdFlags.awsMode {
 		return nil, errors.New("Cannot use both --onprem-mode and --aws-mode together. Provide only one at a time")
 	}
@@ -52,13 +61,13 @@ func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deplo
 	switch deployerType {
 	case EXISTING_INFRA_MODE:
 		if !addDeleteNodeHACmdFlags.awsMode {
-			hamd = NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+			hamd = NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}), statusSummary)
 		} else {
 			err = fmt.Errorf("flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
 		}
 	case AWS_MODE:
 		if !addDeleteNodeHACmdFlags.onPremMode {
-			hamd = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+			hamd = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}), statusSummary)
 		} else {
 			err = fmt.Errorf("flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
 		}

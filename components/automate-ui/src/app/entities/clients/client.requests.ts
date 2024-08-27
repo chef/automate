@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment as env } from 'environments/environment';
+import { environment as env } from '../../../environments/environment';
 import { ClientsPayload, CreateClientPayload } from './client.action';
 import { Client } from './client.model';
-import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
+import { InterceptorSkipHeader } from '../../services/http/http-client-auth.interceptor';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 

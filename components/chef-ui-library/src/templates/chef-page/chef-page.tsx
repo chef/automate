@@ -46,52 +46,52 @@ export class ChefPage {
   /**
    * Text for page heading
    */
-  @Prop({ reflectToAttr: true }) heading: string;
+  @Prop({ reflect: true }) heading: string;
 
   /**
    * Text for page subheading
    */
-  @Prop({ reflectToAttr: true }) subheading: string;
+  @Prop({ reflect: true }) subheading: string;
 
   /**
    * Text for error message
    */
-  @Prop({ reflectToAttr: true }) errorMessage: string;
+  @Prop({ reflect: true }) errorMessage: string;
 
   /**
    * Text for secondary button
    */
-  @Prop({ reflectToAttr: true }) secondaryBtnText: string;
+  @Prop({ reflect: true }) secondaryBtnText: string;
 
   /**
    * Show secondary button
    */
-  @Prop({ reflectToAttr: true }) secondaryBtnShow = false;
+  @Prop({ reflect: true }) secondaryBtnShow = false;
 
   /**
    * Text for confirm button
    */
-  @Prop({ reflectToAttr: true }) confirmBtnText = 'Confirm';
+  @Prop({ reflect: true }) confirmBtnText = 'Confirm';
 
   /**
    * Text for cancel button
    */
-  @Prop({ reflectToAttr: true }) cancelBtnText = 'Cancel';
+  @Prop({ reflect: true }) cancelBtnText = 'Cancel';
 
   /**
    * Indicate confirm is loading
    */
-  @Prop({ reflectToAttr: true }) confirmLoading = false;
+  @Prop({ reflect: true }) confirmLoading = false;
 
   /**
    * Indicate page is loading
    */
-  @Prop({ reflectToAttr: true }) pageLoading = false;
+  @Prop({ reflect: true }) pageLoading = false;
 
   /**
    * Disable confirm buttom
    */
-  @Prop({ reflectToAttr: true }) disableConfirm = true;
+  @Prop({ reflect: true }) disableConfirm = true;
 
   @Event() secondaryConfirm: EventEmitter;
   @Event() confirm: EventEmitter;

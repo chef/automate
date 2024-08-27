@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../styles/variables";
 
 #pending-edits-bar {
   background-color: $chef-primary-bright;
@@ -34,6 +34,7 @@
     position: absolute;
     right: 0;
     top: 0;
+    color: inherit;
   }
 
   .failure-container button:hover,

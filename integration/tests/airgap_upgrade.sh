@@ -49,8 +49,14 @@ do_deploy() {
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
+
+    do_apply_license
 }
 
 do_upgrade() {
     run_upgrade update.aib
+}
+
+do_apply_license(){
+    chef-automate license apply "$A2_LICENSE"
 }

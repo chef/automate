@@ -46,7 +46,8 @@ func init() {
 		Use:   "service-versions",
 		Short: "Retrieve the versions of the individual Chef Automate services",
 		Long:  "Retrieve the versions of the individual Chef Automate services",
-		RunE:  runServiceVersionsCmd,
+		//PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE: runServiceVersionsCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},

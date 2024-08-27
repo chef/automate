@@ -213,6 +213,7 @@ module AutomateCluster
           next
         elsif response.code == 200
           logger.debug "auth successful for #{config['admin_username']}"
+          logger.debug "Got response #{response}"
         end
 #
         case response.code
@@ -245,14 +246,12 @@ module AutomateCluster
           wait
           next
         elsif response.code == 200
-          logger.debug "auth successful for #{config['admin_username']} now testing #{config['dashboard_username']}"
-          response = test_authentication(config['dashboard_username'], config['dashboard_password'])
+          logger.debug "Got successful response #{response}"
         end
 
         case response.code
         when 200
           logger.debug 'Authentication successful, doing nothing'
-          insert_dashboards
         when 401, 403
           logger.warn 'Authentication failed, inserting credentials'
           rotate_credentials

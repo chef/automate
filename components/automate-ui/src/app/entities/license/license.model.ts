@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { EntityStatus } from '../entities';
-import * as moment from 'moment/moment';
+import * as moment from 'moment';
 import { DateTime } from '../../helpers/datetime/datetime';
 
 // Example JSON returned from gateway:
@@ -24,6 +24,8 @@ export interface LicenseStatus {
     start: string; // timestamp
     end: string; // timestamp
   };
+  grace_period: boolean
+  license_type: string
 }
 
 export interface LicenseApplyReason {
@@ -69,12 +71,12 @@ export interface FetchStatus {
 
 export interface ApplyStatus {
   status: EntityStatus;
-  errorResp: HttpErrorResponse;
+  errorResp: HttpErrorResponse | null;
 }
 
 export interface RequestStatus {
   status: EntityStatus;
-  errorResp: HttpErrorResponse;
+  errorResp: HttpErrorResponse | null;
 }
 
 export interface TriggerWelcomeStatus {

@@ -5,13 +5,13 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { environment as env } from '../../../../../../environments/environment';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from '../../../../../entities/layout/layout.facade';
+import { NgrxStateAtom } from '../../../../../ngrx.reducers';
 import { select, Store } from '@ngrx/store';
-import { NodeCredentialsSearchPayload, SearchCredentials } from 'app/entities/credentials/credential.actions';
-import { allCredentials, credStatus, credtotal } from 'app/entities/credentials/credential.selectors';
-import { Credential } from 'app/entities/credentials/credential.model';
-import { pending, EntityStatus } from 'app/entities/entities';
+import { NodeCredentialsSearchPayload, SearchCredentials } from '../../../../../entities/credentials/credential.actions';
+import { allCredentials, credStatus, credtotal } from '../../../../../entities/credentials/credential.selectors';
+import { Credential } from '../../../../../entities/credentials/credential.model';
+import { pending, EntityStatus } from '../../../../../entities/entities';
 
 @Component({
   templateUrl: './nodes-add.component.html',

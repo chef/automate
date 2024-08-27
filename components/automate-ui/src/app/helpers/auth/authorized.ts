@@ -12,13 +12,13 @@ import {
   has
 } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { IndexedEntities } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { IndexedEntities } from '../../entities/entities';
 import {
   GetSomeUserPerms, UserPermsPayload, GetUserParamPerms, UserPermsParameterizedPayload
-} from 'app/entities/userperms/userperms.actions';
-import { UserPermEntity } from 'app/entities/userperms/userperms.entity';
-import { allPerms } from 'app/entities/userperms/userperms.selectors';
+} from '../../entities/userperms/userperms.actions';
+import { UserPermEntity } from '../../entities/userperms/userperms.entity';
+import { allPerms } from '../../entities/userperms/userperms.selectors';
 
 export interface CheckObj {
   endpoint: string;
@@ -41,8 +41,8 @@ export class AuthorizedChecker {
         debounceTime(AuthorizedChecker.DebounceTime),
         filter(perms => !isEmpty(perms)),
         filter(() => !isEmpty(this.allOf) || !isEmpty(this.anyOf)),
-        filter(perms => this.permsPopulated(perms)),
-        rxjsMap(perms => this.evalPerms(perms)));
+        filter(perms => this.permsPopulated(perms as any)),
+        rxjsMap(perms => this.evalPerms(perms as any)));
   }
 
   public setPermissions(allOf: CheckObj[], anyOf: CheckObj[]): void {
@@ -64,8 +64,8 @@ export class AuthorizedChecker {
     inputs.forEach(check => {
       if (this.placeholderRE.test(check.endpoint)) {
         let newEndpoint = check.endpoint;
-        const list = isArray(check.paramList) ? check.paramList : [check.paramList];
-        list.forEach(val => newEndpoint = newEndpoint.replace(this.placeholderRE, val));
+        const list: any = isArray(check.paramList) ? check.paramList : [check.paramList];
+        list?.forEach(val => newEndpoint = newEndpoint.replace(this.placeholderRE, val));
         check.inflatedEndpoint = newEndpoint;
       }
     });
@@ -96,7 +96,7 @@ export class AuthorizedChecker {
     return concat(allOf, anyOf)
       .filter((check: CheckObj) => this.placeholderRE.test(check.endpoint))
       .map((check: CheckObj) =>
-        ({ path: this.fillPlaceholders(check.endpoint, check.paramList), parameters })
+        ({ path: this.fillPlaceholders(check.endpoint, check.paramList || ""), parameters })
       );
   }
 
@@ -107,13 +107,13 @@ export class AuthorizedChecker {
 
   private checkAllOf(perms: IndexedEntities<UserPermEntity>, allOf: CheckObj[]): boolean {
     return every(({ endpoint, verb, paramList }: CheckObj) =>
-      get([this.fillPlaceholders(endpoint, paramList), verb], perms), allOf);
+      get([this.fillPlaceholders(endpoint, paramList || ""), verb], perms), allOf);
   }
 
   private checkAnyOf(perms: IndexedEntities<UserPermEntity>, anyOf: CheckObj[]): boolean {
     return isEmpty(anyOf) ||
       some(({ endpoint, verb, paramList }: CheckObj) =>
-        get([this.fillPlaceholders(endpoint, paramList), verb], perms), anyOf);
+        get([this.fillPlaceholders(endpoint, paramList || ""), verb], perms), anyOf);
   }
 
   private fillPlaceholders(path: string, parameters: string | string[]): string {

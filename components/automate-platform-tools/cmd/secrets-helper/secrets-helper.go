@@ -9,15 +9,14 @@
 // The current implementation uses a files on disk for
 // storage.
 //
-// KNOWN ISSUES
+// # KNOWN ISSUES
 //
-// - generate and insert are not safe for concurrent access to the
-//   same key. A basic check is in place to allow "idempotent"-ish
-//   operations for a single service, but if multiple services are
-//   generating the same key the last writer wins. However, we ARE
-//   concurrency safe for /different/ keys since those are stored in
-//   different files on disk.
-//
+//   - generate and insert are not safe for concurrent access to the
+//     same key. A basic check is in place to allow "idempotent"-ish
+//     operations for a single service, but if multiple services are
+//     generating the same key the last writer wins. However, we ARE
+//     concurrency safe for /different/ keys since those are stored in
+//     different files on disk.
 package main
 
 import (
@@ -45,9 +44,7 @@ import (
 
 var defaultWatchInterval = 15 * time.Second
 
-//
 // Option structs
-//
 type globalOptions struct {
 	// Enables debug logging output
 	debug bool
@@ -233,7 +230,6 @@ func newSecretsStore() (secrets.SecretStore, error) {
 	return secrets.NewDiskStore(globalOpts.dataDir, uid, gid), nil
 }
 
-//
 // Subcommand funcs
 //
 // NOTE(ssd) 2018-08-20: These top level functions assume that the
@@ -442,9 +438,7 @@ func execCommand(_ *cobra.Command, args []string) {
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
 		cmd.Stdin = os.Stdin
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			Pdeathsig: syscall.SIGTERM,
-		}
+		cmd.SysProcAttr = &syscall.SysProcAttr{}
 
 		logrus.WithFields(logrus.Fields{
 			"secrets_fd": readPipe.Fd(),

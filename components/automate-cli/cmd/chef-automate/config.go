@@ -161,8 +161,9 @@ var showConfigCmd = &cobra.Command{
 	Use:   "show [/path/to/write/config.toml]",
 	Short: "show the Chef Automate configuration",
 	Long:  "Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT",
-	RunE:  runShowCmd,
-	Args:  cobra.RangeArgs(0, 2),
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runShowCmd,
+	Args: cobra.RangeArgs(0, 2),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
@@ -172,8 +173,9 @@ var genConfigCmd = &cobra.Command{
 	Use:   "gen [/path/to/write/config.toml]",
 	Short: "generate the Automate HA configuration",
 	Long:  "Prompt based Config Generation command. It will output the config in the provided file, if file path is not provided then it will print on STDOUT.",
-	RunE:  runGenCmd,
-	Args:  cobra.RangeArgs(0, 2),
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runGenCmd,
+	Args: cobra.RangeArgs(0, 2),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
@@ -182,6 +184,7 @@ var genConfigCmd = &cobra.Command{
 var patchConfigCmd = &cobra.Command{
 	Use:   "patch path/to/config.toml",
 	Short: "patch the Chef Automate configuration", Long: "Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.",
+	//PersistentPreRunE: WarnLicenseStatusForExpiry,
 	RunE: runPatchCommand,
 	Args: cobra.ExactArgs(1),
 	Annotations: map[string]string{
@@ -193,8 +196,9 @@ var setConfigCmd = &cobra.Command{
 	Use:   "set path/to/config.toml",
 	Short: "set the Chef Automate configuration",
 	Long:  "Set the Chef Automate configuration for the deployment. It will replace the Chef Automate configuration with the given configuration and apply any required changes.",
-	RunE:  runSetCommand,
-	Args:  cobra.ExactArgs(1),
+	// PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE: runSetCommand,
+	Args: cobra.ExactArgs(1),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
@@ -274,10 +278,11 @@ func checkConfigGenFileExist(outFile string, fsu fileutils.FileUtils) error {
 }
 
 var ocIdShowAppCmd = &cobra.Command{
-	Use:   "oc-id-show-app",
-	Short: "Get the details of the oauth applications registered with OC-ID",
-	Long:  "Get the details of the oauth applications registered with OC-ID",
-	RunE:  runOcIdShowAppCommand,
+	Use:               "oc-id-show-app",
+	Short:             "Get the details of the oauth applications registered with OC-ID",
+	Long:              "Get the details of the oauth applications registered with OC-ID",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runOcIdShowAppCommand,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},

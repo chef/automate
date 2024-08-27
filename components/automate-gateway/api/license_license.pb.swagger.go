@@ -133,6 +133,13 @@ func init() {
         },
         "customer_name": {
           "type": "string"
+        },
+        "grace_period": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "license_type": {
+          "type": "string"
         }
       }
     },

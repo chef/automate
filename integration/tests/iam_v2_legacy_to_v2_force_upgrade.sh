@@ -55,6 +55,8 @@ do_deploy() {
 
     # this migrates v1 legacy policies
     "${cli_bin}" iam upgrade-to-v2 
+
+  do_apply_license
 }
 
 do_prepare_upgrade() {

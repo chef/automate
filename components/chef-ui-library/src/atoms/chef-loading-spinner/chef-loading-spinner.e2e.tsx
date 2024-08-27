@@ -30,7 +30,7 @@ describe('chef-loading-spinner', () => {
       element.setProperty('fixed', true);
       await page.waitForChanges();
 
-      expect(element.hasAttribute('fixed')).toEqual(true);
+      expect(element.getAttribute('fixed')).toEqual(true);
     });
   });
 
@@ -44,7 +44,7 @@ describe('chef-loading-spinner', () => {
       element.setProperty('fixed', false);
       await page.waitForChanges();
 
-      expect(element.hasAttribute('fixed')).toEqual(false);
+      expect(element.getAttribute('fixed')).toEqual(false);
     });
   });
 });

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, OnDestroy, OnChanges, Output, SimpleChange } from '@angular/core';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
+import { TimeFromNowPipe } from '../../../pipes/time-from-now.pipe';
 
 @Component({
   selector: 'app-daily-check-in',

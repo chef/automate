@@ -1,6 +1,6 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
-import { User } from 'app/entities/users/user.model';
+import { MatOptionSelectionChange } from '@angular/material/core';
+import { User } from '../../../entities/users/user.model';
 
 @Component({
   selector: 'app-user-table',
@@ -22,8 +22,8 @@ export class UserTableComponent implements OnInit {
   // These will default to baseUrl + {get, post}, but can be overridden
   // to make this work with parameterized endpoints. For an example, see
   // team-details.component.html.
-  @Input() getPermissionsPath: string[];
-  @Input() createPermissionsPath: string[];
+  @Input() getPermissionsPath: any;
+  @Input() createPermissionsPath: any;
 
   ngOnInit(): void {
     if (this.getPermissionsPath === undefined) {

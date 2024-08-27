@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, BehaviorSubject } from 'rxjs';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { isProductDeployed } from 'app/staticConfig';
-import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { isProductDeployed } from '../../staticConfig';
+import { clientRunsWorkflowEnabled } from '../../entities/client-runs/client-runs.selectors';
+import * as fromClientRuns from '../../entities/client-runs/client-runs.reducer';
 import { UpdateSidebars } from './layout.actions';
 import { Sidebars, MenuItem } from './layout.model';
-import { MenuItemGroup } from 'app/entities/layout/layout.model';
+import { MenuItemGroup } from '../../entities/layout/layout.model';
 
 @Injectable({
     providedIn: 'root'

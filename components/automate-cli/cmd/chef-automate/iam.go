@@ -62,10 +62,11 @@ func newIAMTokensCommand() *cobra.Command {
 
 func newIAMCreateTokenCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create NAME",
-		Short: "Generate a token",
-		RunE:  runCreateTokenCmd,
-		Args:  cobra.ExactArgs(1),
+		Use:               "create NAME",
+		Short:             "Generate a token",
+		PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE:              runCreateTokenCmd,
+		Args:              cobra.ExactArgs(1),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -105,10 +106,11 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 
 func newIAMVersionCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "version",
-		Short: "Retrieve IAM version in use",
-		RunE:  runIAMVersionCmd,
-		Args:  cobra.ExactArgs(0),
+		Use:               "version",
+		Short:             "Retrieve IAM version in use",
+		PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE:              runIAMVersionCmd,
+		Args:              cobra.ExactArgs(0),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},

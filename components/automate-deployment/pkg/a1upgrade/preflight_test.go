@@ -27,7 +27,7 @@ func TestCheckA1Installed(t *testing.T) {
 
 	t.Run("it returns an error if the A1VersionManifest is not found on disk", func(t *testing.T) {
 		A1VersionManifestPath = "/this/path/really/should/not/exist/on/your/computer.txt"
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1Installed()
 		assert.Error(t, p.err)
 	})
@@ -40,7 +40,7 @@ func TestCheckA1Installed(t *testing.T) {
 			os.Remove(tempfile.Name())
 		}()
 		A1VersionManifestPath = tempfile.Name()
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1Installed()
 		assert.NoError(t, p.err)
 	})
@@ -70,7 +70,7 @@ func TestCheckA1MinimumVersion(t *testing.T) {
 
 	t.Run("it returns an error if the A1VersionManifest cannot be read", func(t *testing.T) {
 		A1VersionManifestPath = "/this/path/really/should/not/exist/on/your/computer.txt"
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 	})
@@ -78,19 +78,19 @@ func TestCheckA1MinimumVersion(t *testing.T) {
 	t.Run("it returns an error if the A1VersionManifest has too old of a version", func(t *testing.T) {
 		cleanup1 := createMockManifest(t, "0.19.991")
 		defer cleanup1()
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 
 		cleanup2 := createMockManifest(t, "1.7.341")
 		defer cleanup2()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 
 		cleanup3 := createMockManifest(t, "1.8.0")
 		defer cleanup3()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 	})
@@ -98,31 +98,31 @@ func TestCheckA1MinimumVersion(t *testing.T) {
 	t.Run("it returns an error for malformed manifests", func(t *testing.T) {
 		cleanup1 := createMockManifest(t, "potato")
 		defer cleanup1()
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 
 		cleanup2 := createMockManifest(t, "potato.2.3")
 		defer cleanup2()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 
 		cleanup3 := createMockManifest(t, "1.potato.3")
 		defer cleanup3()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 
 		cleanup4 := createMockManifest(t, "1.2.potato")
 		defer cleanup4()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 
 		cleanup5 := createMockManifest(t, "")
 		defer cleanup5()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.Error(t, p.err)
 	})
@@ -130,19 +130,19 @@ func TestCheckA1MinimumVersion(t *testing.T) {
 	t.Run("it succeeds for a recent enough automate 1", func(t *testing.T) {
 		cleanup := createMockManifest(t, "1.8.38")
 		defer cleanup()
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.NoError(t, p.err)
 
 		cleanup2 := createMockManifest(t, "1.9.1")
 		defer cleanup2()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.NoError(t, p.err)
 
 		cleanup3 := createMockManifest(t, "2.0.0")
 		defer cleanup3()
-		p = NewPreflightRunner(w, r, s, false, false)
+		p = NewPreflightRunner(w, r, s, false)
 		p.checkA1MinimumVersion()
 		assert.NoError(t, p.err)
 	})
@@ -168,7 +168,7 @@ func TestCheckA1InstallUp(t *testing.T) {
 			Cmd:     "automate-ctl",
 			Args:    []string{"status"},
 			Timeout: automateCtlTimeout}).Return(nil)
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1InstallUp()
 		assert.NoError(t, p.err)
 		mock.AssertAllCalled()
@@ -180,7 +180,7 @@ func TestCheckA1InstallUp(t *testing.T) {
 			Cmd:     "automate-ctl",
 			Args:    []string{"status"},
 			Timeout: automateCtlTimeout}).Return(errors.New("exit 1"))
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1InstallUp()
 		assert.Error(t, p.err)
 		mock.AssertAllCalled()
@@ -202,7 +202,7 @@ func TestCheckA1InstallHealthy(t *testing.T) {
 		defer ts.Close()
 		A1StatusURL = ts.URL
 
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1InstallHealthy()
 		assert.NoError(t, p.err)
 	})
@@ -214,7 +214,7 @@ func TestCheckA1InstallHealthy(t *testing.T) {
 		defer ts.Close()
 		A1StatusURL = ts.URL
 
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkA1InstallHealthy()
 		assert.Error(t, p.err)
 	})
@@ -241,13 +241,13 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 	t.Run("it doesn't error if all source directories exist", func(t *testing.T) {
 		setup(t)
 
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkExpectedDataPaths()
 		assert.NoError(t, p.err)
 	})
 
 	t.Run("it raises an error if an expected source directory doesn't exist", func(t *testing.T) {
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkExpectedDataPaths()
 		assert.Error(t, p.err)
 	})
@@ -264,7 +264,7 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 		err = ioutil.WriteFile(filepath.Join(esDataDir, "testfile"), []byte("test context"), os.ModePerm)
 		require.NoError(t, err)
 
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkExpectedDataPaths()
 		assert.Error(t, p.err)
 	})
@@ -285,7 +285,7 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 		err = ioutil.WriteFile(filepath.Join(filepath.Dir(esDataDir), ".data-a1-migration-move-started"), []byte("test context"), os.ModePerm)
 		require.NoError(t, err)
 
-		p := NewPreflightRunner(w, r, s, false, false)
+		p := NewPreflightRunner(w, r, s, false)
 		p.checkExpectedDataPaths()
 		assert.NoError(t, p.err)
 	})

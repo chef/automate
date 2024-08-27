@@ -2,10 +2,10 @@ import { catchError, mergeMap, map, withLatestFrom, switchMap, tap } from 'rxjs/
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of, combineLatest, from } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Store } from '@ngrx/store';
-import { NodeRunsService } from 'app/services/node-details/node-runs.service';
-import { NodeRun } from 'app/types/types';
+import { NodeRunsService } from '../../services/node-details/node-runs.service';
+import { NodeRun } from '../../types/types';
 
 import {
   GetDailyCheckInTimeSeries,
@@ -37,9 +37,9 @@ import {
   GetDesktopColumnOptionsDefaults
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
-import { getSelectedDaysAgo } from 'app/entities/desktop/desktop.selectors';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
+import { getSelectedDaysAgo } from '../../entities/desktop/desktop.selectors';
 
 @Injectable()
 export class DesktopEffects {
@@ -136,7 +136,7 @@ export class DesktopEffects {
       ofType<GetNodeMetadataCounts>(DesktopActionTypes.GET_NODE_METADATA_COUNTS),
       withLatestFrom(this.store$),
       switchMap(([_action, storeState]) =>
-        this.requests.getNodeMetadataCounts(storeState.desktops.getDesktopsFilter).pipe(
+        this.requests.getNodeMetadataCounts((storeState as any).desktops.getDesktopsFilter).pipe(
           map(nodeMetadataCounts => new GetNodeMetadataCountsSuccess(nodeMetadataCounts)),
           catchError((error) => of(new GetNodeMetadataCountsFailure(error))))
     )));
@@ -157,7 +157,7 @@ export class DesktopEffects {
       ofType(DesktopActionTypes.GET_DESKTOPS),
       withLatestFrom(this.store$),
       switchMap(([_action, storeState]) =>
-        this.requests.getDesktops(storeState.desktops.getDesktopsFilter).pipe(
+        this.requests.getDesktops((storeState as any).desktops.getDesktopsFilter).pipe(
           map(desktops => new GetDesktopsSuccess( desktops )),
         catchError((error) => of(new GetDesktopsFailure(error))))
     )));
@@ -198,7 +198,7 @@ export class DesktopEffects {
       ofType(DesktopActionTypes.GET_DESKTOPS_TOTAL),
       withLatestFrom(this.store$),
       switchMap(([_action, storeState]) =>
-        this.requests.getDesktopsTotal(storeState.desktops.getDesktopsFilter).pipe(
+        this.requests.getDesktopsTotal((storeState as any).desktops.getDesktopsFilter).pipe(
           map(total => new GetDesktopsTotalSuccess( total )),
         catchError((error) => of(new GetDesktopsTotalFailure(error))))
       )));

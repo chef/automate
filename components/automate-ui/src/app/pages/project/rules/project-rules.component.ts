@@ -6,30 +6,30 @@ import { Subject, combineLatest, Observable } from 'rxjs';
 import { takeUntil, pluck, filter, map } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
-import { HttpStatus } from 'app/types/types';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
-import { Regex } from 'app/helpers/auth/regex';
-import { AuthorizedChecker } from 'app/helpers/auth/authorized';
-import { EntityStatus } from 'app/entities/entities';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeParams } from '../../../route.selectors';
+import { HttpStatus } from '../../../types/types';
+import { IdMapper } from '../../../helpers/auth/id-mapper';
+import { Regex } from '../../../helpers/auth/regex';
+import { AuthorizedChecker } from '../../../helpers/auth/authorized';
+import { EntityStatus } from '../../../entities/entities';
+import { Utilities } from '../../../helpers/utilities/utilities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
-} from 'app/entities/rules/rule.model';
+} from '../../../entities/rules/rule.model';
 import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
-} from 'app/entities/rules/rule.actions';
+} from '../../../entities/rules/rule.actions';
 import {
   getRuleAttributes, getStatus, updateStatus, ruleFromRoute, createError, createStatus
-} from 'app/entities/rules/rule.selectors';
+} from '../../../entities/rules/rule.selectors';
 import {
   getStatus as getProjectStatus,
   projectFromRoute
-} from 'app/entities/projects/project.selectors';
-import { Project } from 'app/entities/projects/project.model';
-import { GetProject } from 'app/entities/projects/project.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/projects/project.selectors';
+import { Project } from '../../../entities/projects/project.model';
+import { GetProject } from '../../../entities/projects/project.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 interface KVCondition {
   key: ConditionOperator;
@@ -51,7 +51,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   public isLoading$: Observable<boolean>;
   public saving = false;
-  public attributeList: KVPair;
+  public attributeList;
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
   private isDestroyed = new Subject<boolean>();
@@ -119,7 +119,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       }));
    });
 
-    this.store.select(projectFromRoute).pipe(
+    this.store.select(projectFromRoute as any).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(project => {
@@ -133,7 +133,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       ], []);
     });
 
-    this.store.select(ruleFromRoute).pipe(
+    this.store.select(ruleFromRoute as any).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(rule => {
@@ -272,7 +272,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   convertToRule(): Rule {
-    const conditions: Condition[] = this.ruleForm.controls.conditions.value.map(
+    const conditions: Condition[] = this.ruleForm.controls['conditions'].value.map(
       (c: {attribute: string, values: string, operator: string}) => {
         // Note(sr): the 'default' here should never happen -- but what should we do? Skip?
         const op = isConditionOperator(c.operator) ? c.operator : 'EQUALS';
@@ -287,9 +287,9 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       });
     return {
       project_id: this.project.id,
-      id: this.ruleForm.controls.id.value,
-      name: this.ruleForm.controls.name.value.trim(),
-      type: this.ruleForm.controls.type.value,
+      id: this.ruleForm.controls['id'].value,
+      name: this.ruleForm.controls['name'].value.trim(),
+      type: this.ruleForm.controls['type'].value,
       status: 'STAGED',
       conditions: conditions
     };
@@ -307,8 +307,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public handleNameInput(event: KeyboardEvent): void {
     if (!this.modifyID && !Utilities.isNavigationKey(event) && !this.editingRule) {
       this.conflictError = false;
-      this.ruleForm.controls.id.setValue(
-        IdMapper.transform(this.ruleForm.controls.name.value.trim()));
+      this.ruleForm.controls['id'].setValue(
+        IdMapper.transform(this.ruleForm.controls['name'].value.trim()));
     }
   }
 
@@ -319,7 +319,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.conflictError = false;
   }
 
-  get conditionControls(): { [key: string]: AbstractControl } {
+  get conditionControls(): any {
     return (this.ruleForm.get('conditions') as FormGroup).controls;
   }
 

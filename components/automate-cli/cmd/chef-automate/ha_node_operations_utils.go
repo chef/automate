@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -11,10 +12,13 @@ import (
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/remotescripts"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
@@ -34,9 +38,13 @@ if [ "$S3_STATE" == "module.s3[0].aws_s3_bucket.createS3bucket" ]; then
 terraform state rm $S3_STATE
 fi`
 
-	AWS_AUTO_TFVARS    = "aws.auto.tfvars"
-	DESTROY_AWS_FOLDER = "destroy/aws/"
-	TF_ARCH_FILE       = ".tf_arch"
+	AWS_AUTO_TFVARS               = "aws.auto.tfvars"
+	DESTROY_AWS_FOLDER            = "destroy/aws/"
+	TF_ARCH_FILE                  = ".tf_arch"
+	SERVICE_HEALTH_OK             = "OK"
+	SERVICE_HEALTH_WARN           = "WARN"
+	SERVICE_HEALTH_CHECK_INTERVAL = 5
+	MAX_TIMEOUT_THRESHOLD         = 120
 )
 
 type HAModifyAndDeploy interface {
@@ -56,12 +64,12 @@ type NodeOpUtils interface {
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
-	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	isManagedServicesOn() bool
 	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
 	getModeOfDeployment() string
 	executeShellCommand(command string, path string) error
 	moveAWSAutoTfvarsFile(string) error
@@ -72,9 +80,11 @@ type NodeOpUtils interface {
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCount() (int, error)
 	parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error
-	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error
 	saveConfigToBastion() error
-	syncConfigToAllNodes() error
+	syncConfigToAllNodes(unreachableNodes map[string][]string) error
+	restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error
+	postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error
 }
 
 type NodeUtilsImpl struct {
@@ -104,31 +114,31 @@ func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	}, nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateInfraConfig()
+	return configPuller.generateInfraConfig(removeUnreachableNodes)
 }
 
-func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return configPuller.fetchInfraConfig()
+	return configPuller.fetchInfraConfig(removeUnreachableNodes)
 }
 
-func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return configPuller.fetchAwsConfig()
+	return configPuller.fetchAwsConfig(removeUnreachableNodes)
 }
 
 func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
@@ -140,17 +150,17 @@ func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) 
 	return NewPullConfigs(infra, *sshUtil), nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
 	configPuller := NewPullConfigs(infra, *sshUtil)
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateAwsConfig()
+	return configPuller.generateAwsConfig(removeUnreachableNodes)
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
@@ -259,22 +269,22 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 
 func (nu *NodeUtilsImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu, nil)
 }
 
-func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
+func (nu *NodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][]string) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu, unreachableNodes)
 }
 
 // Execute custom command in one node of all the each node-type
-func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
+func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils, unreachableNodes map[string][]string) error {
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
 		if nodeObject.NodeType == OPENSEARCH || nodeObject.NodeType == POSTGRESQL {
 			singleNode = true
 		}
-		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, unreachableNodes)
 		if err != nil {
 			return err
 		}
@@ -288,14 +298,14 @@ func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleN
 }
 
 // Execute 'config show' command in specific service and fetch the output file to bastion
-func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
+func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, unreachableNodes map[string][]string) error {
 
 	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
-	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
-
+	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra, unreachableNodes)
+	nodeMap.unreachableNodes = unreachableNodes
 	sshUtil := nu.cmdUtil.GetSshUtil()
 
 	sshUtil.setSSHConfig(&SSHConfig{
@@ -445,7 +455,7 @@ func (nu *NodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *
 func (nu *NodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	cmd := `
         a2csCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module.automate|module.bootstrap_automate|module.chef_server" | wc -l)
-        pgosCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module.opensearch|module.postgresql" | wc -l)
+        pgosCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module\.(opensearch|postgresql\[0\])" | wc -l)
         echo $(($a2csCount/2 + $pgosCount))
     `
 
@@ -460,6 +470,152 @@ func (nu *NodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	}
 
 	return count, nil
+}
+
+func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+	newSSHConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	}
+	sshUtil := NewSSHUtil(newSSHConfig)
+	// restart followers
+	nu.writer.Println("trying to restaring follower node")
+	err := restartFollowerNodeAndWaitForhealthy(leaderNode, pgIps, infra, statusSummary, sshUtil, nu.writer)
+	if err != nil {
+		return err
+	}
+	//restart leader
+	nu.writer.Println("trying to restaring leader node")
+	for _, pgIp := range pgIps {
+		nu.writer.Println("looking for leader node to restart")
+		if strings.EqualFold(pgIp, leaderNode.IP) {
+			nu.writer.Println("Restaring leader node")
+			sshUtil.getSSHConfig().hostIP = pgIp
+			res, err := sshUtil.connectAndExecuteCommandOnRemote(RESTART_BACKEND_COMMAND, true)
+			if err != nil {
+				writer.Errorf("error in executing restart backend supervisor command")
+				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
+			}
+			break
+		}
+	}
+	return nil
+}
+
+func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+
+	content, err := fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
+	if err != nil {
+		return fmt.Errorf("failed to get manifest auto tfvars: %v", err)
+	}
+
+	contentStr := string(content)
+
+	pgIdentVal, err := findIdentValue(contentStr, PG_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", PG_IDENT, err)
+	}
+	pgLeaderIdentVal, err := findIdentValue(contentStr, PG_LEADER_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", PG_LEADER_IDENT, err)
+	}
+	haProxyIdentVal, err := findIdentValue(contentStr, HA_PROXY_IDENT)
+	if err != nil {
+		return fmt.Errorf("failed to get %s: %v", HA_PROXY_IDENT, err)
+	}
+
+	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
+	filename, err := fileUtils.CreateTempFile(scriptContent, "pg-restart-*.sh", HAB_TMP_DIR)
+	if err != nil {
+		return fmt.Errorf("failed to create file %v", err)
+	}
+	defer fileUtils.RemoveFile(filename)
+
+	conf := sshutils.SSHConfig{
+		SshUser:    sshconfig.sshUser,
+		SshPort:    sshconfig.sshPort,
+		SshKeyFile: sshconfig.sshKeyFile,
+		Timeout:    sshconfig.timeout,
+	}
+	sshUtilPkg := sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor())
+
+	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, filename, PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
+
+	var isErr bool
+	for _, result := range excuteResults {
+		printCertRotateOutput(result, POSTGRESQL, writer)
+		if result.Error != nil {
+			isErr = true
+		}
+	}
+
+	if isErr {
+		return fmt.Errorf("failed to copy file to remote")
+	}
+
+	command := fmt.Sprintf(`sudo bash -s < %s`, path.Join(PG_SCRIPT_PATH, PG_SCRIPT_NAME))
+	excuteResults = sshUtilPkg.ExecuteConcurrently(conf, command, pgIps)
+	for _, result := range excuteResults {
+		printCertRotateOutput(result, POSTGRESQL, writer)
+		if result.Error != nil {
+			isErr = true
+		}
+	}
+	if isErr {
+		return fmt.Errorf("failed to execute post rotate pg script on remote")
+	}
+	return nil
+}
+
+func restartFollowerNodeAndWaitForhealthy(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary, sshUtil SSHUtil, writer *cli.Writer) error {
+	for _, pgIp := range pgIps {
+		if !strings.EqualFold(pgIp, leaderNode.IP) {
+			sshUtil.getSSHConfig().hostIP = pgIp
+			res, err := sshUtil.connectAndExecuteCommandOnRemote(RESTART_BACKEND_COMMAND, true)
+			if err != nil {
+				writer.Errorf("error in executing restart backend supervisor command")
+				return status.Wrapf(err, status.RestartDeploymentServiceError, "error in executing restart backend supervisor command %s", res)
+			}
+		}
+	}
+	writer.Println("polling follower node health")
+	start := time.Now()
+	followers := make(map[string]bool)
+	for _, followerNodes := range pgIps {
+		if !strings.EqualFold(followerNodes, leaderNode.IP) {
+			followers[followerNodes] = false
+		}
+	}
+	for {
+		healthy := false
+		for k, v := range statusSummary.GetPGFollwerNodes() {
+			if strings.EqualFold(v, SERVICE_HEALTH_OK) {
+				writer.Println(fmt.Sprintf("follower node %s health %s", k, v))
+				followers[k] = true
+			}
+		}
+
+		for _, v := range followers {
+			if v {
+				healthy = true
+			} else {
+				healthy = false
+				break
+			}
+		}
+		if healthy {
+			writer.Println("all pg follower nodes are healthy")
+			break
+		}
+		time.Sleep(time.Second * SERVICE_HEALTH_CHECK_INTERVAL)
+		timeElaspsed := time.Since(start)
+		if timeElaspsed.Seconds() > MAX_TIMEOUT_THRESHOLD {
+			writer.Println("follower nodes are still un-helathy timeed out")
+			break
+		}
+	}
+	return nil
 }
 
 func getIPsFromOSClusterResponse(output string) string {
@@ -498,16 +654,21 @@ func trimSliceSpace(slc []string) []string {
 	return slc
 }
 
-func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
-	inc, err := modifyInstanceCount(*instanceCount, len(newIps))
-	*instanceCount = inc
+	originalLen := len(*existingPrivateIPs)
+	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
+	filteredLen := len(*existingPrivateIPs)
+	removeIpCount := originalLen - filteredLen
+
+	inc, err := modifyInstanceCount(*instanceCount, len(newIps)-removeIpCount)
 	if err != nil {
 		return err
 	}
+	*instanceCount = inc
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
 			c := CertByIP{
@@ -517,6 +678,11 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
 			}
 			*certsIp = append(*certsIp, c)
+		}
+	}
+	if len(*certsIp) > 0 {
+		for _, ip := range unreachableNodes {
+			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
 	return nil
@@ -543,12 +709,16 @@ func modifyConfigForNewNodeCertByIp(instanceCount int, existingPrivateIPs []stri
 	return nil
 }
 
-func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = difference(*existingPrivateIPs, newIps)
-	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	originalLen := len(*existingPrivateIPs)
+	*existingPrivateIPs = difference(*existingPrivateIPs, unreachableNodes)
+	filteredLen := len(*existingPrivateIPs)
+	removeIpCount := originalLen - filteredLen
+	inc, err := modifyInstanceCount(*instanceCount, -(len(newIps) + removeIpCount))
 	*instanceCount = inc
 	if err != nil {
 		return err
@@ -558,20 +728,28 @@ func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]stri
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
+	if len(*certsIp) > 0 && len(unreachableNodes) > 0 {
+		for _, ip := range unreachableNodes {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+	}
 	return nil
 }
 
-func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string, certsIp *[]CertByIP, unreachableNodes []string) error {
 	if len(newIps) == 0 {
 		return nil
 	}
-	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	inc, err := modifyInstanceCount(*instanceCount, -(len(newIps) + len(unreachableNodes)))
 	if err != nil {
 		return err
 	}
 	*instanceCount = inc
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+		for _, ip := range unreachableNodes {
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
@@ -749,8 +927,8 @@ func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
 
 func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	timestamp := time.Now().Format("20060102150405")
-	fmt.Println("====================================================================")
-	fmt.Println("Syncing configs to frontend nodes")
+	writer.Println("====================================================================")
+	writer.Println("Syncing configs to frontend nodes")
 	frontendPrefix := "frontend" + "_" + timestamp + "_"
 	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
 	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
@@ -761,7 +939,7 @@ func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	return nodeObjects
 }
 
-func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails, unreachableNodes map[string][]string) *NodeTypeAndCmd {
 
 	nodeMap := NewNodeTypeAndCmd()
 	cmd := newNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
@@ -907,3 +1085,14 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		return srcString, nil
 	}
 }
+
+func getPGLeader(statusSummary StatusSummary) *NodeIpHealth {
+	ip, health := statusSummary.GetPGLeaderNode()
+	nodeIpHealth := NodeIpHealth{
+		IP:     ip,
+		Health: health,
+	}
+	return &nodeIpHealth
+}
+
+var getPGLeaderFunc func(statusSummary StatusSummary) *NodeIpHealth = getPGLeader

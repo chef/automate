@@ -1,6 +1,6 @@
-@import "~styles/variables";
-@import "@carbon/layout/scss/layout";
-@import "@carbon/grid/scss/grid";
+@import "../../../../styles/variables";
+@import "@carbon/layout";
+@import "@carbon/grid";
 
 :host {
   display: flex;

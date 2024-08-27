@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -1498,7 +1499,7 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 			},
 			infra: infra,
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -1515,9 +1516,9 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -1534,7 +1535,7 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1550,7 +1551,7 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 			},
 			infra: infra,
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -1567,9 +1568,9 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -1586,7 +1587,7 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1604,7 +1605,7 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 			},
 			infra: infra,
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -1621,10 +1622,10 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
-					return nil, errors.New("ERROR")
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
+					return nil, nil, errors.New("ERROR")
 				},
 			},
 
@@ -1642,11 +1643,11 @@ func TestGetSkipIpsListForPgRootCAPatching(t *testing.T) {
 			},
 			infra: infra,
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
-					return nil, errors.New("ERROR")
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
+					return nil, nil, errors.New("ERROR")
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
-					return nil, errors.New("ERROR")
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
+					return nil, nil, errors.New("ERROR")
 				},
 			},
 
@@ -1698,7 +1699,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			nodesCn:  "chefnode",
 			flagsObj: &certRotateFlags{},
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -1718,9 +1719,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP1: {
 							Global: &shared.GlobalConfig{
@@ -1740,7 +1741,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1758,7 +1759,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			nodesCn:  "chefnode",
 			flagsObj: &certRotateFlags{},
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -1778,9 +1779,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP1: {
 							Global: &shared.GlobalConfig{
@@ -1800,7 +1801,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1818,7 +1819,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			nodesCn:  "chefnodee",
 			flagsObj: &certRotateFlags{},
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -1838,9 +1839,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP1: {
 							Global: &shared.GlobalConfig{
@@ -1860,7 +1861,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1880,7 +1881,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			},
 			nodesCn: "chefnode",
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -1897,9 +1898,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP1: {
 							Global: &shared.GlobalConfig{
@@ -1916,7 +1917,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1936,7 +1937,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			},
 			nodesCn: "chefnode",
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -1953,9 +1954,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP1: {
 							Global: &shared.GlobalConfig{
@@ -1972,7 +1973,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -1993,7 +1994,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 				node: ValidIP4,
 			},
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -2010,10 +2011,10 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
-					return nil, errors.New("ERROR")
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
+					return nil, nil, errors.New("ERROR")
 				},
 			},
 
@@ -2031,10 +2032,10 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			},
 			infra: infra,
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
-					return nil, errors.New("ERROR")
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
+					return nil, nil, errors.New("ERROR")
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP7: {
 							Global: &shared.GlobalConfig{
@@ -2051,7 +2052,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -2069,7 +2070,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			nodesCn:  "chefnode",
 			flagsObj: &certRotateFlags{},
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -2107,9 +2108,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP2: {
 							Global: &shared.GlobalConfig{
@@ -2147,7 +2148,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -2165,7 +2166,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 			nodesCn:  "chefnode",
 			flagsObj: &certRotateFlags{},
 			MockPullConfigs: &MockPullConfigs{
-				pullAutomateConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullAutomateConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP: {
 							Global: &shared.GlobalConfig{
@@ -2185,9 +2186,9 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
-				pullChefServerConfigsFunc: func() (map[string]*deployment.AutomateConfig, error) {
+				pullChefServerConfigsFunc: func(removeUnreachableNodes bool) (map[string]*deployment.AutomateConfig, []string, error) {
 					return map[string]*deployment.AutomateConfig{
 						ValidIP2: {
 							Global: &shared.GlobalConfig{
@@ -2225,7 +2226,7 @@ func TestGetSkipIpsListForOsRootCACNPatching(t *testing.T) {
 								},
 							},
 						},
-					}, nil
+					}, nil, nil
 				},
 			},
 
@@ -2465,7 +2466,7 @@ func TestPatchConfig(t *testing.T) {
 			testDir := t.TempDir()
 			fPath := filepath.Join(testDir, testCase.param.fileName)
 			testCase.param.fileName = fPath
-			output := c.patchConfig(testCase.param)
+			output := c.patchConfig(testCase.param, true)
 			if testCase.isError {
 				assert.EqualError(t, output, testCase.ExpectedError)
 			} else {
@@ -2493,7 +2494,7 @@ func NewMockInfra() *AutomateHAInfraDetails {
 
 func NewCertRotate() *certRotateFlow {
 	log, _ := logger.NewLogger("text", "debug")
-	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log)
+	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log, &NodeUtilsImpl{})
 	return c
 }
 
@@ -3113,10 +3114,34 @@ func TestCertRotateFromTemplate(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			c := certRotateFlow{fileUtils: &fileutils.FileSystemUtils{},
+			c := certRotateFlow{
+				nodeUtils: &MockNodeUtilsImpl{
+					postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
+						return nil
+					},
+				},
+				fileUtils: &fileutils.MockFileSystemUtils{
+					ReadFileFunc: func(filepath string) ([]byte, error) {
+						if strings.Contains(filepath, "a2ha_manifest.auto.tfvars") {
+							return []byte(`elasticsidecar_pkg_ident = "chef/automate-ha-elasticsidecar/0.1.0/20240725174312"
+	proxy_pkg_ident = "chef/automate-ha-haproxy/2.2.14/20240725171322"
+	opensearch_pkg_ident = "chef/automate-ha-opensearch/1.3.14/20240725173732"
+	pgleaderchk_pkg_ident = "chef/automate-ha-pgleaderchk/0.1.0/20240725172920"
+	postgresql_pkg_ident = "chef/automate-ha-postgresql/13.14.0/20240725171322"`), nil
+						}
+						fu := fileutils.FileSystemUtils{}
+						return fu.ReadFile(filepath)
+					},
+					CreateTempFileFunc: func(content, filename, dir string) (string, error) {
+						return filename, nil
+					},
+					RemoveFileFunc: func(filename string) error {
+						return nil
+					},
+				},
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl(), log: log}
-			output := c.certRotateFromTemplate(testCase.certFileName, testCase.sshutil, testCase.inf, testCase.currentCertsInfo, testCase.statusSummary, false, 0, 0)
+			output := c.certRotateFromTemplate(testCase.certFileName, testCase.sshutil, testCase.inf, testCase.currentCertsInfo, testCase.statusSummary, false, 0, &certRotateFlags{})
 			fmt.Println(output)
 			if testCase.isError {
 				assert.Error(t, output, testCase.ExpectedError)
@@ -3365,6 +3390,170 @@ func TestValidateCertificateTemplate(t *testing.T) {
 				assert.Error(t, output[0], testCase.ExpectedError)
 			} else {
 				assert.NoError(t, nil)
+			}
+		})
+	}
+}
+
+func TestGetScriptCommandsNoRestart(t *testing.T) {
+	type testCaseInfo struct {
+		patchParams *patchFnParameters
+		expectedRes string
+	}
+	testCases := []testCaseInfo{
+		{
+			patchParams: &patchFnParameters{
+				remoteService: AUTOMATE,
+				timestamp:     "test-time_automate",
+			},
+			expectedRes: "\n\tsudo chef-automate config patch /tmp/automatetest-time_automate;\n\texport TIMESTAMP=$(date +'%Y%m%d%H%M%S');\n\tsudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;\n\tsudo chef-automate config show > sudo /etc/chef-automate/config.toml",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: CHEF_SERVER,
+				timestamp:     "test-time_chef_server",
+			},
+			expectedRes: "\n\tsudo chef-automate config patch /tmp/chef_servertest-time_chef_server;\n\texport TIMESTAMP=$(date +'%Y%m%d%H%M%S');\n\tsudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;\n\tsudo chef-automate config show > sudo /etc/chef-automate/config.toml",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: "frontend",
+				timestamp:     "test-time_frontend",
+			},
+			expectedRes: "\n\tsudo chef-automate config patch /tmp/frontendtest-time_frontend;\n\texport TIMESTAMP=$(date +'%Y%m%d%H%M%S');\n\tsudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;\n\tsudo chef-automate config show > sudo /etc/chef-automate/config.toml",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: POSTGRESQL,
+				timestamp:     "test-time_postgresql",
+			},
+			expectedRes: "\n\techo \"y\" | sudo cp /tmp/postgresqltest-time_postgresql /hab/user/automate-ha-postgresql/config/user.toml\n\t",
+		},
+		{
+			patchParams: &patchFnParameters{
+				remoteService: OPENSEARCH,
+				timestamp:     "test-time_opensearch",
+			},
+			expectedRes: "\n\techo \"y\" | sudo cp /tmp/opensearchtest-time_opensearch /hab/user/automate-ha-opensearch/config/user.toml\n\t",
+		},
+	}
+
+	for _, tests := range testCases {
+		command := getScriptCommandsNoRestart(tests.patchParams, "")
+		assert.Equal(t, tests.expectedRes, command)
+	}
+
+}
+
+func TestRotateClusterPGOSRootFrontendCertificates(t *testing.T) {
+	_, infra := getMockCertRotateFlowAndInfra()
+	type testCaseInfo struct {
+		description      string
+		inf              *AutomateHAInfraDetails
+		flagsObj         certRotateFlags
+		currentCertsInfo *certShowCertificates
+		certToml         *CertificateToml
+		MockSSHUtil      sshutils.SSHUtil
+		sshutil          SSHUtil
+		isError          bool
+		ExpectedError    string
+		FilterIps        []IP
+		ExpectedPatch    []string
+	}
+	mocksshUtils := &sshutils.MockSSHUtilsImpl{
+		CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+			return []sshutils.Result{
+				{
+					HostIP: "",
+					Error:  nil,
+					Output: "",
+				},
+			}
+		},
+		Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
+			return "", nil
+		},
+	}
+	testCases := []testCaseInfo{
+		{
+			description: "Rotate PG Root Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				timeout: 1000,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil:      mocksshUtils,
+			isError:          false,
+			ExpectedError:    "No  IPs are found",
+			FilterIps:        []IP{},
+			ExpectedPatch:    []string{ValidIP, ValidIP1, ValidIP2, ValidIP3},
+		},
+		{
+			description: "Rotate PG Root Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				timeout: 1000,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil:      mocksshUtils,
+			isError:          false,
+			ExpectedError:    "No  IPs are found",
+			FilterIps: []IP{
+				{
+					IP: ValidIP1,
+				},
+			},
+			ExpectedPatch: []string{ValidIP, ValidIP2, ValidIP3},
+		},
+		{
+			description: "Rotate PG Root Frontend Certs",
+			inf:         infra,
+			flagsObj: certRotateFlags{
+				timeout: 1000,
+			},
+			currentCertsInfo: mockCertShowCertificates(),
+			certToml:         mockCertifiateTemplate(),
+			sshutil:          GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			MockSSHUtil:      mocksshUtils,
+			isError:          false,
+			ExpectedError:    "No  IPs are found",
+			FilterIps: []IP{
+				{
+					IP: ValidIP1,
+				},
+				{
+					IP: ValidIP3,
+				},
+			},
+			ExpectedPatch: []string{ValidIP, ValidIP2},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			c := certRotateFlow{fileUtils: mockFS(),
+				sshUtil: testCase.MockSSHUtil,
+				writer:  getMockWriterImpl()}
+			filteredIps, output := c.patchPGOSRootCAOnFrontend(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, testCase.certToml, testCase.FilterIps)
+			fmt.Println(output)
+			if testCase.isError {
+				assert.Error(t, output, testCase.ExpectedError)
+			} else {
+				assert.NoError(t, output)
+				assert.EqualValues(t, testCase.ExpectedPatch, filteredIps)
 			}
 		})
 	}

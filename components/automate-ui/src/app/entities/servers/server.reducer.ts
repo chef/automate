@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
 import { pipe, set, unset } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { ServerActionTypes, ServerActions } from './server.actions';
 import { Server } from './server.model';
 
@@ -35,7 +35,7 @@ export const ServerEntityInitialState: ServerEntityState =
 
 export function serverEntityReducer(
   state: ServerEntityState = ServerEntityInitialState,
-  action: ServerActions): ServerEntityState {
+  action: ServerActions | any): ServerEntityState {
 
   switch (action.type) {
 

@@ -37,8 +37,6 @@
     "chef/automate-cs-oc-erchef",
     "chef/automate-cs-ocid",
     "chef/automate-cs-nginx",
-    "chef/automate-workflow-server",
-    "chef/automate-workflow-nginx",
     "chef/automate-builder-memcached",
     "chef/automate-builder-api",
     "chef/automate-builder-api-proxy",
@@ -182,15 +180,6 @@
         "chef/automate-cs-oc-erchef",
         "chef/automate-cs-nginx",
         "chef/automate-cs-ocid"
-      ]
-    },
-    {
-      "name": "workflow",
-      "type": "product",
-      "dependencies": ["automate"],
-      "services": [
-        "chef/automate-workflow-server",
-        "chef/automate-workflow-nginx"
       ]
     },
     {

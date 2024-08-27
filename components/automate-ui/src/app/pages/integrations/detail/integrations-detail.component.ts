@@ -3,13 +3,13 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { IntegrationsDetailState } from './integrations-detail.reducer';
 import { integrationsDetail } from './integrations-detail.selectors';
 import { includes, without } from 'lodash';
-import { ManagerDeleteNodes } from 'app/entities/managers/manager.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ManagerDeleteNodes } from '../../../entities/managers/manager.actions';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations-detail',

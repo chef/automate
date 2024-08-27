@@ -36,7 +36,7 @@ export class ClientRunsEffects {
       ofType(ClientRunsActionTypes.GET_NODES),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
-        return this.requests.getNodes(storeState.clientRunsEntity.nodeFilter).pipe(
+        return this.requests.getNodes((storeState as any).clientRunsEntity.nodeFilter).pipe(
         map(responseNodes => new GetNodesSuccess({ nodes: responseNodes })),
         catchError((error) => of(new GetNodesFailure(error))));
       })));
@@ -46,7 +46,7 @@ export class ClientRunsEffects {
       ofType(ClientRunsActionTypes.GET_NODES_COUNT),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
-        return this.requests.getNodeCount(storeState.clientRunsEntity.nodeFilter).pipe(
+        return this.requests.getNodeCount((storeState as any).clientRunsEntity.nodeFilter).pipe(
         map(responseNodeCount => new GetNodeCountSuccess({ nodeCount: responseNodeCount })),
         catchError((error) => of(new GetNodeCountFailure(error))));
       })));
@@ -67,7 +67,7 @@ export class ClientRunsEffects {
         const getNodeSuggestions = action as GetNodeSuggestions;
         return this.requests.getSuggestions(
           getNodeSuggestions.payload.type, getNodeSuggestions.payload.text,
-          storeState.clientRunsEntity.nodeFilter).pipe(
+          (storeState as any).clientRunsEntity.nodeFilter).pipe(
         map(nodeSuggestions => new GetNodeSuggestionsSuccess({ nodeSuggestions })),
         catchError((error) => of(new GetNodeSuggestionsFailure(error))));
       })));

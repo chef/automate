@@ -47,6 +47,9 @@ do_deploy() {
         --skip-preflight \
         --self-test \
         --yes
+
+
+    do_apply_license
 }
 
 do_prepare_upgrade() {

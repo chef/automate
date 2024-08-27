@@ -1,8 +1,8 @@
 import { set, pipe, find } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { EntityStatus } from '../../entities/entities';
+import { ChefSorters } from '../..//helpers/auth/sorter';
+import { ProjectConstants } from '../..//entities/projects/project.model';
 import {
   ProjectsFilterActions,
   ProjectsFilterActionTypes
@@ -50,7 +50,7 @@ export const projectsFilterInitialState: ProjectsFilterState = {
 
 export function projectsFilterReducer(
   state: ProjectsFilterState = projectsFilterInitialState,
-  action: ProjectsFilterActions): ProjectsFilterState {
+  action: ProjectsFilterActions | any): ProjectsFilterState {
 
   switch (action.type) {
 

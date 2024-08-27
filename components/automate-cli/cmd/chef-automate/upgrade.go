@@ -58,11 +58,12 @@ var upgradeRunCmdFlags = struct {
 }{}
 
 var upgradeRunCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run an upgrade of Chef Automate",
-	Long:  "Run an upgrade of Chef Automate",
-	RunE:  runUpgradeCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:               "run",
+	Short:             "Run an upgrade of Chef Automate",
+	Long:              "Run an upgrade of Chef Automate",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runUpgradeCmd,
+	Args:              cobra.MaximumNArgs(0),
 }
 
 var upgradeStatusCmdFlags = struct {
@@ -121,11 +122,18 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
 	}
 
-	if airgap.AirgapInUse() {
-		res, err := client.GetAutomateConfig(configCmdFlags.timeout)
-		if err != nil {
-			return err
+	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+	if err != nil {
+		return err
+	}
+
+	for _, product := range res.Config.Deployment.GetV1().GetSvc().Products {
+		if product == "workflow" {
+			return status.New(status.InvalidCommandArgsError, "Automate does not support the `workflow` as product, please remove the `workflow` from the configuration and run the upgrade")
 		}
+	}
+
+	if airgap.AirgapInUse() {
 		if res.Config.Deployment.GetV1().GetSvc().GetUpgradeStrategy().GetValue() != "none" {
 			return status.New(status.InvalidCommandArgsError, "Before running the upgrade, set upgrade_strategy = 'none' and patch the config.")
 		}
@@ -440,7 +448,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateInfraConfig()
+		config, _, err := configPuller.generateInfraConfig(false)
 		if err != nil {
 			return err
 		}
@@ -465,7 +473,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateAwsConfig()
+		config, _, err := configPuller.generateAwsConfig(false)
 		if err != nil {
 			return err
 		}

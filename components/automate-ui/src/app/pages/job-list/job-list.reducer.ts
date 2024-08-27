@@ -33,7 +33,7 @@ export const JobListInitialState: JobListState = {
 };
 
 export function jobListReducer(state: JobListState = JobListInitialState,
-                               action: JobListActions): JobListState {
+                               action: JobListActions | any): JobListState {
   switch (action.type) {
 
     case JobListActionTypes.SORT_JOBS:

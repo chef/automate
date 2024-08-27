@@ -10,20 +10,20 @@ import { Store, select } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
 import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { HttpStatus } from 'app/types/types';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { Regex } from '../../../helpers/auth/regex';
+import { EntityStatus, pending } from '../../../entities/entities';
+import { HttpStatus } from '../../../types/types';
 import {
   saveStatus,
   saveError
-} from 'app/entities/data-bags/data-bags.selectors';
-import { DataBag } from 'app/entities/data-bags/data-bags.model';
+} from '../../../entities/data-bags/data-bags.selectors';
+import { DataBag } from '../../../entities/data-bags/data-bags.model';
 import {
   CreateDataBag
-} from 'app/entities/data-bags/data-bags.actions';
-import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/data-bags/data-bags.actions';
+import { Utilities } from '../../../helpers/utilities/utilities';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-data-bag-modal',

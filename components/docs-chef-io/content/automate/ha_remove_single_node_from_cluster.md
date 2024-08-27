@@ -63,6 +63,20 @@ The command requires some arguments to determine which types of nodes you want t
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
+You can remove other unreachable nodes while removing a node.
+
+- To remove unreachable nodes while removing a node, pass the flag --remove-unreachable-node or -r like the example below:
+
+     ```sh
+     chef-automate node remove --automate-ip 10.1.2.23 --remove-unreachable-node
+    ```
+
+    or 
+
+     ```sh
+     chef-automate node remove --automate-ip 10.1.2.23 -r
+    ```
+
 Once the command executes, it will remove the particular node from your HA setup. The command might take a while to complete.
 
 - Make sure to remove the IP address of the deleted node from your load balancer configuration. For reference, check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
@@ -105,6 +119,20 @@ The command requires some arguments to determine the type of node you want to re
 
     ```sh
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
+    ```
+
+You can remove other unreachable nodes while removing a node.
+
+- To remove unreachable nodes while removing a node, pass the flag --remove-unreachable-node or -r like the example below:
+
+     ```sh
+     chef-automate node remove --automate-ip 10.1.2.23 --remove-unreachable-node
+    ```
+
+    or 
+
+     ```sh
+     chef-automate node remove --automate-ip 10.1.2.23 -r
     ```
 
 Once the command is executed, it will remove the particular node from your HA setup. The command might take a while to complete.

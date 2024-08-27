@@ -12,7 +12,8 @@ func newProvisionInfraCmd() *cobra.Command {
 		Short: "Provision Automate HA infra.",
 		Long:  "Provision infra for Automate HA deployment.",
 		Args:  cobra.RangeArgs(0, 1),
-		RunE:  runProvisionInfraCmd,
+		//PersistentPreRunE: checkLicenseStatusForExpiry,
+		RunE: runProvisionInfraCmd,
 		Annotations: map[string]string{
 			docs.Compatibility: docs.CompatiblewithHA,
 		},

@@ -10,7 +10,7 @@ export const InitialState: NotificationEntityState = [];
 
 export function notificationEntityReducer(
   state: NotificationEntityState = InitialState,
-  action: NotificationActions): NotificationEntityState {
+  action: NotificationActions | any): NotificationEntityState {
 
   switch (action.type) {
 

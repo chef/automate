@@ -6,7 +6,7 @@ import { catchError, mergeMap, map, tap } from 'rxjs/operators';
 import { intersectionBy } from 'lodash/fp';
 
 
-import { Project } from 'app/entities/projects/project.model';
+import { Project } from '../../entities/projects/project.model';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import { ProjectsFilterService } from './projects-filter.service';
 import { ProjectsFilterRequests, AuthorizedProjectsResponse } from './projects-filter.requests';

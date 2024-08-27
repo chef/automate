@@ -10,27 +10,27 @@ import { Store, select } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
 import { first, filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { HttpStatus } from 'app/types/types';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { Regex } from '../../helpers/auth/regex';
+import { EntityStatus, pending } from '../../entities/entities';
+import { HttpStatus } from '../../types/types';
+import { Utilities } from '../../helpers/utilities/utilities';
 import {
   saveStatus,
   saveError
-} from 'app/entities/notification_rules/notification_rule.selectors';
+} from '../../entities/notification_rules/notification_rule.selectors';
 import {
   NotificationRule,
   ServiceActionType,
   RuleType
-} from 'app/entities/notification_rules/notification_rule.model';
+} from '../../entities/notification_rules/notification_rule.model';
 import {
   CreateNotificationRule
-} from 'app/entities/notification_rules/notification_rule.action';
+} from '../../entities/notification_rules/notification_rule.action';
 import {
   NotificationRuleRequests
-} from 'app/entities/notification_rules/notification_rule.requests';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../entities/notification_rules/notification_rule.requests';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 enum UrlTestState {
   Inactive,

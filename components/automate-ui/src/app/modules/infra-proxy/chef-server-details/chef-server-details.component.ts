@@ -1,34 +1,34 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { HttpStatus } from 'app/types/types';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams, routeURL } from 'app/route.selectors';
-import { Regex } from 'app/helpers/auth/regex';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
+import { HttpStatus } from '../../../types/types';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { routeParams, routeURL } from '../../../route.selectors';
+import { Regex } from '../../../helpers/auth/regex';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { pending, EntityStatus, allLoaded } from '../../../entities/entities';
 import {
   getStatus, serverFromRoute, updateStatus
-} from 'app/entities/servers/server.selectors';
+} from '../../../entities/servers/server.selectors';
 
-import { Server } from 'app/entities/servers/server.model';
-import { GetServer, UpdateServer } from 'app/entities/servers/server.actions';
-import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
-import { Org } from 'app/entities/orgs/org.model';
+import { Server } from '../../../entities/servers/server.model';
+import { GetServer, UpdateServer } from '../../../entities/servers/server.actions';
+import { GetOrgs, CreateOrg, DeleteOrg } from '../../../entities/orgs/org.actions';
+import { Org } from '../../../entities/orgs/org.model';
 import {
   createStatus,
   createError,
   allOrgs,
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus
-} from 'app/entities/orgs/org.selectors';
-import { ProjectConstants } from 'app/entities/projects/project.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+} from '../../../entities/orgs/org.selectors';
+import { ProjectConstants } from '../../../entities/projects/project.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 export type ChefServerTabName = 'orgs' | 'details';
 @Component({
@@ -129,7 +129,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getStatus),
       this.store.select(getAllOrgsForServerStatus),
-      this.store.select(serverFromRoute),
+      this.store.select(serverFromRoute as any),
       this.store.select(allOrgs)
     ]).pipe(
       filter(([getServerStatus, getOrgsStatus, serverState, allOrgsState]) =>
@@ -193,7 +193,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onSelectedTab(event: { target: { value: ChefServerTabName } }) {
+  onSelectedTab(event: { target: { value: ChefServerTabName } } | any) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }

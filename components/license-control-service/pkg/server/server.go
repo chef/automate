@@ -116,6 +116,21 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Deployment id and type not available: %s", err.Error())
 		}
+
+		//calculate Grace period status
+		gracePeriod := false
+		licensedEndTime := time.Unix(licensedPeriod.end.Seconds, 0)
+		if lic.Type == "commercial" {
+			if licensedEndTime.Before(time.Now()) {
+				//adding 60 days of grace period if license got expired
+				gracePeriodDate := time.Unix(licensedPeriod.end.Seconds, 0).AddDate(0, 0, 60)
+				//checks if current date and time is within the grace period
+				if time.Now().Before(gracePeriodDate) {
+					gracePeriod = true
+				}
+			}
+		}
+
 		response := &lc.StatusResponse{
 			LicenseId:    lic.Id,
 			CustomerName: lic.Customer,
@@ -126,8 +141,10 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 			},
 			DeploymentId:   deploymentResponse.DeploymentId,
 			DeploymentType: deploymentResponse.DeploymentType,
+			LicenseType:    lic.Type,
+			DeploymentAt:   deploymentResponse.DeploymentAt,
+			GracePeriod:    gracePeriod,
 		}
-
 		return response, nil
 	default:
 		return nil, status.Errorf(codes.Internal, "failed to retrieve error from storage backend: %s", err.Error())
@@ -203,6 +220,7 @@ func (s *LicenseControlServer) GetDeploymentID(ctx context.Context, req *lc.GetD
 	return &lc.GetDeploymentIDResponse{
 		DeploymentId:   deployment.ID,
 		DeploymentType: deployment.Type,
+		DeploymentAt:   &timestamp.Timestamp{Seconds: deployment.CreatedAt.Unix()},
 	}, nil
 }
 

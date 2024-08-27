@@ -14,13 +14,13 @@ import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
 import { FilterC } from '../types';
-import * as moment from 'moment/moment';
-import { Chicklet } from 'app/types/types';
+import moment from 'moment';
+import { Chicklet } from '../../../../types/types';
 import {
   ReportQueryService,
   SuggestionsService
-} from 'app/pages/+compliance/shared/reporting';
-import { DateTime } from 'app/helpers/datetime/datetime';
+} from '../../../../pages/+compliance/shared/reporting';
+import { DateTime } from '../../../../helpers/datetime/datetime';
 
 @Component({
   selector: 'app-reporting-searchbar',
@@ -449,12 +449,13 @@ export class ReportingSearchbarComponent implements OnInit {
 
   // month - month with January 0 and December 11
   // year - 4 digit year (2019)
-  onMonthSelect([month, year]) {
+  onMonthSelect(e: any) {
+    const [month, year] = e;
     this.visibleDate.month(month);
     this.visibleDate.year(year);
   }
 
-  onDaySelect(date: string) {
+  onDaySelect(date: string | any) {
     const m = moment.utc(date);
     this.visibleDate.date(m.date());
     this.visibleDate.month(m.month());

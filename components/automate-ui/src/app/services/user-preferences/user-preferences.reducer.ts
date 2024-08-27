@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { UserPreferencesActionTypes, UserPreferencesActions } from './user-preferences.actions';
 import { UserPreferenceTimeformat } from './user-preferences.model';
 
@@ -8,7 +8,7 @@ export interface UserPreferencesEntityState {
   list: {
     timeformat: UserPreferenceTimeformat
   };
-  error: HttpErrorResponse;
+  error: HttpErrorResponse | null;
   status: EntityStatus;
 }
 
@@ -25,7 +25,7 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
 
 export function userPreferencesEntityReducer(
   state: UserPreferencesEntityState = UserPreferencesEntityInitialState,
-  action: UserPreferencesActions): UserPreferencesEntityState {
+  action: UserPreferencesActions | any): UserPreferencesEntityState {
   switch (action.type) {
 
     case UserPreferencesActionTypes.GET:

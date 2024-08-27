@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA , ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ChefComponentsModule } from 'app/components/chef-components.module';
+import { ChefComponentsModule } from '../../../components/chef-components.module';
 import { StatsService } from './reporting';
 import { ReportQueryService } from './reporting/report-query.service';
 import { ReportDataService } from './reporting/report-data.service';

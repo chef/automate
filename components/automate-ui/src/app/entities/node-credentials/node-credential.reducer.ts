@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe, unset } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { NodeCredentialActionTypes, NodeCredentialActions } from './node-credential.actions';
 import { NodeCredential } from './node-credential.model';
 
@@ -43,7 +43,7 @@ nodeCredentialEntityAdapter.getInitialState(<NodeCredentialEntityState>{
 
 export function nodeCredentialEntityReducer(
   state: NodeCredentialEntityState = NodeCredentialEntityInitialState,
-  action: NodeCredentialActions): NodeCredentialEntityState {
+  action: NodeCredentialActions | any): NodeCredentialEntityState {
 
   switch (action.type) {
     case NodeCredentialActionTypes.SEARCH:

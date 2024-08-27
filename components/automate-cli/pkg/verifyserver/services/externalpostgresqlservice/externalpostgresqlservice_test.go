@@ -32,7 +32,7 @@ func TestExternalPostgresqlService(t *testing.T) {
 			return nil
 		},
 	}, &fileutils.MockFileSystemUtils{
-		CreateTempFileFunc: func(content string, filename string) (string, error) {
+		CreateTempFileFunc: func(content string, filename string, dir string) (string, error) {
 			return "", nil
 		},
 		DeleteTempFileFunc: func(tempFile string) error {
@@ -69,7 +69,7 @@ func TestExternalPostgresqlServiceFailure(t *testing.T) {
 			return errors.New("")
 		},
 	}, &fileutils.MockFileSystemUtils{
-		CreateTempFileFunc: func(content string, filename string) (string, error) {
+		CreateTempFileFunc: func(content string, filename string, dir string) (string, error) {
 			return "", nil
 		},
 		DeleteTempFileFunc: func(tempFile string) error {

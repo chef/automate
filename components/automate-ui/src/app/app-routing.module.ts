@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, mapToCanActivate } from '@angular/router';
 
 // Views
 import {
@@ -50,7 +50,7 @@ import { ProjectListComponent } from './pages/project/list/project-list.componen
 import { ProjectRulesComponent } from './pages/project/rules/project-rules.component';
 import { RolesListComponent } from './modules/roles/list/roles-list.component';
 import { RoleDetailsComponent } from './modules/roles/details/role-details.component';
-import { UIComponent } from 'app/ui.component';
+import { UIComponent } from './ui.component';
 import { UserDetailsComponent } from './modules/user/user-details/user-details.component';
 import { UserDetailsNonAdminResolve } from './modules/user/user-details/user-details.resolver';
 
@@ -72,301 +72,302 @@ const routes: Routes = [
   {
     path: '',
     component: UIComponent,
-    canActivate: [ChefSessionService],
-    children: [{
-      path: '',
-      pathMatch: 'full',
-      component: TopNavLandingComponent
-    },
-    {
-      path: 'settings',
-      children: [
-        {
-          path: '',
-          pathMatch: 'full',
-          component: SettingsLandingComponent
-        },
-        {
-          path: 'data-lifecycle',
-          component: AutomateSettingsComponent
-        },
-        {
-          path: 'teams',
-          loadChildren: () => import('./modules/team/team.module').then(m => m.TeamModule)
-        },
-        {
-          path: 'tokens',
-          component: ApiTokenListComponent
-        },
-        {
-          path: 'tokens/:id',
-          component: ApiTokenDetailsComponent
-        },
-        {
-          path: 'users',
-          loadChildren: () => import('./modules/user/user.module').then(m => m.UserModule)
-        },
-        {
-          path: 'policies',
-          component: PolicyListComponent
-        },
-        {
-          path: 'policies/:id',
-          component: PolicyDetailsComponent
-        },
-        {
-          path: 'policies/:id/add-members',
-          component: PolicyAddMembersComponent,
-          data: { hideNavBar: true }
-        },
-        {
-          path: 'projects',
-          component: ProjectListComponent
-        },
-        {
-          path: 'projects/:id',
-          component: ProjectDetailsComponent
-        },
-        {
-          path: 'projects/:id/rules',
-          component: ProjectRulesComponent,
-          data: { hideNavBar: true }
-        },
-        {
-          path: 'projects/:id/rules/:ruleid',
-          component: ProjectRulesComponent,
-          data: { hideNavBar: true }
-        },
-        {
-          path: 'roles',
-          component: RolesListComponent
-        },
-        {
-          path: 'roles/:id',
-          component: RoleDetailsComponent
-        },
-        {
-          path: 'node-integrations',
-          children: [
-            {
-              path: '',
-              component: IntegrationsListComponent
-            },
-            {
-              path: 'add',
-              component: IntegrationsAddComponent
-            },
-            {
-              path: 'edit/:id',
-              component: IntegrationsEditComponent
-            },
-            {
-              path: ':id',
-              component: IntegrationsDetailComponent
-            }
-          ]
-        },
-        {
-          path: 'node-credentials',
-          loadChildren: () =>
-            import('./pages/+compliance/+node-credentials/node-credentials.module')
-              .then(m => m.NodeCredentialsModule)
-        },
-        {
-          path: 'notifications',
-          children: [
-            {
-              path: '',
-              component: NotificationsComponent
-            },
-            {
-              path: ':id',
-              component: NotificationDetailsComponent
-            }
-          ]
-        },
-        {
-          path: 'data-feeds',
-          children: [
-            {
-              path: '',
-              component: DataFeedComponent
-            },
-            {
-              path: ':id',
-              component: DataFeedDetailsComponent
-            }
-          ]
-        }
-      ]
-    },
-    {
-      path: 'user-details/:id',
-      component: UserDetailsComponent,
-      resolve: { isNonAdmin: UserDetailsNonAdminResolve }
-    },
-    {
-      path: 'compliance',
-      loadChildren: () => import('app/pages/+compliance/compliance.module')
-        .then(m => m.ComplianceModule)
-    },
-    {
-      path: 'infrastructure',
-      children: [
-        {
-          path: '',
-          redirectTo: '/infrastructure/client-runs',
-          pathMatch: 'full'
-        },
-        {
-          path: 'client-runs',
-          children: [
-            {
-              path: '',
-              component: ClientRunsComponent
-            },
-            {
-              path: ':node-id',
-              component: NodeNoRunsDetailsComponent,
-              resolve: {
-                node: NodeNoRunIdResolverService
+    canActivate: mapToCanActivate([ChefSessionService]),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: TopNavLandingComponent
+      },
+      {
+        path: 'settings',
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            component: SettingsLandingComponent
+          },
+          {
+            path: 'data-lifecycle',
+            component: AutomateSettingsComponent
+          },
+          {
+            path: 'teams',
+            loadChildren: () => import('./modules/team/team.module').then(m => m.TeamModule)
+          },
+          {
+            path: 'tokens',
+            component: ApiTokenListComponent
+          },
+          {
+            path: 'tokens/:id',
+            component: ApiTokenDetailsComponent
+          },
+          {
+            path: 'users',
+            loadChildren: () => import('./modules/user/user.module').then(m => m.UserModule)
+          },
+          {
+            path: 'policies',
+            component: PolicyListComponent
+          },
+          {
+            path: 'policies/:id',
+            component: PolicyDetailsComponent
+          },
+          {
+            path: 'policies/:id/add-members',
+            component: PolicyAddMembersComponent,
+            data: { hideNavBar: true }
+          },
+          {
+            path: 'projects',
+            component: ProjectListComponent
+          },
+          {
+            path: 'projects/:id',
+            component: ProjectDetailsComponent
+          },
+          {
+            path: 'projects/:id/rules',
+            component: ProjectRulesComponent,
+            data: { hideNavBar: true }
+          },
+          {
+            path: 'projects/:id/rules/:ruleid',
+            component: ProjectRulesComponent,
+            data: { hideNavBar: true }
+          },
+          {
+            path: 'roles',
+            component: RolesListComponent
+          },
+          {
+            path: 'roles/:id',
+            component: RoleDetailsComponent
+          },
+          {
+            path: 'node-integrations',
+            children: [
+              {
+                path: '',
+                component: IntegrationsListComponent
+              },
+              {
+                path: 'add',
+                component: IntegrationsAddComponent
+              },
+              {
+                path: 'edit/:id',
+                component: IntegrationsEditComponent
+              },
+              {
+                path: ':id',
+                component: IntegrationsDetailComponent
               }
-            },
-            {
-              path: ':node-id/missing-runs',
-              component: NodeNoRunsDetailsComponent,
-              resolve: {
-                node: NodeNoRunsDetailsResolverService
+            ]
+          },
+          {
+            path: 'node-credentials',
+            loadChildren: () =>
+              import('./pages/+compliance/+node-credentials/node-credentials.module')
+                .then(m => m.NodeCredentialsModule)
+          },
+          {
+            path: 'notifications',
+            children: [
+              {
+                path: '',
+                component: NotificationsComponent
+              },
+              {
+                path: ':id',
+                component: NotificationDetailsComponent
               }
-            },
-            {
-              path: ':node-id/runs/:run-id',
-              component: NodeDetailsComponent,
-              resolve: {
-                nodeRun: NodeDetailsResolverService
+            ]
+          },
+          {
+            path: 'data-feeds',
+            children: [
+              {
+                path: '',
+                component: DataFeedComponent
+              },
+              {
+                path: ':id',
+                component: DataFeedDetailsComponent
               }
-            }
-          ]
-        },
-        {
-          path: 'chef-servers',
-          children: [
-            {
-              path: '',
-              component: ChefServersListComponent
-            },
-            {
-              path: ':id',
-              component: ChefServerDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id',
-              component: OrgDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/cookbooks/:cookbook-name',
-              component: CookbookDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/nodes/:name',
-              component: InfraNodeDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/roles/:name',
-              component: InfraRoleDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/environments/:name',
-              component: EnvironmentDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/data-bags/:name',
-              component: DataBagsDetailsComponent
-            },
-            {
-              path: ':id/organizations/:orgid/clients/:name',
-              component: ClientDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/policyfiles/:name/revision/:revision',
-              component: PolicyFileDetailsComponent
-            },
-            {
-              path: ':id/organizations/:org-id/policyGroups/:name',
-              component: PolicyGroupDetailsComponent
-            }
-          ]
-        }
-      ]
-    },
-    {
-      path: 'applications/service-groups',
-      children: [
-        {
-          path: '',
-          component: ApplicationsComponent
-        }
-      ]
-    },
-    {
-      path: 'dashboards/event-feed',
-      children: [
-        {
-          path: '',
-          component: EventFeedComponent
-        }
-      ]
-    },
-    {
-      path: 'desktop',
-      loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
-    },
-    {
-      path: 'cds',
-      loadChildren: () => import('./modules/cds/cds.module').then(m => m.CdsModule)
-    },
-    {
-      path: 'nodes',
-      loadChildren: () => import('./modules/nodes/nodes.module').then(m => m.NodesModule)
-    },
-    {
-      path: 'profiles',
-      redirectTo: '/compliance/compliance-profiles',
-      pathMatch: 'full'
-    },
-    {
-      path: 'profiles/profile-details',
-      redirectTo: '/compliance/compliance-profiles/profile-details',
-      pathMatch: 'full'
-    },
-    {
-      path: 'jobs',
-      children: [
-        {
-          path: '',
-          // For now we are redirecting to the old jobs list. When we get the UX
-          // worked out we can stop redirecting and use the new JobListComponent.
-          redirectTo: '/compliance/scan-jobs/jobs',
-          pathMatch: 'full'
-        },
-        {
-          path: 'add',
-          component: JobAddComponent
-        },
-        {
-          path: ':id/edit',
-          component: JobEditComponent
-        }
-      ]
-    },
-    {
-      // TODO: we'd like this to only load in dev mode, but it doesn't work without require, and
-      // we don't want require in the code base because it leads people to use libraries that
-      // mutate the dom outside of angular's change detection.
-      path: 'component_library',
-      loadChildren: () => import('app/pages/component-library/component-library.module')
-        .then(m => m.ComponentLibraryModule)
-    }
+            ]
+          }
+        ]
+      },
+      {
+        path: 'user-details/:id',
+        component: UserDetailsComponent,
+        resolve: { isNonAdmin: UserDetailsNonAdminResolve }
+      },
+      {
+        path: 'compliance',
+        loadChildren: () => import('./pages/+compliance/compliance.module')
+          .then(m => m.ComplianceModule)
+      },
+      {
+        path: 'infrastructure',
+        children: [
+          {
+            path: '',
+            redirectTo: '/infrastructure/client-runs',
+            pathMatch: 'full'
+          },
+          {
+            path: 'client-runs',
+            children: [
+              {
+                path: '',
+                component: ClientRunsComponent
+              },
+              {
+                path: ':node-id',
+                component: NodeNoRunsDetailsComponent,
+                resolve: {
+                  node: NodeNoRunIdResolverService
+                }
+              },
+              {
+                path: ':node-id/missing-runs',
+                component: NodeNoRunsDetailsComponent,
+                resolve: {
+                  node: NodeNoRunsDetailsResolverService
+                }
+              },
+              {
+                path: ':node-id/runs/:run-id',
+                component: NodeDetailsComponent,
+                resolve: {
+                  nodeRun: NodeDetailsResolverService
+                }
+              }
+            ]
+          },
+          {
+            path: 'chef-servers',
+            children: [
+              {
+                path: '',
+                component: ChefServersListComponent
+              },
+              {
+                path: ':id',
+                component: ChefServerDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id',
+                component: OrgDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/cookbooks/:cookbook-name',
+                component: CookbookDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/nodes/:name',
+                component: InfraNodeDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/roles/:name',
+                component: InfraRoleDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/environments/:name',
+                component: EnvironmentDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/data-bags/:name',
+                component: DataBagsDetailsComponent
+              },
+              {
+                path: ':id/organizations/:orgid/clients/:name',
+                component: ClientDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/policyfiles/:name/revision/:revision',
+                component: PolicyFileDetailsComponent
+              },
+              {
+                path: ':id/organizations/:org-id/policyGroups/:name',
+                component: PolicyGroupDetailsComponent
+              }
+            ]
+          }
+        ]
+      },
+      {
+        path: 'applications/service-groups',
+        children: [
+          {
+            path: '',
+            component: ApplicationsComponent
+          }
+        ]
+      },
+      {
+        path: 'dashboards/event-feed',
+        children: [
+          {
+            path: '',
+            component: EventFeedComponent
+          }
+        ]
+      },
+      {
+        path: 'desktop',
+        loadChildren: () => import('./modules/desktop/desktop.module').then(m => m.DesktopModule)
+      },
+      {
+        path: 'cds',
+        loadChildren: () => import('./modules/cds/cds.module').then(m => m.CdsModule)
+      },
+      {
+        path: 'nodes',
+        loadChildren: () => import('./modules/nodes/nodes.module').then(m => m.NodesModule)
+      },
+      {
+        path: 'profiles',
+        redirectTo: '/compliance/compliance-profiles',
+        pathMatch: 'full'
+      },
+      {
+        path: 'profiles/profile-details',
+        redirectTo: '/compliance/compliance-profiles/profile-details',
+        pathMatch: 'full'
+      },
+      {
+        path: 'jobs',
+        children: [
+          {
+            path: '',
+            // For now we are redirecting to the old jobs list. When we get the UX
+            // worked out we can stop redirecting and use the new JobListComponent.
+            redirectTo: '/compliance/scan-jobs/jobs',
+            pathMatch: 'full'
+          },
+          {
+            path: 'add',
+            component: JobAddComponent
+          },
+          {
+            path: ':id/edit',
+            component: JobEditComponent
+          }
+        ]
+      },
+      {
+        // TODO: we'd like this to only load in dev mode, but it doesn't work without require, and
+        // we don't want require in the code base because it leads people to use libraries that
+        // mutate the dom outside of angular's change detection.
+        path: 'component_library',
+        loadChildren: () => import('./pages/component-library/component-library.module')
+          .then(m => m.ComponentLibraryModule)
+      }
     ]
   },
   { // This component does not use app.component.html -- it's using the bare template,
@@ -422,7 +423,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
+  imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../../../../styles/variables";
 
 .select-box-list-container {
   display: flex;
@@ -26,6 +26,17 @@
 
 .role-list-margin {
   margin: 8px;
+  .mat-icon {
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.roles-options {
+  display: inline-flex;
+  margin-right: 0.5rem;
+  position: relative;
+  top: 0.25rem;
 }
 
 .run-list-box {
@@ -376,7 +387,8 @@ chef-error {
 }
 
 ::ng-deep .chef-dropdown {
-  margin-top: 27px;
+  margin-top: 15px;
+  right: 0.25rem !important;
 
   .mat-option {
     line-height: 3em;
@@ -453,4 +465,8 @@ chef-error {
 
 ::ng-deep .highlight-text {
   background: $chef-highlight;
+}
+
+.role-run-list-dropdown {
+  color: gainsboro;
 }

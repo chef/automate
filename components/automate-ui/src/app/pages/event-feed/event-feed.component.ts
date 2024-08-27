@@ -18,12 +18,12 @@ import { Status } from '../../services/event-feed/event-feed.reducer';
 import { Chicklet, SearchBarCategoryItem } from '../../types/types';
 import { sumBy } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState
 } from '../../services/event-feed/event-feed.selectors';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
   selector: 'app-event-feed',
@@ -49,7 +49,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   loadedEmptySetOfEvents = false;
   permissionDenied = false; // not currently used
   guitarStringCollection: GuitarStringCollection = initialState.guitarStringCollection;
-  @ViewChild('guitarStrings', { static: true }) guitarStrings;
+  @ViewChild('guitarStrings', { static: true }) guitarStrings: any;
   resetTimescaleDisabled = true;
 
   // Should the search bar filter bar be displayed
@@ -97,6 +97,8 @@ export class EventFeedComponent implements OnInit, OnDestroy {
       ]
     }
   ];
+  filterTimeScaleDates: any[] = [];
+  filterDateData: ChefEvent[] = []
 
   toggleFilters() {
     this.filtersVisible = !this.filtersVisible;
@@ -159,10 +161,19 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     this.store.select(eventFeedSelectors.loadedEvents).pipe(
     takeUntil(this.isDestroyed))
     .subscribe((loadedEvents: ChefEvent[]) => {
+      if(this.filterTimeScaleDates.length) {
+        this.filterDateData = loadedEvents.filter((val)=> {
+          const dateOnly = val.startTime.toString().substring(0, 10)
+          return this.filterTimeScaleDates.includes(dateOnly);
+        })
+        this.events = this.filterDateData;
+        this.setHeadersCountOnFilterTimeScale();
+      }else {
         this.events = loadedEvents;
-        this.totalNumberOfEventsLoaded = this.countTotalNumberOfEvents(loadedEvents);
-        this.loadedEmptySetOfEvents = this.events.length === 0 &&
-          this.initialFeedStatus === Status.loadingSuccess;
+      }
+      this.loadedEmptySetOfEvents = this.events.length === 0 &&
+      this.initialFeedStatus === Status.loadingSuccess;
+      this.totalNumberOfEventsLoaded = this.countTotalNumberOfEvents(loadedEvents);
     });
 
     const allUrlParameters$ = this.getAllUrlParameters();
@@ -227,14 +238,19 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     this.store.dispatch(eventFeedActions.loadMoreFeed());
   }
 
-  selectDateRange(dateRange: DateRange): void {
+  selectDateRange(dateRange): void {
     const start = moment(dateRange.start);
     const end = moment(dateRange.end);
 
     if (start.add(6, 'days').format('l') !== end.format('l')) {
       this.resetTimescaleDisabled = false;
+      const startDateFrom = moment(dateRange.start).toDate();
+      const endDateTo = moment(dateRange.end).toDate();
+      const dateInRange = this.getAllDatesInRange(startDateFrom, endDateTo)
+      this.filterTimeScaleDates = [...dateInRange];
     } else {
       this.resetTimescaleDisabled = true;
+      this.filterTimeScaleDates = []
     }
 
     this.store.dispatch(eventFeedActions.addFeedDateRangeFilter(dateRange.start, dateRange.end));
@@ -262,5 +278,36 @@ export class EventFeedComponent implements OnInit, OnDestroy {
         return list.concat(paramValues.map(value => ({type: key, text: value})));
       }, []);
     }));
+  }
+
+  getAllDatesInRange(startDate: Date, endDate: Date): string[] {
+    const dates: string[] = [];
+    const currentDate = moment(startDate);
+    const lastDate = moment(endDate);
+
+    while (currentDate.isSameOrBefore(lastDate)) {
+        const convertToDate = currentDate.toDate();
+        const formattedDate =  moment(convertToDate).format('YYYY-MM-DD')
+        dates.push(formattedDate);
+        currentDate.add(1, 'days');
+    }
+    return dates;
+  }
+
+  handleFilterHeaderCount(taskType: string){
+    return this.filterDateData.filter((val)=> val.task.includes(taskType)).length;
+  }
+
+  setHeadersCountOnFilterTimeScale(){
+    setTimeout(()=> {
+      this.store.select(eventFeedSelectors.eventTaskCounts).pipe(
+        takeUntil(this.isDestroyed))
+        .subscribe((counts: EventTaskCount) => {
+          this.totalTaskCounts = counts.total;
+      });
+      this.updateCounts = this.handleFilterHeaderCount('update');
+      this.createCounts =this.handleFilterHeaderCount('create');
+      this.deleteCounts = this.handleFilterHeaderCount('delete');
+    }, 1000)
   }
 }

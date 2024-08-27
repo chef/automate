@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { isProductDeployed as staticIsProductDeployed } from 'app/staticConfig';
+import { isProductDeployed as staticIsProductDeployed } from '../../staticConfig';
 
 @Injectable()
 export class ProductDeployedService {

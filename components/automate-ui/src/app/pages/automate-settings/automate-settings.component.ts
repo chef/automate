@@ -5,8 +5,8 @@ import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
 import { distinctUntilKeyChanged, takeUntil, filter } from 'rxjs/operators';
-import { pendingState } from 'app/entities/entities';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { pendingState } from '../../entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 import {
   automateSettingsState,
   changeConfiguration
@@ -22,10 +22,11 @@ import {
   NonNestedJobName,
   NestedJobName,
   DefaultFormData,
-  JobCategories
+  JobCategories,
+  RespJob
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+import { ProductDeployedService } from '../../services/product-deployed/product-deployed.service';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -171,7 +172,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   // This prevents a user from being allowed to enter negative numbers
   // or other actions that we don't want to allow
-  public preventNegatives(key: string) {
+  public preventNegatives(key: string = "") {
     const allowedKeys = [
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
       'Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'
@@ -180,7 +181,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Update the width of input when greater than one digit
-  public autoUpdateInputWidth(element: HTMLInputElement): void {
+  public autoUpdateInputWidth(element: any): void {
     // Keep default in sync with input width in automate-settings.component.scss
     const DEFAULT_WIDTH_PIXELS = 64;
     const numDigits = element.value.length;
@@ -204,7 +205,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   public handleFormActivation(form: FormGroup, checked: boolean): void {
     // patchValue does not mark the form dirty, so we need to do it manually;
-    form.get('disabled').markAsDirty();
+    form.get('disabled')?.markAsDirty();
     // patchValue is a workaround for the chef-checkbox because we need to be
     // able to store a reference to it being checked or not
     form.patchValue({
@@ -213,8 +214,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
 
     // this disables the relevant controls;
-    this.setEnabled(form.controls.unit, checked);
-    this.setEnabled(form.controls.threshold, checked);
+    this.setEnabled(form.controls['unit'], checked);
+    this.setEnabled(form.controls['threshold'], checked);
   }
 
   // Apply the changes that the user updated in the forms
@@ -292,7 +293,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     //   "code":3,
     //   "details":[]
     // }
-    if (error.error.error) {
+    if (error?.error?.error) {
       msg = msg + ' [' + error.error.error + ']';
     }
     console.error(error.message);
@@ -336,7 +337,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     // Update all number inputs to grow if holding number larger than two digits
     const numberInputs = Array.from(
       this.dataLifeCycleFormElement.nativeElement.querySelectorAll('.auto-update-width'));
-    numberInputs.forEach((element: HTMLInputElement) => this.autoUpdateInputWidth(element));
+    numberInputs.forEach((element: any) => this.autoUpdateInputWidth(element));
 
     // After a successful load of initial values, trigger a notification
     // to FormControlDirective to treat them as the "original" values.
@@ -420,9 +421,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   private populateNested(job: IngestJob): void {
-    const _jobs = job.purge_policies.elasticsearch;
+    const _jobs = job?.purge_policies?.elasticsearch;
 
-    _jobs.forEach(_job => {
+    _jobs?.forEach(_job => {
       const form = {
         threshold: _job.older_than_days,
         disabled: _job.disabled
@@ -468,8 +469,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   private handleDisable(form: FormGroup, disabled: boolean = false): void {
     // this disables the relevant controls
     // We have to pass in !disabled because the function is initially build for enabling
-    this.setEnabled(form.controls.unit, !disabled);
-    this.setEnabled(form.controls.threshold, !disabled);
+    this.setEnabled(form.controls['unit'], !disabled);
+    this.setEnabled(form.controls['threshold'], !disabled);
   }
 
   private getDefaultFormData(isDesktopView: boolean): DefaultFormData {

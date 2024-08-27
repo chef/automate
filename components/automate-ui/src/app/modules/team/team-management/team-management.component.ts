@@ -1,26 +1,26 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { ChefSorters } from 'app/helpers/auth/sorter';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { loading, EntityStatus, pending } from 'app/entities/entities';
+import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.facade';
+import { ChefSorters } from '../../../helpers/auth/sorter';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { loading, EntityStatus, pending } from '../../../entities/entities';
 import {
   createError,
   createStatus,
   allTeams,
-  getAllStatus } from 'app/entities/teams/team.selectors';
-import { Team } from 'app/entities/teams/team.model';
-import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
-import { Regex } from 'app/helpers/auth/regex';
-import { HttpStatus } from 'app/types/types';
-import { ProjectConstants } from 'app/entities/projects/project.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+  getAllStatus } from '../../../entities/teams/team.selectors';
+import { Team } from '../../../entities/teams/team.model';
+import { CreateTeam, DeleteTeam, GetTeams } from '../../../entities/teams/team.actions';
+import { Regex } from '../../../helpers/auth/regex';
+import { HttpStatus } from '../../../types/types';
+import { ProjectConstants } from '../../../entities/projects/project.model';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-team-management',
@@ -28,7 +28,7 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
   styleUrls: ['./team-management.component.scss']
 })
 export class TeamManagementComponent implements OnInit, OnDestroy {
-  public sortedTeams$: Observable<Team[]>;
+  public sortedTeams$: Observable<any[]>;
   public teamToDelete: Team;
   public deleteModalVisible = false;
   public createModalVisible = false;
@@ -125,10 +125,10 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
   public createTeam(): void {
     this.createTeamCommon({
-      id: this.createTeamForm.controls.id.value,
-      name: this.createTeamForm.controls.name.value.trim(),
-      projects: this.createTeamForm.controls.projects.value,
-      guid: null
+      id: this.createTeamForm.controls['id'].value,
+      name: this.createTeamForm.controls['name'].value.trim(),
+      projects: this.createTeamForm.controls['projects'].value,
+      guid: ""
     });
   }
 

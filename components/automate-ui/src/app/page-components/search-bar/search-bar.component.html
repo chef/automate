@@ -55,7 +55,7 @@
             class="no-category-items">
           Not a Valid Filter Category
       </li>
-      <li *ngFor="let category of visibleCategories.toJS(); let i = index"
+      <li *ngFor="let category of visibleCategories.toJS(); let i = index; trackBy: trackCatergory"
           (click)="handleCategoryItemClick(category, $event)"
           (mouseenter)="handleCategoryItemOnMouseOver(i)"
           class="list-item category

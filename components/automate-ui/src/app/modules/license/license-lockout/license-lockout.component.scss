@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../../styles/variables";
 
 .license-wrapper {
   display: flex;
@@ -8,6 +8,14 @@
   chef-checkbox {
     white-space: normal;
     margin-bottom: 7px;
+  }
+
+  chef-icon.icon-right {
+    float: right;
+    margin-right: 13px;
+    font-size: 20px;
+    color: #3864F2;
+    cursor: pointer;
   }
 
   .suggester-input-wrapper {
@@ -52,8 +60,9 @@
   }
 
   .button {
-    margin-top: 1em;
+    margin-top: 0.5em;
     text-align: center;
+    width: 500px;
   }
 
   .trial {
@@ -148,7 +157,7 @@
     display: flex;
     justify-content: flex-start;
     margin-top: 10px;
-    height: 60px;
+    height: 20px;
   }
 
   chef-alert {
@@ -171,5 +180,32 @@
     display: flex;
     flex-direction: row;
     margin-top: 2em;
+  }
+
+  .border-box {
+    width: 100%;
+    padding: 8px 0px 8px 16px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .25);
+
+    a {
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+
+  .compact-table {
+    border-collapse: collapse;
+    padding: 0;
+    margin: 0;
+  }
+
+  .compact-cell {
+    vertical-align: middle;
+    padding: 0;
+    margin: 0;
+  }
+
+  .regular-text {
+    font-size: .875em;
   }
 }

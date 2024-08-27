@@ -1,0 +1,79 @@
+defaultSeverity: warning
+extends:
+  - stylelint-config-standard
+  - stylelint-config-recommended
+  - stylelint-config-sass-guidelines
+plugins:
+  - stylelint-scss
+rules:
+# Line Spacing
+  rule-empty-line-before:
+    - always-multi-line
+    - ignore:
+        - after-comment
+        - first-nested
+        - inside-block
+
+# Disallows
+selector-max-id: 2
+comment-no-empty: true
+declaration-block-no-duplicate-properties: true
+block-no-empty:
+  - true
+  - ignore:
+      - comments
+no-descending-specificity:
+  - true
+  - ignore:
+      - selectors-within-list
+no-extra-semicolons: true
+color-no-invalid-hex: true
+number-no-trailing-zeros: true
+length-zero-no-unit: true
+scss/at-extend-no-missing-placeholder: null
+selector-no-qualifying-type:
+  - true
+  - ignore:
+      - attribute
+      - class
+      - id
+property-no-unknown:
+  - true
+  - ignoreProperties:
+      - "box-orient"
+
+# Nesting
+max-nesting-depth:
+  - 5
+  - ignore: ["blockless-at-rules", "pseudo-classes"]
+
+# Name Formats
+selector-class-pattern: ^[A-Z].*$
+scss/at-mixin-pattern: ^[A-Z].*$
+
+# Style Guide
+indentation: 4
+color-named: "never"
+declaration-block-trailing-semicolon: always
+unit-case: lower
+color-hex-case: lower
+number-leading-zero: always
+unit-no-unknown:
+  - true
+  - ignoreUnits:
+      - /^[-+][\d$(]/
+font-family-no-duplicate-names: true
+string-quotes: single
+selector-max-compound-selectors: 6
+
+# Inner Spacing
+function-calc-no-unspaced-operator: true
+declaration-block-semicolon-newline-after: always
+block-opening-brace-space-before: always
+block-opening-brace-newline-after: always
+block-closing-brace-newline-after: always
+declaration-bang-space-after: never
+declaration-colon-space-after: always
+
+# Final Items
+scss/at-import-partial-extension-blacklist: [/css/]

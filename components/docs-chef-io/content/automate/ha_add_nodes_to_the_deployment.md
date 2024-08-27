@@ -77,6 +77,19 @@ You can mix and match different services to add nodes across various services.
     ```sh
     chef-automate node add --automate-ips 10.1.2.23 --chef-server-ips 10.1.0.36,10.0.1.233  --postgresql-ips 10.0.1.42,10.0.1.54
     ```
+You can remove unreachable nodes while adding nodes.
+
+- To remove unreachable nodes while adding new nodes, pass the flag --remove-unreachable-node or -r like the example below:
+
+     ```sh
+     chef-automate node add --automate-ips 10.1.2.23 --remove-unreachable-node
+    ```
+
+    or 
+
+     ```sh
+     chef-automate node add --automate-ips 10.1.2.23 -r
+    ```
 
 {{< note >}}
 
@@ -96,6 +109,7 @@ Once the command executes, it will add the supplied nodes to your automate setup
 - The new node will be configured with the certificates already configured in your HA setup.
 - If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
 - If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
+- Certificate rotation should be done in maintenance window, as service will restart.
 
 {{< /note >}}
 
@@ -149,12 +163,15 @@ You can mix and match different services to add nodes across various services.
 
 Once the command executes, it will add the supplied nodes to your automated setup. The changes might take a while.
 
+
 {{< note >}}
 
 - The new node will be configured with the certificates that are already configured in your HA setup.
 - If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
 - If you want to change the certificates for the new nodes, you can manually run the chef-automate cert-rotate [options] command.
-
+- Removing unreachable nodes while adding nodes is not supported in AWS mode of deployment; you have to use [remove node commands page](/automate/ha_remove_single_node_from_cluster/)
+ to remove unreachable nodes first before adding new nodes
+- Certificate rotation should be done in maintenance window as service will restart.
 {{< /note >}}
 
 {{< warning >}}

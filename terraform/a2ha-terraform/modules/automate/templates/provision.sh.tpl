@@ -271,6 +271,27 @@ wait_for_healthy() {
   fi
 }
 
+create_bootstrap_bundle() {
+# actions to perform only on the Automate + bootstrap node
+if [[ "${automate_role}" == "bootstrap_automate" ]]; then
+  # reset the admin user password to the one specified in the TF config
+  if [ ! -f ${tmp_path}/$ADMIN_PASSWORD_SET ] && [ -n "${admin_password}" ]; then
+    echo "Applying the password for chef-automate on bootstrap node" 
+    chef-automate iam admin-access restore '${admin_password}'
+    sudo touch ${tmp_path}/$ADMIN_PASSWORD_SET
+  else
+    echo "Escaping the password reset command, this might be upgrade flow"  
+  fi  
+  # generate a bootstrap bundle and make it available to scp down
+  rm -f ${tmp_path}/bootstrap.abb
+  chef-automate bootstrap bundle create ${tmp_path}/bootstrap.abb
+  chown ${ssh_user} ${tmp_path}/bootstrap.abb
+  # creating skip_migration file to avoid db lock for restart on First Automate node
+  # this file will getting removed in upgrade flow at line #295
+  [ ! -f /hab/.skip_migration ] && echo "creating on bootstrap node " && touch /hab/.skip_migration
+fi
+}
+
 wait_for_install chef-automate
 wait_for_install automate-backend-ctl
 wait_for_frontend_aib
@@ -299,7 +320,8 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
   # existing installation
   version_check_for_addnode
   # If isSkipRequired is true then we are exiting from here  
-  if $isSkipRequired ; then 
+  if $isSkipRequired ; then
+     create_bootstrap_bundle 
      echo "Skipping the below flow, not required for the add-node case"
      exit
   fi
@@ -357,23 +379,6 @@ else
   chef-automate deploy /etc/chef-automate/config.toml $DEPLOY_BUNDLES --accept-terms-and-mlsa | grep --line-buffered -v "\┤\|\┘\|\└\|\┴\|\├\|\┌\|\┬\|\┴\|\┐"
 fi
 
-# actions to perform only on the Automate + bootstrap node
-if [[ "${automate_role}" == "bootstrap_automate" ]]; then
-  # reset the admin user password to the one specified in the TF config
-  if [ ! -f ${tmp_path}/$ADMIN_PASSWORD_SET ] && [ -n "${admin_password}" ]; then
-    echo "Applying the password for chef-automate on bootstrap node" 
-    chef-automate iam admin-access restore '${admin_password}'
-    sudo touch ${tmp_path}/$ADMIN_PASSWORD_SET
-  else
-    echo "Escaping the password reset command, this might be upgrade flow"  
-  fi  
-  # generate a bootstrap bundle and make it available to scp down
-  rm -f ${tmp_path}/bootstrap.abb
-  chef-automate bootstrap bundle create ${tmp_path}/bootstrap.abb
-  chown ${ssh_user} ${tmp_path}/bootstrap.abb
-  # creating skip_migration file to avoid db lock for restart on First Automate node
-  # this file will getting removed in upgrade flow at line #295
-  [ ! -f /hab/.skip_migration ] && echo "creating on bootstrap node " && touch /hab/.skip_migration
-fi
+create_bootstrap_bundle
 
 save_space

@@ -8,7 +8,6 @@ authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-ser
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
-automate-ha-elasticsearch BINDING_MODE strict
 automate-ha-elasticsidecar REQUIRED opensearch
 automate-ha-elasticsidecar BINDING_MODE strict
 automate-ha-haproxy OPTIONAL database pgleaderchk
@@ -43,7 +42,7 @@ automate-gateway OPTIONAL applications-service authn-service authz-service autom
 automate-gateway BINDING_MODE relaxed
 automate-ha-pgleaderchk OPTIONAL database
 automate-ha-pgleaderchk BINDING_MODE strict
-automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
+automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui session-service
 automate-load-balancer BINDING_MODE relaxed
 automate-minio BINDING_MODE strict
 automate-opensearch REQUIRED backup-gateway
@@ -54,10 +53,6 @@ automate-postgresql BINDING_MODE strict
 automate-prometheus OPTIONAL applications-service automate-gateway
 automate-prometheus BINDING_MODE relaxed
 automate-ui BINDING_MODE strict
-automate-workflow-nginx REQUIRED automate-workflow-server
-automate-workflow-nginx BINDING_MODE strict
-automate-workflow-server REQUIRED automate-pg-gateway pg-sidecar-service
-automate-workflow-server BINDING_MODE strict
 backup-gateway BINDING_MODE strict
 cereal-service REQUIRED automate-pg-gateway pg-sidecar-service
 cereal-service BINDING_MODE strict

@@ -32,10 +32,11 @@ var caCmd = &cobra.Command{
 }
 
 var caInfo = &cobra.Command{
-	Use:   "info",
-	Short: "Print information of the root certificate for the internal certificate authority",
-	RunE:  runCAInfoCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:               "info",
+	Short:             "Print information of the root certificate for the internal certificate authority",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runCAInfoCmd,
+	Args:              cobra.MaximumNArgs(0),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
@@ -50,10 +51,11 @@ var regen = &cobra.Command{
 }
 
 var regenRoot = &cobra.Command{
-	Use:   "root",
-	Short: "Regenerate the root certificate for the internal certificate authority",
-	RunE:  runRegenRootCmd,
-	Args:  cobra.MaximumNArgs(0),
+	Use:               "root",
+	Short:             "Regenerate the root certificate for the internal certificate authority",
+	PersistentPreRunE: checkLicenseStatusForExpiry,
+	RunE:              runRegenRootCmd,
+	Args:              cobra.MaximumNArgs(0),
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},

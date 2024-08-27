@@ -32,6 +32,7 @@ do_backup() {
 }
 
 do_prepare_restore() {
+  do_apply_license
   do_prepare_restore_gcs_default
 }
 

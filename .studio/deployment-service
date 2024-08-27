@@ -116,7 +116,6 @@ function upgrade_from_v1_self_test {
       --skip-preflight \
       --self-test \
       --enable-chef-server \
-      --enable-workflow \
       --yes
 }
 

@@ -13,6 +13,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 )
 
 const (
@@ -46,7 +49,8 @@ func init() {
 		Use:   "restart-services",
 		Short: "restart deployment services",
 		Long:  "Restart services for a deployment",
-		RunE:  runRestartServicesCmd(&restartCmdFlags),
+		//PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE: runRestartServicesCmd(&restartCmdFlags),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -78,9 +82,17 @@ func runRestartServicesCmd(flags *RestartCmdFlags) func(cmd *cobra.Command, args
 
 func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlags) error {
 	if isA2HARBFileExist() {
-		nodeOpUtils := &NodeUtilsImpl{}
+		nodeOpUtils := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer)
 		remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
-		return runRestartFromBastion(flags, remoteExcecutor, nodeOpUtils, printRestartOutput)
+		infra, _, err := nodeOpUtils.getHaInfraDetails()
+		if err != nil {
+			return err
+		}
+		statusSummary, err := getStatusSummary(infra)
+		if err != nil {
+			return err
+		}
+		return runRestartFromBastion(flags, remoteExcecutor, nodeOpUtils, printRestartOutput, statusSummary)
 	}
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
@@ -109,7 +121,7 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 	return nil
 }
 
-func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu NodeOpUtils, printRestartOutput func(map[string][]*CmdResult, string, *cli.Writer)) error {
+func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu NodeOpUtils, printRestartOutput func(map[string][]*CmdResult, string, *cli.Writer), statusSummary StatusSummary) error {
 	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
@@ -141,7 +153,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu Node
 		return handleManagedServices(flags)
 	}
 
-	runRestartCmdForBackend(infra, flags, rs, restartCmdResults)
+	runRestartCmdForBackend(infra, flags, rs, restartCmdResults, nu, statusSummary)
 
 	return getChannelValue(restartCmdResults, printRestartOutput)
 }
@@ -161,11 +173,11 @@ func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFl
 	}
 }
 
-func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult, nu NodeOpUtils, statusSummary StatusSummary) {
 	flags.automate = false
 	flags.chefServer = false
 	if flags.postgresql {
-		restartOnGivenNode(flags, POSTGRESQL, infra, rs, restartCmdResults)
+		restartAndReloadPgConfig(restartCmdResults, nu, statusSummary)
 	} else {
 		restartCmdResults <- restartCmdResult{}
 	}
@@ -175,6 +187,63 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 	} else {
 		restartCmdResults <- restartCmdResult{}
 	}
+}
+
+func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult, nu NodeOpUtils, statusSummary StatusSummary) {
+	infra, sshConfig, err := nu.getHaInfraDetails()
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	level := "info"
+	if globalOpts.debug {
+		level = "debug"
+	}
+
+	log, err := logger.NewLogger("text", level)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	fileUtils := &fileutils.FileSystemUtils{}
+	sshConfig.timeout = DEFAULT_TIMEOUT
+
+	// restart pg nodes in a sequence of follower nodes first and then leader node
+	leader := getPGLeaderFunc(statusSummary)
+	err = nu.restartPgNodes(*leader, infra.Outputs.PostgresqlPrivateIps.Value, infra, statusSummary)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	// restart done
+
+	// reloading the pg config to make sure all nodes of pg have correct config
+	err = nu.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *sshConfig, fileUtils, log)
+	if err != nil {
+		restartCmdResults <- restartCmdResult{
+			err: err,
+		}
+	}
+	cmdResult := []*CmdResult{}
+	for _, v := range infra.Outputs.PostgresqlPrivateIps.Value {
+		cmdResult = append(cmdResult, &CmdResult{
+			ScriptName: "restart and reload pg",
+			HostIP:     v,
+			Output:     "successfully restared and reloaded postgresql node",
+		})
+	}
+	restartCmdResults <- restartCmdResult{
+		cmdResult: map[string][]*CmdResult{
+			POSTGRESQL: cmdResult,
+		},
+		writer:   writer,
+		nodeType: POSTGRESQL,
+		err:      err,
+	}
+	// config reload done
 }
 
 func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {

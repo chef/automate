@@ -1,4 +1,0 @@
-all_access:
-  readonly: true
-  backendroles:
-    - admin

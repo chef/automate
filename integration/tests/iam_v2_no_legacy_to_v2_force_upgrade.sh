@@ -51,6 +51,8 @@ do_deploy() {
         --debug
 
     "${cli_bin}" iam upgrade-to-v2 --skip-policy-migration
+
+    do_apply_license
 }
 
 do_prepare_upgrade() {

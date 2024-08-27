@@ -1,10 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
-@import "@carbon/grid/scss/grid";
-@import "assets/chef-ui-library/chef/chef.css";
-@import "assets/chef-ui-library/collection/assets/fonts/material-icons/material-icons.css";
-@import "assets/chef-ui-library/collection/styles/variables.example.css";
-@import "styles/chef-theme";
-@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "@carbon/grid";
+@import "./assets/chef-ui-library/chef/chef";
+@import "./assets/chef-ui-library/collection/assets/fonts/material-icons/material-design-icons";
+@import "./assets/chef-ui-library/collection/styles/variables.example";
+@import "./app/styles/chef-theme";
+@import "@ng-select/ng-select/themes/default.theme";
 
 #app-content-wrapper {
   chef-side-panel {
@@ -250,6 +250,25 @@ input {
   margin-top: 35px;
   right: -48px;
   margin-right: 35px;
+  &.mat-mdc-select-panel {
+    min-width: max-content;
+    position: absolute;
+    top: -2.25rem;
+    padding: 0;
+    border-radius: 5px !important;
+    right: -2.5rem;
+    font-size: 14px;
+  }
+}
+
+div.chef-dropdown.mat-mdc-select-panel {
+  min-width: max-content;
+  position: absolute;
+  top: -2.5rem;
+  padding: 0;
+  border-radius: 5px !important;
+  right: 0.8rem;
+  font-size: 14px;
 }
 
 .three-dot-column {
@@ -258,17 +277,20 @@ input {
   max-width: 54px;
 }
 
-.mat-option {
+.mat-mdc-option {
   font-family: 'Muli', Helvetica, Arial, sans-serif;
 
-  &.mat-active,
-  &:hover:not(.mat-option-disabled),
-  &:focus:not(.mat-option-disabled) {
-    background: $chef-primary-bright;
+  &.mat-mdc-option-active,
+  &:hover:not(.mat-mdc-option-disabled),
+  &:focus:not(.mat-mdc-option-disabled) {
+    background: $chef-primary-bright !important;
     color: $chef-white;
+    .mdc-list-item__primary-text {
+      color: $chef-white !important;
+    }
   }
 
-  &:hover:not(.mat-option-disabled):not(.mat-active) {
+  &:hover:not(.mat-mdc-option-disabled):not(.mat-mdc-option-active) {
     background: lighten($chef-primary-bright, 15%);
   }
 }
@@ -276,11 +298,11 @@ input {
 [panelclass="chef-control-menu"] {
   text-align: right;
 
-  &:focus .mat-select-trigger {
+  &:focus .mat-mdc-select-trigger {
     outline: -webkit-focus-ring-color auto 5px;
   }
 
-  .mat-select-trigger {
+  .mat-mdc-select-trigger {
     display: inline-block;
     position: absolute;
     right: 10px;
@@ -311,7 +333,7 @@ input {
 
   &[aria-owns] {  // hacky alternative for selecting when the panel is open
 
-    .mat-select-trigger {
+    .mat-mdc-select-trigger {
       background-color: var(--chef-badge-primary-border);
 
       &:after {
@@ -322,7 +344,7 @@ input {
 
   &:disabled {
 
-    .mat-select-trigger {
+    .mat-mdc-select-trigger {
       background-color: var(--chef-white);
 
       &:after {
@@ -332,8 +354,8 @@ input {
   }
 
   .mat-select-placeholder,
-  .mat-select-arrow-wrapper,
-  .mat-select-arrow {
+  .mat-mdc-select-arrow-wrapper,
+  .mat-mdc-select-arrow {
     display: none;
   }
 }
@@ -383,6 +405,7 @@ input {
 // mat-select dropdown menu
 
 [panelClass="chef-dropdown"] {
+  display: flex !important;
   height: 45px;
   background-color: $chef-white;
   padding: 1em;

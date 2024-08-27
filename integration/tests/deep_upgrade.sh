@@ -79,6 +79,9 @@ EOF
         --admin-password chefautomate \
         --skip-preflight \
         --debug
+
+    
+    do_apply_license
 }
 
 do_cleanup() {

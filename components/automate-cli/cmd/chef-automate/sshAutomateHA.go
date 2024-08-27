@@ -206,6 +206,7 @@ var sshCommand = &cobra.Command{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithHA,
 	},
+	//PersistentPreRunE: checkLicenseStatusForExpiry,
 	RunE: runSshCommand,
 }
 
@@ -237,6 +238,8 @@ func runSshCommand(_ *cobra.Command, _ []string) error {
 	sshTokens := strings.Split(sshString, " ")
 	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
+
+var getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error) = getAutomateHAInfraDetails
 
 func getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
 

@@ -33,6 +33,10 @@ options:
       shorthand: P
       usage: |
         Postgresql ip addresses to be removed. Works with --onprem-mode flag
+    - name: remove-unreachable-node
+      shorthand: r
+      default_value: "false"
+      usage: remove unreachable nodes from cluster
 inherited_options:
     - name: debug
       shorthand: d

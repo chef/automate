@@ -40,8 +40,9 @@ func newGatherLogsCmd() *cobra.Command {
 		Use:   "gather-logs [/path/to/log/bundle.tar.gz]",
 		Short: "Gather system diagnostics and logs",
 		Long:  "Collect system diagnostics and logs from Chef Automate and other services",
-		RunE:  runGatherLogsCmd,
-		Args:  cobra.RangeArgs(0, 3),
+		//PersistentPreRunE: WarnLicenseStatusForExpiry,
+		RunE: runGatherLogsCmd,
+		Args: cobra.RangeArgs(0, 3),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},

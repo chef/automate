@@ -19,8 +19,8 @@ import {
   UpdateUserPreferencesFailure
 } from './user-preferences.actions';
 
-import { CreateNotification } from 'app/entities/notifications/notification.actions';
-import { Type } from 'app/entities/notifications/notification.model';
+import { CreateNotification } from '../../entities/notifications/notification.actions';
+import { Type } from '../../entities/notifications/notification.model';
 
 @Injectable()
 export class UserPreferencesEffects {

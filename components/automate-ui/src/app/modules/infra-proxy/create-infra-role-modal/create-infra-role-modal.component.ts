@@ -9,24 +9,24 @@ import { Subject, combineLatest } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { takeUntil, filter } from 'rxjs/operators';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
+import { NgrxStateAtom } from '../../../ngrx.reducers';
+import { Regex } from '../../../helpers/auth/regex';
 import {
   CreateRole,
   GetRoles,
   RolesPayload,
   CreateRolePayload
-} from 'app/entities/infra-roles/infra-role.action';
+} from '../../../entities/infra-roles/infra-role.action';
 import {
   saveStatus,
   saveError
-} from 'app/entities/infra-roles/infra-role.selectors';
+} from '../../../entities/infra-roles/infra-role.selectors';
 import { isNil } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
-import { HttpStatus } from 'app/types/types';
-import { Utilities } from 'app/helpers/utilities/utilities';
+import { EntityStatus } from '../../../entities/entities';
+import { HttpStatus } from '../../../types/types';
+import { Utilities } from '../../../helpers/utilities/utilities';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 
 const CREATE_TAB_NAME = 'roleTab';
@@ -177,7 +177,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.conflictError = false;
   }
 
-  onChangeDefaultJson(event: { target: { value: string } } ) {
+  onChangeDefaultJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);
@@ -187,7 +187,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  onChangeOverrideJson(event: { target: { value: string } } ) {
+  onChangeOverrideJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
     try {
       JSON.parse(newValue);

@@ -1,19 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../../../ngrx.reducers';
+import { EntityStatus } from '../../../../entities/entities';
 import { isNil } from 'lodash/fp';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
 import { combineLatest, Subject, Observable } from 'rxjs';
 import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
-import * as moment from 'moment/moment';
-import { DateTime } from 'app/helpers/datetime/datetime';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import moment from 'moment';
+import { DateTime } from '../../../../helpers/datetime/datetime';
+import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout.facade';
 import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
-import { GetControlDetail } from 'app/entities/control-details/control-details.action';
-import { controlDetailStatus, controlDetailList, controlsList } from 'app/entities/control-details/control-details.selectors';
+import { GetControlDetail } from '../../../../entities/control-details/control-details.action';
+import { controlDetailStatus, controlDetailList, controlsList } from '../../../../entities/control-details/control-details.selectors';
 
 @Component({
   selector: 'app-reporting-node',
@@ -117,7 +117,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.onPageChanged(1);
   }
 
-  onPageChanged(page: number) {
+  onPageChanged(page: number | any) {
     this.page$.next(page);
   }
 
@@ -203,12 +203,18 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const state = this.openControls[key];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[key] = toggled;
+
+    // to fetch the past control details we need to pass the start and end time
+    const start_time = this.activeReport.end_time;
+    const end_time = moment(start_time).endOf('day').toISOString();
     if (toggled.open === true) {
       if (!this.reportIdArray.includes(key)) {
         this.reportIdArray.push(key);
         const payload = {
           report_id : this.activeReport.id,
           filters : [
+            {'type': 'start_time', 'values': [start_time]},
+            {'type': 'end_time', 'values': [end_time]},
             {'type': 'profile_id', 'values': [`${control.profile_id}`]},
             {'type': 'control', 'values': [`${control.id}`]}]
         };

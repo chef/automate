@@ -1,4 +1,4 @@
-@import "~styles/variables";
+@import "../../styles/variables";
 
 .container {
   background-color: $chef-white;
@@ -70,13 +70,13 @@ mat-form-field {
   margin: 0 8px 0 0;
   width: 120px;
 
-  ::ng-deep .mat-form-field-wrapper {
-    padding-bottom: 0;
+  ::ng-deep .mdc-text-field {
+    padding: 0;
   }
 
-  ::ng-deep .mat-form-field-infix {
+  ::ng-deep .mat-mdc-form-field-infix {
     padding: 0;
-    border-top: 0;
+    min-height: fit-content;
   }
 
   ::ng-deep .mat-select-disabled {
@@ -87,4 +87,9 @@ mat-form-field {
       color: rgb(84, 84, 84);
     }
   }
+}
+
+::ng-deep .chef-dropdown {
+  right: 0px !important;
+  top: -2.75rem !important;
 }

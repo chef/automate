@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +70,7 @@ func TestDeletenodeAWSValidateIsManagedServicesOnError(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -119,7 +121,7 @@ func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -172,7 +174,7 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -222,7 +224,7 @@ func TestDeletenodeAWSModifyA2(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -275,7 +277,7 @@ func TestDeletenodeAWSModifyCS(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 
@@ -329,7 +331,7 @@ func TestDeletenodeAWSModifyPG(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -382,7 +384,7 @@ func TestDeletenodeAWSModifyOS(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
@@ -435,7 +437,7 @@ func TestDeleteAwsnodePrompt(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.validate()
 	assert.NoError(t, err)
 	err = nodeDelete.modifyConfig()
@@ -518,7 +520,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return nil
 			},
-			syncConfigToAllNodesFunc: func() error {
+			syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 				return nil
 			},
 		},
@@ -528,7 +530,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.validate()
 	assert.NoError(t, err)
 	err = nodeDelete.modifyConfig()
@@ -571,7 +573,7 @@ func TestDeletenodeWithExecuteA2haRbNotExist(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeDelete.Execute(nil, nil)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `Invalid bastion, to run this command use automate bastion`)
@@ -647,7 +649,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			saveConfigToBastionFunc: func() error {
 				return nil
 			},
-			syncConfigToAllNodesFunc: func() error {
+			syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 				return nil
 			},
 		},
@@ -657,7 +659,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 	err := nodeDelete.Execute(nil, nil)
 	assert.True(t, tfArchModified)
 	assert.True(t, ipAddres)
@@ -732,7 +734,13 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
+			return nil
+		},
+		restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
+			return nil
+		},
+		postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
 			return nil
 		},
 	}
@@ -752,7 +760,13 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 	}
 
 	for _, flags := range flagsArr {
+		fmt.Println(flags)
 		w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+		getAutomateHAInfraDetailsFunc = func() (*AutomateHAInfraDetails, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+			return infra, nil
+		}
 		nodeDelete := NewDeleteNodeAWS(
 			w.CliWriter,
 			flags,
@@ -760,10 +774,19 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			CONFIG_TOML_PATH_AWS,
 			&fileutils.MockFileSystemUtils{},
 			&MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{
+						sshUser:    "ubuntu",
+						sshPort:    "22",
+						sshKeyFile: "/rt.pem",
+						hostIP:     "12.12.12.12",
+						timeout:    30,
+					}
+				},
 				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 					return "", nil
 				},
-			})
+			}, getMockStatusSummary())
 		err := nodeDelete.Execute(nil, nil)
 		assert.NoError(t, err)
 		assert.True(t, tfArchModified)
@@ -792,7 +815,7 @@ func TestDeletenodeDeploy(t *testing.T) {
 
 	t.Run("With sync config error", func(t *testing.T) {
 
-		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+		mockNodeUtil.syncConfigToAllNodesFunc = func(unreachableNodes map[string][]string) error {
 			return errors.New("sync error")
 		}
 		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
@@ -802,7 +825,7 @@ func TestDeletenodeDeploy(t *testing.T) {
 	})
 	t.Run("With sync config error and deploy error", func(t *testing.T) {
 
-		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+		mockNodeUtil.syncConfigToAllNodesFunc = func(unreachableNodes map[string][]string) error {
 			return errors.New("sync error")
 		}
 		mockNodeUtil.executeAutomateClusterCtlCommandAsyncfunc = func(command string, args []string, helpDocs string) error {
@@ -817,6 +840,71 @@ func TestDeletenodeDeploy(t *testing.T) {
 		assert.Error(t, err, "sync error")
 		assert.Error(t, err, "deploy error")
 	})
+}
+
+func TestGetTerraformMoveStateCommand(t *testing.T) {
+
+	t.Run("remove all except 1", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0, 1, 3, 4, 5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 1)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[2]\" \"module.aws.aws_instance.Automate[0]\"")
+	})
+
+	t.Run("remove reandom two ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{1, 4}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 2)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[4]\"")
+		assert.EqualValues(t, cmds[1], "terraform state mv \"module.aws.aws_instance.Automate[4]\" \"module.aws.aws_instance.Automate[1]\"")
+	})
+
+	t.Run("remove all ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0, 1, 2, 3, 4, 5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.Empty(t, cmds)
+		assert.Len(t, cmds, 0)
+	})
+
+	t.Run("remove 1st two ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0, 1}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 2)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[1]\"")
+		assert.EqualValues(t, cmds[1], "terraform state mv \"module.aws.aws_instance.Automate[4]\" \"module.aws.aws_instance.Automate[0]\"")
+	})
+
+	t.Run("remove last 2 ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{4, 5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.Empty(t, cmds)
+	})
+
+	t.Run("remove middle 2 Ips", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{2, 3}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 2)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[3]\"")
+		assert.EqualValues(t, cmds[1], "terraform state mv \"module.aws.aws_instance.Automate[4]\" \"module.aws.aws_instance.Automate[2]\"")
+	})
+
+	t.Run("remove 1st Ip", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{0}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 1)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[0]\"")
+	})
+
+	t.Run("remove last Ip", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{5}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.Empty(t, cmds)
+	})
+
+	t.Run("remove mid Ip", func(t *testing.T) {
+		cmds := getTerraformMoveStateCommand("Automate", []int{3}, []string{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6"})
+		assert.NotEmpty(t, cmds)
+		assert.Len(t, cmds, 1)
+		assert.EqualValues(t, cmds[0], "terraform state mv \"module.aws.aws_instance.Automate[5]\" \"module.aws.aws_instance.Automate[3]\"")
+	})
+
 }
 
 func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
@@ -869,7 +957,7 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 		calculateTotalInstanceCountFunc: func() (int, error) {
@@ -893,5 +981,5 @@ func createNewDeleteNodeAWS(mockNodeUtilsImpl *MockNodeUtilsImpl, mockSSHUtilsIm
 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 				return "", nil
 			},
-		})
+		}, getMockStatusSummary())
 }

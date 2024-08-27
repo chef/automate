@@ -29,15 +29,15 @@ import {
   throttleTime
 } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
+import { NgrxStateAtom } from '../../../../../ngrx.reducers';
+import { EntityStatus } from '../../../../../entities/entities';
 import {
   getAllStatus,
   roleList
-} from 'app/entities/infra-roles/infra-role.selectors';
-import { GetRoles } from 'app/entities/infra-roles/infra-role.action';
-import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
-import { Regex } from 'app/helpers/auth/regex';
+} from '../../../../../entities/infra-roles/infra-role.selectors';
+import { GetRoles } from '../../../../../entities/infra-roles/infra-role.action';
+import { InfraRole } from '../../../../../entities/infra-roles/infra-role.model';
+import { Regex } from '../../../../../helpers/auth/regex';
 
 export const SELECT_BOX_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,

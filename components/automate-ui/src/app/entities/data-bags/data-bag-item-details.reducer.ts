@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus } from '../../entities/entities';
 import { DataBagItemDetailsActionTypes, DataBagItemDetailsActions } from './data-bag-item-details.actions';
 import { DataBagsItemDetails } from './data-bags.model';
 
@@ -22,7 +22,7 @@ dataBagItemDetailsEntityAdapter.getInitialState(<DataBagItemDetailsEntityState>{
 
 export function dataBagItemDetailsEntityReducer(
   state: DataBagItemDetailsEntityState = DataBagItemDetailsEntityInitialState,
-  action: DataBagItemDetailsActions): DataBagItemDetailsEntityState {
+  action: DataBagItemDetailsActions | any): DataBagItemDetailsEntityState {
 
   switch (action.type) {
     case DataBagItemDetailsActionTypes.GET:

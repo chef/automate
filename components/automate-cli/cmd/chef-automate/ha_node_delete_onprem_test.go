@@ -14,20 +14,20 @@ const (
 	multipleNodeError = `Only one node can be deleted at a time`
 )
 
-func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
+func PullConfFunc(sshUtil *SSHUtil, ex []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &cfg, nil
+	return &cfg, nil, nil
 }
 
-func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
+func PullAwsConfFunc(sshUtil *SSHUtil, ex []string, removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error) {
 	cfg, err := readConfigAWS(CONFIG_TOML_PATH_AWS + "/config.toml")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &cfg, nil
+	return &cfg, nil, nil
 }
 
 func TestDeleteNodeValidateError(t *testing.T) {
@@ -50,7 +50,7 @@ func TestDeleteNodeValidateError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `
@@ -77,7 +77,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
@@ -104,7 +104,7 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -130,18 +130,18 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
@@ -163,18 +163,18 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), multipleNodeError)
@@ -200,7 +200,7 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.")
@@ -233,7 +233,7 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -264,7 +264,7 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
@@ -297,7 +297,7 @@ func TestDeleteNodePrompt(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -355,14 +355,14 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -421,14 +421,14 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		isA2HARBFileExistFunc: func() bool {
 			return true
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.Execute(nil, nil)
 	assert.Error(t, err, "error on removing output header in fetched config")
 }
@@ -467,14 +467,14 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -532,15 +532,14 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("sync failed")
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	},
-	)
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -598,15 +597,14 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("Invalid or empty command")
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	},
-	)
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -666,7 +664,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
@@ -706,7 +704,7 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -773,16 +771,16 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string, removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			cfg.Automate.Config.CertsByIP = []CertByIP{}
 			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
 			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
-			return &cfg, nil
+			return &cfg, nil, nil
 		},
 
 		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
@@ -794,14 +792,14 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -872,14 +870,14 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -950,14 +948,14 @@ func TestRemovenodeExecuteWithProvisionError(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		syncConfigToAllNodesFunc: func() error {
+		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
-	})
+	}, getMockStatusSummary())
 	err := nodeAdd.Execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:

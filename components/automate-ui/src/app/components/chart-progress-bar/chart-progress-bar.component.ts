@@ -55,5 +55,6 @@ export class ChartProgressBarComponent implements OnChanges {
     if (value < 25) { return 'low'; }
     if (value >= 25 && value < 50) { return 'mid'; }
     if (value >= 50 && value < 75) { return 'high'; }
+    return "";
   }
 }
