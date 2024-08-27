@@ -4,7 +4,7 @@ package chef.automate.api;
 
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto";
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/secret.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto";
 
 option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf";
 

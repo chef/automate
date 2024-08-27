@@ -17,14 +17,14 @@ syntax = "proto3";
 package google.api.servicemanagement.v1;
 
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
-import "google/api/client.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/googleapis/google/api/field_behavior.proto";
-import "google/api/service.proto";
-import "google/api/servicemanagement/v1/resources.proto";
-import "google/longrunning/operations.proto";
-import "google/protobuf/any.proto";
-import "google/protobuf/field_mask.proto";
-import "google/rpc/status.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/client.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/field_behavior.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/service.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/resources.proto";
+import "protovendor/github.com/googleapis/googleapis/google/longrunning/operations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/field_mask.proto";
+import "protovendor/github.com/googleapis/googleapis/google/rpc/status.proto";
 
 option csharp_namespace = "Google.Cloud.ServiceManagement.V1";
 option go_package = "google.golang.org/genproto/googleapis/api/servicemanagement/v1;servicemanagement";

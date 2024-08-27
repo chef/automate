@@ -1,12 +1,12 @@
-syntax = "proto2";
+syntax = "proto3";
 package validate;
 
 option go_package = "github.com/envoyproxy/protoc-gen-validate/validate";
 option java_package = "io.envoyproxy.pgv.validate";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/duration.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/timestamp.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto";
 
 // Validation rules applied at the message level
 extend google.protobuf.MessageOptions {

@@ -3,8 +3,8 @@ syntax = "proto3";
 package chef.automate.api.applications;
 option go_package = "github.com/chef/automate/api/external/applications";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/timestamp.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/duration.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto";
+import "protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto";
 
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/error_details.proto";
 
