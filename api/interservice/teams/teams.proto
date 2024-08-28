@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "api/external/common/version/version.proto";
 

@@ -7,7 +7,6 @@ import "api/external/event_feed/request/event.proto";
 import "api/external/event_feed/request/eventstrings.proto";
 import "api/external/event_feed/response/event.proto";
 import "api/external/event_feed/response/eventstrings.proto";
-import "api/external/common/response.proto";
 
 import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 

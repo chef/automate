@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/api/config/authz";
 import "api/config/shared/global.proto";
 import "api/config/shared/tls.proto";
 import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/error_details.proto";
+import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
   option (chef.automate.api.service_config) = {name: "authz-service"};

@@ -7,7 +7,6 @@ import "protovendor/github.com/googleapis/googleapis/google/api/annotations.prot
 
 import "api/external/annotations/iam/annotations.proto";
 
-import "google/protobuf/struct.proto";
 import "api/external/common/query/parameters.proto";
 
 service DatafeedService {

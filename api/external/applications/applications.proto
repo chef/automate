@@ -5,8 +5,7 @@ option go_package = "github.com/chef/automate/api/external/applications";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
-
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/error_details.proto";
+import "google/protobuf/wrappers.proto";
 
 import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
