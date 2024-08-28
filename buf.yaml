@@ -71,6 +71,31 @@ lint:
     IMPORT_USED:
       - api/external/compliance/reporting/stats/stats.proto
     SERVICE_SUFFIX:
+    - api/interservice/notifications/service/server.proto
+    - api/interservice/infra_proxy/service/infra_proxy.proto
+    - components/automate-gateway/api/deployment/deployment.proto
+    - components/automate-gateway/api/gateway/gateway.proto
+    - components/automate-gateway/api/legacy/legacy.proto
+    - components/automate-gateway/api/license/license.proto
+    - components/automate-gateway/api/notifications/notifications.proto
+    - components/automate-gateway/api/telemetry/telemetry.proto
+    - components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto
+    - components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto
+    - components/automate-grpc/protoc-gen-a2-config/api/a2conf/secret.proto
+    - api/external/cds/cds.proto
+    - api/external/cfgmgmt/cfgmgmt.proto
+    - api/external/data_lifecycle/data_lifecycle.proto
+    - api/external/iam/v2/introspect.proto
+    - api/external/iam/v2/policy.proto
+    - api/external/iam/v2/rules.proto
+    - api/external/iam/v2/teams.proto
+    - api/external/iam/v2/tokens.proto
+    - api/external/iam/v2/users.proto
+    - api/external/infra_proxy/infra_proxy.proto
+    - api/external/ingest/chef.proto
+    - api/external/ingest/job_scheduler.proto
+    - api/interservice/data_lifecycle/purge.proto
+    - api/interservice/deployment/automate_deployment.proto
     # TODO: [notifications rewrite] - this violation can be addressed once
     # the golang rewrite of notifications is completed
     - interservice/notifications/service/server.proto
@@ -106,6 +131,25 @@ lint:
     # /lib/
     - grpc/debug/debug_api/debug.proto
     RPC_REQUEST_STANDARD_NAME:
+    - api/external/data_feed/data_feed.proto
+    - api/external/report_manager/report_manager.proto
+    - api/interservice/authn/tokens.proto
+    - api/interservice/authz/authz.proto
+    - api/interservice/cds/service/cds.proto
+    - api/interservice/cfgmgmt/service/cfgmgmt.proto
+    - api/interservice/compliance/ingest/ingest/compliance.proto
+    - api/interservice/compliance/version/version.proto
+    - api/interservice/deployment/certificate_authority.proto
+    - api/external/user_settings/user_settings.proto
+    - api/interservice/event_feed/event_feed.proto
+    - api/interservice/infra_proxy/service/infra_proxy.proto
+    - api/interservice/ingest/automate_event.proto
+    - api/interservice/ingest/chef.proto
+    - api/interservice/ingest/job_scheduler.proto
+    - api/interservice/ingest/status.proto
+    - api/interservice/local_user/users.proto
+    - api/interservice/report_manager/report_manager.proto
+    - api/interservice/teams/teams.proto
     # Golang upgrade
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
@@ -215,7 +259,6 @@ lint:
     - components/notifications-service/server/priv/server.proto   
     - lib/grpc/debug/debug_api/debug.proto      
     - lib/grpc/debug/debug_api/debug.proto       
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/GooDBYe.proto      
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto   
@@ -299,6 +342,25 @@ lint:
     # /lib/
     - grpc/debug/debug_api/debug.proto
     RPC_RESPONSE_STANDARD_NAME:
+    - api/external/user_settings/user_settings.proto
+    - api/interservice/event_feed/event_feed.proto
+    - api/interservice/infra_proxy/service/infra_proxy.proto
+    - api/interservice/ingest/automate_event.proto
+    - api/interservice/ingest/chef.proto
+    - api/interservice/ingest/job_scheduler.proto
+    - api/interservice/ingest/status.proto
+    - api/interservice/local_user/users.proto
+    - api/interservice/report_manager/report_manager.proto
+    - api/interservice/teams/teams.proto
+    - api/external/data_feed/data_feed.proto
+    - api/external/report_manager/report_manager.proto
+    - api/interservice/authn/tokens.proto
+    - api/interservice/authz/authz.proto
+    - api/interservice/cds/service/cds.proto
+    - api/interservice/cfgmgmt/service/cfgmgmt.proto
+    - api/interservice/compliance/ingest/ingest/compliance.proto
+    - api/interservice/compliance/version/version.proto
+    - api/interservice/deployment/certificate_authority.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/resources.proto
@@ -407,7 +469,6 @@ lint:
     - components/notifications-service/server/priv/server.proto   
     - lib/grpc/debug/debug_api/debug.proto      
     - lib/grpc/debug/debug_api/debug.proto       
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/GooDBYe.proto      
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto   
@@ -490,6 +551,25 @@ lint:
     # /lib/
     - grpc/debug/debug_api/debug.proto
     RPC_REQUEST_RESPONSE_UNIQUE:
+    - api/external/user_settings/user_settings.proto
+    - api/interservice/event_feed/event_feed.proto
+    - api/interservice/infra_proxy/service/infra_proxy.proto
+    - api/interservice/ingest/automate_event.proto
+    - api/interservice/ingest/chef.proto
+    - api/interservice/ingest/job_scheduler.proto
+    - api/interservice/ingest/status.proto
+    - api/interservice/local_user/users.proto
+    - api/interservice/report_manager/report_manager.proto
+    - api/interservice/teams/teams.proto
+    - api/external/data_feed/data_feed.proto
+    - api/external/report_manager/report_manager.proto
+    - api/interservice/authn/tokens.proto
+    - api/interservice/authz/authz.proto
+    - api/interservice/cds/service/cds.proto
+    - api/interservice/cfgmgmt/service/cfgmgmt.proto
+    - api/interservice/compliance/ingest/ingest/compliance.proto
+    - api/interservice/compliance/version/version.proto
+    - api/interservice/deployment/certificate_authority.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/resources.proto
@@ -598,7 +678,6 @@ lint:
     - components/notifications-service/server/priv/server.proto   
     - lib/grpc/debug/debug_api/debug.proto      
     - lib/grpc/debug/debug_api/debug.proto       
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/GooDBYe.proto      
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto   
@@ -613,10 +692,7 @@ lint:
     - protovendor/github.com/googleapis/googleapis/google/logging/v2/logging.proto      
     - protovendor/github.com/googleapis/googleapis/google/logging/v2/logging_metrics.proto    
     - protovendor/github.com/googleapis/googleapis/google/longrunning/operations.proto
-    # TODO: [notifications rewrite] - this violation can be addressed once
-    # the golang rewrite of notifications is completed
     - interservice/notifications/service/server.proto
-    # /api/
     - external/applications/applications.proto
     - external/cds/cds.proto
     - external/cfgmgmt/cfgmgmt.proto
@@ -639,9 +715,7 @@ lint:
     - external/secrets/secrets.proto
     - external/user_settings/user_settings.proto
     - external/report_manager/report_manager.proto
-    # deployment interservice is exposed to automate-cli, we treat it like an external API
     - interservice/deployment/automate_deployment.proto
-    # These interservice protos could be changed but the churn is very large:
     - interservice/authn/tokens.proto
     - interservice/authz/authz.proto
     - interservice/authz/policy.proto
@@ -670,7 +744,6 @@ lint:
     - interservice/teams/teams.proto
     - interservice/user_settings/user_settings.proto
     - interservice/report_manager/report_manager.proto
-    # /components/
     - automate-gateway/api/deployment/deployment.proto
     - automate-gateway/api/event_feed/event_feed.proto
     - automate-gateway/api/gateway/gateway.proto
@@ -678,9 +751,64 @@ lint:
     - automate-gateway/api/license/license.proto
     - automate-gateway/api/notifications/notifications.proto
     - automate-gateway/api/telemetry/telemetry.proto
-    # /lib/
     - grpc/debug/debug_api/debug.proto
     PACKAGE_SAME_GO_PACKAGE:
+    - api/interservice/es_sidecar/service.proto
+    - api/interservice/ingest/automate_event.proto
+    - api/interservice/ingest/chef.proto
+    - api/interservice/ingest/job_scheduler.proto
+    - api/interservice/ingest/status.proto
+    - api/interservice/license_control/license_control.proto
+    - api/interservice/local_user/users.proto
+    - api/interservice/teams/teams.proto
+    - components/automate-gateway/api/gateway/gateway.proto
+    - components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto
+    - components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto
+    - components/automate-grpc/protoc-gen-a2-config/api/a2conf/secret.proto
+    - api/config/authn/config_request.proto
+    - api/config/authz/config_request.proto
+    - api/config/cereal/config_request.proto
+    - api/config/deployment/automate_config.proto
+    - api/config/deployment/config_request.proto
+    - api/config/es_sidecar/config_request.proto
+    - api/config/ingest/config_request.proto
+    - api/config/license_control/config_request.proto
+    - api/config/local_user/config_request.proto
+    - api/config/pg_sidecar/config_request.proto
+    - api/config/teams/config_request.proto
+    - api/external/iam/v2/common/policy.proto
+    - api/external/iam/v2/common/rules.proto
+    - api/external/iam/v2/common/teams.proto
+    - api/external/iam/v2/common/tokens.proto
+    - api/external/iam/v2/common/users.proto
+    - api/external/iam/v2/introspect.proto
+    - api/external/iam/v2/policy.proto
+    - api/external/iam/v2/request/introspect.proto
+    - api/external/iam/v2/request/policy.proto
+    - api/external/iam/v2/request/rules.proto
+    - api/external/iam/v2/request/teams.proto
+    - api/external/iam/v2/request/tokens.proto
+    - api/external/iam/v2/request/users.proto
+    - api/external/iam/v2/response/introspect.proto
+    - api/external/iam/v2/response/policy.proto
+    - api/external/iam/v2/response/rules.proto
+    - api/external/iam/v2/response/teams.proto
+    - api/external/iam/v2/response/tokens.proto
+    - api/external/iam/v2/response/users.proto
+    - api/external/iam/v2/rules.proto
+    - api/external/iam/v2/teams.proto
+    - api/external/iam/v2/tokens.proto
+    - api/external/iam/v2/users.proto
+    - api/interservice/authn/authenticate.proto
+    - api/interservice/authn/tokens.proto
+    - api/interservice/authz/authz.proto
+    - api/interservice/authz/policy.proto
+    - api/interservice/authz/project.proto
+    - api/interservice/authz/type.proto
+    - api/interservice/cds/service/cds.proto
+    - api/interservice/cereal/cereal.proto
+    - api/interservice/deployment/automate_deployment.proto
+    - api/interservice/deployment/certificate_authority.proto
     # /api/
     - external/iam/v2
     - config
@@ -698,8 +826,15 @@ lint:
     - automate-gateway/api/gateway
     - automate-grpc/protoc-gen-a2-config/api/a2conf
     FIELD_LOWER_SNAKE_CASE:
+    - api/interservice/notifications/service/events.proto
+    - api/interservice/notifications/service/rules.proto
+    - api/interservice/infra_proxy/service/infra_proxy.proto
+    - components/automate-gateway/api/notifications/notifications.proto
+    - components/notifications-service/server/priv/notifications.proto
+    - components/notifications-service/server/priv/rules.proto
     # TODO: [notifications rewrite] - this violation can be addressed once
     # the golang rewrite of notifications is completed
+    - api/external/infra_proxy/response/policyfiles.proto
     - interservice/notifications/service/events.proto
     - interservice/notifications/service/rules.proto
     - external/infra_proxy/response/policyfiles.proto
@@ -819,7 +954,6 @@ lint:
     - components/notifications-service/server/priv/server.proto   
     - lib/grpc/debug/debug_api/debug.proto      
     - lib/grpc/debug/debug_api/debug.proto       
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/GooDBYe.proto      
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto   
@@ -944,7 +1078,6 @@ lint:
     - components/notifications-service/server/priv/server.proto   
     - lib/grpc/debug/debug_api/debug.proto      
     - lib/grpc/debug/debug_api/debug.proto       
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/GooDBYe.proto      
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto   
@@ -1007,6 +1140,10 @@ lint:
     - api/external/compliance/reporting/stats/stats.proto
     ENUM_ZERO_VALUE_SUFFIX:
     # Golang upgrade
+    - api/external/compliance/reporting/reporting.proto
+    - api/external/compliance/reporting/stats/stats.proto
+    - api/external/applications/applications.proto
+    - external/common/query/parameters.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/resources.proto
@@ -1115,7 +1252,6 @@ lint:
     - components/notifications-service/server/priv/server.proto   
     - lib/grpc/debug/debug_api/debug.proto      
     - lib/grpc/debug/debug_api/debug.proto       
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/GooDBYe.proto      
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto     
     - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto   
@@ -1173,9 +1309,10 @@ lint:
     # /lib/
     - grpc/debug/debug_api/debug.proto
     MESSAGE_PASCAL_CASE:
-    - config/dex/config_request.proto
+    - api/config/dex/config_request.proto
     PACKAGE_DEFINED:
     - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+    - components/automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
   ignore:
   - protoc-gen-swagger # grpc gateway
   - internal # grpc gateway
