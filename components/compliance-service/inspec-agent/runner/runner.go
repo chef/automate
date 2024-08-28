@@ -775,8 +775,9 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 	timeout := time.Duration(job.Timeout) * time.Second
 	// inputs are not required here, as detect has no need for them
 	env, _, genericErr := cloudEnvVars(&job.TargetConfig)
-	
-	env["CHEF_LICENSE_KEY"] = "tmns-1cee0361-a42a-4ae6-9a7a-1428a3738cc5-4023"
+	//https: //licensing-acceptance.chef.co/License
+	env["CHEF_LICENSE_SERVER"] = "http://127.0.0.1:2133"
+	//env["CHEF_LICENSE_KEY"] = "tmns-1cee0361-a42a-4ae6-9a7a-1428a3738cc5-4023"
 	defer func() {
 		cleanupCreds(env)
 	}()
