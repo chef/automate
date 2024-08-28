@@ -3,10 +3,10 @@ syntax = "proto3";
 package chef.automate.api;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/gateway";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 service Gateway {
   rpc GetVersion (google.protobuf.Empty) returns (Version) {

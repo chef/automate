@@ -4,7 +4,7 @@ package io.envoyproxy.pgv.grpc;
 
 option java_multiple_files = false;
 
-import "validate/validate.proto";
+import "protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 
 service Dismisser {
     rpc SayGoodbye (GoodbyeJKRequest) returns (GoodbyeResponse) {}

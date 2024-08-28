@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/chef/automate/lib/logger"
-	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"

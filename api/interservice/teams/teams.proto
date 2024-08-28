@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-import "google/api/annotations.proto";
-import "validate/validate.proto";
-import "external/common/version/version.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "api/external/common/version/version.proto";
 
 package chef.automate.domain.teams;
 option go_package = "github.com/chef/automate/api/interservice/teams";

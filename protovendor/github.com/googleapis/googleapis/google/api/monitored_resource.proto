@@ -16,8 +16,8 @@ syntax = "proto3";
 
 package google.api;
 
-import "google/api/label.proto";
-import "google/api/launch_stage.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/label.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/launch_stage.proto";
 import "google/protobuf/struct.proto";
 
 option cc_enable_arenas = true;

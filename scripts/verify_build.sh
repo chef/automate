@@ -17,6 +17,8 @@ export HAB_NONINTERACTIVE=true
 export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
+export GOPROXY="https://proxy.golang.org,direct"
+export GOSUMDB="sum.golang.org"
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
 log_section_start "install ruby"

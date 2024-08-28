@@ -1,0 +1,42 @@
+[1][default:/src:0]# compile_all_protobuf_components
+go: downloading github.com/golang/protobuf v1.5.4
+go: downloading google.golang.org/protobuf v1.34.2
+internal/godebugs
+internal/goarch
+encoding
+internal/coverage/rtcov
+internal/goos
+internal/goexperiment
+internal/unsafeheader
+internal/itoa
+GEN: api/external/annotations/iam/*.proto
+api/external/annotations/iam/policy.proto: File not found.
+protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto: File not found.
+external/annotations/iam/annotations.proto:5:1: Import "api/external/annotations/iam/policy.proto" was not found or had errors.
+external/annotations/iam/annotations.proto:6:1: Import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto" was not found or had errors.
+external/annotations/iam/annotations.proto:10:8: "google.protobuf.MethodOptions" is not defined.
+/src/components /src
+GEN: components/automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
+components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto: File not found.
+components/automate-grpc/protoc-gen-a2-config/api/a2conf/secret.proto: File not found.
+protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto: File not found.
+automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto:5:1: Import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto" was not found or had errors.
+automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto:6:1: Import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/secret.proto" was not found or had errors.
+automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto:7:1: Import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto" was not found or had errors.
+automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto:11:8: "google.protobuf.FieldOptions" is not defined.
+automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto: "google.protobuf.FieldOptions" is not defined.
+automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto:20:8: "google.protobuf.MessageOptions" is not defined.
+go: downloading github.com/lyft/protoc-gen-star v0.6.2
+go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20240812133136-8ffd90a71988
+go: downloading github.com/dave/jennifer v1.7.0
+github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options
+github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/genswagger
+github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+🧹 Linting protos with `buf lint`...
+Failure: api/external/annotations/iam/annotations.proto: import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/protobuf/descriptor.proto": file does not exist
+😱 Command `buf lint` failed! Refer to the docs if you need help fixing:
+- https://buf.build/docs/style-guide/
+- https://buf.build/docs/lint-checkers
+- https://buf.build/docs/lint-configuration
+
+See also the config file `buf.yaml` in the repo root

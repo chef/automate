@@ -3,8 +3,8 @@ syntax = "proto3";
 package chef.automate.api.user_settings;
 option go_package = "github.com/chef/automate/api/external/user_settings";
 
-import "google/api/annotations.proto";
-import "external/annotations/iam/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 import "google/protobuf/empty.proto";
 
 // UserSettings allows accessing of user settings

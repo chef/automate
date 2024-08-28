@@ -4,8 +4,8 @@ package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 
 import "google/protobuf/timestamp.proto";
-import "external/common/query/parameters.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+import "api/external/common/query/parameters.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
 message Nodes {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {

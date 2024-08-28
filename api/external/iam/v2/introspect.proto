@@ -3,12 +3,12 @@ syntax = "proto3";
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/api/external/iam/v2";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 
-import "external/iam/v2/request/introspect.proto";
-import "external/iam/v2/response/introspect.proto";
+import "api/external/iam/v2/request/introspect.proto";
+import "api/external/iam/v2/response/introspect.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 service Authorization {
   rpc IntrospectAll (IntrospectAllReq) returns (IntrospectResp) {

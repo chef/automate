@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
-import "interservice/infra_proxy/response/common.proto";
+import "api/interservice/infra_proxy/response/common.proto";
 message Roles {
     // List of the roles item.
     repeated RoleListItem roles = 1;

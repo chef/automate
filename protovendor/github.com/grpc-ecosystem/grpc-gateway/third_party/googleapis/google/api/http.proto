@@ -47,7 +47,7 @@ message Http {
 // request message are mapped to URL path, URL query parameters, and
 // HTTP request body. The mapping is typically specified as an
 // `google.api.http` annotation on the RPC method,
-// see "google/api/annotations.proto" for details.
+// see "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto" for details.
 //
 // The mapping consists of a field specifying the path template and
 // method kind.  The path template can refer to fields in the request

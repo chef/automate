@@ -3,10 +3,10 @@ syntax = "proto3";
 package chef.automate.api.compliance.profiles.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/profiles";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 service ProfilesService {
 	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410

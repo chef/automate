@@ -3,15 +3,15 @@ syntax = "proto3";
 package chef.automate.api.compliance.reporting.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/reporting";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
-import "external/common/version/version.proto";
-import "external/common/response.proto";
+import "api/external/common/version/version.proto";
+import "api/external/common/response.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 service ReportingService {
 	/*

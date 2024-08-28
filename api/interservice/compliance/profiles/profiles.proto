@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.compliance.profiles;
 option go_package = "github.com/chef/automate/api/interservice/compliance/profiles";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 service ProfilesService {
