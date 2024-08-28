@@ -67,14 +67,14 @@ chef-automate status --chef_server
 chef-automate status --cs
 ```
 
-- To check the service status on Postgres nodes.
+- To check the service status on PostgreSQL nodes.
 
 ```sh
 chef-automate status --postgresql
 chef-automate status -pg
 ```
 
-- To check the service status on Opensearch nodes.
+- To check the service status on OpenSearch nodes.
 
 ```sh
 chef-automate status --opensearch
@@ -128,7 +128,7 @@ sorthands for --postgresql is --pg and -p
 
 {{< note >}}
 
-- Frontend patch will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node.
+- Frontend patch will be applied to all nodes where are PostgreSQL and OpenSearch changes will be applied to only one node.
 - After patching, some services will go restart. So the health status will take up to 2 minutes to show healthy.
 
 {{< /note >}}
@@ -148,28 +148,28 @@ chef-automate gather-logs
 ```
 
 - View the active Habitat gossiped toml config for any locally loaded service:
-  - SSH to the backend opensearch nodes `chef-automate ssh --hostname os`
+  - SSH to the backend OpenSearch nodes `chef-automate ssh --hostname os`
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
 automate-backend-ctl show --svc=automate-ha-opensearch
 ```
 
-- SSH to the backend postgres nodes `chef-automate ssh --hostname pg`
+- SSH to the backend PostgreSQL nodes `chef-automate ssh --hostname pg`
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
 automate-backend-ctl show --svc=automate-ha-postgresql
 ```
 
-- To Rotate the password for Postgres cluster, run the command from the bastion node
+- To Rotate the password for PostgreSQL cluster, run the command from the bastion node
 
 ```sh
   cd /hab/a2_deploy_workspace/
   ./scripts/credentials set postgresql --no-auto
 ```
 
-- To Rotate the password for Opensearch cluster, run the command from the bastion node
+- To Rotate the password for OpenSearch cluster, run the command from the bastion node
 
 ```sh
   cd /hab/a2_deploy_workspace/

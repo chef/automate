@@ -43,7 +43,7 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
 {{< warning >}} If you are planning to move 4.7.52 or above, [verify and update](/automate/upgrade_san_certificates) non-SAN based public certificates with SAN certificates. This step is not applicable if you are planning to upgrade to a version 4.5.177 or below. {{< /warning >}}
 
 - **Plan your downtime:** This upgrade requires downtime. Before upgrading, set the environment to handle the downtime. 
-- **Backup Chef Automate database:** This Chef Automate version upgrades ElasticSearch. [Backup](/automate/backup/) your data before upgrading.
+- **Backup Chef Automate database:** This Chef Automate version upgrades Elasticsearch. [Backup](/automate/backup/) your data before upgrading.
 - **Current version should be 3.0.49:** If you are not on *3.0.49* version, do regular upgrades according to your topology.
 - **Download latest chef-automate cli:**
     ```sh
@@ -78,9 +78,9 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.x version.
 
 - [Chef Automate in Air-Gapped Environment With External Elasticsearch]({{< relref "#chef-automate-in-air-gapped-environment-with-external-elasticsearch" >}})
 
-{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. 
+{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using an external Elasticsearch.
 
-If Automate is configured with external Elasticsearch then data should be migrated by user to external OpenSearch.
+If Automate is configured with external Elasticsearch then data should be migrated by the user to external OpenSearch.
 
 For Automate configured with embedded Elasticsearch then data will be migrate in the upgrade flow to embedded OpenSearch.
 {{< /note >}}
@@ -94,15 +94,16 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 **Upgrade Chef Automate from version 3.0.49 to 4.x**
 
 1. Download latest chef-automate cli.
+
     ```sh
     curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
+
 2. Start a major version upgrade:
 
     ```sh
     sudo ./chef-automate upgrade run --major
     ```
-
 
     ```shell
     #Output
@@ -151,7 +152,6 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     ```sh
     sudo chef-automate upgrade status
     ```
-    
 
     ```shell
     #Output
@@ -185,7 +185,8 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
        Clean up successful  
     
     ```
-4. **[If not done in previous steps]** Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+
+4. **[If not done in previous steps]** Migrate your data from *Elasticsearch 6.8* to *OpenSearch 1.2.4*:
 
     ```sh
     sudo chef-automate post-major-upgrade migrate --data=es
@@ -211,10 +212,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     ip-172-31-26-40.ap-south-1.compute.internal
     
     Once verified, you can remove old Elasticsearch data.
-    
-    
     ```
-
 
 5. Verify whether all services are running:
 
@@ -222,7 +220,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     sudo chef-automate status
     ```
 
-6. **[If not done in step 2]** Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+6. **[If not done in step 2]** Clear the old Elasticsearch 6.8 data if all the data is present in your upgraded Chef Automate.
 
     ```sh
     sudo chef-automate post-major-upgrade clear-data --data=es
@@ -233,16 +231,17 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
     Would you like to clean up the old Elasticsearch data now? (y/n)
     y
-       Clean up successful 
+       Clean up successful
     ```
 
-### Chef Automate with External ElasticSearch
+### Chef Automate with External Elasticsearch
 
 To upgrade Chef Automate with external Elasticsearch, follow the steps given below:
 
 **Upgrade Chef Automate from version 3.0.49 to 4.x**
 
 1. Download latest chef-automate cli.
+
     ```sh
     curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
@@ -308,7 +307,6 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
     sudo chef-automate status
     ```
 
-    
     ```shell
     #Output
 
@@ -330,14 +328,15 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
 
       Maintenance mode turned ON successfully
     ```
-4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
+
+4. Upgrade your external *Elasticsearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of Elasticsearch, patch the new configuration to use Chef Automate.
 
 5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
     Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
     Add the relevant configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
 
-### Chef Automate in Air-Gapped Environment With Embedded ElasticSearch
+### Chef Automate in Air-Gapped Environment With Embedded Elasticsearch
 
 **Upgrade Chef Automate from version 3.0.49 to 4.x**
 
@@ -356,21 +355,24 @@ To upgrade to 4.x, follow the steps below:
     ```sh
     sudo ./chef-automate airgap bundle create 
     ```
+
     OR we can directly download via curl request
-    
+
     ```sh
     curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
     ```
+
 3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate-4.x.y.aib`) to the air-gapped machine running Chef Automate.
 
 #### On Air-Gapped machine running Chef Automate
 
 1. Make sure your upgrade strategy as none in Chef Automate config. Check using:
+
     ```sh
     sudo ./chef-automate config show
     ```
-    Reference to change [upgrade strategy]({{< relref "install.md#disable-automatic-upgrades" >}})
 
+    Reference to change [upgrade strategy]({{< relref "install.md#disable-automatic-upgrades" >}})
 
 2. Upgrade using new AIB and Chef Automate CLI:
 
@@ -425,7 +427,6 @@ To upgrade to 4.x, follow the steps below:
     ```sh
     sudo chef-automate upgrade status
     ```
-    
 
     ```shell
     #Output
@@ -459,7 +460,8 @@ To upgrade to 4.x, follow the steps below:
        Clean up successful  
     
     ```
-4. **[If not done in previous steps]** Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+
+4. **[If not done in previous steps]** Migrate your data from *Elasticsearch 6.8* to *OpenSearch 1.2.4*:
 
     ```sh
     sudo chef-automate post-major-upgrade migrate --data=es
@@ -489,14 +491,13 @@ To upgrade to 4.x, follow the steps below:
     
     ```
 
-
 5. Verify whether all services are running:
 
     ```sh
     sudo chef-automate status
     ```
 
-6. **[If not done in step 2]** Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+6. **[If not done in step 2]** Clear the old Elasticsearch 6.8 data if all the data is present in your upgraded Chef Automate.
 
     ```sh
     sudo chef-automate post-major-upgrade clear-data --data=es
@@ -507,10 +508,10 @@ To upgrade to 4.x, follow the steps below:
 
     Would you like to clean up the old Elasticsearch data now? (y/n)
     y
-       Clean up successful 
+       Clean up successful
     ```
 
-### Chef Automate in Air-Gapped Environment With External ElasticSearch
+### Chef Automate in Air-Gapped Environment With External Elasticsearch
 
 **Upgrade Chef Automate from version 3.0.49 to 4.x**
 
@@ -529,8 +530,9 @@ To upgrade to 4.x, follow the steps below:
     ```sh
     sudo ./chef-automate airgap bundle create
     ```
+
     OR we can directly download via curl request
-    
+
     ```sh
     curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
     ```
@@ -539,11 +541,14 @@ To upgrade to 4.x, follow the steps below:
 
 #### On Air-Gapped machine running Chef Automate
 
-1. Make sure your upgrade strategy as none in Chef Automate config. Check using:
+1. Make sure your upgrade strategy as none in the Chef Automate config. Check using:
+
     ```sh
     sudo ./chef-automate config show
     ```
+
     Reference to change [upgrade strategy]({{< relref "install.md#disable-automatic-upgrades" >}})
+
 2. Upgrade using new AIB and Chef Automate CLI:
 
     ```sh
@@ -605,7 +610,6 @@ To upgrade to 4.x, follow the steps below:
     sudo chef-automate status
     ```
 
-    
     ```shell
     #Output
 
@@ -627,13 +631,13 @@ To upgrade to 4.x, follow the steps below:
 
       Maintenance mode turned ON successfully
     ```
-4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
+
+4. Upgrade your external *Elasticsearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of Elasticsearch, patch the new configuration to use Chef Automate.
 
 5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
     Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
     Add the relevant configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
-
 
 {{< note >}}
 After upgrading to version 4.x, Automate will have the configurations both for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
@@ -643,12 +647,13 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 
 ### Circuit Breaking Exception
 
-```
+```sh
 {"error":{"root_cause":[{"type":"circuit_breaking_exception","reason":"[parent] Data too large, data for [<http_request>] would be [6126524880/5.7gb], which is larger than the limit of [5988548608/5.5gb], real usage: [6126524880/5.7gb], new bytes reserved: [0/0b], usages [request=0/0b, fielddata=74975/73.2kb, in_flight_requests=0/0b, accounting=89882860/85.7mb]","bytes_wanted":6126524880,"bytes_limit":5988548608,"durability":"PERMANENT"}]
 ```
 
-- Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>`
-```
+- Update the OpenSearch Config, using `chef-automate config patch <config_patch.toml>`
+
+```cd
 [opensearch]
   [opensearch.v1]
     [opensearch.v1.sys]
@@ -666,9 +671,9 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 ```
 
 To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
-Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>` 
+Update the OpenSearch Config, using `chef-automate config patch <config_patch.toml>`
 
-```
+```ruby
 [opensearch]
   [opensearch.v1]
     [opensearch.v1.sys]
@@ -683,7 +688,9 @@ If you are using Proxy Settings and have upgraded to a version between 4.0.27 an
 ```sh
 DeploymentServiceCallError: A request to the deployment-service failed: Request to get upgrade status failed: rpc error: code = Unknown desc = error in getting the versions from current channel: error in invoking the endpoint https://packages.chef.io/manifests/current/automate/versions.json: Get "https://packages.chef.io/manifests/current/automate/versions.json": dial tcp: lookup packages.chef.io on 10.2.72.20:53: read udp 10.1.97.98:59620->10.2.72.20:53: i/o timeout
 ```
-To move ahead with upgrade you can download latest CLI and Airgapped bundle using curl command with proxy settings:
+
+To move ahead with the upgrade you can download the latest CLI and Airgapped bundle using the curl command with proxy settings:
+
 ```sh
 curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 
@@ -696,7 +703,7 @@ After downloading, run the upgrade command with airgapped bundle option:
 ./chef-automate upgrade run --airgap-bundle automate-latest.aib
 ```
 
-Output will look like this:
+The output will look like this:
 
 ```sh
 Installing airgap install bundle
@@ -779,4 +786,4 @@ To start the upgrade, use the **backup ID** from the backup created. In case the
 
 ### Adding Custom Configuration to optimize OpenSearch Performance
 
-To add custom configurations or optimizing OpenSearch performance please refer to [Custom OpenSearch configuration docs](/automate/opensearch/#configure-embedded-opensearch).
+To add custom configurations or optimize OpenSearch performance please refer to [Custom OpenSearch configuration docs](/automate/opensearch/#configure-embedded-opensearch).

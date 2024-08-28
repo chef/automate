@@ -84,7 +84,7 @@ creates a `config.toml` file with default values. Setting an upgrade strategy of
 prevents Chef Automate from checking its release channel for updates via the internet.
 
 Edit `config.toml` to make changes to FQDN and other configuration settings. 
-add elasticsearch heap size setting at end of config as shown below, 
+add Elasticsearch heap size setting at end of config as shown below, 
 recommended heap size is 50% of total memory, but cannot exceed more than 32 gb.
 
 ```toml

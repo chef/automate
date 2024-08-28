@@ -161,9 +161,9 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 {{< readfile file = "content/automate/reusable/md/restore_troubleshooting.md" >}}
 
-For **Disaster Recovery or AMI upgrade**, while running the restore in secondary cluster which is in different region follow the steps given below.
+For **Disaster Recovery or AMI upgrade**, while running the restore in the secondary cluster which is in a different region follow the steps given below.
 
-- Make a curl request in any opensearch node`curl -XGET https://localhost:9200/_snapshot?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k`
+- Make a curl request in any OpenSearch node`curl -XGET https://localhost:9200/_snapshot?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k`
 - Check the curl request response if the region is not matching with the primary cluster follow the below steps:
 
 1. Modify the region in FrontEnd nodes by patching the below configs with command, `chef-automate config patch <file-name>.toml --fe`
@@ -173,7 +173,7 @@ For **Disaster Recovery or AMI upgrade**, while running the restore in secondary
                   region = "<FIRST-CLUSTER-REGION>"
     ```
 
-2. Make a PUT request in an Opensearch node by running this script:
+2. Make a PUT request in an OpenSearch node by running this script:
 
     ```sh
     indices=(

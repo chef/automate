@@ -86,7 +86,7 @@ Once the command executes, it will remove the particular node from your HA setup
 - The IPs provided must be associated with a node in your HA setup.
 - Automate instance count cannot be less than 1.
 - Chef Server instance count cannot be less than 1.
-- Open search instance count cannot be less than 3.
+- OpenSearch instance count cannot be less than 3.
 - PostgreSQL instance count cannot be less than 3.
 
 {{< /note >}}

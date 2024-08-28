@@ -438,7 +438,7 @@ You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#
         ```
 
 1. While running the restore command, If you are getting this error: `Path is not accessible on master node`, follow the steps given below:
-    1. Log in to any Automate HA Opensearch Node, and run the below command:
+    1. Log in to any Automate HA OpenSearch Node, and run the below command:
 
         ```bash
         chmod 777 -R /mnt/automate_backups/

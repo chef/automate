@@ -33,7 +33,7 @@ Create a `config.toml` file with default values for your Chef Automate installat
 sudo ./chef-automate init-config
 ```
 
-You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor. Add ElasticSearch heap size setting at the end of `config` as shown below. The recommended heap size is 50% of total memory but should not exceed more than 32 GB.
+You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor. Add Elasticsearch heap size setting at the end of `config` as shown below. The recommended heap size is 50% of total memory but should not exceed more than 32 GB.
 
 ```toml
 [elasticsearch.v1.sys.runtime]
@@ -149,11 +149,11 @@ Add the following to your `config.toml` for HTTPS connection:
   enable = true
   nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
 
-# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+# Uncomment and fill out if using External OpenSearch with SSL and/or basic auth
 [global.v1.external.opensearch.auth]
   scheme = "basic_auth"
 [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Chef Automate deployment;
+## Create this OpenSearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
   username = "<admin username>"
   password = "<admin password>"
@@ -182,11 +182,11 @@ Add the following to your `config.toml` for HTTP connection:
   enable = true
   nodes = ["http://opensearch1.example:9200", "http://opensearch2.example:9200", "..." ]
 
-# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+# Uncomment and fill out if using external OpenSearch with SSL and/or basic auth
 [global.v1.external.opensearch.auth]
   scheme = "basic_auth"
 [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Chef Automate deployment;
+## Create this OpenSearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
   username = "<admin username>"
   password = "<admin password>"
@@ -353,7 +353,7 @@ Add the following settings to your `config.toml`:
 enable = true
 nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
 
-# To use postgres with SSL, Set enable = true then, uncomment root_cert and fill out the certificate value. 
+# To use PostgreSQL with SSL, Set enable = true then, uncomment root_cert and fill out the certificate value. 
 [global.v1.external.postgresql.ssl]
 enable = false
 # root_cert = """$(cat </path/to/root/cert.pem>)"""
@@ -361,7 +361,7 @@ enable = false
 [global.v1.external.postgresql.auth]
 scheme = "password"
 
-# Create these postgres users before starting the Automate deployment;
+# Create these PostgreSQL users before starting the Automate deployment;
 # Automate assumes they already exist.
 [global.v1.external.postgresql.auth.password.superuser]
 username = "<admin username>"

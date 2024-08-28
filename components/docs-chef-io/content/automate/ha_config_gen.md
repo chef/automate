@@ -32,7 +32,7 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 `On-Premise`
 : To deploy on customer created Chef Automate HA cluster.
 
-`Aws`
+`AWS`
 : To deploy in AWS environment. Cluster will be created by Automate HA.
 
 `Deployment`
@@ -74,7 +74,7 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 : Chef Automate FQDN. For example, `chefserver.example.com`.
 
 `Chef Server FQDN ARN`
-: For Aws deployment ARN name is required for Chef Servers FQDN domain.
+: For AWS deployment ARN name is required for Chef Servers FQDN domain.
 
 `Chef Server FQDN Root Certificate`
 : SSL root certificate for Chef Infra Server FQDN domain.
@@ -87,11 +87,11 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 `Chef Server node count`
 : Number of nodes we want to keep for Chef Server, in case of On-Premise deployment need to provide IP Address for all nodes.
 
-`Opensearch node count`
-: Number of nodes we want to keep for Opensearch, in case of On-Premise deployment need to provide IP Address for all nodes.
+`OpenSearch node count`
+: Number of nodes we want to keep for OpenSearch, in case of On-Premise deployment need to provide IP Address for all nodes.
 
-`Postgresql node count`
-: Number of nodes we want to keep for Postgresql, in case of On-Premise deployment need to provide IP Address for all nodes.
+`PostgreSQL node count`
+: Number of nodes we want to keep for PostgreSQL, in case of On-Premise deployment need to provide IP Address for all nodes.
 
 ## Private/Public Key For Automate
 
@@ -111,31 +111,31 @@ You need to have `Chef Automate HA` as a topology for HA deployments.
 
 ## OpenSearch Certificate and Private/Public Key
 
-`Root CA for Open Search`
-: In case of have custom certificates for Open Search node provide root certificates.
+`Root CA for OpenSearch`
+: In case of have custom certificates for OpenSearch node provide root certificates.
 
-`Admin Key certificate for Open Search`
-: In case of have custom certificates for Open Search node provide admin key certificates.
+`Admin Key certificate for OpenSearch`
+: In case of have custom certificates for OpenSearch node provide admin key certificates.
 
-`Admin certificate for Open Search`
-: In case of have custom certificates for Open Search node provide admin certificates.
+`Admin certificate for OpenSearch`
+: In case of have custom certificates for OpenSearch node provide admin certificates.
 
-`Private key for Open Search`
-: If you have a custom certificate for Open Search node provide your private for Open Search, If you have a custom certificates for each Open Search node then provide different private key for each of Open Search node.
+`Private key for OpenSearch`
+: If you have a custom certificate for OpenSearch node provide your private for OpenSearch, If you have a custom certificates for each OpenSearch node then provide different private key for each of OpenSearch node.
 
-`Public key for Open Search`
-: If you have a custom certificate for Open Search node provide your public for Open Search, If you have a custom certificates for each Open Search node then provide different public key for each of Open Search node.
+`Public key for OpenSearch`
+: If you have a custom certificate for OpenSearch node provide your public for OpenSearch, If you have a custom certificates for each OpenSearch node then provide different public key for each of OpenSearch node.
 
 ## PostgreSQL Certificate and Private/Public Key
 
-`Root CA for Postgresql`
-: In case of have custom certificates for Postgresql node provide root certificates.
+`Root CA for PostgreSQL`
+: In case of have custom certificates for PostgreSQL node provide root certificates.
 
-`Private key for Postgresql`
-: If you have a custom certificate for Postgresql node provide your private for Postgresql, If you have a custom certificates for each Postgresql node then provide different private key for each of Postgresql node.
+`Private key for PostgreSQL`
+: If you have a custom certificate for PostgreSQL node provide your private for PostgreSQL, If you have a custom certificates for each PostgreSQL node then provide different private key for each of PostgreSQL node.
 
-`Public key for Postgresql`
-: If you have a custom certificate for Postgresql node provide your public for Postgresql, If you have a custom certificates for each Postgresql node then provide different public key for each of Postgresql node.
+`Public key for PostgreSQL`
+: If you have a custom certificate for PostgreSQL node provide your public for PostgreSQL, If you have a custom certificates for each PostgreSQL node then provide different public key for each of PostgreSQL node.
 
 ## AWS Deployment
 
@@ -179,10 +179,10 @@ Settings for AWS-managed or customer-managed databases.
 
 ### OpenSearch
 
-`Opensearch domain name`
-: Opensearch domain name deployed on AWS or customer environment.
+`OpenSearch domain name`
+: OpenSearch domain name deployed on AWS or customer environment.
 
-`Opensearch domain url`
+`OpenSearch domain url`
 : For AWS managed provide domain URL without port and protocol.
 
   For example, `opensearch.example.com`.
@@ -191,13 +191,13 @@ Settings for AWS-managed or customer-managed databases.
 
   For example, `opensearch.example.com:9200`.
 
-`Opensearch user name`
+`OpenSearch user name`
 : Username to login to OpenSearch.
 
-`Opensearch user passwords`
+`OpenSearch user passwords`
 : Password to login to OpenSearch.
 
-`Opensearch root-ca`
+`OpenSearch root-ca`
 : SSL root certificates to connect with OpenSearch.
 
   If you have AWS managed databases we have option to use default AWS certificates - - If using default certificates then no need to provide root certificates.
@@ -205,7 +205,7 @@ Settings for AWS-managed or customer-managed databases.
 ### PostgreSQL
 
 `PostgreSQL URL and port`
-: Postgresql URL along with port.
+: PostgreSQL URL along with port.
 
   For example, `postgresql.example.com:5432`.
 
@@ -223,13 +223,13 @@ Settings for AWS-managed or customer-managed databases.
 
 ### AWS OpenSearch
 
-`Aws OpenSearch snapshot arn`
+`AWS OpenSearch snapshot arn`
 : Snapshot arn is required to take a backup from AWS OpenSearch
 
-`Aws OpenSearch snapshot user accesskey`
+`AWS OpenSearch snapshot user accesskey`
 : Snapshot user accesskey is required to take a backup from AWS OpenSearch
 
-`Aws OpenSearch snapshot secret key`
+`AWS OpenSearch snapshot secret key`
 : Snapshot user accesskey is required to take a backup from AWS OpenSearch. Refer to the [Enabling OpenSearch Backup Restore](/automate/managed_services/#enabling-opensearch-backup-restore) section, to create them and get their values.
 
 ## Backup

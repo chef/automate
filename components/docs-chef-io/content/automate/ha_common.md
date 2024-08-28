@@ -108,7 +108,7 @@ Follow these steps to rotate your certificates that are to be used in Chef Autom
 
     {{< note >}}
 
-    When you run this command first time, a series of certificates are created and saved in `/hab/a2_deploy_workspace/certs` location. You need to identify the appropriate certificates. For example, to rotate certificates for PostgreSQL, use certificate values into *pg_ssl_private.key*,  *pg_ssl_public.pem*, and *ca_root.pem*. Likewise, to rotate certificates for ElasticSearch, use certificate values into *ca_root.pem*, *es_admin_ssl_private.key*, *es_admin_ssl_public.pem*, *es_ssl_private.key*, *es_ssl_public.pem*, *kibana_ssl_private.key*, *kibana_ssl_public.pem*.
+    When you run this command first time, a series of certificates are created and saved in `/hab/a2_deploy_workspace/certs` location. You need to identify the appropriate certificates. For example, to rotate certificates for PostgreSQL, use certificate values into *pg_ssl_private.key*,  *pg_ssl_public.pem*, and *ca_root.pem*. Likewise, to rotate certificates for Elasticsearch, use certificate values into *ca_root.pem*, *es_admin_ssl_private.key*, *es_admin_ssl_public.pem*, *es_ssl_private.key*, *es_ssl_public.pem*, *kibana_ssl_private.key*, *kibana_ssl_public.pem*.
 
     {{< /note >}}
 
@@ -376,7 +376,7 @@ The default limit to create a VPC in a region is *5*. However, if the VPCs used 
 
 {{< note >}}
 
-You require a minimum of three node clusters for ElaticSearcg and Postgres-sql instances.
+You require a minimum of three node clusters for Elasticsearch and PostgreSQL instances.
 
 {{< /note >}}
 

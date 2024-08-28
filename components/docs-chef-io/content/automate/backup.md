@@ -250,7 +250,7 @@ where `bucket_name` is the name of the GCS bucket and `base_path` is an optional
 
 ## Delete Backups
 
-To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete the backup using [`chef automate backup delete ID`]({{< relref "cli/#chef-automate-backup-delete" >}}).
+To delete backups from a running instance of Chef Automate, first find the relevant backup ID with `chef-automate backup list` and then delete the backup using [`chef-automate backup delete ID`]({{< relref "cli/#chef-automate-backup-delete" >}}).
 
 ```shell
 chef-automate backup list
