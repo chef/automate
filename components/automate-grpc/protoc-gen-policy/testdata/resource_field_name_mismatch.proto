@@ -2,7 +2,6 @@ syntax = "proto3";
 package chef.automate.domain.resource_field_name_mismatch;
 option go_package = "github.com/chef/automate/components/mock-service/mock";
 
-import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "api/external/annotations/iam/annotations.proto";
 
 message Foo {

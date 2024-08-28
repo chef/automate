@@ -130,6 +130,7 @@ lint:
     - automate-gateway/api/telemetry/telemetry.proto
     # /lib/
     - grpc/debug/debug_api/debug.proto
+    - lib/grpc/debug/debug_api/debug.proto
     RPC_REQUEST_STANDARD_NAME:
     - api/external/data_feed/data_feed.proto
     - api/external/report_manager/report_manager.proto
@@ -809,6 +810,45 @@ lint:
     - api/interservice/cereal/cereal.proto
     - api/interservice/deployment/automate_deployment.proto
     - api/interservice/deployment/certificate_authority.proto
+    - api/interservice/pg_sidecar/service.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/embedded.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/annotations.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/auth.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/backend.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/billing.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/client.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/config_change.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/consumer.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/context.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/control.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/distribution.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/documentation.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/endpoint.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/checked.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/conformance_service.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/eval.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/explain.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/syntax.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/value.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/field_behavior.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/http.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/httpbody.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/label.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/launch_stage.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/log.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/logging.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/metric.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/monitored_resource.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/monitoring.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/quota.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/resource.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/service.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/source_info.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/system_parameter.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/usage.proto
     # /api/
     - external/iam/v2
     - config
@@ -970,6 +1010,15 @@ lint:
     - protovendor/github.com/googleapis/googleapis/google/longrunning/operations.proto
     ENUM_VALUE_PREFIX:
     # Golang upgrade 
+    - protovendor/github.com/googleapis/googleapis/google/api/resource.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/conformance_service.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/servicecontrol/v1/check_error.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/metric.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/launch_stage.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/field_behavior.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/expr/v1alpha1/checked.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/config_change.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/backend.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/resources.proto
@@ -1140,9 +1189,9 @@ lint:
     - api/external/compliance/reporting/stats/stats.proto
     ENUM_ZERO_VALUE_SUFFIX:
     # Golang upgrade
-    - api/external/compliance/reporting/reporting.proto
-    - api/external/compliance/reporting/stats/stats.proto
-    - api/external/applications/applications.proto
+    # - api/external/compliance/reporting/reporting.proto
+    # - api/external/compliance/reporting/stats/stats.proto
+    # - api/external/applications/applications.proto
     - external/common/query/parameters.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
     - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto

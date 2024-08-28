@@ -17,16 +17,9 @@ syntax = "proto3";
 
 package google.api.servicemanagement.v1;
 
-import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/config_change.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/field_behavior.proto";
-import "protovendor/github.com/googleapis/googleapis/google/api/metric.proto";
-import "protovendor/github.com/googleapis/googleapis/google/api/quota.proto";
-import "protovendor/github.com/googleapis/googleapis/google/api/service.proto";
-import "google/protobuf/any.proto";
-import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
-import "protovendor/github.com/googleapis/googleapis/google/rpc/status.proto";
 
 option csharp_namespace = "Google.Cloud.ServiceManagement.V1";
 option go_package = "google.golang.org/genproto/googleapis/api/servicemanagement/v1;servicemanagement";
