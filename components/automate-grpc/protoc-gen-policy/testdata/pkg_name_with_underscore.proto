@@ -1,12 +1,14 @@
 syntax = "proto3";
-package chef.automate.domain.pkg_name_with_underscore;
-option go_package = "github.com/chef/automate/components/mock-service/pkg_name_with_underscore";
+package chef.automate.domain.imported_method_arguments;
+option go_package = "github.com/chef/automate/components/mock-service/mock";
 import "api/external/annotations/iam/annotations.proto";
 
-message Foo {}
 
-service Mock {
-  rpc MockMethod (Foo) returns (Foo) {
+
+message Foo5 {}
+
+service Mock3{
+  rpc MockMethod (Foo5) returns (Foo5) {
     option (chef.automate.api.iam.policy).resource = "mock:foo";
     option (chef.automate.api.iam.policy).action = "action:item:verb";
   };

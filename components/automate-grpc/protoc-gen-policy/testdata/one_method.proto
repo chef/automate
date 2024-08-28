@@ -4,12 +4,12 @@ option go_package = "github.com/chef/automate/components/mock-service/mock";
 
 import "api/external/annotations/iam/annotations.proto";
 
-message Foo {
-  string bar = 1;
+message Fooo {
+  string barr = 1;
 }
-message Bar {}
-service Mock {
-  rpc MockMethod (Foo) returns (Bar) {
+message Barr {}
+service Mock2{
+  rpc MockMethod (Fooo) returns (Barr) {
     option (chef.automate.api.iam.policy).resource = "mock:foo:{bar}";
     option (chef.automate.api.iam.policy).action = "action:item:verb";
   };

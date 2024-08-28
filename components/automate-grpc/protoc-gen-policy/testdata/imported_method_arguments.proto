@@ -4,10 +4,16 @@ option go_package = "github.com/chef/automate/components/mock-service/mock";
 
 import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "api/external/annotations/iam/annotations.proto";
-import "components/automate-grpc/protoc-gen-policy/testdata/messages.proto";
 
-service Mock {
-  rpc MockMethod (messages.Foo) returns (messages.Bar) {
+message Foo6{
+
+}
+message Bar6{
+
+}
+
+service Mock1 {
+  rpc MockMethod (Foo6) returns (Bar6) {
     option (google.api.http).get = "/api/v0/auth/foo/baz";
     option (chef.automate.api.iam.policy).resource = "mock:foo:{bar}";
     option (chef.automate.api.iam.policy).action = "action:item:verb";

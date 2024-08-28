@@ -1,15 +1,15 @@
 syntax = "proto3";
-package chef.automate.domain.resource_field_name_mismatch;
+package chef.automate.domain.imported_method_arguments;
 option go_package = "github.com/chef/automate/components/mock-service/mock";
 
 import "api/external/annotations/iam/annotations.proto";
 
-message Foo {
+message Foo1 {
   string bar = 1;
 }
-message Bar {}
+message Bar2 {}
 service Mock {
-  rpc MockMethod (Foo) returns (Bar) {
+  rpc MockMethod (Foo1) returns (Bar2) {
     option (chef.automate.api.iam.policy).resource = "mockvtwo:foo:{baz}";
     option (chef.automate.api.iam.policy).action = "actionvtwo";
   };

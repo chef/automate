@@ -59,6 +59,8 @@ lint:
   # allow_comment_ignores: true
   use:
   - DEFAULT
+  rpc_allow_google_protobuf_empty_requests: true
+  rpc_allow_google_protobuf_empty_responses: true
   except:
   # This linter requires your proto package names to end with .v1 or similar. 
   # Adopting this for existing code would break anyone using our protos
@@ -791,6 +793,7 @@ lint:
     - automate-gateway/api/telemetry/telemetry.proto
     - grpc/debug/debug_api/debug.proto
     PACKAGE_SAME_GO_PACKAGE:
+    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto
     - api/interservice/es_sidecar/service.proto
     - api/interservice/ingest/automate_event.proto
     - api/interservice/ingest/chef.proto
@@ -886,6 +889,17 @@ lint:
     - protovendor/github.com/googleapis/googleapis/google/api/source_info.proto
     - protovendor/github.com/googleapis/googleapis/google/api/system_parameter.proto
     - protovendor/github.com/googleapis/googleapis/google/api/usage.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/messages.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/no_services.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
+    - components/notifications-service/server/priv/health.proto
+    - components/notifications-service/server/priv/notifications.proto
+    - components/notifications-service/server/priv/rules.proto
+    - components/notifications-service/server/priv/server.proto
+    - components/notifications-service/server/priv/slack_post.proto
     # /api/
     - external/iam/v2
     - config
