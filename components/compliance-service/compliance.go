@@ -716,6 +716,13 @@ func (conf *ServiceInfo) serveCustomRoutes() error {
 
 	r.HandleFunc("/profiles/tar", conf.ProfileTarHandler)
 
+	r.HandleFunc("/v1/listLicenses", conf.Inspec6ListLicenseHandler)
+	r.HandleFunc("/v1/client", conf.Inspec6ClientHandler)
+	r.HandleFunc("/v1/validate", conf.Inspec6ValidateHandler)
+	r.HandleFunc("/v1/desc", conf.Inspec6DescHandler)
+
+	//r.HandleFunc("/inspec6/license/{version}/{path}", conf.Inspec6LicenseHandler)
+	//http://127.0.0.1:2133/inspec6/license/
 	return http.ListenAndServe(serveAddress, r)
 }
 
@@ -727,6 +734,46 @@ func NewServiceConfig(cfg *config.Compliance, connFactory *secureconn.Factory) *
 
 		connFactory: connFactory,
 	}
+}
+
+// Inspec6ListLicenseHandler is the http handler for handling inspec-6 List License API
+func (conf *ServiceInfo) Inspec6ListLicenseHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("--------------******** dmaddu listlicensehandler start  *************------------------")
+	logrus.Infof(r.URL.Path)
+	logrus.Infof("--------------******** dmaddu listlicensehandler end  *************------------------")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"data":["5fd13cca-14b7-42b9-ad47-d52a0630c1ae"],"status_code":200}`))
+	w.WriteHeader(http.StatusOK)
+}
+
+// Inspec6ClientHandler is the http handler for handling inspec-6 Client API
+func (conf *ServiceInfo) Inspec6ClientHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("--------------******** dmaddu clienthandler start  *************------------------")
+	logrus.Infof(r.URL.Path)
+	logrus.Infof("--------------******** dmaddu clienthandler end  *************------------------")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"data":{"cache":{"lastModified":"2024-05-31T19:43:22Z","evaluatedOn":"2024-08-28T05:53:28.47436404Z","expires":"2025-08-29T05:53:28.474364129Z","cacheControl":"private, max-age:68072"},"client":{"license":"commercial","status":"Active","changesTo":"Grace","changesOn":"2028-06-04T00:00:00Z","changesIn":-85,"usage":"Active","used":0,"limit":1,"measure":"node"},"assets":[{"name":"Desktop Management Content","id":"75ea6490-7f29-40e5-9391-39f4884c9207"}],"features":null,"entitlement":{"id":"3ff52c37-e41f-4f6c-ad4d-365192205968","name":"InSpec","start":"2024-06-05","end":"2028-06-04","licenses":1,"limits":[{"measure":"node","amount":4}],"entitled":true}},"message":"","status_code":200}`))
+	w.WriteHeader(http.StatusOK)
+}
+
+// Inspec6ValidateHandler is the http handler for handling inspec-6 validate API
+func (conf *ServiceInfo) Inspec6ValidateHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("--------------******** dmaddu validatehandler start  *************------------------")
+	logrus.Infof(r.URL.Path)
+	logrus.Infof("--------------******** dmaddu validatehandler end  *************------------------")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"data":true,"message":"License Id is valid","status_code":200}`))
+	w.WriteHeader(http.StatusOK)
+}
+
+// Inspec6DescHandler is the http handler for handling inspec-6 desc API
+func (conf *ServiceInfo) Inspec6DescHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("--------------******** dmaddu deschandler start  *************------------------")
+	logrus.Infof(r.URL.Path)
+	logrus.Infof("--------------******** dmaddu deschandler end  *************------------------")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"data":{"license":[{"licenseKey":"5fd13cca-14b7-42b9-ad47-d52a0630c1ae","serialNumber":"S8YD2QXQ2JWM5BA7TMN0CC61NR","licenseType":"commercial","name":"AppDynamics LLC","start":"2024-06-05T00:00:00Z","end":"2028-06-04T00:00:00Z","status":"Active","limits":[{"software":"InSpec","id":"3ff52c37-e41f-4f6c-ad4d-365192205968","amount":4,"measure":"node","used":0,"status":"Active"}]}],"Assets":[{"id":"75ea6490-7f29-40e5-9391-39f4884c9207","name":"Desktop Management Content","entitled":true,"from":[{"license":"5fd13cca-14b7-42b9-ad47-d52a0630c1ae","status":"Active"}]}],"Software":[{"id":"a5213d76-181f-4924-adba-4b7ed2b098b5","name":"Infra","entitled":true,"from":[{"license":"5fd13cca-14b7-42b9-ad47-d52a0630c1ae","status":"Active"}]},{"id":"c770f0fa-7fa1-4c5b-b694-7b5462595f35","name":"Automate","entitled":true,"from":[{"license":"5fd13cca-14b7-42b9-ad47-d52a0630c1ae","status":"Active"}]},{"id":"3ff52c37-e41f-4f6c-ad4d-365192205968","name":"InSpec","entitled":true,"from":[{"license":"5fd13cca-14b7-42b9-ad47-d52a0630c1ae","status":"Active"}]}],"Features":null,"Services":null},"message":"","status":200}`))
+	w.WriteHeader(http.StatusOK)
 }
 
 // ProfileTarHandler is the http handler for profile tarballs, used by the inspec-agent
