@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package google.api.servicecontrol.v1;
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/client.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/servicecontrol/v1/check_error.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/servicecontrol/v1/operation.proto";

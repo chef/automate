@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 
 package chef.automate.domain.authn;

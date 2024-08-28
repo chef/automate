@@ -4,7 +4,7 @@ package chef.automate.api.compliance.scanner.jobs.v1;
 option go_package = "github.com/chef/automate/api/external/compliance/scanner/jobs";
 
 import "google/protobuf/timestamp.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 import "api/external/annotations/iam/annotations.proto";

@@ -2,15 +2,17 @@ syntax = "proto3";
 package chef.automate.domain.one_method;
 option go_package = "github.com/chef/automate/components/mock-service/mock";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "api/external/annotations/iam/annotations.proto";
 
-message Foo {
-  string bar = 1;
-}
-message Bar {
-  string baz = 1;
-}
+// message Foo {
+//   string bar = 1;
+// }
+
+// message Bar {
+//   string baz = 1;
+// }
+
 service Mock {
   rpc MockMethod (Foo) returns (Bar) {
     option (google.api.http).get = "/api/v0/auth/foo/baz";

@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.data_lifecycle;
 option go_package = "github.com/chef/automate/api/external/data_lifecycle";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "api/external/annotations/iam/annotations.proto";
 
 import "google/protobuf/timestamp.proto";

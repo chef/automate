@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.report_manager;
 option go_package = "github.com/chef/automate/api/external/report_manager";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "api/external/annotations/iam/annotations.proto";

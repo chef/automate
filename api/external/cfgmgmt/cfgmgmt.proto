@@ -24,7 +24,7 @@ import "api/external/common/version/version.proto";
 import "api/external/common/response.proto";
 
 import "google/protobuf/struct.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
 import "api/external/annotations/iam/annotations.proto";

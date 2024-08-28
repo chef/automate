@@ -2,7 +2,7 @@ syntax = "proto3";
 package chef.automate.domain.one_method;
 option go_package = "github.com/chef/automate/components/mock-service/mock";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "api/external/annotations/iam/annotations.proto";
 
 message Foo {

@@ -21,9 +21,9 @@ import "protovendor/github.com/googleapis/googleapis/google/api/monitored_resour
 import "protovendor/github.com/googleapis/googleapis/google/api/resource.proto";
 import "protovendor/github.com/googleapis/googleapis/google/logging/type/http_request.proto";
 import "protovendor/github.com/googleapis/googleapis/google/logging/type/log_severity.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.Cloud.Logging.V2";

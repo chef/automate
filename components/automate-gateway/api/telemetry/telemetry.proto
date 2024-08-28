@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.telemetry;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/telemetry";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 
 import "api/external/annotations/iam/annotations.proto";
 

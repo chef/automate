@@ -3,12 +3,12 @@ syntax = "proto3";
 package chef.automate.api.applications;
 option go_package = "github.com/chef/automate/api/external/applications";
 
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/error_details.proto";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 // TODO @afiune Move or re-create the common messages inside the api/ folder
 import "api/external/common/version/version.proto";

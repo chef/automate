@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.iam;
 
 import "api/external/annotations/iam/policy.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto";
+import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/chef/automate/api/external/annotations/iam";
 

@@ -18,11 +18,11 @@ package google.longrunning;
 
 import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/client.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
 import "protovendor/github.com/googleapis/googleapis/google/rpc/status.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto";
+import "google/protobuf/descriptor.proto";
 
 option cc_enable_arenas = true;
 option csharp_namespace = "Google.LongRunning";

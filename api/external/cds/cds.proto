@@ -7,8 +7,8 @@ import "api/external/cds/request/root.proto";
 import "api/external/cds/response/root.proto";
 import "api/external/common/response.proto";
 
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
 import "api/external/annotations/iam/annotations.proto";

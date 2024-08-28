@@ -9,7 +9,7 @@ import "api/external/event_feed/response/event.proto";
 import "api/external/event_feed/response/eventstrings.proto";
 import "api/external/common/response.proto";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 
 import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 

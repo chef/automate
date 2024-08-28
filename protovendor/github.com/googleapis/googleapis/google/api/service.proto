@@ -35,10 +35,10 @@ import "protovendor/github.com/googleapis/googleapis/google/api/resource.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/source_info.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/system_parameter.proto";
 import "protovendor/github.com/googleapis/googleapis/google/api/usage.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/api.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/type.proto";
-import "protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/api.proto";
+import "google/protobuf/type.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "google.golang.org/genproto/googleapis/api/serviceconfig;serviceconfig";
 option java_multiple_files = true;

@@ -1,107 +1,43 @@
-google/protobuf/any.proto:128:9:symbol "google.protobuf.Any" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto:128:9
-google/protobuf/any.proto:158:10:symbol "google.protobuf.Any.type_url" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto:158:10
-google/protobuf/any.proto:161:9:symbol "google.protobuf.Any.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/any.proto:161:9
-google/protobuf/empty.proto:51:9:symbol "google.protobuf.Empty" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/empty.proto:51:9
-google/protobuf/struct.proto:51:9:symbol "google.protobuf.Struct" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:51:9
-google/protobuf/struct.proto:53:7:symbol "google.protobuf.Struct.FieldsEntry.key" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:53:7
-google/protobuf/struct.proto:53:15:symbol "google.protobuf.Struct.FieldsEntry.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:53:15
-google/protobuf/struct.proto:53:22:symbol "google.protobuf.Struct.FieldsEntry" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:53:22
-google/protobuf/struct.proto:53:22:symbol "google.protobuf.Struct.fields" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:53:22
-google/protobuf/struct.proto:62:9:symbol "google.protobuf.Value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:62:9
-google/protobuf/struct.proto:64:9:symbol "google.protobuf.Value.kind" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:64:9
-google/protobuf/struct.proto:66:15:symbol "google.protobuf.Value.null_value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:66:15
-google/protobuf/struct.proto:68:12:symbol "google.protobuf.Value.number_value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:68:12
-google/protobuf/struct.proto:70:12:symbol "google.protobuf.Value.string_value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:70:12
-google/protobuf/struct.proto:72:10:symbol "google.protobuf.Value.bool_value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:72:10
-google/protobuf/struct.proto:74:12:symbol "google.protobuf.Value.struct_value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:74:12
-google/protobuf/struct.proto:76:15:symbol "google.protobuf.Value.list_value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:76:15
-google/protobuf/struct.proto:84:6:symbol "google.protobuf.NullValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:84:6
-google/protobuf/struct.proto:86:3:symbol "google.protobuf.NULL_VALUE" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:86:3; protobuf uses C++ scoping rules for enum values, so they exist in the scope enclosing the enum
-google/protobuf/struct.proto:92:9:symbol "google.protobuf.ListValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:92:9
-google/protobuf/struct.proto:94:18:symbol "google.protobuf.ListValue.values" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/struct.proto:94:18
-google/protobuf/timestamp.proto:133:9:symbol "google.protobuf.Timestamp" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto:133:9
-google/protobuf/timestamp.proto:137:9:symbol "google.protobuf.Timestamp.seconds" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto:137:9
-google/protobuf/timestamp.proto:143:9:symbol "google.protobuf.Timestamp.nanos" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/timestamp.proto:143:9
-google/protobuf/wrappers.proto:56:9:symbol "google.protobuf.DoubleValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:56:9
-google/protobuf/wrappers.proto:58:10:symbol "google.protobuf.DoubleValue.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:58:10
-google/protobuf/wrappers.proto:64:9:symbol "google.protobuf.FloatValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:64:9
-google/protobuf/wrappers.proto:66:9:symbol "google.protobuf.FloatValue.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:66:9
-google/protobuf/wrappers.proto:72:9:symbol "google.protobuf.Int64Value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:72:9
-google/protobuf/wrappers.proto:74:9:symbol "google.protobuf.Int64Value.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:74:9
-google/protobuf/wrappers.proto:80:9:symbol "google.protobuf.UInt64Value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:80:9
-google/protobuf/wrappers.proto:82:10:symbol "google.protobuf.UInt64Value.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:82:10
-google/protobuf/wrappers.proto:88:9:symbol "google.protobuf.Int32Value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:88:9
-google/protobuf/wrappers.proto:90:9:symbol "google.protobuf.Int32Value.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:90:9
-google/protobuf/wrappers.proto:96:9:symbol "google.protobuf.UInt32Value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:96:9
-google/protobuf/wrappers.proto:98:10:symbol "google.protobuf.UInt32Value.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:98:10
-google/protobuf/wrappers.proto:104:9:symbol "google.protobuf.BoolValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:104:9
-google/protobuf/wrappers.proto:106:8:symbol "google.protobuf.BoolValue.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:106:8
-google/protobuf/wrappers.proto:112:9:symbol "google.protobuf.StringValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:112:9
-google/protobuf/wrappers.proto:114:10:symbol "google.protobuf.StringValue.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:114:10
-google/protobuf/wrappers.proto:120:9:symbol "google.protobuf.BytesValue" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:120:9
-google/protobuf/wrappers.proto:122:9:symbol "google.protobuf.BytesValue.value" already defined at protovendor/github.com/googleapis/googleapis/google/protobuf/wrappers.proto:122:9
-protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto:566:30:field validate.StringRules.strict: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/api/annotations.proto:30:12:symbol "google.api.http" already defined at protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto:30:12
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:216:8:field google.protobuf.ExtensionRangeOptions.verification: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:219:14:message google.protobuf.ExtensionRangeOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:227:19:enum google.protobuf.FieldDescriptorProto.Type: proto3 requires that first value of enum have numeric value zero
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:260:22:enum google.protobuf.FieldDescriptorProto.Label: proto3 requires that first value of enum have numeric value zero
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:392:39:field google.protobuf.MethodDescriptorProto.client_streaming: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:394:39:field google.protobuf.MethodDescriptorProto.server_streaming: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:450:43:field google.protobuf.FileOptions.java_multiple_files: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:465:46:field google.protobuf.FileOptions.java_string_check_utf8: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:469:13:enum google.protobuf.FileOptions.OptimizeMode: proto3 requires that first value of enum have numeric value zero
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:474:43:field google.protobuf.FileOptions.optimize_for: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:493:43:field google.protobuf.FileOptions.cc_generic_services: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:494:45:field google.protobuf.FileOptions.java_generic_services: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:495:43:field google.protobuf.FileOptions.py_generic_services: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:503:34:field google.protobuf.FileOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:507:40:field google.protobuf.FileOptions.cc_enable_arenas: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:550:14:message google.protobuf.FileOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:574:46:field google.protobuf.MessageOptions.message_set_wire_format: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:579:54:field google.protobuf.MessageOptions.no_standard_descriptor_accessor: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:585:33:field google.protobuf.MessageOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:634:14:message google.protobuf.MessageOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:645:52:field google.protobuf.FieldOptions.ctype: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:680:31:field google.protobuf.FieldOptions.jstype: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:714:27:field google.protobuf.FieldOptions.lazy: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:719:39:field google.protobuf.FieldOptions.unverified_lazy: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:725:33:field google.protobuf.FieldOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:728:28:field google.protobuf.FieldOptions.weak: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:732:36:field google.protobuf.FieldOptions.debug_redact: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:799:14:message google.protobuf.FieldOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:813:14:message google.protobuf.OneofOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:826:33:field google.protobuf.EnumOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:845:14:message google.protobuf.EnumOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:853:33:field google.protobuf.EnumValueOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:861:35:field google.protobuf.EnumValueOptions.debug_redact: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:870:14:message google.protobuf.EnumValueOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:887:34:field google.protobuf.ServiceOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:893:14:message google.protobuf.ServiceOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:907:34:field google.protobuf.MethodOptions.deprecated: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:918:8:field google.protobuf.MethodOptions.idempotency_level: default values are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:927:14:message google.protobuf.MethodOptions: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:943:5:field google.protobuf.UninterpretedOption.NamePart.name_part: label 'required' is not allowed in proto3 or editions
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:944:5:field google.protobuf.UninterpretedOption.NamePart.is_extension: label 'required' is not allowed in proto3 or editions
-protovendor/github.com/googleapis/googleapis/google/protobuf/descriptor.proto:1069:14:message google.protobuf.FeatureSet: extension ranges are not allowed in proto3
-protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto:102:9:symbol "google.protobuf.Duration" already defined at google/protobuf/duration.proto:102:9
-protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto:106:9:symbol "google.protobuf.Duration.seconds" already defined at google/protobuf/duration.proto:106:9
-protovendor/github.com/googleapis/googleapis/google/protobuf/duration.proto:114:9:symbol "google.protobuf.Duration.nanos" already defined at google/protobuf/duration.proto:114:9
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:30:9:symbol "google.api.Http" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:29:9
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:34:21:symbol "google.api.Http.rules" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:33:21
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:42:8:symbol "google.api.Http.fully_decode_reserved_expansion" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:41:8
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:262:9:symbol "google.api.HttpRule" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:313:9
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:266:10:symbol "google.api.HttpRule.selector" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:317:10
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:271:9:symbol "google.api.HttpRule.pattern" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:322:9
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:273:12:symbol "google.api.HttpRule.get" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:325:12
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:276:12:symbol "google.api.HttpRule.put" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:328:12
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:279:12:symbol "google.api.HttpRule.post" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:331:12
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:282:12:symbol "google.api.HttpRule.delete" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:334:12
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:285:12:symbol "google.api.HttpRule.patch" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:337:12
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:291:23:symbol "google.api.HttpRule.custom" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:343:23
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:298:10:symbol "google.api.HttpRule.body" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:352:10
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:303:10:symbol "google.api.HttpRule.response_body" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:360:10
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:308:21:symbol "google.api.HttpRule.additional_bindings" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:365:21
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:312:9:symbol "google.api.CustomHttpPattern" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:369:9
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:314:10:symbol "google.api.CustomHttpPattern.kind" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:371:10
-protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto:317:10:symbol "google.api.CustomHttpPattern.path" already defined at protovendor/github.com/googleapis/googleapis/google/api/http.proto:374:10
+api/config/applications/config_request.proto:28:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Service.host: unknown type google.protobuf.StringValue
+api/config/applications/config_request.proto:29:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Service.port: unknown type google.protobuf.Int32Value
+api/config/applications/config_request.proto:30:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Service.metrics_port: unknown type google.protobuf.Int32Value
+api/config/applications/config_request.proto:35:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Log.format: unknown type google.protobuf.StringValue
+api/config/applications/config_request.proto:36:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Log.level: unknown type google.protobuf.StringValue
+api/config/applications/config_request.proto:40:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Storage.database: unknown type google.protobuf.StringValue
+api/config/applications/config_request.proto:41:33:field chef.automate.domain.applications.ConfigRequest.V1.System.Storage.user: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:34:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Service.host: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:35:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Service.port: unknown type google.protobuf.Int32Value
+api/config/authn/config_request.proto:36:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Service.debug: unknown type google.protobuf.BoolValue
+api/config/authn/config_request.proto:37:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Service.external_fqdn: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:38:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Service.a1_data_collector_token: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:42:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Oidc.client_id: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:43:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Oidc.client_secret: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:44:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Oidc.redirect_url: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:48:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Http1.host: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:49:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Http1.port: unknown type google.protobuf.Int32Value
+api/config/authn/config_request.proto:54:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Storage.database: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:55:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Storage.user: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:56:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Storage.max_connections: unknown type google.protobuf.Int32Value
+api/config/authn/config_request.proto:60:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Logger.format: unknown type google.protobuf.StringValue
+api/config/authn/config_request.proto:61:33:field chef.automate.domain.authn.ConfigRequest.V1.System.Logger.level: unknown type google.protobuf.StringValue
+api/config/authz/config_request.proto:30:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Service.host: unknown type google.protobuf.StringValue
+api/config/authz/config_request.proto:31:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Service.port: unknown type google.protobuf.Int32Value
+api/config/authz/config_request.proto:32:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Service.project_limit: unknown type google.protobuf.Int32Value
+api/config/authz/config_request.proto:36:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Logger.format: unknown type google.protobuf.StringValue
+api/config/authz/config_request.proto:37:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Logger.level: unknown type google.protobuf.StringValue
+api/config/authz/config_request.proto:42:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Storage.database: unknown type google.protobuf.StringValue
+api/config/authz/config_request.proto:43:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Storage.user: unknown type google.protobuf.StringValue
+api/config/authz/config_request.proto:44:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Storage.max_connections: unknown type google.protobuf.Int32Value
+api/config/authz/config_request.proto:45:33:field chef.automate.domain.authz.ConfigRequest.V1.System.Storage.max_idle_connections: unknown type google.protobuf.Int32Value
+api/external/applications/applications.proto:609:3:field chef.automate.api.applications.PeriodicMandatoryJobConfig.running: unknown type google.protobuf.BoolValue
+components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_many_terms.proto:8:9:symbol "chef.automate.domain.one_method.Foo" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:8:9
+components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_many_terms.proto:9:10:symbol "chef.automate.domain.one_method.Foo.bar" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:9:10
+components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_many_terms.proto:11:9:symbol "chef.automate.domain.one_method.Bar" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:11:9
+components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_many_terms.proto:12:9:symbol "chef.automate.domain.one_method.Mock" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:12:9
+components/automate-grpc/protoc-gen-policy/testdata/one_method.proto:8:9:symbol "chef.automate.domain.one_method.Foo" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:8:9
+components/automate-grpc/protoc-gen-policy/testdata/one_method.proto:9:10:symbol "chef.automate.domain.one_method.Foo.bar" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:9:10
+components/automate-grpc/protoc-gen-policy/testdata/one_method.proto:11:9:symbol "chef.automate.domain.one_method.Bar" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:11:9
+components/automate-grpc/protoc-gen-policy/testdata/one_method.proto:12:9:symbol "chef.automate.domain.one_method.Mock" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:12:9
+components/automate-grpc/protoc-gen-policy/testdata/one_method.proto:13:7:symbol "chef.automate.domain.one_method.Mock.MockMethod" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:13:7
+components/automate-grpc/protoc-gen-policy/testdata/one_method_plus_http.proto:16:9:symbol "chef.automate.domain.one_method.Mock" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:12:9
+components/automate-grpc/protoc-gen-policy/testdata/one_method_plus_http.proto:17:7:symbol "chef.automate.domain.one_method.Mock.MockMethod" already defined at components/automate-grpc/protoc-gen-policy/testdata/invalid_action_too_few_terms.proto:13:7

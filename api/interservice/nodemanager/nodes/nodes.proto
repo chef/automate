@@ -4,7 +4,7 @@ package chef.automate.domain.nodemanager.nodes;
 option go_package = "github.com/chef/automate/api/interservice/nodemanager/nodes";
 
 import "google/protobuf/timestamp.proto";
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 import "api/interservice/compliance/common/common.proto";

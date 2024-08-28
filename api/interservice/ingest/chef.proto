@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.ingest;
 option go_package = "github.com/chef/automate/api/interservice/ingest";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "api/external/ingest/request/chef.proto";
 import "api/external/ingest/request/action.proto";
 import "api/external/ingest/request/liveness.proto";

@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.compliance.version;
 option go_package = "github.com/chef/automate/api/interservice/compliance/version";
 
-import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
+import "protovendor/github.com/googleapis/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 service VersionService {
