@@ -67,10 +67,45 @@ lint:
   # names, but this is difficult and probably breaking to adopt now
   - PACKAGE_SAME_DIRECTORY
   - PACKAGE_DIRECTORY_MATCH
-  ignore_only:   
+  ignore_only: 
+    PACKAGE_SAME_JAVA_PACKAGE:
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/embedded.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto
+    PACKAGE_SAME_DIRECTORY:
+    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/messages.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/no_services.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
+    - components/notifications-service/server/priv/health.proto
+    - components/notifications-service/server/priv/notifications.proto
+    - components/notifications-service/server/priv/rules.proto
+    - components/notifications-service/server/priv/server.proto
+    - components/notifications-service/server/priv/slack_post.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/embedded.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto  
     IMPORT_USED:
       - api/external/compliance/reporting/stats/stats.proto
     SERVICE_SUFFIX:
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
+    - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
+    - components/notifications-service/server/priv/server.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/servicecontrol/v1/quota_controller.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/servicecontrol/v1/service_controller.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement/v1/servicemanager.proto
+    - protovendor/github.com/googleapis/googleapis/google/logging/v2/logging.proto
+    - protovendor/github.com/googleapis/googleapis/google/logging/v2/logging_metrics.proto
+    - protovendor/github.com/googleapis/googleapis/google/longrunning/operations.proto
     - api/interservice/notifications/service/server.proto
     - api/interservice/infra_proxy/service/infra_proxy.proto
     - components/automate-gateway/api/deployment/deployment.proto
@@ -343,6 +378,7 @@ lint:
     # /lib/
     - grpc/debug/debug_api/debug.proto
     RPC_RESPONSE_STANDARD_NAME:
+    - api/interservice/user_settings/user_settings.proto
     - api/external/user_settings/user_settings.proto
     - api/interservice/event_feed/event_feed.proto
     - api/interservice/infra_proxy/service/infra_proxy.proto
@@ -552,6 +588,7 @@ lint:
     # /lib/
     - grpc/debug/debug_api/debug.proto
     RPC_REQUEST_RESPONSE_UNIQUE:
+    - api/interservice/user_settings/user_settings.proto
     - api/external/user_settings/user_settings.proto
     - api/interservice/event_feed/event_feed.proto
     - api/interservice/infra_proxy/service/infra_proxy.proto
@@ -866,6 +903,7 @@ lint:
     - automate-gateway/api/gateway
     - automate-grpc/protoc-gen-a2-config/api/a2conf
     FIELD_LOWER_SNAKE_CASE:
+    - components/automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
     - api/interservice/notifications/service/events.proto
     - api/interservice/notifications/service/rules.proto
     - api/interservice/infra_proxy/service/infra_proxy.proto
@@ -1359,6 +1397,7 @@ lint:
     - grpc/debug/debug_api/debug.proto
     MESSAGE_PASCAL_CASE:
     - api/config/dex/config_request.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto
     PACKAGE_DEFINED:
     - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
     - components/automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
