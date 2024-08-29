@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.authn;
 option go_package = "github.com/chef/automate/api/interservice/authn";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 
 message AuthenticateRequest {};
 

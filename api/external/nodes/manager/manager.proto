@@ -3,15 +3,15 @@ syntax = "proto3";
 package chef.automate.api.nodes.manager.v1;
 option go_package = "github.com/chef/automate/api/external/nodes/manager";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
-import "external/common/query/parameters.proto";
+import "api/external/common/query/parameters.proto";
 
-import "protoc-gen-swagger/options/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
 service NodeManagerService {
 	/*

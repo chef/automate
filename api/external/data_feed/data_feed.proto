@@ -3,12 +3,12 @@ syntax = "proto3";
 package chef.automate.api.datafeed;
 option go_package = "github.com/chef/automate/api/external/data_feed";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 import "google/protobuf/struct.proto";
-import "external/common/query/parameters.proto";
+import "api/external/common/query/parameters.proto";
 
 service DatafeedService {
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse) {

@@ -17,9 +17,9 @@ syntax = "proto3";
 
 package google.api.servicemanagement.v1;
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "google/api/config_change.proto";
-import "google/api/field_behavior.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/googleapis/google/api/field_behavior.proto";
 import "google/api/metric.proto";
 import "google/api/quota.proto";
 import "google/api/service.proto";

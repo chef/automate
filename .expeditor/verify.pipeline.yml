@@ -2,6 +2,10 @@ env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
   HAB_BLDR_CHANNEL: "stable"
   HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
+  # Use the Go module mirror and checksum database by default.
+  # See https://proxy.golang.org for details.
+  GOPROXY: "https://proxy.golang.org,direct"
+  GOSUMDB: "sum.golang.org"
 
 expeditor:
   defaults:
@@ -10,937 +14,937 @@ expeditor:
         workdir: /go/src/github.com/chef/automate
 
 steps:
-  #
-  # A2 protobufs - Detect if there is any component that has protobuf files that hasn't been compiled
-  #
-  - label: "[codegen] A2 protobufs"
-    command:
-      - hab studio run "source .studiorc && verify_all_protobuf_components"
-    timeout_in_minutes: 10
-    soft_fail: true
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+#
+# A2 protobufs - Detect if there is any component that has protobuf files that hasn't been compiled
+#
+- label: "[codegen] A2 protobufs"
+  command:
+  - hab studio run "source .studiorc && verify_all_protobuf_components"
+  timeout_in_minutes: 10
+  soft_fail: true
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  #
-  # A2 products generation - Detect if the products.meta or package.meta files has been update
-  # without generating meta files.
-  #
-  - label: "[codegen] A2 products generation"
-    command:
-      - hab studio run "source .studiorc && verify_products_generation"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+#
+# A2 products generation - Detect if the products.meta or package.meta files has been update
+# without generating meta files.
+#
+- label: "[codegen] A2 products generation"
+  command:
+  - hab studio run "source .studiorc && verify_products_generation"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  #
-  # Repo Health - These are tests that apply to the repository as a
-  # whole.
-  #
-  - label: repo health
-    command:
-      - hab studio run "source .studiorc && scripts/repo_health.sh && run_studio_repo_health_checks"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+#
+# Repo Health - These are tests that apply to the repository as a
+# whole.
+#
+- label: repo health
+  command:
+  - hab studio run "source .studiorc && scripts/repo_health.sh && run_studio_repo_health_checks"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  #A2ha pipeline
-  - label: ":terraform: :buildkite: a2-ha-backend/terraform"
-    commands:
-      - tfenv install 0.14.11
-      - tfenv use 0.14.11
-      - cd terraform/a2ha-terraform
-      - make check
-    expeditor:
-      executor:
-        docker:
+#A2ha pipeline
+- label: ":terraform: :buildkite: a2-ha-backend/terraform"
+  commands:
+  - tfenv install 0.14.11
+  - tfenv use 0.14.11
+  - cd terraform/a2ha-terraform
+  - make check
+  expeditor:
+    executor:
+      docker:
 
-  - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
-    commands:
-      - gem install bundler:1.16.6
-      - cd components/automate-cluster-ctl/; bundle install --jobs=3 --retry=3
-      - bundle exec rspec
-    expeditor:
-      executor:
-        docker:
-          image: rubydistros/ubuntu-18.04
+- label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
+  commands:
+  - gem install bundler:1.16.6
+  - cd components/automate-cluster-ctl/; bundle install --jobs=3 --retry=3
+  - bundle exec rspec
+  expeditor:
+    executor:
+      docker:
+        image: rubydistros/ubuntu-18.04
 
-  #
-  # Static & Unit tests
-  #
-  # Any tests that don't require Habitat packages to be built.
-  # Ideally, all tests in this section should complete faster than the
-  # build takes to complete.
-  #
-  - label: infrastructure
-    command:
-      - cd terraform/test-environments && make lint
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+#
+# Static & Unit tests
+#
+# Any tests that don't require Habitat packages to be built.
+# Ideally, all tests in this section should complete faster than the
+# build takes to complete.
+#
+- label: infrastructure
+  command:
+  - cd terraform/test-environments && make lint
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] applications-service"
-    command:
-      - hab studio run "source .studiorc && go_component_make components/applications-service ci"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] applications-service"
+  command:
+  - hab studio run "source .studiorc && go_component_make components/applications-service ci"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] authn-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh authn_test
-      - cd components/authn-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] authn-service"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh authn_test
+  - cd components/authn-service
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] OPA"
-    command:
-      - rm -rf /bin/catchsegv
-      - rm -rf /bin/gencat
-      - rm -rf /bin/getconf
-      - rm -rf /bin/getent
-      - rm -rf /bin/iconvconfig
-      - rm -rf /bin/ldconfig
-      - rm -rf /bin/ldd
-      - rm -rf /bin/locale
-      - rm -rf /bin/mtrace
-      - rm -rf /bin/pcprofiledump
-      - rm -rf /bin/pldd
-      - rm -rf /bin/tzselect
-      - rm -rf /bin/zic
-      - rm -rf /bin/xtrace
-      - rm -rf /bin/iconv
-      - rm -rf /bin/makedb
-      - rm -rf /bin/sotruss
-      - rm -rf /bin/nscd
-      - rm -rf /bin/localedef
-      - rm -rf /bin/zdump
-      - rm -rf /bin/sprof
-      - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
-      - scripts/install_hab_pkg.sh core/opa
-      - cd components/authz-service/engine/opa/policy
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] OPA"
+  command:
+  - rm -rf /bin/catchsegv
+  - rm -rf /bin/gencat
+  - rm -rf /bin/getconf
+  - rm -rf /bin/getent
+  - rm -rf /bin/iconvconfig
+  - rm -rf /bin/ldconfig
+  - rm -rf /bin/ldd
+  - rm -rf /bin/locale
+  - rm -rf /bin/mtrace
+  - rm -rf /bin/pcprofiledump
+  - rm -rf /bin/pldd
+  - rm -rf /bin/tzselect
+  - rm -rf /bin/zic
+  - rm -rf /bin/xtrace
+  - rm -rf /bin/iconv
+  - rm -rf /bin/makedb
+  - rm -rf /bin/sotruss
+  - rm -rf /bin/nscd
+  - rm -rf /bin/localedef
+  - rm -rf /bin/zdump
+  - rm -rf /bin/sprof
+  - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
+  - scripts/install_hab_pkg.sh core/opa
+  - cd components/authz-service/engine/opa/policy
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] authz-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh authz_test
-      - cd components/authz-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] authz-service"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh authz_test
+  - cd components/authz-service
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] infra-proxy-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh infra_proxy_test
-      - cd components/infra-proxy-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] infra-proxy-service"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh infra_proxy_test
+  - cd components/infra-proxy-service
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] teams-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh teams_test
-      - cd components/teams-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] teams-service"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh teams_test
+  - cd components/teams-service
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] automate lib"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh cereal_test
-      - cd lib
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH make lint unit cereal_integration
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] automate lib"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh cereal_test
+  - cd lib
+  - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH make lint unit cereal_integration
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] cereal service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh cereal_test
-      - cd components/cereal-service/
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH make lint unit integration
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] cereal service"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh cereal_test
+  - cd components/cereal-service/
+  - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH make lint unit integration
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] automate-platform-tools"
-    command:
-      - scripts/install_golang.sh
-      - cd components/automate-platform-tools
-      - make lint unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] automate-platform-tools"
+  command:
+  - scripts/install_golang.sh
+  - cd components/automate-platform-tools
+  - make lint unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] automate-cli"
-    command:
-      - scripts/install_golang.sh
-      - cd components/automate-cli
-      - make lint unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] automate-cli"
+  command:
+  - scripts/install_golang.sh
+  - cd components/automate-cli
+  - make lint unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] event-gateway"
-    command:
-      - scripts/install_golang.sh
-      - cd components/event-gateway
-      - make ci
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] event-gateway"
+  command:
+  - scripts/install_golang.sh
+  - cd components/event-gateway
+  - make ci
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] deployment-service"
-    command:
-      - git config --global --add safe.directory /go/src/github.com/chef/automate
-      - scripts/install_golang.sh
-      - cd components/automate-deployment
-      - REAL_USERADD_TESTS=true make ci
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
+- label: "[unit] deployment-service"
+  command:
+  - git config --global --add safe.directory /go/src/github.com/chef/automate
+  - scripts/install_golang.sh
+  - cd components/automate-deployment
+  - REAL_USERADD_TESTS=true make ci
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
 
-  - label: "[unit] automate-gateway"
-    command:
-      - hab studio run "source .studiorc && go_component_unit automate-gateway"
-      - cd components/automate-gateway
-      - make lint fmt
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] automate-gateway"
+  command:
+  - hab studio run "source .studiorc && go_component_unit automate-gateway"
+  - cd components/automate-gateway
+  - make lint fmt
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] automate-grpc"
-    command:
-      - scripts/install_golang.sh
-      - cd components/automate-grpc
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] automate-grpc"
+  command:
+  - scripts/install_golang.sh
+  - cd components/automate-grpc
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[static] release-mgmt-dashboard"
-    command:
-      - cd components/release-mgmt-dashboard
-      - make build
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[static] release-mgmt-dashboard"
+  command:
+  - cd components/release-mgmt-dashboard
+  - make build
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] automate-ui"
-    command:
-      - cd components/automate-ui
-      - make install lint unit
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] automate-ui"
+  command:
+  - cd components/automate-ui
+  - make install lint unit
+  timeout_in_minutes: 20
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] chef-ui-library"
-    command:
-      - cd components/chef-ui-library
-      - node -v
-      - npm cache clean --force && npm install && npm run lint && npm run test
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] chef-ui-library"
+  command:
+  - cd components/chef-ui-library
+  - node -v
+  - npm cache clean --force && npm install && npm run lint && npm run test
+  timeout_in_minutes: 20
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[static] e2e"
-    command:
-      - cd e2e
-      - npm install && npm run lint
-    timeout_in_minutes: 5
-    expeditor:
-      executor:
-        docker:
+- label: "[static] e2e"
+  command:
+  - cd e2e
+  - npm install && npm run lint
+  timeout_in_minutes: 5
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] compliance-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/compliance-service
-      - make lint test-unit
-    timeout_in_minutes: 10
-    soft_fail: true
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] compliance-service"
+  command:
+  - scripts/install_golang.sh
+  - cd components/compliance-service
+  - make lint test-unit
+  timeout_in_minutes: 10
+  soft_fail: true
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] nodemanager-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/nodemanager-service
-      - make lint test-unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] nodemanager-service"
+  command:
+  - scripts/install_golang.sh
+  - cd components/nodemanager-service
+  - make lint test-unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] config-mgmt-service"
-    command:
-      - hab studio run "source .studiorc && go_component_unit config-mgmt-service && go_component_static_tests config-mgmt-service"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] config-mgmt-service"
+  command:
+  - hab studio run "source .studiorc && go_component_unit config-mgmt-service && go_component_static_tests config-mgmt-service"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] event-feed-service"
-    command:
-      - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service && go_component_lint event-feed-service"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] event-feed-service"
+  command:
+  - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service && go_component_lint event-feed-service"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] ingest-service"
-    command:
-      - hab studio run "source .studiorc && go_component_unit ingest-service && go_component_static_tests ingest-service && go_component_lint ingest-service"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] ingest-service"
+  command:
+  - hab studio run "source .studiorc && go_component_unit ingest-service && go_component_static_tests ingest-service && go_component_lint ingest-service"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] local-user-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/local-user-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] local-user-service"
+  command:
+  - scripts/install_golang.sh
+  - cd components/local-user-service
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] notifications-client"
-    command:
-      - scripts/install_golang.sh
-      - cd components/notifications-client
-      - make lint
-      - make test
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] notifications-client"
+  command:
+  - scripts/install_golang.sh
+  - cd components/notifications-client
+  - make lint
+  - make test
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] notifications-service2"
-    command:
-      - scripts/install_golang.sh
-      - cd components/notifications-service2
-      - make ci
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] notifications-service2"
+  command:
+  - scripts/install_golang.sh
+  - cd components/notifications-service2
+  - make ci
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] notifications-service"
-    command:
-      - cd components/notifications-service/server
-      - git config --global url."https://github.com/".insteadOf git://github.com/
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
+- label: "[unit] notifications-service"
+  command:
+  - cd components/notifications-service/server
+  - git config --global url."https://github.com/".insteadOf git://github.com/
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
 
-    expeditor:
-      executor:
-        docker:
-          image: "elixir:1.14"
-          environment:
-            - EXTERNAL_FQDN=http://localhost
-            - MEX_ENV=test mix do compile, credo
-            - PORT=4001
-            - RULE_STORE_FILE=test_rule_store
+  expeditor:
+    executor:
+      docker:
+        image: "elixir:1.14"
+        environment:
+        - EXTERNAL_FQDN=http://localhost
+        - MEX_ENV=test mix do compile, credo
+        - PORT=4001
+        - RULE_STORE_FILE=test_rule_store
 
-  - label: "[unit] session-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh sessions_test
-      - cd components/session-service
-      - make static migrations-append-only-check unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] session-service"
+  command:
+  - scripts/install_golang.sh
+  - scripts/setup_buildkite_pg.sh sessions_test
+  - cd components/session-service
+  - make static migrations-append-only-check unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[static] es-sidecar-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/es-sidecar-service
-      - make lint
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[static] es-sidecar-service"
+  command:
+  - scripts/install_golang.sh
+  - cd components/es-sidecar-service
+  - make lint
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] es-sidecar-service"
-    command:
-      - hab studio run "source .studiorc && go_component_unit es-sidecar-service"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] es-sidecar-service"
+  command:
+  - hab studio run "source .studiorc && go_component_unit es-sidecar-service"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] secrets-service"
-    command:
-      - hab studio run "source .studiorc && go_component_unit secrets-service && go_component_static_tests secrets-service"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] secrets-service"
+  command:
+  - hab studio run "source .studiorc && go_component_unit secrets-service && go_component_static_tests secrets-service"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - label: "[unit] pg-sidecar-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/pg-sidecar-service
-      - make lint test
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] pg-sidecar-service"
+  command:
+  - scripts/install_golang.sh
+  - cd components/pg-sidecar-service
+  - make lint test
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "[unit] automate-cds"
-    command:
-      - hab studio run "source .studiorc && go_component_unit automate-cds && go_component_static_tests automate-cds"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+- label: "[unit] automate-cds"
+  command:
+  - hab studio run "source .studiorc && go_component_unit automate-cds && go_component_static_tests automate-cds"
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
+        privileged: true
+        environment:
+        - HAB_STUDIO_SUP=false
+        - HAB_NONINTERACTIVE=true
 
-  - wait
+- wait
 
-  - label: "automate-ui"
-    command:
-      - cd components/automate-ui
-      - ./scripts/build_chef_ui_lib
-      - npm run copy-ui-lib
-      - make install
-      - ./scripts/update-webdriver
-      - make e2e
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "automate-ui"
+  command:
+  - cd components/automate-ui
+  - ./scripts/build_chef_ui_lib
+  - npm run copy-ui-lib
+  - make install
+  - ./scripts/update-webdriver
+  - make e2e
+  timeout_in_minutes: 20
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:
 
-  - label: "compliance-service db-migrations"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-db
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/secrets-service.log
-      - /tmp/event-service.log
-      - /tmp/compliance.log
-    env:
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service db-migrations"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-db
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/secrets-service.log
+  - /tmp/event-service.log
+  - /tmp/compliance.log
+  env:
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service scanner"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/secrets-service.log
-      - /tmp/event-service.log
-      - /tmp/compliance.log
-      - /tmp/nodemanager-service.log
-    env:
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service scanner"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/secrets-service.log
+  - /tmp/event-service.log
+  - /tmp/compliance.log
+  - /tmp/nodemanager-service.log
+  env:
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service scanner with inspec master"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec_master.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/secrets-service.log
-      - /tmp/event-service.log
-      - /tmp/compliance.log
-      - /tmp/nodemanager-service.log
-    env:
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    soft_fail: true
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service scanner with inspec master"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec_master.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/secrets-service.log
+  - /tmp/event-service.log
+  - /tmp/compliance.log
+  - /tmp/nodemanager-service.log
+  env:
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  soft_fail: true
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service reporting"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-reporting
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/secrets-service.log
-      - /tmp/event-service.log
-      - /tmp/compliance.log
-      - /tmp/nodemanager-service.log
-    env:
-      ES_VER: 6
-    timeout_in_minutes: 30
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service reporting"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-reporting
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/secrets-service.log
+  - /tmp/event-service.log
+  - /tmp/compliance.log
+  - /tmp/nodemanager-service.log
+  env:
+    ES_VER: 6
+  timeout_in_minutes: 30
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "nodemanager-service run-db-tests"
-    command:
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/nodemanager-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-db
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-      - /tmp/event-service.log
-      - /tmp/nodemanager-service.log
-      - /tmp/secrets-service.log
-    env:
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "nodemanager-service run-db-tests"
+  command:
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/nodemanager-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-db
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  - /tmp/event-service.log
+  - /tmp/nodemanager-service.log
+  - /tmp/secrets-service.log
+  env:
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v1"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "60_A1_migration_spec.rb"
-      A1_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v1"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "60_A1_migration_spec.rb"
+    A1_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v2v1"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "61_A2V1_migration_spec.rb"
-      A2V1_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v2v1"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "61_A2V1_migration_spec.rb"
+    A2V1_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v2v2"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "62_A2V2_migration_spec.rb"
-      A2V2_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v2v2"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "62_A2V2_migration_spec.rb"
+    A2V2_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v2v3"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "63_A2V3_migration_spec.rb"
-      A2V3_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v2v3"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "63_A2V3_migration_spec.rb"
+    A2V3_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v2v4"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "64_A2V4_migration_spec.rb"
-      A2V4_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v2v4"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "64_A2V4_migration_spec.rb"
+    A2V4_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v2v5"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "65_A2V5_migration_spec.rb"
-      A2V5_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v2v5"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "65_A2V5_migration_spec.rb"
+    A2V5_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "compliance-service upgrade from Automate v2v6"
-    command:
-      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec.sh
-      - sudo scripts/install_golang.sh
-      - sudo scripts/install_grpcurl.sh
-      - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
-      - cd ../.. && sudo git clean -fxd
-    artifact_paths:
-      - /tmp/compliance.log
-    env:
-      TEST: "66_A2V6_migration_spec.rb"
-      A2V6_DATA: true
-      ES_VER: 6
-      LANG: en_US.UTF-8
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-    plugins:
-      - gopath-checkout#v1.0.1:
-          import: github.com/chef/automate
+- label: "compliance-service upgrade from Automate v2v6"
+  command:
+  - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+  - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+  - sudo scripts/install_inspec.sh
+  - sudo scripts/install_golang.sh
+  - sudo scripts/install_grpcurl.sh
+  - cd components/compliance-service
+  - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
+  - cd ../.. && sudo git clean -fxd
+  artifact_paths:
+  - /tmp/compliance.log
+  env:
+    TEST: "66_A2V6_migration_spec.rb"
+    A2V6_DATA: true
+    ES_VER: 6
+    LANG: en_US.UTF-8
+  timeout_in_minutes: 20
+  expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
+  plugins:
+  - gopath-checkout#v1.0.1:
+      import: github.com/chef/automate
 
-  - label: "[unit] sample-data-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/sample-data-service
-      - make static
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
+- label: "[unit] sample-data-service"
+  command:
+  - scripts/install_golang.sh
+  - cd components/sample-data-service
+  - make static
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    executor:
+      docker:

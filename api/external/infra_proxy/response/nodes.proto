@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
 
-import "external/infra_proxy/response/common.proto";
+import "api/external/infra_proxy/response/common.proto";
 
 message Nodes {
     // Node list.

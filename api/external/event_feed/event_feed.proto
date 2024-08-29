@@ -3,17 +3,17 @@ syntax = "proto3";
 package chef.automate.api.event_feed;
 option go_package = "github.com/chef/automate/api/external/event_feed";
 
-import "external/event_feed/request/event.proto";
-import "external/event_feed/request/eventstrings.proto";
-import "external/event_feed/response/event.proto";
-import "external/event_feed/response/eventstrings.proto";
-import "external/common/response.proto";
+import "api/external/event_feed/request/event.proto";
+import "api/external/event_feed/request/eventstrings.proto";
+import "api/external/event_feed/response/event.proto";
+import "api/external/event_feed/response/eventstrings.proto";
+import "api/external/common/response.proto";
 
-import "google/api/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 
-import "protoc-gen-swagger/options/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
-import "external/annotations/iam/annotations.proto";
+import "api/external/annotations/iam/annotations.proto";
 
 service EventFeedService {
   /*

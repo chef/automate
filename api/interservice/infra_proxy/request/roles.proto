@@ -4,7 +4,7 @@ package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
 import "google/protobuf/struct.proto";
-import "interservice/infra_proxy/request/common.proto";
+import "api/interservice/infra_proxy/request/common.proto";
 
 message Roles {
     // Chef organization ID.
