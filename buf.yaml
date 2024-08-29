@@ -74,19 +74,15 @@ lint:
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/embedded.proto
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto
-    PACKAGE_SAME_DIRECTORY:
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/messages.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/no_services.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto
+    PACKAGE_SAME_DIRECTORY:                                                                                   
+    # Removing
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
     - components/notifications-service/server/priv/health.proto
     - components/notifications-service/server/priv/notifications.proto
     - components/notifications-service/server/priv/rules.proto
-    - components/notifications-service/server/priv/server.proto
-    - components/notifications-service/server/priv/slack_post.proto
+    - components/notifications-service/server/priv/server.proto                                                        
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/embedded.proto
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto  
@@ -94,9 +90,8 @@ lint:
       - api/external/compliance/reporting/stats/stats.proto
     SERVICE_SUFFIX:
     - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-grpc/src/test/proto/hello.proto
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto                                                        
+    # Removing
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
@@ -281,9 +276,8 @@ lint:
     - components/automate-gateway/api/license/license.proto   
     - components/automate-gateway/api/notifications/notifications.proto    
     - components/automate-gateway/api/notifications/notifications.proto  
-    - components/automate-gateway/api/telemetry/telemetry.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto    
+    - components/automate-gateway/api/telemetry/telemetry.proto                                                                
+    # Removing    
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto   
@@ -492,9 +486,8 @@ lint:
     - components/automate-gateway/api/license/license.proto   
     - components/automate-gateway/api/notifications/notifications.proto    
     - components/automate-gateway/api/notifications/notifications.proto  
-    - components/automate-gateway/api/telemetry/telemetry.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto    
+    - components/automate-gateway/api/telemetry/telemetry.proto                                                                
+    # Removing    
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto   
@@ -702,9 +695,8 @@ lint:
     - components/automate-gateway/api/license/license.proto   
     - components/automate-gateway/api/notifications/notifications.proto    
     - components/automate-gateway/api/notifications/notifications.proto  
-    - components/automate-gateway/api/telemetry/telemetry.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto    
+    - components/automate-gateway/api/telemetry/telemetry.proto                                                                 
+    # Removing    
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto   
@@ -792,8 +784,7 @@ lint:
     - automate-gateway/api/notifications/notifications.proto
     - automate-gateway/api/telemetry/telemetry.proto
     - grpc/debug/debug_api/debug.proto
-    PACKAGE_SAME_GO_PACKAGE:
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto
+    PACKAGE_SAME_GO_PACKAGE:                                                        
     - api/interservice/es_sidecar/service.proto
     - api/interservice/ingest/automate_event.proto
     - api/interservice/ingest/chef.proto
@@ -888,18 +879,15 @@ lint:
     - protovendor/github.com/googleapis/googleapis/google/api/service.proto
     - protovendor/github.com/googleapis/googleapis/google/api/source_info.proto
     - protovendor/github.com/googleapis/googleapis/google/api/system_parameter.proto
-    - protovendor/github.com/googleapis/googleapis/google/api/usage.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/messages.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/no_services.proto
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto
+    - protovendor/github.com/googleapis/googleapis/google/api/usage.proto                                                                                                         
+    # Removing
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
     - components/notifications-service/server/priv/health.proto
     - components/notifications-service/server/priv/notifications.proto
     - components/notifications-service/server/priv/rules.proto
-    - components/notifications-service/server/priv/server.proto
-    - components/notifications-service/server/priv/slack_post.proto
+    - components/notifications-service/server/priv/server.proto                                                         
     # /api/
     - external/iam/v2
     - config
@@ -1030,9 +1018,8 @@ lint:
     - components/automate-gateway/api/license/license.proto   
     - components/automate-gateway/api/notifications/notifications.proto    
     - components/automate-gateway/api/notifications/notifications.proto  
-    - components/automate-gateway/api/telemetry/telemetry.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto    
+    - components/automate-gateway/api/telemetry/telemetry.proto                                                                 
+    # Removing    
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto   
@@ -1163,9 +1150,8 @@ lint:
     - components/automate-gateway/api/license/license.proto   
     - components/automate-gateway/api/notifications/notifications.proto    
     - components/automate-gateway/api/notifications/notifications.proto  
-    - components/automate-gateway/api/telemetry/telemetry.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto    
+    - components/automate-gateway/api/telemetry/telemetry.proto                                                                
+    # Removing    
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto   
@@ -1235,7 +1221,6 @@ lint:
     - automate-gateway/api/notifications/notifications.proto
     # /lib/
     - grpc/debug/debug_api/debug.proto
-
     # golang upgrade
     - api/external/compliance/reporting/reporting.proto
     - api/external/compliance/reporting/stats/stats.proto
@@ -1337,9 +1322,8 @@ lint:
     - components/automate-gateway/api/license/license.proto   
     - components/automate-gateway/api/notifications/notifications.proto    
     - components/automate-gateway/api/notifications/notifications.proto  
-    - components/automate-gateway/api/telemetry/telemetry.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/imported_method_arguments.proto    
-    - components/automate-grpc/protoc-gen-policy/testdata/one_method.proto    
+    - components/automate-gateway/api/telemetry/telemetry.proto                                                                
+    # Removing    
     - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto   
     - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto   
@@ -1430,7 +1414,18 @@ breaking:
   # This linter requires your proto package names to end with .v1 or similar.
   # Adopting this for existing code would break anyone using our protos
   - FILE_NO_DELETE
-  ignore:
+  ignore:                                                                                          
+  # Removing
+  - components/automate-grpc/protoc-gen-policy/testdata/pkg_name_with_underscore.proto
+  - components/automate-grpc/protoc-gen-policy/testdata/resource_field_name_mismatch.proto
+  - components/automate-grpc/protoc-gen-policy/testdata/service_without_methods.proto
+  - components/notifications-service/server/priv/health.proto
+  - components/notifications-service/server/priv/notifications.proto
+  - components/notifications-service/server/priv/rules.proto
+  - components/notifications-service/server/priv/server.proto                                               
+  - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/embedded.proto
+  - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/enum.proto
+  - protovendor/github.com/envoyproxy/protoc-gen-validate/java/pgv-java-stub/src/test/proto/underscoreName.proto  
   # Changes to interservice APIs are okay until (if ever) we support clusters
   # of interconnected internal services that would not upgrade in unison
   - interservice
