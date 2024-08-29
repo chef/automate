@@ -1,6 +1,6 @@
 module github.com/chef/automate/protovendor
 
-go 1.22.0
+go 1.22.5
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.1.0
