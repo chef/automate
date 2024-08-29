@@ -3,8 +3,8 @@ module github.com/chef/automate/protovendor
 go 1.22
 
 require (
-	github.com/envoyproxy/protoc-gen-validate v0.4.1
-	github.com/grpc-ecosystem/grpc-gateway v1.14.8
+	github.com/envoyproxy/protoc-gen-validate v1.1.0
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 )
 
 require (
