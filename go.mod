@@ -1,6 +1,6 @@
 module github.com/chef/automate
 
-go 1.22.0
+go 1.22.5
 
 require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
@@ -118,10 +118,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240827150818-7e3bb234dfed
 )
 
-require (
-	go.opencensus.io v0.24.0 // indirect
-	go.starlark.net v0.0.0-20190702223751-32f345186213 // indirect
-)
+require go.opencensus.io v0.24.0 // indirect
 
 require (
 	cloud.google.com/go/auth v0.9.1 // indirect
@@ -281,7 +278,7 @@ require (
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	// go.opencensus.io v0.24.0 // indirect
-	// go.starlark.net v0.0.0-20190702223751-32f345186213 // indirect
+	go.starlark.net v0.0.0-20190702223751-32f345186213 // indirect
 	golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4 // indirect
 	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.28.0 // indirect
