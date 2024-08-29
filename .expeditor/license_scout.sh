@@ -10,6 +10,8 @@ log() {
     echo "[$(date -u)] $*"
 }
 
+export GOPROXY=https://proxy.golang.org,direct  
+
 # license_scout uses licensee internally. licensee reads OCTOKIT_ACCESS_TOKEN
 # from the environment to make authenticated requests to github. This increases
 # the API rate limits that github enforces. Our license checks now read so many
