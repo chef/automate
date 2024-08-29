@@ -6,7 +6,7 @@ option java_multiple_files = true;
 option java_package = "io.envoyproxy.pgv.grpc.asubpackage";
 option java_outer_classname = "Ponycopter";
 
-import "validate/validate.proto";
+import "protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 
 service Greeter {
     rpc SayHello (HelloJKRequest) returns (HelloResponse) {}

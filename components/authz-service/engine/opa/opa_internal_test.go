@@ -777,19 +777,22 @@ func genericInput(subjects []string, resource string, action string, projects []
 }
 
 func specificInput(subjects []string, resource string, action string, projects []string) ast.Value {
-	subs := make(ast.Array, len(subjects))
-	for i, sub := range subjects {
-		subs[i] = ast.NewTerm(ast.String(sub))
+
+	subs := ast.NewArray()
+	for _, sub := range subjects {
+		subs = subs.Append(ast.NewTerm(ast.String(sub)))
 	}
-	projs := make(ast.Array, len(projects))
-	for j, proj := range projects {
-		projs[j] = ast.NewTerm(ast.String(proj))
+
+	projs := ast.NewArray()
+	for _, proj := range projects {
+		projs = projs.Append(ast.NewTerm(ast.String(proj)))
 	}
+
 	return ast.NewObject(
-		[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
-		[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
-		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
-		[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
+		ast.Item(ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)),
+		ast.Item(ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))),
+		ast.Item(ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))),
+		ast.Item(ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)),
 	)
 }
 

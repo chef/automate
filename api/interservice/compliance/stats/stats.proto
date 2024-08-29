@@ -3,9 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.compliance.stats;
 option go_package = "github.com/chef/automate/api/interservice/compliance/stats";
 
-import "google/api/annotations.proto";
-import "interservice/compliance/reporting/reporting.proto";
-import "google/protobuf/timestamp.proto";
+import "api/interservice/compliance/reporting/reporting.proto";
 
 
 service StatsService {

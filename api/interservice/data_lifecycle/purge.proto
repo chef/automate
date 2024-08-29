@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/api/interservice/data_lifecycle";
 
 import "google/protobuf/timestamp.proto";
 
-import "external/data_lifecycle/data_lifecycle.proto";
+import "api/external/data_lifecycle/data_lifecycle.proto";
 
 service Purge {
 	rpc Run (RunRequest) returns (RunResponse);

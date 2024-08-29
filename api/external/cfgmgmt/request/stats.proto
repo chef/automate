@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 
-import "protoc-gen-swagger/options/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
 message NodesCounts {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {

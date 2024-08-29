@@ -13,9 +13,9 @@ option go_package = ".;api";
 // api/interservice/notifications/service.
 ///
 
-import "notifications.proto";
-import "rules.proto";
-import "health.proto";
+import "components/notifications-service/server/priv/notifications.proto";
+import "components/notifications-service/server/priv/rules.proto";
+import "components/notifications-service/server/priv/health.proto";
 
 service Notifications {
   // Publish a notification

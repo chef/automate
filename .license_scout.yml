@@ -108,9 +108,6 @@ fallbacks:
   - name: github.com/klauspost/compress
     license_id: Apache-2.0
     license_content: https://raw.githubusercontent.com/klauspost/compress/master/LICENSE
-  - name: github.com/jpillora/backoff
-    license_id: MIT
-    license_content: https://raw.githubusercontent.com/jpillora/backoff/master/LICENSE
   - name: github.com/google/uuid
     license_id: BSD-3-Clause
     license_content: https://raw.githubusercontent.com/google/uuid/master/LICENSE

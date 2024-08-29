@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/api/external/iam/v2/response";
 
-import "external/iam/v2/common/users.proto";
+import "api/external/iam/v2/common/users.proto";
 
 message CreateUserResp {
   User user = 1;

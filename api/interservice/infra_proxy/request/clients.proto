@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
-import "interservice/infra_proxy/request/common.proto";
+import "api/interservice/infra_proxy/request/common.proto";
 
 message Clients {
     // Chef organization ID.

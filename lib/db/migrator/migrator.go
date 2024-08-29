@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/golang-migrate/migrate"
-	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
-	_ "github.com/golang-migrate/migrate/source/file"       // make source available
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres" // make driver available
+	_ "github.com/golang-migrate/migrate/v4/source/file"       // make source available
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/logger"

@@ -3,9 +3,9 @@ syntax = "proto3";
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/api/external/iam/v2/request";
 
-import "external/iam/v2/common/rules.proto";
+import "api/external/iam/v2/common/rules.proto";
 
-import "protoc-gen-swagger/options/annotations.proto";
+import "protovendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
 
 message CreateRuleReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {

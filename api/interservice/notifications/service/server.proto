@@ -6,9 +6,9 @@ option go_package = "github.com/chef/automate/api/interservice/notifications/ser
 // Core RPC definitions for the notifications service, which includes
 // posting notifications and managing rules.
 
-import "interservice/notifications/service/events.proto";
-import "interservice/notifications/service/rules.proto";
-import "interservice/notifications/service/health.proto";
+import "api/interservice/notifications/service/events.proto";
+import "api/interservice/notifications/service/rules.proto";
+import "api/interservice/notifications/service/health.proto";
 
 service Notifications {
   // Publish a notification
