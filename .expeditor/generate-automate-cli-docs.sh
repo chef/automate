@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eou pipefail
 
-# bumping expeditor to go 1.19
-hab pkg install --binlink core/go19 --force
+# bumping expeditor to go 1.22
+hab pkg install --binlink core/go1_22/1.22.5/20240805184444 --force
 
 pushd components/automate-cli
   make docs
