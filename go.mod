@@ -101,7 +101,7 @@ require (
 )
 
 require (
-	github.com/ansrivas/fiberprometheus/v2 v2.6.0
+	github.com/ansrivas/fiberprometheus/v2 v2.7.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/bufbuild/buf v0.29.0
 	github.com/chef/automate/api/external v0.0.0-20240828051912-8c022fa4f66b
@@ -114,6 +114,8 @@ require (
 	github.com/prashantv/gostub v1.1.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.uber.org/automaxprocs v1.5.3
+	google.golang.org/genproto/googleapis/api v0.0.0-20240827150818-7e3bb234dfed
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240827150818-7e3bb234dfed
 )
 
 require (
