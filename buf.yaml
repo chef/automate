@@ -33,7 +33,7 @@
 # special cases. Unless noted otherwise, the style guide exceptions configured
 # here are intended only to cover older code. Follow the style guide whenever
 # you can do so without breaking things.
-
+version: v1
 build:
   roots:
     - api
