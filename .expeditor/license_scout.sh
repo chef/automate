@@ -41,7 +41,7 @@ gem install license_scout -v 2.5.1
 log "Finished Installing License Scout"
 
 log_section_start "Installing Go 1.22.5"
-hab pkg install --force --binlink core/go1_22/1.22.5/20240805184444 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
+hab pkg install --force --binlink core/go22/1.22.5 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
 go version
 log "Finished Installing Go 1.22.5"
 
