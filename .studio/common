@@ -98,7 +98,7 @@ function link_component_bin() {
 }
 
 function desired_golang_ident() {
-    echo "core/go19/$(cat /src/GOLANG_VERSION)"
+    echo "core/go1_22/1.22.5/20240805184444/$(cat /src/GOLANG_VERSION)"
 }
 
 function verify_components_have_platform_config() {
