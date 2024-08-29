@@ -1,6 +1,6 @@
 module github.com/chef/automate/api/external
 
-go 1.22.0
+go 1.22.5
 
 replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
 
