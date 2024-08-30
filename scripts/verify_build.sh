@@ -16,6 +16,8 @@ log_section_start() {
 export HAB_NONINTERACTIVE=true
 export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
+export GOPROXY="https://proxy.golang.org,direct"
+export GOSUMDB="sum.golang.org"
 export HAB_LICENSE="accept-no-persist"
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
