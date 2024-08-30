@@ -25,7 +25,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -47,7 +47,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -79,7 +79,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -117,7 +117,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -146,7 +146,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -175,7 +175,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -213,7 +213,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -245,7 +245,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -321,8 +321,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -355,8 +354,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -389,8 +387,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -423,8 +420,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -445,12 +441,10 @@ func init() {
           "format": "int64"
         },
         "updated_nodes_only": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "disable_cidr_filter": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "cidr_filter": {
           "type": "array",
@@ -510,8 +504,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -525,8 +518,7 @@ func init() {
       "type": "object",
       "properties": {
         "success": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -560,8 +552,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -587,8 +578,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -621,8 +611,7 @@ func init() {
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
