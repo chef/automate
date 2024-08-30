@@ -28,8 +28,7 @@
           "type": "string"
         },
         "active": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "created": {
           "type": "string"

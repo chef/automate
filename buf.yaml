@@ -33,7 +33,7 @@
 # special cases. Unless noted otherwise, the style guide exceptions configured
 # here are intended only to cover older code. Follow the style guide whenever
 # you can do so without breaking things.
-version: v2
+
 build:
   roots:
     - api
@@ -53,7 +53,7 @@ build:
     - protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party
     - protovendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
 lint:
-  # allow_comment_ignores: true
+  allow_comment_ignores: true
   use:
     - DEFAULT
   except:
@@ -467,4 +467,3 @@ breaking:
     - config/workflow_server/config_request.proto
     - config/workflow_nginx/config_request.proto
     - config/workflow_server/config_request.proto
-
