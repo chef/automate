@@ -526,7 +526,7 @@ func file_interservice_cfgmgmt_request_nodes_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_request_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_interservice_cfgmgmt_request_nodes_proto_goTypes = []any{
+var file_interservice_cfgmgmt_request_nodes_proto_goTypes = []interface{}{
 	(*NodeRun)(nil),                       // 0: chef.automate.domain.cfgmgmt.request.NodeRun
 	(*Nodes)(nil),                         // 1: chef.automate.domain.cfgmgmt.request.Nodes
 	(*Node)(nil),                          // 2: chef.automate.domain.cfgmgmt.request.Node

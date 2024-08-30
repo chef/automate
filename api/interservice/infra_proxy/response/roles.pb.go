@@ -417,7 +417,7 @@ func file_interservice_infra_proxy_response_roles_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_infra_proxy_response_roles_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_interservice_infra_proxy_response_roles_proto_goTypes = []any{
+var file_interservice_infra_proxy_response_roles_proto_goTypes = []interface{}{
 	(*Roles)(nil),            // 0: chef.automate.domain.infra_proxy.response.Roles
 	(*RoleListItem)(nil),     // 1: chef.automate.domain.infra_proxy.response.RoleListItem
 	(*Role)(nil),             // 2: chef.automate.domain.infra_proxy.response.Role

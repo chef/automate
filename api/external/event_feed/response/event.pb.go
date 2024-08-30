@@ -548,7 +548,7 @@ func file_external_event_feed_response_event_proto_rawDescGZIP() []byte {
 }
 
 var file_external_event_feed_response_event_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_external_event_feed_response_event_proto_goTypes = []any{
+var file_external_event_feed_response_event_proto_goTypes = []interface{}{
 	(*GetEventFeedResponse)(nil),       // 0: chef.automate.api.event_feed.response.GetEventFeedResponse
 	(*Event)(nil),                      // 1: chef.automate.api.event_feed.response.Event
 	(*GetEventTypeCountsResponse)(nil), // 2: chef.automate.api.event_feed.response.GetEventTypeCountsResponse

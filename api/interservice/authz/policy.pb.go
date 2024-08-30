@@ -2287,7 +2287,7 @@ func file_interservice_authz_policy_proto_rawDescGZIP() []byte {
 
 var file_interservice_authz_policy_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_interservice_authz_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
-var file_interservice_authz_policy_proto_goTypes = []any{
+var file_interservice_authz_policy_proto_goTypes = []interface{}{
 	(Flag)(0),                            // 0: chef.automate.domain.authz.Flag
 	(Statement_Effect)(0),                // 1: chef.automate.domain.authz.Statement.Effect
 	(Version_VersionNumber)(0),           // 2: chef.automate.domain.authz.Version.VersionNumber

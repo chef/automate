@@ -2207,7 +2207,7 @@ func file_interservice_authz_project_proto_rawDescGZIP() []byte {
 
 var file_interservice_authz_project_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_interservice_authz_project_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
-var file_interservice_authz_project_proto_goTypes = []any{
+var file_interservice_authz_project_proto_goTypes = []interface{}{
 	(ProjectRuleTypes)(0),               // 0: chef.automate.domain.authz.ProjectRuleTypes
 	(ProjectRuleConditionAttributes)(0), // 1: chef.automate.domain.authz.ProjectRuleConditionAttributes
 	(ProjectRuleConditionOperators)(0),  // 2: chef.automate.domain.authz.ProjectRuleConditionOperators

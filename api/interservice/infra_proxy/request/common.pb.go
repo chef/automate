@@ -116,7 +116,7 @@ func file_interservice_infra_proxy_request_common_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_infra_proxy_request_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_interservice_infra_proxy_request_common_proto_goTypes = []any{
+var file_interservice_infra_proxy_request_common_proto_goTypes = []interface{}{
 	(*SearchQuery)(nil), // 0: chef.automate.domain.infra_proxy.request.SearchQuery
 }
 var file_interservice_infra_proxy_request_common_proto_depIdxs = []int32{

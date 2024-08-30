@@ -681,7 +681,7 @@ func file_interservice_report_manager_report_manager_proto_rawDescGZIP() []byte 
 }
 
 var file_interservice_report_manager_report_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_interservice_report_manager_report_manager_proto_goTypes = []any{
+var file_interservice_report_manager_report_manager_proto_goTypes = []interface{}{
 	(*ListFilter)(nil),              // 0: chef.automate.domain.report_manager.service.ListFilter
 	(*StoreReportRequest)(nil),      // 1: chef.automate.domain.report_manager.service.StoreReportRequest
 	(*CustomReportRequest)(nil),     // 2: chef.automate.domain.report_manager.service.CustomReportRequest

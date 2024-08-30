@@ -1815,7 +1815,7 @@ func file_interservice_cfgmgmt_response_nodes_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_response_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
-var file_interservice_cfgmgmt_response_nodes_proto_goTypes = []any{
+var file_interservice_cfgmgmt_response_nodes_proto_goTypes = []interface{}{
 	(*NodeAttribute)(nil),                 // 0: chef.automate.domain.cfgmgmt.response.NodeAttribute
 	(*AbridgedConverge)(nil),              // 1: chef.automate.domain.cfgmgmt.response.AbridgedConverge
 	(*Run)(nil),                           // 2: chef.automate.domain.cfgmgmt.response.Run

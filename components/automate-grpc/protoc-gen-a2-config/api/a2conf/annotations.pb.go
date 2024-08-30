@@ -164,7 +164,7 @@ func file_automate_grpc_protoc_gen_a2_config_api_a2conf_annotations_proto_rawDes
 }
 
 var file_automate_grpc_protoc_gen_a2_config_api_a2conf_annotations_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_automate_grpc_protoc_gen_a2_config_api_a2conf_annotations_proto_goTypes = []any{
+var file_automate_grpc_protoc_gen_a2_config_api_a2conf_annotations_proto_goTypes = []interface{}{
 	(*ServiceConfig)(nil),               // 0: chef.automate.api.ServiceConfig
 	(*descriptorpb.FieldOptions)(nil),   // 1: google.protobuf.FieldOptions
 	(*descriptorpb.MessageOptions)(nil), // 2: google.protobuf.MessageOptions

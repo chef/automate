@@ -161,7 +161,7 @@ func file_external_ingest_response_action_proto_rawDescGZIP() []byte {
 }
 
 var file_external_ingest_response_action_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_external_ingest_response_action_proto_goTypes = []any{
+var file_external_ingest_response_action_proto_goTypes = []interface{}{
 	(*ProcessChefActionResponse)(nil),         // 0: chef.automate.api.ingest.response.ProcessChefActionResponse
 	(*ProcessNodeDeleteResponse)(nil),         // 1: chef.automate.api.ingest.response.ProcessNodeDeleteResponse
 	(*ProcessMultipleNodeDeleteResponse)(nil), // 2: chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse

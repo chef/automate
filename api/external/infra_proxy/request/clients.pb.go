@@ -360,7 +360,7 @@ func file_external_infra_proxy_request_clients_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_request_clients_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_external_infra_proxy_request_clients_proto_goTypes = []any{
+var file_external_infra_proxy_request_clients_proto_goTypes = []interface{}{
 	(*Clients)(nil),      // 0: chef.automate.api.infra_proxy.request.Clients
 	(*Client)(nil),       // 1: chef.automate.api.infra_proxy.request.Client
 	(*CreateClient)(nil), // 2: chef.automate.api.infra_proxy.request.CreateClient

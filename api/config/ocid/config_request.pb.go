@@ -287,7 +287,7 @@ func (x *ConfigRequest_V1_System_Network) GetPort() *wrapperspb.Int32Value {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in config/ocid/config_request.proto.
+// Deprecated: Do not use.
 func (x *ConfigRequest_V1_System_Network) GetListenIp() *wrapperspb.StringValue {
 	if x != nil {
 		return x.ListenIp
@@ -836,7 +836,7 @@ func file_config_ocid_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_ocid_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_config_ocid_config_request_proto_goTypes = []any{
+var file_config_ocid_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest)(nil),                                                        // 0: chef.automate.domain.ocid.ConfigRequest
 	(*ConfigRequest_V1)(nil),                                                     // 1: chef.automate.domain.ocid.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),                                              // 2: chef.automate.domain.ocid.ConfigRequest.V1.System

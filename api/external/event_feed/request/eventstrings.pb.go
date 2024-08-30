@@ -139,7 +139,7 @@ func file_external_event_feed_request_eventstrings_proto_rawDescGZIP() []byte {
 }
 
 var file_external_event_feed_request_eventstrings_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_event_feed_request_eventstrings_proto_goTypes = []any{
+var file_external_event_feed_request_eventstrings_proto_goTypes = []interface{}{
 	(*GetEventStringBucketsRequest)(nil), // 0: chef.automate.api.event_feed.request.GetEventStringBucketsRequest
 }
 var file_external_event_feed_request_eventstrings_proto_depIdxs = []int32{

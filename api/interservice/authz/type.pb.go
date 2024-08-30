@@ -94,7 +94,7 @@ func file_interservice_authz_type_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_authz_type_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_interservice_authz_type_proto_goTypes = []any{
+var file_interservice_authz_type_proto_goTypes = []interface{}{
 	(Type)(0), // 0: chef.automate.domain.authz.Type
 }
 var file_interservice_authz_type_proto_depIdxs = []int32{

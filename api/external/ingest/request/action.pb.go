@@ -448,7 +448,7 @@ func file_external_ingest_request_action_proto_rawDescGZIP() []byte {
 }
 
 var file_external_ingest_request_action_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_external_ingest_request_action_proto_goTypes = []any{
+var file_external_ingest_request_action_proto_goTypes = []interface{}{
 	(*Action)(nil),                    // 0: chef.automate.api.ingest.request.Action
 	(*Delete)(nil),                    // 1: chef.automate.api.ingest.request.Delete
 	(*MultipleNodeDeleteRequest)(nil), // 2: chef.automate.api.ingest.request.MultipleNodeDeleteRequest

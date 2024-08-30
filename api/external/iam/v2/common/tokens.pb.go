@@ -158,7 +158,7 @@ func file_external_iam_v2_common_tokens_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_common_tokens_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_iam_v2_common_tokens_proto_goTypes = []any{
+var file_external_iam_v2_common_tokens_proto_goTypes = []interface{}{
 	(*Token)(nil), // 0: chef.automate.api.iam.v2.Token
 }
 var file_external_iam_v2_common_tokens_proto_depIdxs = []int32{

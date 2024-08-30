@@ -187,7 +187,7 @@ func file_external_iam_v2_request_introspect_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_request_introspect_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_external_iam_v2_request_introspect_proto_goTypes = []any{
+var file_external_iam_v2_request_introspect_proto_goTypes = []interface{}{
 	(*IntrospectAllReq)(nil),  // 0: chef.automate.api.iam.v2.IntrospectAllReq
 	(*IntrospectSomeReq)(nil), // 1: chef.automate.api.iam.v2.IntrospectSomeReq
 	(*IntrospectReq)(nil),     // 2: chef.automate.api.iam.v2.IntrospectReq

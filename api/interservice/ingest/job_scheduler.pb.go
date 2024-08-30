@@ -1471,7 +1471,7 @@ func file_interservice_ingest_job_scheduler_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_ingest_job_scheduler_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
-var file_interservice_ingest_job_scheduler_proto_goTypes = []any{
+var file_interservice_ingest_job_scheduler_proto_goTypes = []interface{}{
 	(*JobSettings)(nil),                                       // 0: chef.automate.domain.ingest.JobSettings
 	(*JobSchedulerStatus)(nil),                                // 1: chef.automate.domain.ingest.JobSchedulerStatus
 	(*Job)(nil),                                               // 2: chef.automate.domain.ingest.Job

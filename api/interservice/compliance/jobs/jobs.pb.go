@@ -1050,7 +1050,7 @@ func file_interservice_compliance_jobs_jobs_proto_rawDescGZIP() []byte {
 
 var file_interservice_compliance_jobs_jobs_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_interservice_compliance_jobs_jobs_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_interservice_compliance_jobs_jobs_proto_goTypes = []any{
+var file_interservice_compliance_jobs_jobs_proto_goTypes = []interface{}{
 	(Query_OrderType)(0),                // 0: chef.automate.domain.compliance.jobs.Query.OrderType
 	(*GetJobResultByNodeIdRequest)(nil), // 1: chef.automate.domain.compliance.jobs.GetJobResultByNodeIdRequest
 	(*RerunResponse)(nil),               // 2: chef.automate.domain.compliance.jobs.RerunResponse

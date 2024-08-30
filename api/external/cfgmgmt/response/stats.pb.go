@@ -321,7 +321,7 @@ func file_external_cfgmgmt_response_stats_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cfgmgmt_response_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_external_cfgmgmt_response_stats_proto_goTypes = []any{
+var file_external_cfgmgmt_response_stats_proto_goTypes = []interface{}{
 	(*RunsCounts)(nil),              // 0: chef.automate.api.cfgmgmt.response.RunsCounts
 	(*NodesCounts)(nil),             // 1: chef.automate.api.cfgmgmt.response.NodesCounts
 	(*CheckInCountsTimeSeries)(nil), // 2: chef.automate.api.cfgmgmt.response.CheckInCountsTimeSeries

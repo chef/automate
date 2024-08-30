@@ -257,7 +257,7 @@ func (*ConfigRequest_V1_System_Service) Descriptor() ([]byte, []int) {
 	return file_config_builder_memcached_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 0}
 }
 
-// Deprecated: Marked as deprecated in config/builder_memcached/config_request.proto.
+// Deprecated: Do not use.
 func (x *ConfigRequest_V1_System_Service) GetHost() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Host
@@ -363,7 +363,7 @@ func file_config_builder_memcached_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_builder_memcached_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_config_builder_memcached_config_request_proto_goTypes = []any{
+var file_config_builder_memcached_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest)(nil),                   // 0: chef.automate.infra.builder_memcached.ConfigRequest
 	(*ConfigRequest_V1)(nil),                // 1: chef.automate.infra.builder_memcached.ConfigRequest.V1
 	(*ConfigRequest_Service)(nil),           // 2: chef.automate.infra.builder_memcached.ConfigRequest.Service

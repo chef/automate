@@ -631,7 +631,7 @@ func file_external_iam_v2_common_policy_proto_rawDescGZIP() []byte {
 
 var file_external_iam_v2_common_policy_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_external_iam_v2_common_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_external_iam_v2_common_policy_proto_goTypes = []any{
+var file_external_iam_v2_common_policy_proto_goTypes = []interface{}{
 	(Type)(0),                  // 0: chef.automate.api.iam.v2.Type
 	(Statement_Effect)(0),      // 1: chef.automate.api.iam.v2.Statement.Effect
 	(Version_VersionNumber)(0), // 2: chef.automate.api.iam.v2.Version.VersionNumber

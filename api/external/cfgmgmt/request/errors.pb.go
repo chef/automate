@@ -110,7 +110,7 @@ func file_external_cfgmgmt_request_errors_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cfgmgmt_request_errors_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_cfgmgmt_request_errors_proto_goTypes = []any{
+var file_external_cfgmgmt_request_errors_proto_goTypes = []interface{}{
 	(*Errors)(nil), // 0: chef.automate.api.cfgmgmt.request.Errors
 }
 var file_external_cfgmgmt_request_errors_proto_depIdxs = []int32{

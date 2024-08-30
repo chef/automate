@@ -1737,7 +1737,7 @@ func file_interservice_nodemanager_nodes_nodes_proto_rawDescGZIP() []byte {
 
 var file_interservice_nodemanager_nodes_nodes_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_interservice_nodemanager_nodes_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_interservice_nodemanager_nodes_nodes_proto_goTypes = []any{
+var file_interservice_nodemanager_nodes_nodes_proto_goTypes = []interface{}{
 	(Query_OrderType)(0),          // 0: chef.automate.domain.nodemanager.nodes.Query.OrderType
 	(LastContactData_Status)(0),   // 1: chef.automate.domain.nodemanager.nodes.LastContactData.Status
 	(*NodeError)(nil),             // 2: chef.automate.domain.nodemanager.nodes.NodeError

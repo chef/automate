@@ -441,7 +441,7 @@ func file_interservice_ingest_status_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_ingest_status_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_interservice_ingest_status_proto_goTypes = []any{
+var file_interservice_ingest_status_proto_goTypes = []interface{}{
 	(*Health)(nil),                 // 0: chef.automate.domain.ingest.Health
 	(*MigrationStatus)(nil),        // 1: chef.automate.domain.ingest.MigrationStatus
 	(*Metrics)(nil),                // 2: chef.automate.domain.ingest.Metrics

@@ -211,7 +211,7 @@ func file_interservice_cfgmgmt_request_node_export_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_request_node_export_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_cfgmgmt_request_node_export_proto_goTypes = []any{
+var file_interservice_cfgmgmt_request_node_export_proto_goTypes = []interface{}{
 	(*NodeExport)(nil),            // 0: chef.automate.domain.cfgmgmt.request.NodeExport
 	(*ReportExport)(nil),          // 1: chef.automate.domain.cfgmgmt.request.ReportExport
 	(*Sorting)(nil),               // 2: chef.automate.domain.cfgmgmt.request.Sorting

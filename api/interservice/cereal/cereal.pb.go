@@ -3354,7 +3354,7 @@ func file_interservice_cereal_cereal_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cereal_cereal_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
-var file_interservice_cereal_cereal_proto_goTypes = []any{
+var file_interservice_cereal_cereal_proto_goTypes = []interface{}{
 	(*Task)(nil),                                 // 0: chef.automate.infra.cereal.Task
 	(*TaskMetadata)(nil),                         // 1: chef.automate.infra.cereal.TaskMetadata
 	(*WorkflowInstance)(nil),                     // 2: chef.automate.infra.cereal.WorkflowInstance
@@ -3493,23 +3493,23 @@ func file_interservice_cereal_cereal_proto_init() {
 		(*DequeueWorkflowRequest_Done_)(nil),
 		(*DequeueWorkflowRequest_Fail_)(nil),
 	}
-	file_interservice_cereal_cereal_proto_msgTypes[6].OneofWrappers = []any{
+	file_interservice_cereal_cereal_proto_msgTypes[6].OneofWrappers = []interface{}{
 		(*DequeueWorkflowChunkRequest_Dequeue_)(nil),
 		(*DequeueWorkflowChunkRequest_Continue_)(nil),
 		(*DequeueWorkflowChunkRequest_Done_)(nil),
 		(*DequeueWorkflowChunkRequest_Fail_)(nil),
 	}
-	file_interservice_cereal_cereal_proto_msgTypes[7].OneofWrappers = []any{
+	file_interservice_cereal_cereal_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*DequeueWorkflowResponse_Dequeue_)(nil),
 		(*DequeueWorkflowResponse_Status_)(nil),
 		(*DequeueWorkflowResponse_Committed_)(nil),
 	}
-	file_interservice_cereal_cereal_proto_msgTypes[15].OneofWrappers = []any{
+	file_interservice_cereal_cereal_proto_msgTypes[15].OneofWrappers = []interface{}{
 		(*DequeueTaskRequest_Dequeue_)(nil),
 		(*DequeueTaskRequest_Succeed_)(nil),
 		(*DequeueTaskRequest_Fail_)(nil),
 	}
-	file_interservice_cereal_cereal_proto_msgTypes[16].OneofWrappers = []any{
+	file_interservice_cereal_cereal_proto_msgTypes[16].OneofWrappers = []interface{}{
 		(*DequeueTaskResponse_Dequeue_)(nil),
 		(*DequeueTaskResponse_Cancel_)(nil),
 		(*DequeueTaskResponse_Committed_)(nil),

@@ -469,7 +469,7 @@ func file_external_infra_proxy_request_orgs_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_request_orgs_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_external_infra_proxy_request_orgs_proto_goTypes = []any{
+var file_external_infra_proxy_request_orgs_proto_goTypes = []interface{}{
 	(*CreateOrg)(nil),        // 0: chef.automate.api.infra_proxy.request.CreateOrg
 	(*UpdateOrg)(nil),        // 1: chef.automate.api.infra_proxy.request.UpdateOrg
 	(*DeleteOrg)(nil),        // 2: chef.automate.api.infra_proxy.request.DeleteOrg

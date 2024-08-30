@@ -789,7 +789,7 @@ func file_external_habitat_event_proto_rawDescGZIP() []byte {
 
 var file_external_habitat_event_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_external_habitat_event_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_external_habitat_event_proto_goTypes = []any{
+var file_external_habitat_event_proto_goTypes = []interface{}{
 	(UpdateStrategy)(0),               // 0: chef.habitat.supervisor.event.UpdateStrategy
 	(HealthCheckResult)(0),            // 1: chef.habitat.supervisor.event.HealthCheckResult
 	(*EventMetadata)(nil),             // 2: chef.habitat.supervisor.event.EventMetadata

@@ -1287,7 +1287,7 @@ func file_interservice_es_sidecar_service_proto_rawDescGZIP() []byte {
 
 var file_interservice_es_sidecar_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_interservice_es_sidecar_service_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
-var file_interservice_es_sidecar_service_proto_goTypes = []any{
+var file_interservice_es_sidecar_service_proto_goTypes = []interface{}{
 	(SnapshotState)(0),                         // 0: chef.automate.infra.es_sidecar.SnapshotState
 	(*PurgeRequest)(nil),                       // 1: chef.automate.infra.es_sidecar.PurgeRequest
 	(*PurgeResponse)(nil),                      // 2: chef.automate.infra.es_sidecar.PurgeResponse

@@ -266,7 +266,7 @@ func file_external_cfgmgmt_request_stats_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cfgmgmt_request_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_external_cfgmgmt_request_stats_proto_goTypes = []any{
+var file_external_cfgmgmt_request_stats_proto_goTypes = []interface{}{
 	(*NodesCounts)(nil),             // 0: chef.automate.api.cfgmgmt.request.NodesCounts
 	(*RunsCounts)(nil),              // 1: chef.automate.api.cfgmgmt.request.RunsCounts
 	(*CheckInCountsTimeSeries)(nil), // 2: chef.automate.api.cfgmgmt.request.CheckInCountsTimeSeries

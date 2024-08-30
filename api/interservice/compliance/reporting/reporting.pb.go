@@ -5265,7 +5265,7 @@ func file_interservice_compliance_reporting_reporting_proto_rawDescGZIP() []byte
 
 var file_interservice_compliance_reporting_reporting_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_interservice_compliance_reporting_reporting_proto_msgTypes = make([]protoimpl.MessageInfo, 64)
-var file_interservice_compliance_reporting_reporting_proto_goTypes = []any{
+var file_interservice_compliance_reporting_reporting_proto_goTypes = []interface{}{
 	(Query_OrderType)(0),                       // 0: chef.automate.domain.compliance.reporting.Query.OrderType
 	(*ReportContentRequest)(nil),               // 1: chef.automate.domain.compliance.reporting.ReportContentRequest
 	(*ReportContentResponse)(nil),              // 2: chef.automate.domain.compliance.reporting.ReportContentResponse

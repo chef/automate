@@ -693,7 +693,7 @@ func file_interservice_infra_proxy_request_nodes_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_infra_proxy_request_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_interservice_infra_proxy_request_nodes_proto_goTypes = []any{
+var file_interservice_infra_proxy_request_nodes_proto_goTypes = []interface{}{
 	(*Nodes)(nil),                 // 0: chef.automate.domain.infra_proxy.request.Nodes
 	(*Node)(nil),                  // 1: chef.automate.domain.infra_proxy.request.Node
 	(*NodeDetails)(nil),           // 2: chef.automate.domain.infra_proxy.request.NodeDetails

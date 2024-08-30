@@ -475,7 +475,7 @@ func file_interservice_infra_proxy_request_environments_proto_rawDescGZIP() []by
 }
 
 var file_interservice_infra_proxy_request_environments_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_interservice_infra_proxy_request_environments_proto_goTypes = []any{
+var file_interservice_infra_proxy_request_environments_proto_goTypes = []interface{}{
 	(*Environments)(nil),      // 0: chef.automate.domain.infra_proxy.request.Environments
 	(*Environment)(nil),       // 1: chef.automate.domain.infra_proxy.request.Environment
 	(*CreateEnvironment)(nil), // 2: chef.automate.domain.infra_proxy.request.CreateEnvironment

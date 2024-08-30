@@ -2677,7 +2677,7 @@ func (*External_Postgresql_SSL) Descriptor() ([]byte, []int) {
 	return file_config_shared_global_proto_rawDescGZIP(), []int{3, 3, 2}
 }
 
-// Deprecated: Marked as deprecated in config/shared/global.proto.
+// Deprecated: Do not use.
 func (x *External_Postgresql_SSL) GetMode() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Mode

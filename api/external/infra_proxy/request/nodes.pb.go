@@ -692,7 +692,7 @@ func file_external_infra_proxy_request_nodes_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_request_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_external_infra_proxy_request_nodes_proto_goTypes = []any{
+var file_external_infra_proxy_request_nodes_proto_goTypes = []interface{}{
 	(*Nodes)(nil),                 // 0: chef.automate.api.infra_proxy.request.Nodes
 	(*Node)(nil),                  // 1: chef.automate.api.infra_proxy.request.Node
 	(*NodeDetails)(nil),           // 2: chef.automate.api.infra_proxy.request.NodeDetails

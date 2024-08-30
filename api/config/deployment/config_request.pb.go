@@ -473,7 +473,7 @@ func (*ConfigRequest_V1_AdminUser) Descriptor() ([]byte, []int) {
 	return file_config_deployment_config_request_proto_rawDescGZIP(), []int{0, 0, 3}
 }
 
-// Deprecated: Marked as deprecated in config/deployment/config_request.proto.
+// Deprecated: Do not use.
 func (x *ConfigRequest_V1_AdminUser) GetEmail() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Email
@@ -541,7 +541,7 @@ func (*ConfigRequest_V1_System_Service) Descriptor() ([]byte, []int) {
 	return file_config_deployment_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 0}
 }
 
-// Deprecated: Marked as deprecated in config/deployment/config_request.proto.
+// Deprecated: Do not use.
 func (x *ConfigRequest_V1_System_Service) GetListenAddress() *wrapperspb.StringValue {
 	if x != nil {
 		return x.ListenAddress

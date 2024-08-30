@@ -582,7 +582,7 @@ func file_external_infra_proxy_request_databags_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_request_databags_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_external_infra_proxy_request_databags_proto_goTypes = []any{
+var file_external_infra_proxy_request_databags_proto_goTypes = []interface{}{
 	(*DataBags)(nil),          // 0: chef.automate.api.infra_proxy.request.DataBags
 	(*DataBag)(nil),           // 1: chef.automate.api.infra_proxy.request.DataBag
 	(*DataBagItems)(nil),      // 2: chef.automate.api.infra_proxy.request.DataBagItems

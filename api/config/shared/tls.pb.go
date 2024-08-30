@@ -199,7 +199,7 @@ func file_config_shared_tls_proto_rawDescGZIP() []byte {
 }
 
 var file_config_shared_tls_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_config_shared_tls_proto_goTypes = []any{
+var file_config_shared_tls_proto_goTypes = []interface{}{
 	(*TLSCredentials)(nil),        // 0: chef.automate.infra.config.TLSCredentials
 	(*FrontendTLSCredential)(nil), // 1: chef.automate.infra.config.FrontendTLSCredential
 }

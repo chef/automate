@@ -95,7 +95,7 @@ func file_automate_grpc_protoc_gen_a2_config_api_a2conf_secret_proto_rawDescGZIP
 }
 
 var file_automate_grpc_protoc_gen_a2_config_api_a2conf_secret_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_automate_grpc_protoc_gen_a2_config_api_a2conf_secret_proto_goTypes = []any{
+var file_automate_grpc_protoc_gen_a2_config_api_a2conf_secret_proto_goTypes = []interface{}{
 	(*Secret)(nil), // 0: chef.automate.api.Secret
 }
 var file_automate_grpc_protoc_gen_a2_config_api_a2conf_secret_proto_depIdxs = []int32{

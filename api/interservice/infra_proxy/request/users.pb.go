@@ -176,7 +176,7 @@ func file_interservice_infra_proxy_request_users_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_infra_proxy_request_users_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_infra_proxy_request_users_proto_goTypes = []any{
+var file_interservice_infra_proxy_request_users_proto_goTypes = []interface{}{
 	(*OrgUsers)(nil),    // 0: chef.automate.domain.infra_proxy.request.OrgUsers
 	(*ServerUsers)(nil), // 1: chef.automate.domain.infra_proxy.request.ServerUsers
 }

@@ -155,7 +155,7 @@ func file_external_ingest_request_liveness_proto_rawDescGZIP() []byte {
 }
 
 var file_external_ingest_request_liveness_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_ingest_request_liveness_proto_goTypes = []any{
+var file_external_ingest_request_liveness_proto_goTypes = []interface{}{
 	(*Liveness)(nil), // 0: chef.automate.api.ingest.request.Liveness
 }
 var file_external_ingest_request_liveness_proto_depIdxs = []int32{

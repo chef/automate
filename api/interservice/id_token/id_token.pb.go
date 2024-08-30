@@ -156,7 +156,7 @@ func file_interservice_id_token_id_token_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_id_token_id_token_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_id_token_id_token_proto_goTypes = []any{
+var file_interservice_id_token_id_token_proto_goTypes = []interface{}{
 	(*ValidateIdTokenRequest)(nil),  // 0: chef.automate.domain.id_token.ValidateIdTokenRequest
 	(*ValidateIdTokenResponse)(nil), // 1: chef.automate.domain.id_token.ValidateIdTokenResponse
 }

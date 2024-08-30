@@ -162,7 +162,7 @@ func file_interservice_infra_proxy_response_common_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_infra_proxy_response_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_interservice_infra_proxy_response_common_proto_goTypes = []any{
+var file_interservice_infra_proxy_response_common_proto_goTypes = []interface{}{
 	(*RunList)(nil), // 0: chef.automate.domain.infra_proxy.response.RunList
 }
 var file_interservice_infra_proxy_response_common_proto_depIdxs = []int32{

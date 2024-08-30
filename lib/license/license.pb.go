@@ -283,7 +283,7 @@ func file_lib_license_license_proto_rawDescGZIP() []byte {
 }
 
 var file_lib_license_license_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_lib_license_license_proto_goTypes = []any{
+var file_lib_license_license_proto_goTypes = []interface{}{
 	(*License)(nil),               // 0: license.License
 	(*Entitlement)(nil),           // 1: license.Entitlement
 	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp

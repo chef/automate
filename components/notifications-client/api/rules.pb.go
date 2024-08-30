@@ -1441,7 +1441,7 @@ func file_rules_proto_rawDescGZIP() []byte {
 
 var file_rules_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_rules_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_rules_proto_goTypes = []any{
+var file_rules_proto_goTypes = []interface{}{
 	(Rule_Event)(0),                 // 0: notifications.Rule.Event
 	(URLValidationResponse_Code)(0), // 1: notifications.URLValidationResponse.Code
 	(RuleUpdateResponse_Code)(0),    // 2: notifications.RuleUpdateResponse.Code
@@ -1499,7 +1499,7 @@ func file_rules_proto_init() {
 		(*Rule_WebhookAlert)(nil),
 		(*Rule_ServiceNowAlert)(nil),
 	}
-	file_rules_proto_msgTypes[7].OneofWrappers = []any{
+	file_rules_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*URLValidationRequest_UsernamePassword)(nil),
 		(*URLValidationRequest_SecretId)(nil),
 		(*URLValidationRequest_None)(nil),

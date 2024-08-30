@@ -148,7 +148,7 @@ func file_interservice_compliance_version_version_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_compliance_version_version_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_interservice_compliance_version_version_proto_goTypes = []any{
+var file_interservice_compliance_version_version_proto_goTypes = []interface{}{
 	(*VersionInfo)(nil),   // 0: chef.automate.domain.compliance.version.VersionInfo
 	(*emptypb.Empty)(nil), // 1: google.protobuf.Empty
 }

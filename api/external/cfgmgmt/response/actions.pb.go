@@ -170,7 +170,7 @@ func file_external_cfgmgmt_response_actions_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cfgmgmt_response_actions_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_external_cfgmgmt_response_actions_proto_goTypes = []any{
+var file_external_cfgmgmt_response_actions_proto_goTypes = []interface{}{
 	(*PolicyCookbooks)(nil), // 0: chef.automate.api.cfgmgmt.response.PolicyCookbooks
 	(*CookbookLock)(nil),    // 1: chef.automate.api.cfgmgmt.response.CookbookLock
 }

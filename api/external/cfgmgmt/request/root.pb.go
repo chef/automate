@@ -121,7 +121,7 @@ func file_external_cfgmgmt_request_root_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cfgmgmt_request_root_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_external_cfgmgmt_request_root_proto_goTypes = []any{
+var file_external_cfgmgmt_request_root_proto_goTypes = []interface{}{
 	(*Organizations)(nil), // 0: chef.automate.api.cfgmgmt.request.Organizations
 	(*SourceFqdns)(nil),   // 1: chef.automate.api.cfgmgmt.request.SourceFqdns
 }

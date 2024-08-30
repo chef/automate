@@ -230,7 +230,7 @@ func file_interservice_deployment_certificate_authority_proto_rawDescGZIP() []by
 }
 
 var file_interservice_deployment_certificate_authority_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_interservice_deployment_certificate_authority_proto_goTypes = []any{
+var file_interservice_deployment_certificate_authority_proto_goTypes = []interface{}{
 	(*RootCertRequest)(nil),        // 0: chef.automate.domain.deployment.RootCertRequest
 	(*RootCertResponse)(nil),       // 1: chef.automate.domain.deployment.RootCertResponse
 	(*RegenerateRootRequest)(nil),  // 2: chef.automate.domain.deployment.RegenerateRootRequest

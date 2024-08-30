@@ -115,7 +115,7 @@ var file_interservice_notifications_service_server_proto_rawDesc = []byte{
 	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_interservice_notifications_service_server_proto_goTypes = []any{
+var file_interservice_notifications_service_server_proto_goTypes = []interface{}{
 	(*Event)(nil),                 // 0: chef.automate.domain.notifications.service.Event
 	(*Rule)(nil),                  // 1: chef.automate.domain.notifications.service.Rule
 	(*RuleIdentifier)(nil),        // 2: chef.automate.domain.notifications.service.RuleIdentifier

@@ -356,7 +356,7 @@ func file_config_user_settings_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_user_settings_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_config_user_settings_config_request_proto_goTypes = []any{
+var file_config_user_settings_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.user_settings.ConfigRequest
 	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.user_settings.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.user_settings.ConfigRequest.V1.System

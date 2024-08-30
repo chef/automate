@@ -174,7 +174,7 @@ func file_interservice_authn_authenticate_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_authn_authenticate_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_authn_authenticate_proto_goTypes = []any{
+var file_interservice_authn_authenticate_proto_goTypes = []interface{}{
 	(*AuthenticateRequest)(nil),  // 0: chef.automate.domain.authn.AuthenticateRequest
 	(*AuthenticateResponse)(nil), // 1: chef.automate.domain.authn.AuthenticateResponse
 }

@@ -1745,7 +1745,7 @@ func file_notifications_proto_rawDescGZIP() []byte {
 }
 
 var file_notifications_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
-var file_notifications_proto_goTypes = []any{
+var file_notifications_proto_goTypes = []interface{}{
 	(*ExceptionInfo)(nil),                   // 0: notifications.ExceptionInfo
 	(*TimeInfo)(nil),                        // 1: notifications.TimeInfo
 	(*Profile)(nil),                         // 2: notifications.Profile

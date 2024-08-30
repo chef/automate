@@ -454,7 +454,7 @@ func file_config_minio_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_minio_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_config_minio_config_request_proto_goTypes = []any{
+var file_config_minio_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest)(nil),                           // 0: chef.automate.infra.minio.ConfigRequest
 	(*ConfigRequest_V1)(nil),                        // 1: chef.automate.infra.minio.ConfigRequest.V1
 	(*ConfigRequest_Service)(nil),                   // 2: chef.automate.infra.minio.ConfigRequest.Service

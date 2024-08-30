@@ -104,7 +104,7 @@ func file_interservice_cfgmgmt_response_suggestions_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_response_suggestions_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_interservice_cfgmgmt_response_suggestions_proto_goTypes = []any{
+var file_interservice_cfgmgmt_response_suggestions_proto_goTypes = []interface{}{
 	(*Suggestion)(nil), // 0: chef.automate.domain.cfgmgmt.response.Suggestion
 }
 var file_interservice_cfgmgmt_response_suggestions_proto_depIdxs = []int32{

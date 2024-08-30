@@ -512,7 +512,7 @@ func file_interservice_user_settings_user_settings_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_user_settings_user_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_interservice_user_settings_user_settings_proto_goTypes = []any{
+var file_interservice_user_settings_user_settings_proto_goTypes = []interface{}{
 	(*User)(nil),                      // 0: chef.automate.domain.user_settings.service.User
 	(*GetUserSettingsRequest)(nil),    // 1: chef.automate.domain.user_settings.service.GetUserSettingsRequest
 	(*PutUserSettingsRequest)(nil),    // 2: chef.automate.domain.user_settings.service.PutUserSettingsRequest

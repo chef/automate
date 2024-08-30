@@ -507,7 +507,7 @@ func file_interservice_infra_proxy_response_databags_proto_rawDescGZIP() []byte 
 }
 
 var file_interservice_infra_proxy_response_databags_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_interservice_infra_proxy_response_databags_proto_goTypes = []any{
+var file_interservice_infra_proxy_response_databags_proto_goTypes = []interface{}{
 	(*DataBags)(nil),          // 0: chef.automate.domain.infra_proxy.response.DataBags
 	(*DataBagItems)(nil),      // 1: chef.automate.domain.infra_proxy.response.DataBagItems
 	(*DataBagListItem)(nil),   // 2: chef.automate.domain.infra_proxy.response.DataBagListItem

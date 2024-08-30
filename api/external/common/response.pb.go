@@ -93,7 +93,7 @@ func file_external_common_response_proto_rawDescGZIP() []byte {
 }
 
 var file_external_common_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_common_response_proto_goTypes = []any{
+var file_external_common_response_proto_goTypes = []interface{}{
 	(*ExportData)(nil), // 0: chef.automate.api.common.ExportData
 }
 var file_external_common_response_proto_depIdxs = []int32{

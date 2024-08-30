@@ -1368,7 +1368,7 @@ func file_interservice_compliance_ingest_events_inspec_inspec_proto_rawDescGZIP(
 }
 
 var file_interservice_compliance_ingest_events_inspec_inspec_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_interservice_compliance_ingest_events_inspec_inspec_proto_goTypes = []any{
+var file_interservice_compliance_ingest_events_inspec_inspec_proto_goTypes = []interface{}{
 	(*Report)(nil),               // 0: chef.automate.domain.compliance.ingest.events.inspec.Report
 	(*Platform)(nil),             // 1: chef.automate.domain.compliance.ingest.events.inspec.Platform
 	(*Statistics)(nil),           // 2: chef.automate.domain.compliance.ingest.events.inspec.Statistics

@@ -609,7 +609,7 @@ func file_external_cfgmgmt_request_rollouts_proto_rawDescGZIP() []byte {
 
 var file_external_cfgmgmt_request_rollouts_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_external_cfgmgmt_request_rollouts_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_external_cfgmgmt_request_rollouts_proto_goTypes = []any{
+var file_external_cfgmgmt_request_rollouts_proto_goTypes = []interface{}{
 	(SCMType)(0),                                // 0: chef.automate.api.cfgmgmt.request.SCMType
 	(SCMWebType)(0),                             // 1: chef.automate.api.cfgmgmt.request.SCMWebType
 	(*CreateRollout)(nil),                       // 2: chef.automate.api.cfgmgmt.request.CreateRollout

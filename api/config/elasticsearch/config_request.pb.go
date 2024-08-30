@@ -2090,7 +2090,7 @@ func file_config_elasticsearch_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_elasticsearch_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
-var file_config_elasticsearch_config_request_proto_goTypes = []any{
+var file_config_elasticsearch_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest)(nil),                // 0: chef.automate.infra.elasticsearch.ConfigRequest
 	(*ConfigRequest_V1)(nil),             // 1: chef.automate.infra.elasticsearch.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),      // 2: chef.automate.infra.elasticsearch.ConfigRequest.V1.System

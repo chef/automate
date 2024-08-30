@@ -125,7 +125,7 @@ func file_health_proto_rawDescGZIP() []byte {
 }
 
 var file_health_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_health_proto_goTypes = []any{
+var file_health_proto_goTypes = []interface{}{
 	(*VersionRequest)(nil),  // 0: notifications.VersionRequest
 	(*VersionResponse)(nil), // 1: notifications.VersionResponse
 }

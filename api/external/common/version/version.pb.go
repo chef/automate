@@ -159,7 +159,7 @@ func file_external_common_version_version_proto_rawDescGZIP() []byte {
 }
 
 var file_external_common_version_version_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_external_common_version_version_proto_goTypes = []any{
+var file_external_common_version_version_proto_goTypes = []interface{}{
 	(*VersionInfo)(nil),        // 0: chef.automate.api.common.version.VersionInfo
 	(*VersionInfoRequest)(nil), // 1: chef.automate.api.common.version.VersionInfoRequest
 }

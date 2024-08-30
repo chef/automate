@@ -413,7 +413,7 @@ func file_interservice_compliance_ingest_events_compliance_compliance_proto_rawD
 }
 
 var file_interservice_compliance_ingest_events_compliance_compliance_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_interservice_compliance_ingest_events_compliance_compliance_proto_goTypes = []any{
+var file_interservice_compliance_ingest_events_compliance_compliance_proto_goTypes = []interface{}{
 	(*Report)(nil),            // 0: chef.automate.domain.compliance.ingest.events.compliance.Report
 	(*inspec.Platform)(nil),   // 1: chef.automate.domain.compliance.ingest.events.inspec.Platform
 	(*inspec.Statistics)(nil), // 2: chef.automate.domain.compliance.ingest.events.inspec.Statistics

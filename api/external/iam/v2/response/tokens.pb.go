@@ -319,7 +319,7 @@ func file_external_iam_v2_response_tokens_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_response_tokens_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_external_iam_v2_response_tokens_proto_goTypes = []any{
+var file_external_iam_v2_response_tokens_proto_goTypes = []interface{}{
 	(*CreateTokenResp)(nil), // 0: chef.automate.api.iam.v2.CreateTokenResp
 	(*GetTokenResp)(nil),    // 1: chef.automate.api.iam.v2.GetTokenResp
 	(*UpdateTokenResp)(nil), // 2: chef.automate.api.iam.v2.UpdateTokenResp

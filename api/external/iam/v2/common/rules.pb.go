@@ -525,7 +525,7 @@ func file_external_iam_v2_common_rules_proto_rawDescGZIP() []byte {
 
 var file_external_iam_v2_common_rules_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_external_iam_v2_common_rules_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_external_iam_v2_common_rules_proto_goTypes = []any{
+var file_external_iam_v2_common_rules_proto_goTypes = []interface{}{
 	(RuleType)(0),           // 0: chef.automate.api.iam.v2.RuleType
 	(ConditionAttribute)(0), // 1: chef.automate.api.iam.v2.ConditionAttribute
 	(ConditionOperator)(0),  // 2: chef.automate.api.iam.v2.ConditionOperator
