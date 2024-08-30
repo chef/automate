@@ -33,8 +33,13 @@ function install_protoc_toolchain() {
     github.com/envoyproxy/protoc-gen-validate
     github.com/ckaznocha/protoc-gen-lint
     github.com/bufbuild/buf/cmd/buf
+<<<<<<< HEAD
     github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking
     github.com/bufbuild/buf/cmd/protoc-gen-buf-lint
+=======
+    # github.com/bufbuild/buf/cmd/protoc-gen-buf-check-breaking
+    # github.com/bufbuild/buf/cmd/protoc-gen-buf-check-lint
+>>>>>>> 90da8c736 (Compiled protobuf with upgraded Golang v1.22.5)
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
   )
