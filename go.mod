@@ -62,7 +62,7 @@ require (
 	github.com/nats-io/nats.go v1.37.0
 	github.com/nats-io/stan.go v0.10.4
 	github.com/olivere/elastic/v7 v7.0.32
-	github.com/open-policy-agent/opa v0.46.3
+	github.com/open-policy-agent/opa v0.19.1
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.9.5
@@ -118,13 +118,12 @@ require (
 
 require (
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
-	github.com/distribution/reference v0.6.0 // indirect
 	github.com/felixge/fgprof v0.9.4 // indirect
 	github.com/gofiber/adaptor/v2 v2.1.31 // indirect
 	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
-	github.com/moby/docker-image-spec v1.3.1 // indirect
-	github.com/opencontainers/image-spec v1.1.0 // indirect
+	github.com/moby/docker-image-spec v1.2.0 // indirect
+	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
@@ -147,6 +146,8 @@ require (
 	github.com/minio/highwayhash v1.0.3 // indirect
 	github.com/nats-io/jwt/v2 v2.5.8 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
+	github.com/olekukonko/tablewriter v0.0.1 // indirect
+	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
