@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -30,6 +31,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
+var _ = metadata.Join
 
 func request_NodeManagerService_Create_0(ctx context.Context, marshaler runtime.Marshaler, client NodeManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq NodeManager
@@ -652,11 +654,14 @@ func local_request_NodeManagerService_Connect_0(ctx context.Context, marshaler r
 // RegisterNodeManagerServiceHandlerServer registers the http handlers for service NodeManagerService to "mux".
 // UnaryRPC     :call NodeManagerServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterNodeManagerServiceHandlerFromEndpoint instead.
 func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server NodeManagerServiceServer) error {
 
 	mux.Handle("POST", pattern_NodeManagerService_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -664,6 +669,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_Create_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -677,6 +683,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("GET", pattern_NodeManagerService_Read_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -684,6 +692,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_Read_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -697,6 +706,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("PUT", pattern_NodeManagerService_Update_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -704,6 +715,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_Update_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -717,6 +729,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("DELETE", pattern_NodeManagerService_Delete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -724,6 +738,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_Delete_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -737,6 +752,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("DELETE", pattern_NodeManagerService_DeleteWithNodes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -744,6 +761,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_DeleteWithNodes_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -757,6 +775,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("DELETE", pattern_NodeManagerService_DeleteWithNodeStateStopped_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -764,6 +784,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_DeleteWithNodeStateStopped_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -777,6 +798,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("DELETE", pattern_NodeManagerService_DeleteWithNodeStateTerminated_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -784,6 +807,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_DeleteWithNodeStateTerminated_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -797,6 +821,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("POST", pattern_NodeManagerService_List_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -804,6 +830,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_List_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -817,6 +844,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("POST", pattern_NodeManagerService_SearchNodeFields_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -824,6 +853,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_SearchNodeFields_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -837,6 +867,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("POST", pattern_NodeManagerService_SearchNodes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -844,6 +876,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_SearchNodes_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -857,6 +890,8 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 	mux.Handle("POST", pattern_NodeManagerService_Connect_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -864,6 +899,7 @@ func RegisterNodeManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 		resp, md, err := local_request_NodeManagerService_Connect_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)

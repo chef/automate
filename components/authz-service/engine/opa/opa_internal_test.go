@@ -777,7 +777,7 @@ func genericInput(subjects []string, resource string, action string, projects []
 }
 
 func specificInput(subjects []string, resource string, action string, projects []string) ast.Value {
-	subs := make(ast.Array)
+	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = ast.NewTerm(ast.String(sub))
 	}

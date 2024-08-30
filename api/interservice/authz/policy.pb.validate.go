@@ -11,11 +11,12 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,18 +31,30 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
-// define the regex for a UUID once up-front
-var _policy_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-
 // Validate checks the field values on Policy with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *Policy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Policy with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in PolicyMultiError, or nil if none found.
+func (m *Policy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Policy) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Name
 
@@ -52,7 +65,26 @@ func (m *Policy) Validate() error {
 	for idx, item := range m.GetStatements() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PolicyValidationError{
+						field:  fmt.Sprintf("Statements[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PolicyValidationError{
+						field:  fmt.Sprintf("Statements[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return PolicyValidationError{
 					field:  fmt.Sprintf("Statements[%v]", idx),
@@ -64,8 +96,28 @@ func (m *Policy) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return PolicyMultiError(errors)
+	}
+
 	return nil
 }
+
+// PolicyMultiError is an error wrapping multiple validation errors returned by
+// Policy.ValidateAll() if the designated constraints aren't met.
+type PolicyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolicyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolicyMultiError) AllErrors() []error { return m }
 
 // PolicyValidationError is the validation error returned by Policy.Validate if
 // the designated constraints aren't met.
@@ -122,11 +174,25 @@ var _ interface {
 } = PolicyValidationError{}
 
 // Validate checks the field values on Role with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
 func (m *Role) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Role with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in RoleMultiError, or nil if none found.
+func (m *Role) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Role) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Name
 
@@ -134,8 +200,28 @@ func (m *Role) Validate() error {
 
 	// no validation rules for Type
 
+	if len(errors) > 0 {
+		return RoleMultiError(errors)
+	}
+
 	return nil
 }
+
+// RoleMultiError is an error wrapping multiple validation errors returned by
+// Role.ValidateAll() if the designated constraints aren't met.
+type RoleMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoleMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoleMultiError) AllErrors() []error { return m }
 
 // RoleValidationError is the validation error returned by Role.Validate if the
 // designated constraints aren't met.
@@ -192,18 +278,36 @@ var _ interface {
 } = RoleValidationError{}
 
 // Validate checks the field values on CreatePolicyReq with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *CreatePolicyReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreatePolicyReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CreatePolicyReqMultiError, or nil if none found.
+func (m *CreatePolicyReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreatePolicyReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_CreatePolicyReq_Id_Pattern.MatchString(m.GetId()) {
-		return CreatePolicyReqValidationError{
+		err := CreatePolicyReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for Name
@@ -214,34 +318,65 @@ func (m *CreatePolicyReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _CreatePolicyReq_Members_Unique[item]; exists {
-			return CreatePolicyReqValidationError{
+			err := CreatePolicyReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_CreatePolicyReq_Members_Unique[item] = struct{}{}
 		}
 
 		if !_CreatePolicyReq_Members_Pattern.MatchString(item) {
-			return CreatePolicyReqValidationError{
+			err := CreatePolicyReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetStatements()) < 1 {
-		return CreatePolicyReqValidationError{
+		err := CreatePolicyReqValidationError{
 			field:  "Statements",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetStatements() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CreatePolicyReqValidationError{
+						field:  fmt.Sprintf("Statements[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CreatePolicyReqValidationError{
+						field:  fmt.Sprintf("Statements[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CreatePolicyReqValidationError{
 					field:  fmt.Sprintf("Statements[%v]", idx),
@@ -259,10 +394,14 @@ func (m *CreatePolicyReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _CreatePolicyReq_Projects_Unique[item]; exists {
-			return CreatePolicyReqValidationError{
+			err := CreatePolicyReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_CreatePolicyReq_Projects_Unique[item] = struct{}{}
 		}
@@ -270,8 +409,29 @@ func (m *CreatePolicyReq) Validate() error {
 		// no validation rules for Projects[idx]
 	}
 
+	if len(errors) > 0 {
+		return CreatePolicyReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// CreatePolicyReqMultiError is an error wrapping multiple validation errors
+// returned by CreatePolicyReq.ValidateAll() if the designated constraints
+// aren't met.
+type CreatePolicyReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreatePolicyReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreatePolicyReqMultiError) AllErrors() []error { return m }
 
 // CreatePolicyReqValidationError is the validation error returned by
 // CreatePolicyReq.Validate if the designated constraints aren't met.
@@ -332,17 +492,52 @@ var _CreatePolicyReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 var _CreatePolicyReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$")
 
 // Validate checks the field values on DeletePolicyReq with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *DeletePolicyReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeletePolicyReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeletePolicyReqMultiError, or nil if none found.
+func (m *DeletePolicyReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeletePolicyReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return DeletePolicyReqMultiError(errors)
+	}
 
 	return nil
 }
+
+// DeletePolicyReqMultiError is an error wrapping multiple validation errors
+// returned by DeletePolicyReq.ValidateAll() if the designated constraints
+// aren't met.
+type DeletePolicyReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeletePolicyReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeletePolicyReqMultiError) AllErrors() []error { return m }
 
 // DeletePolicyReqValidationError is the validation error returned by
 // DeletePolicyReq.Validate if the designated constraints aren't met.
@@ -399,15 +594,50 @@ var _ interface {
 } = DeletePolicyReqValidationError{}
 
 // Validate checks the field values on DeletePolicyResp with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *DeletePolicyResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeletePolicyResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeletePolicyRespMultiError, or nil if none found.
+func (m *DeletePolicyResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeletePolicyResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeletePolicyRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// DeletePolicyRespMultiError is an error wrapping multiple validation errors
+// returned by DeletePolicyResp.ValidateAll() if the designated constraints
+// aren't met.
+type DeletePolicyRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeletePolicyRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeletePolicyRespMultiError) AllErrors() []error { return m }
 
 // DeletePolicyRespValidationError is the validation error returned by
 // DeletePolicyResp.Validate if the designated constraints aren't met.
@@ -464,11 +694,26 @@ var _ interface {
 } = DeletePolicyRespValidationError{}
 
 // Validate checks the field values on Statement with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *Statement) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Statement with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in StatementMultiError, or nil
+// if none found.
+func (m *Statement) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Statement) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Effect
 
@@ -478,19 +723,27 @@ func (m *Statement) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _Statement_Resources_Unique[item]; exists {
-			return StatementValidationError{
+			err := StatementValidationError{
 				field:  fmt.Sprintf("Resources[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_Statement_Resources_Unique[item] = struct{}{}
 		}
 
 		if !_Statement_Resources_Pattern.MatchString(item) {
-			return StatementValidationError{
+			err := StatementValidationError{
 				field:  fmt.Sprintf("Resources[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*(?::[*])?$|^[*]$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -501,28 +754,40 @@ func (m *Statement) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _Statement_Actions_Unique[item]; exists {
-			return StatementValidationError{
+			err := StatementValidationError{
 				field:  fmt.Sprintf("Actions[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_Statement_Actions_Unique[item] = struct{}{}
 		}
 
 		if !_Statement_Actions_Pattern.MatchString(item) {
-			return StatementValidationError{
+			err := StatementValidationError{
 				field:  fmt.Sprintf("Actions[%v]", idx),
 				reason: "value does not match regex pattern \"^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if !_Statement_Role_Pattern.MatchString(m.GetRole()) {
-		return StatementValidationError{
+		err := StatementValidationError{
 			field:  "Role",
 			reason: "value does not match regex pattern \"^$|^[a-z0-9-_]{1,64}$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_Statement_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
@@ -531,10 +796,14 @@ func (m *Statement) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _Statement_Projects_Unique[item]; exists {
-			return StatementValidationError{
+			err := StatementValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_Statement_Projects_Unique[item] = struct{}{}
 		}
@@ -542,8 +811,28 @@ func (m *Statement) Validate() error {
 		// no validation rules for Projects[idx]
 	}
 
+	if len(errors) > 0 {
+		return StatementMultiError(errors)
+	}
+
 	return nil
 }
+
+// StatementMultiError is an error wrapping multiple validation errors returned
+// by Statement.ValidateAll() if the designated constraints aren't met.
+type StatementMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StatementMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StatementMultiError) AllErrors() []error { return m }
 
 // StatementValidationError is the validation error returned by
 // Statement.Validate if the designated constraints aren't met.
@@ -606,15 +895,50 @@ var _Statement_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$
 var _Statement_Role_Pattern = regexp.MustCompile("^$|^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on ListPoliciesReq with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *ListPoliciesReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPoliciesReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPoliciesReqMultiError, or nil if none found.
+func (m *ListPoliciesReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPoliciesReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListPoliciesReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListPoliciesReqMultiError is an error wrapping multiple validation errors
+// returned by ListPoliciesReq.ValidateAll() if the designated constraints
+// aren't met.
+type ListPoliciesReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPoliciesReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPoliciesReqMultiError) AllErrors() []error { return m }
 
 // ListPoliciesReqValidationError is the validation error returned by
 // ListPoliciesReq.Validate if the designated constraints aren't met.
@@ -671,17 +995,50 @@ var _ interface {
 } = ListPoliciesReqValidationError{}
 
 // Validate checks the field values on ListPoliciesResp with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *ListPoliciesResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPoliciesResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPoliciesRespMultiError, or nil if none found.
+func (m *ListPoliciesResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPoliciesResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	for idx, item := range m.GetPolicies() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListPoliciesRespValidationError{
+						field:  fmt.Sprintf("Policies[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListPoliciesRespValidationError{
+						field:  fmt.Sprintf("Policies[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ListPoliciesRespValidationError{
 					field:  fmt.Sprintf("Policies[%v]", idx),
@@ -693,8 +1050,29 @@ func (m *ListPoliciesResp) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return ListPoliciesRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListPoliciesRespMultiError is an error wrapping multiple validation errors
+// returned by ListPoliciesResp.ValidateAll() if the designated constraints
+// aren't met.
+type ListPoliciesRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPoliciesRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPoliciesRespMultiError) AllErrors() []error { return m }
 
 // ListPoliciesRespValidationError is the validation error returned by
 // ListPoliciesResp.Validate if the designated constraints aren't met.
@@ -751,17 +1129,51 @@ var _ interface {
 } = ListPoliciesRespValidationError{}
 
 // Validate checks the field values on GetPolicyReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *GetPolicyReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetPolicyReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetPolicyReqMultiError, or
+// nil if none found.
+func (m *GetPolicyReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetPolicyReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return GetPolicyReqMultiError(errors)
+	}
 
 	return nil
 }
+
+// GetPolicyReqMultiError is an error wrapping multiple validation errors
+// returned by GetPolicyReq.ValidateAll() if the designated constraints aren't met.
+type GetPolicyReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetPolicyReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetPolicyReqMultiError) AllErrors() []error { return m }
 
 // GetPolicyReqValidationError is the validation error returned by
 // GetPolicyReq.Validate if the designated constraints aren't met.
@@ -818,12 +1230,26 @@ var _ interface {
 } = GetPolicyReqValidationError{}
 
 // Validate checks the field values on UpdatePolicyReq with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *UpdatePolicyReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdatePolicyReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdatePolicyReqMultiError, or nil if none found.
+func (m *UpdatePolicyReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdatePolicyReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Id
 
@@ -833,34 +1259,65 @@ func (m *UpdatePolicyReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _UpdatePolicyReq_Members_Unique[item]; exists {
-			return UpdatePolicyReqValidationError{
+			err := UpdatePolicyReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_UpdatePolicyReq_Members_Unique[item] = struct{}{}
 		}
 
 		if !_UpdatePolicyReq_Members_Pattern.MatchString(item) {
-			return UpdatePolicyReqValidationError{
+			err := UpdatePolicyReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetStatements()) < 1 {
-		return UpdatePolicyReqValidationError{
+		err := UpdatePolicyReqValidationError{
 			field:  "Statements",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetStatements() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdatePolicyReqValidationError{
+						field:  fmt.Sprintf("Statements[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdatePolicyReqValidationError{
+						field:  fmt.Sprintf("Statements[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return UpdatePolicyReqValidationError{
 					field:  fmt.Sprintf("Statements[%v]", idx),
@@ -880,10 +1337,14 @@ func (m *UpdatePolicyReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _UpdatePolicyReq_Projects_Unique[item]; exists {
-			return UpdatePolicyReqValidationError{
+			err := UpdatePolicyReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_UpdatePolicyReq_Projects_Unique[item] = struct{}{}
 		}
@@ -891,8 +1352,29 @@ func (m *UpdatePolicyReq) Validate() error {
 		// no validation rules for Projects[idx]
 	}
 
+	if len(errors) > 0 {
+		return UpdatePolicyReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// UpdatePolicyReqMultiError is an error wrapping multiple validation errors
+// returned by UpdatePolicyReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdatePolicyReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdatePolicyReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdatePolicyReqMultiError) AllErrors() []error { return m }
 
 // UpdatePolicyReqValidationError is the validation error returned by
 // UpdatePolicyReq.Validate if the designated constraints aren't met.
@@ -952,11 +1434,25 @@ var _UpdatePolicyReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?:loc
 
 // Validate checks the field values on ReplacePolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ReplacePolicyMembersReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ReplacePolicyMembersReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ReplacePolicyMembersReqMultiError, or nil if none found.
+func (m *ReplacePolicyMembersReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReplacePolicyMembersReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Id
 
@@ -966,25 +1462,54 @@ func (m *ReplacePolicyMembersReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _ReplacePolicyMembersReq_Members_Unique[item]; exists {
-			return ReplacePolicyMembersReqValidationError{
+			err := ReplacePolicyMembersReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_ReplacePolicyMembersReq_Members_Unique[item] = struct{}{}
 		}
 
 		if !_ReplacePolicyMembersReq_Members_Pattern.MatchString(item) {
-			return ReplacePolicyMembersReqValidationError{
+			err := ReplacePolicyMembersReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return ReplacePolicyMembersReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// ReplacePolicyMembersReqMultiError is an error wrapping multiple validation
+// errors returned by ReplacePolicyMembersReq.ValidateAll() if the designated
+// constraints aren't met.
+type ReplacePolicyMembersReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReplacePolicyMembersReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReplacePolicyMembersReqMultiError) AllErrors() []error { return m }
 
 // ReplacePolicyMembersReqValidationError is the validation error returned by
 // ReplacePolicyMembersReq.Validate if the designated constraints aren't met.
@@ -1046,14 +1571,49 @@ var _ReplacePolicyMembersReq_Members_Pattern = regexp.MustCompile("^(?:team|user
 
 // Validate checks the field values on ReplacePolicyMembersResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ReplacePolicyMembersResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ReplacePolicyMembersResp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ReplacePolicyMembersRespMultiError, or nil if none found.
+func (m *ReplacePolicyMembersResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReplacePolicyMembersResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ReplacePolicyMembersRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ReplacePolicyMembersRespMultiError is an error wrapping multiple validation
+// errors returned by ReplacePolicyMembersResp.ValidateAll() if the designated
+// constraints aren't met.
+type ReplacePolicyMembersRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReplacePolicyMembersRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReplacePolicyMembersRespMultiError) AllErrors() []error { return m }
 
 // ReplacePolicyMembersRespValidationError is the validation error returned by
 // ReplacePolicyMembersResp.Validate if the designated constraints aren't met.
@@ -1113,19 +1673,37 @@ var _ interface {
 
 // Validate checks the field values on AddPolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *AddPolicyMembersReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddPolicyMembersReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddPolicyMembersReqMultiError, or nil if none found.
+func (m *AddPolicyMembersReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddPolicyMembersReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
 
 	if len(m.GetMembers()) < 1 {
-		return AddPolicyMembersReqValidationError{
+		err := AddPolicyMembersReqValidationError{
 			field:  "Members",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_AddPolicyMembersReq_Members_Unique := make(map[string]struct{}, len(m.GetMembers()))
@@ -1134,25 +1712,54 @@ func (m *AddPolicyMembersReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _AddPolicyMembersReq_Members_Unique[item]; exists {
-			return AddPolicyMembersReqValidationError{
+			err := AddPolicyMembersReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_AddPolicyMembersReq_Members_Unique[item] = struct{}{}
 		}
 
 		if !_AddPolicyMembersReq_Members_Pattern.MatchString(item) {
-			return AddPolicyMembersReqValidationError{
+			err := AddPolicyMembersReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return AddPolicyMembersReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// AddPolicyMembersReqMultiError is an error wrapping multiple validation
+// errors returned by AddPolicyMembersReq.ValidateAll() if the designated
+// constraints aren't met.
+type AddPolicyMembersReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddPolicyMembersReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddPolicyMembersReqMultiError) AllErrors() []error { return m }
 
 // AddPolicyMembersReqValidationError is the validation error returned by
 // AddPolicyMembersReq.Validate if the designated constraints aren't met.
@@ -1214,14 +1821,49 @@ var _AddPolicyMembersReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?
 
 // Validate checks the field values on AddPolicyMembersResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *AddPolicyMembersResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddPolicyMembersResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddPolicyMembersRespMultiError, or nil if none found.
+func (m *AddPolicyMembersResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddPolicyMembersResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return AddPolicyMembersRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// AddPolicyMembersRespMultiError is an error wrapping multiple validation
+// errors returned by AddPolicyMembersResp.ValidateAll() if the designated
+// constraints aren't met.
+type AddPolicyMembersRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddPolicyMembersRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddPolicyMembersRespMultiError) AllErrors() []error { return m }
 
 // AddPolicyMembersRespValidationError is the validation error returned by
 // AddPolicyMembersResp.Validate if the designated constraints aren't met.
@@ -1280,18 +1922,52 @@ var _ interface {
 } = AddPolicyMembersRespValidationError{}
 
 // Validate checks the field values on Version with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *Version) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Version with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in VersionMultiError, or nil if none found.
+func (m *Version) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Version) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Major
 
 	// no validation rules for Minor
 
+	if len(errors) > 0 {
+		return VersionMultiError(errors)
+	}
+
 	return nil
 }
+
+// VersionMultiError is an error wrapping multiple validation errors returned
+// by Version.ValidateAll() if the designated constraints aren't met.
+type VersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m VersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m VersionMultiError) AllErrors() []error { return m }
 
 // VersionValidationError is the validation error returned by Version.Validate
 // if the designated constraints aren't met.
@@ -1349,14 +2025,49 @@ var _ interface {
 
 // Validate checks the field values on GetPolicyVersionReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GetPolicyVersionReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetPolicyVersionReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetPolicyVersionReqMultiError, or nil if none found.
+func (m *GetPolicyVersionReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetPolicyVersionReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return GetPolicyVersionReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// GetPolicyVersionReqMultiError is an error wrapping multiple validation
+// errors returned by GetPolicyVersionReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetPolicyVersionReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetPolicyVersionReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetPolicyVersionReqMultiError) AllErrors() []error { return m }
 
 // GetPolicyVersionReqValidationError is the validation error returned by
 // GetPolicyVersionReq.Validate if the designated constraints aren't met.
@@ -1416,13 +2127,46 @@ var _ interface {
 
 // Validate checks the field values on GetPolicyVersionResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GetPolicyVersionResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetPolicyVersionResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetPolicyVersionRespMultiError, or nil if none found.
+func (m *GetPolicyVersionResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetPolicyVersionResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetVersion()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetVersion()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetPolicyVersionRespValidationError{
+					field:  "Version",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetPolicyVersionRespValidationError{
+					field:  "Version",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetVersion()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GetPolicyVersionRespValidationError{
 				field:  "Version",
@@ -1432,8 +2176,29 @@ func (m *GetPolicyVersionResp) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return GetPolicyVersionRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// GetPolicyVersionRespMultiError is an error wrapping multiple validation
+// errors returned by GetPolicyVersionResp.ValidateAll() if the designated
+// constraints aren't met.
+type GetPolicyVersionRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetPolicyVersionRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetPolicyVersionRespMultiError) AllErrors() []error { return m }
 
 // GetPolicyVersionRespValidationError is the validation error returned by
 // GetPolicyVersionResp.Validate if the designated constraints aren't met.
@@ -1492,15 +2257,49 @@ var _ interface {
 } = GetPolicyVersionRespValidationError{}
 
 // Validate checks the field values on ListRolesReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ListRolesReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListRolesReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListRolesReqMultiError, or
+// nil if none found.
+func (m *ListRolesReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListRolesReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListRolesReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListRolesReqMultiError is an error wrapping multiple validation errors
+// returned by ListRolesReq.ValidateAll() if the designated constraints aren't met.
+type ListRolesReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListRolesReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListRolesReqMultiError) AllErrors() []error { return m }
 
 // ListRolesReqValidationError is the validation error returned by
 // ListRolesReq.Validate if the designated constraints aren't met.
@@ -1557,17 +2356,50 @@ var _ interface {
 } = ListRolesReqValidationError{}
 
 // Validate checks the field values on ListRolesResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ListRolesResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListRolesResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListRolesRespMultiError, or
+// nil if none found.
+func (m *ListRolesResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListRolesResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	for idx, item := range m.GetRoles() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListRolesRespValidationError{
+						field:  fmt.Sprintf("Roles[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListRolesRespValidationError{
+						field:  fmt.Sprintf("Roles[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ListRolesRespValidationError{
 					field:  fmt.Sprintf("Roles[%v]", idx),
@@ -1579,8 +2411,29 @@ func (m *ListRolesResp) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return ListRolesRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListRolesRespMultiError is an error wrapping multiple validation errors
+// returned by ListRolesResp.ValidateAll() if the designated constraints
+// aren't met.
+type ListRolesRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListRolesRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListRolesRespMultiError) AllErrors() []error { return m }
 
 // ListRolesRespValidationError is the validation error returned by
 // ListRolesResp.Validate if the designated constraints aren't met.
@@ -1637,17 +2490,52 @@ var _ interface {
 } = ListRolesRespValidationError{}
 
 // Validate checks the field values on DeleteRoleReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *DeleteRoleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteRoleReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DeleteRoleReqMultiError, or
+// nil if none found.
+func (m *DeleteRoleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteRoleReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return DeleteRoleReqMultiError(errors)
+	}
 
 	return nil
 }
+
+// DeleteRoleReqMultiError is an error wrapping multiple validation errors
+// returned by DeleteRoleReq.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteRoleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteRoleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteRoleReqMultiError) AllErrors() []error { return m }
 
 // DeleteRoleReqValidationError is the validation error returned by
 // DeleteRoleReq.Validate if the designated constraints aren't met.
@@ -1704,15 +2592,50 @@ var _ interface {
 } = DeleteRoleReqValidationError{}
 
 // Validate checks the field values on DeleteRoleResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *DeleteRoleResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteRoleResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DeleteRoleRespMultiError,
+// or nil if none found.
+func (m *DeleteRoleResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteRoleResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteRoleRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// DeleteRoleRespMultiError is an error wrapping multiple validation errors
+// returned by DeleteRoleResp.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteRoleRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteRoleRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteRoleRespMultiError) AllErrors() []error { return m }
 
 // DeleteRoleRespValidationError is the validation error returned by
 // DeleteRoleResp.Validate if the designated constraints aren't met.
@@ -1769,22 +2692,40 @@ var _ interface {
 } = DeleteRoleRespValidationError{}
 
 // Validate checks the field values on UpdateRoleReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *UpdateRoleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateRoleReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UpdateRoleReqMultiError, or
+// nil if none found.
+func (m *UpdateRoleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateRoleReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Id
 
 	// no validation rules for Name
 
 	if len(m.GetActions()) < 1 {
-		return UpdateRoleReqValidationError{
+		err := UpdateRoleReqValidationError{
 			field:  "Actions",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_UpdateRoleReq_Actions_Unique := make(map[string]struct{}, len(m.GetActions()))
@@ -1793,19 +2734,27 @@ func (m *UpdateRoleReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _UpdateRoleReq_Actions_Unique[item]; exists {
-			return UpdateRoleReqValidationError{
+			err := UpdateRoleReqValidationError{
 				field:  fmt.Sprintf("Actions[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_UpdateRoleReq_Actions_Unique[item] = struct{}{}
 		}
 
 		if !_UpdateRoleReq_Actions_Pattern.MatchString(item) {
-			return UpdateRoleReqValidationError{
+			err := UpdateRoleReqValidationError{
 				field:  fmt.Sprintf("Actions[%v]", idx),
 				reason: "value does not match regex pattern \"^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1816,10 +2765,14 @@ func (m *UpdateRoleReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _UpdateRoleReq_Projects_Unique[item]; exists {
-			return UpdateRoleReqValidationError{
+			err := UpdateRoleReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_UpdateRoleReq_Projects_Unique[item] = struct{}{}
 		}
@@ -1827,8 +2780,29 @@ func (m *UpdateRoleReq) Validate() error {
 		// no validation rules for Projects[idx]
 	}
 
+	if len(errors) > 0 {
+		return UpdateRoleReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// UpdateRoleReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateRoleReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateRoleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateRoleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateRoleReqMultiError) AllErrors() []error { return m }
 
 // UpdateRoleReqValidationError is the validation error returned by
 // UpdateRoleReq.Validate if the designated constraints aren't met.
@@ -1888,16 +2862,51 @@ var _UpdateRoleReq_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-
 
 // Validate checks the field values on ListPolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ListPolicyMembersReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPolicyMembersReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPolicyMembersReqMultiError, or nil if none found.
+func (m *ListPolicyMembersReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPolicyMembersReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return ListPolicyMembersReqMultiError(errors)
+	}
 
 	return nil
 }
+
+// ListPolicyMembersReqMultiError is an error wrapping multiple validation
+// errors returned by ListPolicyMembersReq.ValidateAll() if the designated
+// constraints aren't met.
+type ListPolicyMembersReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPolicyMembersReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPolicyMembersReqMultiError) AllErrors() []error { return m }
 
 // ListPolicyMembersReqValidationError is the validation error returned by
 // ListPolicyMembersReq.Validate if the designated constraints aren't met.
@@ -1957,14 +2966,49 @@ var _ interface {
 
 // Validate checks the field values on ListPolicyMembersResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ListPolicyMembersResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPolicyMembersResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPolicyMembersRespMultiError, or nil if none found.
+func (m *ListPolicyMembersResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPolicyMembersResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListPolicyMembersRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListPolicyMembersRespMultiError is an error wrapping multiple validation
+// errors returned by ListPolicyMembersResp.ValidateAll() if the designated
+// constraints aren't met.
+type ListPolicyMembersRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPolicyMembersRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPolicyMembersRespMultiError) AllErrors() []error { return m }
 
 // ListPolicyMembersRespValidationError is the validation error returned by
 // ListPolicyMembersResp.Validate if the designated constraints aren't met.
@@ -2024,19 +3068,37 @@ var _ interface {
 
 // Validate checks the field values on RemovePolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RemovePolicyMembersReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemovePolicyMembersReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemovePolicyMembersReqMultiError, or nil if none found.
+func (m *RemovePolicyMembersReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemovePolicyMembersReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
 
 	if len(m.GetMembers()) < 1 {
-		return RemovePolicyMembersReqValidationError{
+		err := RemovePolicyMembersReqValidationError{
 			field:  "Members",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_RemovePolicyMembersReq_Members_Unique := make(map[string]struct{}, len(m.GetMembers()))
@@ -2045,25 +3107,54 @@ func (m *RemovePolicyMembersReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _RemovePolicyMembersReq_Members_Unique[item]; exists {
-			return RemovePolicyMembersReqValidationError{
+			err := RemovePolicyMembersReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_RemovePolicyMembersReq_Members_Unique[item] = struct{}{}
 		}
 
 		if !_RemovePolicyMembersReq_Members_Pattern.MatchString(item) {
-			return RemovePolicyMembersReqValidationError{
+			err := RemovePolicyMembersReqValidationError{
 				field:  fmt.Sprintf("Members[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return RemovePolicyMembersReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// RemovePolicyMembersReqMultiError is an error wrapping multiple validation
+// errors returned by RemovePolicyMembersReq.ValidateAll() if the designated
+// constraints aren't met.
+type RemovePolicyMembersReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemovePolicyMembersReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemovePolicyMembersReqMultiError) AllErrors() []error { return m }
 
 // RemovePolicyMembersReqValidationError is the validation error returned by
 // RemovePolicyMembersReq.Validate if the designated constraints aren't met.
@@ -2125,14 +3216,49 @@ var _RemovePolicyMembersReq_Members_Pattern = regexp.MustCompile("^(?:team|user)
 
 // Validate checks the field values on RemovePolicyMembersResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RemovePolicyMembersResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemovePolicyMembersResp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemovePolicyMembersRespMultiError, or nil if none found.
+func (m *RemovePolicyMembersResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemovePolicyMembersResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return RemovePolicyMembersRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// RemovePolicyMembersRespMultiError is an error wrapping multiple validation
+// errors returned by RemovePolicyMembersResp.ValidateAll() if the designated
+// constraints aren't met.
+type RemovePolicyMembersRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemovePolicyMembersRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemovePolicyMembersRespMultiError) AllErrors() []error { return m }
 
 // RemovePolicyMembersRespValidationError is the validation error returned by
 // RemovePolicyMembersResp.Validate if the designated constraints aren't met.
@@ -2191,19 +3317,54 @@ var _ interface {
 } = RemovePolicyMembersRespValidationError{}
 
 // Validate checks the field values on MigrateToV2Req with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *MigrateToV2Req) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MigrateToV2Req with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MigrateToV2ReqMultiError,
+// or nil if none found.
+func (m *MigrateToV2Req) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MigrateToV2Req) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Flag
 
 	// no validation rules for SkipV1Policies
 
+	if len(errors) > 0 {
+		return MigrateToV2ReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// MigrateToV2ReqMultiError is an error wrapping multiple validation errors
+// returned by MigrateToV2Req.ValidateAll() if the designated constraints
+// aren't met.
+type MigrateToV2ReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MigrateToV2ReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MigrateToV2ReqMultiError) AllErrors() []error { return m }
 
 // MigrateToV2ReqValidationError is the validation error returned by
 // MigrateToV2Req.Validate if the designated constraints aren't met.
@@ -2260,15 +3421,50 @@ var _ interface {
 } = MigrateToV2ReqValidationError{}
 
 // Validate checks the field values on MigrateToV2Resp with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *MigrateToV2Resp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MigrateToV2Resp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MigrateToV2RespMultiError, or nil if none found.
+func (m *MigrateToV2Resp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MigrateToV2Resp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return MigrateToV2RespMultiError(errors)
+	}
+
 	return nil
 }
+
+// MigrateToV2RespMultiError is an error wrapping multiple validation errors
+// returned by MigrateToV2Resp.ValidateAll() if the designated constraints
+// aren't met.
+type MigrateToV2RespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MigrateToV2RespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MigrateToV2RespMultiError) AllErrors() []error { return m }
 
 // MigrateToV2RespValidationError is the validation error returned by
 // MigrateToV2Resp.Validate if the designated constraints aren't met.
@@ -2325,15 +3521,49 @@ var _ interface {
 } = MigrateToV2RespValidationError{}
 
 // Validate checks the field values on ResetToV1Req with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ResetToV1Req) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResetToV1Req with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ResetToV1ReqMultiError, or
+// nil if none found.
+func (m *ResetToV1Req) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResetToV1Req) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ResetToV1ReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// ResetToV1ReqMultiError is an error wrapping multiple validation errors
+// returned by ResetToV1Req.ValidateAll() if the designated constraints aren't met.
+type ResetToV1ReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResetToV1ReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResetToV1ReqMultiError) AllErrors() []error { return m }
 
 // ResetToV1ReqValidationError is the validation error returned by
 // ResetToV1Req.Validate if the designated constraints aren't met.
@@ -2390,15 +3620,50 @@ var _ interface {
 } = ResetToV1ReqValidationError{}
 
 // Validate checks the field values on ResetToV1Resp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ResetToV1Resp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResetToV1Resp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ResetToV1RespMultiError, or
+// nil if none found.
+func (m *ResetToV1Resp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResetToV1Resp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ResetToV1RespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ResetToV1RespMultiError is an error wrapping multiple validation errors
+// returned by ResetToV1Resp.ValidateAll() if the designated constraints
+// aren't met.
+type ResetToV1RespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResetToV1RespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResetToV1RespMultiError) AllErrors() []error { return m }
 
 // ResetToV1RespValidationError is the validation error returned by
 // ResetToV1Resp.Validate if the designated constraints aren't met.
@@ -2455,16 +3720,51 @@ var _ interface {
 } = ResetToV1RespValidationError{}
 
 // Validate checks the field values on GetRoleReq with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *GetRoleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetRoleReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetRoleReqMultiError, or
+// nil if none found.
+func (m *GetRoleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetRoleReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return GetRoleReqMultiError(errors)
+	}
 
 	return nil
 }
+
+// GetRoleReqMultiError is an error wrapping multiple validation errors
+// returned by GetRoleReq.ValidateAll() if the designated constraints aren't met.
+type GetRoleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetRoleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetRoleReqMultiError) AllErrors() []error { return m }
 
 // GetRoleReqValidationError is the validation error returned by
 // GetRoleReq.Validate if the designated constraints aren't met.
@@ -2521,27 +3821,49 @@ var _ interface {
 } = GetRoleReqValidationError{}
 
 // Validate checks the field values on CreateRoleReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *CreateRoleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreateRoleReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CreateRoleReqMultiError, or
+// nil if none found.
+func (m *CreateRoleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateRoleReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_CreateRoleReq_Id_Pattern.MatchString(m.GetId()) {
-		return CreateRoleReqValidationError{
+		err := CreateRoleReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for Name
 
 	if len(m.GetActions()) < 1 {
-		return CreateRoleReqValidationError{
+		err := CreateRoleReqValidationError{
 			field:  "Actions",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_CreateRoleReq_Actions_Unique := make(map[string]struct{}, len(m.GetActions()))
@@ -2550,19 +3872,27 @@ func (m *CreateRoleReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _CreateRoleReq_Actions_Unique[item]; exists {
-			return CreateRoleReqValidationError{
+			err := CreateRoleReqValidationError{
 				field:  fmt.Sprintf("Actions[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_CreateRoleReq_Actions_Unique[item] = struct{}{}
 		}
 
 		if !_CreateRoleReq_Actions_Pattern.MatchString(item) {
-			return CreateRoleReqValidationError{
+			err := CreateRoleReqValidationError{
 				field:  fmt.Sprintf("Actions[%v]", idx),
 				reason: "value does not match regex pattern \"^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -2573,10 +3903,14 @@ func (m *CreateRoleReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _CreateRoleReq_Projects_Unique[item]; exists {
-			return CreateRoleReqValidationError{
+			err := CreateRoleReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_CreateRoleReq_Projects_Unique[item] = struct{}{}
 		}
@@ -2584,8 +3918,29 @@ func (m *CreateRoleReq) Validate() error {
 		// no validation rules for Projects[idx]
 	}
 
+	if len(errors) > 0 {
+		return CreateRoleReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// CreateRoleReqMultiError is an error wrapping multiple validation errors
+// returned by CreateRoleReq.ValidateAll() if the designated constraints
+// aren't met.
+type CreateRoleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateRoleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateRoleReqMultiError) AllErrors() []error { return m }
 
 // CreateRoleReqValidationError is the validation error returned by
 // CreateRoleReq.Validate if the designated constraints aren't met.
@@ -2647,21 +4002,60 @@ var _CreateRoleReq_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-
 
 // Validate checks the field values on PurgeSubjectFromPoliciesReq with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *PurgeSubjectFromPoliciesReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PurgeSubjectFromPoliciesReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PurgeSubjectFromPoliciesReqMultiError, or nil if none found.
+func (m *PurgeSubjectFromPoliciesReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PurgeSubjectFromPoliciesReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_PurgeSubjectFromPoliciesReq_Subject_Pattern.MatchString(m.GetSubject()) {
-		return PurgeSubjectFromPoliciesReqValidationError{
+		err := PurgeSubjectFromPoliciesReqValidationError{
 			field:  "Subject",
 			reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|service):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return PurgeSubjectFromPoliciesReqMultiError(errors)
 	}
 
 	return nil
 }
+
+// PurgeSubjectFromPoliciesReqMultiError is an error wrapping multiple
+// validation errors returned by PurgeSubjectFromPoliciesReq.ValidateAll() if
+// the designated constraints aren't met.
+type PurgeSubjectFromPoliciesReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PurgeSubjectFromPoliciesReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PurgeSubjectFromPoliciesReqMultiError) AllErrors() []error { return m }
 
 // PurgeSubjectFromPoliciesReqValidationError is the validation error returned
 // by PurgeSubjectFromPoliciesReq.Validate if the designated constraints
@@ -2724,14 +4118,49 @@ var _PurgeSubjectFromPoliciesReq_Subject_Pattern = regexp.MustCompile("^(?:team|
 
 // Validate checks the field values on PurgeSubjectFromPoliciesResp with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *PurgeSubjectFromPoliciesResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PurgeSubjectFromPoliciesResp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PurgeSubjectFromPoliciesRespMultiError, or nil if none found.
+func (m *PurgeSubjectFromPoliciesResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PurgeSubjectFromPoliciesResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return PurgeSubjectFromPoliciesRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// PurgeSubjectFromPoliciesRespMultiError is an error wrapping multiple
+// validation errors returned by PurgeSubjectFromPoliciesResp.ValidateAll() if
+// the designated constraints aren't met.
+type PurgeSubjectFromPoliciesRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PurgeSubjectFromPoliciesRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PurgeSubjectFromPoliciesRespMultiError) AllErrors() []error { return m }
 
 // PurgeSubjectFromPoliciesRespValidationError is the validation error returned
 // by PurgeSubjectFromPoliciesResp.Validate if the designated constraints
