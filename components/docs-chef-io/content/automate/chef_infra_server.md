@@ -38,6 +38,8 @@ The objects that you can manage from the Chef Infra Server are:
 
 ## Connect Chef Infra Servers to Chef Automate
 
+{{< note >}} Check the article [Adding the Chef Infra Server view to Chef Automate UI](https://community.progress.com/s/article/Adding-Chef-Infra-server-view-to-Chef-Automate-UI) to see the method to automate the process of adding the Chef Infra Server view to Chef Automate UI. {{< /note >}}
+
 The _Chef Infra Server_ panel starts with an empty list of servers.
 
 To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN, and IP address of your Chef Infra Server:
