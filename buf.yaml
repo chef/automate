@@ -52,6 +52,7 @@ build:
   - protovendor/github.com/envoyproxy/protoc-gen-validate/java/
   - protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party
   - protovendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
+
 lint:
   allow_comment_ignores: true
   use:
@@ -441,6 +442,7 @@ breaking:
   # This linter requires your proto package names to end with .v1 or similar.
   # Adopting this for existing code would break anyone using our protos
   - FILE_NO_DELETE
+  - RESERVED_MESSAGE_NO_DELETE
   ignore:
   # Changes to interservice APIs are okay until (if ever) we support clusters
   # of interconnected internal services that would not upgrade in unison
