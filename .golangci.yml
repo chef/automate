@@ -11,65 +11,71 @@ linters-settings:
     simplify: false
   godox:
     keywords:
-      - NOCOMMIT
+    - NOCOMMIT
   govet:
     disable:
-      - assign
-      - atomic
-      - copylocks
+    - assign
+    - atomic
+    - copylocks
 
 linters:
   enable-all: true
   disable:
-    - bodyclose
-    - dogsled
-    - dupl
-    - funlen
-    - gocognit
-    - goconst
-    - godot
-    - goerr113
-    - goimports
-    - gomnd
-    - goprintffuncname
-    - maligned
-    - megacheck
-    - nestif
-    - nolintlint
-    - interfacer
-    - golint
-    - gas
-    - gochecknoglobals
-    - gochecknoinits
-    - gocritic
-    - rowserrcheck # too many false positives as of Feb 2021
-    - scopelint
-    - stylecheck
-    - unparam
-    - lll
-    - whitespace
-    - wsl
-    - gci
-    - gofumpt
-    - gofmt
-    - gomoddirectives
-    - revive
-    - containedctx
-    - cyclop
-    - errorlint
-    - exhaustive
-    - exhaustivestruct
-    - forcetypeassert
-    - nlreturn
-    - nosnakecase
-    - tagliatelle
-    - varnamelen
-    - wrapcheck
-    - exhaustruct
-    - interfacebloat
-    - ireturn
-    - makezero
-    - maintidx
-    - nilerr
-    - nonamedreturns
-    - predeclared
+  - bodyclose
+  - dogsled
+  - dupl
+  - funlen
+  - gocognit
+  - goconst
+  - godot
+  - goerr113
+  - goimports
+  - gomnd
+  - goprintffuncname
+  - maligned
+  - megacheck
+  - nestif
+  - nolintlint
+  - interfacer
+  - golint
+  - gas
+  - gochecknoglobals
+  - gochecknoinits
+  - gocritic
+  - rowserrcheck # too many false positives as of Feb 2021
+  - scopelint
+  - stylecheck
+  - unparam
+  - lll
+  - whitespace
+  - wsl
+  - gci
+  - gofumpt
+  - gofmt
+  - gomoddirectives
+  - revive
+  - containedctx
+  - cyclop
+  - errorlint
+  - exhaustive
+  - exhaustivestruct
+  - forcetypeassert
+  - nlreturn
+  - nosnakecase
+  - tagliatelle
+  - varnamelen
+  - wrapcheck
+  - exhaustruct
+  - interfacebloat
+  - ireturn
+  - makezero
+  - maintidx
+  - nilerr
+  - nonamedreturns
+  - predeclared
+  - protogetter
+  - tagalign
+  - depguard
+  - govet
+  - inamedparam
+  - mnd
