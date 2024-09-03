@@ -5,7 +5,7 @@ export HAB_ORIGIN=${HAB_ORIGIN:-chef}
 # Bring studio-common to life
 RECOMMENDED_HAB_VERSION="1.6.521"
 
-GOLANGCILINTVERSION=1.60.3
+GOLANGCILINTVERSION=1.50.1
 
 # TODO(ssd) 2019-11-19: https://github.com/habitat-sh/habitat/issues/7219
 unset SSL_CERT_FILE
