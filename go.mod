@@ -24,7 +24,7 @@ require (
 	github.com/dave/jennifer v1.7.0
 	github.com/dexidp/dex v2.35.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/envoyproxy/protoc-gen-validate v0.10.0-SNAPSHOT.8
+	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/fatih/color v1.17.0
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 	github.com/go-chef/chef v0.30.1
@@ -91,9 +91,9 @@ require (
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.17.0
-	google.golang.org/api v0.112.0
-	google.golang.org/genproto v0.0.0-20230303212802-e74f57abe488
-	google.golang.org/grpc v1.55.0-dev
+	google.golang.org/api v0.109.0
+	google.golang.org/genproto v0.0.0-20230113154510-dbe35b8444a5
+	google.golang.org/grpc v1.53.0-dev
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
@@ -132,7 +132,7 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v0.13.0 // indirect
+	cloud.google.com/go/iam v0.10.0 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
@@ -156,8 +156,8 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.110.0 // indirect
-	cloud.google.com/go/storage v1.30.0
+	cloud.google.com/go v0.109.0 // indirect
+	cloud.google.com/go/storage v1.29.0
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.6 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
@@ -192,7 +192,7 @@ require (
 	github.com/golang/glog v1.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/wire v0.6.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
