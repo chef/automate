@@ -27,7 +27,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -49,7 +49,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -89,7 +89,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -120,7 +120,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -151,7 +151,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -209,6 +209,7 @@ func init() {
         },
         "active": {
           "type": "boolean",
+          "format": "boolean",
           "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "value": {
@@ -315,6 +316,7 @@ func init() {
         },
         "active": {
           "type": "boolean",
+          "format": "boolean",
           "description": "Active state. Defaults to true.\nIf set to false, token will not authenticate."
         },
         "created_at": {
@@ -355,6 +357,7 @@ func init() {
         },
         "active": {
           "type": "boolean",
+          "format": "boolean",
           "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "projects": {

@@ -26,7 +26,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -59,7 +59,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -92,7 +92,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -115,7 +115,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -148,7 +148,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -181,7 +181,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -214,7 +214,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -237,7 +237,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -270,7 +270,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -303,7 +303,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -326,7 +326,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -358,7 +358,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -390,7 +390,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -423,7 +423,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -446,7 +446,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -476,7 +476,8 @@ func init() {
           "type": "string"
         },
         "disabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -487,7 +488,8 @@ func init() {
           "type": "string"
         },
         "disabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "older_than_days": {
           "type": "integer",
@@ -563,7 +565,8 @@ func init() {
           "type": "string"
         },
         "disabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "recurrence": {
           "type": "string"
@@ -584,7 +587,8 @@ func init() {
           "type": "string"
         },
         "disabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "recurrence": {
           "type": "string"
@@ -624,7 +628,8 @@ func init() {
           "type": "string"
         },
         "disabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -635,7 +640,8 @@ func init() {
           "type": "string"
         },
         "disabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
