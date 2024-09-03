@@ -79,3 +79,4 @@ linters:
   - govet
   - inamedparam
   - mnd
+  - perfsprint
