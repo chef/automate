@@ -11,12 +11,11 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"google.golang.org/protobuf/types/known/anypb"
+	"github.com/golang/protobuf/ptypes"
 )
 
 // ensure the imports are used
@@ -31,41 +30,25 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = anypb.Any{}
-	_ = sort.Sort
+	_ = ptypes.DynamicAny{}
 )
 
+// define the regex for a UUID once up-front
+var _tokens_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // Validate checks the field values on CreateTokenReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
 func (m *CreateTokenReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on CreateTokenReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in CreateTokenReqMultiError,
-// or nil if none found.
-func (m *CreateTokenReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *CreateTokenReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	if !_CreateTokenReq_Id_Pattern.MatchString(m.GetId()) {
-		err := CreateTokenReqValidationError{
+		return CreateTokenReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	// no validation rules for Name
@@ -78,54 +61,25 @@ func (m *CreateTokenReq) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _CreateTokenReq_Projects_Unique[item]; exists {
-			err := CreateTokenReqValidationError{
+			return CreateTokenReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_CreateTokenReq_Projects_Unique[item] = struct{}{}
 		}
 
 		if !_CreateTokenReq_Projects_Pattern.MatchString(item) {
-			err := CreateTokenReqValidationError{
+			return CreateTokenReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
-	if len(errors) > 0 {
-		return CreateTokenReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// CreateTokenReqMultiError is an error wrapping multiple validation errors
-// returned by CreateTokenReq.ValidateAll() if the designated constraints
-// aren't met.
-type CreateTokenReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m CreateTokenReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m CreateTokenReqMultiError) AllErrors() []error { return m }
 
 // CreateTokenReqValidationError is the validation error returned by
 // CreateTokenReq.Validate if the designated constraints aren't met.
@@ -187,25 +141,11 @@ var _CreateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on CreateTokenWithValueReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *CreateTokenWithValueReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on CreateTokenWithValueReq with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// CreateTokenWithValueReqMultiError, or nil if none found.
-func (m *CreateTokenWithValueReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *CreateTokenWithValueReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
-
-	var errors []error
 
 	// no validation rules for Id
 
@@ -221,54 +161,25 @@ func (m *CreateTokenWithValueReq) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _CreateTokenWithValueReq_Projects_Unique[item]; exists {
-			err := CreateTokenWithValueReqValidationError{
+			return CreateTokenWithValueReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_CreateTokenWithValueReq_Projects_Unique[item] = struct{}{}
 		}
 
 		if !_CreateTokenWithValueReq_Projects_Pattern.MatchString(item) {
-			err := CreateTokenWithValueReqValidationError{
+			return CreateTokenWithValueReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
-	if len(errors) > 0 {
-		return CreateTokenWithValueReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// CreateTokenWithValueReqMultiError is an error wrapping multiple validation
-// errors returned by CreateTokenWithValueReq.ValidateAll() if the designated
-// constraints aren't met.
-type CreateTokenWithValueReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m CreateTokenWithValueReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m CreateTokenWithValueReqMultiError) AllErrors() []error { return m }
 
 // CreateTokenWithValueReqValidationError is the validation error returned by
 // CreateTokenWithValueReq.Validate if the designated constraints aren't met.
@@ -329,26 +240,12 @@ var _ interface {
 var _CreateTokenWithValueReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on UpdateTokenReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
 func (m *UpdateTokenReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on UpdateTokenReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UpdateTokenReqMultiError,
-// or nil if none found.
-func (m *UpdateTokenReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *UpdateTokenReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
-
-	var errors []error
 
 	// no validation rules for Id
 
@@ -362,54 +259,25 @@ func (m *UpdateTokenReq) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _UpdateTokenReq_Projects_Unique[item]; exists {
-			err := UpdateTokenReqValidationError{
+			return UpdateTokenReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_UpdateTokenReq_Projects_Unique[item] = struct{}{}
 		}
 
 		if !_UpdateTokenReq_Projects_Pattern.MatchString(item) {
-			err := UpdateTokenReqValidationError{
+			return UpdateTokenReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
-	if len(errors) > 0 {
-		return UpdateTokenReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// UpdateTokenReqMultiError is an error wrapping multiple validation errors
-// returned by UpdateTokenReq.ValidateAll() if the designated constraints
-// aren't met.
-type UpdateTokenReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m UpdateTokenReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m UpdateTokenReqMultiError) AllErrors() []error { return m }
 
 // UpdateTokenReqValidationError is the validation error returned by
 // UpdateTokenReq.Validate if the designated constraints aren't met.
@@ -468,25 +336,11 @@ var _ interface {
 var _UpdateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on Token with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// proto definition for this message. If any rules are violated, an error is returned.
 func (m *Token) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Token with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in TokenMultiError, or nil if none found.
-func (m *Token) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Token) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
-
-	var errors []error
 
 	// no validation rules for Id
 
@@ -500,28 +354,8 @@ func (m *Token) validate(all bool) error {
 
 	// no validation rules for Updated
 
-	if len(errors) > 0 {
-		return TokenMultiError(errors)
-	}
-
 	return nil
 }
-
-// TokenMultiError is an error wrapping multiple validation errors returned by
-// Token.ValidateAll() if the designated constraints aren't met.
-type TokenMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m TokenMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m TokenMultiError) AllErrors() []error { return m }
 
 // TokenValidationError is the validation error returned by Token.Validate if
 // the designated constraints aren't met.
@@ -578,49 +412,16 @@ var _ interface {
 } = TokenValidationError{}
 
 // Validate checks the field values on Tokens with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// proto definition for this message. If any rules are violated, an error is returned.
 func (m *Tokens) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Tokens with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in TokensMultiError, or nil if none found.
-func (m *Tokens) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Tokens) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	for idx, item := range m.GetTokens() {
 		_, _ = idx, item
 
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, TokensValidationError{
-						field:  fmt.Sprintf("Tokens[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, TokensValidationError{
-						field:  fmt.Sprintf("Tokens[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TokensValidationError{
 					field:  fmt.Sprintf("Tokens[%v]", idx),
@@ -632,28 +433,8 @@ func (m *Tokens) validate(all bool) error {
 
 	}
 
-	if len(errors) > 0 {
-		return TokensMultiError(errors)
-	}
-
 	return nil
 }
-
-// TokensMultiError is an error wrapping multiple validation errors returned by
-// Tokens.ValidateAll() if the designated constraints aren't met.
-type TokensMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m TokensMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m TokensMultiError) AllErrors() []error { return m }
 
 // TokensValidationError is the validation error returned by Tokens.Validate if
 // the designated constraints aren't met.
@@ -710,50 +491,16 @@ var _ interface {
 } = TokensValidationError{}
 
 // Validate checks the field values on Value with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// proto definition for this message. If any rules are violated, an error is returned.
 func (m *Value) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Value with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in ValueMultiError, or nil if none found.
-func (m *Value) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Value) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	// no validation rules for Value
-
-	if len(errors) > 0 {
-		return ValueMultiError(errors)
-	}
 
 	return nil
 }
-
-// ValueMultiError is an error wrapping multiple validation errors returned by
-// Value.ValidateAll() if the designated constraints aren't met.
-type ValueMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ValueMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ValueMultiError) AllErrors() []error { return m }
 
 // ValueValidationError is the validation error returned by Value.Validate if
 // the designated constraints aren't met.
@@ -810,51 +557,17 @@ var _ interface {
 } = ValueValidationError{}
 
 // Validate checks the field values on GetTokenReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
 func (m *GetTokenReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetTokenReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetTokenReqMultiError, or
-// nil if none found.
-func (m *GetTokenReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetTokenReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	// no validation rules for Id
-
-	if len(errors) > 0 {
-		return GetTokenReqMultiError(errors)
-	}
 
 	return nil
 }
-
-// GetTokenReqMultiError is an error wrapping multiple validation errors
-// returned by GetTokenReq.ValidateAll() if the designated constraints aren't met.
-type GetTokenReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetTokenReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetTokenReqMultiError) AllErrors() []error { return m }
 
 // GetTokenReqValidationError is the validation error returned by
 // GetTokenReq.Validate if the designated constraints aren't met.
@@ -911,49 +624,15 @@ var _ interface {
 } = GetTokenReqValidationError{}
 
 // Validate checks the field values on GetTokensReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
 func (m *GetTokensReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetTokensReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetTokensReqMultiError, or
-// nil if none found.
-func (m *GetTokensReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetTokensReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
-	if len(errors) > 0 {
-		return GetTokensReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// GetTokensReqMultiError is an error wrapping multiple validation errors
-// returned by GetTokensReq.ValidateAll() if the designated constraints aren't met.
-type GetTokensReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetTokensReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetTokensReqMultiError) AllErrors() []error { return m }
 
 // GetTokensReqValidationError is the validation error returned by
 // GetTokensReq.Validate if the designated constraints aren't met.
@@ -1010,52 +689,17 @@ var _ interface {
 } = GetTokensReqValidationError{}
 
 // Validate checks the field values on DeleteTokenReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
 func (m *DeleteTokenReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on DeleteTokenReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in DeleteTokenReqMultiError,
-// or nil if none found.
-func (m *DeleteTokenReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *DeleteTokenReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	// no validation rules for Id
-
-	if len(errors) > 0 {
-		return DeleteTokenReqMultiError(errors)
-	}
 
 	return nil
 }
-
-// DeleteTokenReqMultiError is an error wrapping multiple validation errors
-// returned by DeleteTokenReq.ValidateAll() if the designated constraints
-// aren't met.
-type DeleteTokenReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DeleteTokenReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DeleteTokenReqMultiError) AllErrors() []error { return m }
 
 // DeleteTokenReqValidationError is the validation error returned by
 // DeleteTokenReq.Validate if the designated constraints aren't met.
@@ -1112,50 +756,15 @@ var _ interface {
 } = DeleteTokenReqValidationError{}
 
 // Validate checks the field values on DeleteTokenResp with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
 func (m *DeleteTokenResp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on DeleteTokenResp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// DeleteTokenRespMultiError, or nil if none found.
-func (m *DeleteTokenResp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *DeleteTokenResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
-	if len(errors) > 0 {
-		return DeleteTokenRespMultiError(errors)
-	}
-
 	return nil
 }
-
-// DeleteTokenRespMultiError is an error wrapping multiple validation errors
-// returned by DeleteTokenResp.ValidateAll() if the designated constraints
-// aren't met.
-type DeleteTokenRespMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DeleteTokenRespMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DeleteTokenRespMultiError) AllErrors() []error { return m }
 
 // DeleteTokenRespValidationError is the validation error returned by
 // DeleteTokenResp.Validate if the designated constraints aren't met.
