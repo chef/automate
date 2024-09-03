@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
-	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/grpc-ecosystem/grpc-gateway v1.14.8
 )
 
 require (
