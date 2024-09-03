@@ -5,7 +5,6 @@ export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
 export GOPROXY=https://proxy.golang.org,direct  
-
 export GOSUMDB="sum.golang.org"
 
 desired_golang_version() {
