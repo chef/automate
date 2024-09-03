@@ -30,7 +30,7 @@ export GATEWAY_PORT=2000
 # Compiling with cgo require gcc to be in our path. We don't typically
 # use cgo so we set CGO_ENABLED=0 by default in the studio.
 export CGO_ENABLED=0
-export GOPROXY=https://proxy.golang.org,direct  
+export GOPROXY="https://proxy.golang.org,direct" 
 export GOSUMDB="sum.golang.org"
 
 # Go >= 1.13 will assume this but we have tools like protoc extensions that
