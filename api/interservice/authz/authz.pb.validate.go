@@ -11,12 +11,11 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"google.golang.org/protobuf/types/known/anypb"
+	"github.com/golang/protobuf/ptypes"
 )
 
 // ensure the imports are used
@@ -31,104 +30,55 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = anypb.Any{}
-	_ = sort.Sort
+	_ = ptypes.DynamicAny{}
 )
 
+// define the regex for a UUID once up-front
+var _authz_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // Validate checks the field values on IsAuthorizedReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
 func (m *IsAuthorizedReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on IsAuthorizedReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// IsAuthorizedReqMultiError, or nil if none found.
-func (m *IsAuthorizedReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *IsAuthorizedReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	if len(m.GetSubjects()) < 1 {
-		err := IsAuthorizedReqValidationError{
+		return IsAuthorizedReqValidationError{
 			field:  "Subjects",
 			reason: "value must contain at least 1 item(s)",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetSubjects() {
 		_, _ = idx, item
 
 		if !_IsAuthorizedReq_Subjects_Pattern.MatchString(item) {
-			err := IsAuthorizedReqValidationError{
+			return IsAuthorizedReqValidationError{
 				field:  fmt.Sprintf("Subjects[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
 	if !_IsAuthorizedReq_Resource_Pattern.MatchString(m.GetResource()) {
-		err := IsAuthorizedReqValidationError{
+		return IsAuthorizedReqValidationError{
 			field:  "Resource",
 			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if !_IsAuthorizedReq_Action_Pattern.MatchString(m.GetAction()) {
-		err := IsAuthorizedReqValidationError{
+		return IsAuthorizedReqValidationError{
 			field:  "Action",
 			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return IsAuthorizedReqMultiError(errors)
 	}
 
 	return nil
 }
-
-// IsAuthorizedReqMultiError is an error wrapping multiple validation errors
-// returned by IsAuthorizedReq.ValidateAll() if the designated constraints
-// aren't met.
-type IsAuthorizedReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m IsAuthorizedReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m IsAuthorizedReqMultiError) AllErrors() []error { return m }
 
 // IsAuthorizedReqValidationError is the validation error returned by
 // IsAuthorizedReq.Validate if the designated constraints aren't met.
@@ -191,50 +141,15 @@ var _IsAuthorizedReq_Resource_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*
 var _IsAuthorizedReq_Action_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*$")
 
 // Validate checks the field values on GetVersionReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
 func (m *GetVersionReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetVersionReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetVersionReqMultiError, or
-// nil if none found.
-func (m *GetVersionReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetVersionReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
-	if len(errors) > 0 {
-		return GetVersionReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// GetVersionReqMultiError is an error wrapping multiple validation errors
-// returned by GetVersionReq.ValidateAll() if the designated constraints
-// aren't met.
-type GetVersionReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetVersionReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetVersionReqMultiError) AllErrors() []error { return m }
 
 // GetVersionReqValidationError is the validation error returned by
 // GetVersionReq.Validate if the designated constraints aren't met.
@@ -292,73 +207,43 @@ var _ interface {
 
 // Validate checks the field values on ProjectsAuthorizedReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *ProjectsAuthorizedReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on ProjectsAuthorizedReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// ProjectsAuthorizedReqMultiError, or nil if none found.
-func (m *ProjectsAuthorizedReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *ProjectsAuthorizedReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	if len(m.GetSubjects()) < 1 {
-		err := ProjectsAuthorizedReqValidationError{
+		return ProjectsAuthorizedReqValidationError{
 			field:  "Subjects",
 			reason: "value must contain at least 1 item(s)",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetSubjects() {
 		_, _ = idx, item
 
 		if !_ProjectsAuthorizedReq_Subjects_Pattern.MatchString(item) {
-			err := ProjectsAuthorizedReqValidationError{
+			return ProjectsAuthorizedReqValidationError{
 				field:  fmt.Sprintf("Subjects[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
 	if !_ProjectsAuthorizedReq_Resource_Pattern.MatchString(m.GetResource()) {
-		err := ProjectsAuthorizedReqValidationError{
+		return ProjectsAuthorizedReqValidationError{
 			field:  "Resource",
 			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if !_ProjectsAuthorizedReq_Action_Pattern.MatchString(m.GetAction()) {
-		err := ProjectsAuthorizedReqValidationError{
+		return ProjectsAuthorizedReqValidationError{
 			field:  "Action",
 			reason: "value does not match regex pattern \"^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	_ProjectsAuthorizedReq_ProjectsFilter_Unique := make(map[string]struct{}, len(m.GetProjectsFilter()))
@@ -367,54 +252,25 @@ func (m *ProjectsAuthorizedReq) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _ProjectsAuthorizedReq_ProjectsFilter_Unique[item]; exists {
-			err := ProjectsAuthorizedReqValidationError{
+			return ProjectsAuthorizedReqValidationError{
 				field:  fmt.Sprintf("ProjectsFilter[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_ProjectsAuthorizedReq_ProjectsFilter_Unique[item] = struct{}{}
 		}
 
 		if !_ProjectsAuthorizedReq_ProjectsFilter_Pattern.MatchString(item) {
-			err := ProjectsAuthorizedReqValidationError{
+			return ProjectsAuthorizedReqValidationError{
 				field:  fmt.Sprintf("ProjectsFilter[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
-	if len(errors) > 0 {
-		return ProjectsAuthorizedReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// ProjectsAuthorizedReqMultiError is an error wrapping multiple validation
-// errors returned by ProjectsAuthorizedReq.ValidateAll() if the designated
-// constraints aren't met.
-type ProjectsAuthorizedReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ProjectsAuthorizedReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ProjectsAuthorizedReqMultiError) AllErrors() []error { return m }
 
 // ProjectsAuthorizedReqValidationError is the validation error returned by
 // ProjectsAuthorizedReq.Validate if the designated constraints aren't met.
@@ -482,25 +338,11 @@ var _ProjectsAuthorizedReq_ProjectsFilter_Pattern = regexp.MustCompile("^[a-z0-9
 
 // Validate checks the field values on ProjectsAuthorizedResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *ProjectsAuthorizedResp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on ProjectsAuthorizedResp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// ProjectsAuthorizedRespMultiError, or nil if none found.
-func (m *ProjectsAuthorizedResp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *ProjectsAuthorizedResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
-
-	var errors []error
 
 	_ProjectsAuthorizedResp_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
 
@@ -508,54 +350,25 @@ func (m *ProjectsAuthorizedResp) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _ProjectsAuthorizedResp_Projects_Unique[item]; exists {
-			err := ProjectsAuthorizedRespValidationError{
+			return ProjectsAuthorizedRespValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_ProjectsAuthorizedResp_Projects_Unique[item] = struct{}{}
 		}
 
 		if !_ProjectsAuthorizedResp_Projects_Pattern.MatchString(item) {
-			err := ProjectsAuthorizedRespValidationError{
+			return ProjectsAuthorizedRespValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
-	if len(errors) > 0 {
-		return ProjectsAuthorizedRespMultiError(errors)
-	}
-
 	return nil
 }
-
-// ProjectsAuthorizedRespMultiError is an error wrapping multiple validation
-// errors returned by ProjectsAuthorizedResp.ValidateAll() if the designated
-// constraints aren't met.
-type ProjectsAuthorizedRespMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ProjectsAuthorizedRespMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ProjectsAuthorizedRespMultiError) AllErrors() []error { return m }
 
 // ProjectsAuthorizedRespValidationError is the validation error returned by
 // ProjectsAuthorizedResp.Validate if the designated constraints aren't met.
@@ -617,49 +430,27 @@ var _ProjectsAuthorizedResp_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1
 
 // Validate checks the field values on FilterAuthorizedPairsReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *FilterAuthorizedPairsReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FilterAuthorizedPairsReq with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FilterAuthorizedPairsReqMultiError, or nil if none found.
-func (m *FilterAuthorizedPairsReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FilterAuthorizedPairsReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	if len(m.GetSubjects()) < 1 {
-		err := FilterAuthorizedPairsReqValidationError{
+		return FilterAuthorizedPairsReqValidationError{
 			field:  "Subjects",
 			reason: "value must contain at least 1 item(s)",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetSubjects() {
 		_, _ = idx, item
 
 		if !_FilterAuthorizedPairsReq_Subjects_Pattern.MatchString(item) {
-			err := FilterAuthorizedPairsReqValidationError{
+			return FilterAuthorizedPairsReqValidationError{
 				field:  fmt.Sprintf("Subjects[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
@@ -667,26 +458,7 @@ func (m *FilterAuthorizedPairsReq) validate(all bool) error {
 	for idx, item := range m.GetPairs() {
 		_, _ = idx, item
 
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FilterAuthorizedPairsReqValidationError{
-						field:  fmt.Sprintf("Pairs[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FilterAuthorizedPairsReqValidationError{
-						field:  fmt.Sprintf("Pairs[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FilterAuthorizedPairsReqValidationError{
 					field:  fmt.Sprintf("Pairs[%v]", idx),
@@ -698,29 +470,8 @@ func (m *FilterAuthorizedPairsReq) validate(all bool) error {
 
 	}
 
-	if len(errors) > 0 {
-		return FilterAuthorizedPairsReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// FilterAuthorizedPairsReqMultiError is an error wrapping multiple validation
-// errors returned by FilterAuthorizedPairsReq.ValidateAll() if the designated
-// constraints aren't met.
-type FilterAuthorizedPairsReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FilterAuthorizedPairsReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FilterAuthorizedPairsReqMultiError) AllErrors() []error { return m }
 
 // FilterAuthorizedPairsReqValidationError is the validation error returned by
 // FilterAuthorizedPairsReq.Validate if the designated constraints aren't met.
@@ -782,49 +533,16 @@ var _FilterAuthorizedPairsReq_Subjects_Pattern = regexp.MustCompile("^(?:(?:team
 
 // Validate checks the field values on FilterAuthorizedPairsResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *FilterAuthorizedPairsResp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FilterAuthorizedPairsResp with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FilterAuthorizedPairsRespMultiError, or nil if none found.
-func (m *FilterAuthorizedPairsResp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FilterAuthorizedPairsResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	for idx, item := range m.GetPairs() {
 		_, _ = idx, item
 
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FilterAuthorizedPairsRespValidationError{
-						field:  fmt.Sprintf("Pairs[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FilterAuthorizedPairsRespValidationError{
-						field:  fmt.Sprintf("Pairs[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FilterAuthorizedPairsRespValidationError{
 					field:  fmt.Sprintf("Pairs[%v]", idx),
@@ -836,29 +554,8 @@ func (m *FilterAuthorizedPairsResp) validate(all bool) error {
 
 	}
 
-	if len(errors) > 0 {
-		return FilterAuthorizedPairsRespMultiError(errors)
-	}
-
 	return nil
 }
-
-// FilterAuthorizedPairsRespMultiError is an error wrapping multiple validation
-// errors returned by FilterAuthorizedPairsResp.ValidateAll() if the
-// designated constraints aren't met.
-type FilterAuthorizedPairsRespMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FilterAuthorizedPairsRespMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FilterAuthorizedPairsRespMultiError) AllErrors() []error { return m }
 
 // FilterAuthorizedPairsRespValidationError is the validation error returned by
 // FilterAuthorizedPairsResp.Validate if the designated constraints aren't met.
@@ -917,70 +614,28 @@ var _ interface {
 } = FilterAuthorizedPairsRespValidationError{}
 
 // Validate checks the field values on Pair with the rules defined in the proto
-// definition for this message. If any rules are violated, the first error
-// encountered is returned, or nil if there are no violations.
+// definition for this message. If any rules are violated, an error is returned.
 func (m *Pair) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Pair with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in PairMultiError, or nil if none found.
-func (m *Pair) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Pair) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	if !_Pair_Resource_Pattern.MatchString(m.GetResource()) {
-		err := PairValidationError{
+		return PairValidationError{
 			field:  "Resource",
 			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if !_Pair_Action_Pattern.MatchString(m.GetAction()) {
-		err := PairValidationError{
+		return PairValidationError{
 			field:  "Action",
 			reason: "value does not match regex pattern \"^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$\"",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return PairMultiError(errors)
 	}
 
 	return nil
 }
-
-// PairMultiError is an error wrapping multiple validation errors returned by
-// Pair.ValidateAll() if the designated constraints aren't met.
-type PairMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m PairMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m PairMultiError) AllErrors() []error { return m }
 
 // PairValidationError is the validation error returned by Pair.Validate if the
 // designated constraints aren't met.
@@ -1042,76 +697,33 @@ var _Pair_Action_Pattern = regexp.MustCompile("^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*
 
 // Validate checks the field values on FilterAuthorizedProjectsReq with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *FilterAuthorizedProjectsReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FilterAuthorizedProjectsReq with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FilterAuthorizedProjectsReqMultiError, or nil if none found.
-func (m *FilterAuthorizedProjectsReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FilterAuthorizedProjectsReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
 	if len(m.GetSubjects()) < 1 {
-		err := FilterAuthorizedProjectsReqValidationError{
+		return FilterAuthorizedProjectsReqValidationError{
 			field:  "Subjects",
 			reason: "value must contain at least 1 item(s)",
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetSubjects() {
 		_, _ = idx, item
 
 		if !_FilterAuthorizedProjectsReq_Subjects_Pattern.MatchString(item) {
-			err := FilterAuthorizedProjectsReqValidationError{
+			return FilterAuthorizedProjectsReqValidationError{
 				field:  fmt.Sprintf("Subjects[%v]", idx),
 				reason: "value does not match regex pattern \"^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
-	if len(errors) > 0 {
-		return FilterAuthorizedProjectsReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// FilterAuthorizedProjectsReqMultiError is an error wrapping multiple
-// validation errors returned by FilterAuthorizedProjectsReq.ValidateAll() if
-// the designated constraints aren't met.
-type FilterAuthorizedProjectsReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FilterAuthorizedProjectsReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FilterAuthorizedProjectsReqMultiError) AllErrors() []error { return m }
 
 // FilterAuthorizedProjectsReqValidationError is the validation error returned
 // by FilterAuthorizedProjectsReq.Validate if the designated constraints
@@ -1174,49 +786,14 @@ var _FilterAuthorizedProjectsReq_Subjects_Pattern = regexp.MustCompile("^(?:(?:t
 
 // Validate checks the field values on FilterAuthorizedProjectsResp with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *FilterAuthorizedProjectsResp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FilterAuthorizedProjectsResp with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FilterAuthorizedProjectsRespMultiError, or nil if none found.
-func (m *FilterAuthorizedProjectsResp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FilterAuthorizedProjectsResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
-	if len(errors) > 0 {
-		return FilterAuthorizedProjectsRespMultiError(errors)
-	}
-
 	return nil
 }
-
-// FilterAuthorizedProjectsRespMultiError is an error wrapping multiple
-// validation errors returned by FilterAuthorizedProjectsResp.ValidateAll() if
-// the designated constraints aren't met.
-type FilterAuthorizedProjectsRespMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FilterAuthorizedProjectsRespMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FilterAuthorizedProjectsRespMultiError) AllErrors() []error { return m }
 
 // FilterAuthorizedProjectsRespValidationError is the validation error returned
 // by FilterAuthorizedProjectsResp.Validate if the designated constraints
@@ -1277,25 +854,11 @@ var _ interface {
 
 // Validate checks the field values on ValidateProjectAssignmentReq with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *ValidateProjectAssignmentReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on ValidateProjectAssignmentReq with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// ValidateProjectAssignmentReqMultiError, or nil if none found.
-func (m *ValidateProjectAssignmentReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *ValidateProjectAssignmentReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
-
-	var errors []error
 
 	_ValidateProjectAssignmentReq_OldProjects_Unique := make(map[string]struct{}, len(m.GetOldProjects()))
 
@@ -1303,27 +866,19 @@ func (m *ValidateProjectAssignmentReq) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _ValidateProjectAssignmentReq_OldProjects_Unique[item]; exists {
-			err := ValidateProjectAssignmentReqValidationError{
+			return ValidateProjectAssignmentReqValidationError{
 				field:  fmt.Sprintf("OldProjects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_ValidateProjectAssignmentReq_OldProjects_Unique[item] = struct{}{}
 		}
 
 		if !_ValidateProjectAssignmentReq_OldProjects_Pattern.MatchString(item) {
-			err := ValidateProjectAssignmentReqValidationError{
+			return ValidateProjectAssignmentReqValidationError{
 				field:  fmt.Sprintf("OldProjects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
@@ -1334,56 +889,27 @@ func (m *ValidateProjectAssignmentReq) validate(all bool) error {
 		_, _ = idx, item
 
 		if _, exists := _ValidateProjectAssignmentReq_NewProjects_Unique[item]; exists {
-			err := ValidateProjectAssignmentReqValidationError{
+			return ValidateProjectAssignmentReqValidationError{
 				field:  fmt.Sprintf("NewProjects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		} else {
 			_ValidateProjectAssignmentReq_NewProjects_Unique[item] = struct{}{}
 		}
 
 		if !_ValidateProjectAssignmentReq_NewProjects_Pattern.MatchString(item) {
-			err := ValidateProjectAssignmentReqValidationError{
+			return ValidateProjectAssignmentReqValidationError{
 				field:  fmt.Sprintf("NewProjects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
 			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
 		}
 
 	}
 
 	// no validation rules for IsUpdateRequest
 
-	if len(errors) > 0 {
-		return ValidateProjectAssignmentReqMultiError(errors)
-	}
-
 	return nil
 }
-
-// ValidateProjectAssignmentReqMultiError is an error wrapping multiple
-// validation errors returned by ValidateProjectAssignmentReq.ValidateAll() if
-// the designated constraints aren't met.
-type ValidateProjectAssignmentReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ValidateProjectAssignmentReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ValidateProjectAssignmentReqMultiError) AllErrors() []error { return m }
 
 // ValidateProjectAssignmentReqValidationError is the validation error returned
 // by ValidateProjectAssignmentReq.Validate if the designated constraints
@@ -1448,49 +974,14 @@ var _ValidateProjectAssignmentReq_NewProjects_Pattern = regexp.MustCompile("^[a-
 
 // Validate checks the field values on ValidateProjectAssignmentResp with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, an error is returned.
 func (m *ValidateProjectAssignmentResp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on ValidateProjectAssignmentResp with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// ValidateProjectAssignmentRespMultiError, or nil if none found.
-func (m *ValidateProjectAssignmentResp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *ValidateProjectAssignmentResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	var errors []error
-
-	if len(errors) > 0 {
-		return ValidateProjectAssignmentRespMultiError(errors)
-	}
-
 	return nil
 }
-
-// ValidateProjectAssignmentRespMultiError is an error wrapping multiple
-// validation errors returned by ValidateProjectAssignmentResp.ValidateAll()
-// if the designated constraints aren't met.
-type ValidateProjectAssignmentRespMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ValidateProjectAssignmentRespMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ValidateProjectAssignmentRespMultiError) AllErrors() []error { return m }
 
 // ValidateProjectAssignmentRespValidationError is the validation error
 // returned by ValidateProjectAssignmentResp.Validate if the designated
