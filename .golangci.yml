@@ -19,8 +19,6 @@ linters-settings:
       - copylocks
 
 linters:
-  enable:
-    - unused
   enable-all: true
   disable:
     - bodyclose
@@ -79,3 +77,4 @@ linters:
     - ifshort
     - structcheck
     - deadcode
+    - gomodguard
