@@ -19,8 +19,6 @@ linters-settings:
       - copylocks
 
 linters:
-  enable:
-    - unused
   enable-all: true
   disable:
     - bodyclose
@@ -81,4 +79,4 @@ linters:
     - govet
     - inamedparam
     - mnd
-    - perfsprint
+    - perfsprint    - gomodguard
