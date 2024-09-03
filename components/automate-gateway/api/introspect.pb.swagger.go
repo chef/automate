@@ -25,7 +25,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -45,7 +45,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -77,7 +77,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -140,19 +140,24 @@ func init() {
       "type": "object",
       "properties": {
         "get": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "put": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "post": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "delete": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         },
         "patch": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
