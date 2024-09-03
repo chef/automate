@@ -22,7 +22,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -44,7 +44,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "An unexpected error response",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -95,7 +95,8 @@
           "type": "string"
         },
         "finished": {
-          "type": "boolean"
+          "type": "boolean",
+          "format": "boolean"
         }
       },
       "title": "Migration message"
