@@ -73,8 +73,10 @@ linters:
     - nilerr
     - nonamedreturns
     - predeclared
-    - varcheck
-    - ifshort
-    - structcheck
-    - deadcode
-    - gomodguard
+    - protogetter
+    - tagalign
+    - depguard
+    - govet
+    - inamedparam
+    - mnd
+    - perfsprint
