@@ -31,6 +31,7 @@ func BuildRunProjectTagger(authzClient authz.ProjectsServiceClient) message.Chef
 func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.ProjectsServiceClient) <-chan message.ChefRun {
 	out := make(chan message.ChefRun, 100)
 	go func() {
+		defer close(out)
 		nextNumToDrop := 1
 		bundleSize := 0
 		var projectRulesCollection map[string]*authz.ProjectRules
@@ -67,7 +68,7 @@ func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.Project
 
 			message.PropagateChefRun(out, &msg)
 		}
-		close(out)
+
 	}()
 
 	return out

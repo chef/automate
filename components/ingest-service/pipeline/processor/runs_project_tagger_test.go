@@ -1113,28 +1113,28 @@ func TestBundlerSingleMessage(t *testing.T) {
 func TestBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefRun, 100)
 	listProjectRulesCount := 0
+
 	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
-	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*authz.ListRulesForAllProjectsResp, error) {
+
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}, opts ...interface{}) (*authz.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
 			return &authz.ListRulesForAllProjectsResp{}, nil
-		})
+		}).Times(1)
+
 	errc := make(chan error)
 
-	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
-	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
-	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
-	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
-	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
+	for i := 0; i < 5; i++ {
+		inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
+	}
 	close(inbox)
 
 	out := runBundleProjectTagger(inbox, authzClient)
 
-	<-out
-	<-out
-	<-out
-	<-out
-	<-out
+	count := 0
+	for range out {
+		count++
+	}
 
 	assert.Equal(t, 1, listProjectRulesCount)
 }
