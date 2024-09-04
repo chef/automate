@@ -12,7 +12,7 @@ func TestLookup(t *testing.T) {
 	s := &userutils.UserUtilImp{}
 	sysUser, err := s.Lookup(constants.USER_NAME)
 	if sysUser == nil {
-		assert.Contains(t, constants.USER_NAME, err.Error())
+		assert.Contains(t, err.Error(), constants.USER_NAME)
 	}
 }
 
@@ -20,7 +20,7 @@ func TestLookupGroup(t *testing.T) {
 	s := &userutils.UserUtilImp{}
 	group, err := s.LookupGroup(constants.GROUP_NAME)
 	if group == nil {
-		assert.Contains(t, constants.GROUP_NAME, err.Error())
+		assert.Contains(t, err.Error(), constants.GROUP_NAME)
 	}
 }
 
@@ -30,6 +30,6 @@ func TestLookupGroupId(t *testing.T) {
 	group, err := s.LookupGroupId(gid)
 
 	if group == nil {
-		assert.Contains(t, gid, err.Error())
+		assert.Contains(t, err.Error(), gid)
 	}
 }
