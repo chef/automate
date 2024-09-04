@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -155,7 +156,12 @@ func TestBundlerSingleMessage(t *testing.T) {
 	close(inbox)
 	out := nodeManagerPublisher(inbox, nodeMgrClient)
 
-	<-out
+	select {
+	case <-out:
+		fmt.Println("Success")
+	case <-time.After(10 * time.Minute):
+		fmt.Println("Test failed")
+	}
 
 	assert.Equal(t, 1, processNodeCount)
 }
