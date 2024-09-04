@@ -61,7 +61,7 @@ require (
 	github.com/nats-io/nats-streaming-server v0.25.5
 	github.com/nats-io/nats.go v1.37.0
 	github.com/nats-io/stan.go v0.10.4
-	github.com/olivere/elastic/v7 v7.0.32
+	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -107,7 +107,6 @@ require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/bufbuild/buf v0.29.0
-	github.com/chef/automate/api/external v0.0.0-20240828051912-8c022fa4f66b
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/utils v1.1.0
 	github.com/hashicorp/go-version v1.7.0
