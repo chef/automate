@@ -65,7 +65,7 @@ func (suite *LookupTestSuite) TestLookupGroupId() {
 	suite.Run("group is not found", func() {
 		_, err := suite.p.LookupGroupId("4294967295")
 		suite.Require().Error(err)
-		suite.Require().Contains(err, "4294967295")
+		suite.Require().Contains(err.Error(), "4294967295")
 	})
 
 	suite.Run("group exists", func() {
