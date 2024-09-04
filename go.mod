@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/boltdb/bolt v1.3.2-0.20171120010307-9da317453632
-	github.com/briandowns/spinner v1.23.1
+	github.com/briandowns/spinner v0.0.0-20180123222039-b3ed21e9d3b2
 	github.com/buger/goterm v1.0.4
 	github.com/buger/jsonparser v1.1.1
 	github.com/chef/toml v0.3.1-0.20200807000621-f5591d7db659
