@@ -54,11 +54,11 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/lyft/protoc-gen-star v0.6.2
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
-	github.com/minio/minio-go/v7 v7.0.76
+	github.com/minio/minio-go/v7 v7.0.72
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/crunchy v0.4.0
-	github.com/nats-io/nats-streaming-server v0.25.6
+	github.com/nats-io/nats-streaming-server v0.25.5
 	github.com/nats-io/nats.go v1.37.0
 	github.com/nats-io/stan.go v0.10.4
 	github.com/olivere/elastic/v7 v7.0.32
@@ -87,10 +87,10 @@ require (
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	gocloud.dev v0.23.0
-	golang.org/x/crypto v0.26.0
+	golang.org/x/crypto v0.23.0
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
-	golang.org/x/text v0.17.0
+	golang.org/x/text v0.15.0
 	google.golang.org/api v0.109.0
 	google.golang.org/genproto v0.0.0-20230113154510-dbe35b8444a5
 	google.golang.org/grpc v1.53.0-dev
@@ -140,7 +140,7 @@ require (
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.3 // indirect
-	github.com/hashicorp/go-msgpack/v2 v2.1.2 // indirect
+	github.com/hashicorp/go-msgpack/v2 v2.1.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/minio/highwayhash v1.0.3 // indirect
 	github.com/nats-io/jwt/v2 v2.5.8 // indirect
@@ -165,7 +165,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Masterminds/semver/v3 v3.3.0
-	github.com/Microsoft/go-winio v0.6.2 // indirect
+	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
@@ -190,14 +190,14 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/glog v1.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/google/wire v0.6.0 // indirect
+	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/raft v1.7.0 // indirect
+	github.com/hashicorp/raft v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -217,7 +217,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/nats-io/nats-server/v2 v2.10.19
+	github.com/nats-io/nats-server/v2 v2.10.17-RC.1
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/peterh/liner v1.2.2 // indirect
@@ -236,7 +236,7 @@ require (
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.55.0 // indirect
+	github.com/valyala/fasthttp v1.54.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
@@ -247,11 +247,11 @@ require (
 	// go.opencensus.io v0.24.0 // indirect
 	go.starlark.net v0.0.0-20190702223751-32f345186213 // indirect
 	golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4 // indirect
-	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/mod v0.12.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/term v0.23.0 // indirect
-	golang.org/x/tools v0.24.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect
