@@ -28,8 +28,7 @@ func BuildRunProjectTagger(authzClient authz.ProjectsServiceClient) message.Chef
 // it works is when a message comes in, we make a call to the authz-service for the rules. We use
 // these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
 // of messages that can use the current project rules from authz.
-func runBundleProjectTagger(in <-chan message.ChefRun,
-	authzClient authz.ProjectsServiceClient) <-chan message.ChefRun {
+func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.ProjectsServiceClient) <-chan message.ChefRun {
 	out := make(chan message.ChefRun, 100)
 	go func() {
 		nextNumToDrop := 1

@@ -1086,11 +1086,13 @@ func TestBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefRun, 100)
 	listProjectRulesCount := 0
 	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
-	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*authz.ListRulesForAllProjectsResp, error) {
+
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}, opts ...interface{}) (*authz.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
 			return &authz.ListRulesForAllProjectsResp{}, nil
-		})
+		}).Times(1)
+
 	errc := make(chan error)
 
 	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
@@ -1100,12 +1102,11 @@ func TestBundlerSingleMessage(t *testing.T) {
 
 	select {
 	case <-out:
-		fmt.Println("Success")
 	case <-time.After(5 * time.Second):
-		fmt.Println("Test failed")
+		t.Fatal("Test timed out waiting for the out channel to close")
 	}
 
-	assert.Equal(t, 0, listProjectRulesCount)
+	assert.Equal(t, 1, listProjectRulesCount) // Check if the mock was called
 }
 
 // When 5 messages are in the inbox the ListRulesForAllProjects function is only called once.
