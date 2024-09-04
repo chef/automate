@@ -181,8 +181,8 @@ github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4Yn
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/boltdb/bolt v1.3.2-0.20171120010307-9da317453632 h1:5cBPp9mZiSPzQ3mQApXoSKhE27Bbrka0g+tsxXZ09lI=
 github.com/boltdb/bolt v1.3.2-0.20171120010307-9da317453632/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
-github.com/briandowns/spinner v1.23.1 h1:t5fDPmScwUjozhDj4FA46p5acZWIPXYE30qW2Ptu650=
-github.com/briandowns/spinner v1.23.1/go.mod h1:LaZeM4wm2Ywy6vO571mvhQNRcWfRUnXOs0RcKV0wYKM=
+github.com/briandowns/spinner v0.0.0-20180123222039-b3ed21e9d3b2 h1:in2sy9EUvc/vYQSiLUdeuwfbbkBmxeqyf/3XRor0AA8=
+github.com/briandowns/spinner v0.0.0-20180123222039-b3ed21e9d3b2/go.mod h1:hw/JEQBIE+c/BLI4aKM8UU8v+ZqrD3h7HC27kKt8JQU=
 github.com/bufbuild/buf v0.29.0 h1:4H7m9SW5JaNCf8CUFMZiRAHvimUEU5w8GpKs3wnQt+s=
 github.com/bufbuild/buf v0.29.0/go.mod h1:ukzHJo2ZzZlUHGmyPzwMEjn01DIIZwub+kia5NX5vJE=
 github.com/buger/goterm v1.0.4 h1:Z9YvGmOih81P0FbVtEYTFF6YsSgxSUKEhf/f9bTMXbY=
