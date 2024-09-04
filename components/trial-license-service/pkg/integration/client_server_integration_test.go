@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestClientAndServer(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	licenseByte, err := ioutil.ReadFile("../../../../dev/license.jwt")
+	licenseByte, err := os.ReadFile("../../../../dev/license.jwt")
 	require.NoError(t, err, "could not open license file")
 	licenseData := string(licenseByte)
 
