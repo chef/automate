@@ -106,7 +106,7 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 
 		if nodeInfoErr != nil {
 			err = nodeInfoErr
-			return
+			return Node{}, nodeInfoErr
 		}
 		hasDeprecations := false
 		if len(ccr.Deprecations) > 0 {

@@ -77,7 +77,7 @@ func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.Project
 func dropChefRunMessages(in <-chan message.ChefRun, err error, numToDrop int) {
 	var numDropped int
 	err = errors.Wrap(err, "bulk dropping message")
-	for numDropped = 0; numDropped < numToDrop; numDropped++ {
+	for numDropped = range make([]struct{}, numToDrop) {
 		select {
 		case m := <-in:
 			m.FinishProcessing(err)
