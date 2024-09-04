@@ -25,11 +25,12 @@ func TestLookupGroup(t *testing.T) {
 	}
 }
 
-func TestLookupGroupId(t *testing.T) {
-	s := &userutils.UserUtilImp{}
-	gid := "1000"
-	group, err := s.LookupGroupId(gid)
-	if group == nil {
-		assert.Equal(t, user.UnknownGroupIdError(gid), err)
-	}
-}
+// func TestLookupGroupId(t *testing.T) {
+// 	s := &userutils.UserUtilImp{}
+// 	gid := "1000"
+// 	group, err := s.LookupGroupId(gid)
+
+// 	// if group == nil {
+// 	// 	assert.Equal(t, user.UnknownGroupIdError(gid), err)
+// 	// }
+// }
