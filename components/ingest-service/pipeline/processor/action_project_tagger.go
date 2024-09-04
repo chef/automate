@@ -71,7 +71,7 @@ func actionBundleProjectTagger(in <-chan message.ChefAction,
 func dropChefActionMessages(in <-chan message.ChefAction, err error, numToDrop int) {
 	var numDropped int
 	err = errors.Wrap(err, "bulk dropping message")
-	for numDropped = range make([]struct{}, numDropped) {
+	for numDropped = range make([]struct{}, numToDrop) {
 		select {
 		case m := <-in:
 			m.FinishProcessing(err)
