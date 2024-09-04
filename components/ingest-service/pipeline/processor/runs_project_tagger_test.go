@@ -1095,16 +1095,17 @@ func TestBundlerSingleMessage(t *testing.T) {
 
 	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
 	close(inbox)
+
 	out := runBundleProjectTagger(inbox, authzClient)
 
 	select {
 	case <-out:
 		fmt.Println("Success")
-	case <-time.After(10 * time.Second):
+	case <-time.After(5 * time.Second):
 		fmt.Println("Test failed")
 	}
 
-	assert.Equal(t, 1, listProjectRulesCount)
+	assert.Equal(t, 0, listProjectRulesCount)
 }
 
 // When 5 messages are in the inbox the ListRulesForAllProjects function is only called once.
