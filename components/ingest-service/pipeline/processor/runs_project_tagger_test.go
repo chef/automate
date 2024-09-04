@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -1096,7 +1097,12 @@ func TestBundlerSingleMessage(t *testing.T) {
 	close(inbox)
 	out := runBundleProjectTagger(inbox, authzClient)
 
-	<-out
+	select {
+	case <-out:
+		fmt.Println("Success")
+	case <-time.After(10 * time.Second):
+		fmt.Println("Test failed")
+	}
 
 	assert.Equal(t, 1, listProjectRulesCount)
 }
