@@ -9,6 +9,7 @@ install_chefdk() {
 
 start_requestbin() {
     export GOBIN="/go/bin"
+    go install golang.org/x/tools/gopls@latest
     go install integration/helpers/requestbin/requestbin.go
     cat > /etc/systemd/system/requestbin.service <<EOF
 [Unit]
