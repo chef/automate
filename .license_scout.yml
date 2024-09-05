@@ -327,9 +327,6 @@ fallbacks:
   - name: github.com/shirou/gopsutil
     license_id: BSD-Source-Code
     license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
-  - name: github.com/shirou/w32
-    license_id: w32-Authors
-    license_content: https://raw.githubusercontent.com/shirou/w32/master/LICENSE
   - name: github.com/go-ldap/ldap
     license_id: MIT
     license_content: https://raw.githubusercontent.com/go-ldap/ldap/master/LICENSE
