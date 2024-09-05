@@ -329,11 +329,14 @@ fallbacks:
     name: honnef.co/go/tools
   - license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
     license_id: BSD-Source-Code
-    name: github.com/shirou/gopsutil
-  - license_content: https://raw.githubusercontent.com/tinylib/msgp/master/LICENSE
+    license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
+  - name: github.com/go-ldap/ldap
     license_id: MIT
-    name: github.com/tinylib/msgp
-  - license_content: https://raw.githubusercontent.com/golang/crypto/master/LICENSE
+    license_content: https://raw.githubusercontent.com/go-ldap/ldap/master/LICENSE
+  - name: github.com/tinylib/msgp
+    license_id: MIT
+    license_content: https://raw.githubusercontent.com/tinylib/msgp/master/LICENSE
+  - name: golang.org/x/crypto
     license_id: BSD-3-Clause
     name: golang.org/x/crypto
   - license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
