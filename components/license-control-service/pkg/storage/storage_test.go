@@ -51,7 +51,7 @@ func TestPGBackend(t *testing.T) {
 		defer resetDB(t)
 		backend := storage.NewCurrentBackend(pgURL, "../../migrations", "/definitely/should/not/exist")
 		_ = backend.Init(context.Background(), keys.NewLicenseParser(keys.BuiltinKeyData))
-		// require.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("Init should succeed with existent but corrupt legacy migration file", func(t *testing.T) {
