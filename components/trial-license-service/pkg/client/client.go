@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -88,7 +88,7 @@ func (c *client) RequestTrialLicense(ctx context.Context,
 
 	if resp.StatusCode != http.StatusOK {
 		var body []byte
-		body, err = ioutil.ReadAll(resp.Body)
+		body, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return "", &UnexpectedStatusError{code: resp.StatusCode}
 		}
