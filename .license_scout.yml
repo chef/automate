@@ -324,9 +324,6 @@ fallbacks:
   - name: honnef.co/go/tools
     license_id: MIT
     license_content: https://raw.githubusercontent.com/dominikh/go-tools/master/LICENSE
-  - name: github.com/axw/gocov
-    license_id: Gocov-Authors
-    license_content: https://raw.githubusercontent.com/axw/gocov/master/LICENSE
   - name: github.com/keybase/go-ps
     license_id: MIT
     license_content: https://raw.githubusercontent.com/keybase/go-ps/master/LICENSE.md
