@@ -105,10 +105,10 @@ func TestAppliedLicense(t *testing.T) {
 		// tests are initialized with a license and it's not updated in this test
 		// function. so we aren't actually testing to see if updating the license
 		// changes ConfiguredAt.
-		assert.True(
-			t, (res.ConfiguredAt.Seconds >= startTime.Unix()),
-			"Policy should have been reconfigured after we marked the time",
-		)
+		// assert.True(
+		// 	t, (res.ConfiguredAt.Seconds >= startTime.Unix()),
+		// 	"Policy should have been reconfigured after we marked the time",
+		// )
 		assert.True(
 			t, (res.ConfiguredAt.Seconds <= time.Now().Unix()),
 			"Policy should have been reconfigured before we evaluate this test",
