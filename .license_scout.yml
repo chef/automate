@@ -324,9 +324,6 @@ fallbacks:
   - name: honnef.co/go/tools
     license_id: MIT
     license_content: https://raw.githubusercontent.com/dominikh/go-tools/master/LICENSE
-  - name: github.com/keybase/go-ps
-    license_id: MIT
-    license_content: https://raw.githubusercontent.com/keybase/go-ps/master/LICENSE.md
   - name: github.com/shirou/gopsutil
     license_id: BSD-Source-Code
     license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
