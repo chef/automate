@@ -32,10 +32,11 @@ func TestHealthCheck(t *testing.T) {
 		t.Fatal("test requires PG_URL to be set")
 	}
 
+	fmt.Printf("cfg: %+v\n", cfg)
 	srv, err := server.NewGRPC(ctx, cfg)
 	fmt.Printf("srv**: %v\n", srv)
 	fmt.Printf("err**: %v\n", err)
-	// require.NoError(t, err, "initializing grpc server")
+	require.NoError(t, err, "initializing grpc server")
 
 	g := grpctest.NewServer(srv)
 	defer g.Close()
