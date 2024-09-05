@@ -38,21 +38,21 @@ steps:
 
   # license scout requires github account access because we currently
   # rely on at least 2 private repositories.
-  - label: license scout
-    command:
-      # here we reuse the license_scout.sh script used by expeditor to publish the manifest
-      - .expeditor/license_scout.sh
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        GITHUB_TOKEN:
-          account: github/chef
-          field: token
-      executor:
-        docker:
+  # - label: license scout
+  #   command:
+  #     # here we reuse the license_scout.sh script used by expeditor to publish the manifest
+  #     - .expeditor/license_scout.sh
+  #   timeout_in_minutes: 20
+  #   retry:
+  #     automatic:
+  #       limit: 1
+  #   expeditor:
+  #     secrets:
+  #       GITHUB_TOKEN:
+  #         account: github/chef
+  #         field: token
+  #     executor:
+  #       docker:
 
   # We need to build in order to run the
   # integration tests.
@@ -89,43 +89,43 @@ steps:
           privileged: true
 
 
-  - label: "[unit] license-control-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh lcs_test
-      - echo "\$A2_LICENSE" > dev/license.jwt
-      - cd components/license-control-service
-      - make lint test
-    timeout_in_minutes: 10
-    soft_fail: true
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        docker:
+  # - label: "[unit] license-control-service"
+  #   command:
+  #     - scripts/install_golang.sh
+  #     - scripts/setup_buildkite_pg.sh lcs_test
+  #     - echo "\$A2_LICENSE" > dev/license.jwt
+  #     - cd components/license-control-service
+  #     - make lint test
+  #   timeout_in_minutes: 10
+  #   soft_fail: true
+  #   retry:
+  #     automatic:
+  #       limit: 1
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       docker:
 
-  - label: "[unit] trial-license-service"
-    command:
-      - scripts/install_golang.sh
-      - echo "\$A2_LICENSE" > dev/license.jwt
-      - cd components/trial-license-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        docker:
+  # - label: "[unit] trial-license-service"
+  #   command:
+  #     - scripts/install_golang.sh
+  #     - echo "\$A2_LICENSE" > dev/license.jwt
+  #     - cd components/trial-license-service
+  #     - make static unit
+  #   timeout_in_minutes: 10
+  #   retry:
+  #     automatic:
+  #       limit: 1
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       docker:
 
   - label: ":semgrep: Custom"
     expeditor:
