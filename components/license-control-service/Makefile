@@ -25,7 +25,7 @@ kill_docker_pg:
 
 PG_URL ?= "postgresql://postgres@127.0.0.1:5432/lcs_test?sslmode=disable"
 test:
-	PG_URL=$(PG_URL) go test -cover ./...
+	PG_URL=$(PG_URL) go test  ./...
 
 run:
 	go run cmd/license-control-service/license-control-service.go serve --config config.dev.toml
