@@ -33,7 +33,6 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient authz.Project
 	}
 	out := make(chan message.Compliance, 100)
 	go func() {
-		defer close(out)
 		nextNumToDrop := 1
 		bundleSize := 0
 		var projectRulesCollection map[string]*authz.ProjectRules
@@ -73,6 +72,7 @@ func reportProjectTagger(in <-chan message.Compliance, authzClient authz.Project
 
 			message.Propagate(out, &msg)
 		}
+		close(out)
 	}()
 
 	return out

@@ -25,7 +25,6 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 	maxNumberOfBundledMsgs := 100
 	out := make(chan message.Compliance, maxNumberOfBundledMsgs)
 	go func() {
-		defer close(out)
 		for msg := range in {
 			if err := msg.Ctx.Err(); err != nil {
 				msg.FinishProcessingCompliance(err)
@@ -47,6 +46,7 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 
 			message.Propagate(out, &msg)
 		}
+		close(out)
 	}()
 
 	return out

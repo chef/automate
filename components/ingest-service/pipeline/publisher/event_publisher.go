@@ -24,7 +24,7 @@ func BuildEventPublisher(
 
 		out := make(chan message.ChefAction, 100)
 		log.Infof("Starting event feed service publisher")
-		for range make([]struct{}, numPublishers) {
+		for i := 0; i < numPublishers; i++ {
 			go eventPublisher(in, eventFeedServiceClient, out)
 		}
 		return out

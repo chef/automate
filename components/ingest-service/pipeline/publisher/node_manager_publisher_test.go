@@ -2,7 +2,6 @@ package publisher
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -83,8 +82,8 @@ func TestBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefRun, 100)
 	processNodeCount := 0
 	nodeMgrClient := manager.NewMockNodeManagerServiceClient(gomock.NewController(t))
-	nodeMgrClient.EXPECT().ProcessNode(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}, opts ...interface{}) (*manager.ProcessNodeResponse, error) {
+	nodeMgrClient.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}) (*manager.ProcessNodeResponse, error) {
 			processNodeCount++
 			return &manager.ProcessNodeResponse{}, nil
 		})
@@ -94,12 +93,7 @@ func TestBundlerSingleMessage(t *testing.T) {
 	close(inbox)
 	out := nodeManagerPublisher(inbox, nodeMgrClient, 1)
 
-	select {
-	case <-out:
-		fmt.Println("Success")
-	case <-time.After(10 * time.Second):
-		fmt.Println("Test failed")
-	}
+	<-out
 
 	assert.Equal(t, 1, processNodeCount)
 }

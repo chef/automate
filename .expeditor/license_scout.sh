@@ -10,8 +10,6 @@ log() {
     echo "[$(date -u)] $*"
 }
 
-export GOPROXY="https://proxy.golang.org,direct " 
-
 # license_scout uses licensee internally. licensee reads OCTOKIT_ACCESS_TOKEN
 # from the environment to make authenticated requests to github. This increases
 # the API rate limits that github enforces. Our license checks now read so many
@@ -42,10 +40,10 @@ log_section_start "Installing License Scout"
 gem install license_scout -v 2.5.1
 log "Finished Installing License Scout"
 
-log_section_start "Installing Go 1.22.5"
-hab pkg install --force --binlink core/go22/1.22.5 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
+log_section_start "Installing Go 1.19.3"
+hab pkg install --force --binlink core/go19/1.19.3 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
 go version
-log "Finished Installing Go 1.22.5"
+log "Finished Installing Go 1.19.3"
 
 log_section_start "Installing Chef UI Library dependencies"
 pushd components/chef-ui-library

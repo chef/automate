@@ -1,4 +1,3 @@
-//go:build !mockgen
 // +build !mockgen
 
 //
@@ -41,22 +40,22 @@ var (
 //
 // Example: Create an Automate Gateway where the IngestClient is mocked
 //
-//	func TestGatewayWithMockedIngestClient(t *testing.T) {
-//	  // Create a mocked Chef Ingest client
-//	  mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
+// func TestGatewayWithMockedIngestClient(t *testing.T) {
+//   // Create a mocked Chef Ingest client
+//   mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
 //
-//	  // Assert that we will call the ProcessChefAction() func and return an error
-//	  mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
-//	    func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
-//	      return &gp.Empty{}, errors.New("Something happened")
-//	    },
-//	  )
+//   // Assert that we will call the ProcessChefAction() func and return an error
+//   mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
+//     func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
+//       return &gp.Empty{}, errors.New("Something happened")
+//     },
+//   )
 //
-//	  // Create a new gateway.Server instance with mocked Clients
-//	  subject := newMockGatewayServer(t, mockIngest)
+//   // Create a new gateway.Server instance with mocked Clients
+//   subject := newMockGatewayServer(t, mockIngest)
 //
-//	  // Call functions, inspec, pass it to other objects. Play with it!
-//	}
+//   // Call functions, inspec, pass it to other objects. Play with it!
+// }
 func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 	var (
 		ctrl                    = gomock.NewController(t)
@@ -79,11 +78,11 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 		case authz.AuthorizationServiceClient:
 			// Mocking the provided mocked AuthorizationClient
 			mockAuthorizationClient = authz.AuthorizationServiceClient(s)
-			//mockClientsFactory.EXPECT().AuthorizationClient().DoAndReturn(
-			//	func() (authz.AuthorizationServiceClient, error) {
-			//		return mockAuthorizationClient, nil
-			//	},
-			//)
+			mockClientsFactory.EXPECT().AuthorizationClient().DoAndReturn(
+				func() (authz.AuthorizationServiceClient, error) {
+					return mockAuthorizationClient, nil
+				},
+			)
 		case compliance_ingest.ComplianceIngesterServiceClient:
 			// Mocking the provided mocked ComplianceIngesterClient
 			mockComplianceIngester := compliance_ingest.ComplianceIngesterServiceClient(s)
@@ -135,7 +134,7 @@ func newAuthorizationMocks(t *testing.T, resource, action string) (
 
 	// Mocking AuthN Calls
 	mockAuthClient.EXPECT().Authenticate(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(_ context.Context, _ *authn.AuthenticateRequest, i ...interface{}) (*authn.AuthenticateResponse, error) {
+		func(_ context.Context, _ *authn.AuthenticateRequest) (*authn.AuthenticateResponse, error) {
 			return &authn.AuthenticateResponse{Subject: "mock", Teams: []string{}}, nil
 		})
 
@@ -149,7 +148,7 @@ func newAuthorizationMocks(t *testing.T, resource, action string) (
 			ProjectsFilter: []string{},
 		},
 	).DoAndReturn(
-		func(_ context.Context, _ *authz.ProjectsAuthorizedReq, i ...interface{}) (*authz.ProjectsAuthorizedResp, error) {
+		func(_ context.Context, _ *authz.ProjectsAuthorizedReq) (*authz.ProjectsAuthorizedResp, error) {
 			return &authz.ProjectsAuthorizedResp{Projects: []string{"any"}}, nil
 		},
 	)
