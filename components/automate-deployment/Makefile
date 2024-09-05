@@ -11,7 +11,7 @@ BINS = ${CHEF_AUTOMATE_PKG} ${PACKAGE_PATH}/cmd/deployment-service
 GIT_SHA = $(shell git rev-parse HEAD)
 BUILD_TIME ?= $(shell date -u '+%Y%m%d%H%M%S')
 VERSION = ${BUILD_TIME}
-GO_LDFLAGS = -ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA} -X ${LIBRARY_PATH}/version.BuildTime=${BUILD_TIME}"
+GO_LDFLAGS = --ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA} -X ${LIBRARY_PATH}/version.BuildTime=${BUILD_TIME}"
 LINTERARGS=--exclude-use-default -D lll ./...
 LICENSE_TOKEN = $(shell cat ${REPOROOT}/dev/license.jwt)
 RESULT_DIR = ${REPOROOT}/results
