@@ -56,7 +56,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		conf, err := suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
 		assert.Equal(t, "23s", conf.Threshold)
-		assert.Equal(t, "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61", conf.Recurrence)
+		assert.Equal(t, "DTSTART:20200612T182105Z\nRRULE:FREQ=SECONDLY;INTERVAL=61", conf.Recurrence)
 		assert.True(t, conf.Running.Value)
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
