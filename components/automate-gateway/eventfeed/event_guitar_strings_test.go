@@ -23,7 +23,7 @@ func TestEventGuitarStringsNormal(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeedTimeline(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedTimelineRequest) (*event_feed_api.FeedTimelineResponse, error) {
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedTimelineRequest, i ...interface{}) (*event_feed_api.FeedTimelineResponse, error) {
 		return &event_feed_api.FeedTimelineResponse{
 			Start:    request.Start,
 			End:      request.End,
@@ -82,7 +82,7 @@ func TestEventGuitarStringsNotEnoughEventsStrings(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeedTimeline(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedTimelineRequest) (*event_feed_api.FeedTimelineResponse, error) {
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedTimelineRequest, i ...interface{}) (*event_feed_api.FeedTimelineResponse, error) {
 		return &event_feed_api.FeedTimelineResponse{
 			Start:    request.Start,
 			End:      request.End,
@@ -134,7 +134,7 @@ func TestEventGuitarStringsToManyEventsStrings(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeedTimeline(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedTimelineRequest) (*event_feed_api.FeedTimelineResponse, error) {
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedTimelineRequest, i ...interface{}) (*event_feed_api.FeedTimelineResponse, error) {
 		return &event_feed_api.FeedTimelineResponse{
 			Start:    request.Start,
 			End:      request.End,
