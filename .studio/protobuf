@@ -219,6 +219,8 @@ function compile_all_protobuf_components_nolint() {
   local components
 
   install_if_missing core/git git
+  export GOPROXY="https://proxy.golang.org,direct"
+  export GOSUMDB="sum.golang.org"
   components=()
   read -d "\n" -ra components <<< "$(git ls-files '*/scripts/grpc.sh' | awk -F/ '!/api/{print $2}')"
   # Note 2019/02/05 (sr): "api" doesn't fit in the folder structure, so it's
