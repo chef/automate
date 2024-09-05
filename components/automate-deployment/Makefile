@@ -77,7 +77,7 @@ ci: clean build unit lint fmt-check
 
 ${BINS}: bin echo-build-data
 	@echo "GO $@"
-	@cd bin; go build -ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA} -X ${LIBRARY_PATH}/version.BuildTime=${BUILD_TIME}" $@
+	@cd bin; go build $@
 
 echo-build-data:
 	@echo "build_time: ${BUILD_TIME}"
