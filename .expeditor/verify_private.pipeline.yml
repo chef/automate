@@ -58,7 +58,7 @@ steps:
 - label: build
   command:
   - scripts/verify_build.sh
-  timeout_in_minutes: 120
+  timeout_in_minutes: 60
   env:
     ALLOW_LOCAL_PACKAGES: true
     HAB_STUDIO_SUP: false
@@ -576,7 +576,7 @@ steps:
 - label: "iam v2 with no legacy policies force-upgrade to v2"
   command:
   - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-  timeout_in_minutes: 45
+  timeout_in_minutes: 25
   expeditor:
     secrets:
       A2_LICENSE:
@@ -750,6 +750,15 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      AWS_ACCESS_KEY_ID:
+        account: aws/chef-cd
+        field: access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        account: aws/chef-cd
+        field: secret_access_key
+      AWS_SESSION_TOKEN:
+        account: aws/chef-cd
+        field: session_token
 
 - label: "backup to s3"
   command:
