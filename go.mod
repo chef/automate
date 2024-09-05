@@ -47,7 +47,7 @@ require (
 	github.com/imdario/mergo v0.3.16
 	github.com/jaswdr/faker v1.0.2
 	github.com/jedib0t/go-pretty/v5 v5.0.2-alpha
-	github.com/jhump/protoreflect v1.14.1
+	github.com/jhump/protoreflect v1.7.1-0.20200723220026-11eaaf73e0ec
 	github.com/kevinburke/go-bindata v3.16.0+incompatible
 	github.com/kylelemons/godebug v1.1.0
 	github.com/leanovate/gopter v0.2.4

@@ -579,6 +579,7 @@ github.com/jedib0t/go-pretty/v5 v5.0.2-alpha/go.mod h1:DAKhNY3KVw+n6uMJ+WIzEs2XH
 github.com/jhump/gopoet v0.0.0-20190322174617-17282ff210b3/go.mod h1:me9yfT6IJSlOL3FCfrg+L6yzUEZ+5jW6WHt4Sk+UPUI=
 github.com/jhump/gopoet v0.1.0/go.mod h1:me9yfT6IJSlOL3FCfrg+L6yzUEZ+5jW6WHt4Sk+UPUI=
 github.com/jhump/goprotoc v0.5.0/go.mod h1:VrbvcYrQOrTi3i0Vf+m+oqQWk9l72mjkJCYo7UvLHRQ=
+github.com/jhump/protoreflect v1.7.1-0.20200723220026-11eaaf73e0ec h1:LeWD9kGWul9js18sWzNP2SjMuO6smUEpXt8OmRs7qU0=
 github.com/jhump/protoreflect v1.7.1-0.20200723220026-11eaaf73e0ec/go.mod h1:D8nEtk+lKr8kMTMiLayswAtSSeHYDaRYk9r78Cy11mM=
 github.com/jhump/protoreflect v1.11.0/go.mod h1:U7aMIjN0NWq9swDP7xDdoMfRHb35uiuTd3Z9nFXJf5E=
 github.com/jhump/protoreflect v1.14.1 h1:N88q7JkxTHWFEqReuTsYH1dPIwXxA0ITNQp7avLY10s=
