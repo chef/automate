@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 
@@ -32,6 +33,8 @@ func TestHealthCheck(t *testing.T) {
 	}
 
 	srv, err := server.NewGRPC(ctx, cfg)
+	fmt.Printf("srv**: %v\n", srv)
+	fmt.Printf("err**: %v\n", err)
 	// require.NoError(t, err, "initializing grpc server")
 
 	g := grpctest.NewServer(srv)
