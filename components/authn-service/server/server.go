@@ -12,7 +12,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
 	api "github.com/chef/automate/api/interservice/authn"
@@ -125,30 +124,20 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		version.GitSHA,
 	))
 
-	var teamsConn *grpc.ClientConn
-	var err error
-	if c.TeamsAddress != "" {
-		teamsConn, err = factory.Dial("teams-service", c.TeamsAddress)
-		if err != nil {
-			return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
-		}
+	teamsConn, err := factory.Dial("teams-service", c.TeamsAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
 	}
 
-	var sessionConn *grpc.ClientConn
-	if c.SessionAddress != "" {
-		sessionConn, err = factory.Dial("session-service", c.SessionAddress)
-		if err != nil {
-			return nil, errors.Wrapf(err, "dial session-service (%s)", c.SessionAddress)
-		}
+	sessionConn, err := factory.Dial("session-service", c.SessionAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "dial session-service (%s)", c.SessionAddress)
 	}
 	sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
 
-	var authzConn *grpc.ClientConn
-	if c.AuthzAddress != "" {
-		authzConn, err = factory.Dial("authz-service", c.AuthzAddress)
-		if err != nil {
-			return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
-		}
+	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
 	}
 	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 	policiesClient := authz.NewPoliciesServiceClient(authzConn)

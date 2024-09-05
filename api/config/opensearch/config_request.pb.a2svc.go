@@ -6,8 +6,8 @@ package os
 import (
 	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
-	"strconv"
-	"strings"
+	strconv "strconv"
+	strings "strings"
 )
 
 // ServiceName returns the name of the service this config belongs to

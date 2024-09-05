@@ -74,7 +74,7 @@ func NoSupervisorUpgradeRequired(m *target.MockTarget) *target.MockTarget {
 	m.On("RenderAutomateUnitFile", "", testHabBinPkg, testHabLauncherPkg).Return(string(testAutomateUnitFileContent), nil)
 	m.On("SystemdReloadRequired").Return(false, nil)
 	m.On("HabSupRestartRequired", testHabSupPkg).Return(false, nil)
-	m.On("BinlinkPackage", context.TODO(), &testHabBinPkg, "hab").Return("", nil)
+	m.On("BinlinkPackage", context.Background(), &testHabBinPkg, "hab").Return("", nil)
 	return m
 }
 
@@ -101,28 +101,28 @@ func (m *mockHabSup) Hup(c context.Context) error {
 
 func AlreadyInstalled(m *target.MockTarget, pkg habpkg.VersionedPackage) {
 	if p, ok := pkg.(*habpkg.HabPkg); ok {
-		m.On("IsInstalled", context.TODO(), p).Return(true, nil)
+		m.On("IsInstalled", context.Background(), p).Return(true, nil)
 		return
 	}
 
 	if p, ok := pkg.(*habpkg.Hart); ok {
-		m.On("IsInstalled", context.TODO(), p).Return(true, nil)
+		m.On("IsInstalled", context.Background(), p).Return(true, nil)
 		return
 	}
-	m.On("IsInstalled", context.TODO(), &pkg).Return(true, nil)
+	m.On("IsInstalled", context.Background(), &pkg).Return(true, nil)
 }
 
 func NotInstalled(m *target.MockTarget, pkg habpkg.VersionedPackage) {
 	if p, ok := pkg.(*habpkg.HabPkg); ok {
-		m.On("IsInstalled", context.TODO(), p).Return(false, nil)
+		m.On("IsInstalled", context.Background(), p).Return(false, nil)
 		return
 	}
 
 	if p, ok := pkg.(*habpkg.Hart); ok {
-		m.On("IsInstalled", context.TODO(), p).Return(false, nil)
+		m.On("IsInstalled", context.Background(), p).Return(false, nil)
 		return
 	}
-	m.On("IsInstalled", context.TODO(), &pkg).Return(false, nil)
+	m.On("IsInstalled", context.Background(), &pkg).Return(false, nil)
 }
 
 func WithUserToml(m *target.MockTarget, pkg habpkg.VersionedPackage, currentUserToml string) {
@@ -153,26 +153,26 @@ func ExpectSetUserToml(m *target.MockTarget, pkg habpkg.VersionedPackage, config
 }
 
 func ExpectInstallHart(m *target.MockTarget, pkg *habpkg.Hart) {
-	m.On("InstallService", context.TODO(), pkg, "").Return(nil)
+	m.On("InstallService", context.Background(), pkg, "").Return(nil)
 }
 
 func ExpectInstallFromDepot(m *target.MockTarget, pkg habpkg.HabPkg) {
-	m.On("InstallService", context.TODO(), &pkg, "").Return(nil)
+	m.On("InstallService", context.Background(), &pkg, "").Return(nil)
 }
 
 func ExpectUnloadService(m *target.MockTarget, pkg habpkg.HabPkg) {
-	m.On("UnloadService", context.TODO(), &pkg).Return(nil)
+	m.On("UnloadService", context.Background(), &pkg).Return(nil)
 }
 
 func ExpectLoadDeploymentService(m *target.MockTarget, pkg habpkg.VersionedPackage) {
-	m.On("LoadDeploymentService", context.TODO(), pkg).Return(nil)
+	m.On("LoadDeploymentService", context.Background(), pkg).Return(nil)
 }
 
 func ExpectServiceReload(m *target.MockTarget, pkg habpkg.VersionedPackage) {
 	m.
-		On("UnloadService", context.TODO(), pkg).
+		On("UnloadService", context.Background(), pkg).
 		Return(nil).
-		On("LoadService", context.TODO(), pkg, mock.Anything, mock.Anything).
+		On("LoadService", context.Background(), pkg, mock.Anything, mock.Anything).
 		Return(nil)
 }
 

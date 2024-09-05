@@ -22,7 +22,7 @@ func BuildConfigMgmtPublisher(client cfgmgmt.CfgMgmtServiceClient, numPublishers
 
 		out := make(chan message.ChefAction, 100)
 		log.Infof("Starting config-management-service publisher")
-		for range make([]struct{}, numPublishers) {
+		for i := 0; i < numPublishers; i++ {
 			go configMgmtPublisher(in, client, out)
 		}
 		return out

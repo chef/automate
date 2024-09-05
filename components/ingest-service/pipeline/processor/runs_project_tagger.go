@@ -28,10 +28,10 @@ func BuildRunProjectTagger(authzClient authz.ProjectsServiceClient) message.Chef
 // it works is when a message comes in, we make a call to the authz-service for the rules. We use
 // these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
 // of messages that can use the current project rules from authz.
-func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.ProjectsServiceClient) <-chan message.ChefRun {
+func runBundleProjectTagger(in <-chan message.ChefRun,
+	authzClient authz.ProjectsServiceClient) <-chan message.ChefRun {
 	out := make(chan message.ChefRun, 100)
 	go func() {
-		defer close(out)
 		nextNumToDrop := 1
 		bundleSize := 0
 		var projectRulesCollection map[string]*authz.ProjectRules
@@ -68,7 +68,7 @@ func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.Project
 
 			message.PropagateChefRun(out, &msg)
 		}
-
+		close(out)
 	}()
 
 	return out
@@ -77,7 +77,7 @@ func runBundleProjectTagger(in <-chan message.ChefRun, authzClient authz.Project
 func dropChefRunMessages(in <-chan message.ChefRun, err error, numToDrop int) {
 	var numDropped int
 	err = errors.Wrap(err, "bulk dropping message")
-	for numDropped = range make([]struct{}, numToDrop) {
+	for numDropped = 0; numDropped < numToDrop; numDropped++ {
 		select {
 		case m := <-in:
 			m.FinishProcessing(err)
