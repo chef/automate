@@ -1,6 +1,8 @@
 module github.com/chef/automate/api/external
 
-go 1.19
+go 1.22
+
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
 
 require (
 	github.com/golang/mock v1.4.4
