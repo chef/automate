@@ -77,7 +77,7 @@ ci: clean build unit lint fmt-check
 
 ${BINS}: bin echo-build-data
 	@echo "GO $@"
-	@cd bin; go build $@
+	@cd bin; go build -i ${GO_LDFLAGS} $@
 
 echo-build-data:
 	@echo "build_time: ${BUILD_TIME}"

@@ -1,4 +1,3 @@
-//go:build !mockgen
 // +build !mockgen
 
 //
@@ -96,7 +95,7 @@ func TestDataCollectorHandlerMsgErrorWithNonGRPCError(t *testing.T) {
 	// Mock the IngestClient to test  the behavior when we've got a Non GRPC Error
 	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(_ context.Context, _ *ingestReq.Action, i ...interface{}) (*gp.Empty, error) {
+		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, errors.New("A Non GRPC Error")
 		},
 	)
@@ -123,7 +122,7 @@ func TestDataCollectorHandlerChefActionMsgError(t *testing.T) {
 	// Mock the IngestClient to assert that we've got an error calling ProcessChefAction() func
 	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(_ context.Context, _ *ingestReq.Action, i ...interface{}) (*gp.Empty, error) {
+		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, status.Error(codes.Internal, "Something happened")
 		},
 	)
@@ -209,7 +208,7 @@ func TestDataCollectorHandlerChefRunMsgError(t *testing.T) {
 	mockIngest := ingest.NewMockChefIngesterServiceClient(ctrl)
 	// Assert that we've got an error calling ProcessChefRun() func
 	mockIngest.EXPECT().ProcessChefRun(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(_ context.Context, _ *ingestReq.Run, i ...interface{}) (*gp.Empty, error) {
+		func(_ context.Context, _ *ingestReq.Run) (*gp.Empty, error) {
 			return &gp.Empty{}, status.Error(codes.Internal, "Something happened")
 		},
 	)
@@ -342,7 +341,7 @@ func TestDataCollectorHandlerWithPartialMalformedJSON(t *testing.T) {
 	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	// Assert that we will call the ProcessChefAction() func and return and error
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(_ context.Context, _ *ingestReq.Action, i ...interface{}) (*gp.Empty, error) {
+		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, status.Error(codes.InvalidArgument, "Malformed JSON Message")
 		},
 	)

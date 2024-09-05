@@ -54,9 +54,9 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when a valid org is submitted, creates the new org successfully", func(t *testing.T) {
 			ctx := context.Background()
-			secretsMock.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Return(secretID, nil)
-			secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), gomock.Any(), gomock.Any())
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
 				Id:        "infra-org-id",
@@ -81,9 +81,9 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when no projects are passed, creates the new org successfully with empty projects", func(t *testing.T) {
 			ctx := context.Background()
-			secretsMock.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), gomock.Any(), gomock.Any())
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
 				Id:        "infra-org-id",
@@ -106,9 +106,9 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the org exists, raise the error org already exists", func(t *testing.T) {
 			ctx := context.Background()
-			secretsMock.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), gomock.Any(), gomock.Any())
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
 				Id:        "infra-org-id",
@@ -121,7 +121,7 @@ func TestOrgs(t *testing.T) {
 			require.NoError(t, err)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
@@ -193,7 +193,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			serverID := "97e01ea1-976e-4626-88c8-43345c5d934f"
 			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
@@ -237,7 +237,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the project filter is empty returns all orgs", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -265,7 +265,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the project filter is filtered by * returns all orgs", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -281,7 +281,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req = &request.CreateOrg{
 				Id:        "other-org-id",
@@ -310,7 +310,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the project filter is filtered by (unassigned) returns all (unassigned) orgs", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -325,7 +325,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req = &request.CreateOrg{
@@ -355,7 +355,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the project filter has one project returns only the orgs with the same project as the filter", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -371,7 +371,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req = &request.CreateOrg{
@@ -401,7 +401,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the project filter has multiple projects returns only the orgs with at least one of the projects from the filter", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -417,7 +417,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req = &request.CreateOrg{
@@ -433,7 +433,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp2)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req = &request.CreateOrg{
@@ -464,7 +464,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the project filter has one project and none of the orgs in the db have that project, returns empty orgs", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -480,7 +480,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req = &request.CreateOrg{
@@ -558,7 +558,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when an invalid server ID with valid org ID, return org not found", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -588,7 +588,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the org exists, returns the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -642,7 +642,7 @@ func TestOrgs(t *testing.T) {
 			}
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -658,7 +658,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req = &request.CreateOrg{
 				Id:        "infra-org-id-2",
@@ -708,7 +708,7 @@ func TestOrgs(t *testing.T) {
 			}
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -724,7 +724,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req = &request.CreateOrg{
 				Id:        "infra-org-id-2",
@@ -776,7 +776,7 @@ func TestOrgs(t *testing.T) {
 			}
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -792,7 +792,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req = &request.CreateOrg{
 				Id:        "infra-org-id-2",
@@ -844,7 +844,7 @@ func TestOrgs(t *testing.T) {
 			}
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -860,7 +860,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req = &request.CreateOrg{
 				Id:        "infra-org-id-2",
@@ -911,7 +911,7 @@ func TestOrgs(t *testing.T) {
 			}
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
@@ -927,7 +927,7 @@ func TestOrgs(t *testing.T) {
 			require.NotNil(t, resp1)
 
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req = &request.CreateOrg{
 				Id:        "infra-org-id-2",
@@ -987,8 +987,8 @@ func TestOrgs(t *testing.T) {
 		t.Run("when a valid org update request is submitted, updates the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//	secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
-			//secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			req := &request.CreateOrg{
 				Id:        "infra-org-id",
 				Name:      "infra-org",
@@ -1108,8 +1108,8 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
-			//secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
@@ -1136,9 +1136,9 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when a valid org reset admin key request is submitted, resets the org admin key successfully", func(t *testing.T) {
 			ctx := context.Background()
-			//secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&secretWithID, nil)
-			//secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
 				Id:        "infra-org-id",
@@ -1162,7 +1162,7 @@ func TestOrgs(t *testing.T) {
 			newSecretWithID.Id = "fake id"
 
 			secretsMock.EXPECT().Update(gomock.Any(), &newSecretWithID, gomock.Any())
-			//secretsMock.EXPECT().Read(gomock.Any(), gomock.Any(), gomock.Any()).Return(&newSecretWithID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&newSecretWithID, nil)
 
 			newKey := "--NEW_KEY--"
 			updateOrg, err := cl.ResetOrgAdminKey(ctx, &request.ResetOrgAdminKey{

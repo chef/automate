@@ -8,11 +8,8 @@ desired_golang_version() {
     cat "$top_level/GOLANG_VERSION"
 }
 
-export GOPROXY="https://proxy.golang.org,direct" 
-export GOSUMDB="sum.golang.org"
-
 hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
-hab pkg install -b "core/go22/$(desired_golang_version)"
+hab pkg install -b "core/go19/$(desired_golang_version)"
 
 echo "Checking Go Dependencies And Vendored Protos"
 go mod verify

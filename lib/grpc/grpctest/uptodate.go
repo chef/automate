@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strings"
 	"testing"
 
@@ -180,33 +179,19 @@ func AssertGeneratedPolicyUpToDate(t *testing.T, file string) {
 
 func assertEqualOrOutputDiff(t *testing.T, filename, a, b string) {
 	t.Helper()
-
-	// Helper function to sort lines
-	sortLines := func(input string) string {
-		lines := difflib.SplitLines(input)
-		sort.Strings(lines) // Sort the lines alphabetically
-		return strings.Join(lines, "\n")
+	diff := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(a),
+		B:        difflib.SplitLines(b),
+		FromFile: filename,
+		FromDate: "on disk",
+		ToFile:   filename,
+		ToDate:   "generated",
+		Context:  3,
 	}
-
-	// Sort both 'a' and 'b' to ignore order differences
-	sortedA := sortLines(a)
-	sortedB := sortLines(b)
-
-	if sortedA != sortedB {
-		diff := difflib.UnifiedDiff{
-			A:        difflib.SplitLines(a),
-			B:        difflib.SplitLines(b),
-			FromFile: filename,
-			FromDate: "on disk",
-			ToFile:   filename,
-			ToDate:   "generated",
-			Context:  3,
-		}
-		text, err := difflib.GetUnifiedDiffString(diff)
-		require.NoError(t, err, "error generating diff")
-		if text != "" {
-			t.Error("expected no difference, got diff:\n" + text)
-		}
+	text, err := difflib.GetUnifiedDiffString(diff)
+	require.NoError(t, err, "error generating diff")
+	if text != "" {
+		t.Error("expected no difference, got diff:\n" + text)
 	}
 }
 
@@ -290,9 +275,7 @@ func findRelProtoFiles(t *testing.T, base string, dirs ...string) []string {
 }
 
 // ParseProtoFiles takes a slice of string filenames, like
-//
-//	"api/interservice/authz/authz.proto"
-//
+//   "api/interservice/authz/authz.proto"
 // attempts to parse them, and returns a slice of *desc.FileDescriptor on
 // success.
 func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {

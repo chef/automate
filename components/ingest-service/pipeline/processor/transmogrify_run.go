@@ -19,7 +19,7 @@ func BuildTransmogrify(numProcessors int) message.ChefRunPipe {
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
 		out := make(chan message.ChefRun, 100)
 
-		for i := range make([]struct{}, numProcessors) {
+		for i := 0; i < numProcessors; i++ {
 			ChefRunTransmogrify(in, out, i)
 		}
 

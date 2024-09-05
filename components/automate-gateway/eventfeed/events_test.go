@@ -24,7 +24,7 @@ func TestEventFeedEmpty(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest, i ...interface{}) (*event_feed_api.FeedResponse, error) {
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
 		return &event_feed_api.FeedResponse{}, nil
 	})
 
@@ -50,7 +50,7 @@ func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest, i ...interface{}) (*event_feed_api.FeedResponse, error) {
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
 		return fixedEvents(t), nil
 	})
 
@@ -76,7 +76,7 @@ func TestEventFeedCollectEventFeedCollapseNonoverlapping(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest, i ...interface{}) (*event_feed_api.FeedResponse, error) {
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
 		return fixedEvents(t), nil
 	})
 
@@ -149,12 +149,12 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
 			mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
-			//mockFeedServiceClient.EXPECT().GetFeed(
-			//	context.Background(),
-			//	gomock.Any(),
-			//).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
-			//	return &event_feed_api.FeedResponse{}, nil
-			//})
+			mockFeedServiceClient.EXPECT().GetFeed(
+				context.Background(),
+				gomock.Any(),
+			).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+				return &event_feed_api.FeedResponse{}, nil
+			})
 
 			eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
 
