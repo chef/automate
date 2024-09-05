@@ -10,6 +10,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/bmizerany/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/components/trial-license-service/pkg/client"
@@ -64,8 +65,8 @@ func TestClientAndServer(t *testing.T) {
 	cl := client.New(u)
 	lic, err := cl.RequestTrialLicense(ctx, first, last, email, gdprAgree, deploymentID, automateVersion)
 	_ = lic
-	// require.NoError(t, err)
-	// assert.Equal(t, licenseData, lic)
+	require.NoError(t, err)
+	assert.Equal(t, licenseData, lic)
 
-	// assert.Equal(t, "Gonzo the Great <gonzo@royalflu.sh> - TRIAL", m["customer"])
+	assert.Equal(t, "Gonzo the Great <gonzo@royalflu.sh> - TRIAL", m["customer"])
 }
