@@ -59,7 +59,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/crunchy v0.4.0
 	github.com/nats-io/nats-streaming-server v0.25.6
-	github.com/nats-io/nats.go v1.35.0
+	github.com/nats-io/nats.go v1.37.0
 	github.com/nats-io/stan.go v0.10.4
 	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
