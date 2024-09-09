@@ -8,9 +8,9 @@ install_chefdk() {
 }
 
 start_requestbin() {
-    export GOBIN="/go/bin"
-    go install golang.org/x/tools/gopls@latest
-    go install integration/helpers/requestbin/requestbin.go
+   go install golang.org/dl/go1.22.5@latest
+   go1.22.5 download
+   go1.22.5 install integration/helpers/requestbin/requestbin.go
     cat > /etc/systemd/system/requestbin.service <<EOF
 [Unit]
 Description=Requestbin
@@ -25,7 +25,7 @@ EOF
 }
 start_loadbalancer() {
     export GOBIN="/go/bin"
-    go install ./integration/helpers/loadbalancer/
+    go1.22.5 install ./integration/helpers/loadbalancer/
     #shellcheck disable=SC2154
     cat > /etc/systemd/system/loadbalancer.service <<EOF
 [Unit]
