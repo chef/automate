@@ -58,9 +58,9 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/crunchy v0.4.0
-	github.com/nats-io/nats-streaming-server v0.24.3
+	github.com/nats-io/nats-streaming-server v0.25.6
 	github.com/nats-io/nats.go v1.37.0
-	github.com/nats-io/stan.go v0.10.2
+	github.com/nats-io/stan.go v0.10.4
 	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
 	github.com/opentracing/opentracing-go v1.2.0
@@ -139,7 +139,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.3 // indirect
-	github.com/hashicorp/go-msgpack v1.1.5 // indirect
+	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/minio/highwayhash v1.0.3 // indirect
 	github.com/nats-io/jwt/v2 v2.5.8 // indirect
@@ -196,7 +196,7 @@ require (
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/raft v1.5.0 // indirect
+	github.com/hashicorp/raft v1.6.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -246,11 +246,11 @@ require (
 	// go.opencensus.io v0.24.0 // indirect
 	go.starlark.net v0.0.0-20190702223751-32f345186213 // indirect
 	golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4 // indirect
-	golang.org/x/mod v0.12.0 // indirect
+	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/term v0.23.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/tools v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect
