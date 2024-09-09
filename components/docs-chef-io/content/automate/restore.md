@@ -19,11 +19,7 @@ Before restoring a Chef Automate installation, see how to [configure your backup
 
 ## Prerequisites
 
-1. On the restore host, download and unzip the Chef Automate command-line tool:
-
-   ```shell
-        curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
-    ```
+- On the restore host, [download and unzip](/automate/airgapped_installation/#get-chef-automate-installer-and-admin-tool) the Chef Automate command-line tool.
 
 1. To restore from **filesystem backups**, Chef Automate requires access to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
 Ensure access for the backup type used:
@@ -34,32 +30,34 @@ Ensure access for the backup type used:
 
 1. To restore a backup to a host with a different fully qualified domain name (FQDN) than the original backup host, create a `patch.toml` file that specifies the new FQDN and provide it at restore time:
 
-    ```toml
-         [global.v1]
-         fqdn = "<new-fqdn>"
+     ```toml
+     [global.v1]
+     fqdn = "<new-fqdn>"
 
-         # To provide a cert and key for the restore host, uncomment and fill
-         # these sections.
-         # [[global.v1.frontend_tls]]
-         # The TLS certificate for the load balancer frontend.
-         # cert = """-----BEGIN CERTIFICATE-----
-         # <certificate-for-new-fqdn>
-         # -----END CERTIFICATE-----
-         # """
+     # To provide a cert and key for the restore host, uncomment and fill
+     # these sections.
+     # [[global.v1.frontend_tls]]
+     # The TLS certificate for the load balancer frontend.
+     # cert = """-----BEGIN CERTIFICATE-----
+     # <certificate-for-new-fqdn>
+     # -----END CERTIFICATE-----
+     # """
 
-         # The TLS RSA key for the load balancer frontend.
-         # key = """-----BEGIN RSA PRIVATE KEY-----
-         # <key-for-new-fqdn>
-         # -----END RSA PRIVATE KEY-----
-         # """
-    ```
+     # The TLS RSA key for the load balancer frontend.
+     # key = """-----BEGIN RSA PRIVATE KEY-----
+     # <key-for-new-fqdn>
+     # -----END RSA PRIVATE KEY-----
+     # """
+     ```
 
 1. To restore a backup to a machine with less memory than the original system, adjust for the appropriate lower memory settings by creating a `patch.toml` file that specifies the heapsize, and providing the file at restore time:
 
      ```toml
-       [opensearch.v1.sys.runtime]
-         heapsize = "4096m"
-         # Use "m" for megabytes and "g" for gigabytes
+     [opensearch.v1.sys.runtime]
+     
+     heapsize = "4096m"
+
+     # Use "m" for megabytes and "g" for gigabytes
      ```
 
 {{< note >}}
@@ -70,7 +68,6 @@ Ensure access for the backup type used:
 
 {{< /note >}}
 
-
 ## Restore From a Filesystem Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
@@ -79,7 +76,6 @@ Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before
 
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory.
 Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
 
 To restore on a new host, run:
 
@@ -118,7 +114,7 @@ To restore on a new host, run:
 chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
 ```
 
-To restore on an existing Chef Automate host, run:
+To restore on an existing Chef Automate host (overwriting the existing installation), run:
 
 ```shell
 chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID --skip-preflight
