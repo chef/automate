@@ -8,10 +8,6 @@ env:
   #HAB_STUDIO_SECRET_HAB_BLDR_CHANNEL: "curl8"
   #HAB_FALLBACK_CHANNEL: "stable"
   HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
-  # Use the Go module mirror and checksum database by default.
-  # See https://proxy.golang.org for details.
-  GOPROXY: "https://proxy.golang.org,direct"
-  GOSUMDB: "sum.golang.org"
 
 expeditor:
   defaults:
@@ -36,30 +32,30 @@ steps:
     executor:
       docker:
 
-  # license scout requires github account access because we currently
-  # rely on at least 2 private repositories.
-  # - label: license scout
-  #   command:
-  #     # here we reuse the license_scout.sh script used by expeditor to publish the manifest
-  #     - .expeditor/license_scout.sh
-  #   timeout_in_minutes: 20
-  #   retry:
-  #     automatic:
-  #       limit: 1
-  #   expeditor:
-  #     secrets:
-  #       GITHUB_TOKEN:
-  #         account: github/chef
-  #         field: token
-  #     executor:
-  #       docker:
+# license scout requires github account access because we currently
+# rely on at least 2 private repositories.
+# - label: license scout
+#   command:
+#   # here we reuse the license_scout.sh script used by expeditor to publish the manifest
+#   - .expeditor/license_scout.sh
+#   timeout_in_minutes: 20
+#   retry:
+#     automatic:
+#       limit: 1
+#   expeditor:
+#     secrets:
+#       GITHUB_TOKEN:
+#         account: github/chef
+#         field: token
+#     executor:
+#       docker:
 
 # We need to build in order to run the
 # integration tests.
 - label: build
   command:
   - scripts/verify_build.sh
-  timeout_in_minutes: 60
+  timeout_in_minutes: 120
   env:
     ALLOW_LOCAL_PACKAGES: true
     HAB_STUDIO_SUP: false
@@ -561,23 +557,23 @@ steps:
       linux:
         privileged: true
 
-  - label: "iam v2 with no legacy policies force-upgrade to v2"
-    command:
-      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-    timeout_in_minutes: 45
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
+- label: "iam v1 to v2 force-upgrade (diagnostics only)"
+  command:
+  - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
+  timeout_in_minutes: 25
+  expeditor:
+    secrets:
+      A2_LICENSE:
+        path: secret/a2/license
+        field: license
+    executor:
+      linux:
+        privileged: true
 
 - label: "iam v2 with no legacy policies force-upgrade to v2"
   command:
   - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-  timeout_in_minutes: 25
+  timeout_in_minutes: 45
   expeditor:
     secrets:
       A2_LICENSE:
@@ -738,13 +734,11 @@ steps:
         path: secret/a2/license
         field: license
 
-- label: "backup to s3"
+- label: "ha chef server"
   command:
-    - integration/run_test integration/tests/backup_s3.sh
-  timeout_in_minutes: 60
+  - integration/run_test integration/tests/ha_chef_server.sh
+  timeout_in_minutes: 35
   expeditor:
-    accounts:
-      - aws/chef-cd
     executor:
       linux:
         single-use: true
@@ -753,20 +747,11 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
-      AWS_ACCESS_KEY_ID:
-        account: aws/chef-cd
-        field: access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        account: aws/chef-cd
-        field: secret_access_key
-      AWS_SESSION_TOKEN:
-        account: aws/chef-cd
-        field: session_token
 
 - label: "backup to s3"
   command:
   - integration/run_test integration/tests/backup_s3.sh
-  timeout_in_minutes: 45
+  timeout_in_minutes: 60
   expeditor:
     accounts:
     - aws/chef-cd
@@ -899,18 +884,19 @@ steps:
         path: secret/a2/license
         field: license
 
-- label: "backups"
+- label: "deep migrate upgrade"
   command:
-    - integration/run_test integration/tests/backup.sh
-  timeout_in_minutes: 45
+  - integration/run_test integration/tests/migrate_upgrade.sh
+  timeout_in_minutes: 25
   expeditor:
+    executor:
+      linux:
+        single-use: true
+        privileged: true
     secrets:
       A2_LICENSE:
         path: secret/a2/license
         field: license
-    executor:
-      linux:
-        privileged: true
 
 - label: "deep upgrade backup restore"
   command:
@@ -928,7 +914,7 @@ steps:
 - label: "backups"
   command:
   - integration/run_test integration/tests/backup.sh
-  timeout_in_minutes: 35
+  timeout_in_minutes: 45
   expeditor:
     secrets:
       A2_LICENSE:
