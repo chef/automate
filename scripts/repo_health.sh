@@ -29,6 +29,7 @@ yml2json() {
   ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' "$1"
 }
 
+
 echo "Checking if Golang license fallbacks/exceptions are needed"
 
 # Convert the YAML to JSON
