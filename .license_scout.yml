@@ -1140,6 +1140,69 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/go-playground/universal-translator/master/LICENSE
     license_id: MIT
     name: github.com/go-playground/universal-translator
+  - license_content: https://raw.githubusercontent.com/go-playground/validator/master/LICENSE
+    license_id: MIT
+    name: github.com/go-playground/validator/v10
+  - license_content: https://raw.githubusercontent.com/gobwas/httphead/master/LICENSE
+    license_id: MIT
+    name: github.com/gobwas/httphead
+  - license_content: https://raw.githubusercontent.com/gobwas/pool/master/LICENSE
+    license_id: MIT
+    name: github.com/gobwas/pool
+  - license_content: https://raw.githubusercontent.com/gobwas/ws/master/LICENSE
+    license_id: MIT
+    name: github.com/gobwas/ws
+  - license_content: https://raw.githubusercontent.com/golang-sql/civil/master/LICENSE
+    license_id: MIT
+    name: github.com/golang-sql/civil
+  - license_content: https://raw.githubusercontent.com/golang/freetype/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/golang/freetype
+  - license_content: https://raw.githubusercontent.com/golang/glog/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/glog
+  - license_content: https://raw.githubusercontent.com/golang/groupcache/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/groupcache
+  - license_content: https://raw.githubusercontent.com/golang/mock/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/mock
+  - license_content: https://raw.githubusercontent.com/golang/snappy/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/snappy
+  - license_content: https://raw.githubusercontent.com/google/go-pkcs11/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/google/go-pkcs11
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go-testing/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/googleapis/google-cloud-go-testing
+  - license_content: https://raw.githubusercontent.com/json-iterator/go/master/LICENSE
+    license_id: MIT
+    name: github.com/json-iterator/go
+  - license_content: https://raw.githubusercontent.com/jstemmer/go-junit-report/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/jstemmer/go-junit-report
+  - license_content: https://raw.githubusercontent.com/jung-kurt/gofpdf/master/LICENSE
+    license_id: MIT
+    name: github.com/jung-kurt/gofpdf
+  - license_content: https://raw.githubusercontent.com/ledongthuc/pdf/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/ledongthuc/pdf
+  - license_content: https://raw.githubusercontent.com/leodido/go-urn/master/LICENSE
+    license_id: MIT
+    name: github.com/leodido/go-urn
+  - license_content: https://raw.githubusercontent.com/modern-go/concurrent/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/modern-go/concurrent
+  - license_content: https://raw.githubusercontent.com/modern-go/reflect2/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/modern-go/reflect2
+  - license_content: https://raw.githubusercontent.com/montanaflynn/stats/master/LICENSE
+    license_id: MIT
+    name: github.com/montanaflynn/stats
+  - license_content: https://raw.githubusercontent.com/niemeyer/pretty/master/License
+    license_id: BSD-3-Clause
+    name: github.com/niemeyer/pretty
 
 
 
