@@ -109,23 +109,23 @@ steps:
   #     executor:
   #       docker:
 
-  # - label: "[unit] trial-license-service"
-  #   command:
-  #     - scripts/install_golang.sh
-  #     - echo "\$A2_LICENSE" > dev/license.jwt
-  #     - cd components/trial-license-service
-  #     - make static unit
-  #   timeout_in_minutes: 10
-  #   retry:
-  #     automatic:
-  #       limit: 1
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       docker:
+- label: "[unit] trial-license-service"
+  command:
+  - scripts/install_golang.sh
+  - echo "\$A2_LICENSE" > dev/license.jwt
+  - cd components/trial-license-service
+  - make static unit
+  timeout_in_minutes: 10
+  retry:
+    automatic:
+      limit: 1
+  expeditor:
+    secrets:
+      A2_LICENSE:
+        path: secret/a2/license
+        field: license
+    executor:
+      docker:
 
 - label: ":semgrep: Custom"
   expeditor:
