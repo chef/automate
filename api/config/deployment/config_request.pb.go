@@ -235,6 +235,7 @@ type ConfigRequest_V1_Service struct {
 	PackageCleanupMode              *wrapperspb.StringValue     `protobuf:"bytes,14,opt,name=package_cleanup_mode,json=packageCleanupMode,proto3" json:"package_cleanup_mode,omitempty" toml:"package_cleanup_mode,omitempty" mapstructure:"package_cleanup_mode,omitempty"`
 	EnableDevMonitoring             *wrapperspb.BoolValue       `protobuf:"bytes,15,opt,name=enable_dev_monitoring,json=enableDevMonitoring,proto3" json:"enable_dev_monitoring,omitempty" toml:"enable_dev_monitoring,omitempty" mapstructure:"enable_dev_monitoring,omitempty"`
 	Products                        []string                    `protobuf:"bytes,16,rep,name=products,proto3" json:"products,omitempty" toml:"products,omitempty" mapstructure:"products,omitempty"`
+	Health                          *ConfigRequest_V1_Health    `protobuf:"bytes,17,opt,name=health,proto3" json:"health,omitempty" toml:"health,omitempty" mapstructure:"health,omitempty"`
 }
 
 func (x *ConfigRequest_V1_Service) Reset() {
@@ -381,6 +382,68 @@ func (x *ConfigRequest_V1_Service) GetProducts() []string {
 	return nil
 }
 
+func (x *ConfigRequest_V1_Service) GetHealth() *ConfigRequest_V1_Health {
+	if x != nil {
+		return x.Health
+	}
+	return nil
+}
+
+type ConfigRequest_V1_Health struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	HealthCheckInterval *wrapperspb.Int32Value `protobuf:"bytes,1,opt,name=health_check_interval,json=healthCheckInterval,proto3" json:"health_check_interval,omitempty" toml:"health_check_interval,omitempty" mapstructure:"health_check_interval,omitempty"`
+	Services            []string               `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty" toml:"services,omitempty" mapstructure:"services,omitempty"`
+}
+
+func (x *ConfigRequest_V1_Health) Reset() {
+	*x = ConfigRequest_V1_Health{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_config_deployment_config_request_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConfigRequest_V1_Health) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfigRequest_V1_Health) ProtoMessage() {}
+
+func (x *ConfigRequest_V1_Health) ProtoReflect() protoreflect.Message {
+	mi := &file_config_deployment_config_request_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfigRequest_V1_Health.ProtoReflect.Descriptor instead.
+func (*ConfigRequest_V1_Health) Descriptor() ([]byte, []int) {
+	return file_config_deployment_config_request_proto_rawDescGZIP(), []int{0, 0, 2}
+}
+
+func (x *ConfigRequest_V1_Health) GetHealthCheckInterval() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.HealthCheckInterval
+	}
+	return nil
+}
+
+func (x *ConfigRequest_V1_Health) GetServices() []string {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
 type ConfigRequest_V1_AdminUser struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -399,7 +462,7 @@ type ConfigRequest_V1_AdminUser struct {
 func (x *ConfigRequest_V1_AdminUser) Reset() {
 	*x = ConfigRequest_V1_AdminUser{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[4]
+		mi := &file_config_deployment_config_request_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -412,7 +475,7 @@ func (x *ConfigRequest_V1_AdminUser) String() string {
 func (*ConfigRequest_V1_AdminUser) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_AdminUser) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[4]
+	mi := &file_config_deployment_config_request_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -425,7 +488,7 @@ func (x *ConfigRequest_V1_AdminUser) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigRequest_V1_AdminUser.ProtoReflect.Descriptor instead.
 func (*ConfigRequest_V1_AdminUser) Descriptor() ([]byte, []int) {
-	return file_config_deployment_config_request_proto_rawDescGZIP(), []int{0, 0, 2}
+	return file_config_deployment_config_request_proto_rawDescGZIP(), []int{0, 0, 3}
 }
 
 // Deprecated: Do not use.
@@ -470,7 +533,7 @@ type ConfigRequest_V1_System_Service struct {
 func (x *ConfigRequest_V1_System_Service) Reset() {
 	*x = ConfigRequest_V1_System_Service{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[5]
+		mi := &file_config_deployment_config_request_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -483,7 +546,7 @@ func (x *ConfigRequest_V1_System_Service) String() string {
 func (*ConfigRequest_V1_System_Service) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_System_Service) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[5]
+	mi := &file_config_deployment_config_request_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -525,7 +588,7 @@ type ConfigRequest_V1_System_Log struct {
 func (x *ConfigRequest_V1_System_Log) Reset() {
 	*x = ConfigRequest_V1_System_Log{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[6]
+		mi := &file_config_deployment_config_request_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -538,7 +601,7 @@ func (x *ConfigRequest_V1_System_Log) String() string {
 func (*ConfigRequest_V1_System_Log) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_System_Log) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[6]
+	mi := &file_config_deployment_config_request_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -572,7 +635,7 @@ type ConfigRequest_V1_System_GatherLogs struct {
 func (x *ConfigRequest_V1_System_GatherLogs) Reset() {
 	*x = ConfigRequest_V1_System_GatherLogs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[7]
+		mi := &file_config_deployment_config_request_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -585,7 +648,7 @@ func (x *ConfigRequest_V1_System_GatherLogs) String() string {
 func (*ConfigRequest_V1_System_GatherLogs) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_System_GatherLogs) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[7]
+	mi := &file_config_deployment_config_request_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -620,7 +683,7 @@ type ConfigRequest_V1_System_Proxy struct {
 func (x *ConfigRequest_V1_System_Proxy) Reset() {
 	*x = ConfigRequest_V1_System_Proxy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[8]
+		mi := &file_config_deployment_config_request_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -633,7 +696,7 @@ func (x *ConfigRequest_V1_System_Proxy) String() string {
 func (*ConfigRequest_V1_System_Proxy) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_System_Proxy) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[8]
+	mi := &file_config_deployment_config_request_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -674,7 +737,7 @@ type ConfigRequest_V1_System_Backup struct {
 func (x *ConfigRequest_V1_System_Backup) Reset() {
 	*x = ConfigRequest_V1_System_Backup{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[9]
+		mi := &file_config_deployment_config_request_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -687,7 +750,7 @@ func (x *ConfigRequest_V1_System_Backup) String() string {
 func (*ConfigRequest_V1_System_Backup) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_System_Backup) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[9]
+	mi := &file_config_deployment_config_request_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -721,7 +784,7 @@ type ConfigRequest_V1_System_Backup_Filesystem struct {
 func (x *ConfigRequest_V1_System_Backup_Filesystem) Reset() {
 	*x = ConfigRequest_V1_System_Backup_Filesystem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_deployment_config_request_proto_msgTypes[10]
+		mi := &file_config_deployment_config_request_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -734,7 +797,7 @@ func (x *ConfigRequest_V1_System_Backup_Filesystem) String() string {
 func (*ConfigRequest_V1_System_Backup_Filesystem) ProtoMessage() {}
 
 func (x *ConfigRequest_V1_System_Backup_Filesystem) ProtoReflect() protoreflect.Message {
-	mi := &file_config_deployment_config_request_proto_msgTypes[10]
+	mi := &file_config_deployment_config_request_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -772,12 +835,12 @@ var file_config_deployment_config_request_proto_rawDesc = []byte{
 	0x67, 0x72, 0x70, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e, 0x2d,
 	0x61, 0x32, 0x2d, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x32,
 	0x63, 0x6f, 0x6e, 0x66, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x81, 0x16, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66, 0x69,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xca, 0x17, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66, 0x69,
 	0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x41, 0x0a, 0x02, 0x76, 0x31, 0x18, 0x03,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x31, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f,
 	0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x64, 0x65, 0x70, 0x6c,
 	0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x31, 0x52, 0x02, 0x76, 0x31, 0x1a, 0x8c, 0x15, 0x0a, 0x02,
+	0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x31, 0x52, 0x02, 0x76, 0x31, 0x1a, 0xd5, 0x16, 0x0a, 0x02,
 	0x56, 0x31, 0x12, 0x4a, 0x0a, 0x03, 0x73, 0x79, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x38, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e,
 	0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e,
@@ -859,7 +922,7 @@ var file_config_deployment_config_request_proto_rawDesc = []byte{
 	0x74, 0x65, 0x6d, 0x12, 0x30, 0x0a, 0x04, 0x70, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52,
-	0x04, 0x70, 0x61, 0x74, 0x68, 0x1a, 0x86, 0x09, 0x0a, 0x07, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x04, 0x70, 0x61, 0x74, 0x68, 0x1a, 0xd8, 0x09, 0x0a, 0x07, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
 	0x65, 0x12, 0x30, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x04, 0x6e,
@@ -931,28 +994,40 @@ var file_config_deployment_config_request_proto_rawDesc = []byte{
 	0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x13, 0x65,
 	0x6e, 0x61, 0x62, 0x6c, 0x65, 0x44, 0x65, 0x76, 0x4d, 0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x69,
 	0x6e, 0x67, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x18, 0x10,
-	0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x1a, 0xe9,
-	0x01, 0x0a, 0x09, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x55, 0x73, 0x65, 0x72, 0x12, 0x36, 0x0a, 0x05,
-	0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x73, 0x12, 0x50,
+	0x0a, 0x06, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x18, 0x11, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x38,
+	0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64,
+	0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74,
+	0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x56,
+	0x31, 0x2e, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x52, 0x06, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68,
+	0x1a, 0x75, 0x0a, 0x06, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x12, 0x4f, 0x0a, 0x15, 0x68, 0x65,
+	0x61, 0x6c, 0x74, 0x68, 0x5f, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72,
+	0x76, 0x61, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
+	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49, 0x6e, 0x74, 0x33,
+	0x32, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x13, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68,
+	0x65, 0x63, 0x6b, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x12, 0x1a, 0x0a, 0x08, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x1a, 0xe9, 0x01, 0x0a, 0x09, 0x41, 0x64, 0x6d, 0x69,
+	0x6e, 0x55, 0x73, 0x65, 0x72, 0x12, 0x36, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x42, 0x02, 0x18, 0x01, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x38, 0x0a,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x08, 0x75,
+	0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x30, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x38, 0x0a, 0x08, 0x70, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f,
 	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74,
-	0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x02, 0x18, 0x01, 0x52, 0x05, 0x65,
-	0x6d, 0x61, 0x69, 0x6c, 0x12, 0x38, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56,
-	0x61, 0x6c, 0x75, 0x65, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x30,
-	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67,
-	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53,
-	0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
-	0x12, 0x38, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65,
-	0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x3a, 0x18, 0xc2, 0xf3, 0x18, 0x14,
-	0x0a, 0x12, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x2d, 0x73, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x4a, 0x04, 0x08, 0x01, 0x10, 0x03, 0x42, 0x30, 0x5a, 0x2e, 0x67, 0x69,
-	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75,
-	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69,
-	0x67, 0x2f, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77,
+	0x6f, 0x72, 0x64, 0x3a, 0x18, 0xc2, 0xf3, 0x18, 0x14, 0x0a, 0x12, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x6d, 0x65, 0x6e, 0x74, 0x2d, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4a, 0x04, 0x08,
+	0x01, 0x10, 0x03, 0x42, 0x30, 0x5a, 0x2e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x6d, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -967,66 +1042,69 @@ func file_config_deployment_config_request_proto_rawDescGZIP() []byte {
 	return file_config_deployment_config_request_proto_rawDescData
 }
 
-var file_config_deployment_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_config_deployment_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_config_deployment_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest)(nil),                             // 0: chef.automate.domain.deployment.ConfigRequest
 	(*ConfigRequest_V1)(nil),                          // 1: chef.automate.domain.deployment.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),                   // 2: chef.automate.domain.deployment.ConfigRequest.V1.System
 	(*ConfigRequest_V1_Service)(nil),                  // 3: chef.automate.domain.deployment.ConfigRequest.V1.Service
-	(*ConfigRequest_V1_AdminUser)(nil),                // 4: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser
-	(*ConfigRequest_V1_System_Service)(nil),           // 5: chef.automate.domain.deployment.ConfigRequest.V1.System.Service
-	(*ConfigRequest_V1_System_Log)(nil),               // 6: chef.automate.domain.deployment.ConfigRequest.V1.System.Log
-	(*ConfigRequest_V1_System_GatherLogs)(nil),        // 7: chef.automate.domain.deployment.ConfigRequest.V1.System.GatherLogs
-	(*ConfigRequest_V1_System_Proxy)(nil),             // 8: chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy
-	(*ConfigRequest_V1_System_Backup)(nil),            // 9: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup
-	(*ConfigRequest_V1_System_Backup_Filesystem)(nil), // 10: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.Filesystem
-	(*shared.Mlsa)(nil),                               // 11: chef.automate.infra.config.Mlsa
-	(*wrapperspb.StringValue)(nil),                    // 12: google.protobuf.StringValue
-	(*wrapperspb.BoolValue)(nil),                      // 13: google.protobuf.BoolValue
-	(*wrapperspb.Int32Value)(nil),                     // 14: google.protobuf.Int32Value
+	(*ConfigRequest_V1_Health)(nil),                   // 4: chef.automate.domain.deployment.ConfigRequest.V1.Health
+	(*ConfigRequest_V1_AdminUser)(nil),                // 5: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser
+	(*ConfigRequest_V1_System_Service)(nil),           // 6: chef.automate.domain.deployment.ConfigRequest.V1.System.Service
+	(*ConfigRequest_V1_System_Log)(nil),               // 7: chef.automate.domain.deployment.ConfigRequest.V1.System.Log
+	(*ConfigRequest_V1_System_GatherLogs)(nil),        // 8: chef.automate.domain.deployment.ConfigRequest.V1.System.GatherLogs
+	(*ConfigRequest_V1_System_Proxy)(nil),             // 9: chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy
+	(*ConfigRequest_V1_System_Backup)(nil),            // 10: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup
+	(*ConfigRequest_V1_System_Backup_Filesystem)(nil), // 11: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.Filesystem
+	(*shared.Mlsa)(nil),                               // 12: chef.automate.infra.config.Mlsa
+	(*wrapperspb.StringValue)(nil),                    // 13: google.protobuf.StringValue
+	(*wrapperspb.BoolValue)(nil),                      // 14: google.protobuf.BoolValue
+	(*wrapperspb.Int32Value)(nil),                     // 15: google.protobuf.Int32Value
 }
 var file_config_deployment_config_request_proto_depIdxs = []int32{
 	1,  // 0: chef.automate.domain.deployment.ConfigRequest.v1:type_name -> chef.automate.domain.deployment.ConfigRequest.V1
 	2,  // 1: chef.automate.domain.deployment.ConfigRequest.V1.sys:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System
 	3,  // 2: chef.automate.domain.deployment.ConfigRequest.V1.svc:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.Service
-	11, // 3: chef.automate.domain.deployment.ConfigRequest.V1.System.mlsa:type_name -> chef.automate.infra.config.Mlsa
-	5,  // 4: chef.automate.domain.deployment.ConfigRequest.V1.System.service:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Service
-	6,  // 5: chef.automate.domain.deployment.ConfigRequest.V1.System.log:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Log
-	7,  // 6: chef.automate.domain.deployment.ConfigRequest.V1.System.gather_logs:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.GatherLogs
-	8,  // 7: chef.automate.domain.deployment.ConfigRequest.V1.System.proxy:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy
-	9,  // 8: chef.automate.domain.deployment.ConfigRequest.V1.System.backup:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Backup
-	12, // 9: chef.automate.domain.deployment.ConfigRequest.V1.Service.name:type_name -> google.protobuf.StringValue
-	12, // 10: chef.automate.domain.deployment.ConfigRequest.V1.Service.origin:type_name -> google.protobuf.StringValue
-	12, // 11: chef.automate.domain.deployment.ConfigRequest.V1.Service.channel:type_name -> google.protobuf.StringValue
-	12, // 12: chef.automate.domain.deployment.ConfigRequest.V1.Service.upgrade_strategy:type_name -> google.protobuf.StringValue
-	12, // 13: chef.automate.domain.deployment.ConfigRequest.V1.Service.deployment_type:type_name -> google.protobuf.StringValue
-	12, // 14: chef.automate.domain.deployment.ConfigRequest.V1.Service.override_origin:type_name -> google.protobuf.StringValue
-	12, // 15: chef.automate.domain.deployment.ConfigRequest.V1.Service.hartifacts_path:type_name -> google.protobuf.StringValue
-	4,  // 16: chef.automate.domain.deployment.ConfigRequest.V1.Service.admin_user:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.AdminUser
-	12, // 17: chef.automate.domain.deployment.ConfigRequest.V1.Service.manifest_cache_expiry:type_name -> google.protobuf.StringValue
-	12, // 18: chef.automate.domain.deployment.ConfigRequest.V1.Service.manifest_directory:type_name -> google.protobuf.StringValue
-	13, // 19: chef.automate.domain.deployment.ConfigRequest.V1.Service.enable_chef_server:type_name -> google.protobuf.BoolValue
-	13, // 20: chef.automate.domain.deployment.ConfigRequest.V1.Service.enable_deployment_order_stress_mode:type_name -> google.protobuf.BoolValue
-	13, // 21: chef.automate.domain.deployment.ConfigRequest.V1.Service.feature_flag_s3_backups:type_name -> google.protobuf.BoolValue
-	12, // 22: chef.automate.domain.deployment.ConfigRequest.V1.Service.package_cleanup_mode:type_name -> google.protobuf.StringValue
-	13, // 23: chef.automate.domain.deployment.ConfigRequest.V1.Service.enable_dev_monitoring:type_name -> google.protobuf.BoolValue
-	12, // 24: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.email:type_name -> google.protobuf.StringValue
-	12, // 25: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.username:type_name -> google.protobuf.StringValue
-	12, // 26: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.name:type_name -> google.protobuf.StringValue
-	12, // 27: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.password:type_name -> google.protobuf.StringValue
-	12, // 28: chef.automate.domain.deployment.ConfigRequest.V1.System.Service.listen_address:type_name -> google.protobuf.StringValue
-	14, // 29: chef.automate.domain.deployment.ConfigRequest.V1.System.Service.port:type_name -> google.protobuf.Int32Value
-	12, // 30: chef.automate.domain.deployment.ConfigRequest.V1.System.Log.level:type_name -> google.protobuf.StringValue
-	12, // 31: chef.automate.domain.deployment.ConfigRequest.V1.System.GatherLogs.staging_dir:type_name -> google.protobuf.StringValue
-	12, // 32: chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy.connection_string:type_name -> google.protobuf.StringValue
-	12, // 33: chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy.no_proxy_string:type_name -> google.protobuf.StringValue
-	10, // 34: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.filesystem:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.Filesystem
-	12, // 35: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.Filesystem.path:type_name -> google.protobuf.StringValue
-	36, // [36:36] is the sub-list for method output_type
-	36, // [36:36] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	12, // 3: chef.automate.domain.deployment.ConfigRequest.V1.System.mlsa:type_name -> chef.automate.infra.config.Mlsa
+	6,  // 4: chef.automate.domain.deployment.ConfigRequest.V1.System.service:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Service
+	7,  // 5: chef.automate.domain.deployment.ConfigRequest.V1.System.log:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Log
+	8,  // 6: chef.automate.domain.deployment.ConfigRequest.V1.System.gather_logs:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.GatherLogs
+	9,  // 7: chef.automate.domain.deployment.ConfigRequest.V1.System.proxy:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy
+	10, // 8: chef.automate.domain.deployment.ConfigRequest.V1.System.backup:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Backup
+	13, // 9: chef.automate.domain.deployment.ConfigRequest.V1.Service.name:type_name -> google.protobuf.StringValue
+	13, // 10: chef.automate.domain.deployment.ConfigRequest.V1.Service.origin:type_name -> google.protobuf.StringValue
+	13, // 11: chef.automate.domain.deployment.ConfigRequest.V1.Service.channel:type_name -> google.protobuf.StringValue
+	13, // 12: chef.automate.domain.deployment.ConfigRequest.V1.Service.upgrade_strategy:type_name -> google.protobuf.StringValue
+	13, // 13: chef.automate.domain.deployment.ConfigRequest.V1.Service.deployment_type:type_name -> google.protobuf.StringValue
+	13, // 14: chef.automate.domain.deployment.ConfigRequest.V1.Service.override_origin:type_name -> google.protobuf.StringValue
+	13, // 15: chef.automate.domain.deployment.ConfigRequest.V1.Service.hartifacts_path:type_name -> google.protobuf.StringValue
+	5,  // 16: chef.automate.domain.deployment.ConfigRequest.V1.Service.admin_user:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.AdminUser
+	13, // 17: chef.automate.domain.deployment.ConfigRequest.V1.Service.manifest_cache_expiry:type_name -> google.protobuf.StringValue
+	13, // 18: chef.automate.domain.deployment.ConfigRequest.V1.Service.manifest_directory:type_name -> google.protobuf.StringValue
+	14, // 19: chef.automate.domain.deployment.ConfigRequest.V1.Service.enable_chef_server:type_name -> google.protobuf.BoolValue
+	14, // 20: chef.automate.domain.deployment.ConfigRequest.V1.Service.enable_deployment_order_stress_mode:type_name -> google.protobuf.BoolValue
+	14, // 21: chef.automate.domain.deployment.ConfigRequest.V1.Service.feature_flag_s3_backups:type_name -> google.protobuf.BoolValue
+	13, // 22: chef.automate.domain.deployment.ConfigRequest.V1.Service.package_cleanup_mode:type_name -> google.protobuf.StringValue
+	14, // 23: chef.automate.domain.deployment.ConfigRequest.V1.Service.enable_dev_monitoring:type_name -> google.protobuf.BoolValue
+	4,  // 24: chef.automate.domain.deployment.ConfigRequest.V1.Service.health:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.Health
+	15, // 25: chef.automate.domain.deployment.ConfigRequest.V1.Health.health_check_interval:type_name -> google.protobuf.Int32Value
+	13, // 26: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.email:type_name -> google.protobuf.StringValue
+	13, // 27: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.username:type_name -> google.protobuf.StringValue
+	13, // 28: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.name:type_name -> google.protobuf.StringValue
+	13, // 29: chef.automate.domain.deployment.ConfigRequest.V1.AdminUser.password:type_name -> google.protobuf.StringValue
+	13, // 30: chef.automate.domain.deployment.ConfigRequest.V1.System.Service.listen_address:type_name -> google.protobuf.StringValue
+	15, // 31: chef.automate.domain.deployment.ConfigRequest.V1.System.Service.port:type_name -> google.protobuf.Int32Value
+	13, // 32: chef.automate.domain.deployment.ConfigRequest.V1.System.Log.level:type_name -> google.protobuf.StringValue
+	13, // 33: chef.automate.domain.deployment.ConfigRequest.V1.System.GatherLogs.staging_dir:type_name -> google.protobuf.StringValue
+	13, // 34: chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy.connection_string:type_name -> google.protobuf.StringValue
+	13, // 35: chef.automate.domain.deployment.ConfigRequest.V1.System.Proxy.no_proxy_string:type_name -> google.protobuf.StringValue
+	11, // 36: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.filesystem:type_name -> chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.Filesystem
+	13, // 37: chef.automate.domain.deployment.ConfigRequest.V1.System.Backup.Filesystem.path:type_name -> google.protobuf.StringValue
+	38, // [38:38] is the sub-list for method output_type
+	38, // [38:38] is the sub-list for method input_type
+	38, // [38:38] is the sub-list for extension type_name
+	38, // [38:38] is the sub-list for extension extendee
+	0,  // [0:38] is the sub-list for field type_name
 }
 
 func init() { file_config_deployment_config_request_proto_init() }
@@ -1084,7 +1162,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_AdminUser); i {
+			switch v := v.(*ConfigRequest_V1_Health); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1096,7 +1174,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_System_Service); i {
+			switch v := v.(*ConfigRequest_V1_AdminUser); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1108,7 +1186,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_System_Log); i {
+			switch v := v.(*ConfigRequest_V1_System_Service); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1120,7 +1198,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_System_GatherLogs); i {
+			switch v := v.(*ConfigRequest_V1_System_Log); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1132,7 +1210,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_System_Proxy); i {
+			switch v := v.(*ConfigRequest_V1_System_GatherLogs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1144,7 +1222,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_System_Backup); i {
+			switch v := v.(*ConfigRequest_V1_System_Proxy); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1156,6 +1234,18 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ConfigRequest_V1_System_Backup); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_config_deployment_config_request_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ConfigRequest_V1_System_Backup_Filesystem); i {
 			case 0:
 				return &v.state
@@ -1174,7 +1264,7 @@ func file_config_deployment_config_request_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_config_deployment_config_request_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

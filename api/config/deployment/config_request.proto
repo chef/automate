@@ -71,6 +71,13 @@ message ConfigRequest {
 
 			google.protobuf.BoolValue enable_dev_monitoring = 15;
 			repeated string products = 16;
+
+			Health health = 17;
+		}
+
+		message Health {
+			google.protobuf.Int32Value health_check_interval = 1;
+			repeated string services = 2;
 		}
 
 		message AdminUser {
