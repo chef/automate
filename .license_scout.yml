@@ -812,6 +812,18 @@ fallbacks:
     name: cloud.google.com/go/contactcenterinsights
   - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
     license_id: Apache-2.0
+    name: cloud.google.com/go/compute
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/recaptchaenterprise/v2
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/vision/v2
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/workflows
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
     name: cloud.google.com/go/container
   - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
     license_id: Apache-2.0
@@ -1281,6 +1293,15 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/rsc/pdf/master/LICENSE
     license_id: BSD-3-Clause
     name: rsc.io/pdf
+  - license_content: https://raw.githubusercontent.com/googleapis/gax-go/main/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/googleapis/gax-go
+  - license_content: https://raw.githubusercontent.com/savsgio/dictpool/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/savsgio/dictpool
+
+
+
 
 exceptions:
   habitat:
@@ -1411,4 +1432,14 @@ exceptions:
 
   nodejs:
   - name: jschardet
+    reason: Exception made by Chef Legal
+  - name: chownr
+    reason: Exception made by Chef Legal
+  - name: jackspeak
+    reason: Exception made by Chef Legal
+  - name: package-json-from-dist
+    reason: Exception made by Chef Legal
+  - name: path-scurry
+    reason: Exception made by Chef Legal
+  - name: yallist
     reason: Exception made by Chef Legal
