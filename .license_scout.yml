@@ -1203,8 +1203,84 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/niemeyer/pretty/master/License
     license_id: BSD-3-Clause
     name: github.com/niemeyer/pretty
-
-
+  - license_content: https://raw.githubusercontent.com/orisano/pixelmatch/master/LICENSE
+    license_id: MIT
+    name: github.com/orisano/pixelmatch
+  - license_content: https://raw.githubusercontent.com/pkg/diff/main/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/pkg/diff
+  - license_content: https://raw.githubusercontent.com/pquerna/ffjson/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/pquerna/ffjson
+  - license_content: https://raw.githubusercontent.com/savsgio/gotils/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/savsgio/gotils
+  - license_content: https://raw.githubusercontent.com/ugorji/go/master/LICENSE
+    license_id: MIT
+    name: github.com/ugorji/go/codec
+  - license_content: https://raw.githubusercontent.com/ugorji/go/master/LICENSE
+    license_id: MIT
+    name: github.com/ugorji/go
+  - license_content: https://raw.githubusercontent.com/vmihailenco/msgpack/v5/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/vmihailenco/msgpack/v5
+  - license_content: https://raw.githubusercontent.com/vmihailenco/tagparser/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/vmihailenco/tagparser/v2
+  - license_content: https://raw.githubusercontent.com/vmihailenco/tagparser/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/xdg-go/pbkdf2
+  - license_content: https://raw.githubusercontent.com/xdg-go/scram/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/xdg-go/scram
+  - license_content: https://raw.githubusercontent.com/xdg-go/stringprep/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/xdg-go/stringprep
+  - license_content: https://raw.githubusercontent.com/xhit/go-str2duration/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/xhit/go-str2duration
+  - license_content: https://raw.githubusercontent.com/youmark/pkcs8/master/LICENSE
+    license_id: MIT
+    name: github.com/youmark/pkcs8
+  - license_content: https://raw.githubusercontent.com/zclconf/go-cty-debug/master/LICENSE
+    license_id: MIT
+    name: github.com/zclconf/go-cty-debug
+  - license_content: https://raw.githubusercontent.com/etcd-io/gofail/master/LICENSE
+    license_id: Apache-2.0
+    name: go.etcd.io/gofail
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-go/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/otel/metric
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-go/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/otel
+  - license_content: https://raw.githubusercontent.com/uber-go/goleak/master/LICENSE
+    license_id: MIT
+    name: go.uber.org/goleak
+  - license_content: https://raw.githubusercontent.com/gonum/gonum/master/LICENSE
+    license_id: BSD-3-Clause
+    name: gonum.org/v1/gonum
+  - license_content: https://raw.githubusercontent.com/gonum/netlib/master/LICENSE
+    license_id: BSD-3-Clause
+    name: gonum.org/v1/netlib
+  - license_content: https://raw.githubusercontent.com/gonum/plot/master/LICENSE
+    license_id: BSD-3-Clause
+    name: gonum.org/v1/plot
+  - license_content: https://raw.githubusercontent.com/googleapis/go-genproto/main/LICENSE
+    license_id: Apache-2.0
+    name: google.golang.org/genproto
+  - license_content: https://raw.githubusercontent.com/go-mgo/mgo/v2/LICENSE
+    license_id: BSD-3-Clause
+    name: gopkg.in/mgo.v2
+  - license_content: https://raw.githubusercontent.com/vmihailenco/msgpack/v2.9.2/LICENSE
+    license_id: BSD-3-Clause
+    name: gopkg.in/vmihailenco/msgpack.v2
+  - license_content: https://raw.githubusercontent.com/coder/websocket/master/LICENSE.txt
+    license_id: BSD-3-Clause
+    name: nhooyr.io/websocket
+  - license_content: https://raw.githubusercontent.com/rsc/pdf/master/LICENSE
+    license_id: BSD-3-Clause
+    name: rsc.io/pdf
 
 exceptions:
   habitat:
