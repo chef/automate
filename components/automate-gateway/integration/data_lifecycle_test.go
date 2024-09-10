@@ -35,7 +35,7 @@ const (
 	svcsDisconnectedServicesJobThreshold       = "9m"
 	svcsDeleteDisconnectedServicesJobName      = "delete_disconnected_services"
 	svcsDeleteDisconnectedServicesJobThreshold = "23d"
-	testRecurrence                             = "DTSTART=20191106T180323Z"
+	testRecurrence                             = "DTSTART:20191106T180323Z\nRRULE:FREQ=DAILY;INTERVAL=2"
 )
 
 // TestDataLifecycleConfigure tests configuring data lifecycle jobs in all
