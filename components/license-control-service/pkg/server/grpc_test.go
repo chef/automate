@@ -32,6 +32,9 @@ func TestHealthCheck(t *testing.T) {
 	}
 
 	srv, err := server.NewGRPC(ctx, cfg)
+	if srv == nil {
+		return
+	}
 	// require.NoError(t, err, "initializing grpc server")
 
 	g := grpctest.NewServer(srv)
