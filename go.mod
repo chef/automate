@@ -47,7 +47,7 @@ require (
 	github.com/imdario/mergo v0.3.16
 	github.com/jaswdr/faker v1.0.2
 	github.com/jedib0t/go-pretty/v5 v5.0.2-alpha
-	github.com/jhump/protoreflect v1.14.1
+	github.com/jhump/protoreflect v1.10.3
 	github.com/kevinburke/go-bindata v3.16.0+incompatible
 	github.com/kylelemons/godebug v1.1.0
 	github.com/leanovate/gopter v0.2.4
@@ -86,14 +86,14 @@ require (
 	go.uber.org/atomic v1.11.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	gocloud.dev v0.23.0
+	gocloud.dev v0.22.0
 	golang.org/x/crypto v0.23.0
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.15.0
-	google.golang.org/api v0.109.0
-	google.golang.org/genproto v0.0.0-20230113154510-dbe35b8444a5
-	google.golang.org/grpc v1.53.0-dev
+	google.golang.org/api v0.44.0-impersonate-preview
+	google.golang.org/genproto v0.0.0-20210323160006-e668133fea6a
+	google.golang.org/grpc v1.36.0
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
@@ -132,7 +132,6 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v0.10.0 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
@@ -154,8 +153,8 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.109.0 // indirect
-	cloud.google.com/go/storage v1.29.0
+	cloud.google.com/go v0.80.0 // indirect
+	cloud.google.com/go/storage v1.14.0
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.6 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
@@ -190,7 +189,7 @@ require (
 	github.com/golang/glog v1.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/wire v0.5.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
