@@ -741,6 +741,406 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE
     license_id: MIT
     name: go.uber.org/automaxprocs
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/accessapproval
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/accesscontextmanager
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/aiplatform
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/analytics
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/apigateway
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/apigeeconnect
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/appengine
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/area120
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/artifactregistry
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/asset
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/assuredworkloads
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/automl
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/baremetalsolution
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/batch
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/beyondcorp
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/billing
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/binaryauthorization
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/certificatemanager
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/channel
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/cloudbuild
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/clouddms
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/cloudtasks
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/contactcenterinsights
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/container
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/containeranalysis
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/datacatalog
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dataflow
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dataform
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/datafusion
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/datalabeling
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dataplex
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dataproc
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dataqna
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/datastream
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/deploy
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dialogflow
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dlp
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/documentai
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/domains
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/edgecontainer
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/essentialcontacts
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/eventarc
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/filestore
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/functions
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/gaming
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/gkebackup
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/gkeconnect
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/gkehub
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/gkemulticloud
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/gsuiteaddons
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/iap
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/ids
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/iot
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/kms
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/language
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/lifesciences
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/longrunning
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/managedidentities
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/mediatranslation
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/memcache
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/metastore
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/monitoring
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/networkconnectivity
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/networkmanagement
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/networksecurity
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/notebooks
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/optimization
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/orchestration
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/orgpolicy
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/osconfig
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/oslogin
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/phishingprotection
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/policytroubleshooter
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/privatecatalog
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/recaptchaenterprise
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/recommendationengine
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/recommender
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/redis
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/resourcemanager
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/resourcesettings
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/retail
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/run
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/scheduler
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/secretmanager
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/security
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/securitycenter
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/servicecontrol
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/servicedirectory
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/servicemanagement
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/serviceusage
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/shell
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/speech
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/storagetransfer
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/talent
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/texttospeech
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/tpu
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/trace
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/translate
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/video
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/videointelligence
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/vision
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/vmmigration
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/vpcaccess
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/webrisk
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/websecurityscanner
+  - license_content: https://raw.githubusercontent.com/Azure/azure-amqp-common-go/master/LICENSE
+    license_id: MIT
+    name: github.com/Azure/azure-amqp-common-go/v3
+  - license_content: https://raw.githubusercontent.com/Azure/azure-amqp-common-go/master/LICENSE
+    license_id: MIT
+    name: github.com/Azure/go-amqp
+  - license_content: https://raw.githubusercontent.com/BurntSushi/toml/master/COPYING
+    license_id: MIT
+    name: github.com/BurntSushi/toml
+  - license_content: https://raw.githubusercontent.com/DataDog/zstd/1.x/LICENSE
+    license_id: BSD-2-Clause
+    name: github.com/DataDog/zstd
+  - license_content: https://raw.githubusercontent.com/Sereal/Sereal/master/Go/sereal/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/Sereal/Sereal/Go/sereal
+  - license_content: https://raw.githubusercontent.com/ajstarks/svgo/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/ajstarks/svgo
+  - license_content: https://raw.githubusercontent.com/alecthomas/kingpin/master/COPYING
+    license_id: BSD-3-Clause
+    name: github.com/alecthomas/kingpin/v2
+  - license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/apparentlymart/go-textseg/v13
+  - license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/apparentlymart/go-textseg/v15
+  - license_content: https://raw.githubusercontent.com/aws/aws-sdk-go/main/LICENSE.txt
+    license_id: Apache-2.0
+    name: github.com/aws/aws-sdk-go
+  - license_content: https://raw.githubusercontent.com/benbjohnson/clock/master/LICENSE
+    license_id: MIT
+    name: github.com/benbjohnson/clock
+  - license_content: https://raw.githubusercontent.com/chromedp/cdproto/master/LICENSE
+    license_id: MIT
+    name: github.com/chromedp/cdproto
+  - license_content: https://raw.githubusercontent.com/chromedp/chromedp/master/LICENSE
+    license_id: MIT
+    name: github.com/chromedp/chromedp
+  - license_content: https://raw.githubusercontent.com/chromedp/sysutil/master/LICENSE
+    license_id: MIT
+    name: github.com/chromedp/sysutil
+  - license_content: https://raw.githubusercontent.com/cncf/xds/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/cncf/xds/go
+  - license_content: https://raw.githubusercontent.com/creack/pty/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/creack/pty
+  - license_content: https://raw.githubusercontent.com/davecgh/go-spew/master/LICENSE
+    license_id: ISC
+    name: github.com/davecgh/go-spew
+  - license_content: https://raw.githubusercontent.com/davecgh/go-xdr/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/davecgh/go-xdr
+  - license_content: https://raw.githubusercontent.com/denisenkom/go-mssqldb/master/LICENSE.txt
+    license_id: BSD-3-Clause
+    name: github.com/denisenkom/go-mssqldb
+  - license_content: https://raw.githubusercontent.com/fogleman/gg/master/LICENSE.md
+    license_id: BSD-3-Clause
+    name: github.com/fogleman/gg
+  - license_content: https://raw.githubusercontent.com/frankban/quicktest/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/frankban/quicktest
+  - license_content: https://raw.githubusercontent.com/gin-contrib/sse/master/LICENSE
+    license_id: MIT
+    name: github.com/gin-contrib/sse
+  - license_content: https://raw.githubusercontent.com/gin-gonic/gin/master/LICENSE
+    license_id: MIT
+    name: github.com/gin-gonic/gin
+  - license_content: https://raw.githubusercontent.com/gin-gonic/gin/master/LICENSE
+    license_id: MIT
+    name: github.com/go-logr/logr
+  - license_content: https://raw.githubusercontent.com/go-logr/stdr/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/go-logr/stdr
+  - license_content: https://raw.githubusercontent.com/go-playground/assert/master/LICENSE
+    license_id: MIT
+    name: github.com/go-playground/assert/v2
+  - license_content: https://raw.githubusercontent.com/go-playground/locales/master/LICENSE
+    license_id: MIT
+    name: github.com/go-playground/locales
+  - license_content: https://raw.githubusercontent.com/go-playground/universal-translator/master/LICENSE
+    license_id: MIT
+    name: github.com/go-playground/universal-translator
+
 
 
 exceptions:
