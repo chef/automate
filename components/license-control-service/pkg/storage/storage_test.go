@@ -3,7 +3,6 @@ package storage_test
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -50,11 +49,12 @@ func TestPGBackend(t *testing.T) {
 	}
 	t.Run("Init should succeed with non-existent legacy migration file", func(t *testing.T) {
 		defer resetDB(t)
-		fmt.Printf("pgURL: %v\n", pgURL)
-
 		backend := storage.NewCurrentBackend(pgURL, "../../migrations", "/definitely/should/not/exist")
 
 		err = backend.Init(context.Background(), keys.NewLicenseParser(keys.BuiltinKeyData))
+		if err != nil && strings.Contains(err.Error(), "licenses table does not exist") {
+			t.Log("Licenses table was missing but was created during Init.")
+		}
 		require.NoError(t, err)
 	})
 
