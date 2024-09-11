@@ -129,11 +129,11 @@ func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
 
 	err = migrator.Migrate(p.pgURL, p.migrationPath, logger.NewLogrusStandardLogger(), false)
 	if err != nil {
-	    if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-	        log.Warn("Skipping migration as it has already been applied")
-	    } else {
-	        return errors.Wrap(err, "failed to apply database schema")
-	    }
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			logrus.Warn("Skipping migration as it has already been applied")
+		} else {
+			return errors.Wrap(err, "failed to apply database schema")
+		}
 	}
 
 	// Ensure 'licenses' table exists
