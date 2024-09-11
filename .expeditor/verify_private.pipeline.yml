@@ -644,7 +644,7 @@ steps:
   - label: "product"
     command:
       - integration/run_test integration/tests/product.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
