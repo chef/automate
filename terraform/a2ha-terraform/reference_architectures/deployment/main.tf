@@ -412,6 +412,7 @@ module "bootstrap_automate" {
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips                        = slice(var.automate_private_ips, 0, 1)
   proxy_listen_port                  = var.proxy_listen_port
+  postgresql_listen_port             = var.postgresql_listen_port
   setup_managed_services             = var.setup_managed_services
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
@@ -487,6 +488,7 @@ module "automate" {
     length(var.automate_private_ips),
   )
   proxy_listen_port      = var.proxy_listen_port
+  postgresql_listen_port = var.postgresql_listen_port
   setup_managed_services = var.setup_managed_services
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
@@ -558,6 +560,7 @@ module "chef_server" {
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips                        = var.chef_server_private_ips
   proxy_listen_port                  = var.proxy_listen_port
+  postgresql_listen_port             = var.postgresql_listen_port
   setup_managed_services             = var.setup_managed_services
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user

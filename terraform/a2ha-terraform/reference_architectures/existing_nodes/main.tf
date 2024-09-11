@@ -287,6 +287,7 @@ module "bootstrap_automate" {
   opensearch_listen_port             = var.opensearch_listen_port
   opensearch_private_ips             = var.existing_opensearch_private_ips
   proxy_listen_port                  = var.proxy_listen_port
+  postgresql_listen_port             = var.postgresql_listen_port
   postgresql_private_ips             = var.existing_postgresql_private_ips
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips                        = slice(var.existing_automate_private_ips, 0, 1)
@@ -361,6 +362,7 @@ module "automate" {
   opensearch_listen_port             = var.opensearch_listen_port
   opensearch_private_ips             = var.existing_opensearch_private_ips
   proxy_listen_port                  = var.proxy_listen_port
+  postgresql_listen_port             = var.postgresql_listen_port
   postgresql_private_ips             = var.existing_postgresql_private_ips
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips = slice(
@@ -439,6 +441,7 @@ module "chef_server" {
   opensearch_listen_port             = var.opensearch_listen_port
   opensearch_private_ips             = var.existing_opensearch_private_ips
   proxy_listen_port                  = var.proxy_listen_port
+  postgresql_listen_port             = var.postgresql_listen_port
   postgresql_private_ips             = var.existing_postgresql_private_ips
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips                        = var.existing_chef_server_private_ips

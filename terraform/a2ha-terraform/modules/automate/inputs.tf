@@ -224,6 +224,9 @@ variable "private_ips" {
 variable "proxy_listen_port" {
 }
 
+variable "postgresql_listen_port" {
+}
+
 variable "public_ips" {
   default = []
 }
