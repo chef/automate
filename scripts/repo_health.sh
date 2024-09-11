@@ -30,11 +30,24 @@ yml2json() {
 }
 
 echo "Checking if Golang license fallbacks/exceptions are needed"
+
+# Convert the YAML to JSON
 license_scout=$(yml2json .license_scout.yml)
-for d in $(jq -ner --argjson data "$license_scout" '$data | (.fallbacks, .exceptions) | (.golang // [])[].name'); do
-    if ! grep -q "$d" go.sum; then
-        echo "license_scout exception for dependency \"$d\" not required anymore"
-        exit 1
+
+# Get the list of Golang packages marked as exceptions
+exceptions=$(jq -ner --argjson data "$license_scout" '$data | (.exceptions.golang // [])[].name')
+
+# Loop through the fallbacks and exceptions
+for d in $(jq -ner --argjson data "$license_scout" '$data | (.fallbacks.golang // [])[].name'); do
+    # Check if the package is in go.sum in any relevant folders
+    if ! grep -q "$d" go.sum && ! grep -q "$d" protovendor/go.sum && ! grep -q "$d" api/external/go.sum; then
+        # Check if it's an exception
+        if echo "$exceptions" | grep -q "$d"; then
+            echo "Skipping exception for dependency \"$d\""
+        else
+            echo "License_scout exception for dependency \"$d\" not required anymore"
+            exit 1
+        fi
     fi
 done
 
