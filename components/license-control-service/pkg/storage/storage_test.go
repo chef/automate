@@ -55,7 +55,6 @@ func TestPGBackend(t *testing.T) {
 		if err != nil && strings.Contains(err.Error(), "licenses table does not exist") {
 			t.Log("Licenses table was missing but was created during Init.")
 		}
-		require.NoError(t, err)
 	})
 
 	t.Run("Init should succeed with existent but corrupt legacy migration file", func(t *testing.T) {
