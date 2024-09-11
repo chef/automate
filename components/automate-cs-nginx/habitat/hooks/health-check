@@ -15,6 +15,7 @@ do
     output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "https://automate-cs-nginx:{{cfg.service.port}}/_status")
     res=$?
     if [ "0" = "$res" ]; then
+        echo "health check passed"
         exit 0
     fi
 sleep 1    
