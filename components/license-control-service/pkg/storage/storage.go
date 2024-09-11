@@ -127,6 +127,12 @@ func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
 	}
 	p.db = d
 
+	if err := p.db.Ping(); err != nil {
+		logrus.Error("cannot connect to the db")
+	}
+
+	logrus.Error("connected to the db")
+
 	err = migrator.Migrate(p.pgURL, p.migrationPath, logger.NewLogrusStandardLogger(), false)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
