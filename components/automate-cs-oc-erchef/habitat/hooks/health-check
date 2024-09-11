@@ -15,6 +15,7 @@ do
     if [ "0" = "$res" ]; then
         exit 0
     fi
+sleep 1      
 done
 
 echo "health check curl command returned exit code ${res}:"
