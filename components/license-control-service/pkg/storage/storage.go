@@ -127,6 +127,12 @@ func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
 	}
 	p.db = d
 
+	if err := p.db.Ping(); err != nil {
+		logrus.Error("cannot connect to the db")
+	}
+
+	logrus.Error("connected to the db")
+
 	err = migrator.Migrate(p.pgURL, p.migrationPath, logger.NewLogrusStandardLogger(), false)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
@@ -134,6 +140,13 @@ func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
 		} else {
 			return errors.Wrap(err, "failed to apply database schema")
 		}
+	}
+
+	// Ensure 'licenses' table exists
+	row := p.db.QueryRow("SELECT to_regclass('public.licenses')")
+	var tableName string
+	if err := row.Scan(&tableName); err != nil || tableName == "" {
+		return errors.New("licenses table does not exist after migration")
 	}
 
 	_, _, err = p.GetLicense(ctx)
