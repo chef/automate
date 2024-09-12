@@ -7,10 +7,11 @@ pkg_origin=chef
 pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
+
 pkg_deps=(
   core/ruby30
   core/aws-cli
-  chef/inspec
+  chef/inspec/4.56.61
   core/bash
   core/coreutils
   core/cacerts

@@ -18,6 +18,7 @@ pkg_license=("GPL-2.0-with-classpath-exception")
 pkg_description=('Eclipse Temurin is the open source Java SE build based upon OpenJDK.')
 pkg_upstream_url=https://adoptium.net/
 
+
 pkg_deps=(
   core/gcc-libs
   core/glibc

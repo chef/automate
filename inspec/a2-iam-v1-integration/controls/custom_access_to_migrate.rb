@@ -19,24 +19,24 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
   describe 'using custom policies' do
   
     before(:all) do
-      create_non_admin_resp = automate_api_request(
+      create_non_admin_resp = automate_api_request({
         # we need to keep this deprecated path here because this test is run
         # on an older version of Automate
-        '/api/v0/auth/users',
+        endpoint: '/api/v0/auth/users',
         http_method: 'POST',
         request_body: {
           'username': MIGRATED_TEAM_VIEWER,
           'name': MIGRATED_TEAM_VIEWER,
           'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
         }.to_json
-      )
+      })
 
       expect(create_non_admin_resp.http_status.to_s).to match(/200|409/)
 
-      test_token_resp = automate_api_request(
+      test_token_resp = automate_api_request({
         # we need to keep this deprecated path here because this test is run
         # on an older version of Automate
-        '/api/v0/auth/tokens',
+        endpoint: '/api/v0/auth/tokens',
         http_method: 'POST',
         request_body: {
           'id': MIGRATED_TOKEN_ID,
@@ -44,7 +44,7 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
           'description': 'v1 inspec admin token to be migrated',
           'active': true
         }.to_json
-      )
+      })
       TOKEN = test_token_resp.parsed_response_body[:value]
 
       expect(test_token_resp.http_status).to eq(200)
@@ -55,28 +55,28 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
     describe 'v1 admin token policy' do
       it 'can create policy for token to make it an admin token' do
         expect(
-          automate_api_request(
+          automate_api_request({
             # we need to keep this deprecated path here because this test is run
             # on an older version of Automate
-            '/api/v0/auth/policies',
+            endpoint: '/api/v0/auth/policies',
             http_method: 'POST',
             request_body: {
               subjects: ["token:#{MIGRATED_TOKEN_ID}"],
               action: "*",
               resource: "*"
             }.to_json
-          ).http_status
+          }).http_status
         ).to eq 200
       end
 
       it 'token with admin permissions can access policies (admin-only resource)' do
         expect(
-          automate_client_api_request(
+          automate_client_api_request({
             # we need to keep this deprecated path here because this test is run
             # on an older version of Automate
-            '/api/v0/auth/policies',
-            TOKEN
-          ).http_status
+            endpoint: '/api/v0/auth/policies',
+            api_token: TOKEN
+          }).http_status
         ).to eq 200
       end
     end
@@ -84,29 +84,29 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
     describe 'v1 user team-viewer policy' do
       it 'can create policy for a user to grant them access to view the teams list' do
         expect(
-          automate_api_request(
+          automate_api_request({
             # we need to keep this deprecated path here because this test is run
             # on an older version of Automate
-            '/api/v0/auth/policies',
+            endpoint: '/api/v0/auth/policies',
             http_method: 'POST',
             request_body: {
               subjects: ["user:local:#{MIGRATED_TEAM_VIEWER}"],
               action: "read",
               resource: "auth:teams"
             }.to_json
-          ).http_status
+          }).http_status
         ).to eq 200
       end
 
       it 'the team-viewer user can access the team list' do
         expect(
-          automate_api_request(
+          automate_api_request({
             # we need to keep this deprecated path here because this test is run
             # on an older version of Automate
-            '/api/v0/auth/teams',
+            endpoint: '/api/v0/auth/teams',
             http_method: 'GET',
             user: MIGRATED_TEAM_VIEWER
-          ).http_status
+          }).http_status
         ).to eq 200
       end
     end

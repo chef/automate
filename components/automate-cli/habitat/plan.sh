@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=automate-cli
 pkg_origin=chef
 component_name=automate-cli

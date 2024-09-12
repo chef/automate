@@ -23,91 +23,92 @@ control 'iam-chef-managed-access-1' do
 
   describe 'chef-managed policy access' do
     before(:all) do
-      create_viewer_resp = automate_api_request(
-        '/apis/iam/v2/users',
+      create_viewer_resp = automate_api_request({
+        endpoint: '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: VIEWER_USER_ID,
           name: VIEWER_USER_ID,
           password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate'
         }.to_json
-      )
+      })
       expect(create_viewer_resp.http_status).to eq 200
 
-      create_editor_resp = automate_api_request(
-        '/apis/iam/v2/users',
+      create_editor_resp = automate_api_request({
+        endpoint: '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: EDITOR_USER_ID,
           name: EDITOR_USER_ID,
           password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate'
         }.to_json
-      )
+      })
       expect(create_editor_resp.http_status).to eq 200
 
-      create_project_owner_resp = automate_api_request(
-        '/apis/iam/v2/users',
+      create_project_owner_resp = automate_api_request({
+        endpoint: '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: PROJECT_OWNER_USER_ID,
           name: PROJECT_OWNER_USER_ID,
           password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate'
         }.to_json
-      )
+      })
       expect(create_project_owner_resp.http_status).to eq 200
 
-      create_project_resp = automate_api_request(
-        '/apis/iam/v2/projects',
+      create_project_resp = automate_api_request({
+        endpoint: '/apis/iam/v2/projects',
         http_method: 'POST',
         request_body: {
           id: PROJECT_ID,
           name: PROJECT_ID,
           skip_policies: false
         }.to_json
-      )
+      })
       expect(create_project_resp.http_status).to eq 200
 
-      add_viewer_member_resp = automate_api_request("/apis/iam/v2/policies/#{VIEWER_POLICY_ID}/members:add",
+      add_viewer_member_resp = automate_api_request({
+      endpoint: "/apis/iam/v2/policies/#{VIEWER_POLICY_ID}/members:add",
       http_method: 'POST',
       request_body: {
         members: ["user:local:#{VIEWER_USER_ID}"]
-      }.to_json)
+      }.to_json})
       expect(add_viewer_member_resp.http_status).to eq 200
 
-      add_editor_member_resp = automate_api_request("/apis/iam/v2/policies/#{EDITOR_POLICY_ID}/members:add",
+      add_editor_member_resp = automate_api_request({endpoint: "/apis/iam/v2/policies/#{EDITOR_POLICY_ID}/members:add",
       http_method: 'POST',
       request_body: {
         members: ["user:local:#{EDITOR_USER_ID}"]
-      }.to_json)
+      }.to_json})
       expect(add_editor_member_resp.http_status).to eq 200
 
-      add_project_owner_member_resp = automate_api_request("/apis/iam/v2/policies/#{PROJECT_OWNER_POLICY_ID}/members:add",
+      add_project_owner_member_resp = automate_api_request({endpoint: "/apis/iam/v2/policies/#{PROJECT_OWNER_POLICY_ID}/members:add",
       http_method: 'POST',
       request_body: {
         members: ["user:local:#{PROJECT_OWNER_USER_ID}"]
-      }.to_json)
+      }.to_json})
       expect(add_project_owner_member_resp.http_status).to eq 200
     end
 
     after(:all) do
-      delete_user_resp = automate_api_request(
-        "/apis/iam/v2/users/#{VIEWER_USER_ID}", http_method: 'DELETE'
-      )
+      delete_user_resp = automate_api_request({
+        endpoint: "/apis/iam/v2/users/#{VIEWER_USER_ID}", http_method: 'DELETE'
+      })
       expect(delete_user_resp.http_status).to eq 200
 
-      delete_user_resp = automate_api_request(
-        "/apis/iam/v2/users/#{EDITOR_USER_ID}", http_method: 'DELETE'
-      )
+      delete_user_resp = automate_api_request({
+        endpoint: "/apis/iam/v2/users/#{EDITOR_USER_ID}", http_method: 'DELETE'
+      })
       expect(delete_user_resp.http_status).to eq 200
 
-      delete_user_resp = automate_api_request(
-        "/apis/iam/v2/users/#{PROJECT_OWNER_USER_ID}", http_method: 'DELETE'
-      )
+      delete_user_resp = automate_api_request({
+        endpoint: "/apis/iam/v2/users/#{PROJECT_OWNER_USER_ID}", http_method: 'DELETE'
+      })
       expect(delete_user_resp.http_status).to eq 200
 
-      delete_project_resp = automate_api_request(
-        "/apis/iam/v2/projects/#{PROJECT_ID}", http_method: 'DELETE'
-      )
+      delete_project_resp = automate_api_request({
+        endpoint: "/apis/iam/v2/projects/#{PROJECT_ID}", http_method: 'DELETE'
+      })
       expect(delete_project_resp.http_status).to eq 200
     end
 
@@ -141,11 +142,11 @@ control 'iam-chef-managed-access-1' do
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/compliance/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/compliance/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -172,23 +173,23 @@ control 'iam-chef-managed-access-1' do
         urls.each do |url|
           it "#{method} #{url} returns 403 for viewer" do
             expect(
-              automate_api_request(
-                "/api/v0/compliance/#{url}",
+              automate_api_request({
+                endpoint: "/api/v0/compliance/#{url}",
                 request_headers: { 'Content-type': 'application/json' },
                 http_method: method,
                 user: VIEWER_USER_ID
-              ).http_status
+              }).http_status
             ).to eq 403
           end
 
           [ADMIN_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/compliance/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/compliance/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -199,26 +200,26 @@ control 'iam-chef-managed-access-1' do
     describe 'handcrafted profile upload handler' do
       it 'POST profiles?owner=OWNER returns 403 for viewer' do
         expect(
-          automate_api_request(
-            '/api/v0/compliance/profiles?owner=OWNER}',
+          automate_api_request({
+            endpoint: '/api/v0/compliance/profiles?owner=OWNER}',
             request_headers: { 'Content-type': 'application/json' },
             request_body: { name: 'NAME', version: 'VER' }.to_json,
             http_method: 'POST',
             user: VIEWER_USER_ID
-          ).http_status
+          }).http_status
         ).to eq 403
       end
 
       [ADMIN_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
         it "POST profiles?owner=OWNER does not return 403 for #{user}" do
           expect(
-            automate_api_request(
-              '/api/v0/compliance/profiles?owner=OWNER',
+            automate_api_request({
+              endpoint: '/api/v0/compliance/profiles?owner=OWNER',
               request_headers: { 'Content-type': 'application/json' },
               request_body: { name: 'NAME', version: 'VER' }.to_json,
               http_method: 'POST',
               user: user
-            ).http_status
+            }).http_status
           ).not_to eq 403
         end
       end
@@ -234,11 +235,11 @@ control 'iam-chef-managed-access-1' do
         urls.each do |url|
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
-              status = automate_api_request(
-                "/api/v0/#{url}",
+              status = automate_api_request({
+                endpoint: "/api/v0/#{url}",
                 http_method: method,
                 user: user
-              ).http_status
+              }).http_status
               expect(status).not_to eq 403
             end
           end
@@ -266,22 +267,22 @@ control 'iam-chef-managed-access-1' do
         urls.each do |url|
           it "#{method} #{url} returns 403 for viewer" do
             expect(
-              automate_api_request(
-                "/api/v0/#{url}",
+              automate_api_request({
+                endpoint: "/api/v0/#{url}",
                 http_method: method,
                 user: VIEWER_USER_ID
-              ).http_status
+              }).http_status
             ).to eq 403
           end
 
           [ADMIN_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -306,11 +307,11 @@ control 'iam-chef-managed-access-1' do
         urls.each do |url|
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
-              status = automate_api_request(
-                "/api/v0/cfgmgmt/#{url}",
+              status = automate_api_request({
+                endpoint: "/api/v0/cfgmgmt/#{url}",
                 http_method: method,
                 user: user
-              ).http_status
+              }).http_status
               expect(status).not_to eq 403
             end
           end
@@ -334,11 +335,11 @@ control 'iam-chef-managed-access-1' do
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -349,22 +350,22 @@ control 'iam-chef-managed-access-1' do
     describe 'gateway health' do
       it 'GET gateway/health for ADMIN' do
         expect(
-          automate_api_request(
-            '/api/v0/gateway/health',
+          automate_api_request({
+            endpoint: '/api/v0/gateway/health',
             http_method: 'GET',
             user: ADMIN_USER_ID
-          ).http_status
+          }).http_status
         ).not_to eq 403
       end
 
       it 'GET gateway/health NON-ADMIN' do
         ALL_NON_ADMIN_USERS_ACROSS_ROLES.each do |user|
           expect(
-            automate_api_request(
-              '/api/v0/gateway/health',
+            automate_api_request({
+              endpoint: '/api/v0/gateway/health',
               http_method: 'GET',
               user: user
-            ).http_status
+            }).http_status
           ).to eq 403
         end
       end
@@ -387,11 +388,11 @@ control 'iam-chef-managed-access-1' do
         urls.each do |url|
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
-              status = automate_api_request(
-                "/api/v0/#{url}",
+              status = automate_api_request({
+                endpoint: "/api/v0/#{url}",
                 http_method: method,
                 user: user
-              ).http_status
+              }).http_status
               expect(status).not_to eq 403
             end
           end
@@ -413,11 +414,11 @@ control 'iam-chef-managed-access-1' do
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -441,22 +442,22 @@ control 'iam-chef-managed-access-1' do
         urls.each do |url|
           it "#{method} #{url} returns 403 for viewer" do
             expect(
-              automate_api_request(
-                "/api/v0/#{url}",
+              automate_api_request({
+                endpoint: "/api/v0/#{url}",
                 http_method: method,
                 user: VIEWER_USER_ID
-              ).http_status
+              }).http_status
             ).to eq 403
           end
 
           [ADMIN_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -477,11 +478,11 @@ control 'iam-chef-managed-access-1' do
           ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/#{url}",
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -500,21 +501,21 @@ control 'iam-chef-managed-access-1' do
           ALL_NON_ADMIN_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user
-                ).http_status
+                }).http_status
               ).to eq 403
             end
 
             it "#{method} #{url} does not return 403 for admin" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: ADMIN_USER_ID
-                ).http_status
+                }).http_status
               ).to_not eq 403
             end
           end
@@ -535,11 +536,11 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID ].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
@@ -547,11 +548,11 @@ control 'iam-chef-managed-access-1' do
           [ ADMIN_USER_ID, PROJECT_OWNER_USER_ID ].each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -568,22 +569,22 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID, PROJECT_OWNER_USER_ID ].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
 
           it "#{method} #{url} does not return 403 for admin" do
             expect(
-              automate_api_request(
-                url,
+              automate_api_request({
+                endpoint: url,
                 http_method: method,
                 user: ADMIN_USER_ID
-              ).http_status
+              }).http_status
             ).not_to eq 403
           end
         end
@@ -612,22 +613,22 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID, PROJECT_OWNER_USER_ID ].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
 
           it "#{method} #{url} does not return 403 for admin" do
             expect(
-              automate_api_request(
-                url,
+              automate_api_request({
+                endpoint: url,
                 http_method: method,
                 user: ADMIN_USER_ID
-              ).http_status
+              }).http_status
             ).not_to eq 403
           end
         end
@@ -646,11 +647,11 @@ control 'iam-chef-managed-access-1' do
           [EDITOR_USER_ID, VIEWER_USER_ID].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
@@ -658,11 +659,11 @@ control 'iam-chef-managed-access-1' do
           [ADMIN_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  url,
+                automate_api_request({
+                  endpoint: url,
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -672,31 +673,31 @@ control 'iam-chef-managed-access-1' do
     ALL_USERS_ACROSS_ROLES.each do |user|
       it "a #{user} can see their own user record" do
         expect(
-          automate_api_request(
-            "/apis/iam/v2/users/#{user}",
+          automate_api_request({
+            endpoint: "/apis/iam/v2/users/#{user}",
             http_method: "GET",
             user: user,
-          ).http_status
+          }).http_status
         ).not_to eq 403
       end
 
       it "a #{user} can update their own user record" do
         expect(
-          automate_api_request(
-            "/apis/iam/v2/users/#{user}",
+          automate_api_request({
+            endpoint: "/apis/iam/v2/users/#{user}",
             http_method: "PUT",
             user: user,
-          ).http_status
+          }).http_status
         ).not_to eq 403
       end
 
       it "a #{user} cannot delete their own user record" do
         expect(
-          automate_api_request(
-            "/apis/iam/v2/users/#{user}",
+          automate_api_request({
+            endpoint: "/apis/iam/v2/users/#{user}",
             http_method: "DELETE",
             user: user,
-          ).http_status
+          }).http_status
         ).to eq 403
       end
     end
@@ -711,11 +712,11 @@ control 'iam-chef-managed-access-1' do
         ALL_USERS_ACROSS_ROLES.each do |user|
           it "#{method} #{url} does not return 403 for #{user}" do
             expect(
-              automate_api_request(
-                "/apis/iam/v2/#{url}",
+              automate_api_request({
+                endpoint: "/apis/iam/v2/#{url}",
                 http_method: method,
                 user: user,
-              ).http_status
+              }).http_status
             ).not_to eq 403
           end
         end
@@ -747,22 +748,22 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/apis/iam/v2/#{url}",
+                automate_api_request({
+                  endpoint: "/apis/iam/v2/#{url}",
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
 
           it "#{method} #{url} does not return 403 for admin" do
             expect(
-              automate_api_request(
-                url,
+              automate_api_request({
+                endpoint: url,
                 http_method: method,
                 user: ADMIN_USER_ID
-              ).http_status
+              }).http_status
             ).not_to eq 403
           end
         end
@@ -786,11 +787,11 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID ].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/apis/iam/v2/#{url}",
+                automate_api_request({
+                  endpoint: "/apis/iam/v2/#{url}",
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
@@ -798,11 +799,11 @@ control 'iam-chef-managed-access-1' do
           [ ADMIN_USER_ID, PROJECT_OWNER_USER_ID ].each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/apis/iam/v2/#{url}",
+                automate_api_request({
+                  endpoint: "/apis/iam/v2/#{url}",
                   http_method: method,
                   user: PROJECT_OWNER_USER_ID,
-                ).http_status
+                }).http_status
               ).not_to eq 403
             end
           end
@@ -825,22 +826,22 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID, PROJECT_OWNER_USER_ID ].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/retention/nodes/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/retention/nodes/#{url}",
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
 
           it "#{method} #{url} does not return 403 for admin" do
             expect(
-              automate_api_request(
-                url,
+              automate_api_request({
+                endpoint: url,
                 http_method: method,
                 user: ADMIN_USER_ID
-              ).http_status
+              }).http_status
             ).not_to eq 403
           end
         end
@@ -865,22 +866,22 @@ control 'iam-chef-managed-access-1' do
           [ EDITOR_USER_ID, VIEWER_USER_ID, PROJECT_OWNER_USER_ID ].each do |user|
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
-                automate_api_request(
-                  "/api/v0/notifications/#{url}",
+                automate_api_request({
+                  endpoint: "/api/v0/notifications/#{url}",
                   http_method: method,
                   user: user,
-                ).http_status
+                }).http_status
               ).to eq 403
             end
           end
 
           it "#{method} #{url} does not return 403 for admin" do
             expect(
-              automate_api_request(
-                url,
+              automate_api_request({
+                endpoint: url,
                 http_method: method,
                 user: ADMIN_USER_ID
-              ).http_status
+              }).http_status
             ).not_to eq 403
           end
         end

@@ -14,7 +14,9 @@ control 'iam-chef-managed-teams-1' do
     VIEWERS = 'viewers'
 
     it 'list includes chef-managed teams' do
-      resp = automate_api_request('/apis/iam/v2/teams')
+      resp = automate_api_request({
+        endpoint: '/apis/iam/v2/teams'
+      })
 
       expect(resp.http_status).to eq 200
       teams = resp.parsed_response_body[:teams].map { |p| p[:id] }

@@ -33,10 +33,11 @@ control 'config-mgmt-ccr-1' do
     ).each do |message_type|
       describe "POST /data-collector/v0 #{message_type} for #{node_name}" do
         let(:api_request) do
-          automate_api_request(
-            '/data-collector/v0',
-            http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{node_name}_#{message_type}.json")
+          automate_api_request({
+              endpoint: '/data-collector/v0',
+              http_method: 'POST',
+              request_body: inspec.profile.file("fixtures/converge/#{node_name}_#{message_type}.json")
+            }
           )
         end
 
@@ -56,11 +57,11 @@ control 'config-mgmt-ccr-1' do
     ).each do |message_type|
       describe "POST /api/v0/ingest/events/chef/run #{message_type} for #{node_name}" do
         let(:api_request) do
-          automate_api_request(
-            '/api/v0/ingest/events/chef/run',
+          automate_api_request({
+            endpoint: '/api/v0/ingest/events/chef/run',
             http_method: 'POST',
             request_body: inspec.profile.file("fixtures/converge/#{node_name}_#{message_type}.json")
-          )
+        })
         end
 
         it 'should ingest the data successfully' do
@@ -81,11 +82,11 @@ control 'config-mgmt-ccr-2' do
 
   describe 'GET /api/v0/cfgmgmt/nodes' do
     let(:api_request) do
-      automate_api_request(
-        '/api/v0/cfgmgmt/nodes',
+      automate_api_request({
+        endpoint: '/api/v0/cfgmgmt/nodes',
         request_params: request_params,
         http_method: 'GET'
-      )
+    })
     end
 
     let(:request_params) do
@@ -95,10 +96,10 @@ control 'config-mgmt-ccr-2' do
     end
 
     let(:api_runs_request) do
-      automate_api_request(
-        "/api/v0/cfgmgmt/nodes/#{request_node_id}/runs/#{request_run_id}",
+      automate_api_request({
+        endpoint: "/api/v0/cfgmgmt/nodes/#{request_node_id}/runs/#{request_run_id}",
         http_method: 'GET'
-      )
+    })
     end
 
     let(:request_node_id) do
@@ -610,11 +611,11 @@ control 'config-mgmt-ccr-2' do
         }
       end
       let(:api_delete_request) do
-        automate_api_request(
-          '/api/v0/ingest/events/chef/node-multiple-deletes',
+        automate_api_request({
+          endpoint: '/api/v0/ingest/events/chef/node-multiple-deletes',
           request_body: delete_request_params.to_json,
           http_method: 'POST'
-        )
+      })
       end
       # This test should be ran last because it deletes nodes that are used in the above tests
       it 'Should remove all nodes' do

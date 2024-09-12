@@ -3,6 +3,7 @@
 #shellcheck disable=SC2039
 #stable channel
 
+
 pkg_name=applications-load-gen
 pkg_description="Applications Load Generator"
 pkg_origin=chef

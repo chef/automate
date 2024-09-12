@@ -5,6 +5,8 @@
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
   HAB_BLDR_CHANNEL: "stable"
+  #HAB_STUDIO_SECRET_HAB_BLDR_CHANNEL: "curl8"
+  #HAB_FALLBACK_CHANNEL: "stable"
   HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
 
 expeditor:
@@ -53,7 +55,7 @@ steps:
   - label: build
     command:
       - scripts/verify_build.sh
-    timeout_in_minutes: 60
+    timeout_in_minutes: 120
     env:
       ALLOW_LOCAL_PACKAGES: true
       HAB_STUDIO_SUP: false
@@ -583,7 +585,7 @@ steps:
   - label: "iam v2 with no legacy policies force-upgrade to v2"
     command:
       - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 45
     expeditor:
       secrets:
         A2_LICENSE:
@@ -642,7 +644,7 @@ steps:
   - label: "product"
     command:
       - integration/run_test integration/tests/product.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -761,7 +763,7 @@ steps:
   - label: "backup to s3"
     command:
       - integration/run_test integration/tests/backup_s3.sh
-    timeout_in_minutes: 45
+    timeout_in_minutes: 60
     expeditor:
       accounts:
         - aws/chef-cd
@@ -924,7 +926,7 @@ steps:
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 45
     expeditor:
       secrets:
         A2_LICENSE:

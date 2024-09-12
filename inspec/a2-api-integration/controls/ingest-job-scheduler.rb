@@ -12,10 +12,10 @@ control 'ingest-job-scheduler' do
     end
 
     it 'GET /api/v0/retention/nodes/status returns the correct status' do
-      job_scheduler_status = automate_api_request(
-        job_scheduler_status_endpoint,
+      job_scheduler_status = automate_api_request({
+        endpoint: job_scheduler_status_endpoint,
         http_method: 'GET',
-      )
+    })
       expect(job_scheduler_status.http_status).to eq 200
       expect(job_scheduler_status.parsed_response_body[:running]).to eq(true)
     end
@@ -38,13 +38,13 @@ control 'ingest-job-scheduler' do
       end
 
       let(:get_test_node) do
-        automate_api_request(
-          '/api/v0/cfgmgmt/nodes',
+        automate_api_request({
+          endpoint: '/api/v0/cfgmgmt/nodes',
           request_params: {
             filter: 'node_id:82760210-4686-497e-b039-efca78dee64b',
           },
           http_method: 'GET'
-        )
+        })
       end
 
       let(:delete_request_params) do
@@ -67,30 +67,30 @@ control 'ingest-job-scheduler' do
 
       it 'if update has running == true, run the job' do
         # turn off missing node job
-        expect(automate_api_request(
-          '/api/v0/retention/nodes/missing-nodes/config',
+        expect(automate_api_request({
+          endpoint: '/api/v0/retention/nodes/missing-nodes/config',
           http_method: 'POST',
           request_body: config_off.to_json,
-          ).http_status
+          }).http_status
         ).to eq 200
 
         # Add old CCR
-        expect(automate_api_request(
-            '/data-collector/v0',
+        expect(automate_api_request({
+            endpoint: '/data-collector/v0',
             http_method: 'POST',
             request_body: inspec.profile.file("fixtures/converge/chefdk-debian-7-tester-2d206b_run_converge.json")
-          ).http_status
+          }).http_status
         ).to eq 200
 
         # wait for elastic search to update
         refresh_elasticsearch()
 
         # turn on node missing with a day old threshold
-        expect(automate_api_request(
-          '/api/v0/retention/nodes/missing-nodes/config',
+        expect(automate_api_request({
+          endpoint: '/api/v0/retention/nodes/missing-nodes/config',
           http_method: 'POST',
           request_body: config_on.to_json,
-          ).http_status
+          }).http_status
         ).to eq 200
 
         sleep 10
@@ -104,40 +104,40 @@ control 'ingest-job-scheduler' do
         expect(node[:status]).to eq 'missing'
 
         # clean up delete node
-        expect(automate_api_request(
-            '/api/v0/ingest/events/chef/node-multiple-deletes',
+        expect(automate_api_request({
+            endpoint: '/api/v0/ingest/events/chef/node-multiple-deletes',
             request_body: delete_request_params.to_json,
             http_method: 'POST'
-          ).http_status
+          }).http_status
         ).to eq 200
       end
 
       it 'if update running == false, do not run the job' do
         # turn off missing node job
-        expect(automate_api_request(
-          '/api/v0/retention/nodes/missing-nodes/config',
+        expect(automate_api_request({
+          endpoint: '/api/v0/retention/nodes/missing-nodes/config',
           http_method: 'POST',
           request_body: config_off.to_json,
-          ).http_status
+          }).http_status
         ).to eq 200
 
         # Add old CCR
-        expect(automate_api_request(
-            '/data-collector/v0',
+        expect(automate_api_request({
+            endpoint: '/data-collector/v0',
             http_method: 'POST',
             request_body: inspec.profile.file("fixtures/converge/chefdk-debian-7-tester-2d206b_run_converge.json")
-          ).http_status
+          }).http_status
         ).to eq 200
 
         # wait for elastic search to update
         refresh_elasticsearch()
 
         # update node missing job config with a day old threshold
-        expect(automate_api_request(
-          '/api/v0/retention/nodes/missing-nodes/config',
+        expect(automate_api_request({
+          endpoint: '/api/v0/retention/nodes/missing-nodes/config',
           http_method: 'POST',
           request_body: config_off.to_json,
-          ).http_status
+          }).http_status
         ).to eq 200
 
         # wait for elastic search to update
@@ -150,11 +150,11 @@ control 'ingest-job-scheduler' do
         expect(node[:status]).to eq 'success'
 
         # clean up: delete node
-        expect(automate_api_request(
-            '/api/v0/ingest/events/chef/node-multiple-deletes',
+        expect(automate_api_request({
+            endpoint: '/api/v0/ingest/events/chef/node-multiple-deletes',
             request_body: delete_request_params.to_json,
             http_method: 'POST'
-          ).http_status
+          }).http_status
         ).to eq 200
       end
     end
@@ -183,17 +183,17 @@ control 'ingest-job-scheduler' do
         },
       ].each do |job|
         it "POST #{job[:url]} configures the #{job[:name]} job" do
-            expect(automate_api_request(
-                job[:url],
+            expect(automate_api_request({
+                endpoint: job[:url],
                 http_method: 'POST',
                 request_body: test_object.to_json,
-              ).http_status
+              }).http_status
             ).to eq 200
 
-            job_scheduler_status = automate_api_request(
-              job_scheduler_status_endpoint,
+            job_scheduler_status = automate_api_request({
+              endpoint: job_scheduler_status_endpoint,
               http_method: 'GET',
-            )
+            })
             expect(job_scheduler_status.http_status).to eq 200
             expect(job_scheduler_status.parsed_response_body[:running]).to eq(true)
 
@@ -226,29 +226,29 @@ control 'ingest-job-scheduler' do
           it 'updates are performed before returning' do
             # queuing up requests.
             for i in 1..10 do
-              expect(automate_api_request(
-                  job[:url],
+              expect(automate_api_request({
+                endpoint: job[:url],
                   http_method: 'POST',
                   request_body: {
                     'threshold': '77h',
                     'running': !config[:running],
                     'every': '77m',
                   }.to_json,
-                ).http_status
+                }).http_status
               ).to eq 200
             end
 
-            expect(automate_api_request(
-                job[:url],
+            expect(automate_api_request({
+                endpoint: job[:url],
                 http_method: 'POST',
                 request_body: config.to_json,
-              ).http_status
+              }).http_status
             ).to eq 200
 
-            job_scheduler_status = automate_api_request(
-              job_scheduler_status_endpoint,
+            job_scheduler_status = automate_api_request({
+              endpoint: job_scheduler_status_endpoint,
               http_method: 'GET',
-            )
+          })
             expect(job_scheduler_status.http_status).to eq 200
 
             job_status = job_scheduler_status

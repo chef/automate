@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154
 #stable channel
 
+
 pkg_name=compliance-service
 pkg_description="Compliance API service"
 pkg_origin=chef
@@ -32,7 +33,7 @@ pkg_binds_optional=(
 )
 #Adding it to use compliance with firejail
 pkg_svc_user=root
-inspec_release="chef/inspec/4.56.22/20240130061718"
+inspec_release="chef/inspec/4.56.61/20240809111842"
 pkg_deps=(
   core/coreutils
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
