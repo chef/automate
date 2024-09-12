@@ -1443,3 +1443,259 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: yallist
     reason: Exception made by Chef Legal
+
+  golang:
+  - name: cloud.google.com/go/accessapproval
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/accesscontextmanager
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/aiplatform
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/analytics
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/apigateway
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/apigeeconnect
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/appengine
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/area120
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/artifactregistry
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/asset
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/assuredworkloads
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/automl
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/baremetalsolution
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/batch
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/beyondcorp
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/billing
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/binaryauthorization
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/certificatemanager
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/channel
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/cloudbuild
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/clouddms
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/cloudtasks
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/contactcenterinsights
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/recaptchaenterprise/v2
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/vision/v2
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/workflows
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/container
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/containeranalysis
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/datacatalog
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dataflow
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dataform
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/datafusion
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/datalabeling
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dataplex
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dataproc
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dataqna
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/datastream
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/deploy
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dialogflow
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/dlp
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/documentai
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/domains
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/edgecontainer
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/essentialcontacts
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/eventarc
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/filestore
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/functions
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/gaming
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/gkebackup
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/gkeconnect
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/gkehub
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/gkemulticloud
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/gsuiteaddons
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/iap
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/ids
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/iot
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/kms
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/language
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/lifesciences
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/managedidentities
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/mediatranslation
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/memcache
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/metastore
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/monitoring
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/networkconnectivity
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/networkmanagement
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/networksecurity
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/notebooks
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/optimization
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/orchestration
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/orgpolicy
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/osconfig
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/oslogin
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/phishingprotection
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/policytroubleshooter
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/privatecatalog
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/recaptchaenterprise
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/recommendationengine
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/recommender
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/redis
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/resourcemanager
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/resourcesettings
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/retail
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/run
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/scheduler
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/secretmanager
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/security
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/securitycenter
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/servicecontrol
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/servicedirectory
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/servicemanagement
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/serviceusage
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/shell
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/speech
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/storagetransfer
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/talent
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/texttospeech
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/tpu
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/trace
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/translate
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/video
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/videointelligence
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/vision
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/vmmigration
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/vpcaccess
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/webrisk
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/websecurityscanner
+    reason: Exception made by Chef Legal
+  - name: github.com/DataDog/zstd
+    reason: Exception made by Chef Legal
+  - name: github.com/Sereal/Sereal/Go/sereal
+    reason: Exception made by Chef Legal
+  - name: github.com/alecthomas/kingpin/v2
+    reason: Exception made by Chef Legal
+  - name: github.com/apparentlymart/go-textseg/v13
+    reason: Exception made by Chef Legal
+  - name: github.com/cncf/xds/go
+    reason: Exception made by Chef Legal
+  - name: github.com/davecgh/go-xdr
+    reason: Exception made by Chef Legal
+  - name: github.com/golang/snappy
+    reason: Exception made by Chef Legal
+  - name: github.com/google/go-pkcs11
+    reason: Exception made by Chef Legal
+  - name: github.com/montanaflynn/stats
+    reason: Exception made by Chef Legal
+  - name: github.com/pquerna/ffjson
+    reason: Exception made by Chef Legal
+  - name: github.com/vmihailenco/msgpack/v5
+    reason: Exception made by Chef Legal
+  - name: github.com/vmihailenco/tagparser/v2
+    reason: Exception made by Chef Legal
+  - name: github.com/xdg-go/pbkdf2
+    reason: Exception made by Chef Legal
+  - name: github.com/xdg-go/scram
+    reason: Exception made by Chef Legal
+  - name: github.com/xdg-go/stringprep
+    reason: Exception made by Chef Legal
+  - name: github.com/xhit/go-str2duration
+    reason: Exception made by Chef Legal
+  - name: github.com/youmark/pkcs8
+    reason: Exception made by Chef Legal
+  - name: go.etcd.io/gofail
+    reason: Exception made by Chef Legal
+  - name: gopkg.in/mgo.v2
+    reason: Exception made by Chef Legal
+  - name: gopkg.in/vmihailenco/msgpack.v2
+    reason: Exception made by Chef Legal
