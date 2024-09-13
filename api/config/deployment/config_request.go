@@ -50,6 +50,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Svc.PackageCleanupMode = w.String("conservative")
 
 	c.V1.Svc.Health.HealthCheckInterval = w.Int32(30)
+	c.V1.Svc.Health.Services = []string{}
 
 	return c
 }
