@@ -3,7 +3,7 @@ host = '0.0.0.0'
 
 print_db_statistics = true
 
-max_connections = 350
+max_connections = 1500
 max_locks_per_transaction = 64
 max_wal_size = "1GB"
 min_wal_size = "80MB"
@@ -40,4 +40,9 @@ path = "/hab/svc/automate-ha-postgresql/data/pg_dump"
 [ssl]
 enable = true
 # tls 1.2 ciphersuite (to exclude tlsv1 and tlsv1.1)
-tls_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"
+tls_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"# server public cert used for ssl listener
+ssl_cert = """"""
+# server private key
+ssl_key = """"""
+# issuer public cert that signed the above server public cert
+issuer_cert = """"""

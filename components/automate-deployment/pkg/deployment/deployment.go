@@ -15,7 +15,7 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
-	globalconfig "github.com/chef/automate/components/automate-deployment/pkg/globalConfig"
+	"github.com/chef/automate/components/automate-deployment/pkg/globalconfig"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
