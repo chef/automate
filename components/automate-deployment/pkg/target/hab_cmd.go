@@ -9,7 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	globalconfig "github.com/chef/automate/components/automate-deployment/pkg/globalConfig"
+	"github.com/chef/automate/components/automate-deployment/pkg/globalconfig"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
