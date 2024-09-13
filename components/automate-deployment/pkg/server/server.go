@@ -1159,6 +1159,7 @@ func StartServer(config *Config) error {
 	}()
 
 	server.convergeLoop.Start()
+	deployment.SethealthCheckConfig(server.deployment.Config)
 	return grpcServer.Serve(listener)
 }
 

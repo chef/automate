@@ -51,6 +51,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ngx.Main.WorkerProcesses = w.Int32(4)
 	c.V1.Sys.Ngx.Main.MaxFails = w.Int32(10)
+	c.V1.Sys.Ngx.Main.FailTimeout = w.Int32(10)
 	// TODO(ssd) 2020-12-08: Enable automatic discovery of system
 	// resolvers once we are a bit more confident in the nginx
 	// module we are using to do dynamic resolution.

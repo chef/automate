@@ -45,6 +45,7 @@ message ConfigRequest {
 					google.protobuf.Int32Value max_fails = 2;
 					reserved 3;
 					Resolvers resolvers = 4;
+					google.protobuf.Int32Value fail_timeout = 5;
 
 					message Resolvers {
 						google.protobuf.BoolValue enable_system_nameservers = 1;

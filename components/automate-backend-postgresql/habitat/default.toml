@@ -3,7 +3,7 @@ host = '0.0.0.0'
 
 print_db_statistics = true
 
-max_connections = 350
+max_connections = 1500
 max_locks_per_transaction = 64
 max_wal_size = "1GB"
 min_wal_size = "80MB"

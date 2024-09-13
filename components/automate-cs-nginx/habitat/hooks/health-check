@@ -9,10 +9,18 @@ curlOpts="$curlOpts --key {{pkg.svc_config_path}}/service.key"
 
 # This gets routed to erchef which does a "deep" health check
 # shellcheck disable=SC2086
-output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "https://automate-cs-nginx:{{cfg.service.port}}/_status")
-res=$?
-if [ "0" != "$res" ]; then
-    echo "health check curl command returned exit code ${res}:"
-    echo "$output"
-    exit 2
-fi
+
+for i in $(seq 1 5);
+do
+    output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "https://automate-cs-nginx:{{cfg.service.port}}/_status")
+    res=$?
+    if [ "0" = "$res" ]; then
+        echo "health check passed"
+        exit 0
+    fi
+sleep 1    
+done
+
+echo "health check curl command returned exit code ${res}:"
+echo "$output"
+exit $res

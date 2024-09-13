@@ -2,14 +2,17 @@ package target
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/globalconfig"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 var stdHabOptions = []command.Opt{
@@ -210,6 +213,9 @@ func (c *habCmd) BinlinkPackage(ctx context.Context, pkg habpkg.VersionedPackage
 
 func (c *habCmd) LoadService(ctx context.Context, svc habpkg.VersionedPackage, opts ...LoadOption) (string, error) {
 	args := []string{"svc", "load", "--force", habpkg.Ident(svc), "--strategy", "none"}
+	if stringutils.SliceContains(globalconfig.Services, svc.Name()) {
+		args = append(args, "--health-check-interval", fmt.Sprintf("%d", globalconfig.HealthCheckInterval))
+	}
 	for _, o := range opts {
 		args = o(args)
 	}

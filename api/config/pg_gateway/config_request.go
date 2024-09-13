@@ -40,6 +40,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Timeouts.Connect = w.Int32(5)
 	c.V1.Sys.Timeouts.Idle = w.Int32(43200)
 	c.V1.Sys.Resolvers.EnableSystemNameservers = w.Bool(false)
+	c.V1.Sys.MaxConnections = w.Int32(350)
 
 	return c
 }

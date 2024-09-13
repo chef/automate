@@ -89,6 +89,9 @@ shared_buffers = "1GB"
       username = "admin"
       name = "Local Administrator"
       password = "chefautomate"
+    [deployment.v1.svc.health]
+      health_check_interval=31
+      services = ["authz-service", "secrets-service"]
 
 # Gateway service configuration.
 [gateway.v1]

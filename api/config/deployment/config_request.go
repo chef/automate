@@ -27,6 +27,7 @@ func NewConfigRequest() *ConfigRequest {
 			},
 			Svc: &ConfigRequest_V1_Service{
 				AdminUser: &ConfigRequest_V1_AdminUser{},
+				Health:    &ConfigRequest_V1_Health{},
 			},
 		},
 	}
@@ -47,6 +48,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Svc.AdminUser.Name = w.String("Local Administrator")
 	c.V1.Svc.ManifestCacheExpiry = w.String("60m")
 	c.V1.Svc.PackageCleanupMode = w.String("conservative")
+
+	c.V1.Svc.Health.HealthCheckInterval = w.Int32(30)
+	c.V1.Svc.Health.Services = []string{}
 
 	return c
 }

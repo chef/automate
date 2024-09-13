@@ -23,6 +23,7 @@ message ConfigRequest {
 			chef.automate.infra.config.Log log = 4;
 			Timeouts timeouts = 5;
 			Resolvers resolvers = 6;
+			google.protobuf.Int32Value max_connections = 7;
 
 			message Resolvers {
 				repeated google.protobuf.StringValue nameservers = 1;

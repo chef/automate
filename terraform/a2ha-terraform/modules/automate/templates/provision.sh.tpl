@@ -365,8 +365,8 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
 
   # Below command is commented as patch is not required during upgrade and add/remove node
   # Also when it is being applied, it was reverting patched configs (automate) to the older ones
-  # echo "Applying /etc/chef-automate/config.toml"
-  # chef-automate config patch /etc/chef-automate/config.toml
+  echo "Applying /etc/chef-automate/config.toml"
+  chef-automate config patch /etc/chef-automate/config.toml
 
   echo "MAINTENANCE MODE OFF"
   chef-automate maintenance off

@@ -17,6 +17,7 @@
 worker_processes = 4
 error_log = "stderr"
 max_fails = 10
+fail_timeout = 10
 
 [ngx.events]
 worker_connections = 1024

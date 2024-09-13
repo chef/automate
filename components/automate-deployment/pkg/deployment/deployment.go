@@ -15,6 +15,7 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
+	"github.com/chef/automate/components/automate-deployment/pkg/globalconfig"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
@@ -134,6 +135,8 @@ func (d *Deployment) UpdateWithUserOverrideConfig(config *dc.AutomateConfig, sec
 	}
 
 	d.ExpectedServices = expectedServices
+	SethealthCheckConfig(d.Config)
+
 	return d.MoveSecretsToSecretStore(secretStore)
 }
 
@@ -158,6 +161,7 @@ func (d *Deployment) MergeIntoUserOverrideConfig(config *dc.AutomateConfig, secr
 	}
 	mergedConfig.SetGlobalConfig()
 	d.Config = mergedConfig
+	SethealthCheckConfig(d.Config)
 
 	return d.MoveSecretsToSecretStore(secretStore)
 }
@@ -173,8 +177,16 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig, secret
 	}
 	mergedConfig.SetGlobalConfig()
 	d.Config = mergedConfig
+	SethealthCheckConfig(d.Config)
 
 	return d.MoveSecretsToSecretStore(secretStore)
+}
+
+func SethealthCheckConfig(config *dc.AutomateConfig) {
+	if config != nil {
+		globalconfig.HealthCheckInterval = config.Deployment.GetV1().GetSvc().GetHealth().GetHealthCheckInterval().GetValue()
+		globalconfig.Services = config.Deployment.GetV1().GetSvc().GetHealth().GetServices()
+	}
 }
 
 func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
