@@ -30,7 +30,20 @@ Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_p
 
 Provision the other nodes in the high availability cluster before deploying the bastion host.
 
-Make sure you have all resources either on existing infrastructure or on existing cloud infrastructure (AWS/Google Cloud Platform).
+Make sure you have all resources either on existing infrastructure or on existing cloud infrastructure (`AWS`/`Azure`/`GoogleCloudPlatform`).
+For Cloud Infrastructure following are supported:
+
+### AWS
+
+  Infrastructure on AWS can either be provisioned manually or using [provision utility](https://docs.chef.io/automate/ha_aws_deploy_steps/#steps-to-provision).
+
+### Azure
+
+  Infrastructure on Azure should be provisioned manually by the user before deploying Automate HA Solution.
+
+### GCP
+
+  Infrastructure on GCP should be provisioned manually by the user before deploying Automate HA Solution.
 
 ## Deploy the bastion host
 
@@ -45,7 +58,12 @@ Make sure you have all resources either on existing infrastructure or on existin
     "
     ```
 
-    To download specific version bundle, replace `latest.aib` with Chef Automate version number. For example, `4.2.59.aib`.
+    {{< note spaces=4 >}}
+
+    In case `/usr/bin` is not there then check for `/bin` directory
+
+    {{< /note >}}
+    To download specific version bundle, replace `latest.aib` with Chef Automate version number. For example, `4.12.144.aib`.
 
     {{< note spaces=4 >}}
 

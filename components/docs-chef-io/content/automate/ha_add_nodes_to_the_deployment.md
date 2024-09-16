@@ -27,6 +27,7 @@ Chef Automate HA comes with five different types of deployment flows. This page 
 {{< note >}}
 
 - The flags like `opensearch-ips` and `postgresql-ips` are only applicable for the Chef Managed Database cluster
+- If `/hab` volume is externally mounted, then trigger the `add node`/`remove node` command from the `/hab` directory.
 
 {{< /note >}}
 
