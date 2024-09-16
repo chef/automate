@@ -43,13 +43,13 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
 
     ```bash
     # !/bin/bash
-
-echo extendedKeyUsage = clientAuth, serverAuth > server_cert_ext.cnf
-echo subjectAltName = DNS:chefadmin >> server_cert_ext.cnf
-echo extendedKeyUsage = clientAuth, serverAuth > node_cert_ext.cnf
-echo subjectAltName = DNS:chefnode >> node_cert_ext.cnf 
-echo extendedKeyUsage = clientAuth, serverAuth > client_cert_ext.cnf
-echo subjectAltName = DNS:chefclient >> client_cert_ext.cnf
+    echo extendedKeyUsage = clientAuth, serverAuth > server_cert_ext.cnf
+    echo subjectAltName = DNS:chefadmin >> server_cert_ext.cnf
+    echo extendedKeyUsage = clientAuth, serverAuth > node_cert_ext.cnf
+    echo subjectAltName = DNS:chefnode >> node_cert_ext.cnf 
+    echo extendedKeyUsage = clientAuth, serverAuth > client_cert_ext.cnf
+    echo subjectAltName = DNS:chefclient >> client_cert_ext.cnf
+    
     openssl genrsa -out root-ca-key.pem 2048
     openssl req -new -x509 -sha256 -key root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=progress" -out root-ca.pem -days 1095 -addext basicConstraints=CA:TRUE
 
