@@ -28,7 +28,6 @@ do_after() {
   # being placed in a specific location in the hab package. Therefore, instead
   # of relying on the scaffolding install we'll do it manually to please the
   # updater and chef-automate cli zip creator in expeditor.
-
   local bin_root="${pkg_prefix}/static/linux"
   mkdir -p "${bin_root}"
 
