@@ -1,6 +1,5 @@
 #!/bin/sh
 #
-
 curlOpts="-X GET -sS --fail --max-time 2"
 curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/service.crt"
 curlOpts="$curlOpts --key {{pkg.svc_config_path}}/service.key"

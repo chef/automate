@@ -1,6 +1,5 @@
 #!/bin/sh
 #
-
 curlOpts="-sS --fail --max-time 2"
 curlOpts="$curlOpts --resolve automate-cs-nginx:{{cfg.service.port}}:127.0.0.1"
 curlOpts="$curlOpts --noproxy automate-cs-nginx"

@@ -4,7 +4,6 @@ set -Eeuo pipefail
 
 source {{pkg.svc_config_path}}/functions.sh
 
-
 {{#if svc.me.follower}}
 # This is the health check for a follower node
 
