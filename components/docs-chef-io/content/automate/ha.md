@@ -67,24 +67,23 @@ The Chef Automate HA Architecture involves the following clusters as part of the
 
 ## Provisioning
 
-Chef Automate High Availability solution can run on systems provisioned by cloud providers and on-premise infrastructure. Appropriately provisioned backend, frontend and bastion systems will help in smooth deployment and installation experience.
+Chef Automate's high availability solution can run on cloud providers and on-premise infrastructure systems. Appropriately provisioned backend, frontend, and bastion systems will help ensure a smooth deployment and installation experience.
 
   - On-premise provisioning
   - Cloud provisioning
 
 ### On-premise provisioning
 
-  Customer can provision virtual machines or bare metal machines on supported operating system with required system settings to deploy Automate HA solution. 
+  The customer can provision virtual machines or bare metal machines on a supported operating system with the required system settings to deploy the Automate HA solution.
 
 ### Cloud provisioing
-  Systems and services from following cloud providers are supported:
+  Systems and services from the following cloud providers are supported:
 
   - [AWS](https://docs.chef.io/automate/ha_aws_deploy_steps/#steps-to-provision)
   - Azure
   - Google
 
-Once cloud systems are provisioned, Automate HA solution can be deployed on the cloud infrastructure.
-For AWS we have a simplified provisioning utility, whereas for Azure and Google we expect customers to manually provision the systems.
+Deploy the Automate HA on the cloud infrastructure after the provisioning—the cloud systems. We have a simplified provisioning utility for AWS, Azure, and Google, and we expect to provision the systems manually.
 
 ## Deployment Methods
 
@@ -116,7 +115,7 @@ The two-step deployment process is as shown below:
 - Provisioning Infrastructure: Manually provision the infrastructure
 - Deployment of services on the provisioned infrastructure (follow the [On-premise Deployment steps](/automate/ha_onprim_deployment_procedure/)).
   - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
-- Only File System Backup and Restore is supported.
+- Only File System Backup and Restore are supported.
 
 ### Cloud Deployment using Google Cloud Platform (GCP)
 

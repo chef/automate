@@ -30,8 +30,7 @@ Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_p
 
 Provision the other nodes in the high availability cluster before deploying the bastion host.
 
-Make sure you have all resources either on existing infrastructure or on existing cloud infrastructure (`AWS`/`Azure`/`GoogleCloudPlatform`).
-For Cloud Infrastructure following are supported:
+Ensure all resources are on existing or cloud infrastructure (`AWS`/`Azure`/`GoogleCloudPlatform`). For Cloud Infrastructure, the following are supported:
 
 ### AWS
 
@@ -39,11 +38,11 @@ For Cloud Infrastructure following are supported:
 
 ### Azure
 
-  Infrastructure on Azure should be provisioned manually by the user before deploying Automate HA Solution.
+  The user should provide infrastructure on Azure before deploying the Automate HA Solution.
 
 ### GCP
 
-  Infrastructure on GCP should be provisioned manually by the user before deploying Automate HA Solution.
+  The user should manually provision Infrastructure on GCP before deploying Automate HA Solution.
 
 ## Deploy the bastion host
 
