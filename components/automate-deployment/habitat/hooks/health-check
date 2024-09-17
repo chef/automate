@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 # Client-side code we use in health-check reads this env var. See deployment/address.go
 export DEPLOYMENT_SERVICE_ADDRESS="127.0.0.1:{{cfg.service.port}}"
 
