@@ -98,7 +98,7 @@ function link_component_bin() {
 }
 
 function desired_golang_ident() {
-    echo "core/go22/$(cat /src/GOLANG_VERSION)"
+    echo "core/go1_22/1.22.4/$(cat /src/GOLANG_VERSION)"
 }
 
 function verify_components_have_platform_config() {
@@ -209,6 +209,8 @@ function build() {
     hab_build=/bin/build
   fi
 
+  echo "Building from channel: $HAB_BLDR_CHANNEL"
+  
   # Support prior hab versions
   if [ -f /hab/bin/build ]; then
     hab_build=/hab/bin/build
