@@ -19,14 +19,15 @@ export GOSUMDB="sum.golang.org"
 export HAB_NONINTERACTIVE=true
 export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
+export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true
 export HAB_LICENSE="accept-no-persist"
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
 log_section_start "install ruby"
-sudo -E hab pkg install core/ruby
+sudo -E hab pkg install core/ruby3_1
 export PATH
-PATH="$(hab pkg path core/ruby)/bin:$PATH"
-sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
+PATH="$(hab pkg path core/ruby3_1)/bin:$PATH"
+sudo -E "$(hab pkg path core/ruby3_1)"/bin/gem install toml
 
 log_section_start "generate ephemeral origin key"
 HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR hab origin key generate chef
