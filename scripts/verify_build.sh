@@ -66,7 +66,7 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
-    if [[ "$component" == "components/compliance-service" || "$component" == "components/automate-es-gateway" || "$component" == "components/automate-cs-oc-erchef" || "$component" == "components/automate-cs-nginx" || "$component" == "components/automate-cs-ocid" ]]; then
+    if [[ "$component" == "components/compliance-service" || "$component" == "components/automate-es-gateway" || "$component" == "components/automate-cs-oc-erchef" || "$component" == "components/automate-cs-nginx" || "$component" == "components/automate-cs-ocid" || "$component" == "components/automate-minio"]]; then
         echo "Skipping component: $component"
         continue
     fi
