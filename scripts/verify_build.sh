@@ -19,7 +19,8 @@ export GOSUMDB="sum.golang.org"
 export HAB_NONINTERACTIVE=true
 export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
-export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=false
+export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true
+export HAB_STUDIO_SECRET_HAB_FEAT_OFFLINE_INSTALL=true
 export HAB_LICENSE="accept-no-persist"
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
@@ -74,12 +75,13 @@ if [[ "$build_commands" != "" ]]; then
     # generated in this build
     echo "Inside If"
     export HAB_DOCKER_OPTS="--label buildkitejob=$BUILDKITE_JOB_ID "
+    export HAB_BLDR_CHANNEL="LTS-2024"
     HAB_STUDIO_SECRET_OPENSEARCH_ROOT_CA_PEM=$OPENSEARCH_ROOT_CA_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_ADMIN_PEM=$OPENSEARCH_ADMIN_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_ADMIN_KEY_PEM=$OPENSEARCH_ADMIN_KEY_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_NODE1_PEM=$OPENSEARCH_NODE1_PEM \
     HAB_STUDIO_SECRET_OPENSEARCH_NODE1_KEY_PEM=$OPENSEARCH_NODE1_KEY_PEM \
-    HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio run -D "source .studiorc; set -e; $build_commands"
+    HAB_ORIGIN=chef HAB_FEAT_IGNORE_LOCAL=true HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio run -D "source .studiorc; set -e; $build_commands"
 fi
 
 # Generate a local A2 manifest. This manifest represents the total
