@@ -12,7 +12,7 @@ export GOPROXY="https://proxy.golang.org,direct"
 export GOSUMDB="sum.golang.org"
 
 hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
-hab pkg install -b "core/go1_22/1.22.4"
+hab pkg install -b "core/go1_22/1.22.5"
 
 echo "Checking Go Dependencies And Vendored Protos"
 go mod verify
