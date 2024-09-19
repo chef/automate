@@ -47,7 +47,8 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 }
 
 // This method will support adding a document with a specified id
-func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
+func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping,
+	runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
 
 	_, err := backend.client.Index().
 		Index(mapping.Index).
@@ -145,7 +146,6 @@ func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 
 // ProfilesMissing takes an array of profile sha256 IDs and returns back
 // the ones that are missing from the profiles metadata index
-//
 func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []string, err error) {
 	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(allHashes...)
@@ -1036,7 +1036,7 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId []string, indexTod
 
 }
 
-//UploadDataToControlIndex Uploades the data to new control index with comp-1-control-*
+// UploadDataToControlIndex Uploades the data to new control index with comp-1-control-*
 func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time, docIds []string) error {
 	mapping := mappings.ComplianceControlRepData
 	index := mapping.IndexTimeseriesFmt(endTime)
@@ -1166,7 +1166,7 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(nodeId string) *el
 	return script
 }
 
-//SetNodesDayLatestFalse Sets the flag for the currently present data in os database
+// SetNodesDayLatestFalse Sets the flag for the currently present data in os database
 func (backend *ESClient) SetNodesDayLatestFalseForUpgrade(ctx context.Context, nodeUuid string, endTime time.Time) error {
 	script := elastic.NewScript("ctx._source.day_latest = false")
 	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
@@ -1196,7 +1196,7 @@ func (backend *ESClient) SetNodesDayLatestFalseForUpgrade(ctx context.Context, n
 	return nil
 }
 
-//script for updating control index status and end time
+// script for updating control index status and end time
 func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeStatus string, nodeEndtime time.Time) *elastic.Script {
 	params := make(map[string]interface{})
 	newStatus := getNewControlStatus(controlStatus, nodeStatus)
@@ -1210,7 +1210,7 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	return script
 }
 
-//getting new control status
+// getting new control status
 func getNewControlStatus(controlStatus string, nodeStatus string) string {
 	var newStatus string
 	if controlStatus != "failed" && nodeStatus == "failed" {
@@ -1223,7 +1223,7 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 	return newStatus
 }
 
-//GetReportsDailyLatestTrue Get the Nodes where daily latest flag is true from past 90 days from current date for upgrading
+// GetReportsDailyLatestTrue Get the Nodes where daily latest flag is true from past 90 days from current date for upgrading
 func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, upgradeTime time.Time) (map[string]string, map[string]bool, error) {
 	reportsMap := make(map[string]string)
 	nodesMap := make(map[string]relaxting.ReportId)
@@ -1367,7 +1367,7 @@ func (backend *ESClient) InsertComplianceRunInfoUpgrade(ctx context.Context, rep
 	return err
 }
 
-//CheckIfControlIdExistsForControlIndex gets a control document from comp-1-control-* for upgrade process
+// CheckIfControlIdExistsForControlIndex gets a control document from comp-1-control-* for upgrade process
 func (backend *ESClient) CheckIfControlIdANdNodeIdExistsForControlIndex(docId []string, indexWithDateAndTime string) (map[string]*relaxting.ControlNodesInfo, error) {
 	logrus.Debugf("Checking the control document exists for today with doc Id :%s", docId)
 	statusMap := make(map[string]*relaxting.ControlNodesInfo)
@@ -1421,7 +1421,7 @@ func (backend *ESClient) CheckIfControlIdANdNodeIdExistsForControlIndex(docId []
 
 }
 
-//UploadDataToControlIndexForUpgrade Uploades the data to new control index with comp-1-control-* in the upgrade process
+// UploadDataToControlIndexForUpgrade Uploades the data to new control index with comp-1-control-* in the upgrade process
 // Different from UploadDataToControlIndex as it pre-checks if the node exists already or not
 func (backend *ESClient) UploadDataToControlIndexForUpgrade(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time, statusMap map[string]*relaxting.ControlNodesInfo) error {
 	var err error
