@@ -62,11 +62,6 @@ $(printf '* %s\n' "${modified_sql_files[@]}")
 EOF
 fi
 
-automate-es-gateway
-automate-cs-bookshelf
-automate-cs-oc-bifrost
-automate-cs-oc-erchef
-automate-cs-ocid
 
 # Build all habitat packages that have changed
 build_commands=""
