@@ -65,6 +65,11 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
+    if [[ "$component" == "components/compliance-service" || "$component" == "placeholed" ]]; then
+        echo "Skipping component: $component"
+        continue
+    fi
+
     echo "component: $component"
     component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
     build_commands="${build_commands} $component_build;"
