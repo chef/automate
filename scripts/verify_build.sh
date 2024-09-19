@@ -62,10 +62,16 @@ $(printf '* %s\n' "${modified_sql_files[@]}")
 EOF
 fi
 
+automate-es-gateway
+automate-cs-bookshelf
+automate-cs-oc-bifrost
+automate-cs-oc-erchef
+automate-cs-ocid
+
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
-    if [[ "$component" == "components/compliance-service" || "$component" == "components/automate-es-gateway" || "$component" == "components/automate-cs-oc-erchef" ]]; then
+    if [[ "$component" == "components/compliance-service" || "$component" == "components/automate-es-gateway" || "$component" == "components/automate-cs-oc-erchef" || "$component" == "components/automate-cs-nginx" || "$component" == "components/automate-cs-ocid" ]]; then
         echo "Skipping component: $component"
         continue
     fi
