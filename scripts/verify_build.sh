@@ -66,7 +66,7 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
-    if [[ "$component" == "components/compliance-service" || "$component" == "components/automate-es-gateway" || "$component" == "components/automate-cs-oc-erchef" || "$component" == "components/automate-cs-nginx" || "$component" == "components/automate-cs-ocid" || "$component" == "components/automate-minio" || "$component" == "components/automate-builder-memcached" || "$component" == "components/automate-builder-api" || "$component" == "components/automate-builder-api-proxy" ]]; then
+    if [[ "$component" == "components/compliance-service" || "$component" == "components/automate-es-gateway" || "$component" == "components/automate-cs-oc-erchef" || "$component" == "components/automate-cs-nginx" || "$component" == "components/automate-cs-ocid" || "$component" == "components/automate-minio" || "$component" == "components/automate-builder-memcached" || "$component" == "components/automate-builder-api" || "$component" == "components/automate-builder-api-proxy" || "$component" == "components/automate-backend-opensearch" || "$component" == "components/automate-backend-opensearch" || "$component" == "components/automate-backend-elasticsidecar" ]]; then
         echo "Skipping component: $component"
         continue
     fi
