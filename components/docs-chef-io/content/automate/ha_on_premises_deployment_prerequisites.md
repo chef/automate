@@ -189,6 +189,7 @@ The on-premises deployment specific pre-requisites are as follows:
 - This SSH user should have sudo privileges on all the machines.
 - SSH user should have write permission in nodes.
 - The SSH user should access all machines using the same SSH private key.
+- The SSH user should have execute permissions on the `/tmp` directory.
 
 ### Cluster Setup
 

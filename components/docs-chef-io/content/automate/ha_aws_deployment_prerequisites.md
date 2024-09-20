@@ -207,6 +207,7 @@ The AWS deployment specific pre-requisites are as follows:
 -   This SSH user should have sudo privileges on the Bastion machine.
 -   SSH user should have write permission in nodes.
 -   Use the SSH user to access all machines using the same SSH private key.
+-   The SSH user should have execute permissions on the `/tmp` directory.
 
 ### Cluster Setup
 

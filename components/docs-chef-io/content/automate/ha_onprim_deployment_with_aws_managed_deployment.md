@@ -20,6 +20,7 @@ This section will discuss deploying Chef Automate HA on-premises machines with A
 {{< warning >}}
 
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
+- The SSH user should have execute permissions on the `/tmp` directory.
 
 {{< /warning >}}
 
