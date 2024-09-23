@@ -63,7 +63,7 @@ fi
 build_commands=""
 for component in "${changed_components[@]}"; do
     echo "component: $component"
-    component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
+    component_build="echo \"--- [\$(date -u)] rebuild $component\"; rebuild $component"
     build_commands="${build_commands} $component_build;"
 done
 
