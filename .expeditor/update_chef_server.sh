@@ -9,7 +9,7 @@
 #
 set -eo pipefail
 
-CHANNEL=${1:-local}
+CHANNEL=${1:-stable}
 NO_GIT=${NO_GIT:-false}
 SED=${SED:-sed}
 
