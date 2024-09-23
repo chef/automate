@@ -33,10 +33,10 @@ sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
 log_section_start "generate ephemeral origin key"
 HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR hab origin key generate cheftest
 
-log_section_start "download manifests"
-curl "https://packages.chef.io/manifests/dev/automate/latest_semver.json" > results/dev.json
-curl "https://packages.chef.io/manifests/current/automate/latest_semver.json" > results/current.json
-curl "https://packages.chef.io/manifests/acceptance/automate/latest_semver.json" > results/acceptance.json
+# log_section_start "download manifests"
+# curl "https://packages.chef.io/manifests/dev/automate/latest_semver.json" > results/dev.json
+# curl "https://packages.chef.io/manifests/current/automate/latest_semver.json" > results/current.json
+# curl "https://packages.chef.io/manifests/acceptance/automate/latest_semver.json" > results/acceptance.json
 
 log_section_start "determine changed components"
 mapfile -t changed_components < <(./scripts/changed_components.rb 2>/dev/null)
