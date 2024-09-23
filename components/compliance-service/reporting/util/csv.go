@@ -82,7 +82,7 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 				WaiverJustification: control.WaiverData.Justification,
 				WaiverExpiration:    control.WaiverData.ExpirationDate,
 			}
-			if control.Results != nil {
+			if len(control.Results) > 0 {
 				//If we have the result we will append each field with results
 				//else appending the control information directly
 				for _, result := range control.Results {
