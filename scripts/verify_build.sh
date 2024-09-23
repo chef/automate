@@ -28,7 +28,7 @@ PATH="$(hab pkg path core/ruby)/bin:$PATH"
 sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
 
 log_section_start "generate ephemeral origin key"
-HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR hab origin key generate chef
+HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR hab origin key generate cheftest
 
 log_section_start "download manifests"
 curl "https://packages.chef.io/manifests/dev/automate/latest_semver.json" > results/dev.json
