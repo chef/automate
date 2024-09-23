@@ -16,7 +16,7 @@ log_section_start() {
 export HAB_NONINTERACTIVE=true
 export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
-export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=true
+export HAB_STUDIO_SECRET_HAB_FEAT_IGNORE_LOCAL=false
 export HAB_STUDIO_SECRET_HAB_FEAT_OFFLINE_INSTALL=true
 export HAB_LICENSE="accept-no-persist"
 RESOLVED_RESULTS_DIR=$(realpath results/)
