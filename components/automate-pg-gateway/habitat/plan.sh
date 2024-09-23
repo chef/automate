@@ -21,9 +21,11 @@ pkg_exposes=(port)
 pkg_exports=(
     [port]=service.port
 )
+
 pkg_binds=(
   [automate-postgresql]="port"
 )
+
 pkg_description="PostgreSQL Gateway for Chef Automate"
 pkg_upstream_url="https://www.chef.io/automate"
 
@@ -42,4 +44,3 @@ do_install() {
 do_strip() {
   return 0
 }
-
