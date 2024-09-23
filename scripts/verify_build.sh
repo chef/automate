@@ -41,6 +41,8 @@ mapfile -t changed_components < <(./scripts/changed_components.rb 2>/dev/null)
 changed_components_details=$(./scripts/changed_components.rb 2>&1 >/dev/null |\
   sed '0,/======/d')
 
+echo "vikas Test: changed_components_details $changed_components_details"
+
 if [ -n "$changed_components_details" ]; then
     buildkite-agent annotate --style "info" <<EOF
 This change rebuilds the following components:
@@ -62,8 +64,9 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
+    echo "vikas test for loop: $changed_components"
     echo "component: $component"
-    component_build="echo \"--- [\$(date -u)] rebuild $component\"; rebuild $component"
+    component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
     build_commands="${build_commands} $component_build;"
 done
 
