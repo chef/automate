@@ -23,7 +23,7 @@ Set these two clusters in different data centers or cloud provider regions.
 ## Requirements
 
 1. Two identical clusters located in different data centers or cloud provider regions
-1. Network accessible storage (NAS), object store (S3,MinIO,Google Cloud Storage), available in both data centers/regions
+1. Network accessible storage (NAS), object store (S3,MinIO,Google Cloud Storage, Azure File Share), available in both data centers/regions
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
 In the above approach, there will be 2 identical clusters
@@ -98,12 +98,6 @@ Configure backups for both clusters using either [file system](/automate/ha_back
 
     - We don't recommend creating backups from the disaster recovery cluster unless it has become the active cluster and receiving traffic from the clients/nodes.
 
-    - Stop all the services on all Automate and Chef Infra frontend nodes using the following command:
-
-    ```sh
-    systemctl stop chef-automate
-    ```
-
     - Make sure both backup and restore cron are aligned.
 
     - Run the following command in one of the Automate nodes to get the IDs of all the backups:
@@ -130,6 +124,12 @@ Configure backups for both clusters using either [file system](/automate/ha_back
         [global.v1.external.opensearch.auth.basic_auth]
             username = "admin"
             password = "admin"
+        ```
+
+        - Stop all the services on all Automate and Chef Infra frontend nodes using the following command:
+
+        ```sh
+            systemctl stop chef-automate
         ```
 
         - In the disaster recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.

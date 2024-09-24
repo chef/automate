@@ -28,7 +28,7 @@ The Chef Automate HA equates to reliability, efficiency, and productivity, built
 
 HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *PostgreSQL*, and *OpenSearch*.
 
-### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
+### Chef Automate HA Architecture for OnPremise / Cloud Non-Managed
 
 ![High Availability Architecture](/images/automate/ha_arch_onprem.png)
 
@@ -65,6 +65,26 @@ The Chef Automate HA Architecture involves the following clusters as part of the
   - [Chef Automate](https://docs.chef.io/automate/)
   - [Chef Server](https://docs.chef.io/server/)
 
+## Provisioning
+
+Chef Automate's high availability solution can run on cloud providers and on-premise infrastructure systems. Appropriately provisioned backend, frontend, and bastion systems will help ensure a smooth deployment and installation experience.
+
+  - On-premise provisioning
+  - Cloud provisioning
+
+### On-premise provisioning
+
+  The customer can provision virtual machines or bare metal machines on a supported operating system with the required system settings to deploy the Automate HA solution.
+
+### Cloud provisioing
+  Systems and services from the following cloud providers are supported:
+
+  - [AWS](https://docs.chef.io/automate/ha_aws_deploy_steps/#steps-to-provision)
+  - Azure
+  - Google
+
+Deploy the Automate HA on the cloud infrastructure after the provisioning—the cloud systems. We have a simplified provisioning utility for AWS, Azure, and Google, and we expect to provision the systems manually.
+
 ## Deployment Methods
 
 Chef Automate High Availability (HA) supports two types of deployment:
@@ -86,6 +106,23 @@ The two-step deployment process is as shown below:
 
 - Provisioning Infrastructure. (Optional, if already manually done)
 - Deployment of services on the provisioned infrastructure.
+  - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
+
+### Cloud Deployment using Azure
+
+The two-step deployment process is as shown below:
+
+- Provisioning Infrastructure: Manually provision the infrastructure
+- Deployment of services on the provisioned infrastructure (follow the [On-premise Deployment steps](/automate/ha_onprim_deployment_procedure/)).
+  - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
+- Only File System Backup and Restore are supported.
+
+### Cloud Deployment using Google Cloud Platform (GCP)
+
+The two-step deployment process is as shown below:
+
+- Provisioning Infrastructure: Manually provision the infrastructure
+- Deployment of services on the provisioned infrastructure (follow the [On-premise Deployment steps](/automate/ha_onprim_deployment_procedure/)).
   - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
 
 ## Performance (Benchmarking)

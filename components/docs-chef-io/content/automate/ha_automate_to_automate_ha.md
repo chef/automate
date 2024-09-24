@@ -133,7 +133,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
 
 ## Migration with FileSystem Backup via Volume Mount
 
-Follow the steps below when migrating to On-Premises or AWS HA deployment **(but not for AWS with managed services)**.
+Follow the steps below when migrating to On-Premises or Cloud HA deployment **(but not for AWS with managed services)**.
 
 1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:

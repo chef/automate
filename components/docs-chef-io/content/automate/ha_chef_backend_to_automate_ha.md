@@ -115,6 +115,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 ## Restore Data to Chef Automate HA
 
+To restore the data, you will need to use the `knife-ec-backup` utility, which can be installed on any of the Automate HA Chef-Infra-Server nodes.
 - Execute the below command to install the habitat package for `knife-ec-backup`
 
     ```sh

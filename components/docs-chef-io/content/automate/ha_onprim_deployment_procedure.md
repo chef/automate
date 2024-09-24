@@ -23,6 +23,7 @@ Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_p
 - Do not modify the workspace path. It should always be `/hab/a2_deploy_workspace`.
 - We don't support AD managed users in nodes. We only support local Linux users.
 - If you have configured a sudo password for the user, you must create an environment variable `sudo_password` and set the password as the variable's value. Example: `export sudo_password=<password>`. And then, run all sudo commands with the `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
+- The SSH user should have execute permissions on the `/tmp` directory.
 - If SELinux is enabled, deployment with configure it to `permissive` (Usually in case of RHEL SELinux is enabled)
 {{< /warning >}}
 
@@ -30,7 +31,19 @@ Please see the [On-Premises Prerequisites](/automate/ha_on_premises_deployment_p
 
 Provision the other nodes in the high availability cluster before deploying the bastion host.
 
-Make sure you have all resources either on existing infrastructure or on existing cloud infrastructure (AWS/Google Cloud Platform).
+Ensure all resources are on existing or cloud infrastructure (`AWS`/`Azure`/`GoogleCloudPlatform`). For Cloud Infrastructure, the following are supported:
+
+### AWS
+
+  Infrastructure on AWS can either be provisioned manually or using [provision utility](https://docs.chef.io/automate/ha_aws_deploy_steps/#steps-to-provision).
+
+### Azure
+
+  The user should provide infrastructure on Azure before deploying the Automate HA Solution.
+
+### GCP
+
+  The user should manually provision Infrastructure on GCP before deploying Automate HA Solution.
 
 ## Deploy the bastion host
 
@@ -45,7 +58,12 @@ Make sure you have all resources either on existing infrastructure or on existin
     "
     ```
 
-    To download specific version bundle, replace `latest.aib` with Chef Automate version number. For example, `4.2.59.aib`.
+    {{< note spaces=4 >}}
+
+    In case `/usr/bin` is not there then check for `/bin` directory
+
+    {{< /note >}}
+    To download specific version bundle, replace `latest.aib` with Chef Automate version number. For example, `4.12.144.aib`.
 
     {{< note spaces=4 >}}
 

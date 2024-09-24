@@ -45,9 +45,7 @@ To understand how to generate certificates, refer to the [Certificate Generation
 
 ### Rotate Cluster Certificates
 
-If you want to rotate certificates of the entire cluster using single command, then you can follow the below commands:
-
-To rotate certificates of entire cluster using single command, we need a certificate template.
+To rotate the certificate for a node (automate,chef-server,postgres,opensearch) in the cluster, please provide the certificate file path in `certificate-config.toml` file.
 
 - To generate certificate template use below command
 
@@ -130,7 +128,7 @@ To rotate the Automate Load balancer root certificate:
     [cs_nginx.v1.sys.ngx.http]
       ssl_verify_depth = 6
     [global.v1.external.automate.ssl]
-      server_name = "https://<automatefqdn.example.com>"
+      server_name = "<automatefqdn.example.com>"
       root_cert = """<Root_CA_Content>"""
     ```
 

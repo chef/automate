@@ -40,7 +40,7 @@ This topology requires two load balancers and two DNS entries with certificates.
 
 Chef Automate HA requires a [high availability Chef Infra Server](/server/install_server_ha/) deployment; it does not support a standalone Chef Infra Server deployment.
 
-You can deploy a Chef Automate high availability cluster on AWS or Google Cloud Platform (GCP) VMs.
+You can deploy a Chef Automate high availability cluster on AWS or Google Cloud Platform (GCP) or Azure VMs.
 
 On-prem deployments of Chef Automate HA supports making backups on file system (FS) or object storage (S3/MinIO/Google Cloud Storage).
 
@@ -92,13 +92,13 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ### Minimum Hardware Requirement
 
-| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | GCP Machine Type | Additional Space      |
-| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ---------------- | -----------------     |
-| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
-| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | n2-standard-2    | /var/tmp=5% /root=20% |
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | AZURE Machine Type | GCP Machine Type | Additional Space      |
+| ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ------------------ | ---------------- | -----------------     |
+| Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
+| Chef Infra Server | 2     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
+| PostgreSQL DB     | 3     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
+| OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
+| Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
 
 {{< note >}}
 For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
@@ -189,6 +189,7 @@ The on-premises deployment specific pre-requisites are as follows:
 - This SSH user should have sudo privileges on all the machines.
 - SSH user should have write permission in nodes.
 - The SSH user should access all machines using the same SSH private key.
+- The SSH user should have execute permissions on the `/tmp` directory.
 
 ### Cluster Setup
 
