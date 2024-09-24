@@ -36,10 +36,10 @@ var licenseCmd = &cobra.Command{
 }
 
 var licenseStatusCmd = &cobra.Command{
-	Use:               "status",
-	Short:             "Retrieve Chef Automate license status",
-	RunE:              runLicenseStatusCmd,
-	PersistentPreRunE: preLicenseCmd,
+	Use:   "status",
+	Short: "Retrieve Chef Automate license status",
+	RunE:  runLicenseStatusCmd,
+	//	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
 		NoRequireRootAnnotation: NoRequireRootAnnotation,
 		docs.Tag:                docs.BastionHost,
