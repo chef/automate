@@ -196,26 +196,26 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 	if response.Set {
 		status.GlobalResult = response
 
-		if os.Geteuid() != 0 {
-			// License information for a current license for Non-root user
-			writer.Printf(licenseInfoFmtNonRoot,
-				response.CustomerName,
-				response.LicenseId,
-				time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339),
-				response.LicenseType,
-				response.GracePeriod,
-			)
-		} else {
-			// License information for a current license
-			writer.Printf(licenseInfoFmt,
-				response.CustomerName,
-				response.LicenseId,
-				time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339), response.DeploymentId, response.DeploymentType,
-				time.Unix(response.DeploymentAt.GetSeconds(), 0).UTC().Format(time.RFC3339),
-				response.LicenseType,
-				response.GracePeriod,
-			)
-		}
+		//if os.Geteuid() != 0 {
+		//	// License information for a current license for Non-root user
+		//	writer.Printf(licenseInfoFmtNonRoot,
+		//		response.CustomerName,
+		//		response.LicenseId,
+		//		time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339),
+		//		response.LicenseType,
+		//		response.GracePeriod,
+		//	)
+		//} else {
+		// License information for a current license
+		writer.Printf(licenseInfoFmt,
+			response.CustomerName,
+			response.LicenseId,
+			time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339), response.DeploymentId, response.DeploymentType,
+			time.Unix(response.DeploymentAt.GetSeconds(), 0).UTC().Format(time.RFC3339),
+			response.LicenseType,
+			response.GracePeriod,
+		)
+		//}
 
 		// Add notice if license is expired
 		if !response.GracePeriod && time.Now().Unix() > response.ExpirationDate.GetSeconds() {
