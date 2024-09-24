@@ -23,7 +23,7 @@ Set these two clusters in different data centers or cloud provider regions.
 ## Requirements
 
 1. Two identical clusters located in different data centers or cloud provider regions
-1. Network accessible storage (NAS), object store (S3,MinIO,Google Cloud Storage), available in both data centers/regions
+1. Network accessible storage (NAS), object store (S3,MinIO,Google Cloud Storage, Azure File Share), available in both data centers/regions
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
 In the above approach, there will be 2 identical clusters

@@ -28,7 +28,7 @@ The Chef Automate HA equates to reliability, efficiency, and productivity, built
 
 HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *PostgreSQL*, and *OpenSearch*.
 
-### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
+### Chef Automate HA Architecture for OnPremise / Cloud Non-Managed
 
 ![High Availability Architecture](/images/automate/ha_arch_onprem.png)
 

@@ -40,7 +40,7 @@ This topology requires two load balancers and two DNS entries with certificates.
 
 Chef Automate HA requires a [high availability Chef Infra Server](/server/install_server_ha/) deployment; it does not support a standalone Chef Infra Server deployment.
 
-You can deploy a Chef Automate high availability cluster on AWS or Google Cloud Platform (GCP) VMs.
+You can deploy a Chef Automate high availability cluster on AWS or Google Cloud Platform (GCP) or Azure VMs.
 
 On-prem deployments of Chef Automate HA supports making backups on file system (FS) or object storage (S3/MinIO/Google Cloud Storage).
 

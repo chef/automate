@@ -26,6 +26,7 @@ This page explains the frequently encountered issues in Chef Automate High Avail
     -  Existing Infrastructure
     -  Existing Cloud Infrastructure
         -  AWS
+        -  Azure
         -  Google Cloud Platform
 
 ### What are different types of backup available for deployment on GCP platform?
