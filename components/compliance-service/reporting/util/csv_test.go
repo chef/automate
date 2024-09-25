@@ -101,6 +101,50 @@ func getSampleReport() *reportingapi.Report {
 	return report
 }
 
+func getSampleReportWithoutResults() *reportingapi.Report {
+	controls := []*reportingapi.Control{
+		{
+			Id:     "ControlID1",
+			Title:  "Control Title",
+			Impact: 0.123,
+		}}
+	profiles := []*reportingapi.Profile{
+		{
+			Name:     "ProfileName",
+			Title:    "Profile, Title",
+			Version:  "1.2.3",
+			Summary:  "Profile summary",
+			Controls: controls,
+		}}
+
+	endTime, _ := time.Parse("2006-01-02T15:04:05", "2018-02-09T09:18:41Z")
+	endTimeTimestamp, _ := ptypes.TimestampProto(endTime)
+
+	report := &reportingapi.Report{
+		Id:          "ReportID",
+		EndTime:     endTimeTimestamp,
+		NodeId:      "ID1",
+		NodeName:    "Node1",
+		Profiles:    profiles,
+		Environment: "test-env",
+		Fqdn:        "api.example.com",
+		Ipaddress:   "10.23.149.1",
+	}
+	return report
+}
+
+func TestSimpleExportWithoutResult(t *testing.T) {
+	report := getSampleReportWithoutResults()
+	data, err := ReportToCSV(report)
+	assert.Nil(t, err, "ReportToCSV with a simple report generates without errors.")
+
+	// Please note: We test the format for RFC 4180 compliance and
+	// we also test if commas are escaped properly!
+	// See https://tools.ietf.org/html/rfc4180
+	line := "Node1,0001-01-01T00:00:00Z,,,test-env,10.23.149.1,api.example.com,ProfileName,\"Profile, Title\",1.2.3,Profile summary,ControlID1,Control Title,0.12,false,,,,,,,\n"
+	assert.Equal(t, csvHeader+line, data, "ReportToCSV without results with empty simple report works.")
+}
+
 func TestExportWaiverData(t *testing.T) {
 	report := getSampleReport()
 	report.Profiles[0].Controls[0].WaivedStr = "yes_run"

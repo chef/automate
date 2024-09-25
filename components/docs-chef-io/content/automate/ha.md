@@ -83,7 +83,7 @@ Chef Automate's high availability solution can run on cloud providers and on-pre
   - Azure
   - Google
 
-Deploy the Automate HA on the cloud infrastructure after the provisioning—the cloud systems. We have a simplified provisioning utility for AWS, Azure, and Google, and we expect to provision the systems manually.
+Deploy the Automate HA on the cloud infrastructure after provisioning the cloud systems. We have a simplified provisioning utility for AWS, Azure, and Google, and we expect to provision the systems manually.
 
 ## Deployment Methods
 

@@ -49,44 +49,54 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 	}
 	for _, profile := range report.Profiles {
 		for _, control := range profile.Controls {
-			for _, result := range control.Results {
-				timestamp, err := ptypes.Timestamp(report.EndTime)
-				if err != nil {
-					logrus.Errorf(err.Error())
-					timestamp = time.Time{}
+			timestamp, err := ptypes.Timestamp(report.EndTime)
+			if err != nil {
+				logrus.Errorf(err.Error())
+				timestamp = time.Time{}
+			}
+			waived := false
+			if strings.HasPrefix(control.WaivedStr, "yes") {
+				waived = true
+			}
+			if control.WaiverData == nil {
+				// prevent nil pointer failure
+				control.WaiverData = &reportingapi.OrigWaiverData{}
+			}
+
+			tmpCache := csvFields{
+				NodeName:            report.NodeName,
+				EndTime:             timestamp,
+				Environment:         report.Environment,
+				FQDN:                report.Fqdn,
+				IPAddress:           report.Ipaddress,
+				PlatformName:        report.GetPlatform().GetName(),
+				PlatformRelease:     report.GetPlatform().GetRelease(),
+				ProfileName:         profile.Name,
+				ProfileTitle:        profile.Title,
+				ProfileVersion:      profile.Version,
+				ProfileSummary:      profile.Summary,
+				ControlID:           control.Id,
+				ControlTitle:        control.Title,
+				ControlImpact:       strconv.FormatFloat(float64(control.Impact), 'f', 2, 32),
+				ControlWaived:       waived,
+				WaiverJustification: control.WaiverData.Justification,
+				WaiverExpiration:    control.WaiverData.ExpirationDate,
+			}
+			if len(control.Results) > 0 {
+				//If we have the result we will append each field with results
+				//else appending the control information directly
+				for _, result := range control.Results {
+					resultTmpCache := tmpCache
+					resultTmpCache.ResultStatus = result.Status
+					resultTmpCache.ResultRunTime = strconv.FormatFloat(float64(result.RunTime), 'f', 3, 32)
+					resultTmpCache.ResultCodeDescription = maxCharLimit(result.CodeDesc)
+					resultTmpCache.ResultMessage = maxCharLimit(result.Message)
+					resultTmpCache.ResultSkipMessage = result.SkipMessage
+					cache = append(cache, resultTmpCache)
+
 				}
-				waived := false
-				if strings.HasPrefix(control.WaivedStr, "yes") {
-					waived = true
-				}
-				if control.WaiverData == nil {
-					// prevent nil pointer failure
-					control.WaiverData = &reportingapi.OrigWaiverData{}
-				}
-				cache = append(cache, csvFields{
-					NodeName:              report.NodeName,
-					EndTime:               timestamp,
-					Environment:           report.Environment,
-					FQDN:                  report.Fqdn,
-					IPAddress:             report.Ipaddress,
-					PlatformName:          report.GetPlatform().GetName(),
-					PlatformRelease:       report.GetPlatform().GetRelease(),
-					ProfileName:           profile.Name,
-					ProfileTitle:          profile.Title,
-					ProfileVersion:        profile.Version,
-					ProfileSummary:        profile.Summary,
-					ControlID:             control.Id,
-					ControlTitle:          control.Title,
-					ControlImpact:         strconv.FormatFloat(float64(control.Impact), 'f', 2, 32),
-					ControlWaived:         waived,
-					ResultStatus:          result.Status,
-					ResultRunTime:         strconv.FormatFloat(float64(result.RunTime), 'f', 3, 32),
-					ResultCodeDescription: maxCharLimit(result.CodeDesc),
-					ResultMessage:         maxCharLimit(result.Message),
-					ResultSkipMessage:     result.SkipMessage,
-					WaiverJustification:   control.WaiverData.Justification,
-					WaiverExpiration:      control.WaiverData.ExpirationDate,
-				})
+			} else {
+				cache = append(cache, tmpCache)
 			}
 		}
 	}
