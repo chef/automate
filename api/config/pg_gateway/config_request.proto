@@ -24,7 +24,7 @@ message ConfigRequest {
 			Timeouts timeouts = 5;
 			Resolvers resolvers = 6;
 			google.protobuf.Int32Value max_connections = 7;
-			google.protobuf.BoolValue chef_manage_db = 8;
+			google.protobuf.BoolValue automate_ha_chef_manage_pg = 8;
 
 			message Resolvers {
 				repeated google.protobuf.StringValue nameservers = 1;
