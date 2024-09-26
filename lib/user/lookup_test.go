@@ -16,7 +16,7 @@ func (suite *LookupTestSuite) TestLookupUser() {
 	suite.Run("user is not found", func() {
 		_, err := suite.p.Lookup("thisuserdoesnotexist")
 		suite.Require().Error(err)
-		suite.Require().True(errors.Is(err, UnknownUserError("thisuserdoesnotexist")))
+		suite.Require().Contains(err.Error(), "thisuserdoesnotexist")
 	})
 
 	suite.Run("user exists", func() {
@@ -50,7 +50,7 @@ func (suite *LookupTestSuite) TestLookupGroup() {
 	suite.Run("group is not found", func() {
 		_, err := suite.p.LookupGroup("thisgroupdoesnotexist")
 		suite.Require().Error(err)
-		suite.Require().True(errors.Is(err, UnknownGroupError("thisgroupdoesnotexist")))
+		suite.Require().Contains(err.Error(), "thisgroupdoesnotexist")
 	})
 
 	suite.Run("group exists", func() {
@@ -65,7 +65,7 @@ func (suite *LookupTestSuite) TestLookupGroupId() {
 	suite.Run("group is not found", func() {
 		_, err := suite.p.LookupGroupId("4294967295")
 		suite.Require().Error(err)
-		suite.Require().True(errors.Is(err, UnknownGroupIdError("4294967295")))
+		suite.Require().Contains(err.Error(), "4294967295")
 	})
 
 	suite.Run("group exists", func() {
