@@ -60,36 +60,51 @@ export HAB_SUP_GATEWAY_AUTH_TOKEN=${hab_sup_http_gateway_auth_token}
 export isSkipRequired=false
 # Below function is calculating the version of the install version and airgap bundle version
 # and do comparision in case if both are same it set isSkipRequired=true 
+semver_version_check() {
+    installed_version=$1
+    airgap_bundle_version=$2
+
+    IFS='.' read -r major1 minor1 patch1 <<< "$installed_version"
+    IFS='.' read -r major2 minor2 patch2 <<< "$airgap_bundle_version"
+
+    # Compare major versions
+    if (( major1 > major2 )); then
+        echo "$installed_version is greater than $airgap_bundle_version"
+        isSkipRequired=true
+    elif (( major1 < major2 )); then
+        echo "$airgap_bundle_version is greater than $installed_version, proceeding for upgrade"
+    else
+        # Compare minor versions
+        if (( minor1 > minor2 )); then
+            echo "$installed_version is greater than $airgap_bundle_version"
+            isSkipRequired=true
+        elif (( minor1 < minor2 )); then
+            echo "$airgap_bundle_version is greater than $installed_version, proceeding for upgrade"
+        else
+            # Compare patch versions
+            if (( patch1 > patch2 )); then
+                echo "$installed_version is greater than $airgap_bundle_version"
+                isSkipRequired=true
+            elif (( patch1 < patch2 )); then
+                echo "$airgap_bundle_version is greater than $installed_version, proceeding for upgrade"
+            else
+                echo "Both versions are equal"
+                isSkipRequired=true
+            fi
+        fi
+    fi
+}
+
 version_check_for_addnode() {
     installed_version=$(chef-automate version 2>/dev/null | grep Server | awk '{print $3}')
     airgap_bundle_version=$(chef-automate airgap bundle info ${frontend_aib_file} 2>/dev/null | grep "Version" | awk '{print $2}')
-
     # Uncomment this if you want to override the versions for testing
-    # installed_version=$1
-    # airgap_bundle_version=$2
-
+    # installed_version=$1  4.12.144
+    # airgap_bundle_version=$2  4.13.0
     echo "Installed Version: $installed_version"
     echo "Airgap Bundle Version: $airgap_bundle_version"
-
-    # Split the version strings into arrays based on the dot separator
-    IFS='.' read -ra ver1_arr <<< "$installed_version"
-    IFS='.' read -ra ver2_arr <<< "$airgap_bundle_version"
-
-    # Determine the number of components in the version strings
-    num_components1=$${#ver1_arr[@]}
-    num_components2=$${#ver2_arr[@]}
-
-    # Compare each component of the version strings
-    for ((i = 0; i < num_components1 && i < num_components2; i++)); do
-        if [ "$${ver1_arr[i]}" -lt "$${ver2_arr[i]}" ]; then
-            echo "Airgap bundle version $airgap_bundle_version is greater than installed version $installed_version"
-        elif [ "$${ver1_arr[i]}" -gt "$${ver2_arr[i]}" ]; then
-            echo "Installed version $installed_version is greater than airgap bundle $airgap_bundle_version"
-            isSkipRequired=true
-        fi
-    done
-
-# If we reach this point, the version strings are equal up to the common components.
+    semver_version_check $installed_version $airgap_bundle_version
+    # If we reach this point, the version strings are equal up to the common components.
      if [ $installed_version = $airgap_bundle_version ]; then
         echo "Both version strings are equal."
         isSkipRequired=true

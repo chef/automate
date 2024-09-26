@@ -3399,3 +3399,9 @@ rM2p0kk=
   base_path = "automate"  
 <% end %>
 
+<% if services[:postgresql][:setup_managed_services] == false && overrides[:setup_self_managed_services] == false -%>
+[pg_gateway]
+  [pg_gateway.v1]
+    [pg_gateway.v1.sys]
+      automate_ha_chef_manage_pg = true
+<% end %>

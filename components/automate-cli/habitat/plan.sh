@@ -43,5 +43,3 @@ do_after() {
     sha256sum "${bin_path}" | cut -d ' ' -f1 > "${bin_sha_path}"
   done
 }
-
-
