@@ -2,6 +2,7 @@ package secureconn
 
 import (
 	"context"
+	"fmt"
 	"path"
 	"testing"
 
@@ -80,7 +81,7 @@ func TestSecureConnFactory(t *testing.T) {
 
 		s, ok := status.FromError(err)
 		require.True(t, ok)
-		assert.Regexp(t, "authentication handshake failed: tls: failed to verify certificate: x509: certificate is valid for root-a-service, root-a-service, not root-foo-service", s.Message())
+		assert.Regexp(t, "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate is valid for root-a-service, root-a-service, not root-foo-service", s.Message())
 	})
 
 	t.Run("Test incorrectly signed client cert and correct server name", func(t *testing.T) {
@@ -95,7 +96,7 @@ func TestSecureConnFactory(t *testing.T) {
 
 		s, ok := status.FromError(err)
 		require.True(t, ok)
-		assert.Regexp(t, "authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority", s.Message())
+		assert.Regexp(t, "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority", s.Message())
 	})
 }
 
