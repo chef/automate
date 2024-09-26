@@ -60,18 +60,10 @@ export HAB_SUP_GATEWAY_AUTH_TOKEN=${hab_sup_http_gateway_auth_token}
 export isSkipRequired=false
 # Below function is calculating the version of the install version and airgap bundle version
 # and do comparision in case if both are same it set isSkipRequired=true 
-version_check_for_addnode() {
-    installed_version=$(chef-automate version 2>/dev/null | grep Server | awk '{print $3}')
-    airgap_bundle_version=$(chef-automate airgap bundle info ${frontend_aib_file} 2>/dev/null | grep "Version" | awk '{print $2}')
+semver_version_check() {
+    installed_version=$1
+    airgap_bundle_version=$2
 
-    # Uncomment this if you want to override the versions for testing
-    # installed_version=$1  4.12.144
-    # airgap_bundle_version=$2  4.13.0
-
-    echo "Installed Version: $installed_version"
-    echo "Airgap Bundle Version: $airgap_bundle_version"
-
-    # Split the version strings into arrays based on the dot separator
     IFS='.' read -r major1 minor1 patch1 <<< "$installed_version"
     IFS='.' read -r major2 minor2 patch2 <<< "$airgap_bundle_version"
 
@@ -97,14 +89,22 @@ version_check_for_addnode() {
                 echo "$airgap_bundle_version is greater than $installed_version, proceeding for upgrade"
             else
                 echo "Both versions are equal"
+                isSkipRequired=true
             fi
         fi
     fi
-    # Determine the number of components in the version strings
+}
 
-    # Compare each component of the version strings
-
-# If we reach this point, the version strings are equal up to the common components.
+version_check_for_addnode() {
+    installed_version=$(chef-automate version 2>/dev/null | grep Server | awk '{print $3}')
+    airgap_bundle_version=$(chef-automate airgap bundle info ${frontend_aib_file} 2>/dev/null | grep "Version" | awk '{print $2}')
+    # Uncomment this if you want to override the versions for testing
+    # installed_version=$1  4.12.144
+    # airgap_bundle_version=$2  4.13.0
+    echo "Installed Version: $installed_version"
+    echo "Airgap Bundle Version: $airgap_bundle_version"
+    semver_version_check $installed_version $airgap_bundle_version
+    # If we reach this point, the version strings are equal up to the common components.
      if [ $installed_version = $airgap_bundle_version ]; then
         echo "Both version strings are equal."
         isSkipRequired=true
