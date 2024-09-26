@@ -2,7 +2,6 @@ package secureconn
 
 import (
 	"context"
-	"fmt"
 	"path"
 	"testing"
 
