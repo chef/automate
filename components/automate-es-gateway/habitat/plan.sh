@@ -12,7 +12,6 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
-
 jdomain_version="master"
 jdomain_filename="ngx_upstream_jdomain-${jdomain_version}.tar.gz"
 jdomain_source="https://github.com/wdaike/ngx_upstream_jdomain/archive/${jdomain_version}.tar.gz"
