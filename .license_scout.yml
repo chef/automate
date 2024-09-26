@@ -840,6 +840,13 @@ fallbacks:
   - name: go.uber.org/automaxprocs
     license_id: MIT
     license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE
+  - name: github.com/savsgio/dictpool
+    license_id: Apache-2.0
+    license_content: https://raw.githubusercontent.com/savsgio/dictpool/master/LICENSE
+  - name: github.com/savsgio/gotils
+    license_id: Apache-2.0
+    license_content: https://raw.githubusercontent.com/savsgio/gotils/master/LICENSE
+
 
   habitat:
   - name: chef/mlsa
