@@ -74,7 +74,8 @@ steps:
       - tfenv use 0.14.11
       - cd terraform/a2ha-terraform
       - make check
-      - cd terraform/a2ha-terraform/modules/automate/templates/script/
+      - pwd
+      - cd modules/automate/templates/script/
       - bash test_semver.sh
     expeditor:
       executor:
