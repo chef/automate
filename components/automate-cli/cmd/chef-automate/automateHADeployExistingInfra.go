@@ -155,8 +155,8 @@ func (e *existingInfra) populateCertificateTomlFile() error {
 		var ips []IP
 		// Initialize Opensearch section
 		opensearch.RootCA = "/hab/a2_deploy_workspace/certificate/opensearch.fqdn.root.ca.cert"
-		opensearch.AdminPrivateKey = "/hab/a2_deploy_workspace/certificate/opensearch.admin.public.cert"
-		opensearch.AdminPublickey = "/hab/a2_deploy_workspace/certificate/opensearch.admin.private.cert"
+		opensearch.AdminPublickey = "/hab/a2_deploy_workspace/certificate/opensearch.admin.public.cert"
+		opensearch.AdminPrivateKey = "/hab/a2_deploy_workspace/certificate/opensearch.admin.private.cert"
 		for i := 0; i < OpensearchCount; i++ {
 			var ip IP
 			ip.IP = e.config.ExistingInfra.Config.OpensearchPrivateIps[i]
