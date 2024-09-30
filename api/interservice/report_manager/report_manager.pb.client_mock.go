@@ -6,37 +6,38 @@ package report_manager
 
 import (
 	context "context"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
 )
 
-// MockReportManagerServiceClient is a mock of ReportManagerServiceClient interface
+// MockReportManagerServiceClient is a mock of ReportManagerServiceClient interface.
 type MockReportManagerServiceClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockReportManagerServiceClientMockRecorder
 }
 
-// MockReportManagerServiceClientMockRecorder is the mock recorder for MockReportManagerServiceClient
+// MockReportManagerServiceClientMockRecorder is the mock recorder for MockReportManagerServiceClient.
 type MockReportManagerServiceClientMockRecorder struct {
 	mock *MockReportManagerServiceClient
 }
 
-// NewMockReportManagerServiceClient creates a new mock instance
+// NewMockReportManagerServiceClient creates a new mock instance.
 func NewMockReportManagerServiceClient(ctrl *gomock.Controller) *MockReportManagerServiceClient {
 	mock := &MockReportManagerServiceClient{ctrl: ctrl}
 	mock.recorder = &MockReportManagerServiceClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockReportManagerServiceClient) EXPECT() *MockReportManagerServiceClientMockRecorder {
 	return m.recorder
 }
 
-// GetAllRequestsStatus mocks base method
+// GetAllRequestsStatus mocks base method.
 func (m *MockReportManagerServiceClient) GetAllRequestsStatus(arg0 context.Context, arg1 *AllStatusRequest, arg2 ...grpc.CallOption) (*AllStatusResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -49,14 +50,14 @@ func (m *MockReportManagerServiceClient) GetAllRequestsStatus(arg0 context.Conte
 	return ret0, ret1
 }
 
-// GetAllRequestsStatus indicates an expected call of GetAllRequestsStatus
+// GetAllRequestsStatus indicates an expected call of GetAllRequestsStatus.
 func (mr *MockReportManagerServiceClientMockRecorder) GetAllRequestsStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllRequestsStatus", reflect.TypeOf((*MockReportManagerServiceClient)(nil).GetAllRequestsStatus), varargs...)
 }
 
-// GetPresignedURL mocks base method
+// GetPresignedURL mocks base method.
 func (m *MockReportManagerServiceClient) GetPresignedURL(arg0 context.Context, arg1 *GetPresignedURLRequest, arg2 ...grpc.CallOption) (*GetPresignedURLResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -69,14 +70,14 @@ func (m *MockReportManagerServiceClient) GetPresignedURL(arg0 context.Context, a
 	return ret0, ret1
 }
 
-// GetPresignedURL indicates an expected call of GetPresignedURL
+// GetPresignedURL indicates an expected call of GetPresignedURL.
 func (mr *MockReportManagerServiceClientMockRecorder) GetPresignedURL(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPresignedURL", reflect.TypeOf((*MockReportManagerServiceClient)(nil).GetPresignedURL), varargs...)
 }
 
-// PrepareCustomReport mocks base method
+// PrepareCustomReport mocks base method.
 func (m *MockReportManagerServiceClient) PrepareCustomReport(arg0 context.Context, arg1 *CustomReportRequest, arg2 ...grpc.CallOption) (*CustomReportResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -89,14 +90,14 @@ func (m *MockReportManagerServiceClient) PrepareCustomReport(arg0 context.Contex
 	return ret0, ret1
 }
 
-// PrepareCustomReport indicates an expected call of PrepareCustomReport
+// PrepareCustomReport indicates an expected call of PrepareCustomReport.
 func (mr *MockReportManagerServiceClientMockRecorder) PrepareCustomReport(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareCustomReport", reflect.TypeOf((*MockReportManagerServiceClient)(nil).PrepareCustomReport), varargs...)
 }
 
-// StoreReport mocks base method
+// StoreReport mocks base method.
 func (m *MockReportManagerServiceClient) StoreReport(arg0 context.Context, arg1 ...grpc.CallOption) (ReportManagerService_StoreReportClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
@@ -109,37 +110,37 @@ func (m *MockReportManagerServiceClient) StoreReport(arg0 context.Context, arg1 
 	return ret0, ret1
 }
 
-// StoreReport indicates an expected call of StoreReport
+// StoreReport indicates an expected call of StoreReport.
 func (mr *MockReportManagerServiceClientMockRecorder) StoreReport(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreReport", reflect.TypeOf((*MockReportManagerServiceClient)(nil).StoreReport), varargs...)
 }
 
-// MockReportManagerService_StoreReportClient is a mock of ReportManagerService_StoreReportClient interface
+// MockReportManagerService_StoreReportClient is a mock of ReportManagerService_StoreReportClient interface.
 type MockReportManagerService_StoreReportClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockReportManagerService_StoreReportClientMockRecorder
 }
 
-// MockReportManagerService_StoreReportClientMockRecorder is the mock recorder for MockReportManagerService_StoreReportClient
+// MockReportManagerService_StoreReportClientMockRecorder is the mock recorder for MockReportManagerService_StoreReportClient.
 type MockReportManagerService_StoreReportClientMockRecorder struct {
 	mock *MockReportManagerService_StoreReportClient
 }
 
-// NewMockReportManagerService_StoreReportClient creates a new mock instance
+// NewMockReportManagerService_StoreReportClient creates a new mock instance.
 func NewMockReportManagerService_StoreReportClient(ctrl *gomock.Controller) *MockReportManagerService_StoreReportClient {
 	mock := &MockReportManagerService_StoreReportClient{ctrl: ctrl}
 	mock.recorder = &MockReportManagerService_StoreReportClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockReportManagerService_StoreReportClient) EXPECT() *MockReportManagerService_StoreReportClientMockRecorder {
 	return m.recorder
 }
 
-// CloseAndRecv mocks base method
+// CloseAndRecv mocks base method.
 func (m *MockReportManagerService_StoreReportClient) CloseAndRecv() (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CloseAndRecv")
@@ -148,13 +149,13 @@ func (m *MockReportManagerService_StoreReportClient) CloseAndRecv() (*emptypb.Em
 	return ret0, ret1
 }
 
-// CloseAndRecv indicates an expected call of CloseAndRecv
+// CloseAndRecv indicates an expected call of CloseAndRecv.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) CloseAndRecv() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloseAndRecv", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).CloseAndRecv))
 }
 
-// CloseSend mocks base method
+// CloseSend mocks base method.
 func (m *MockReportManagerService_StoreReportClient) CloseSend() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CloseSend")
@@ -162,13 +163,13 @@ func (m *MockReportManagerService_StoreReportClient) CloseSend() error {
 	return ret0
 }
 
-// CloseSend indicates an expected call of CloseSend
+// CloseSend indicates an expected call of CloseSend.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) CloseSend() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloseSend", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).CloseSend))
 }
 
-// Context mocks base method
+// Context mocks base method.
 func (m *MockReportManagerService_StoreReportClient) Context() context.Context {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Context")
@@ -176,13 +177,13 @@ func (m *MockReportManagerService_StoreReportClient) Context() context.Context {
 	return ret0
 }
 
-// Context indicates an expected call of Context
+// Context indicates an expected call of Context.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) Context() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).Context))
 }
 
-// Header mocks base method
+// Header mocks base method.
 func (m *MockReportManagerService_StoreReportClient) Header() (metadata.MD, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Header")
@@ -191,13 +192,13 @@ func (m *MockReportManagerService_StoreReportClient) Header() (metadata.MD, erro
 	return ret0, ret1
 }
 
-// Header indicates an expected call of Header
+// Header indicates an expected call of Header.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) Header() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Header", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).Header))
 }
 
-// RecvMsg mocks base method
+// RecvMsg mocks base method.
 func (m *MockReportManagerService_StoreReportClient) RecvMsg(arg0 interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RecvMsg", arg0)
@@ -205,13 +206,13 @@ func (m *MockReportManagerService_StoreReportClient) RecvMsg(arg0 interface{}) e
 	return ret0
 }
 
-// RecvMsg indicates an expected call of RecvMsg
+// RecvMsg indicates an expected call of RecvMsg.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).RecvMsg), arg0)
 }
 
-// Send mocks base method
+// Send mocks base method.
 func (m *MockReportManagerService_StoreReportClient) Send(arg0 *StoreReportRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0)
@@ -219,13 +220,13 @@ func (m *MockReportManagerService_StoreReportClient) Send(arg0 *StoreReportReque
 	return ret0
 }
 
-// Send indicates an expected call of Send
+// Send indicates an expected call of Send.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) Send(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).Send), arg0)
 }
 
-// SendMsg mocks base method
+// SendMsg mocks base method.
 func (m *MockReportManagerService_StoreReportClient) SendMsg(arg0 interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", arg0)
@@ -233,13 +234,13 @@ func (m *MockReportManagerService_StoreReportClient) SendMsg(arg0 interface{}) e
 	return ret0
 }
 
-// SendMsg indicates an expected call of SendMsg
+// SendMsg indicates an expected call of SendMsg.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).SendMsg), arg0)
 }
 
-// Trailer mocks base method
+// Trailer mocks base method.
 func (m *MockReportManagerService_StoreReportClient) Trailer() metadata.MD {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Trailer")
@@ -247,36 +248,36 @@ func (m *MockReportManagerService_StoreReportClient) Trailer() metadata.MD {
 	return ret0
 }
 
-// Trailer indicates an expected call of Trailer
+// Trailer indicates an expected call of Trailer.
 func (mr *MockReportManagerService_StoreReportClientMockRecorder) Trailer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Trailer", reflect.TypeOf((*MockReportManagerService_StoreReportClient)(nil).Trailer))
 }
 
-// MockReportManagerServiceServer is a mock of ReportManagerServiceServer interface
+// MockReportManagerServiceServer is a mock of ReportManagerServiceServer interface.
 type MockReportManagerServiceServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockReportManagerServiceServerMockRecorder
 }
 
-// MockReportManagerServiceServerMockRecorder is the mock recorder for MockReportManagerServiceServer
+// MockReportManagerServiceServerMockRecorder is the mock recorder for MockReportManagerServiceServer.
 type MockReportManagerServiceServerMockRecorder struct {
 	mock *MockReportManagerServiceServer
 }
 
-// NewMockReportManagerServiceServer creates a new mock instance
+// NewMockReportManagerServiceServer creates a new mock instance.
 func NewMockReportManagerServiceServer(ctrl *gomock.Controller) *MockReportManagerServiceServer {
 	mock := &MockReportManagerServiceServer{ctrl: ctrl}
 	mock.recorder = &MockReportManagerServiceServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockReportManagerServiceServer) EXPECT() *MockReportManagerServiceServerMockRecorder {
 	return m.recorder
 }
 
-// GetAllRequestsStatus mocks base method
+// GetAllRequestsStatus mocks base method.
 func (m *MockReportManagerServiceServer) GetAllRequestsStatus(arg0 context.Context, arg1 *AllStatusRequest) (*AllStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllRequestsStatus", arg0, arg1)
@@ -285,13 +286,13 @@ func (m *MockReportManagerServiceServer) GetAllRequestsStatus(arg0 context.Conte
 	return ret0, ret1
 }
 
-// GetAllRequestsStatus indicates an expected call of GetAllRequestsStatus
+// GetAllRequestsStatus indicates an expected call of GetAllRequestsStatus.
 func (mr *MockReportManagerServiceServerMockRecorder) GetAllRequestsStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllRequestsStatus", reflect.TypeOf((*MockReportManagerServiceServer)(nil).GetAllRequestsStatus), arg0, arg1)
 }
 
-// GetPresignedURL mocks base method
+// GetPresignedURL mocks base method.
 func (m *MockReportManagerServiceServer) GetPresignedURL(arg0 context.Context, arg1 *GetPresignedURLRequest) (*GetPresignedURLResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPresignedURL", arg0, arg1)
@@ -300,13 +301,13 @@ func (m *MockReportManagerServiceServer) GetPresignedURL(arg0 context.Context, a
 	return ret0, ret1
 }
 
-// GetPresignedURL indicates an expected call of GetPresignedURL
+// GetPresignedURL indicates an expected call of GetPresignedURL.
 func (mr *MockReportManagerServiceServerMockRecorder) GetPresignedURL(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPresignedURL", reflect.TypeOf((*MockReportManagerServiceServer)(nil).GetPresignedURL), arg0, arg1)
 }
 
-// PrepareCustomReport mocks base method
+// PrepareCustomReport mocks base method.
 func (m *MockReportManagerServiceServer) PrepareCustomReport(arg0 context.Context, arg1 *CustomReportRequest) (*CustomReportResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PrepareCustomReport", arg0, arg1)
@@ -315,13 +316,13 @@ func (m *MockReportManagerServiceServer) PrepareCustomReport(arg0 context.Contex
 	return ret0, ret1
 }
 
-// PrepareCustomReport indicates an expected call of PrepareCustomReport
+// PrepareCustomReport indicates an expected call of PrepareCustomReport.
 func (mr *MockReportManagerServiceServerMockRecorder) PrepareCustomReport(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareCustomReport", reflect.TypeOf((*MockReportManagerServiceServer)(nil).PrepareCustomReport), arg0, arg1)
 }
 
-// StoreReport mocks base method
+// StoreReport mocks base method.
 func (m *MockReportManagerServiceServer) StoreReport(arg0 ReportManagerService_StoreReportServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StoreReport", arg0)
@@ -329,36 +330,36 @@ func (m *MockReportManagerServiceServer) StoreReport(arg0 ReportManagerService_S
 	return ret0
 }
 
-// StoreReport indicates an expected call of StoreReport
+// StoreReport indicates an expected call of StoreReport.
 func (mr *MockReportManagerServiceServerMockRecorder) StoreReport(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreReport", reflect.TypeOf((*MockReportManagerServiceServer)(nil).StoreReport), arg0)
 }
 
-// MockReportManagerService_StoreReportServer is a mock of ReportManagerService_StoreReportServer interface
+// MockReportManagerService_StoreReportServer is a mock of ReportManagerService_StoreReportServer interface.
 type MockReportManagerService_StoreReportServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockReportManagerService_StoreReportServerMockRecorder
 }
 
-// MockReportManagerService_StoreReportServerMockRecorder is the mock recorder for MockReportManagerService_StoreReportServer
+// MockReportManagerService_StoreReportServerMockRecorder is the mock recorder for MockReportManagerService_StoreReportServer.
 type MockReportManagerService_StoreReportServerMockRecorder struct {
 	mock *MockReportManagerService_StoreReportServer
 }
 
-// NewMockReportManagerService_StoreReportServer creates a new mock instance
+// NewMockReportManagerService_StoreReportServer creates a new mock instance.
 func NewMockReportManagerService_StoreReportServer(ctrl *gomock.Controller) *MockReportManagerService_StoreReportServer {
 	mock := &MockReportManagerService_StoreReportServer{ctrl: ctrl}
 	mock.recorder = &MockReportManagerService_StoreReportServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockReportManagerService_StoreReportServer) EXPECT() *MockReportManagerService_StoreReportServerMockRecorder {
 	return m.recorder
 }
 
-// Context mocks base method
+// Context mocks base method.
 func (m *MockReportManagerService_StoreReportServer) Context() context.Context {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Context")
@@ -366,13 +367,13 @@ func (m *MockReportManagerService_StoreReportServer) Context() context.Context {
 	return ret0
 }
 
-// Context indicates an expected call of Context
+// Context indicates an expected call of Context.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) Context() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).Context))
 }
 
-// Recv mocks base method
+// Recv mocks base method.
 func (m *MockReportManagerService_StoreReportServer) Recv() (*StoreReportRequest, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recv")
@@ -381,13 +382,13 @@ func (m *MockReportManagerService_StoreReportServer) Recv() (*StoreReportRequest
 	return ret0, ret1
 }
 
-// Recv indicates an expected call of Recv
+// Recv indicates an expected call of Recv.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) Recv() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).Recv))
 }
 
-// RecvMsg mocks base method
+// RecvMsg mocks base method.
 func (m *MockReportManagerService_StoreReportServer) RecvMsg(arg0 interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RecvMsg", arg0)
@@ -395,13 +396,13 @@ func (m *MockReportManagerService_StoreReportServer) RecvMsg(arg0 interface{}) e
 	return ret0
 }
 
-// RecvMsg indicates an expected call of RecvMsg
+// RecvMsg indicates an expected call of RecvMsg.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).RecvMsg), arg0)
 }
 
-// SendAndClose mocks base method
+// SendAndClose mocks base method.
 func (m *MockReportManagerService_StoreReportServer) SendAndClose(arg0 *emptypb.Empty) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendAndClose", arg0)
@@ -409,13 +410,13 @@ func (m *MockReportManagerService_StoreReportServer) SendAndClose(arg0 *emptypb.
 	return ret0
 }
 
-// SendAndClose indicates an expected call of SendAndClose
+// SendAndClose indicates an expected call of SendAndClose.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) SendAndClose(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendAndClose", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).SendAndClose), arg0)
 }
 
-// SendHeader mocks base method
+// SendHeader mocks base method.
 func (m *MockReportManagerService_StoreReportServer) SendHeader(arg0 metadata.MD) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendHeader", arg0)
@@ -423,13 +424,13 @@ func (m *MockReportManagerService_StoreReportServer) SendHeader(arg0 metadata.MD
 	return ret0
 }
 
-// SendHeader indicates an expected call of SendHeader
+// SendHeader indicates an expected call of SendHeader.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).SendHeader), arg0)
 }
 
-// SendMsg mocks base method
+// SendMsg mocks base method.
 func (m *MockReportManagerService_StoreReportServer) SendMsg(arg0 interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", arg0)
@@ -437,13 +438,13 @@ func (m *MockReportManagerService_StoreReportServer) SendMsg(arg0 interface{}) e
 	return ret0
 }
 
-// SendMsg indicates an expected call of SendMsg
+// SendMsg indicates an expected call of SendMsg.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).SendMsg), arg0)
 }
 
-// SetHeader mocks base method
+// SetHeader mocks base method.
 func (m *MockReportManagerService_StoreReportServer) SetHeader(arg0 metadata.MD) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetHeader", arg0)
@@ -451,19 +452,19 @@ func (m *MockReportManagerService_StoreReportServer) SetHeader(arg0 metadata.MD)
 	return ret0
 }
 
-// SetHeader indicates an expected call of SetHeader
+// SetHeader indicates an expected call of SetHeader.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).SetHeader), arg0)
 }
 
-// SetTrailer mocks base method
+// SetTrailer mocks base method.
 func (m *MockReportManagerService_StoreReportServer) SetTrailer(arg0 metadata.MD) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetTrailer", arg0)
 }
 
-// SetTrailer indicates an expected call of SetTrailer
+// SetTrailer indicates an expected call of SetTrailer.
 func (mr *MockReportManagerService_StoreReportServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockReportManagerService_StoreReportServer)(nil).SetTrailer), arg0)

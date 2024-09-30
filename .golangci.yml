@@ -73,3 +73,10 @@ linters:
     - nilerr
     - nonamedreturns
     - predeclared
+    - protogetter
+    - tagalign
+    - depguard
+    - govet
+    - inamedparam
+    - mnd
+    - perfsprint

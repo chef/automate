@@ -19,5 +19,5 @@ bin:
 build: ${BINS}
 
 test:
-	@go test -v -i $(packages)
+	@go test -v $(packages)
 	@go test -v -cover -count=1 $(packages)

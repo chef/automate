@@ -30,7 +30,7 @@ func nodeManagerPublisher(in <-chan message.ChefRun, nodeManagerClient manager.N
 	ctx := context.Background()
 	maxNumberOfBundledMsgs := 100
 	out := make(chan message.ChefRun, maxNumberOfBundledMsgs)
-	for i := 0; i < numPublishers; i++ {
+	for range make([]struct{}, numPublishers) {
 		go func() {
 			for msg := range in {
 				// send to node manager from here.

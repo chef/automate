@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc"
 	"os"
 
 	"github.com/pkg/errors"
@@ -79,14 +80,20 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		return nil, errors.Wrap(err, "initialize password validator")
 	}
 
-	conn, err := factory.DialContext(ctx, "teams-service", c.TeamsAddress)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to dial teams-service at (%s)", c.TeamsAddress)
+	var conn *grpc.ClientConn
+	if c.TeamsAddress != "" {
+		conn, err = factory.DialContext(ctx, "teams-service", c.TeamsAddress)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to dial teams-service at (%s)", c.TeamsAddress)
+		}
 	}
 
-	authzConn, err := factory.DialContext(ctx, "authz-service", c.AuthzAddress)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", c.AuthzAddress)
+	var authzConn *grpc.ClientConn
+	if c.AuthzAddress != "" {
+		authzConn, err = factory.DialContext(ctx, "authz-service", c.AuthzAddress)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", c.AuthzAddress)
+		}
 	}
 
 	s := &Server{

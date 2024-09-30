@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/license-control-service/licenseaudit"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
+	"github.com/chef/automate/lib/tracing"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -18,29 +19,48 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/chef/automate/lib/tracing"
 )
 
 // NewGRPC creates the gRPC server.
 func NewGRPC(ctx context.Context, config *Config) (*grpc.Server, error) {
 	// Setup our gRPC connection factory
 	connFactory := secureconn.NewFactory(*config.ServiceCerts)
+	if connFactory == nil {
+		return nil, errors.New("failed to create secure connection factory")
+	}
+
 	// Register our API
 	grpcServer := connFactory.NewServer(tracing.GlobalServerInterceptor())
+	if grpcServer == nil {
+		return nil, errors.New("failed to create grpc server")
+	}
+
 	licenseParser := keys.NewLicenseParser(keys.BuiltinKeyData)
+	if licenseParser == nil {
+		return nil, errors.New("failed to create license parser")
+	}
 
 	backend := storage.NewCurrentBackend(config.PGURL, config.MigrationsPath, config.LicenseTokenPath)
+	if backend == nil {
+		return nil, errors.New("failed to create storage backend")
+	}
 
 	err := backend.Init(ctx, licenseParser)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize storage backend")
 	}
+
 	// Create deployment id and save it in DB
 	err = storeDeploymentID(backend)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to store deployment ID")
 	}
+
 	srv := NewLicenseControlServer(ctx, backend, licenseParser, config)
+	if srv == nil {
+		return nil, errors.New("failed to create license control server")
+	}
+
 	lc.RegisterLicenseControlServiceServer(grpcServer, srv)
 	health.RegisterHealthServer(grpcServer, srv.health)
 
@@ -79,7 +99,7 @@ func StartGRPC(ctx context.Context, config *Config) error {
 		return errors.Wrap(err, "could not create cereal manager")
 	}
 
-	err = licenseaudit.InitCerealManager(context.TODO(), cerealManager, 1, config.LicenseAudit.Url, config.LicenseAudit.Frequency,config.LicenseAudit.Interval)
+	err = licenseaudit.InitCerealManager(context.TODO(), cerealManager, 1, config.LicenseAudit.Url, config.LicenseAudit.Frequency, config.LicenseAudit.Interval)
 	if err != nil {
 		return errors.Wrap(err, "could not create cereal manager")
 	}

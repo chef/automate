@@ -17,7 +17,7 @@ func BuildChefRun(client backend.Client, numberOfPublishers int) message.ChefRun
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
 		out := make(chan message.ChefRun, 100)
 
-		for i := 0; i < numberOfPublishers; i++ {
+		for i := range make([]struct{}, numberOfPublishers) {
 			go ChefRun(in, client, out, i)
 		}
 

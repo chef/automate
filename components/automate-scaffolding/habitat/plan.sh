@@ -35,3 +35,4 @@ do_install() {
   install -D -m 0644 "$PLAN_CONTEXT/../../../lib/scaffolding/templates/"* "$pkg_prefix/lib/templates/"
 }
 
+

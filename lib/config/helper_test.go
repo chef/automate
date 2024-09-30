@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
+	"io/ioutil"
 	"math/big"
 	"testing"
 	"time"
@@ -14,6 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func readFileData(filepath string) string {
+	certData, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return string("failed to read certificate")
+	}
+	return string(certData)
+}
 func TestValidateStringBasedBoolean(t *testing.T) {
 	tests := []struct {
 		value      string
@@ -432,12 +440,6 @@ func generateExpiredCert() []byte {
 }
 
 const (
-	PublicKey  = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
-	PrivateKey = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
-	RootCa     = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
-	AdminCert  = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
-	AdminKey   = "-----BEGIN CERTIFICATE-----\nMIIDqzCCApOgAwIBAgIUMUG0kbGT5s8Vo415aNfii81CzRcwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMFoXDTI1MDUzMTA3MzMwMFowZTELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApjaGVmcm9vdGNh\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4aKz6j+Otgeg+oZSsHtq\nz5Phyb2cWr+CdbLb2qZA9ZDcCjEzkxvuvI6QBScF9feVk7YVXg59DXlHJRP7AHx5\nnG5iQmND0jUUQGjyZfKTWO8Z9F8D/w0HAFOk4LTvVR/AAC6f9PpxjaydfSzkh5cc\nNxeotjlkYUgh6D7fFma9gRtjX4a36miA5FqCv0Lkwrk9tXHdDk6skdjBvCS0URnq\nzDfyTcK7R/L/iaGYtY43c8tB8eHKwK+ZQ2fR4V90YI3xkbkwr6j0efZyU2Kp/03r\n2nDtFQXHwwuj6Sg465DJB9MQ01IbR30NUjJiFGOJaxdRlhsEeWWNL8BELQuGpJe9\nVQIDAQABo1MwUTAdBgNVHQ4EFgQU3XAfDSRK1wCTf0wiDjlR4m06FCQwHwYDVR0j\nBBgwFoAU3XAfDSRK1wCTf0wiDjlR4m06FCQwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAVTiFfpOzYfXzQxTrl4VxctdQJI52jPjWP55PmK/IO7sb\nn/DKzRNnvn7mN3EDGmshh5i76/hoGA09pK4SdAwJl2QIRJSu3ChH4QCf7n/iIYww\nSxhpOp9QtJA5Cyu4MoemK49Lld/7xf3Qdt1pOgEMz4AGLt2uwS5SdmR4OkSPHqt0\nQq/lgSoiawVOd0UE+5Ocu5S472du/REcVS4KkQdkzZaw9Q7OGIN9G0X0wb0V3UZs\nR2XuApUUaGOl0s0a1uNMv3WkyOrCGS3JkIem6+R59pfliaz6FPcQD+0oXI2gjG3c\nH4VFwOis/oT/2FwYM89j7XZPDpRfUUGMHD53W7YPHA==\n-----END CERTIFICATE-----"
-
 	DummyPublicKey  = "DummyPublicKey"
 	DummyPrivateKey = "DummyPrivateKey"
 )
@@ -547,8 +549,8 @@ func Test_validateAutomateCerts(t *testing.T) {
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
-							PrivateKey: PrivateKey,
-							PublicKey:  PublicKey,
+							PrivateKey: readFileData("./testdata/test_private_key_1.pem"),
+							PublicKey:  readFileData("./testdata/test_public_key_1.pem"),
 						},
 					},
 					PrivateKey: DummyPrivateKey,
@@ -667,8 +669,8 @@ func Test_validateChefServerCerts(t *testing.T) {
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
-							PrivateKey: PrivateKey,
-							PublicKey:  PublicKey,
+							PrivateKey: readFileData("./testdata/test_private_key_1.pem"),
+							PublicKey:  readFileData("./testdata/test_public_key_1.pem"),
 						},
 					},
 					PrivateKey: DummyPrivateKey,
@@ -789,13 +791,13 @@ func Test_validatePostgresqlCerts(t *testing.T) {
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
-							PrivateKey: PrivateKey,
-							PublicKey:  PublicKey,
+							PrivateKey: readFileData("./testdata/test_private_key_1.pem"),
+							PublicKey:  readFileData("./testdata/test_public_key_1.pem"),
 						},
 					},
 					PrivateKey: DummyPrivateKey,
 					PublicKey:  DummyPublicKey,
-					RootCA:     RootCa,
+					RootCA:     readFileData("./testdata/test_root_ca.pem"),
 				},
 			},
 		}
@@ -811,8 +813,8 @@ func Test_validatePostgresqlCerts(t *testing.T) {
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
-							PrivateKey: PrivateKey,
-							PublicKey:  PublicKey,
+							PrivateKey: readFileData("./testdata/test_private_key_1.pem"),
+							PublicKey:  readFileData("./testdata/test_public_key_1.pem"),
 						},
 					},
 					PrivateKey: DummyPrivateKey,
@@ -896,15 +898,15 @@ func Test_validateOpensearchCerts(t *testing.T) {
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
-							PrivateKey: PrivateKey,
-							PublicKey:  PublicKey,
+							PrivateKey: readFileData("./testdata/test_private_key_1.pem"),
+							PublicKey:  readFileData("./testdata/test_public_key_1.pem"),
 						},
 					},
 					PrivateKey: "-----PRIVATE1 KEY-----",
 					PublicKey:  "-----PUBLIC1 KEY-----",
-					RootCA:     RootCa,
-					AdminCert:  AdminCert,
-					AdminKey:   AdminKey,
+					RootCA:     readFileData("./testdata/test_root_ca.pem"),
+					AdminCert:  readFileData("./testdata/test_admin_cert.pem"),
+					AdminKey:   readFileData("./testdata/test_admin_key.pem"),
 				},
 			},
 		}
@@ -920,8 +922,8 @@ func Test_validateOpensearchCerts(t *testing.T) {
 					CertsByIP: &[]CertByIP{
 						{
 							IP:         "10.10.10.11",
-							PrivateKey: PrivateKey,
-							PublicKey:  PublicKey,
+							PrivateKey: readFileData("./testdata/test_private_key_1.pem"),
+							PublicKey:  readFileData("./testdata/test_public_key_1.pem"),
 						},
 					},
 					PrivateKey: "-----PRIVATE1 KEY-----",

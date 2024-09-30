@@ -31,7 +31,7 @@ pkg_deps=(
   core/zlib
   core/bzip2
   core/openssl/1.0.2zi
-  core/pcre
+  core/pcre2
   chef/mlsa
   core/bash
 )
@@ -128,4 +128,5 @@ do_install() {
   mkdir -p "${pkg_prefix}/sbin"
   cp "${HAB_CACHE_SRC_PATH}/${pkg_dirname}/objs/nginx" "${pkg_prefix}/sbin"
 }
+
 

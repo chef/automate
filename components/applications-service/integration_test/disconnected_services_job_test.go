@@ -48,7 +48,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		req := &applications.PeriodicMandatoryJobConfig{
 			Threshold:  "23s",
 			Running:    &w.BoolValue{Value: true},
-			Recurrence: "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+			Recurrence: "DTSTART:20200612T182105Z\nRRULE:FREQ=SECONDLY;INTERVAL=61",
 		}
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
@@ -56,14 +56,14 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		conf, err := suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
 		assert.Equal(t, "23s", conf.Threshold)
-		assert.Equal(t, "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61", conf.Recurrence)
+		assert.Equal(t, "DTSTART:20200612T182105Z\nRRULE:FREQ=SECONDLY;INTERVAL=61", conf.Recurrence)
 		assert.True(t, conf.Running.Value)
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
 		req = &applications.PeriodicMandatoryJobConfig{
 			Threshold:  "42s",
 			Running:    &w.BoolValue{Value: false},
-			Recurrence: "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=62",
+			Recurrence: "DTSTART:20200612T182105Z\nRRULE:FREQ=SECONDLY;INTERVAL=62",
 		}
 		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
@@ -71,7 +71,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		conf, err = suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
 		assert.Equal(t, "42s", conf.Threshold)
-		assert.Equal(t, "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=62", conf.Recurrence)
+		assert.Equal(t, "DTSTART:20200612T182105Z\nRRULE:FREQ=SECONDLY;INTERVAL=62", conf.Recurrence)
 		assert.False(t, conf.Running.Value)
 	})
 
