@@ -53,7 +53,7 @@ apt-get clean
 sysctl -w vm.max_map_count=262144
 sysctl -w vm.dirty_expire_centisecs=20000
 echo "${CFG_IP} ${CFG_HOSTNAME}" | tee -a /etc/hosts
-curl -fsSL https://packages.chef.io/files/current/automate/latest/chef-automate_linux_amd64.zip -o /tmp/chef-automate_linux_amd64.zip
+curl -fsSL https://chefdownload-commercial.chef.io/files/current/automate/latest/chef-automate_linux_amd64.zip -o /tmp/chef-automate_linux_amd64.zip
 unzip -qod /usr/local/bin /tmp/chef-automate_linux_amd64.zip
 chmod +x /usr/local/bin/chef-automate
 chef-automate deploy --accept-terms-and-mlsa

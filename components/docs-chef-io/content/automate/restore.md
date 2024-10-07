@@ -22,7 +22,7 @@ Before restoring a Chef Automate installation, see how to [configure your backup
 1. On the restore host, download and unzip the Chef Automate command-line tool:
 
    ```shell
-        curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+        curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
 1. To restore from **filesystem backups**, Chef Automate requires access to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).

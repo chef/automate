@@ -47,12 +47,12 @@ Run the following steps on Bastion Host Machine:
     #Run commands as sudo.
     sudo -- sh -c "
     #Download Chef Automate CLI.
-    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
+    curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
     | gunzip - > chef-automate && chmod +x chef-automate \
     | cp -f chef-automate /usr/bin/chef-automate
     #Download the latest Airgapped Bundle.
     #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
-    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
+    curl https://chefdownload-commercial.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
     "
     ```
 
