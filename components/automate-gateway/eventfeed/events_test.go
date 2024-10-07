@@ -149,12 +149,12 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
 			mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
-			//mockFeedServiceClient.EXPECT().GetFeed(
-			//	context.Background(),
-			//	gomock.Any(),
-			//).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
-			//	return &event_feed_api.FeedResponse{}, nil
-			//})
+			mockFeedServiceClient.EXPECT().GetFeed(
+				context.Background(),
+				gomock.Any(),
+			).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+				return &event_feed_api.FeedResponse{}, nil
+			})
 
 			eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
 
