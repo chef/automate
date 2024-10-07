@@ -52,7 +52,7 @@ do_build() {
 do_install() {
   build_line "copying chef theme content"
   # Copy static assets from core/dex
-    mkdir -p "${pkg_prefix}/web"
+  mkdir -p "${pkg_prefix}/web"
   cp -r "$GOPATH/src/github.com/chef/dex-1/web/static" "$pkg_prefix/web/"
   cp -r "$GOPATH/src/github.com/chef/dex-1/web/templates" "$pkg_prefix/web/"
   # Copy our custom theme into place
