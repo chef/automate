@@ -8,12 +8,8 @@ install_chefdk() {
 }
 
 start_requestbin() {
-   go install golang.org/dl/go1.22.5@latest
-   go1.22.5 download
-   rm /usr/local/go/bin/go
-   cp /go/bin/go1.22.5 /usr/local/go/bin/go
-   export GOBIN="/go/bin"
-   go install integration/helpers/requestbin/requestbin.go
+    export GOBIN="/go/bin"
+    go install integration/helpers/requestbin/requestbin.go
     cat > /etc/systemd/system/requestbin.service <<EOF
 [Unit]
 Description=Requestbin
