@@ -79,11 +79,11 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 		case authz.AuthorizationServiceClient:
 			// Mocking the provided mocked AuthorizationClient
 			mockAuthorizationClient = authz.AuthorizationServiceClient(s)
-			mockClientsFactory.EXPECT().AuthorizationClient().DoAndReturn(
-				func() (authz.AuthorizationServiceClient, error) {
-					return mockAuthorizationClient, nil
-				},
-			)
+			// mockClientsFactory.EXPECT().AuthorizationClient().DoAndReturn(
+			// 	func() (authz.AuthorizationServiceClient, error) {
+			// 		return mockAuthorizationClient, nil
+			// 	},
+			// )
 		case compliance_ingest.ComplianceIngesterServiceClient:
 			// Mocking the provided mocked ComplianceIngesterClient
 			mockComplianceIngester := compliance_ingest.ComplianceIngesterServiceClient(s)
