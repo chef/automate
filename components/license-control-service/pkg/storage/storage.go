@@ -132,21 +132,6 @@ func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
 		return errors.Wrap(err, "failed to apply database schema")
 	}
 
-	// Ensure 'licenses' table exists
-	row := p.db.QueryRow("SELECT to_regclass('public.licenses')")
-	var tableName string
-	if err := row.Scan(&tableName); err != nil || tableName == "" {
-		logrus.Warn("Creating 'licenses' table as it does not exist.")
-		_, err = p.db.Exec(`CREATE TABLE licenses (
-            id SERIAL PRIMARY KEY,
-            license_data TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-        );`)
-		if err != nil {
-			return errors.Wrap(err, "failed to create licenses table")
-		}
-	}
-
 	_, _, err = p.GetLicense(ctx)
 	switch err.(type) {
 	case nil:

@@ -166,7 +166,6 @@ func TestServers(t *testing.T) {
 
 		t.Run("when the server exists with orgs, return servers list with org count", func(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
@@ -249,7 +248,6 @@ func TestServers(t *testing.T) {
 
 		t.Run("when the server exists with orgs, return the server with org count", func(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
@@ -317,7 +315,6 @@ func TestServers(t *testing.T) {
 
 		t.Run("when the server exists with orgs, raise server can not be deleted error", func(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			//secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{

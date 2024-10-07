@@ -48,15 +48,9 @@ verify_packages() {
 
 no_panic_check() {
     log_info "Checking for Go panics in the logs"
-    
-    if journalctl -u chef-automate -n 1000 | grep -q 'panic: '; then
+    if journalctl -u chef-automate | grep 'panic: ';then
         log_error "Found possible panic in the logs!"
-        
-        journalctl -u chef-automate -n 1000 | grep 'panic: '
-        
         log_error "See uploaded logs for details."
         return 1
-    else
-        log_info "No Go panics found in the logs."
     fi
 }

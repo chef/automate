@@ -467,4 +467,3 @@ breaking:
     - config/workflow_server/config_request.proto
     - config/workflow_nginx/config_request.proto
     - config/workflow_server/config_request.proto
-    - protovendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
