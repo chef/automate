@@ -29,6 +29,7 @@ pkg_deps=(
   core/xlib
   core/zlib
 )
+
 pkg_build_deps=(
   core/patchelf
   core/rsync
