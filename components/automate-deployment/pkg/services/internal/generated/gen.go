@@ -503,9 +503,7 @@ var ProductMetadataJSON = `
       "metadata": null
     }
   ],
-  "deleted_packages": [
-    "chef/data-lifecycle-service/0.0.1/20191101111721"
-  ],
+  "deleted_packages": null,
   "collections": [
     {
       "name": "core",
