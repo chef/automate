@@ -83,7 +83,8 @@ shared_buffers = "1GB"
     deployment_type = "local"
     manifest_cache_expiry = "0s"
     package_cleanup_mode = "disabled"
-    products = ["automate-dev"]
+    products = ["chef-server"]
+    # products = ["automate-dev"]
     [deployment.v1.svc.admin_user]
       # Default admin user settings
       username = "admin"
