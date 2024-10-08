@@ -391,8 +391,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
       }
     } else if (type.name === 'node') {
       if ( value.id ) {
-        typeName = 'node_id';
-        filterValue = value.id;
+        typeName = 'node_name';
+        filterValue = value.title;
         this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'node_name';
