@@ -59,6 +59,9 @@
     "chef/automate-knife-ec-backup",
     "core/rsync"
   ],
+
+  "deleted_packages": null,
+
   "collections": [
     {
       "name": "core",

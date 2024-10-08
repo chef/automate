@@ -247,10 +247,10 @@ class ManifestGenerator
       manifest["packages"] << latest_release.ident
     end
 
-    # products_meta["deleted_packages"].each do |pkg|
-    #   log.info "Adding last stable release of deleted package #{pkg}"
-    #   manifest["packages"] << "#{pkg}"
-    # end
+    products_meta["deleted_packages"].each do |pkg|
+      log.info "Adding last stable release of deleted package #{pkg}"
+      manifest["packages"] << "#{pkg}"
+    end
 
     manifest["packages"].uniq!
     # Sort the packages for easier diff-ing
