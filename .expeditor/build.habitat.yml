@@ -21,5 +21,7 @@ studio_secrets:
     field: node1-key.pem
   HAB_FALLBACK_CHANNEL:
     value: "stable"
+  GOPROXY:
+    value: "https://proxy.golang.org,direct"  
 env:
   GOPROXY: "https://proxy.golang.org,direct"
