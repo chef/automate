@@ -4,6 +4,7 @@ require "json"
 require "net/http"
 require "openssl"
 require "yaml"
+require "open3"  
 
 MANIFEST_HOST = "packages.chef.io".freeze
 MANIFEST_URL = "/manifests/dev/automate/latest_semver.json".freeze
@@ -40,11 +41,13 @@ if valid_sha1?(dev_rev)
 
   # Use the hard-coded git command and append dev_rev if it's valid
   command = GIT_COMMAND + [dev_rev]
-  system(*command)
-  dev_rev_invalid = !$?.success?
+  # Securely execute the command using Open3
+  stdout, stderr, status = Open3.capture3(*command)
+  dev_rev_invalid = !status.success?
 
   if dev_rev_invalid
     STDERR.puts("DEBUG: git cat-file failed for dev_rev: #{dev_rev}")
+    STDERR.puts("ERROR: #{stderr.strip}")
   else
     STDERR.puts("DEBUG: git cat-file succeeded for dev_rev: #{dev_rev}")
   end
