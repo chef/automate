@@ -41,15 +41,19 @@ if valid_sha1?(dev_rev)
 
   # Use the hard-coded git command and append dev_rev if it's valid
   command = GIT_COMMAND + [dev_rev]
-  # Securely execute the command using Open3
-  stdout, stderr, status = Open3.capture3(*command)
-  dev_rev_invalid = !status.success?
-
-  if dev_rev_invalid
-    STDERR.puts("DEBUG: git cat-file failed for dev_rev: #{dev_rev}")
-    STDERR.puts("ERROR: #{stderr.strip}")
-  else
-    STDERR.puts("DEBUG: git cat-file succeeded for dev_rev: #{dev_rev}")
+  
+  # Execute the command and capture output
+  Open3.popen3(*command) do |stdin, stdout, stderr, wait_thr|
+    dev_rev_invalid = !wait_thr.value.success?
+    stdout_str = stdout.read
+    stderr_str = stderr.read
+    
+    if dev_rev_invalid
+      STDERR.puts("DEBUG: git cat-file failed for dev_rev: #{dev_rev}")
+      STDERR.puts("ERROR: #{stderr_str.strip}")
+    else
+      STDERR.puts("DEBUG: git cat-file succeeded for dev_rev: #{dev_rev}")
+    end
   end
 else
   STDERR.puts("WARNING: Invalid dev_rev SHA-1: #{dev_rev}")
