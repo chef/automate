@@ -28,7 +28,7 @@ pkg_deps=(
   core/curl # health_check hook
 )
 
-pkg_build_deps=(core/go19 core/git core/gcc)
+pkg_build_deps=(core/go22 core/git core/gcc)
 
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
@@ -52,7 +52,7 @@ do_build() {
 do_install() {
   build_line "copying chef theme content"
   # Copy static assets from core/dex
-    mkdir -p "${pkg_prefix}/web"
+  mkdir -p "${pkg_prefix}/web"
   cp -r "$GOPATH/src/github.com/chef/dex-1/web/static" "$pkg_prefix/web/"
   cp -r "$GOPATH/src/github.com/chef/dex-1/web/templates" "$pkg_prefix/web/"
   # Copy our custom theme into place

@@ -146,7 +146,7 @@ function load_scan_jobs() {
     # shellcheck disable=SC1091
     source dev/secrets-env.sh
     pushd dev-docs/adding-data &> /dev/null
-    install_if_missing core/go19 go
+    iinstall_if_missing core/go22 go
     go run add_scanjobs.go
     popd &> /dev/null
   fi

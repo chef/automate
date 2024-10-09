@@ -1,6 +1,5 @@
 #stable channel
 
-
 pkg_name=automate-scaffolding
 pkg_origin=chef
 pkg_description="Generic scaffolding for Automate Applications internally at Chef Software Inc."
