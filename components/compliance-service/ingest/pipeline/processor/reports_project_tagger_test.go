@@ -941,8 +941,8 @@ func TestBundler5Messages(t *testing.T) {
 	inbox := make(chan message.Compliance, numberOfMessages)
 	listProjectRulesCount := 0
 	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
-	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*authz.ListRulesForAllProjectsResp, error) {
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}, opts ...interface{}) (*authz.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
 			return &authz.ListRulesForAllProjectsResp{}, nil
 		})

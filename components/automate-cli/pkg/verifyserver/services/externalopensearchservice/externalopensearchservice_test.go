@@ -179,7 +179,7 @@ abcd
 	TIMEOUT = 1
 )
 
-var certErrorMessage = "Machine is unable to connect with External Managed OpenSearch\n Failed to connect to OpenSearch: Get \"https://localhost:3073/_cat/indices\": x509: certificate signed by unknown authority"
+var certErrorMessage = "Machine is unable to connect with External Managed OpenSearch\n Failed to connect to OpenSearch: Get \"https://localhost:3073/_cat/indices\": tls: failed to verify certificate: x509: certificate signed by unknown authority"
 var incorrectUrlError = "Machine is unable to connect with External Managed OpenSearch\n Failed to create request: parse \"https://\\t/_cat/indices\": net/url: invalid control character in URL"
 var osUnreachableError = "Machine is unable to connect with External Managed OpenSearch\n external opensearch is not reachable"
 
