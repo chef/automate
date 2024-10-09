@@ -22,5 +22,4 @@ studio_secrets:
   HAB_FALLBACK_CHANNEL:
     value: "stable"
 env:
-  GOPROXY:
-    value: "https://proxy.golang.org,direct"
+  GOPROXY: "https://proxy.golang.org,direct"
