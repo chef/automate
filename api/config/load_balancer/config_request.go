@@ -72,6 +72,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.ProxyBufferSize = w.String("8k")
 	c.V1.Sys.Ngx.Http.ProxyBuffers = w.String("8 8k")
 	c.V1.Sys.Ngx.Http.ProxyBusyBuffersSize = w.String("16k")
+	c.V1.Sys.Ngx.Http.IncludeXForwardedFor = w.Bool(false)
 
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
 	c.V1.Sys.StaticConfig.Products = []string{"automate"}
@@ -169,6 +170,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = config.GlobalLogLevelToNginxLevel(logLevel)
 	}
+
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
