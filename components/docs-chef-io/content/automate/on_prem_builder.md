@@ -75,7 +75,7 @@ Chef Automate and Chef Habitat Builder require:
 Download and unzip the installer:
 
 ```shell
-curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
 ### Deploy Chef Automate and Chef Habitat Builder On-prem

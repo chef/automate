@@ -22,7 +22,7 @@ See [Airgapped Installation]({{< relref "airgapped_installation.md" >}}) for ins
 Download and unzip the Chef Automate command-line tool:
 
 ```shell
-curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
 ## Create Default Configuration
