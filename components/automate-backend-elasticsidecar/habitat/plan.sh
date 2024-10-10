@@ -46,5 +46,3 @@ do_install() {
 do_end() {
   return 0
 }
-
-
