@@ -29,7 +29,7 @@ dev_rev = if ENV['GIT_DIFF_BASE']
 # check if the dev_rev is actually from this tree.  we only expect to
 # see this until we can get a build through dev.
 dev_rev_invalid = !$?.success?
- 
+
 STDERR.puts("===== CHANGED COMPONENTS =====")
 STDERR.puts("     CURRENT REV: #{current_rev}")
 STDERR.puts("      MASTER REV: #{master_rev}")
