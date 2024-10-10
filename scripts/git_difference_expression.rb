@@ -45,5 +45,4 @@ if current_rev == dev_rev || dev_rev_invalid
   puts 'HEAD~1...HEAD'
 else
   puts "#{dev_rev}...HEAD"
-
 end
