@@ -1,0 +1,4 @@
+[cs_nginx]
+  [cs_nginx.v1]
+    [cs_nginx.v1.sys]
+     health_check_interval=15
