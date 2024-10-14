@@ -146,7 +146,7 @@ func (a *awsDeployment) addDNTocertConfig() error {
 		a.config.Opensearch.Config.EnableCustomCerts = true
 		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
 		// and set it in the config
-		defaultToml, err := os.ReadFile("/hab/default_backend_certificates.toml")
+		defaultToml, err := os.ReadFile("/hab/a2_deploy_workspace/default_backend_certificates.toml")
 		if err != nil {
 			return err
 		}
