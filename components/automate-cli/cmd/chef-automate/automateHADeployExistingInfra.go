@@ -216,6 +216,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 	e.log.Debug("custom certificate enabled status", e.config.Opensearch.Config.EnableCustomCerts)
 	if !e.config.Opensearch.Config.EnableCustomCerts {
 		e.config.Opensearch.Config.EnableCustomCerts = true
+		e.config.Postgresql.Config.EnableCustomCerts = true
 		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
 		// and set it in the config
 		defaultToml, err := os.ReadFile("/hab/a2_deploy_workspace/default_backend_certificates.toml")
@@ -236,7 +237,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 
 		e.config.Postgresql.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
 		e.config.Postgresql.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
-		e.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+		e.config.Postgresql.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
 	}
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if e.config.Opensearch.Config.EnableCustomCerts {

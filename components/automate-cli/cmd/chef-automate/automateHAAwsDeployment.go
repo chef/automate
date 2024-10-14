@@ -144,6 +144,7 @@ func (a *awsDeployment) generateConfig(state string) error {
 func (a *awsDeployment) addDNTocertConfig() error {
 	if !a.config.Opensearch.Config.EnableCustomCerts {
 		a.config.Opensearch.Config.EnableCustomCerts = true
+		a.config.Postgresql.Config.EnableCustomCerts = true
 		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
 		// and set it in the config
 		defaultToml, err := os.ReadFile("/hab/a2_deploy_workspace/default_backend_certificates.toml")
@@ -164,7 +165,7 @@ func (a *awsDeployment) addDNTocertConfig() error {
 
 		a.config.Postgresql.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
 		a.config.Postgresql.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
-		a.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+		a.config.Postgresql.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
 	}
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if a.config.Opensearch.Config.EnableCustomCerts {
