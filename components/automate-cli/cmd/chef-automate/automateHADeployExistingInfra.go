@@ -203,7 +203,42 @@ func (e *existingInfra) populateCertificateTomlFile() error {
 	e.log.Debug("Certificate TOML written to %s\n", CERTIFICATE_TEMPLATE_TOML_FILE)
 	return nil
 }
+
+type DefaultBackendCerts struct {
+	RootCA    string `toml:"rootCA"`
+	AdminCert string `toml:"admin_cert"`
+	AdminKey  string `toml:"admin_key"`
+	SslCert   string `toml:"ssl_cert"`
+	SslKey    string `toml:"ssl_key"`
+}
+
 func (e *existingInfra) addDNTocertConfig() error {
+	e.log.Debug("custom certificate enabled status", e.config.Opensearch.Config.EnableCustomCerts)
+	if !e.config.Opensearch.Config.EnableCustomCerts {
+		e.config.Opensearch.Config.EnableCustomCerts = true
+		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
+		// and set it in the config
+		defaultToml, err := os.ReadFile("/hab/default_backend_certificates.toml")
+		if err != nil {
+			return err
+		}
+		var defaultConfig DefaultBackendCerts
+		err = toml.Unmarshal(defaultToml, &defaultConfig)
+		if err != nil {
+			return err
+		}
+		// set the root_ca, ssl_cert and ssl_key in the config
+		e.config.Opensearch.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
+		e.config.Opensearch.Config.AdminCert = fmt.Sprintf("%v", defaultConfig.AdminCert)
+		e.config.Opensearch.Config.AdminKey = fmt.Sprintf("%v", defaultConfig.AdminKey)
+		e.config.Opensearch.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
+		e.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+
+		e.config.Postgresql.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
+		e.config.Postgresql.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
+		e.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+
+	}
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if e.config.Opensearch.Config.EnableCustomCerts {
 		//If AdminCert is given then get the admin_dn from the cert
@@ -223,7 +258,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 			e.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 		}
 
-		NodesDn := ""
+		var NodesDn, lastNodeDn string
 
 		//Set the admin_dn and nodes_dn in the config for all IP addresses
 		for i := 0; i < len(e.config.Opensearch.Config.CertsByIP); i++ {
@@ -234,11 +269,15 @@ func (e *existingInfra) addDNTocertConfig() error {
 				if err != nil {
 					return err
 				}
+				if nodeDn.String() == lastNodeDn {
+					continue
+				}
 				if NodesDn == "" {
 					NodesDn = NodesDn + fmt.Sprintf("%v", nodeDn) + "\\n  "
 				} else {
 					NodesDn = NodesDn + fmt.Sprintf("- %v", nodeDn) + "\\n  "
 				}
+				lastNodeDn = nodeDn.String()
 			}
 		}
 

@@ -142,6 +142,30 @@ func (a *awsDeployment) generateConfig(state string) error {
 }
 
 func (a *awsDeployment) addDNTocertConfig() error {
+	if !a.config.Opensearch.Config.EnableCustomCerts {
+		a.config.Opensearch.Config.EnableCustomCerts = true
+		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
+		// and set it in the config
+		defaultToml, err := os.ReadFile("/hab/default_backend_certificates.toml")
+		if err != nil {
+			return err
+		}
+		var defaultConfig DefaultBackendCerts
+		err = toml.Unmarshal(defaultToml, &defaultConfig)
+		if err != nil {
+			return err
+		}
+		// set the root_ca, ssl_cert and ssl_key in the config
+		a.config.Opensearch.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
+		a.config.Opensearch.Config.AdminCert = fmt.Sprintf("%v", defaultConfig.AdminCert)
+		a.config.Opensearch.Config.AdminKey = fmt.Sprintf("%v", defaultConfig.AdminKey)
+		a.config.Opensearch.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
+		a.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+
+		a.config.Postgresql.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
+		a.config.Postgresql.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
+		a.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+	}
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if a.config.Opensearch.Config.EnableCustomCerts {
 		//If AdminCert is given then get the admin_dn from the cert
@@ -161,7 +185,7 @@ func (a *awsDeployment) addDNTocertConfig() error {
 			a.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 		}
 
-		NodesDn := ""
+		var NodesDn, lastNodeDn string
 
 		//Set the admin_dn and nodes_dn in the config for all IP addresses
 		for i := 0; i < len(a.config.Opensearch.Config.CertsByIP); i++ {
@@ -172,11 +196,15 @@ func (a *awsDeployment) addDNTocertConfig() error {
 				if err != nil {
 					return err
 				}
+				if nodeDn.String() == lastNodeDn {
+					continue
+				}
 				if NodesDn == "" {
 					NodesDn = NodesDn + fmt.Sprintf("%v", nodeDn) + "\\n  "
 				} else {
 					NodesDn = NodesDn + fmt.Sprintf("- %v", nodeDn) + "\\n  "
 				}
+				lastNodeDn = nodeDn.String()
 			}
 		}
 
