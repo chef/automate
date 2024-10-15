@@ -6,12 +6,12 @@
 pkg_name="automate-ha-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="1.3.14"
+pkg_version="2.17.1"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.14/opensearch-1.3.14-linux-x64.tar.gz"
-pkg_shasum=5d7c0188a393d5d9035e5e81f03bcd00be76e3702750b43b2231a2f428c3187e
+pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/2.17.1/opensearch-2.17.1-linux-arm64.tar.gz"
+pkg_shasum=88eeed07fc2637db16a87774bf7d6433077049f480afdb82c98cbe3a4ed2bf72  
 pkg_build_deps=(
   core/patchelf
   core/make
@@ -70,6 +70,15 @@ do_install() {
   echo "what is pkg_prefix : "${pkg_prefix}
   echo "where i am : "
   pwd
+
+  # Ensure the opensearch-plugin script is executable
+  chmod +x "${pkg_prefix}/os/bin/opensearch-plugin"
+
+  # Verify if /usr/bin/env exists, if not, create a symbolic link
+  if [ ! -f /usr/bin/env ]; then
+    echo "/usr/bin/env not found, creating a symbolic link to /bin/env"
+    ln -s /bin/env /usr/bin/env
+  fi
 
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-gcs
