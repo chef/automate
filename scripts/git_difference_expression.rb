@@ -28,7 +28,7 @@ dev_rev = if ENV['GIT_DIFF_BASE']
 
 # check if the dev_rev is actually from this tree.  we only expect to
 # see this until we can get a build through dev.
-`git cat-file -e #{dev_rev}`
+#`git cat-file -e #{dev_rev}`
 dev_rev_invalid = !$?.success?
 
 STDERR.puts("===== CHANGED COMPONENTS =====")
