@@ -100,4 +100,6 @@ const (
 	`
 
 	GET_OPENSEARCH_CLUSTER_SETTINGS = `curl --location --request GET 'http://localhost:10144/_cluster/settings'`
+
+	DEFAULT_BACKEND_CERTS = "/hab/a2_deploy_workspace/default_backend_certificates.toml"
 )
