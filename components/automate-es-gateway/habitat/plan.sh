@@ -44,8 +44,8 @@ pkg_deps=(
   core/ncurses
   core/zlib
   core/bzip2
-  core/openssl/1.0.2zi
-  core/pcre
+  core/openssl/3.0.9
+  core/pcre2
 
   core/coreutils
   chef/mlsa
