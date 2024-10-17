@@ -33,8 +33,10 @@ do_default_build() {
   tmp_bin="${CACHE_PATH}/bin"
   mkdir -p "${tmp_bin}"
 
+  go_proxy="https://proxy.golang.org,direct"
+  gosum_db="sum.golang.org"
   local go_cmd
-  go_cmd="GOBIN=${tmp_bin} go install"
+  go_cmd="GOBIN=${tmp_bin} GOPROXY=${go_proxy} GOSUMDB=${gosum_db} go install"
 
   # Default to a static build unless the user plan has defined the
   # scaffolding_go_no_static variable.
@@ -51,6 +53,7 @@ do_default_build() {
     go_cmd="CGO_ENABLED=0 ${go_cmd}"
 
     GO_LDFLAGS="${GO_LDFLAGS} -extldflags \"-fno-PIC -static\""
+
 
     if [[ -z ${scaffolding_go_build_tags} ]]; then
       declare -a scaffolding_go_build_tags=()
