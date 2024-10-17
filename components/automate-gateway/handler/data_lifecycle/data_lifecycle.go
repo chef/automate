@@ -145,8 +145,8 @@ func purgeShowToJobStatus(purge *data_lifecycle.ShowResponse) *api.JobStatus {
 		LastEndedAt:    purge.LastEnd,
 		LastElapsed:    maybeLastElapsed(purge.LastStart, purge.LastEnd),
 		PurgePolicies: &api.PurgePolicies{
-			Elasticsearch: purge.EsPolicies,
-			Postgres:      purge.PgPolicies,
+			Opensearch: purge.OsPolicies,
+			Postgres:   purge.PgPolicies,
 		},
 	}
 }
@@ -156,7 +156,7 @@ func jobSettingsToPurgeConfigure(setting *api.JobSettings) *data_lifecycle.Confi
 		Enabled:    !setting.Disabled,
 		Recurrence: setting.Recurrence,
 		PolicyUpdate: &data_lifecycle.PolicyUpdate{
-			Es: setting.GetPurgePolicies().GetElasticsearch(),
+			Os: setting.GetPurgePolicies().GetOpensearch(),
 			Pg: setting.GetPurgePolicies().GetPostgres(),
 		},
 	}
