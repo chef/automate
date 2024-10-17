@@ -8,12 +8,10 @@ locals {
       postgresql_wal_archive_enabled  = var.postgresql_wal_archive_enabled ? "true" : "false",
       postgresql_wal_archive_fs_path  = "${var.postgresql_archive_disk_fs_path}/archive",
       tmp_path                        = var.tmp_path
-      postgresql_root_ca              = var.postgresql_root_ca
-      postgresql_public_key           = var.postgresql_public_key
-      postgresql_private_key          = var.postgresql_private_key
       postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
-      postgresql_public_key           = contains(keys(var.postgresql_certs_by_ip), var.private_ips[n]) ? var.postgresql_certs_by_ip[element(var.private_ips, n)].public_key : var.postgresql_public_key
-      postgresql_private_key          = contains(keys(var.postgresql_certs_by_ip), var.private_ips[n]) ? var.postgresql_certs_by_ip[element(var.private_ips, n)].private_key : var.postgresql_private_key
+      postgresql_root_ca              = trimspace(var.postgresql_root_ca)
+      postgresql_public_key           = trimspace(contains(keys(var.postgresql_certs_by_ip), var.private_ips[n]) ? var.postgresql_certs_by_ip[element(var.private_ips, n)].public_key : var.postgresql_public_key)
+      postgresql_private_key          = trimspace(contains(keys(var.postgresql_certs_by_ip), var.private_ips[n]) ? var.postgresql_certs_by_ip[element(var.private_ips, n)].private_key : var.postgresql_private_key)
     })
   ]
   pgleaderchk_user_toml = templatefile("${path.module}/templates/pgleaderchk_user.toml.tpl", {

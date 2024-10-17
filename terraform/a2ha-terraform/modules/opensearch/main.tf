@@ -13,13 +13,13 @@ locals {
       endpoint                        = length(split("://", var.s3_endpoint)) > 1 ? split("://", var.s3_endpoint)[1] : length(split("://", var.s3_endpoint)) == 1 ? split("://", var.s3_endpoint)[0] : "s3.amazonaws.com"
       nfs_mount_path                  = var.nfs_mount_path
       opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
-      opensearch_root_ca              = var.opensearch_root_ca
-      opensearch_admin_key            = var.opensearch_admin_key
-      opensearch_admin_cert           = var.opensearch_admin_cert
-      opensearch_admin_dn             = var.opensearch_admin_dn
-      opensearch_public_key           = contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].public_key : var.opensearch_public_key
-      opensearch_private_key          = contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].private_key : var.opensearch_private_key
-      opensearch_nodes_dn             = contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].nodes_dn : var.opensearch_nodes_dn
+      opensearch_root_ca              = trimspace(var.opensearch_root_ca)
+      opensearch_admin_key            = trimspace(var.opensearch_admin_key)
+      opensearch_admin_cert           = trimspace(var.opensearch_admin_cert)
+      opensearch_admin_dn             = trimspace(var.opensearch_admin_dn)
+      opensearch_public_key           = trimspace(contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].public_key : var.opensearch_public_key)
+      opensearch_private_key          = trimspace(contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].private_key : var.opensearch_private_key)
+      opensearch_nodes_dn             = trimspace(contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].nodes_dn : var.opensearch_nodes_dn)
     })
   ]
   opensearchsidecar_user_toml = [

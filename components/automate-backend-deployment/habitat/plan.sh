@@ -65,6 +65,12 @@ do_install() {
   mkdir -p $pkg_prefix/workspace/scripts/
   mkdir -p $pkg_prefix/workspace/terraform/
 
+  build_line "Adding Certificates"
+  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "$PLAN_CONTEXT"
+
+  build_line "Copying Certificates toml to workspace"
+  cp $PLAN_CONTEXT/default_backend_certificates.toml $pkg_prefix/workspace/
+
   build_line "Copying tests"
   cp -r $PLAN_CONTEXT/../../../test $pkg_prefix/workspace/
 
