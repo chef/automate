@@ -30,7 +30,7 @@ pkg_deps=(
   core/ncurses
   core/zlib
   core/bzip2
-  core/openssl/3.0.9/20241017121505
+  core/openssl/3.0.9
   core/pcre2
   chef/mlsa
   core/bash
