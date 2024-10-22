@@ -216,35 +216,9 @@ func (e *existingInfra) addDNTocertConfig() error {
 	e.log.Debug("custom certificate opensearch enabled status", e.config.Opensearch.Config.EnableCustomCerts)
 	e.log.Debug("custom certificate postgresql enabled status", e.config.Postgresql.Config.EnableCustomCerts)
 
-	var defaultConfig DefaultBackendCerts
-	if !e.config.Opensearch.Config.EnableCustomCerts || !e.config.Postgresql.Config.EnableCustomCerts {
-		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
-		// and set it in the config
-		defaultToml, err := os.ReadFile(DEFAULT_BACKEND_CERTS)
-		if err != nil {
-			return err
-		}
-		err = toml.Unmarshal(defaultToml, &defaultConfig)
-		if err != nil {
-			return err
-		}
-	}
-	if !e.config.Opensearch.Config.EnableCustomCerts {
-		e.config.Opensearch.Config.EnableCustomCerts = true
-
-		// set the root_ca, ssl_cert and ssl_key in the config
-		e.config.Opensearch.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
-		e.config.Opensearch.Config.AdminCert = fmt.Sprintf("%v", defaultConfig.AdminCert)
-		e.config.Opensearch.Config.AdminKey = fmt.Sprintf("%v", defaultConfig.AdminKey)
-		e.config.Opensearch.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
-		e.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
-	}
-
-	if !e.config.Postgresql.Config.EnableCustomCerts {
-		e.config.Postgresql.Config.EnableCustomCerts = true
-		e.config.Postgresql.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
-		e.config.Postgresql.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
-		e.config.Postgresql.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+	err := setDefaultCertsForBackend(&e.config.Opensearch.Config, &e.config.Postgresql.Config)
+	if err != nil {
+		return err
 	}
 
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
