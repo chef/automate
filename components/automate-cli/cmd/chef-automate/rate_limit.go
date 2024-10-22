@@ -204,19 +204,23 @@ func enableRateLimit(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfi
 	}
 
 	if !isLoggerConfig {
-		if remoteType == "postgresql" {
-			_, err := createTomlFileFromConfig(&reqConfig, postgresLogConfig)
-			if err != nil {
-				writer.Errorf("Unable to created toml file for postgresql toml %v", err)
-			}
-		} else {
-			_, err := createTomlFileFromConfig(&reqConfig, opensearchConfig)
-			if err != nil {
-				writer.Errorf("Unable to created toml file for postgresql toml %v", err)
-			}
-		}
+		updateTomlFileFromConfig(remoteType, reqConfig)
 	}
 
 	return nil
 
+}
+
+func updateTomlFileFromConfig(remoteType string, reqConfig *dc.AutomateConfig) {
+	if remoteType == "postgresql" {
+		_, err := createTomlFileFromConfig(&reqConfig, postgresLogConfig)
+		if err != nil {
+			writer.Errorf("Unable to created toml file for postgresql toml %v", err)
+		}
+	} else {
+		_, err := createTomlFileFromConfig(&reqConfig, opensearchConfig)
+		if err != nil {
+			writer.Errorf("Unable to created toml file for postgresql toml %v", err)
+		}
+	}
 }

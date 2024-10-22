@@ -22,6 +22,7 @@ const (
 	restartSyslogService                   = "sudo systemctl restart rsyslog.service"
 	defaultRateLimitBurstAutomateSyslog    = int32(200)
 	defaultRateLimitIntervalAutomateSyslog = int32(200) // in ms
+	globalV1Log                            = "global.v1.log"
 )
 
 // enableCentralizedLogConfigForHA checks for requested and existing configuration for logging

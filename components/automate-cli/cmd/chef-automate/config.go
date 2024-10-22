@@ -1318,8 +1318,8 @@ func checkIfRequestedConfigHasCentrailisedLogging(args []string) (bool, error) {
 		writer.Println(err.Error())
 		return false, err
 	}
-	if config.Get("global.v1.log") != nil {
-		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+	if config.Get(globalV1Log) != nil {
+		isconfig := config.Get(globalV1Log).(*ptoml.Tree)
 		if isconfig != nil {
 			if isconfig.Get("redirect_sys_log") != nil {
 				return true, nil
@@ -1335,8 +1335,8 @@ func checkIfExistedConfigHasCentrailisedLogging(fileName string) (bool, error) {
 		writer.Println(err.Error())
 		return false, err
 	}
-	if config.Get("global.v1.log") != nil {
-		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+	if config.Get(globalV1Log) != nil {
+		isconfig := config.Get(globalV1Log).(*ptoml.Tree)
 		if isconfig != nil {
 			if isconfig.Get("redirect_sys_log") != nil {
 				val := isconfig.Get("redirect_sys_log").(bool)
@@ -1355,8 +1355,8 @@ func checkIfRequestedConfigHasRateLimit(args []string) (bool, error) {
 		writer.Println(err.Error())
 		return false, err
 	}
-	if config.Get("global.v1.log") != nil {
-		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+	if config.Get(globalV1Log) != nil {
+		isconfig := config.Get(globalV1Log).(*ptoml.Tree)
 		if isconfig != nil {
 			var rateLimitInterval, rateLimitBurst int64 = 0, 0
 			if isconfig.Get("rate_limit_interval") != nil {
