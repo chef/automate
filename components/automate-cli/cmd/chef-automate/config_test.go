@@ -510,7 +510,7 @@ func TestRemoveCentralisedLogsFromUserConfigForPg(t *testing.T) {
 	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
 	t.Run("Remove log config from the file",
 		func(t *testing.T) {
-			file, err := removeCentralisedLogsFromUserConfigForPg(file)
+			file, err := removeCentralisedLogsandRateLimitFromUserConfigForPg(file)
 			os.Remove(file)
 			assert.NoError(t, err)
 
@@ -518,7 +518,7 @@ func TestRemoveCentralisedLogsFromUserConfigForPg(t *testing.T) {
 	)
 	t.Run("Error while removing log config from the file",
 		func(t *testing.T) {
-			file, err := removeCentralisedLogsFromUserConfigForPg(emptyFile)
+			file, err := removeCentralisedLogsandRateLimitFromUserConfigForPg(emptyFile)
 			os.Remove(file)
 			assert.Error(t, err)
 
@@ -531,7 +531,7 @@ func TestRemoveCentralisedLogsFromUserConfigForOs(t *testing.T) {
 	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
 	t.Run("Remove log config from the file",
 		func(t *testing.T) {
-			file, err := removeCentralisedLogsFromUserConfigForOs(file)
+			file, err := removeCentralisedLogsandRateLimitFromUserConfigForOs(file)
 			os.Remove(file)
 			assert.NoError(t, err)
 
@@ -539,7 +539,7 @@ func TestRemoveCentralisedLogsFromUserConfigForOs(t *testing.T) {
 	)
 	t.Run("Error while removing log config from the file",
 		func(t *testing.T) {
-			file, err := removeCentralisedLogsFromUserConfigForOs(emptyFile)
+			file, err := removeCentralisedLogsandRateLimitFromUserConfigForOs(emptyFile)
 			os.Remove(file)
 			assert.Error(t, err)
 

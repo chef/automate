@@ -26,7 +26,6 @@ func removeOrUpdateRateLimit(args []string, remoteType string, sshUtil SSHUtil, 
 	}
 	var scriptCommands string
 	if req.GetGlobal().GetV1().GetLog().GetRateLimitBurst() == nil && req.GetGlobal().GetV1().GetLog().GetRateLimitInterval() == nil {
-		//Checking If the file exist
 		scriptCommands = removeRateLimitFile()
 	} else if req.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 || req.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
 		scriptCommands = removeRateLimitFile()
