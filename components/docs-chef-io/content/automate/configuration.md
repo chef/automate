@@ -126,7 +126,8 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 To log the source node IP address in Automate Load Balancer as well is Chef Server Load Balancer, the following configuration needs to be patched:
 
 ```toml
-
+[global.v1.sys.ngx.http]
+  include_x_forwarded_for = true
 ```
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 The Automate Load Balancer and Chef Server Load Balancer will log the content of `X-Forwarded-For` header data.
