@@ -136,14 +136,14 @@ done
 {{% automate/char-warn %}}
 {{< /warning >}}
 
-```bash
-[global.v1.external.opensearch.auth]
-    scheme = "aws_os"
-[global.v1.external.opensearch.auth.aws_os]
-    username = "THIS YOU GET IT FROM AWS Console"
-    password = "THIS YOU GET IT FROM AWS Console"
-    access_key = "<YOUR AWS ACCESS KEY>"
-    secret_key = "<YOUR AWS SECRET KEY>"
+```sh
+    [global.v1.external.opensearch.auth]
+        scheme = "aws_os"
+    [global.v1.external.opensearch.auth.aws_os]
+        username = "THIS YOU GET IT FROM AWS Console"
+        password = "THIS YOU GET IT FROM AWS Console"
+        access_key = "<YOUR AWS ACCESS KEY>"
+        secret_key = "<YOUR AWS SECRET KEY>"
 ```
 
 1. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
