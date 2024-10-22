@@ -20,9 +20,9 @@ cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.all
 cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
 cluster.routing.allocation.same_shard.host: {{cfg.cluster.routing.allocation.same_shard_host}}
 # https://opensearch.org/docs/latest/opensearch/popular-api/
-cluster.routing.allocation.disk.watermark.low: 1GB
-cluster.routing.allocation.disk.watermark.high: 500MB
-cluster.routing.allocation.disk.watermark.flood_stage: 250MB
+cluster.routing.allocation.disk.watermark.low: "85%"
+cluster.routing.allocation.disk.watermark.high: "90%"
+cluster.routing.allocation.disk.watermark.flood_stage: "95%"
 cluster.info.update.interval: 1m
 
 cluster.max_shards_per_node: {{cfg.cluster.max_shards_per_node}}
@@ -154,8 +154,8 @@ plugins.security.ssl.http.enabled: true
 plugins.security.ssl.http.pemcert_filepath: node1.pem
 plugins.security.ssl.http.pemkey_filepath: node1-key.pem
 plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
-plugins.security.allow_unsafe_democertificates: true
-plugins.security.allow_default_init_securityindex: true
+plugins.security.allow_unsafe_democertificates: false
+plugins.security.allow_default_init_securityindex: false
 plugins.security.authcz.admin_dn:
   - CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US
 
@@ -164,7 +164,7 @@ plugins.security.enable_snapshot_restore_privilege: true
 plugins.security.check_snapshot_restore_write_privileges: true
 plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
 plugins.security.system_indices.enabled: true
-plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opendistro-notifications-*", ".opendistro-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
+plugins.security.system_indices.indices: [".opensearch-alerting-config", ".opensearch-alerting-alert*", ".opensearch-anomaly-results*", ".opensearch-anomaly-detector*", ".opensearch-anomaly-checkpoints", ".opensearch-anomaly-detection-state", ".opensearch-reports-", ".opensearch-notifications-", ".opensearch-notebooks", ".opensearch-observability", ".opensearch-asynchronous-search-response*", ".replication-metadata-store"]
 
 #plugins.security.ssl.transport.keystore_type: "JKS"
 #plugins.security.ssl.transport.keystore_filepath: opensearch.keystore

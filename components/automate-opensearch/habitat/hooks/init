@@ -21,6 +21,9 @@ mkdir -p {{pkg.svc_var_path}}/logs
 mkdir -p {{pkg.svc_var_path}}/plugins
 mkdir -p {{pkg.svc_var_path}}/tmp
 
+# Set the RANDFILE environment variable
+export RANDFILE="{{pkg.svc_data_path}}/.rnd"
+touch $RANDFILE
 
 openssl genrsa -out {{pkg.svc_config_path}}/root-ca-key.pem 2048
 openssl req -new -x509 -sha256 -key {{pkg.svc_config_path}}/root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca" -out {{pkg.svc_config_path}}/root-ca.pem -days 1095
