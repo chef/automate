@@ -564,6 +564,8 @@ type Log struct {
 	CompressRotatedLogs  *wrapperspb.BoolValue   `protobuf:"bytes,5,opt,name=compress_rotated_logs,json=compressRotatedLogs,proto3" json:"compress_rotated_logs,omitempty" toml:"compress_rotated_logs,omitempty" mapstructure:"compress_rotated_logs,omitempty"`
 	MaxSizeRotateLogs    *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=max_size_rotate_logs,json=maxSizeRotateLogs,proto3" json:"max_size_rotate_logs,omitempty" toml:"max_size_rotate_logs,omitempty" mapstructure:"max_size_rotate_logs,omitempty"`
 	MaxNumberRotatedLogs *wrapperspb.Int32Value  `protobuf:"bytes,7,opt,name=max_number_rotated_logs,json=maxNumberRotatedLogs,proto3" json:"max_number_rotated_logs,omitempty" toml:"max_number_rotated_logs,omitempty" mapstructure:"max_number_rotated_logs,omitempty"`
+	RateLimitInterval    *wrapperspb.Int32Value  `protobuf:"bytes,8,opt,name=rate_limit_interval,json=rateLimitInterval,proto3" json:"rate_limit_interval,omitempty" toml:"rate_limit_interval,omitempty" mapstructure:"rate_limit_interval,omitempty"`
+	RateLimitBurst       *wrapperspb.Int32Value  `protobuf:"bytes,9,opt,name=rate_limit_burst,json=rateLimitBurst,proto3" json:"rate_limit_burst,omitempty" toml:"rate_limit_burst,omitempty" mapstructure:"rate_limit_burst,omitempty"`
 }
 
 func (x *Log) Reset() {
@@ -643,6 +645,20 @@ func (x *Log) GetMaxSizeRotateLogs() *wrapperspb.StringValue {
 func (x *Log) GetMaxNumberRotatedLogs() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.MaxNumberRotatedLogs
+	}
+	return nil
+}
+
+func (x *Log) GetRateLimitInterval() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.RateLimitInterval
+	}
+	return nil
+}
+
+func (x *Log) GetRateLimitBurst() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.RateLimitBurst
 	}
 	return nil
 }

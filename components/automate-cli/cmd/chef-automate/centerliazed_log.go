@@ -15,11 +15,13 @@ import (
 )
 
 const (
-	rsyslogConfigFile    = "/etc/rsyslog.d/automate.conf"
-	logRotateConfigFile  = "/etc/logrotate.d/automate"
-	postgresLogConfig    = "/hab/a2_deploy_workspace/postgres_log.toml"
-	opensearchConfig     = "/hab/a2_deploy_workspace/opensearch_log.toml"
-	restartSyslogService = "sudo systemctl restart rsyslog.service"
+	rsyslogConfigFile                      = "/etc/rsyslog.d/automate.conf"
+	logRotateConfigFile                    = "/etc/logrotate.d/automate"
+	postgresLogConfig                      = "/hab/a2_deploy_workspace/postgres_log.toml"
+	opensearchConfig                       = "/hab/a2_deploy_workspace/opensearch_log.toml"
+	restartSyslogService                   = "sudo systemctl restart rsyslog.service"
+	defaultRateLimitBurstAutomateSyslog    = int32(200)
+	defaultRateLimitIntervalAutomateSyslog = int32(200) // in ms
 )
 
 // enableCentralizedLogConfigForHA checks for requested and existing configuration for logging
@@ -30,7 +32,6 @@ func enableCentralizedLogConfigForHA(args []string, remoteType string, sshUtil S
 	}
 	//Returning if there is no config set for logging
 	if reqConfig.GetGlobal().GetV1().GetLog() == nil {
-
 		return nil
 	}
 	existConfig, err := getPostgresOrOpenSearchExistingLogConfig(remoteType)
@@ -55,7 +56,7 @@ func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.Auto
 		return nil
 	}
 
-	err := createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType)
+	err := createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType, true)
 	if err != nil {
 		return err
 	}
@@ -109,7 +110,10 @@ func getScriptCommandsForConfigChangedLogging(reqConfig *dc.AutomateConfig, exis
 	if reqConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 		scriptCommands = rollBackCentralized()
-	} else if reqConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
+	} else if existConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() &&
+		reqConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() &&
+		reqConfig.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() == existConfig.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() &&
+		reqConfig.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() == existConfig.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() {
 		logrotateFileCommand := fmt.Sprintf("echo \"%s\" > %s", configLogrotate(reqConfig.GetGlobal().GetV1().GetLog()), logRotateConfigFile)
 		return fmt.Sprintf("sudo sh -c '%s'", logrotateFileCommand)
 
@@ -139,10 +143,12 @@ func configLogrotate(req *shared.Log) string {
 
 // createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
 // which redirects the logs to the specified location
-func createConfigFileForAutomateSysLog(pathForLog string) string {
-	return fmt.Sprintf(`if \$programname == \"bash\" then %s
-& stop`, getLogFileName(pathForLog))
-
+func createConfigFileForAutomateSysLog(pathForLog string, rateLimitBurst int32, rateLimitInterval int32) string {
+	return fmt.Sprintf(`\$imjournalRatelimitBurst %d
+\$imjournalRatelimitInterval %d
+if \$programname == \"bash\" then %s
+& stop
+`, rateLimitBurst, rateLimitInterval, getLogFileName(pathForLog))
 }
 
 // LogRotateConf gets the log rotate configuration using the values  from config
@@ -182,6 +188,32 @@ func decodeLogConfig(logConfig string) (*dc.AutomateConfig, error) {
 	return &src, nil
 }
 
+func removeOrUpdateCentralisedLog(args []string, remoteType string, sshUtil SSHUtil, remoteIp []string) error {
+	req, err := getConfigForArgsLogs(args, remoteType)
+	if err != nil {
+		return err
+	}
+	var scriptCommands string
+	if req.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false {
+		//Checking If the file exist
+		scriptCommands = rollBackCentralized()
+	} else if req.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
+		scriptCommands = rollBackCentralized()
+		if err := req.GetGlobal().ValidateReDirectSysLogConfig(); err != nil {
+			return err
+		}
+		scriptCommands += createScriptCommandsForCentralizedLog(req)
+	}
+	if len(scriptCommands) == 0 {
+		return nil
+	}
+	err = createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // getConfigForArgsLogs get the requested config from the patched file
 func getConfigForArgsLogs(args []string, remoteService string) (*dc.AutomateConfig, error) {
 
@@ -206,12 +238,28 @@ func rollBackCentralized() string {
 
 	logRotateFileRemove := fmt.Sprintf("sudo rm %s", logRotateConfigFile)
 
-	return fmt.Sprintf(" %s; %s; %s", rsyslogFileRemove, logRotateFileRemove, restartSyslogService)
+	return fmt.Sprintf(" %s; %s; %s;", rsyslogFileRemove, logRotateFileRemove, restartSyslogService)
+}
+
+// Initially rateLimitBurst and rateLimitInterval have default values for the respective service i.e automatesyslog or journald.
+func getRateLimitValues(req *dc.AutomateConfig, rateLimitBurst int32, rateLimitInterval int32) (int32, int32) {
+	// now in current req, if user pass new value then use this value
+	if req.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 {
+		rateLimitBurst = req.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue()
+	}
+
+	// now in current req, if user pass new value then use this value
+	if req.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
+		rateLimitInterval = req.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue()
+	}
+
+	return rateLimitBurst, rateLimitInterval
 }
 
 // setConfigForCentralizedLog sets config for rsyslog and logrotate
 func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string {
-	contentForRsyslogConfig := createConfigFileForAutomateSysLog(reqConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
+	rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog := getRateLimitValues(reqConfig, defaultRateLimitBurstAutomateSyslog, defaultRateLimitIntervalAutomateSyslog)
+	contentForRsyslogConfig := createConfigFileForAutomateSysLog(reqConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
 
 	//creating a file and adding content in the file
 	rsysCreateFileCommand := fmt.Sprintf("echo \"%s\" > %s", contentForRsyslogConfig, rsyslogConfigFile)
@@ -224,7 +272,7 @@ func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string 
 }
 
 // createRsyslogAndLogRotateConfig patching the config into the remote database servers
-func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string) error {
+func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string, print bool) error {
 	for i := 0; i < len(remoteIp); i++ {
 		sshUtil.getSSHConfig().hostIP = remoteIp[i]
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
@@ -233,7 +281,10 @@ func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptC
 			return err
 		}
 		writer.Printf(output)
-		writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
+		// Adding this if condition, because RateLimit Config is shared between centralized logging and systemd. Otherwise it's Printing twice
+		if print {
+			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
+		}
 
 	}
 	return nil

@@ -474,12 +474,37 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
 			return errors.Errorf("The operation timeout duration for each individual node during the config patch process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
 		}
+
+		isRateLimiterConfig, err := checkIfRequestedConfigHasRateLimit(args)
+		if err != nil {
+			return err
+		}
+		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isRateLimiterConfig {
+			if err := patchRateLimitForBackend(args, infra); err != nil {
+				return err
+			}
+		}
+
 		isLoggerConfig, err := checkIfRequestedConfigHasCentrailisedLogging(args)
 		if err != nil {
 			return err
 		}
 		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isLoggerConfig {
 			modifiedConfig, err := patchAndRemoveCentralisedLoggingForBackend(args, infra)
+			if err != nil {
+				return err
+			}
+			checkIfConfigHasOnlyLogConfig, err := checkUserConfigHasOnlyCentrailisedLogConfig(modifiedConfig)
+			if err != nil {
+				return err
+			}
+			if checkIfConfigHasOnlyLogConfig {
+				return nil
+			}
+		}
+
+		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isRateLimiterConfig && !isLoggerConfig {
+			modifiedConfig, err := removeRateLimiterConfig(args)
 			if err != nil {
 				return err
 			}
@@ -590,7 +615,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		} else {
 			writer.Println(cmd.UsageString())
 		}
-		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && isLoggerConfig {
+		if (configCmdFlags.opensearch || configCmdFlags.postgresql) && (isLoggerConfig || isRateLimiterConfig) {
 			os.Remove(configFile)
 		}
 
@@ -599,7 +624,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Annotate(err, status.ConfigError)
 		}
-
 		// keep chefserver fqdn same as automate fqdn in case of standalone automate
 		if !checkIfFileExist(automateHaPath) && cfg.GetGlobal().GetV1().GetChefServer() != nil && cfg.GetGlobal().GetV1().GetChefServer().GetFqdn() != nil {
 			res, err := client.GetAutomateConfig(configCmdFlags.timeout)
@@ -638,13 +662,13 @@ func patchAndRemoveCentralisedLoggingForBackend(args []string, infra *AutomateHA
 	}
 	writer.Success("Centralised logging configuration is patched. \n")
 	if configCmdFlags.postgresql {
-		inputfile, err = removeCentralisedLogsFromUserConfigForPg(args[0])
+		inputfile, err = removeCentralisedLogsandRateLimitFromUserConfigForPg(args[0])
 		if err != nil {
 			return "", err
 		}
 	}
 	if configCmdFlags.opensearch {
-		inputfile, err = removeCentralisedLogsFromUserConfigForOs(args[0])
+		inputfile, err = removeCentralisedLogsandRateLimitFromUserConfigForOs(args[0])
 		if err != nil {
 			return "", err
 		}
@@ -986,9 +1010,13 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 		return nil
 	}
 
+	//checking for RateLimit configuration
+	if err := removeOrUpdateRateLimit(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value); err != nil {
+		return err
+	}
+
 	//checking for log configuration
-	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value)
-	if err != nil {
+	if err := removeOrUpdateCentralisedLog(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value); err != nil {
 		return err
 	}
 
@@ -1289,8 +1317,51 @@ func checkIfRequestedConfigHasCentrailisedLogging(args []string) (bool, error) {
 	if config.Get("global.v1.log") != nil {
 		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
 		if isconfig != nil {
-			val := isconfig.Get("redirect_sys_log").(bool)
-			if val == true {
+			if isconfig.Get("redirect_sys_log") != nil {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+func checkIfExistedConfigHasCentrailisedLogging(fileName string) (bool, error) {
+	config, err := ptoml.LoadFile(fileName)
+	if err != nil {
+		writer.Println(err.Error())
+		return false, err
+	}
+	if config.Get("global.v1.log") != nil {
+		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+		if isconfig != nil {
+			if isconfig.Get("redirect_sys_log") != nil {
+				val := isconfig.Get("redirect_sys_log").(bool)
+				if val {
+					return true, nil
+				}
+			}
+		}
+	}
+	return false, nil
+}
+
+func checkIfRequestedConfigHasRateLimit(args []string) (bool, error) {
+	config, err := ptoml.LoadFile(args[0])
+	if err != nil {
+		writer.Println(err.Error())
+		return false, err
+	}
+	if config.Get("global.v1.log") != nil {
+		isconfig := config.Get("global.v1.log").(*ptoml.Tree)
+		if isconfig != nil {
+			var rateLimitInterval, rateLimitBurst int64 = 0, 0
+			if isconfig.Get("rate_limit_interval") != nil {
+				rateLimitInterval = isconfig.Get("rate_limit_interval").(int64)
+			}
+			if isconfig.Get("rate_limit_burst") != nil {
+				rateLimitBurst = isconfig.Get("rate_limit_burst").(int64)
+			}
+			if rateLimitInterval > 0 || rateLimitBurst > 0 {
 				return true, nil
 			}
 		}
@@ -1378,7 +1449,7 @@ func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	}
 }
 
-func removeCentralisedLogsFromUserConfigForPg(srcString string) (string, error) {
+func removeCentralisedLogsandRateLimitFromUserConfigForPg(srcString string) (string, error) {
 	tomlbyt, _ := os.ReadFile(srcString)
 	destString := string(tomlbyt)
 	var dest PostgresqlConfig
@@ -1395,7 +1466,7 @@ func removeCentralisedLogsFromUserConfigForPg(srcString string) (string, error) 
 	return newSrcString, nil
 }
 
-func removeCentralisedLogsFromUserConfigForOs(srcString string) (string, error) {
+func removeCentralisedLogsandRateLimitFromUserConfigForOs(srcString string) (string, error) {
 	tomlbyt, _ := os.ReadFile(srcString)
 	destString := string(tomlbyt)
 	var dest OpensearchConfig

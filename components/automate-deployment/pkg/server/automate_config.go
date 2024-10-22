@@ -21,8 +21,14 @@ import (
 )
 
 const (
-	rsyslogConfigFile   = "/etc/rsyslog.d/automate.conf"
-	logRotateConfigFile = "/etc/logrotate.d/automate"
+	rsyslogConfigFile                      = "/etc/rsyslog.d/automate.conf"
+	logRotateConfigFile                    = "/etc/logrotate.d/automate"
+	journaldConfigFile                     = "/etc/systemd/journald.conf.d/automate.conf"
+	journaldConfigFilePath                 = "/etc/systemd/journald.conf.d"
+	defaultRateLimitBurstJournald          = int32(1000)
+	defaultRateLimitIntervalJournald       = int32(5000) // in ms
+	defaultRateLimitBurstAutomateSyslog    = int32(200)
+	defaultRateLimitIntervalAutomateSyslog = int32(200) // in ms
 )
 
 // GetAutomateConfig returns a copy of the userOverrideConfig of the existing
@@ -90,6 +96,11 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 			return status.Error(codes.DeadlineExceeded, "The configuration has changed since you initiated the update request. Please try again.")
 		}
 
+		if err = setLogRateLimitConfigJournald(req, existingCopy); err != nil {
+			logrus.Errorf("Unable to set config for Log Rate Limiting with error %v", err)
+			return status.Error(codes.Internal, "Failed to set configuration for Log Rate Limiting for automate")
+		}
+
 		if err = req.GetConfig().GetGlobal().ValidateReDirectSysLogConfig(); err != nil {
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
@@ -145,6 +156,14 @@ func (s *server) SetAutomateConfig(ctx context.Context,
 	// Lock the deployment while we merge the config and persist it
 	operation := func(s *server) error {
 		var err error
+
+		if err = removeOrUpdateRateLimit(req); err != nil {
+			return status.Error(codes.Internal, "Failed to remove configuration for journald")
+		}
+
+		if err = removeOrUpdateRedirectLogs(req); err != nil {
+			return status.Error(codes.Internal, "Failed to remove configuration for Redirect Logs: "+err.Error())
+		}
 
 		if err = req.Config.ValidateWithGlobalAndDefaults(); err != nil {
 			return status.Error(codes.InvalidArgument, err.Error())
@@ -257,16 +276,201 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 	return nil
 }
 
+func setLogRateLimitConfigJournald(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) error {
+	// checking if req doesn't contain info about RateLimitBurst or RateLimitInterval, then return from here only.
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst() == nil && req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval() == nil {
+		return nil
+	}
+
+	// checking will there be any change after applying this config or it's same as existing config.
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() &&
+		req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() {
+		return nil
+	}
+
+	rateLimitBurstJournald, rateLimitIntervalJournald := getRateLimitValues(req, existingCopy, defaultRateLimitBurstJournald, defaultRateLimitIntervalJournald)
+
+	err := createConfigFileForJournald(rateLimitBurstJournald, rateLimitIntervalJournald)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = restartJournaldService()
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+	return nil
+}
+
+// Initially rateLimitBurst and rateLimitInterval have default values for the respective service i.e automatesyslog or journald.
+func getRateLimitValues(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig, rateLimitBurst int32, rateLimitInterval int32) (int32, int32) {
+	// if user already applied this config before, then use that value instead of default value
+	if existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 {
+		rateLimitBurst = existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue()
+	}
+
+	// if user already applied this config before, then use that value instead of default value
+	if existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
+		rateLimitInterval = existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue()
+	}
+
+	// now in current req, if user pass new value then use this value
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 {
+		rateLimitBurst = req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue()
+	}
+
+	// now in current req, if user pass new value then use this value
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
+		rateLimitInterval = req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue()
+	}
+
+	return rateLimitBurst, rateLimitInterval
+}
+
+// createConfigFileForJournald creates a config file as /etc/systemd/journald.conf.d/automate.conf
+func createConfigFileForJournald(rateLimitBurst int32, rateLimitInterval int32) error {
+	os.Remove(journaldConfigFile)
+	err := os.MkdirAll(journaldConfigFilePath, 0755)
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Error creating directory:").Error())
+	}
+	f, err := os.Create(journaldConfigFile)
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to create journald configuration file for automate").Error())
+	}
+
+	defer f.Close()
+
+	_, err = f.WriteString(fmt.Sprintf(`[Journal]
+RateLimitBurst=%d
+RateLimitInterval=%dms
+`, rateLimitBurst, rateLimitInterval))
+
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in journald configuration file for automate").Error())
+	}
+
+	return nil
+}
+
+// restartJournaldService restarts the Journald service for the supported platforms
+func restartJournaldService() error {
+	_, err := exec.Command("bash", "-c", "systemctl restart systemd-journald.service").Output()
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart systemd-journald").Error())
+	}
+
+	return nil
+}
+
+func removeOrUpdateRateLimit(req *api.SetAutomateConfigRequest) error {
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst() == nil && req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval() == nil {
+		//Checking If the file exist
+		if _, err := os.Stat(journaldConfigFile); errors.Is(err, nil) {
+			err := os.Remove(journaldConfigFile)
+			if err != nil {
+				logrus.Error("Error recived while deleteing automate journald config file", err)
+				return status.Error(codes.Internal, errors.Wrap(err, "Unable to delete the journald configuration file for automate").Error())
+			}
+		}
+
+		err := restartJournaldService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	// User want to Update it
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 || req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
+		//Checking If the file exist
+		if _, err := os.Stat(journaldConfigFile); errors.Is(err, nil) {
+			err := os.Remove(journaldConfigFile)
+			if err != nil {
+				logrus.Error("Error recived while deleteing automate journald config file", err)
+				return status.Error(codes.Internal, errors.Wrap(err, "Unable to delete the journald configuration file for automate").Error())
+			}
+		}
+
+		rateLimitBurstJournald, rateLimitIntervalJournald := defaultRateLimitBurstJournald, defaultRateLimitIntervalJournald
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 {
+			rateLimitBurstJournald = req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue()
+		}
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
+			rateLimitIntervalJournald = req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue()
+		}
+
+		err := createConfigFileForJournald(rateLimitBurstJournald, rateLimitIntervalJournald)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		err = restartJournaldService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+	}
+	return nil
+}
+
+func removeOrUpdateRedirectLogs(req *api.SetAutomateConfigRequest) error {
+	if !req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
+		err := removeConfigFileForAutomateSyslog()
+		if err != nil {
+			return status.Error(codes.Internal, "Failed to remove configuration into syslog")
+		}
+
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if err = rollbackLogrotate(); err != nil {
+			logrus.Errorf("cannot rollback logrotate: %v", err)
+			return err
+		}
+	} else {
+		if err := req.GetConfig().GetGlobal().ValidateReDirectSysLogConfig(); err != nil {
+			return status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog := defaultRateLimitBurstAutomateSyslog, defaultRateLimitIntervalAutomateSyslog
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() > 0 {
+			rateLimitBurstAutomateSyslog = req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue()
+		}
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() > 0 {
+			rateLimitIntervalAutomateSyslog = req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue()
+		}
+
+		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+		patchReq := &api.PatchAutomateConfigRequest{
+			Config: req.GetConfig(),
+		}
+		if err = runLogrotateConfig(patchReq); err != nil {
+			logrus.Errorf("cannot configure log rotate: %v", err)
+			return err
+		}
+	}
+	return nil
+}
+
 // setConfigForRedirectLogs Add the config for rsyslog and logrotate
 // if the req has redirect_sys_log as true and existing has redirect_sys_log as false it will add the configurations
 // if the req has redirect_sys_log as false and existing has redirect_sys_log as true it will remove the configurations
 func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) error {
+	rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog := getRateLimitValues(req, existingCopy, defaultRateLimitBurstAutomateSyslog, defaultRateLimitIntervalAutomateSyslog)
 
-	//Set the config if already not set
+	// set the config if already not set
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false {
 
-		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
+		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
@@ -282,53 +486,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 	}
 
-	//Set the config if already not set
-	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
-		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
-
-		res, err := UpdateByMergingStructs(req, existingCopy)
-		if err != nil {
-			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
-		}
-
-		if IfEqual(res, existingCopy) {
-			return nil
-		}
-
-		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
-
-			//to restart the log
-			err = restartSyslogService()
-			if err != nil {
-				return status.Error(codes.Internal, err.Error())
-			}
-
-			if err = runLogrotateConfig(res); err != nil {
-				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
-				return err
-			}
-			return nil
-		}
-
-		err = createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
-		if err != nil {
-			return status.Error(codes.Internal, err.Error())
-		}
-
-		err = restartSyslogService()
-		if err != nil {
-			return status.Error(codes.Internal, err.Error())
-		}
-
-		if err = runLogrotateConfig(res); err != nil {
-			logrus.Errorf("cannot configure log rotate with new file path: %v", err)
-			return err
-		}
-
-		return nil
-	}
-
-	//Rollback the config if requested
+	// rollback the config if requested
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog() != nil && req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 
@@ -347,6 +505,59 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			return err
 		}
 
+		return nil
+	}
+
+	// update the config if already set
+	if existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+		res, err := UpdateByMergingStructs(req, existingCopy)
+		if err != nil {
+			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
+		}
+
+		if IfEqual(res, existingCopy) {
+			return nil
+		}
+
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() &&
+			req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() &&
+			req.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() {
+
+			//to restart the log
+			err = restartSyslogService()
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+
+			if err = runLogrotateConfig(res); err != nil {
+				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
+				return err
+			}
+			return nil
+		}
+
+		// Take filepath from req, if user haven't passed it then pick it from existing config
+		filePath := req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue()
+		if filePath == "" {
+			filePath = existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue()
+		}
+
+		err = createConfigFileForAutomateSysLog(filePath, rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if err = runLogrotateConfig(res); err != nil {
+			logrus.Errorf("cannot configure log rotate with new file path: %v", err)
+			return err
+		}
+
+		return nil
 	}
 
 	return nil
@@ -364,7 +575,7 @@ func restartSyslogService() error {
 
 // createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
 // which redirects the logs to the specified location
-func createConfigFileForAutomateSysLog(pathForLog string) error {
+func createConfigFileForAutomateSysLog(pathForLog string, rateLimitBurst int32, rateLimitInterval int32) error {
 	os.Remove(rsyslogConfigFile)
 	f, err := os.Create(rsyslogConfigFile)
 
@@ -374,7 +585,11 @@ func createConfigFileForAutomateSysLog(pathForLog string) error {
 
 	defer f.Close()
 
-	_, err2 := f.WriteString(fmt.Sprintf("if $programname == 'hab' then %s\n& stop\n", getLogFileName(pathForLog)))
+	_, err2 := f.WriteString(fmt.Sprintf(`$imjournalRatelimitBurst %d
+$imjournalRatelimitInterval %d
+if $programname == 'hab' then %s
+& stop
+`, rateLimitBurst, rateLimitInterval, getLogFileName(pathForLog)))
 
 	if err2 != nil {
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
@@ -474,11 +689,9 @@ func rollbackLogrotate() error {
 
 // UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
 func UpdateByMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
-	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true && existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
-		if err := mergo.Merge(req.Config, existingCopy); err != nil {
-			logrus.Errorf("cannot merge the requested and existing structs: %v", err)
-			return nil, err
-		}
+	if err := mergo.Merge(req.Config, existingCopy); err != nil {
+		logrus.Errorf("cannot merge the requested and existing structs: %v", err)
+		return nil, err
 	}
 
 	return req, nil
@@ -488,7 +701,9 @@ func IfEqual(req *api.PatchAutomateConfigRequest, existingCopy *deployment.Autom
 	if req.Config.Global.V1.Log.MaxNumberRotatedLogs == existingCopy.Global.V1.Log.MaxNumberRotatedLogs &&
 		req.Config.Global.V1.Log.RedirectLogFilePath == existingCopy.Global.V1.Log.RedirectLogFilePath &&
 		req.Config.Global.V1.Log.CompressRotatedLogs == existingCopy.Global.V1.Log.CompressRotatedLogs &&
-		req.Config.Global.V1.Log.MaxSizeRotateLogs == existingCopy.Global.V1.Log.MaxSizeRotateLogs {
+		req.Config.Global.V1.Log.MaxSizeRotateLogs == existingCopy.Global.V1.Log.MaxSizeRotateLogs &&
+		req.Config.Global.V1.Log.RateLimitBurst == existingCopy.Global.V1.Log.RateLimitBurst &&
+		req.Config.Global.V1.Log.RateLimitInterval == existingCopy.Global.V1.Log.RateLimitInterval {
 		return true
 	}
 
