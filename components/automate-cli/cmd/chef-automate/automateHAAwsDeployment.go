@@ -134,19 +134,21 @@ func (a *awsDeployment) generateConfig(state string) error {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
 
-	err = a.addDNTocertConfig()
-	if err != nil {
-		return err
+	if !a.config.Aws.Config.SetupManagedServices {
+		err = setDefaultCertsForBackend(&a.config.Opensearch.Config, &a.config.Postgresql.Config)
+		if err != nil {
+			return err
+		}
+		err = a.addDNTocertConfig()
+		if err != nil {
+			return err
+		}
 	}
+
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }
 
 func (a *awsDeployment) addDNTocertConfig() error {
-	err := setDefaultCertsForBackend(&a.config.Opensearch.Config, &a.config.Postgresql.Config)
-	if err != nil {
-		return err
-	}
-
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if a.config.Opensearch.Config.EnableCustomCerts {
 		//If AdminCert is given then get the admin_dn from the cert

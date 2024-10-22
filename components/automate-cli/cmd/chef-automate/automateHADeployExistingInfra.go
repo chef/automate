@@ -77,10 +77,19 @@ func (e *existingInfra) generateConfig(state string) error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
-	err = e.addDNTocertConfig()
-	if err != nil {
-		return err
+
+	if (e.config.ExternalDB.Database.Type != "aws") && (e.config.ExternalDB.Database.Type != "self-managed") {
+		err = setDefaultCertsForBackend(&e.config.Opensearch.Config, &e.config.Postgresql.Config)
+		if err != nil {
+			return err
+		}
+
+		err = e.addDNTocertConfig()
+		if err != nil {
+			return err
+		}
 	}
+
 	err = e.populateCertificateTomlFile()
 	if err != nil {
 		return err
@@ -213,13 +222,9 @@ type DefaultBackendCerts struct {
 }
 
 func (e *existingInfra) addDNTocertConfig() error {
+
 	e.log.Debug("custom certificate opensearch enabled status", e.config.Opensearch.Config.EnableCustomCerts)
 	e.log.Debug("custom certificate postgresql enabled status", e.config.Postgresql.Config.EnableCustomCerts)
-
-	err := setDefaultCertsForBackend(&e.config.Opensearch.Config, &e.config.Postgresql.Config)
-	if err != nil {
-		return err
-	}
 
 	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if e.config.Opensearch.Config.EnableCustomCerts {
