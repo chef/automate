@@ -142,27 +142,32 @@ func (a *awsDeployment) generateConfig(state string) error {
 }
 
 func (a *awsDeployment) addDNTocertConfig() error {
-	if !a.config.Opensearch.Config.EnableCustomCerts {
-		a.config.Opensearch.Config.EnableCustomCerts = true
-		a.config.Postgresql.Config.EnableCustomCerts = true
+	var defaultConfig DefaultBackendCerts
+	if !a.config.Opensearch.Config.EnableCustomCerts || !a.config.Postgresql.Config.EnableCustomCerts {
 		// reading toml file at "/hab/default_backend_certificates.toml" and read the root_ca, ssl_cert and ssl key from it
 		// and set it in the config
 		defaultToml, err := os.ReadFile(DEFAULT_BACKEND_CERTS)
 		if err != nil {
 			return err
 		}
-		var defaultConfig DefaultBackendCerts
 		err = toml.Unmarshal(defaultToml, &defaultConfig)
 		if err != nil {
 			return err
 		}
+	}
+	if !a.config.Opensearch.Config.EnableCustomCerts {
+		a.config.Opensearch.Config.EnableCustomCerts = true
+
 		// set the root_ca, ssl_cert and ssl_key in the config
 		a.config.Opensearch.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
 		a.config.Opensearch.Config.AdminCert = fmt.Sprintf("%v", defaultConfig.AdminCert)
 		a.config.Opensearch.Config.AdminKey = fmt.Sprintf("%v", defaultConfig.AdminKey)
 		a.config.Opensearch.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
 		a.config.Opensearch.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
+	}
 
+	if !a.config.Postgresql.Config.EnableCustomCerts {
+		a.config.Postgresql.Config.EnableCustomCerts = true
 		a.config.Postgresql.Config.RootCA = fmt.Sprintf("%v", defaultConfig.RootCA)
 		a.config.Postgresql.Config.PublicKey = fmt.Sprintf("%v", defaultConfig.SslCert)
 		a.config.Postgresql.Config.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
