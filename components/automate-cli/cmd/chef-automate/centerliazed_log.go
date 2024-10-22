@@ -282,9 +282,9 @@ func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptC
 			writer.Errorf("%v", err)
 			return err
 		}
-		writer.Printf(output)
 		// Adding this if condition, because RateLimit Config is shared between centralized logging and systemd. Otherwise it's Printing twice
 		if print {
+			writer.Printf(output)
 			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
 		}
 

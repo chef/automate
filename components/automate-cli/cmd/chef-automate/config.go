@@ -1049,12 +1049,12 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 	}
 
 	//checking for RateLimit configuration
-	if err := removeOrUpdateRateLimit(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value); err != nil {
+	if err := removeOrUpdateRateLimit(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value); err != nil {
 		return err
 	}
 
 	//checking for log configuration
-	if err := removeOrUpdateCentralisedLog(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value); err != nil {
+	if err := removeOrUpdateCentralisedLog(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value); err != nil {
 		return err
 	}
 

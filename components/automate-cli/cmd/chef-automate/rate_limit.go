@@ -159,9 +159,9 @@ func createRateLimitJournaldConfig(sshUtil SSHUtil, remoteIp []string, scriptCom
 			writer.Errorf("%v", err)
 			return err
 		}
-		writer.Printf(output)
 		// Adding this IF because otherwise on CLI there will be two print statement for each pg or os nodes. (because RateLimit varibales are shared among them)
 		if print {
+			writer.Printf(output)
 			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
 		}
 
