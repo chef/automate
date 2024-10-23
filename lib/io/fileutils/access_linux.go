@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"syscall"
+	"math"
 
 	"github.com/chef/automate/lib/user"
 	"github.com/pkg/errors"
@@ -243,30 +244,54 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 		return uid, gids, err
 	}
 
-	uidi, err = strconv.Atoi(u.Uid)
+	// Parse the UID as uint64 to handle larger bit sizes, then check bounds for uint32
+	uid64, err := strconv.ParseUint(u.Uid, 10, 64)
+	//uidi, err = strconv.Atoi(u.Uid)
 	if err != nil {
 		return uid, gids, err
 	}
-	uid = uint32(uidi)
+	// Check if UID fits within uint32 bounds
+	if uid64 > math.MaxUint32 {
+		return uid, gids, errors.New("UID exceeds uint32 limit")
+	}
+	// Convert uid64 to uint32 after ensuring it is safe
+	uid = uint32(uid64)
+	//uid = uint32(uidi)
 
 	// WARNING: GroupIds() might not be implemented on linux if cgo is disabled.
 	// Instead of failing if it returns an error we'll fall back to the primary
 	// group only.
 	gidss, err = u.GroupIds()
 	if err != nil {
-		g, err := strconv.Atoi(u.Gid)
+		gid64, err := strconv.ParseUint(u.Gid, 10, 64)
+		//g, err := strconv.Atoi(u.Gid)
 		if err != nil {
 			return uid, gids, err
 		}
 
-		gids = append(gids, uint32(g))
+		// Check if GID fits within uint32 bounds
+		if gid64 > math.MaxUint32 {
+			return uid, gids, errors.New("Primary GID exceeds uint32 limit")
+		}
+		// Append the primary GID
+		gids = append(gids, uint32(gid64))
+
+		//gids = append(gids, uint32(g))
 	} else {
 		for _, g := range gidss {
-			gidi, err = strconv.Atoi(g)
+			gid64, err := strconv.ParseUint(g, 10, 64)
+			//gidi, err = strconv.Atoi(g)
 			if err != nil {
 				return uid, gids, err
 			}
-			gids = append(gids, uint32(gidi))
+
+			// Check if each group ID fits within uint32 bounds
+			if gid64 > math.MaxUint32 {
+				return uid, gids, errors.New("Group ID exceeds uint32 limit")
+			}
+			// Append each GID
+			gids = append(gids, uint32(gid64))
+			//gids = append(gids, uint32(gidi))
 		}
 	}
 
