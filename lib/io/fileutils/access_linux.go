@@ -232,8 +232,8 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 	var (
 		u     *user.User
 		uid   uint32
-		uidi  int
-		gidi  int
+		//uidi  int
+		//gidi  int
 		gids  = []uint32{}
 		gidss []string
 		err   error
