@@ -217,7 +217,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	remoteService := POSTGRESQL
 
 	// Creating and patching the required configurations.
-	config := fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, certs.privateCert, certs.publicCert)
+	config := fmt.Sprintf(POSTGRES_CONFIG, certs.privateCert, certs.publicCert, certs.rootCA)
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, &flagsObj, currentCertsInfo)
 	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
