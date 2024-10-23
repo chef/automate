@@ -17,6 +17,7 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/chef-automate"
 )
 
+
 do_after() {
   do_default_after
 
