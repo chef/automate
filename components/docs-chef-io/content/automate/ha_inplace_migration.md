@@ -190,7 +190,7 @@ OR
 chef-automate config show > applied_config.toml
 ```
 
-Modify `applied_config.toml`, remove the elastic search config, and set the config. Set `applied_config.toml` on all the frontend nodes manually. As the removal of config is not supported from the bastion. Use the below command to set the config manually.
+Modify `applied_config.toml`, remove the elastic search config, and set the config. Set `applied_config.toml` on all the frontend nodes manually. As the removal of config is not supported from the bastion. Use the below command to set the config manually on each Frontend node.
 
 ```bash
 chef-automate config set applied_config.toml
