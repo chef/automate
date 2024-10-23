@@ -86,7 +86,6 @@ func getScriptCommandsForLogging(reqConfig *dc.AutomateConfig, existConfig *dc.A
 		//Merging both the config into the requested config for comparing
 		config.Merge(existConfig, reqConfig, merged)
 		*reqConfig = *merged
-		reqConfig.GetGlobal().ValidateReDirectSysLogConfig()
 		//If config changed reapplying the config accordingly
 		if isConfigChanged(reqConfig.GetGlobal().GetV1().GetLog(), existConfig.GetGlobal().GetV1().GetLog()) {
 			scriptCommands = getScriptCommandsForConfigChangedLogging(reqConfig, existConfig)

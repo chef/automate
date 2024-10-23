@@ -289,17 +289,7 @@ func setLogRateLimitConfigJournald(req *api.PatchAutomateConfigRequest, existing
 	}
 
 	rateLimitBurstJournald, rateLimitIntervalJournald := getRateLimitValues(req, existingCopy, defaultRateLimitBurstJournald, defaultRateLimitIntervalJournald)
-
-	err := createConfigFileForJournald(rateLimitBurstJournald, rateLimitIntervalJournald)
-	if err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-
-	err = restartJournaldService()
-	if err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-	return nil
+	return createRateLimit(rateLimitBurstJournald, rateLimitIntervalJournald)
 }
 
 // Initially rateLimitBurst and rateLimitInterval have default values for the respective service i.e automatesyslog or journald.
@@ -384,6 +374,19 @@ func removeRateLimit() error {
 	return nil
 }
 
+func createRateLimit(rateLimitBurst int32, rateLimitInterval int32) error {
+	err := createConfigFileForJournald(rateLimitBurst, rateLimitInterval)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = restartJournaldService()
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+	return nil
+}
+
 func updateRateLimit(req *api.SetAutomateConfigRequest) error {
 	reqPatchReq := &api.PatchAutomateConfigRequest{
 		Config: req.GetConfig(),
@@ -412,6 +415,37 @@ func removeOrUpdateRateLimit(req *api.SetAutomateConfigRequest) error {
 	return nil
 }
 
+func createRedirectLogs(req *api.PatchAutomateConfigRequest, rateLimitBurstAutomateSyslog int32, rateLimitIntervalAutomateSyslog int32) error {
+	err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = restartSyslogService()
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if err = runLogrotateConfig(req); err != nil {
+		logrus.Errorf("cannot configure log rotate: %v", err)
+		return err
+	}
+	return nil
+}
+
+func updateRedirectLogs(req *api.SetAutomateConfigRequest) error {
+	if err := req.GetConfig().GetGlobal().ValidateReDirectSysLogConfig(); err != nil {
+		return status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	patchReq := &api.PatchAutomateConfigRequest{
+		Config: req.GetConfig(),
+	}
+	rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog := getRateLimitValues(patchReq, nil, defaultRateLimitBurstAutomateSyslog, defaultRateLimitIntervalAutomateSyslog)
+
+	return createRedirectLogs(patchReq, rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+}
+
 func removeRedirectLogs() error {
 	err := removeConfigFileForAutomateSyslog()
 	if err != nil {
@@ -429,31 +463,6 @@ func removeRedirectLogs() error {
 	}
 	return nil
 }
-func updateRedirectLogs(req *api.SetAutomateConfigRequest) error {
-	if err := req.GetConfig().GetGlobal().ValidateReDirectSysLogConfig(); err != nil {
-		return status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	patchReq := &api.PatchAutomateConfigRequest{
-		Config: req.GetConfig(),
-	}
-	rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog := getRateLimitValues(patchReq, nil, defaultRateLimitBurstAutomateSyslog, defaultRateLimitIntervalAutomateSyslog)
-
-	err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
-	if err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-	err = restartSyslogService()
-	if err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-
-	if err = runLogrotateConfig(patchReq); err != nil {
-		logrus.Errorf("cannot configure log rotate: %v", err)
-		return err
-	}
-	return nil
-}
 
 func removeOrUpdateRedirectLogs(req *api.SetAutomateConfigRequest) error {
 	if !req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
@@ -461,24 +470,6 @@ func removeOrUpdateRedirectLogs(req *api.SetAutomateConfigRequest) error {
 	} else {
 		return updateRedirectLogs(req)
 	}
-}
-
-func createRedirectLogs(req *api.PatchAutomateConfigRequest, rateLimitBurstAutomateSyslog int32, rateLimitIntervalAutomateSyslog int32) error {
-	err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
-	if err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-
-	err = restartSyslogService()
-	if err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-
-	if err = runLogrotateConfig(req); err != nil {
-		logrus.Errorf("cannot configure log rotate: %v", err)
-		return err
-	}
-	return nil
 }
 
 // setConfigForRedirectLogs Add the config for rsyslog and logrotate
@@ -508,23 +499,6 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 
 		if IfEqual(mergedConfig, existingCopy) {
-			return nil
-		}
-
-		if mergedConfig.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() &&
-			mergedConfig.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitBurst().GetValue() &&
-			mergedConfig.GetConfig().GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRateLimitInterval().GetValue() {
-
-			//to restart the log
-			err = restartSyslogService()
-			if err != nil {
-				return status.Error(codes.Internal, err.Error())
-			}
-
-			if err = runLogrotateConfig(mergedConfig); err != nil {
-				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
-				return err
-			}
 			return nil
 		}
 
