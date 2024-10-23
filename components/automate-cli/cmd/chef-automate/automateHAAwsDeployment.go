@@ -134,10 +134,17 @@ func (a *awsDeployment) generateConfig(state string) error {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
 
-	err = a.addDNTocertConfig()
-	if err != nil {
-		return err
+	if !a.config.Aws.Config.SetupManagedServices {
+		err = setDefaultCertsForBackend(&a.config.Opensearch.Config, &a.config.Postgresql.Config)
+		if err != nil {
+			return err
+		}
+		err = a.addDNTocertConfig()
+		if err != nil {
+			return err
+		}
 	}
+
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }
 
@@ -161,7 +168,7 @@ func (a *awsDeployment) addDNTocertConfig() error {
 			a.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 		}
 
-		NodesDn := ""
+		var NodesDn, lastNodeDn string
 
 		//Set the admin_dn and nodes_dn in the config for all IP addresses
 		for i := 0; i < len(a.config.Opensearch.Config.CertsByIP); i++ {
@@ -172,11 +179,15 @@ func (a *awsDeployment) addDNTocertConfig() error {
 				if err != nil {
 					return err
 				}
+				if nodeDn.String() == lastNodeDn {
+					continue
+				}
 				if NodesDn == "" {
 					NodesDn = NodesDn + fmt.Sprintf("%v", nodeDn) + "\\n  "
 				} else {
 					NodesDn = NodesDn + fmt.Sprintf("- %v", nodeDn) + "\\n  "
 				}
+				lastNodeDn = nodeDn.String()
 			}
 		}
 
