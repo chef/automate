@@ -1,6 +1,5 @@
 #stable channel
 
-
 pkg_name=automate-ha-deployment
 pkg_description="A wrapper package for setting up a deployment workstation for the A2 HA Backend."
 pkg_origin=chef
