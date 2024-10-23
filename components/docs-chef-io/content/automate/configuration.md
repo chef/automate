@@ -130,7 +130,7 @@ To log the source node IP address in Automate Load Balancer and Chef Server Load
   include_x_forwarded_for = true
 ```
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
-The Automate Load Balancer and Chef Server Load Balancer will log the content of `X-Forwarded-For` header data.
+The Automate Load Balancer and Chef Server Load Balancer will log the content of the `X-Forwarded-For` header data.
 
 #### License Key
 
