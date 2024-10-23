@@ -4,6 +4,7 @@ exec 2>&1
 
 # Executing opensearch securityadmin
 echo "Executing opensearch securityadmin"
+export JAVA_HOME=$(HAB_LICENSE=accept-no-persist hab pkg path chef/automate-openjdk)
 hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/root-ca.pem -nhnv -h "localhost" -p {{cfg.transport.port}}
 echo "Done !!!! Executing opensearch securityadmin"
 
