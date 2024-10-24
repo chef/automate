@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+	"math"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -204,13 +205,23 @@ func AsUser(username string) Opt {
 			return errors.Wrap(err, "user lookup")
 		}
 
-		uid, err := strconv.Atoi(u.Uid)
+        // Parse the UID and GID using strconv.ParseUint to support larger values
+		uid, err := strconv.ParseUint(u.Uid, 10, 64)
+		//uid, err := strconv.Atoi(u.Uid)
 		if err != nil {
 			return errors.Wrap(err, "converting uid to integer")
 		}
-		gid, err := strconv.Atoi(u.Gid)
+		
+		gid, err := strconv.ParseUint(u.Gid, 10, 64)
+		//gid, err := strconv.Atoi(u.Gid)
 		if err != nil {
 			return errors.Wrap(err, "converting gid to integer")
+		}
+
+		// Now, handle both 32-bit and 64-bit values
+		// Ensure that uid and gid are within uint32 bounds
+		if uid > math.MaxUint32 || gid > math.MaxUint32 {
+			return errors.New("uid or gid value exceeds uint32 limits")
 		}
 
 		c.sysProcAttr = sys.SysProcAttrWithCred(uint32(uid), uint32(gid))
