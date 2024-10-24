@@ -458,6 +458,7 @@ func generateProxySettings(c *InitConfig) error {
 
 		// Config expects ports to be int32
 		//p, err := strconv.Atoi(port)
+		
 		if err != nil {
 			return err
 		}
