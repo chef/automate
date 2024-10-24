@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestGetScriptCommandsForConfigChangedLogging(t *testing.T) {
@@ -193,7 +194,7 @@ func TestGetScriptCommandsForLogging(t *testing.T) {
 					},
 				},
 			},
-			want: ` sudo rm /etc/rsyslog.d/automate.conf; sudo rm /etc/logrotate.d/automate; sudo systemctl restart rsyslog.service`,
+			want: ` sudo rm /etc/rsyslog.d/automate.conf; sudo rm /etc/logrotate.d/automate; sudo systemctl restart rsyslog.service;`,
 		},
 		{
 			name: "Get Script Commands if there is config changed in the requested and existed config has more values",
