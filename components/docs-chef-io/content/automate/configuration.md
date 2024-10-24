@@ -121,6 +121,17 @@ key = """-----BEGIN RSA PRIVATE KEY-----
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
+### Include X-Forwarded-For Header
+
+To log the source node IP address in Automate Load Balancer and Chef Server Load Balancer, the following configuration needs to be patched:
+
+```toml
+[global.v1.sys.ngx.http]
+  include_x_forwarded_for = true
+```
+Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+The Automate Load Balancer and Chef Server Load Balancer will log the content of the `X-Forwarded-For` header data.
+
 #### License Key
 
 You can apply for your Chef Automate license with the `chef-automate license apply` command in one of two ways:

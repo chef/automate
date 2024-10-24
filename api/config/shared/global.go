@@ -2,10 +2,11 @@ package shared
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net/url"
 	"os/exec"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -55,6 +56,13 @@ func DefaultGlobalConfig() *GlobalConfig {
 			},
 			LargeReporting: &LargeReporting{
 				EnableLargeReporting: w.Bool(false),
+			},
+			Sys: &V1_System{
+				Ngx: &Nginx{
+					Http: &Http{
+						IncludeXForwardedFor: w.Bool(false),
+					},
+				},
 			},
 		},
 	}

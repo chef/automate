@@ -28,9 +28,9 @@ message V1 {
   LargeReporting large_reporting = 13;
   ChefServer chef_server = 14;
 
-
   message System {
     chef.automate.infra.config.TLSCredentials tls = 1;
+    Nginx ngx = 2;
   }
 
   message Service {}
@@ -42,6 +42,7 @@ message ChefServer {
   google.protobuf.StringValue fqdn = 1;
   google.protobuf.StringValue root_ca = 2;
 }
+
 
 
 message External {
@@ -397,4 +398,12 @@ message SessionSettings {
 
 message LargeReporting {
 	google.protobuf.BoolValue enable_large_reporting = 1;
+}
+
+message Nginx {
+  Http http = 1;
+}
+
+message Http {
+  google.protobuf.BoolValue include_x_forwarded_for = 1;
 }
