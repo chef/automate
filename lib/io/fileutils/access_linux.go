@@ -134,6 +134,10 @@ func MakeReadWriteExecutable(uname, path string) error {
 	// Make sure the owner or group of the base is our uname
 	base = stats[0]
 	if uid != uint32(base.stat.Uid) && !sharesGid(base.stat.Gid, gids) {
+		// Check if uid and base.stat.Gid are within the bounds of int
+		if uid > math.MaxInt32 || base.stat.Gid > math.MaxInt32 {
+			return errors.New("UID or GID exceeds int limit")
+		}
 		err = os.Chown(base.path, int(uid), int(base.stat.Gid))
 		if err != nil {
 			return errors.Wrap(err, "failed to change owner")
