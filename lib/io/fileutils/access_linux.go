@@ -133,7 +133,7 @@ func MakeReadWriteExecutable(uname, path string) error {
 
 	// Make sure the owner or group of the base is our uname
 	base = stats[0]
-	if uid != base.stat.Uid && !sharesGid(base.stat.Gid, gids) {
+	if uid != uint32(base.stat.Uid) && !sharesGid(base.stat.Gid, gids) {
 		err = os.Chown(base.path, int(uid), int(base.stat.Gid))
 		if err != nil {
 			return errors.Wrap(err, "failed to change owner")
