@@ -64,8 +64,8 @@ func (s *CfgMgmtServer) GetRolloutById(ctx context.Context, req *request.Rollout
 		return nil, status.Error(codes.InvalidArgument, message)
 	}
 
-    // Check if the parsed ID exceeds the maximum value of int32
-	if requestedId64 > math.MaxInt32 {
+    // Check if the parsed ID is within the bounds of int32
+	if requestedId64 > math.MaxInt32 || requestedId64 < math.MinInt32 {
 		message := fmt.Sprintf("request_id exceeds int32 bounds: %d", requestedId64)
 		return nil, status.Error(codes.InvalidArgument, message)
 	}

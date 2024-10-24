@@ -770,14 +770,32 @@ func lookupUser(username string) (uid, gid int, err error) {
 	if err != nil {
 		return -1, -1, err
 	}
-	uid, err = strconv.Atoi(u.Uid)
+
+	// Reuse uid and gid variables for parsing
+	uid64, err := strconv.ParseUint(u.Uid, 10, 64)
+	//uid, err = strconv.Atoi(u.Uid)
 	if err != nil {
 		return -1, -1, err
 	}
-	gid, err = strconv.Atoi(u.Gid)
+
+	if uid64 > math.MaxInt32 {
+		return -1, -1, errors.New("UID exceeds int32 bounds")
+	}
+	uid = int(uid64)
+
+
+	gid64, err := strconv.ParseUint(u.Gid, 10, 64)
+	//gid, err = strconv.Atoi(u.Gid)
 	if err != nil {
 		return -1, -1, err
 	}
+
+	// Check if parsed GID fits into int32 bounds
+	if gid64 > math.MaxInt32 {
+		return -1, -1, errors.New("GID exceeds int32 bounds")
+	}
+	gid = int(gid64)
+
 	return uid, gid, nil
 }
 
