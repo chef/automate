@@ -1,5 +1,11 @@
 Use the following commands on OpenSearch nodes to verify their health status.
 
+1. Get the OpenSearch Cluster status from the bastion
+
+    ```sh
+    chef-automate status --os
+    ```
+
 1. Verify that the Habitat service is running.
 
     ```sh

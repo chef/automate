@@ -64,6 +64,11 @@ Configure the OpenSearch `path.repo` attribute.
 - Above command will restart the OpenSearch cluster.
 
 #### Healthcheck commands
+- Get the OpenSearch Cluster status
+
+    ```sh
+    chef-automate status --os
+    ```
 
 - Following command can be run in the OpenSearch node
 

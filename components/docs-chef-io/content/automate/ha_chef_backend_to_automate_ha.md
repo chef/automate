@@ -51,7 +51,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 2. Execute the below command to install the habitat package for `knife-ec-backup`
 
     ```sh
-        hab pkg install chef/knife-ec-backup
+        hab pkg install chef/knife-ec-backup -bf
     ```
 
 3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc.
