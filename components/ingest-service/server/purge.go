@@ -25,7 +25,7 @@ const (
 )
 
 var DefaultPurgePolicies = &purge.Policies{
-	Es: map[string]purge.EsPolicy{
+	Os: map[string]purge.OsPolicy{
 		PurgeConvergeHistoryName: {
 			Name:          PurgeConvergeHistoryName,
 			IndexName:     PurgeConvergeHistoryIndex,
@@ -48,19 +48,19 @@ func ConfigurePurge(man *cereal.Manager, opts *serveropts.Opts) error {
 	// new default policies are added and/or existing policies indices are
 	// updated in case they have been migrated.
 
-	cp := DefaultPurgePolicies.Es[PurgeConvergeHistoryName]
+	cp := DefaultPurgePolicies.Os[PurgeConvergeHistoryName]
 	cp.OlderThanDays = opts.PurgeConvergeHistoryAfterDays
 	if opts.PurgeConvergeHistoryAfterDays < 0 {
 		cp.Disabled = true
 	}
-	DefaultPurgePolicies.Es[PurgeConvergeHistoryName] = cp
+	DefaultPurgePolicies.Os[PurgeConvergeHistoryName] = cp
 
-	ap := DefaultPurgePolicies.Es[PurgeActionsName]
+	ap := DefaultPurgePolicies.Os[PurgeActionsName]
 	ap.OlderThanDays = opts.PurgeActionsAfterDays
 	if opts.PurgeActionsAfterDays < 0 {
 		ap.Disabled = true
 	}
-	DefaultPurgePolicies.Es[PurgeActionsName] = ap
+	DefaultPurgePolicies.Os[PurgeActionsName] = ap
 
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.DAILY,
