@@ -13,6 +13,34 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+func readFileContent(filename string) (string, error) {
+	// Read the entire file content as a byte slice
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert the byte slice to a string and return it
+	return string(content), nil
+}
+
+func createFileWithContent(filename, content string) error {
+	// Create the file
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	fmt.Println("content: ", content)
+	// Write the content to the file
+	_, err = file.WriteString(content)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func TestRemoveRateLimitFile(t *testing.T) {
 	respGot := removeRateLimitFile()
 	expected := fmt.Sprintf("sudo rm -f %s ; \n %s; \n", journaldConfigFile, restartJournaldService)
@@ -136,14 +164,9 @@ func TestUpdateTomlFileFromConfig(t *testing.T) {
 					},
 				},
 			},
-			fileName: postgresLogConfig,
-			expectedFileData: `[global]
-  [global.v1]
-    [global.v1.log]
-      redirect_sys_log = true
-      redirect_log_file_path = "/home/ec2-user"
-`,
-			expectedErr: nil,
+			fileName:         postgresLogConfig,
+			expectedFileData: "[global]\n  [global.v1]\n    [global.v1.log]\n      redirect_sys_log = true\n      redirect_log_file_path = \"/home/ec2-user\"\n",
+			expectedErr:      nil,
 		},
 		{
 			name:       "Updating opensearch config file",
@@ -162,14 +185,9 @@ func TestUpdateTomlFileFromConfig(t *testing.T) {
 					},
 				},
 			},
-			fileName: opensearchConfig,
-			expectedFileData: `[global]
-  [global.v1]
-    [global.v1.log]
-      redirect_sys_log = true
-      redirect_log_file_path = "/home/ec2-user"
-`,
-			expectedErr: nil,
+			fileName:         opensearchConfig,
+			expectedFileData: "[global]\n  [global.v1]\n    [global.v1.log]\n      redirect_sys_log = true\n      redirect_log_file_path = \"/home/ec2-user\"\n",
+			expectedErr:      nil,
 		},
 		{
 			name:             "Config is empty and remote type is opensearch",
@@ -324,14 +342,11 @@ func TestRemoveRateLimiterConfig(t *testing.T) {
 	onlyRateLimitConfigfileName := "onlyRateLimitConfig.toml"
 	postgresNodeConfigFileName := "pglogLevel.toml"
 	opensearchNodeConfigFileName := "oslogLevel.toml"
-	err := createFileWithContent(onlyRateLimitConfigfileName, `[global.v1.log]
-rate_limit_interval = 10
-rate_limit_burst = 10000`)
+	err := createFileWithContent(onlyRateLimitConfigfileName, "[global.v1.log]\nrate_limit_interval = 10\nrate_limit_burst = 10000")
 	assert.NoError(t, err)
-	err = createFileWithContent(postgresNodeConfigFileName, `log_level="debug"`)
+	err = createFileWithContent(postgresNodeConfigFileName, "log_level=\"debug\"")
 	assert.NoError(t, err)
-	err = createFileWithContent(opensearchNodeConfigFileName, `[logger]
-level="debug"`)
+	err = createFileWithContent(opensearchNodeConfigFileName, "[logger]\nlevel=\"debug\"")
 	assert.NoError(t, err)
 	tests := []struct {
 		name                   string
@@ -416,30 +431,298 @@ level="debug"`)
 	assert.NoError(t, err)
 }
 
-func readFileContent(filename string) (string, error) {
-	// Read the entire file content as a byte slice
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return "", err
+func TestEnableRateLimit(t *testing.T) {
+	postgresLogConfigActualFileName := postgresLogConfig
+	opensearchLogConfigActualFileName := opensearchConfig
+	onlyRateLimitConfigfileName := "onlyRateLimitConfig.toml"
+	RateLimitandcentralisedConfigfileName := "RateLimitandCentralisedConfig.toml"
+	postgresLogConfig = "postgres_rate_limit_unit_test_file.toml"
+	opensearchConfig = "opensearch_rate_limit_unit_test_file.toml"
+	err := createFileWithContent(onlyRateLimitConfigfileName, "[global.v1.log]\nrate_limit_interval = 20\nrate_limit_burst = 20000")
+	assert.NoError(t, err)
+	err = createFileWithContent(RateLimitandcentralisedConfigfileName, "[global.v1.log]\nredirect_sys_log = true\nrate_limit_interval = 10\nrate_limit_burst = 10000")
+	assert.NoError(t, err)
+	tests := []struct {
+		name             string
+		reqConfig        *dc.AutomateConfig
+		existConfig      *dc.AutomateConfig
+		sshUtil          SSHUtil
+		remoteIp         []string
+		remoteType       string
+		args             []string
+		fileName         string
+		isFileUpdated    bool
+		expectedFileData string
+		expectedErr      error
+	}{
+		{
+			name: "User gave only RateLimiter Config - haven't enabled centralised login",
+			reqConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+						},
+					},
+				},
+			},
+			existConfig: &deployment.AutomateConfig{},
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			fileName:         postgresLogConfig,
+			args:             []string{onlyRateLimitConfigfileName},
+			isFileUpdated:    true,
+			expectedFileData: "[global]\n  [global.v1]\n    [global.v1.log]\n      rate_limit_interval = 1000\n      rate_limit_burst = 1000\n",
+			expectedErr:      nil,
+		},
+		{
+			name: "User gave RateLimiter Config and Centralised logging together - As we are passing both the config so we will not /hab/a2_deploy_workspace/os_log.toml file",
+			reqConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
+							RedirectLogFilePath: &wrapperspb.StringValue{Value: "log.txt"},
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+						},
+					},
+				},
+			},
+			existConfig: &deployment.AutomateConfig{},
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			fileName:         "not_created.txt",
+			isFileUpdated:    false,
+			args:             []string{RateLimitandcentralisedConfigfileName},
+			expectedFileData: "",
+			expectedErr:      nil,
+		},
+		{
+			name: "User gave RateLimiter Config only - But centralised logging is enabled hence need to patch the same config in rsyslog also",
+			reqConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+						},
+					},
+				},
+			},
+			existConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
+							RedirectLogFilePath: &wrapperspb.StringValue{Value: "log.txt"},
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 200,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 200,
+							},
+						},
+					},
+				},
+			},
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			fileName:         postgresLogConfig,
+			args:             []string{onlyRateLimitConfigfileName},
+			isFileUpdated:    true,
+			expectedFileData: "[global]\n  [global.v1]\n    [global.v1.log]\n      redirect_sys_log = true\n      redirect_log_file_path = \"log.txt\"\n      rate_limit_interval = 1000\n      rate_limit_burst = 1000\n",
+			expectedErr:      nil,
+		},
+		{
+			name: "User gave RateLimiter Config only - centralised logging is enabled hence need to patch the same config in rsyslog also. But config is same hence doing nothing",
+			reqConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 20,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 20000,
+							},
+						},
+					},
+				},
+			},
+			existConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
+							RedirectLogFilePath: &wrapperspb.StringValue{Value: "log.txt"},
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 20,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 20000,
+							},
+						},
+					},
+				},
+			},
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			fileName:         postgresLogConfig,
+			args:             []string{onlyRateLimitConfigfileName},
+			isFileUpdated:    false,
+			expectedFileData: "",
+			expectedErr:      nil,
+		},
+		{
+			name: "User gave same config as existed config",
+			reqConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 20,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 20000,
+							},
+						},
+					},
+				},
+			},
+			existConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 20,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 20000,
+							},
+						},
+					},
+				},
+			},
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			fileName:         "not_created.txt",
+			isFileUpdated:    false,
+			args:             []string{onlyRateLimitConfigfileName},
+			expectedFileData: "",
+			expectedErr:      nil,
+		},
+		{
+			name: "Got some error while executing on remote node",
+			reqConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
+							RedirectLogFilePath: &wrapperspb.StringValue{Value: "log.txt"},
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 1000,
+							},
+						},
+					},
+				},
+			},
+			existConfig: &deployment.AutomateConfig{},
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", errors.New("Got some error")
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			fileName:         "not_created.txt",
+			isFileUpdated:    false,
+			args:             []string{onlyRateLimitConfigfileName},
+			expectedFileData: "",
+			expectedErr:      errors.New("Got some error"),
+		},
 	}
 
-	// Convert the byte slice to a string and return it
-	return string(content), nil
-}
-
-func createFileWithContent(filename, content string) error {
-	// Create the file
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := enableRateLimit(tt.reqConfig, tt.existConfig, tt.sshUtil, tt.remoteIp, tt.remoteType, tt.args)
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.NoError(t, err)
+				if tt.isFileUpdated {
+					respGot, err := readFileContent(tt.fileName)
+					assert.NoError(t, err)
+					assert.Equal(t, tt.expectedFileData, respGot)
+					err = os.Remove(tt.fileName)
+					assert.NoError(t, err)
+				}
+			}
+		})
 	}
-	defer file.Close()
-
-	// Write the content to the file
-	_, err = file.WriteString(content)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = os.Remove(onlyRateLimitConfigfileName)
+	assert.NoError(t, err)
+	err = os.Remove(RateLimitandcentralisedConfigfileName)
+	assert.NoError(t, err)
+	postgresLogConfig = postgresLogConfigActualFileName
+	opensearchConfig = opensearchLogConfigActualFileName
 }

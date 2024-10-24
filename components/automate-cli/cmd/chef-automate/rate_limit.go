@@ -19,6 +19,7 @@ func removeRateLimitFile() string {
 	return fmt.Sprintf("sudo rm -f %s ; \n %s; \n", journaldConfigFile, restartJournaldService)
 }
 
+// left
 func removeOrUpdateRateLimit(args []string, remoteType string, sshUtil SSHUtil, remoteIp []string) error {
 	req, err := getConfigForArgsLogs(args, remoteType)
 	if err != nil {
@@ -34,13 +35,15 @@ func removeOrUpdateRateLimit(args []string, remoteType string, sshUtil SSHUtil, 
 	if len(scriptCommands) == 0 {
 		return nil
 	}
-	err = createRateLimitJournaldConfig(sshUtil, remoteIp, scriptCommands, remoteType, false)
+
+	err = runScriptOnRemoteNode(sshUtil, remoteIp, scriptCommands, remoteType, false)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// left
 func patchRateLimitForBackend(args []string, infra *AutomateHAInfraDetails) error {
 	sshconfig := &SSHConfig{}
 	sshconfig.sshUser = infra.Outputs.SSHUser.Value
@@ -84,6 +87,7 @@ func removeRateLimiterConfig(args []string) (string, error) {
 	return inputfile, nil
 }
 
+// LEFT
 // enableRateLimitConfigForHA checks for requested and existing configuration for Rate Limiting
 func enableRateLimitConfigForHA(args []string, remoteType string, sshUtil SSHUtil, remoteIp []string) error {
 	reqConfig, err := getConfigForArgsLogs(args, remoteType)
@@ -150,26 +154,6 @@ func createScriptCommandsForRateLimit(reqConfig *dc.AutomateConfig) string {
 	return fmt.Sprintf("sudo mkdir -p %s ; \n sudo sh -c '%s'; \n %s;", journaldConfigFilePath, JournaldCreateFileCommand, restartJournaldService)
 }
 
-// createRateLimitJournaldConfig patching the config into the remote servers
-func createRateLimitJournaldConfig(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string, print bool) error {
-	for i := 0; i < len(remoteIp); i++ {
-		sshUtil.getSSHConfig().hostIP = remoteIp[i]
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-		if err != nil {
-			writer.Errorf("%v", err)
-			return err
-		}
-		// Adding this IF because otherwise on CLI there will be two print statement for each pg or os nodes. (because RateLimit varibales are shared among them)
-		if print {
-			writer.Printf(output)
-			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
-		}
-
-	}
-	return nil
-
-}
-
 // enableRateLimit gets commands for systemd-journald rateLimit config
 func enableRateLimit(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfig, sshUtil SSHUtil, remoteIp []string, remoteType string, args []string) error {
 	scriptCommands := getScriptCommandsForRateLimitJournald(reqConfig, existConfig)
@@ -179,36 +163,38 @@ func enableRateLimit(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfi
 	}
 
 	// if centralized logging is off then only we will update the bastion log config (because for rateLimiter and centralized we are maintaing same file).
-	isLoggerConfig, err := checkIfRequestedConfigHasCentrailisedLogging(args)
+	// NOTE: we are passing args here instead of reqConfig. because we are updating reqConfig in above function(if exist config present).
+	isCentralizedLoggerConfigPresent, err := checkIfRequestedConfigHasCentrailisedLogging(args)
 	if err != nil {
 		return err
 	}
 
-	err = createRateLimitJournaldConfig(sshUtil, remoteIp, scriptCommands, remoteType, !isLoggerConfig)
+	err = runScriptOnRemoteNode(sshUtil, remoteIp, scriptCommands, remoteType, !isCentralizedLoggerConfigPresent)
 	if err != nil {
 		return err
 	}
 
 	// We also have to update the same values in centralized log because it's enabled
-	if !isLoggerConfig && existConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
+	if !isCentralizedLoggerConfigPresent && existConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
 		scriptCommands := getScriptCommandsForLogging(reqConfig, existConfig)
 		if scriptCommands == "" {
 			//if there are no script commands do nothing
 			return nil
 		}
 
-		err := createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType, false)
+		// Passing false because we don't want to print it again, we are already printing it's patched for journald also
+		// When user is only patching for centralised logging not rateLimit then only we will pass it as true
+		err := runScriptOnRemoteNode(sshUtil, remoteIp, scriptCommands, remoteType, false)
 		if err != nil {
 			return err
 		}
 	}
 
-	if !isLoggerConfig {
+	if !isCentralizedLoggerConfigPresent {
 		updateTomlFileFromConfig(remoteType, reqConfig)
 	}
 
 	return nil
-
 }
 
 func updateTomlFileFromConfig(remoteType string, reqConfig *dc.AutomateConfig) {
