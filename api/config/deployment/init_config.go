@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"math"
 	"strings"
 	"text/template"
 	"time"
@@ -465,7 +466,7 @@ func generateProxySettings(c *InitConfig) error {
 		if p > math.MaxInt32 || p < math.MinInt32 {
 			return fmt.Errorf("proxy port exceeds int32 bounds: %d", p)
 		}
-		
+
 		c.ProxyPort = int32(p)
 	}
 
