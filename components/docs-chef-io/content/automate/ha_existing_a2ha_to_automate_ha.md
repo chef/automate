@@ -79,11 +79,10 @@ done
 
 1. Configure the backup at Automate HA cluster. If you have not configured it, please refer to this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_file_system/#setting-up-the-backup-configuration)
 
-1. From Step 3, you will get the backup mount path.
+1. From the above Step, you will get the backup mount path.
 
-1. Stop all the services at frontend nodes in Automate HA Cluster.
-
-1. Get the Automate version from the location `/var/tmp/` in Automate instance. Example: `frontend-4.x.y.aib`.
+1. To run the restore command, we need the airgap bundle. Get the Automate HA airgap bundle from the location `/var/tmp/` in Automate instance. Example: `frontend-4.x.y.aib`.
+    - In case of airgap bundle is not present at `/var/tmp`, in that case, we can copy the bundle from the bastion node to the Automate node.
 
 1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config:
 
@@ -97,18 +96,9 @@ done
     sudo chef-automate stop
     ```
 
-1. To run the restore command, we need the airgap bundle. Get the Automate HA airgap bundle from the location `/var/tmp/` in Automate instance. Example: `frontend-4.x.y.aib`.
-    - In case of airgap bundle is not present at `/var/tmp`, in that case, we can copy the bundle from the bastion node to the Automate node.
-
-1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
-
-    ```bash
-    sudo chef-automate config show > current_config.toml
-    ```
-
 1. Add the OpenSearch credentials to the applied config.
 
-    - If using Chef Managed OpenSearch, add the config below into `current_config.toml` (without any changes).
+    - If using Chef Managed OpenSearch, add the config below into `current_config.toml` (unless you have changed the credentials).
 
         ```bash
         [global.v1.external.opensearch.auth.basic_auth]
@@ -136,14 +126,14 @@ done
 {{% automate/char-warn %}}
 {{< /warning >}}
 
-```bash
-[global.v1.external.opensearch.auth]
-    scheme = "aws_os"
-[global.v1.external.opensearch.auth.aws_os]
-    username = "THIS YOU GET IT FROM AWS Console"
-    password = "THIS YOU GET IT FROM AWS Console"
-    access_key = "<YOUR AWS ACCESS KEY>"
-    secret_key = "<YOUR AWS SECRET KEY>"
+```sh
+    [global.v1.external.opensearch.auth]
+        scheme = "aws_os"
+    [global.v1.external.opensearch.auth.aws_os]
+        username = "THIS YOU GET IT FROM AWS Console"
+        password = "THIS YOU GET IT FROM AWS Console"
+        access_key = "<YOUR AWS ACCESS KEY>"
+        secret_key = "<YOUR AWS SECRET KEY>"
 ```
 
 1. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
@@ -151,25 +141,26 @@ done
     ```sh
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
-2. Stop the Service in all the frontend nodes with the below command.
+
+1. Stop the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate stop
     ```
 
-3. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
+1. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
 
     ```sh
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-4. After successfully executing the restore, you will see the below message:
+1. After successfully executing the restore, you will see the below message:
 
     ```bash
     Success: Restored backup 20210622065515
     ```
 
-5. Start the Service in all the frontend nodes with the below command.
+1. Start the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate start
