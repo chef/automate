@@ -14,7 +14,7 @@ import (
 	"io/ioutil"
 )
 
-const (
+var (
 	rsyslogConfigFile                      = "/etc/rsyslog.d/automate.conf"
 	logRotateConfigFile                    = "/etc/logrotate.d/automate"
 	postgresLogConfig                      = "/hab/a2_deploy_workspace/postgres_log.toml"
@@ -57,7 +57,7 @@ func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.Auto
 		return nil
 	}
 
-	err := createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType, true)
+	err := runScriptOnRemoteNode(sshUtil, remoteIp, scriptCommands, remoteType, true)
 	if err != nil {
 		return err
 	}
@@ -208,7 +208,7 @@ func removeOrUpdateCentralisedLog(args []string, remoteType string, sshUtil SSHU
 	if len(scriptCommands) == 0 {
 		return nil
 	}
-	err = createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType, false)
+	err = runScriptOnRemoteNode(sshUtil, remoteIp, scriptCommands, remoteType, false)
 	if err != nil {
 		return err
 	}
@@ -272,8 +272,8 @@ func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string 
 
 }
 
-// createRsyslogAndLogRotateConfig patching the config into the remote database servers
-func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string, print bool) error {
+// runScriptonRemoteNode patching the config into the remote database servers
+func runScriptOnRemoteNode(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string, print bool) error {
 	for i := 0; i < len(remoteIp); i++ {
 		sshUtil.getSSHConfig().hostIP = remoteIp[i]
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
