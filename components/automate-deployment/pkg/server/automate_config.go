@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const (
+var (
 	rsyslogConfigFile                      = "/etc/rsyslog.d/automate.conf"
 	logRotateConfigFile                    = "/etc/logrotate.d/automate"
 	journaldConfigFile                     = "/etc/systemd/journald.conf.d/automate.conf"

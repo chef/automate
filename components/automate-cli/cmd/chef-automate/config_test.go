@@ -526,6 +526,78 @@ func TestRemoveCentralisedLogsFromUserConfigForPg(t *testing.T) {
 	)
 }
 
+func TestCheckIfRequestedConfigHasRateLimit(t *testing.T) {
+	bothRateLimitOptionsPresent := "bothRateLimitConfig.toml"
+	onlyRateLimitIntervalPresent := "onlyRateLimitIntervalPresent.toml"
+	onlyRateLimitBurstPresent := "onlyRateLimitBurstPresent.toml"
+	configDoesnotContainAnythingRelatedToRatelimit := "notRateLimitconfig.toml"
+	err := createFileWithContent(bothRateLimitOptionsPresent, "[global.v1.log]\nrate_limit_interval = 20\nrate_limit_burst = 20000")
+	assert.NoError(t, err)
+	err = createFileWithContent(onlyRateLimitIntervalPresent, "[global.v1.log]\nrate_limit_interval = 20")
+	assert.NoError(t, err)
+	err = createFileWithContent(onlyRateLimitBurstPresent, "[global.v1.log]\nrate_limit_burst = 20000")
+	assert.NoError(t, err)
+	err = createFileWithContent(configDoesnotContainAnythingRelatedToRatelimit, "[global.v1.backups]\nlocation = \"filesystem\"\n")
+	assert.NoError(t, err)
+	tests := []struct {
+		name         string
+		args         []string
+		expectedresp bool
+		expectedErr  error
+	}{
+		{
+			name:         "config file doesn't exist",
+			args:         []string{"doesn't_exist.toml"},
+			expectedresp: false,
+			expectedErr:  errors.New(""),
+		},
+		{
+			name:         "config file contains both rateLimit values",
+			args:         []string{bothRateLimitOptionsPresent},
+			expectedresp: true,
+			expectedErr:  nil,
+		},
+		{
+			name:         "config file contains only rateLimitInterval value",
+			args:         []string{onlyRateLimitIntervalPresent},
+			expectedresp: true,
+			expectedErr:  nil,
+		},
+		{
+			name:         "config file contains only rateLimitBurst value",
+			args:         []string{onlyRateLimitBurstPresent},
+			expectedresp: true,
+			expectedErr:  nil,
+		},
+		{
+			name:         "config file doesn't contain anything related to rateLimit",
+			args:         []string{configDoesnotContainAnythingRelatedToRatelimit},
+			expectedresp: false,
+			expectedErr:  nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			isRateLimitPresent, err := checkIfRequestedConfigHasRateLimit(tt.args)
+			if tt.expectedErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tt.expectedresp, isRateLimitPresent)
+		})
+	}
+	err = os.Remove(bothRateLimitOptionsPresent)
+	assert.NoError(t, err)
+	err = os.Remove(onlyRateLimitIntervalPresent)
+	assert.NoError(t, err)
+	err = os.Remove(onlyRateLimitBurstPresent)
+	assert.NoError(t, err)
+	err = os.Remove(configDoesnotContainAnythingRelatedToRatelimit)
+	assert.NoError(t, err)
+}
+
 func TestRemoveCentralisedLogsFromUserConfigForOs(t *testing.T) {
 	file := "../../pkg/testfiles/aws/centralised_log.toml"
 	emptyFile := "../../pkg/testfiles/aws/invalid_pg.toml"
