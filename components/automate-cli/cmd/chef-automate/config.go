@@ -1329,26 +1329,6 @@ func checkIfRequestedConfigHasCentrailisedLogging(args []string) (bool, error) {
 	return false, nil
 }
 
-func checkIfExistedConfigHasCentrailisedLogging(fileName string) (bool, error) {
-	config, err := ptoml.LoadFile(fileName)
-	if err != nil {
-		writer.Println(err.Error())
-		return false, err
-	}
-	if config.Get(globalV1Log) != nil {
-		isconfig := config.Get(globalV1Log).(*ptoml.Tree)
-		if isconfig != nil {
-			if isconfig.Get("redirect_sys_log") != nil {
-				val := isconfig.Get("redirect_sys_log").(bool)
-				if val {
-					return true, nil
-				}
-			}
-		}
-	}
-	return false, nil
-}
-
 func checkIfRequestedConfigHasRateLimit(args []string) (bool, error) {
 	config, err := ptoml.LoadFile(args[0])
 	if err != nil {
