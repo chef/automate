@@ -31,7 +31,6 @@ func createFileWithContent(filename, content string) error {
 		return err
 	}
 	defer file.Close()
-	fmt.Println("content: ", content)
 	// Write the content to the file
 	_, err = file.WriteString(content)
 	if err != nil {
@@ -725,4 +724,197 @@ func TestEnableRateLimit(t *testing.T) {
 	assert.NoError(t, err)
 	postgresLogConfig = postgresLogConfigActualFileName
 	opensearchConfig = opensearchLogConfigActualFileName
+}
+
+func TestEnableRateLimitConfigForHA(t *testing.T) {
+	postgresLogConfigActualFileName := postgresLogConfig
+	opensearchLogConfigActualFileName := opensearchConfig
+	configDoesnotContainAnythingRelatedToRatelimit := "notRateLimitconfig.toml"
+	onlyRateLimitConfigfileName := "onlyRateLimitConfig.toml"
+	postgresLogConfig = "postgres_rate_limit_unit_test_file.toml"
+	opensearchConfig = "opensearch_rate_limit_unit_test_file.toml"
+	err := createFileWithContent(onlyRateLimitConfigfileName, "[global.v1.log]\nrate_limit_interval = 20\nrate_limit_burst = 20000")
+	assert.NoError(t, err)
+	err = createFileWithContent(configDoesnotContainAnythingRelatedToRatelimit, "[global.v1.log]\nredirect_sys_log = true\n")
+	assert.NoError(t, err)
+	tests := []struct {
+		name             string
+		sshUtil          SSHUtil
+		remoteIp         []string
+		remoteType       string
+		args             []string
+		fileName         string
+		isFileUpdated    bool
+		expectedFileData string
+		expectedErr      error
+	}{
+		{
+			name:             "Config passed by user doesn't exist",
+			sshUtil:          &SSHUtilImpl{},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			args:             []string{"file_doesn't_exist.toml"},
+			fileName:         "",
+			isFileUpdated:    false,
+			expectedFileData: "",
+			expectedErr:      errors.New(""),
+		},
+		{
+			name:             "Config passed by user doesn't contain anything related to Ratelimit",
+			sshUtil:          &SSHUtilImpl{},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "opensearch",
+			args:             []string{configDoesnotContainAnythingRelatedToRatelimit},
+			fileName:         "",
+			isFileUpdated:    false,
+			expectedFileData: "",
+			expectedErr:      nil,
+		},
+		{
+			name: "Config passed by user contains rateLimit - and we enabled the rate Limit successfully and also updated the local bastion file also",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			args:             []string{onlyRateLimitConfigfileName},
+			fileName:         postgresLogConfig,
+			isFileUpdated:    true,
+			expectedFileData: "[global]\n  [global.v1]\n    [global.v1.log]\n      rate_limit_interval = 20\n      rate_limit_burst = 20000\n",
+			expectedErr:      nil,
+		},
+		{
+			name: "Config passed by user contains rateLimit - So enabling the rate Limit but while enabling got some issue, hence not updating the local bastion file also",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", errors.New("Got some error")
+				},
+			},
+			remoteIp:         []string{"1.1.1.1"},
+			remoteType:       "postgresql",
+			args:             []string{onlyRateLimitConfigfileName},
+			fileName:         "",
+			isFileUpdated:    false,
+			expectedFileData: "",
+			expectedErr:      errors.New("Got some error"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := enableRateLimitConfigForHA(tt.args, tt.remoteType, tt.sshUtil, tt.remoteIp)
+			if tt.expectedErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				if tt.isFileUpdated {
+					respGot, err := readFileContent(tt.fileName)
+					assert.NoError(t, err)
+					assert.Equal(t, tt.expectedFileData, respGot)
+					err = os.Remove(tt.fileName)
+					assert.NoError(t, err)
+				}
+			}
+		})
+	}
+	err = os.Remove(onlyRateLimitConfigfileName)
+	assert.NoError(t, err)
+	err = os.Remove(configDoesnotContainAnythingRelatedToRatelimit)
+	assert.NoError(t, err)
+	postgresLogConfig = postgresLogConfigActualFileName
+	opensearchConfig = opensearchLogConfigActualFileName
+}
+
+func TestRemoveOrUpdateRateLimit(t *testing.T) {
+	configDoesnotContainAnythingRelatedToRatelimit := "notRateLimitconfig.toml"
+	onlyRateLimitConfigfileName := "onlyRateLimitConfig.toml"
+	err := createFileWithContent(onlyRateLimitConfigfileName, "[global.v1.log]\nrate_limit_interval = 20\nrate_limit_burst = 20000")
+	assert.NoError(t, err)
+	err = createFileWithContent(configDoesnotContainAnythingRelatedToRatelimit, "[global.v1.log]\nredirect_sys_log = true\n")
+	assert.NoError(t, err)
+	tests := []struct {
+		name        string
+		sshUtil     SSHUtil
+		remoteIp    []string
+		remoteType  string
+		args        []string
+		expectedErr error
+	}{
+		{
+			name:        "Config passed by user doesn't exist",
+			sshUtil:     &SSHUtilImpl{},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{"file_doesn't_exist.toml"},
+			expectedErr: errors.New(""),
+		},
+		{
+			name: "Config passed by user doesn't contain anything related to Ratelimit",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "opensearch",
+			args:        []string{configDoesnotContainAnythingRelatedToRatelimit},
+			expectedErr: nil,
+		},
+		{
+			name: "User wants to enable the rateLimit",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{onlyRateLimitConfigfileName},
+			expectedErr: nil,
+		},
+		{
+			name: "User wants to enable the rateLimit - Bot got some error while enabling it",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", errors.New("Got some error")
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{onlyRateLimitConfigfileName},
+			expectedErr: errors.New("Got some error"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := removeOrUpdateRateLimit(tt.args, tt.remoteType, tt.sshUtil, tt.remoteIp)
+			if tt.expectedErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+	err = os.Remove(onlyRateLimitConfigfileName)
+	assert.NoError(t, err)
+	err = os.Remove(configDoesnotContainAnythingRelatedToRatelimit)
+	assert.NoError(t, err)
 }

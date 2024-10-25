@@ -19,7 +19,6 @@ func removeRateLimitFile() string {
 	return fmt.Sprintf("sudo rm -f %s ; \n %s; \n", journaldConfigFile, restartJournaldService)
 }
 
-// left
 func removeOrUpdateRateLimit(args []string, remoteType string, sshUtil SSHUtil, remoteIp []string) error {
 	req, err := getConfigForArgsLogs(args, remoteType)
 	if err != nil {
@@ -87,7 +86,6 @@ func removeRateLimiterConfig(args []string) (string, error) {
 	return inputfile, nil
 }
 
-// LEFT
 // enableRateLimitConfigForHA checks for requested and existing configuration for Rate Limiting
 func enableRateLimitConfigForHA(args []string, remoteType string, sshUtil SSHUtil, remoteIp []string) error {
 	reqConfig, err := getConfigForArgsLogs(args, remoteType)
