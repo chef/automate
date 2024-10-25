@@ -44,7 +44,7 @@ func TestGetScriptCommandsForConfigChangedLogging(t *testing.T) {
 					},
 				},
 			},
-			want: " sudo rm /etc/rsyslog.d/automate.conf; sudo rm /etc/logrotate.d/automate; sudo systemctl restart rsyslog.service",
+			want: " sudo rm /etc/rsyslog.d/automate.conf; sudo rm /etc/logrotate.d/automate; sudo systemctl restart rsyslog.service;",
 		}, {
 			name: "Get Script Commands if both the config is requested for logroate only and not file path",
 			args: args{
@@ -112,8 +112,11 @@ func TestGetScriptCommandsForConfigChangedLogging(t *testing.T) {
 					},
 				},
 			},
-			want: `sudo sh -c 'echo "if \$programname == \"bash\" then Testing1/automate.log
-& stop" > /etc/rsyslog.d/automate.conf'; 
+			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 200
+\$imjournalRatelimitInterval 200
+if \$programname == \"bash\" then Testing1/automate.log
+& stop
+" > /etc/rsyslog.d/automate.conf'; 
  sudo sh -c 'echo "Testing1/automate.log {
 	size 100M
 	rotate 10
@@ -222,8 +225,11 @@ func TestGetScriptCommandsForLogging(t *testing.T) {
 					},
 				},
 			},
-			want: `sudo sh -c 'echo "if \$programname == \"bash\" then Testing1/automate.log
-& stop" > /etc/rsyslog.d/automate.conf'; 
+			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 200
+\$imjournalRatelimitInterval 200
+if \$programname == \"bash\" then Testing1/automate.log
+& stop
+" > /etc/rsyslog.d/automate.conf'; 
  sudo sh -c 'echo "Testing1/automate.log {
 	size 10k
 	rotate 50
@@ -248,8 +254,11 @@ func TestGetScriptCommandsForLogging(t *testing.T) {
 					},
 				},
 			},
-			want: `sudo sh -c 'echo "if \$programname == \"bash\" then Testing/automate.log
-& stop" > /etc/rsyslog.d/automate.conf'; 
+			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 200
+\$imjournalRatelimitInterval 200
+if \$programname == \"bash\" then Testing/automate.log
+& stop
+" > /etc/rsyslog.d/automate.conf'; 
  sudo sh -c 'echo "Testing/automate.log {
 	size 100M
 	rotate 10
