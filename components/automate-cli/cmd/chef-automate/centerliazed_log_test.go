@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -308,4 +310,110 @@ redirect_log_file_path = "/var/tmp/"
 
 		assert.Equal(t, config.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), "/var/tmp/")
 	})
+}
+
+func TestRemoveOrUpdateCentralisedLog(t *testing.T) {
+	configDoesnotContainAnythingRelatedToCentralisedLogging := "notCentralisedLoggingconfig.toml"
+	CentralisedLoggingEnabledWithPathConfigfileName := "validCentralisedLogging.toml"
+	pathNotGivenForCentralisedLogging := "pathNotGivenForCentralisedLogging.toml"
+	err := createFileWithContent(configDoesnotContainAnythingRelatedToCentralisedLogging, "[global.v1.log]\nrate_limit_interval = 20\nrate_limit_burst = 20000")
+	assert.NoError(t, err)
+	err = createFileWithContent(CentralisedLoggingEnabledWithPathConfigfileName, "[global.v1.log]\nredirect_sys_log = true\nredirect_log_file_path = \"test\"")
+	assert.NoError(t, err)
+	err = createFileWithContent(pathNotGivenForCentralisedLogging, "[global.v1.log]\nredirect_sys_log = true\n")
+	assert.NoError(t, err)
+	tests := []struct {
+		name        string
+		sshUtil     SSHUtil
+		remoteIp    []string
+		remoteType  string
+		args        []string
+		expectedErr error
+	}{
+		{
+			name:        "Config passed by user doesn't exist",
+			sshUtil:     &SSHUtilImpl{},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{"file_doesn't_exist.toml"},
+			expectedErr: errors.New(""),
+		},
+		{
+			name: "Config passed by user doesn't contain anything related to Ratelimit",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "opensearch",
+			args:        []string{configDoesnotContainAnythingRelatedToCentralisedLogging},
+			expectedErr: nil,
+		},
+		{
+			name: "User wants to enable the rateLimit",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{CentralisedLoggingEnabledWithPathConfigfileName},
+			expectedErr: nil,
+		},
+		{
+			name: "User wants to enable the rateLimit - But forgot to give path",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "Executed Successfully", nil
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{pathNotGivenForCentralisedLogging},
+			expectedErr: errors.New(""),
+		},
+		{
+			name: "User wants to enable the rateLimit - Bot got some error while enabling it",
+			sshUtil: &MockSSHUtilsImpl{
+				getSSHConfigFunc: func() *SSHConfig {
+					return &SSHConfig{}
+				},
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", errors.New("Got some error")
+				},
+			},
+			remoteIp:    []string{"1.1.1.1"},
+			remoteType:  "postgresql",
+			args:        []string{CentralisedLoggingEnabledWithPathConfigfileName},
+			expectedErr: errors.New("Got some error"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := removeOrUpdateCentralisedLog(tt.args, tt.remoteType, tt.sshUtil, tt.remoteIp)
+			if tt.expectedErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+	err = os.Remove(CentralisedLoggingEnabledWithPathConfigfileName)
+	assert.NoError(t, err)
+	err = os.Remove(configDoesnotContainAnythingRelatedToCentralisedLogging)
+	assert.NoError(t, err)
+	err = os.Remove(pathNotGivenForCentralisedLogging)
+	assert.NoError(t, err)
 }
