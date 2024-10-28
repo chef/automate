@@ -25,10 +25,10 @@ var (
 	logRotateConfigFile                    = "/etc/logrotate.d/automate"
 	journaldConfigFile                     = "/etc/systemd/journald.conf.d/automate.conf"
 	journaldConfigFilePath                 = "/etc/systemd/journald.conf.d"
-	defaultRateLimitBurstJournald          = int32(1000)
-	defaultRateLimitIntervalJournald       = int32(5000) // in ms
-	defaultRateLimitBurstAutomateSyslog    = int32(200)
-	defaultRateLimitIntervalAutomateSyslog = int32(200) // in ms
+	defaultRateLimitBurstJournald          = int32(10000)
+	defaultRateLimitIntervalJournald       = int32(30) // in seconds
+	defaultRateLimitBurstAutomateSyslog    = int32(20000)
+	defaultRateLimitIntervalAutomateSyslog = int32(600) // in seconds
 )
 
 // GetAutomateConfig returns a copy of the userOverrideConfig of the existing
@@ -333,7 +333,7 @@ func createConfigFileForJournald(rateLimitBurst int32, rateLimitInterval int32) 
 
 	_, err = f.WriteString(fmt.Sprintf(`[Journal]
 RateLimitBurst=%d
-RateLimitInterval=%dms
+RateLimitIntervalSec=%d
 `, rateLimitBurst, rateLimitInterval))
 
 	if err != nil {

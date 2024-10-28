@@ -316,7 +316,7 @@ func TestCreateConfigFileForJournald(t *testing.T) {
 		assert.NoError(t, err)
 		expectedFileContent := `[Journal]
 RateLimitBurst=1000
-RateLimitInterval=1000ms
+RateLimitIntervalSec=1000
 `
 		fileContentgot, err := readFileContent(journaldConfigFile)
 		assert.NoError(t, err)

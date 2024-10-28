@@ -11,8 +11,8 @@ const (
 	restartJournaldService           = "sudo systemctl restart systemd-journald.service"
 	journaldConfigFile               = "/etc/systemd/journald.conf.d/automate.conf"
 	journaldConfigFilePath           = "/etc/systemd/journald.conf.d"
-	defaultRateLimitBurstJournald    = int32(1000)
-	defaultRateLimitIntervalJournald = int32(5000) // in ms
+	defaultRateLimitBurstJournald    = int32(10000)
+	defaultRateLimitIntervalJournald = int32(30) // in seconds
 )
 
 func removeRateLimitFile() string {
@@ -137,7 +137,7 @@ func getScriptCommandsForRateLimitJournald(reqConfig *dc.AutomateConfig, existCo
 func createConfigFileForJournald(rateLimitBurst int32, rateLimitInterval int32) string {
 	return fmt.Sprintf(`[Journal]
 RateLimitBurst=%d
-RateLimitInterval=%dms
+RateLimitIntervalSec=%d
 `, rateLimitBurst, rateLimitInterval)
 }
 

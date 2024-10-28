@@ -57,13 +57,13 @@ func TestCreateConfigFileForJournald(t *testing.T) {
 			name:              "Giving Normal Values",
 			rateLimitBurst:    1000,
 			rateLimitInterval: 10,
-			expectedOutput:    fmt.Sprintf("[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n", 1000, 10),
+			expectedOutput:    fmt.Sprintf("[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n", 1000, 10),
 		},
 		{
 			name:              "Giving Large Values",
 			rateLimitBurst:    10000000,
 			rateLimitInterval: 10000000,
-			expectedOutput:    fmt.Sprintf("[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n", 10000000, 10000000),
+			expectedOutput:    fmt.Sprintf("[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n", 10000000, 10000000),
 		},
 	}
 	for _, tt := range testCases {
@@ -96,7 +96,7 @@ func TestCreateScriptCommandsForRateLimit(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 1000, 1000),
+			expectedOutput: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 1000, 1000),
 		},
 		{
 			name: "Config have only RateLimitBurst value",
@@ -111,7 +111,7 @@ func TestCreateScriptCommandsForRateLimit(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 1000, defaultRateLimitIntervalJournald),
+			expectedOutput: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 1000, defaultRateLimitIntervalJournald),
 		},
 		{
 			name: "Config haven't any value",
@@ -122,7 +122,7 @@ func TestCreateScriptCommandsForRateLimit(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", defaultRateLimitBurstJournald, defaultRateLimitIntervalJournald),
+			expectedOutput: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", defaultRateLimitBurstJournald, defaultRateLimitIntervalJournald),
 		},
 	}
 	for _, tt := range testCases {
@@ -249,7 +249,7 @@ func TestGetScriptCommandsForRateLimitJournald(t *testing.T) {
 				},
 			},
 			existConfig:            &deployment.AutomateConfig{},
-			expectedScriptCommands: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 1000, 1000),
+			expectedScriptCommands: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 1000, 1000),
 		},
 		{
 			name:      "Req Config is empty - Don;t need to do anything hence returning empty string",
@@ -297,7 +297,7 @@ func TestGetScriptCommandsForRateLimitJournald(t *testing.T) {
 					},
 				},
 			},
-			expectedScriptCommands: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitInterval=%dms\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 2000, 3000),
+			expectedScriptCommands: fmt.Sprintf("sudo mkdir -p /etc/systemd/journald.conf.d ; \n sudo sh -c 'echo \"[Journal]\nRateLimitBurst=%d\nRateLimitIntervalSec=%d\n\" > /etc/systemd/journald.conf.d/automate.conf'; \n sudo systemctl restart systemd-journald.service;", 2000, 3000),
 		},
 		{
 			name: "Both Config is Present - user applied the same config, hence no change therefore returning empty string",

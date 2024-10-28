@@ -20,8 +20,8 @@ var (
 	postgresLogConfig                      = "/hab/a2_deploy_workspace/postgres_log.toml"
 	opensearchConfig                       = "/hab/a2_deploy_workspace/opensearch_log.toml"
 	restartSyslogService                   = "sudo systemctl restart rsyslog.service"
-	defaultRateLimitBurstAutomateSyslog    = int32(200)
-	defaultRateLimitIntervalAutomateSyslog = int32(200) // in ms
+	defaultRateLimitBurstAutomateSyslog    = int32(20000)
+	defaultRateLimitIntervalAutomateSyslog = int32(600) // in seconds
 	globalV1Log                            = "global.v1.log"
 )
 

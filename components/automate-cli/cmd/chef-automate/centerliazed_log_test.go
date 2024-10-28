@@ -114,8 +114,8 @@ func TestGetScriptCommandsForConfigChangedLogging(t *testing.T) {
 					},
 				},
 			},
-			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 200
-\$imjournalRatelimitInterval 200
+			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 20000
+\$imjournalRatelimitInterval 600
 if \$programname == \"bash\" then Testing1/automate.log
 & stop
 " > /etc/rsyslog.d/automate.conf'; 
@@ -227,8 +227,8 @@ func TestGetScriptCommandsForLogging(t *testing.T) {
 					},
 				},
 			},
-			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 200
-\$imjournalRatelimitInterval 200
+			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 20000
+\$imjournalRatelimitInterval 600
 if \$programname == \"bash\" then Testing1/automate.log
 & stop
 " > /etc/rsyslog.d/automate.conf'; 
@@ -256,8 +256,8 @@ if \$programname == \"bash\" then Testing1/automate.log
 					},
 				},
 			},
-			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 200
-\$imjournalRatelimitInterval 200
+			want: `sudo sh -c 'echo "\$imjournalRatelimitBurst 20000
+\$imjournalRatelimitInterval 600
 if \$programname == \"bash\" then Testing/automate.log
 & stop
 " > /etc/rsyslog.d/automate.conf'; 
