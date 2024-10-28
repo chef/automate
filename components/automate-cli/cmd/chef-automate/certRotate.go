@@ -34,6 +34,10 @@ const (
 		cert = """%v"""
 		key = """%v"""`
 
+	CS_EXTERNAL_AUTOMATE_CERT_CONFIG = `
+    [global.v1.external.automate.ssl]
+      root_cert = """%v"""`
+
 	POSTGRES_CONFIG = `
 	[ssl]
 		enable = true

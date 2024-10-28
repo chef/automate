@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
@@ -127,4 +128,60 @@ func setDefaultCertsForBackend(osConfig *OsConfigToml, pgConfig *PgConfigToml) e
 		pgConfig.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
 	}
 	return nil
+}
+
+func validateIPs(templateCertIPs []IP, infraIPs []string, serviceName string) []error {
+	ipValidationErrors := []error{}
+	for _, ip := range templateCertIPs {
+		if !stringutils.SliceContains(infraIPs, ip.IP) {
+			ipValidationErrors = append(ipValidationErrors, fmt.Errorf("%s node %s not present in infra\n", serviceName, ip.IP))
+		}
+	}
+	return ipValidationErrors
+}
+
+func ipContain(ips []IP, ip string) bool {
+	for _, i := range ips {
+		if i.IP == ip {
+			return true
+		}
+	}
+	return false
+}
+
+func validateAllServiceIps(templateCerts *CertificateToml, infra *AutomateHAInfraDetails) []error {
+	combinedErrors := []error{}
+
+	if err := validateIPs(
+		templateCerts.OpenSearch.IPS,
+		infra.Outputs.OpensearchPrivateIps.Value,
+		"Opensearch",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+	if err := validateIPs(
+		templateCerts.PostgreSQL.IPS,
+		infra.Outputs.PostgresqlPrivateIps.Value,
+		"PostgreSQL",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+
+	if err := validateIPs(
+		templateCerts.Automate.IPS,
+		infra.Outputs.AutomatePrivateIps.Value,
+		"Automate",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+
+	if err := validateIPs(
+		templateCerts.ChefServer.IPS,
+		infra.Outputs.ChefServerPrivateIps.Value,
+		"ChefServer",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+
+	return combinedErrors
 }

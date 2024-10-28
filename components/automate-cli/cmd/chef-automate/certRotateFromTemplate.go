@@ -43,6 +43,19 @@ func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, s
 		}
 		return errors.New(errorMsg.String())
 	}
+
+	// Validate all service IPs in the template against the infrastructure details
+	// Make sure that the ips provided for each service in the template are also present in the infra for those services
+	errs = validateAllServiceIps(templateCerts, infra)
+	if len(errs) > 0 {
+		var errorMsg strings.Builder
+		for _, er := range errs {
+			errorMsg.WriteString(er.Error())
+			errorMsg.WriteString("\n")
+		}
+		return errors.New(errorMsg.String())
+	}
+
 	c.log.Debug("==========================================================")
 	c.log.Debug("Stopping traffic MAINTENANICE MODE ON")
 	c.log.Debug("==========================================================")
@@ -94,7 +107,6 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	}
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Opensearch certificate rotation since start %f \n", timeElapsed.Seconds())
-	automateIps := map[string]bool{}
 	filterIps := []IP{}
 	// rotate AutomateCerts
 	for i, a2Ip := range templateCerts.Automate.IPS {
@@ -104,7 +116,6 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 			return err
 		}
 		filterIps = append(filterIps, a2Ip)
-		automateIps[a2Ip.IP] = true
 	}
 	automateStartedChan <- true
 
@@ -112,7 +123,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	c.log.Debug("Time elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
 	for i, csIp := range templateCerts.ChefServer.IPS {
-		if _, ok := automateIps[csIp.IP]; !ok {
+		if ok := stringutils.SliceContains(infra.Outputs.AutomatePrivateIps.Value, csIp.IP); !ok {
 			c.writer.Printf("Rotating Chef Server node %d certificates \n", i)
 			err := c.rotateChefServerNodeCerts(infra, sshUtil, currentCertsInfo, templateCerts, &csIp)
 			if err != nil {
@@ -121,6 +132,19 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 			filterIps = append(filterIps, csIp)
 		}
 
+	}
+
+	// patch external automate root ca in chef server
+	if len(templateCerts.Automate.RootCA) > 0 {
+		for _, csIp := range infra.Outputs.ChefServerPrivateIps.Value {
+			if !stringutils.SliceContains(infra.Outputs.AutomatePrivateIps.Value, csIp) &&
+				!ipContain(templateCerts.ChefServer.IPS, csIp) {
+				err = c.patchExternalA2RootCaInCS(sshUtil, csIp, templateCerts.Automate.RootCA, infra)
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
 
 	timeElapsed = time.Since(start)
@@ -140,6 +164,31 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 
 	startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer, totalWaitTimeOut)
 	return nil
+}
+
+// patchExternalA2RootCaInCS patches the external automate root ca in chef server
+func (c *certRotateFlow) patchExternalA2RootCaInCS(sshUtil SSHUtil, csIp, rootCA string, infra *AutomateHAInfraDetails) error {
+	automateRootCA, err := c.getCertFromFile(rootCA, infra)
+	if err != nil {
+		return err
+	}
+	externalA2RootCaConf := fmt.Sprintf(CS_EXTERNAL_AUTOMATE_CERT_CONFIG, string(automateRootCA))
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        externalA2RootCaConf,
+		fileName:      "cert-rotate-cs-externala2-root-cert.toml",
+		timestamp:     time.Now().Format("20060102150405"),
+		remoteService: CHEF_SERVER,
+		concurrent:    true,
+		infra:         infra,
+		flagsObj: &certRotateFlags{
+			chefserver: true,
+			node:       csIp,
+			timeout:    1000,
+		},
+		skipIpsList: []string{},
+	}
+	return c.patchConfig(patchFnParam, true)
 }
 
 func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary StatusSummary, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {
@@ -217,7 +266,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	remoteService := POSTGRESQL
 
 	// Creating and patching the required configurations.
-	config := fmt.Sprintf(POSTGRES_CONFIG, certs.privateCert, certs.publicCert, certs.rootCA)
+	config := fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, certs.privateCert, certs.publicCert)
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, &flagsObj, currentCertsInfo)
 	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
@@ -494,6 +543,15 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 			return err
 		}
 		patchConfig = patchConfig + "\n" + fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, string(postgreSQLRootCA))
+	}
+
+	// patch external automate root ca in chef server
+	if flagsObj.chefserver && len(certToml.Automate.RootCA) > 0 {
+		automateRootCA, err := c.getCertFromFile(certToml.Automate.RootCA, infra)
+		if err != nil {
+			return err
+		}
+		patchConfig = patchConfig + "\n" + fmt.Sprintf(CS_EXTERNAL_AUTOMATE_CERT_CONFIG, string(automateRootCA))
 	}
 
 	// Creating and patching the required configurations.
