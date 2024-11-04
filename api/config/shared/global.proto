@@ -376,7 +376,8 @@ message Log {
   google.protobuf.BoolValue compress_rotated_logs = 5;
   google.protobuf.StringValue max_size_rotate_logs = 6;
   google.protobuf.Int32Value max_number_rotated_logs = 7;
-
+  google.protobuf.Int32Value rate_limit_interval = 8;
+  google.protobuf.Int32Value rate_limit_burst = 9;
 }
 
 message Disclosure {

@@ -109,6 +109,58 @@ To configure log rotation and retention, you must patch your Automate configurat
 
     After you patch the Automate configuration, Automate saves and rotates the log files in the location specified in `redirect_log_file_path`.
 
+## Configure Rate Limiter
+
+To configure Rate Limiter, you must patch your Automate configuration.
+
+1. Create a TOML file with the following content on the node running Chef Automate in a standalone deployment or on the bastion host in an Automate HA cluster:
+
+    ```toml
+    [global.v1.log]
+    redirect_sys_log = true
+    redirect_log_file_path = "<PATH/TO/LOG/DIRECTORY>"
+    rate_limit_interval = 600
+    rate_limit_burst = 20000
+    ```
+
+    Set the following values:
+
+    - `redirect_sys_log`: Whether to save the system logs to a file. Set to `true` to save to a file. Default value: `false`.
+    - `redirect_log_file_path`: The path to the directory that you want to save the Automate log to. This value is required if `redirect_sys_log` is `true`.
+    - `rate_limit_interval`: This defines the time interval for rate-limiting in seconds. For example, if it's set to 600s, rsyslog will track messages within each 600-seconds window. Default value will be same as the `rsyslog` default value, which is `600` [rsyslog Page](https://www.rsyslog.com/doc/configuration/modules/imjournal.html#ratelimit-interval).
+    - `rate_limit_burst`: This sets the maximum number of messages allowed within the interval defined by rate_limit_interval. If more messages are received within the interval, they will be temporarily suppressed to avoid spamming the rsyslog. Default value will be same as the `rsyslog` default value, which is `20000` [rsyslog Page](https://www.rsyslog.com/doc/configuration/modules/imjournal.html#ratelimit-burst).
+
+    {{< info >}}
+    - Changing the rate_limit_burst or rate_limit_interval value will configure both journald and rsyslog settings as well.
+    - The default values for RateLimitInterval and RateLimitBurst in `journald` are 30 seconds and 10,000 messages, respectively.
+    - In `rsyslog`, the default values for RateLimitInterval and RateLimitBurst are 600 seconds and 20,000 messages, respectively.
+
+    {{< /info >}}
+
+    {{< warning >}}
+    By enabling this configuration it may lead to increasing disk utilization.
+    {{< /warning >}}
+
+1. Patch the Chef Automate configuration.
+
+    To patch a standalone Chef Automate node or Chef Automate HA nodes in a cluster:
+
+    ```bash
+    sudo chef-automate config patch </PATH/TO/TOML/FILE>
+    ```
+
+    To patch OpenSearch nodes in Chef Automate HA cluster:
+
+    ```bash
+    chef-automate config patch --opensearch </PATH/TO/TOML/FILE>
+    ```
+
+    To patch PostgreSQL nodes in Chef Automate HA cluster:
+
+    ```bash
+    chef-automate config patch --postgresql </PATH/TO/TOML/FILE>
+    ```
+
 ## Centralize all node logs to one location
 
 You can configure all nodes in a Chef Automate HA cluster to save log files to one log location.

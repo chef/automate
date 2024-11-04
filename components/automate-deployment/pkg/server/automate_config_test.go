@@ -1,6 +1,7 @@
 package server
 
 import (
+	"os"
 	"testing"
 
 	"github.com/chef/automate/api/config/deployment"
@@ -291,4 +292,205 @@ func TestSetConfigForRedirectLogs(t *testing.T) {
 		}
 	}
 
+}
+
+func readFileContent(filename string) (string, error) {
+	// Read the entire file content as a byte slice
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert the byte slice to a string and return it
+	return string(content), nil
+}
+
+func TestCreateConfigFileForJournald(t *testing.T) {
+	actualjournaldConfigFile := journaldConfigFile
+	actualjournaldConfigFilePath := journaldConfigFilePath
+	journaldConfigFile = "temp.conf"
+	journaldConfigFilePath = "./temp"
+
+	t.Run("User able to create configfile for journald", func(t *testing.T) {
+		err := createConfigFileForJournald(1000, 1000)
+		assert.NoError(t, err)
+		expectedFileContent := `[Journal]
+RateLimitBurst=1000
+RateLimitIntervalSec=1000
+`
+		fileContentgot, err := readFileContent(journaldConfigFile)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedFileContent, fileContentgot)
+		err = os.Remove(journaldConfigFile)
+		assert.NoError(t, err)
+	})
+
+	journaldConfigFile = actualjournaldConfigFile
+	journaldConfigFilePath = actualjournaldConfigFilePath
+}
+
+func TestGetRateLimitValues(t *testing.T) {
+	tests := []struct {
+		name                      string
+		reqConfig                 *api.PatchAutomateConfigRequest
+		existingConfig            *deployment.AutomateConfig
+		rateLimitBurst            int32
+		rateLimitInterval         int32
+		expectedRateLimitBurst    int32
+		expectedRateLimitInterval int32
+	}{
+		{
+			name:                      "Both reqConfig and existingConfig is nil, hence taking default values",
+			reqConfig:                 nil,
+			existingConfig:            nil,
+			rateLimitBurst:            100,
+			rateLimitInterval:         1000,
+			expectedRateLimitBurst:    100,
+			expectedRateLimitInterval: 1000,
+		},
+		{
+			name: "reqConfig is present but existingConfig is nil",
+			reqConfig: &api.PatchAutomateConfigRequest{
+				Config: &deployment.AutomateConfig{
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Log: &shared.Log{
+								RateLimitInterval: &wrapperspb.Int32Value{
+									Value: 2000,
+								},
+								RateLimitBurst: &wrapperspb.Int32Value{
+									Value: 2000,
+								},
+							},
+						},
+					},
+				},
+			},
+			existingConfig:            nil,
+			rateLimitBurst:            100,
+			rateLimitInterval:         1000,
+			expectedRateLimitBurst:    2000,
+			expectedRateLimitInterval: 2000,
+		},
+		{
+			name: "existingConfig is present but reqConfig is nil",
+			existingConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 2000,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 2000,
+							},
+						},
+					},
+				},
+			},
+			reqConfig:                 nil,
+			rateLimitBurst:            100,
+			rateLimitInterval:         1000,
+			expectedRateLimitBurst:    2000,
+			expectedRateLimitInterval: 2000,
+		},
+		{
+			name: "both reqConfig and exist config present",
+			reqConfig: &api.PatchAutomateConfigRequest{
+				Config: &deployment.AutomateConfig{
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Log: &shared.Log{
+								RateLimitInterval: &wrapperspb.Int32Value{
+									Value: 2000,
+								},
+								RateLimitBurst: &wrapperspb.Int32Value{
+									Value: 2000,
+								},
+							},
+						},
+					},
+				},
+			},
+			existingConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 3000,
+							},
+							RateLimitBurst: &wrapperspb.Int32Value{
+								Value: 3000,
+							},
+						},
+					},
+				},
+			},
+			rateLimitBurst:            100,
+			rateLimitInterval:         1000,
+			expectedRateLimitBurst:    2000,
+			expectedRateLimitInterval: 2000,
+		},
+		{
+			name: "config doesn't have value of rateLimitBurst. Neither in req nor in existing. Hence taking default value",
+			reqConfig: &api.PatchAutomateConfigRequest{
+				Config: &deployment.AutomateConfig{
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Log: &shared.Log{
+								RateLimitInterval: &wrapperspb.Int32Value{
+									Value: 2000,
+								},
+							},
+						},
+					},
+				},
+			},
+			existingConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						Log: &shared.Log{
+							RateLimitInterval: &wrapperspb.Int32Value{
+								Value: 4000,
+							},
+						},
+					},
+				},
+			},
+			rateLimitBurst:            100,
+			rateLimitInterval:         1000,
+			expectedRateLimitBurst:    100,
+			expectedRateLimitInterval: 2000,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rateLimitBurstGot, rateLimitIntervalGot := getRateLimitValues(tt.reqConfig, tt.existingConfig, tt.rateLimitBurst, tt.rateLimitInterval)
+			assert.Equal(t, tt.expectedRateLimitBurst, rateLimitBurstGot)
+			assert.Equal(t, tt.expectedRateLimitInterval, rateLimitIntervalGot)
+		})
+	}
+}
+
+func TestCreateConfigFileForAutomateSysLog(t *testing.T) {
+	actualRsyslogConfigFile := rsyslogConfigFile
+	rsyslogConfigFile = "temp.conf"
+
+	t.Run("User able to create configfile for automate syslog", func(t *testing.T) {
+		err := createConfigFileForAutomateSysLog("LogDirectory/", 1000, 1000)
+		assert.NoError(t, err)
+		expectedFileContent := `$imjournalRatelimitBurst 1000
+$imjournalRatelimitInterval 1000
+if $programname == 'hab' then LogDirectory/automate.log
+& stop
+`
+		fileContentgot, err := readFileContent(rsyslogConfigFile)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedFileContent, fileContentgot)
+		err = os.Remove(rsyslogConfigFile)
+		assert.NoError(t, err)
+	})
+
+	rsyslogConfigFile = actualRsyslogConfigFile
 }

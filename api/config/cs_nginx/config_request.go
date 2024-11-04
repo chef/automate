@@ -148,7 +148,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		}
 	}
 
-	if xFwd := g.GetV1().GetSys().GetNgx().GetHttp().IncludeXForwardedFor; xFwd != nil {
+	if xFwd := g.GetV1().GetSys().GetNgx().GetHttp().GetIncludeXForwardedFor(); xFwd != nil {
 		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xFwd
 	}
 }
