@@ -5,12 +5,12 @@
 pkg_name="automate-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="2.0.0"
+pkg_version="2.17.1"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/2.0.0/opensearch-2.0.0-linux-arm64.tar.gz"
-pkg_shasum=0ea296ab6a37e737d9a3f82750b1109ce53310fa565bee5bda5a611c9831c362   
+pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/2.17.1/opensearch-2.17.1-linux-arm64.tar.gz"
+pkg_shasum=88eeed07fc2637db16a87774bf7d6433077049f480afdb82c98cbe3a4ed2bf72  
 
 
 pkg_build_deps=(
