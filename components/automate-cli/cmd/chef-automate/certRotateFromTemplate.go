@@ -15,6 +15,7 @@ import (
 )
 
 var automateStartedChan = make(chan bool)
+var automateCompletedChan = make(chan bool)
 
 func (c *certRotateFlow) certRotateFromTemplate(clusterCertificateFile string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, flagsObj *certRotateFlags) error {
 	totalWaitTimeOut := time.Duration(1000)
@@ -119,6 +120,9 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	}
 	automateStartedChan <- true
 
+	// wait for the automate start goroutine to have completed
+	<-automateCompletedChan
+
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute Automate certificate rotation since start %f \n", timeElapsed.Seconds())
 
@@ -162,7 +166,6 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	c.log.Debug("Starting traffic on frontend nodes MAINTENANICE MODE OFF")
 	c.log.Debug("==========================================================")
 
-	startTrafficOnChefServerNode(infra, configRes, c.sshUtil, c.log, writer, totalWaitTimeOut)
 	return nil
 }
 
