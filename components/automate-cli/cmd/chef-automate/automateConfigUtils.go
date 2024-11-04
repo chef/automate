@@ -134,7 +134,7 @@ func validateIPs(templateCertIPs []IP, infraIPs []string, serviceName string) []
 	ipValidationErrors := []error{}
 	for _, ip := range templateCertIPs {
 		if !stringutils.SliceContains(infraIPs, ip.IP) {
-			ipValidationErrors = append(ipValidationErrors, fmt.Errorf("%s node %s not present in infra\n", serviceName, ip.IP))
+			ipValidationErrors = append(ipValidationErrors, fmt.Errorf("%s node %s not present in infra", serviceName, ip.IP))
 		}
 	}
 	return ipValidationErrors
