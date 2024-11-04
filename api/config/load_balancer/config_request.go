@@ -169,7 +169,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = config.GlobalLogLevelToNginxLevel(logLevel)
 	}
 
-	if xFwd := g.GetV1().GetSys().GetNgx().GetHttp().IncludeXForwardedFor; xFwd != nil {
+	if xFwd := g.GetV1().GetSys().GetNgx().GetHttp().GetIncludeXForwardedFor(); xFwd != nil {
 		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xFwd
 	}
 
