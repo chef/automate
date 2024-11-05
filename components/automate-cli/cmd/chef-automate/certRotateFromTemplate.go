@@ -138,19 +138,6 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 
 	}
 
-	// patch external automate root ca in chef server
-	if len(templateCerts.Automate.RootCA) > 0 {
-		for _, csIp := range infra.Outputs.ChefServerPrivateIps.Value {
-			if !stringutils.SliceContains(infra.Outputs.AutomatePrivateIps.Value, csIp) &&
-				!ipContain(templateCerts.ChefServer.IPS, csIp) {
-				err = c.patchExternalA2RootCaInCS(sshUtil, csIp, templateCerts.Automate.RootCA, infra)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-
 	timeElapsed = time.Since(start)
 	c.log.Debug("Time elapsed to execute ChefServer certificate rotation since start %f \n", timeElapsed.Seconds())
 
@@ -159,6 +146,19 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 		_, err = c.patchPGOSRootCAOnFrontend(infra, sshUtil, currentCertsInfo, templateCerts, filterIps)
 		if err != nil {
 			return err
+		}
+	} else {
+		// patch external automate root ca in chef server
+		if len(templateCerts.Automate.RootCA) > 0 {
+			for _, csIp := range infra.Outputs.ChefServerPrivateIps.Value {
+				if !stringutils.SliceContains(infra.Outputs.AutomatePrivateIps.Value, csIp) &&
+					!ipContain(templateCerts.ChefServer.IPS, csIp) {
+					err = c.patchExternalA2RootCaInCS(sshUtil, csIp, templateCerts.Automate.RootCA, infra)
+					if err != nil {
+						return err
+					}
+				}
+			}
 		}
 	}
 
@@ -472,8 +472,23 @@ func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails
 	}
 	filteredIps := c.getFilteredIps(frontendIps, ipsTobeSkiped)
 
-	fileName := "cert-rotate-pg-os-fe.toml"
 	for _, fIp := range filteredIps {
+
+		fileName := "cert-rotate-pg-os-a2.toml"
+		fePatchConf := patchConfig
+		remoteSvc := AUTOMATE
+		if stringutils.SliceContains(infra.Outputs.ChefServerPrivateIps.Value, fIp) {
+			fileName = "cert-rotate-pg-os-cs.toml"
+			remoteSvc = CHEF_SERVER
+			if len(certToml.Automate.RootCA) > 0 && !stringutils.SliceContains(infra.Outputs.AutomatePrivateIps.Value, fIp) {
+				automateRootCA, err := c.getCertFromFile(certToml.Automate.RootCA, infra)
+				if err != nil {
+					return nil, err
+				}
+				fePatchConf = patchConfig + "\n" + fmt.Sprintf(CS_EXTERNAL_AUTOMATE_CERT_CONFIG, string(automateRootCA))
+			}
+		}
+
 		flagsObj := certRotateFlags{
 			node:    fIp,
 			timeout: 1000,
@@ -481,10 +496,10 @@ func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails
 		timestamp := time.Now().Format("20060102150405")
 		patchFnParam := &patchFnParameters{
 			sshUtil:       sshUtil,
-			config:        patchConfig,
+			config:        fePatchConf,
 			fileName:      fileName,
 			timestamp:     timestamp,
-			remoteService: FRONTEND,
+			remoteService: remoteSvc,
 			concurrent:    true,
 			infra:         infra,
 			flagsObj:      &flagsObj,
@@ -555,6 +570,7 @@ func (c *certRotateFlow) rotateClusterFrontendCertificates(infra *AutomateHAInfr
 			return err
 		}
 		patchConfig = patchConfig + "\n" + fmt.Sprintf(CS_EXTERNAL_AUTOMATE_CERT_CONFIG, string(automateRootCA))
+		fileName = "cert-rotate-cs.toml"
 	}
 
 	// Creating and patching the required configurations.
