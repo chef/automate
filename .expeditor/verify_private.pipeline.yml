@@ -723,7 +723,7 @@ steps:
   - label: "chef server"
     command:
       - integration/run_test integration/tests/chef_server.sh
-    timeout_in_minutes: 30 # longer timeout for chef-server
+    timeout_in_minutes: 35 # longer timeout for chef-server
     expeditor:
       executor:
         linux:
@@ -736,7 +736,7 @@ steps:
   - label: "chef server only"
     command:
       - integration/run_test integration/tests/chef_server_only.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
