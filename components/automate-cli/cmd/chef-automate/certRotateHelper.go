@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/sshutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -132,13 +133,29 @@ func startTrafficOnAutomateNode(infra *AutomateHAInfraDetails, sshConfig sshutil
 }
 
 func startTrafficOnChefServerNode(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtil sshutils.SSHUtil, log logger.Logger, writer *cli.Writer, totalWaitTimeOut time.Duration) {
-	hostIps := infra.Outputs.ChefServerPrivateIps.Value
+	frontendIps := infra.Outputs.AutomatePrivateIps.Value
+	hostIps := []string{}
+	for _, ip := range infra.Outputs.ChefServerPrivateIps.Value {
+		if !stringutils.SliceContains(frontendIps, ip) {
+			hostIps = append(hostIps, ip)
+		}
+	}
+	if len(hostIps) == 0 {
+		writer.Println("No chef server node found, Skipping the traffic start on chef server node")
+		return
+	}
 	frontendMaintainenceModeOnOFF(infra, sshConfig, sshUtil, OFF, hostIps, log, writer, totalWaitTimeOut)
 }
 
 func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SSHConfig, sshUtils sshutils.SSHUtil, log logger.Logger, statusSummary StatusSummary, userConsent bool, waitTime time.Duration, totalWaitTimeOut time.Duration, writer *cli.Writer) error {
 	fontendIps := infra.Outputs.AutomatePrivateIps.Value
-	fontendIps = append(fontendIps, infra.Outputs.ChefServerPrivateIps.Value...)
+
+	for _, ip := range infra.Outputs.ChefServerPrivateIps.Value {
+		if !stringutils.SliceContains(fontendIps, ip) {
+			fontendIps = append(fontendIps, ip)
+		}
+	}
+
 	lag, err := getMaxPGLag(log, statusSummary)
 	if err != nil {
 		return err
@@ -160,6 +177,7 @@ func checkLagAndStopTraffic(infra *AutomateHAInfraDetails, sshConfig sshutils.SS
 		if isAutomateStarted {
 			startTrafficOnAutomateNode(infra, sshConfig, sshUtils, log, writer, totalWaitTimeOut)
 		}
+		automateCompletedChan <- true
 	}(automateStartedChan)
 
 	waitingStart := time.Now()
@@ -294,4 +312,50 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 
 	flagsObj.node = nodeVal
 	return nil
+}
+
+func ipContain(ips []IP, ip string) bool {
+	for _, i := range ips {
+		if i.IP == ip {
+			return true
+		}
+	}
+	return false
+}
+
+func validateAllServiceIps(templateCerts *CertificateToml, infra *AutomateHAInfraDetails) []error {
+	combinedErrors := []error{}
+
+	if err := validateIPs(
+		templateCerts.OpenSearch.IPS,
+		infra.Outputs.OpensearchPrivateIps.Value,
+		"Opensearch",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+	if err := validateIPs(
+		templateCerts.PostgreSQL.IPS,
+		infra.Outputs.PostgresqlPrivateIps.Value,
+		"PostgreSQL",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+
+	if err := validateIPs(
+		templateCerts.Automate.IPS,
+		infra.Outputs.AutomatePrivateIps.Value,
+		"Automate",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+
+	if err := validateIPs(
+		templateCerts.ChefServer.IPS,
+		infra.Outputs.ChefServerPrivateIps.Value,
+		"ChefServer",
+	); err != nil {
+		combinedErrors = append(combinedErrors, err...)
+	}
+
+	return combinedErrors
 }

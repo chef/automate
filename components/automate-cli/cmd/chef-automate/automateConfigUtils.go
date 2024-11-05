@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
@@ -127,4 +128,14 @@ func setDefaultCertsForBackend(osConfig *OsConfigToml, pgConfig *PgConfigToml) e
 		pgConfig.PrivateKey = fmt.Sprintf("%v", defaultConfig.SslKey)
 	}
 	return nil
+}
+
+func validateIPs(templateCertIPs []IP, infraIPs []string, serviceName string) []error {
+	ipValidationErrors := []error{}
+	for _, ip := range templateCertIPs {
+		if !stringutils.SliceContains(infraIPs, ip.IP) {
+			ipValidationErrors = append(ipValidationErrors, fmt.Errorf("%s node %s not present in infra", serviceName, ip.IP))
+		}
+	}
+	return ipValidationErrors
 }
