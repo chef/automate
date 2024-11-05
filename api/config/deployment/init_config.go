@@ -10,12 +10,12 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"math/big"
 	"net"
 	"net/url"
 	"os"
 	"strconv"
-	"math"
 	"strings"
 	"text/template"
 	"time"
@@ -453,12 +453,9 @@ func generateProxySettings(c *InitConfig) error {
 	c.ProxyHost = proxyURL.Hostname()
 	port := proxyURL.Port()
 	if port != "" {
-         // Parse port as 64-bit integer to handle larger bit sizes
+		// Parse port as 64-bit integer to handle larger bit sizes
 		p, err := strconv.ParseInt(port, 10, 64)
 
-		// Config expects ports to be int32
-		//p, err := strconv.Atoi(port)
-		
 		if err != nil {
 			return err
 		}

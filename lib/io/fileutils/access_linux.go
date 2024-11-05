@@ -7,11 +7,11 @@
 package fileutils
 
 import (
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
 	"syscall"
-	"math"
 
 	"github.com/chef/automate/lib/user"
 	"github.com/pkg/errors"
@@ -236,8 +236,6 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 	var (
 		u     *user.User
 		uid   uint32
-		//uidi  int
-		//gidi  int
 		gids  = []uint32{}
 		gidss []string
 		err   error
@@ -248,9 +246,9 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 		return uid, gids, err
 	}
 
-	// Parse the UID as uint64 to handle larger bit sizes, then check bounds for uint32
+	// Parse the UID as uint64 to handle larger bit sizes
 	uid64, err := strconv.ParseUint(u.Uid, 10, 64)
-	//uidi, err = strconv.Atoi(u.Uid)
+
 	if err != nil {
 		return uid, gids, err
 	}
@@ -260,15 +258,16 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 	}
 	// Convert uid64 to uint32 after ensuring it is safe
 	uid = uint32(uid64)
-	//uid = uint32(uidi)
 
 	// WARNING: GroupIds() might not be implemented on linux if cgo is disabled.
 	// Instead of failing if it returns an error we'll fall back to the primary
 	// group only.
 	gidss, err = u.GroupIds()
 	if err != nil {
+
+		// Parse the GID as uint64 to handle larger bit sizes
 		gid64, err := strconv.ParseUint(u.Gid, 10, 64)
-		//g, err := strconv.Atoi(u.Gid)
+
 		if err != nil {
 			return uid, gids, err
 		}
@@ -280,11 +279,12 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 		// Append the primary GID
 		gids = append(gids, uint32(gid64))
 
-		//gids = append(gids, uint32(g))
 	} else {
 		for _, g := range gidss {
+
+			// Parse the GID as uint64 to handle larger bit sizes
 			gid64, err := strconv.ParseUint(g, 10, 64)
-			//gidi, err = strconv.Atoi(g)
+
 			if err != nil {
 				return uid, gids, err
 			}
@@ -295,7 +295,6 @@ func uidGidsFor(uname string) (uint32, []uint32, error) {
 			}
 			// Append each GID
 			gids = append(gids, uint32(gid64))
-			//gids = append(gids, uint32(gidi))
 		}
 	}
 

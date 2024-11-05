@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
-	"math"
 	"strings"
 	"syscall"
 	"time"
@@ -772,21 +772,22 @@ func lookupUser(username string) (uid, gid int, err error) {
 		return -1, -1, err
 	}
 
-	// Reuse uid and gid variables for parsing
+	// Parse port as 64-bit integer to handle larger bit sizes
 	uid64, err := strconv.ParseUint(u.Uid, 10, 64)
-	//uid, err = strconv.Atoi(u.Uid)
+
 	if err != nil {
 		return -1, -1, err
 	}
 
+	// Check if parsed UID fits into int32 bounds
 	if uid64 > math.MaxInt32 {
 		return -1, -1, errors.New("UID exceeds int32 bounds")
 	}
 	uid = int(uid64)
 
-
+	// Parse port as 64-bit integer to handle larger bit sizes
 	gid64, err := strconv.ParseUint(u.Gid, 10, 64)
-	//gid, err = strconv.Atoi(u.Gid)
+
 	if err != nil {
 		return -1, -1, err
 	}

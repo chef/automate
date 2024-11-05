@@ -9,12 +9,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
 	"syscall"
 	"time"
-	"math"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -205,15 +205,15 @@ func AsUser(username string) Opt {
 			return errors.Wrap(err, "user lookup")
 		}
 
-        // Parse the UID and GID using strconv.ParseUint to support larger values
+		// Parse the UID and GID using strconv.ParseUint to support larger values
 		uid, err := strconv.ParseUint(u.Uid, 10, 64)
-		//uid, err := strconv.Atoi(u.Uid)
+
 		if err != nil {
 			return errors.Wrap(err, "converting uid to integer")
 		}
-		
+
 		gid, err := strconv.ParseUint(u.Gid, 10, 64)
-		//gid, err := strconv.Atoi(u.Gid)
+
 		if err != nil {
 			return errors.Wrap(err, "converting gid to integer")
 		}
