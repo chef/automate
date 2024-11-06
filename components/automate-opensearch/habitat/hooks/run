@@ -1,42 +1,42 @@
-#!{{pkgPathFor "core/bash"}}/bin/bash
+# #!{{pkgPathFor "core/bash"}}/bin/bash
 
-exec 2>&1
+# exec 2>&1
 
-export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
+# export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
 
-# Fix shebangs for portability
-for file in "${pkg_prefix}/os/bin/*"; do
-  if head -1 "$file" | grep -q '#!/usr/bin/env bash'; then
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      sed -i '' '1s|#!/usr/bin/env bash|#!/bin/bash|' "$file"
-    else
-      sed -i '1s|#!/usr/bin/env bash|#!/bin/bash|' "$file"
-    fi
-  fi
-done
+# # Fix shebangs for portability
+# for file in "${pkg_prefix}/os/bin/*"; do
+#   if head -1 "$file" | grep -q '#!/usr/bin/env bash'; then
+#     if [[ "$OSTYPE" == "darwin"* ]]; then
+#       sed -i '' '1s|#!/usr/bin/env bash|#!/bin/bash|' "$file"
+#     else
+#       sed -i '1s|#!/usr/bin/env bash|#!/bin/bash|' "$file"
+#     fi
+#   fi
+# done
 
-chmod +x "${pkg_prefix}/os/bin/*"
+# chmod +x "${pkg_prefix}/bin/*"
 
-{{#if cfg.disable ~}}
-while true
-do
-  sleep 60
-done
+# {{#if cfg.disable ~}}
+# while true
+# do
+#   sleep 60
+# done
 
-exit 0
-{{~else}}
+# exit 0
+# {{~else}}
 
-{{#if cfg.runtime.es_startup_sleep_time ~}}
-export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
-{{/if ~}}
+# {{#if cfg.runtime.es_startup_sleep_time ~}}
+# export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
+# {{/if ~}}
 
-export TMPDIR="{{pkg.svc_var_path}}/tmp"
-export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
-export ES_PATH_CONF="{{pkg.svc_config_path}}"
+# export TMPDIR="{{pkg.svc_var_path}}/tmp"
+# export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
+# export ES_PATH_CONF="{{pkg.svc_config_path}}"
 
-# Initialize the secrets keystore and trusted certs ca keystore
-source {{pkg.svc_config_path}}/init_keystore
-source {{pkg.svc_config_path}}/init_ca
+# # Initialize the secrets keystore and trusted certs ca keystore
+# source {{pkg.svc_config_path}}/init_keystore
+# source {{pkg.svc_config_path}}/init_ca
 
-exec opensearch
-{{~/if}}
+# exec opensearch
+# {{~/if}}
