@@ -456,6 +456,7 @@ func (c *certRotateFlow) patchPGOSRootCAOnFrontend(infra *AutomateHAInfraDetails
 		}
 		patchConfig = patchConfig + "\n" + fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, string(opensearchRootCA), nodeDn.CommonName)
 	}
+
 	if len(certToml.PostgreSQL.RootCA) != 0 {
 		postgreSQLRootCA, err := c.getCertFromFile(certToml.PostgreSQL.RootCA, infra)
 		if err != nil {
