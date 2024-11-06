@@ -208,7 +208,6 @@ do_prepare_deploy_default() {
 do_deploy() {
     do_deploy_default
     do_apply_license
-    sleep 60
 }
 
 do_apply_license(){

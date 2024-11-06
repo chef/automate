@@ -27,6 +27,19 @@ do_deploy() {
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
+    do_apply_license
+    sleep 60
+    test_json || { echo "test_json failed"; exit 1; }
+}
+
+test_json() {
+    echo "$(chef-automate license status)"
+    echo "Displaying contents of the JSON file:"
+    if [ -f /tmp/lic ]; then
+        cat /tmp/lic
+    else
+        echo "File /tmp/lic not found."
+    fi
 }
 
 do_test_deploy() {

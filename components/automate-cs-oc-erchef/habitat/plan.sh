@@ -7,6 +7,9 @@ pkg_name="automate-cs-oc-erchef"
 pkg_description="Wrapper package for chef/oc_erchef"
 pkg_origin="chef"
 
+pkg_svc_user=root
+pkg_svc_group=root
+
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.10.12"
 vendor_origin="chef"
@@ -17,7 +20,7 @@ pkg_deps=(
   #core/runit/2.1.2/20200403133549
   core/runit
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "${local_platform_tools_origin:-chef}/automate-platform-tools/0.1.0/20241024133101"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_erchef/15.10.12/20240910074329"
 )
