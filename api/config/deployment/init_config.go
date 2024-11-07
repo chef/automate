@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"math/big"
 	"net"
 	"net/url"
@@ -452,11 +453,18 @@ func generateProxySettings(c *InitConfig) error {
 	c.ProxyHost = proxyURL.Hostname()
 	port := proxyURL.Port()
 	if port != "" {
-		// Config expects ports to be int32
-		p, err := strconv.Atoi(port)
+		// Parse port as 64-bit integer to handle larger bit sizes
+		p, err := strconv.ParseInt(port, 10, 64)
+
 		if err != nil {
 			return err
 		}
+
+		// Ensure that the parsed value fits into int32 range
+		if p > math.MaxInt32 || p < math.MinInt32 {
+			return fmt.Errorf("proxy port exceeds int32 bounds: %d", p)
+		}
+
 		c.ProxyPort = int32(p)
 	}
 

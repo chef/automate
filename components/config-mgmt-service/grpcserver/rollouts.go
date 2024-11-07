@@ -3,6 +3,7 @@ package grpcserver
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -54,12 +55,27 @@ func (s *CfgMgmtServer) GetRolloutById(ctx context.Context, req *request.Rollout
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
-	requestedId, err := strconv.Atoi(req.RolloutId)
+
+	// Parse RolloutId as a 64-bit integer to handle larger IDs
+	requestedId64, err := strconv.ParseInt(req.RolloutId, 10, 64)
+
 	if err != nil {
 		message := fmt.Sprintf("invalid request_id: %s", err.Error())
 		return nil, status.Error(codes.InvalidArgument, message)
 	}
-	rollout, err := s.pg.FindRolloutByID(ctx, int32(requestedId))
+
+	// Check if the parsed ID is within the bounds of int32
+	if requestedId64 > math.MaxInt32 || requestedId64 < math.MinInt32 {
+		message := fmt.Sprintf("request_id exceeds int32 bounds: %d", requestedId64)
+		return nil, status.Error(codes.InvalidArgument, message)
+	}
+
+	// Safely cast the parsed ID to int32 after bounds check
+	requestedId := int32(requestedId64)
+
+	// Fetch the rollout by ID using the safely converted int32 ID
+	rollout, err := s.pg.FindRolloutByID(ctx, requestedId)
+
 	if err != nil {
 		return nil, err
 	}
