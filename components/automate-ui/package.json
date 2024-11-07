@@ -15,11 +15,12 @@
     "copy-ui-lib:fonts": "cp -r ../chef-ui-library/dist/collection/assets/fonts/ src/assets/fonts",
     "build": "ng build",
     "build:prod": "npm run build",
-    "test": "scripts/build.sh 'ng test --watch=false --code-coverage --source-map=false --configuration=no_auth' 'WARN:'",
-    "test:watch": "ng test --watch=true --browsers='Chrome' --source-map=true --configuration=no_auth",
+    "test": "scripts/build.sh 'ng test --watch=false --code-coverage --source-map=false' 'WARN:'",
+    "test:watch": "ng test --watch=true --browsers='Chrome' --source-map=true",
     "e2e": "ng e2e --no-webdriver-update",
     "lint": "scripts/build.sh 'ng lint' 'WARNING:'",
-    "lint:html": "node_modules/htmlhint/bin/htmlhint --config .htmlhintrc src/app/**/*.html"
+    "lint:html": "node_modules/htmlhint/bin/htmlhint --config .htmlhintrc src/app/**/*.html",
+    "lint:sass": "stylelint 'src/**/*.scss' --fix"
   },
   "private": true,
   "dependencies": {
@@ -62,7 +63,7 @@
     "zone.js": "~0.14.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.5",
+    "@angular-devkit/build-angular": "^17.3.11",
     "@angular-eslint/builder": "17.5.2",
     "@angular-eslint/eslint-plugin": "17.5.2",
     "@angular-eslint/eslint-plugin-template": "17.5.2",
@@ -82,7 +83,7 @@
     "jasmine-core": "~5.1.0",
     "jasmine-spec-reporter": "^7.0.0",
     "jsprim": "^2.0.2",
-    "karma": "^6.4.3",
+    "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-cli": "^2.0.0",
     "karma-coverage": "^2.2.1",
@@ -92,6 +93,9 @@
     "karma-safari-launcher": "^1.0.0",
     "ng2-mock-component": "^0.2.0",
     "rxjs-spy": "^8.0.2",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-scss": "^6.8.1",
     "typescript": "~5.4.2"
   }
 }
