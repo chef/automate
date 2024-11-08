@@ -449,7 +449,7 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-ha-deployment",
+      "name": "vivek-shankar/automate-ha-deployment",
       "metadata": null
     },
     {
@@ -473,7 +473,7 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-ha-cluster-ctl",
+      "name": "vivek-shankar/automate-ha-cluster-ctl",
       "metadata": null
     },
     {

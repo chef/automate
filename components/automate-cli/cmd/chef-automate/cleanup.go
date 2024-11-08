@@ -22,7 +22,7 @@ var (
 	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy  -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve;cd $i;done
 	`
 
-	DEPLOYMENT_CLEANUP = `hab pkg uninstall chef/automate-ha-deployment`
+	DEPLOYMENT_CLEANUP = `hab pkg uninstall vivek-shankar/automate-ha-deployment`
 	DESTROY_S3_BUCKET  = `HAB_LICENSE=accept-no-persist hab pkg exec core/aws-cli aws s3 rm s3://%s --recursive; hab pkg exec core/aws-cli aws s3 rb s3://%s`
 )
 
@@ -186,7 +186,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 					writer.Errorf("error while destroying infra, %v", err)
 					return err
 				}
-				writer.Success("cleanup completed successfully. Run the following command to remove/uninstall deployment workspace\n hab pkg uninstall chef/automate-ha-deployment\n")
+				writer.Success("cleanup completed successfully. Run the following command to remove/uninstall deployment workspace\n hab pkg uninstall vivek-shankar/automate-ha-deployment\n")
 			}
 		}
 	} else {

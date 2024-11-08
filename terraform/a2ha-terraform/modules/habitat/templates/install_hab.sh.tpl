@@ -126,6 +126,7 @@ wait_for_aib
 [ -d "${tmp_path}" ] && rm -rf "${tmp_path}/aib_workspace"
 mkdir -p "${tmp_path}/aib_workspace"
 tar xf ${aib_file} -C ${tmp_path}/aib_workspace || failure "Failed to extract ${aib_file}!"
+rm -rf /hab/cache/artifacts/*
 rsync -a --keep-dirlinks ${tmp_path}/aib_workspace/hab /
 
 # Copy the hab bin if it doesn't exist
