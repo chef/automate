@@ -83,6 +83,7 @@ wait_for_aib() {
 }
 
 setup_service() {
+  local hab_sup_upgrade_detected=$1
   cp -f "${tmp_path}/hab_peer_watch" /etc/hab_peer_watch
   mkdir -p /hab/sup/default
   # systemd ENV vars
@@ -115,6 +116,10 @@ EOF
   chmod 664 /etc/systemd/system/hab-sup.service
   systemctl daemon-reload
   systemctl enable hab-sup.service
+  if [[ "$hab_sup_upgrade_detected" == true ]]; then
+    echo "Stopping Habitat Supervisor to upgrade.."
+    systemctl stop hab-sup.service
+  fi
   systemctl start hab-sup.service
   # Habitat Supervisor starting up..
   sleep 5
@@ -126,7 +131,6 @@ wait_for_aib
 [ -d "${tmp_path}" ] && rm -rf "${tmp_path}/aib_workspace"
 mkdir -p "${tmp_path}/aib_workspace"
 tar xf ${aib_file} -C ${tmp_path}/aib_workspace || failure "Failed to extract ${aib_file}!"
-rm -rf /hab/cache/artifacts/*
 rsync -a --keep-dirlinks ${tmp_path}/aib_workspace/hab /
 
 # Copy the hab bin if it doesn't exist
@@ -138,8 +142,22 @@ ln -s ${tmp_path}/aib_workspace/bin/hab /usr/bin/hab
 # https://github.com/habitat-sh/habitat/issues/6260
 export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 
+hab_sup_upgrade_detected=false
+if  which hab-sup &> /dev/null; then 
+  binary_version=$(hab-sup --version 2>&1 | grep -oP 'hab-sup \K[0-9]+\.[0-9]+\.[0-9]+/[0-9]+')
+  hart_version=$(ls /hab/cache/artifacts/ | grep hab-sup | awk -F '-' '{print $4 "/" $5}')
+
+  echo "Found Hab-Sup Binary version: $binary_version"
+  echo "Found Hab-Sup Hart version: $hart_version"
+
+  if [[ "$binary_version" != "$hart_version" ]]; then
+    echo "Hab-Sup change detected - Binary: $binary_version, Hart: $hart_version"
+    hab_sup_upgrade_detected=true
+  fi
+fi
+
 # For frontend and backend nodes
-for pkg in /hab/cache/artifacts/{core-hab,*automate-ha-ctl,chef-automate-cli}*hart; do
+for pkg in ${tmp_path}/aib_workspace/hab/cache/artifacts/{core-hab,*automate-ha-ctl,chef-automate-cli}*hart; do
   export pkg
   bash -c 'eval hab pkg install --force --binlink --binlink-dir /bin $pkg "$LOGCMD"' || true
 done
@@ -151,13 +169,13 @@ if [ $NO_SERVICE = true ]; then
 fi
 
 # Exclusively for backend nodes
-for pkg in /hab/cache/artifacts/chef-automate-ha*hart; do
+for pkg in ${tmp_path}/aib_workspace/hab/cache/artifacts/chef-automate-ha*hart; do
   export pkg
   bash -c 'eval hab pkg install --force --binlink --binlink-dir /bin $pkg "$LOGCMD"' || true
 done
 
 wait_for_service_template
-setup_service
+setup_service "$hab_sup_upgrade_detected"
 
 touch "${aib_file}.DONE"
 save_space
