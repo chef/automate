@@ -311,7 +311,7 @@ unless no_pin_hab
   # WARNING: These pins are managed by .expeditor/update_habitat.sh.
   pins["hab"]          = { "origin" => "core", "name" => "hab",          "version" => "1.6.1205", "release" => "20241107140309"}
   pins["hab-sup"]      = { "origin" => "core", "name" => "hab-sup",      "version" => "1.6.1205", "release" => "20241107150331"}
-  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "16260",  "release" => "20240411144621"}
+  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "16260",  "release" => "20220603161305"}
 end
 
 # CONFIGURATION
