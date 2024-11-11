@@ -45,6 +45,8 @@ do_deploy() {
 }
 
 test_json() {
+    echo "BELOW are the Environment variables for expired license:"
+    echo "$(A2_EXPIRED_LICENSE)"
     echo "$(chef-automate license status)"
     echo "Displaying contents of the JSON file:"
     if [ -f /tmp/lic ]; then
