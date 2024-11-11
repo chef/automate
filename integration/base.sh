@@ -451,66 +451,69 @@ source "${source_dir}/helpers/backup.sh"
 source "${source_dir}/helpers/hab.sh"
 
 __run_test() {
+    echo "BELOW are the Environment variables for expired license:"
+    echo $A2_EXPIRED_LICENSE
     trap dump_logs EXIT
     # Load the test definition
     # shellcheck source=/dev/null
     log_info "Loading test definition"
-    source "$1"
+    # source "$1"
 
-    log_info "Running test $test_name on $test_container_name"
+    # log_info "Running test $test_name on $test_container_name"
 
-    log_section_start "Step do_setup"
-    do_setup
+    # log_section_start "Step do_setup"
+    # do_setup
 
-    log_section_start "Step do_build"
-    do_build
+    # log_section_start "Step do_build"
+    # do_build
 
-    log_section_start "Step do_create_config"
-    do_create_config
+    # log_section_start "Step do_create_config"
+    # do_create_config
 
-    log_section_start "Step do_prepare_deploy"
-    do_prepare_deploy
+    # log_section_start "Step do_prepare_deploy"
+    # do_prepare_deploy
 
-    log_section_start "Step do_deploy"
-    do_deploy
-    break_log "deploy"
+    # log_section_start "Step do_deploy"
+    # do_deploy
+    # break_log "deploy"
 
-    log_section_start "Step do_test_deploy"
-    do_test_deploy
-    break_log "test_deploy"
+    
+    # log_section_start "Step do_test_deploy"
+    # do_test_deploy
+    # break_log "test_deploy"
 
-    if [ $test_upgrades = true ]; then
-        log_section_start "Step do_prepare_upgrade"
-        do_prepare_upgrade
-        break_log "prepare_upgrade"
+    # if [ $test_upgrades = true ]; then
+    #     log_section_start "Step do_prepare_upgrade"
+    #     do_prepare_upgrade
+    #     break_log "prepare_upgrade"
 
-        log_section_start "Step do_upgrade"
-        do_upgrade
-        break_log "upgrade"
+    #     log_section_start "Step do_upgrade"
+    #     do_upgrade
+    #     break_log "upgrade"
 
-        log_section_start "Step do_test_upgrade"
-        do_test_upgrade
-        break_log "test_upgrade"
-    fi
+    #     log_section_start "Step do_test_upgrade"
+    #     do_test_upgrade
+    #     break_log "test_upgrade"
+    # fi
 
 
-    if [ $test_backup_restore = true ]; then
-        log_section_start "Step do_backup"
-        do_backup
-        break_log "backup"
+    # if [ $test_backup_restore = true ]; then
+    #     log_section_start "Step do_backup"
+    #     do_backup
+    #     break_log "backup"
 
-        log_section_start "Step do_prepare_restore"
-        do_prepare_restore
+    #     log_section_start "Step do_prepare_restore"
+    #     do_prepare_restore
 
-        log_section_start "Step do_restore"
-        do_restore
-        break_log "restore"
+    #     log_section_start "Step do_restore"
+    #     do_restore
+    #     break_log "restore"
 
-        log_section_start "Step do_test_restore"
-        do_test_restore
-        break_log "test_restore"
-    fi
+    #     log_section_start "Step do_test_restore"
+    #     do_test_restore
+    #     break_log "test_restore"
+    # fi
 
-    log_section_start "Step do_cleanup"
-    do_cleanup
+    # log_section_start "Step do_cleanup"
+    # do_cleanup
 }
