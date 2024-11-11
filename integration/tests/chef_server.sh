@@ -31,6 +31,8 @@ EOF
 }
 
 do_deploy() {
+    echo "BELOW are the Environment variables for expired license:"
+    echo $A2_EXPIRED_LICENSE
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --hartifacts "$test_hartifacts_path" \
@@ -46,7 +48,7 @@ do_deploy() {
 
 test_json() {
     echo "BELOW are the Environment variables for expired license:"
-    echo "$(A2_EXPIRED_LICENSE)"
+    echo $A2_EXPIRED_LICENSE
     echo "$(chef-automate license status)"
     echo "Displaying contents of the JSON file:"
     if [ -f /tmp/lic ]; then
