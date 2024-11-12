@@ -145,7 +145,7 @@ export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 hab_sup_upgrade_detected=false
 if  which hab-sup &> /dev/null; then 
   binary_version=$(hab-sup --version 2>&1 | grep -oP 'hab-sup \K[0-9]+\.[0-9]+\.[0-9]+/[0-9]+')
-  hart_version=$(ls /hab/cache/artifacts/ | grep hab-sup | awk -F '-' '{print $4 "/" $5}')
+  hart_version=$(ls ${tmp_path}/aib_workspace/hab/cache/artifacts/ | grep hab-sup | awk -F '-' '{print $4 "/" $5}')
 
   echo "Found Hab-Sup Binary version: $binary_version"
   echo "Found Hab-Sup Hart version: $hart_version"
