@@ -126,10 +126,11 @@ Configure backups for both clusters using either [file system](/automate/ha_back
             password = "admin"
         ```
 
-        - Stop all the services on all Automate and Chef Infra frontend nodes using the following command:
+        - Stop all the services on all Automate and Chef Infra frontend nodes using the following command, use the below command from the bastion.
 
         ```sh
-            systemctl stop chef-automate
+            chef-automate systemctl --a2
+            chef-automate systemctl --cs
         ```
 
         - In the disaster recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
