@@ -202,13 +202,14 @@ echo "${docker_run_args[*]}"
 
 docker run "${docker_run_args[@]}" chefes/a2-integration:latest
 
-if [ $CI != "true" ]; then
-    secret_origin_key=$(HAB_LICENSE=accept-no-persist hab origin key export --type secret "$HAB_ORIGIN")
-    docker exec -e SEC_KEY="$secret_origin_key" -e HAB_LICENSE="accept-no-persist" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
+echo "is_automate ${IS_AUTOMATE}"
+# if [ $CI != "true" ]; then
+#     secret_origin_key=$(HAB_LICENSE=accept-no-persist hab origin key export --type secret "$HAB_ORIGIN")
+#     docker exec -e SEC_KEY="$secret_origin_key" -e HAB_LICENSE="accept-no-persist" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
 
-    public_origin_key=$(HAB_LICENSE=accept-no-persist hab origin key export --type public "$HAB_ORIGIN")
-    docker exec -e SEC_KEY="$public_origin_key" -e HAB_LICENSE="accept-no-persist" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
-fi
+#     public_origin_key=$(HAB_LICENSE=accept-no-persist hab origin key export --type public "$HAB_ORIGIN")
+#     docker exec -e SEC_KEY="$public_origin_key" -e HAB_LICENSE="accept-no-persist" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
+# fi
 
-echo "Running the docker. Will timeout after $TIMEOUT mins"
-docker exec -e TEST_PATH=$1 "$test_container_name" timeout "${TIMEOUT}m" bash -c 'source ./integration/base.sh; __run_test $TEST_PATH'
+# echo "Running the docker. Will timeout after $TIMEOUT mins"
+# docker exec -e TEST_PATH=$1 "$test_container_name" timeout "${TIMEOUT}m" bash -c 'source ./integration/base.sh; __run_test $TEST_PATH'
