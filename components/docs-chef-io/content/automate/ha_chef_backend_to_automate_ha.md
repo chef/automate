@@ -205,7 +205,7 @@ Where:
 5. ssh to bastion machine and download chef-automate CLI and extract the downloaded zip file
 
     ```sh
-        https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
+        https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
     ```
 
 6. Create an airgap bundle using the command

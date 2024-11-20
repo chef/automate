@@ -28,7 +28,7 @@ To get a trial license for an airgapped host [contact Chef](https://www.chef.io/
 Download the Chef Automate command-line tool from the `current` [release channel]({{< relref "install.md#release-channels" >}}).
 
 ```shell
-curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
 ## Download the Airgap Installation Bundle
@@ -36,13 +36,13 @@ curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-
 Download the airgap installation bundles of the latest automate version to an internet-connected machine using:
 
 ```shell
-curl https://chefdownload-commercial.chef.io/airgap_bundle/current/automate/latest.aib -o </path/to/airgap-install-bundle>
+curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o </path/to/airgap-install-bundle>
 ```
 
 Download the bundle of a specific version using:
 
 ```shell
-curl https://chefdownload-commercial.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
+curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
 ```
 
 {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.{{< /note >}}

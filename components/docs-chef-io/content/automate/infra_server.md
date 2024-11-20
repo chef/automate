@@ -37,7 +37,7 @@ Before beginning your installation, check the [System Requirements]({{< relref "
 To download the `chef-automate` command line tool, run the following command in your command line interface:
 
 ```shell
-curl https://chefdownload-commercial.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
 ## Install Chef Automate and Chef Infra Server on the Same Host
