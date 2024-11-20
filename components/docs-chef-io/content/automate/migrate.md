@@ -49,7 +49,7 @@ You will need the `chef-automate` command line tool to initiate your upgrade.
 1. Download the latest version of the Chef Automate CLI:
 
     ```shell
-    wget https://chefdownload-commercial.chef.io/files/current/automate/latest/chef-automate_linux_amd64.zip
+    wget https://packages.chef.io/files/current/automate/latest/chef-automate_linux_amd64.zip
     ```
 
 2. Unzip the package:
@@ -70,7 +70,7 @@ The Chef Automate upgrade process requires connectivity to the internet to insta
 The standard Chef Automate installation requires current versions for Chrome, Edge, or Firefox browsers.
 If you filter internet access via proxy or by other means, you must ensure the following domains are accessible:
 
-* `chefdownload-commercial.chef.io`
+* `packages.chef.io`
 * `licensing.chef.io`
 * `raw.githubusercontent.com`
 * `api.bintray.com`
