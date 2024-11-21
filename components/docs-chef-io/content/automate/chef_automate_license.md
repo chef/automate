@@ -15,8 +15,14 @@ Before running Chef Automate, you must accept the Chef EULA.
 
 Chef Automate offers two license tiers that have different entitlements:
 
-* **Trial:** A trial license is for users or organizations interested in exploring the product before buying.
+* **Trial:** A trial license is for users or organizations interested in exploring the product before buying. Generate the license from https://www.chef.io/license-generation-free-trial
 * **Commercial:** A commercial license is for customers who have purchased and are entitled to use it according to the license terms.
+
+{{< warning >}}
+
+Chef Server deployed and running with Automate will require license too. The Chef Automate license will cover the Chef Server license.
+
+{{< /warning >}}
 
 Chef Automate is built around a web user interface that provides visibility into all aspects of your infrastructure. The licensing types will affect your UI journey.
 
@@ -104,3 +110,10 @@ You cannot use Chef Automate features and capabilities. To continue using Chef A
 1. [Contact us](https://www.chef.io/contact-us) to get a license.
 1. If you already have a license key, paste it in the popup box and check the I agree to the Terms and Service box.
 1. Select **Apply License**.
+
+
+## Chef Server under Automate License
+Chef Server when deployed with Automate will abide by the Automate license.
+The `chef-server-ctl` command will not work if the commercial/trial license is not applied to Automate or expired.
+In case of `knife` execution or `Infra Client` execution, the Chef Server will not respond if the Automate license is not applied or expired.
+ 
