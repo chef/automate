@@ -27,16 +27,16 @@ type Indices []struct {
 	PriStoreSize string `json:"pri.store.size"`
 }
 
-// type IndexSettings struct {
-// 	Settings struct {
-// 		Index struct {
-// 			Version struct {
-// 				CreatedString  string `json:"created_string"`
-// 				UpgradedString string `json:"upgraded_string"`
-// 			} `json:"version"`
-// 		} `json:"index"`
-// 	} `json:"settings"`
-// }
+type IndexSettingsVersion struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString  string `json:"created_string"`
+				UpgradedString string `json:"upgraded_string"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}
 
 type Settings struct {
 	Index Index `json:"index"`
@@ -158,13 +158,13 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, index := range indices {
-		settings, err := fetchIndexSettings(index.Index)
+		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
 			logrus.Errorf("Error fetching settings for index %s: %v", index.Index, err)
 			continue
 		}
 
-		if settings[index.Index].Settings.Index.Version.Created != settings[index.Index].Settings.Index.Version.Upgraded {
+		if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
 			logrus.Infof("Reindexing required for index: %s", index.Index)
 			if err := triggerReindex(index.Index); err != nil {
 				logrus.Errorf("Error reindexing index %s: %v", index.Index, err)
@@ -198,7 +198,34 @@ func fetchIndices() (Indices, error) {
 	return indices, nil
 }
 
-func fetchIndexSettings(index string) (IndexSettings, error) {
+func fetchIndexSettingsVersion(index string) (*IndexSettingsVersion, error) {
+	fmt.Println("Fetching settings version for index:", index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_settings?pretty&human", index)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read settings response for index %s: %w", index, err)
+	}
+
+	var settings map[string]IndexSettingsVersion
+	if err := json.Unmarshal(body, &settings); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
+	}
+
+	setting, exists := settings[index]
+	if !exists {
+		return nil, errors.New("index settings not found in response")
+	}
+
+	return &setting, nil
+}
+
+func fetchIndexSettings(index string) (map[string]interface{}, error) {
 	fmt.Println("Fetching settings for index:", index)
 	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_settings?pretty&human", index)
 	resp, err := http.Get(url)
@@ -216,18 +243,31 @@ func fetchIndexSettings(index string) (IndexSettings, error) {
 		return nil, fmt.Errorf("failed to read settings response for index %s: %w", index, err)
 	}
 
-	fmt.Printf("body: %v\n", string(body))
-
-	var settings map[string]IndexSettings
-	if err := json.Unmarshal(body, &settings); err != nil {
+	var rawSettings map[string]interface{}
+	if err := json.Unmarshal(body, &rawSettings); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
 	}
-	fmt.Printf("settings: %v\n", settings)
-	setting, exists := settings[index]
-	if !exists {
+	fmt.Printf("rawSettings: %v\n", rawSettings)
+
+	indexData, ok := rawSettings[index]
+	if !ok {
 		return nil, fmt.Errorf("index settings not found in response for index %s", index)
 	}
-	return setting, nil
+	fmt.Printf("indexData: %v\n", indexData)
+
+	// indexDataBytes, err := json.Marshal(indexData)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to marshal extracted settings for index %s: %w", index, err)
+	// }
+
+	// fmt.Printf("indexDataBytes: %v\n", string(indexDataBytes))
+
+	// var settings Settings
+	// if err := json.Unmarshal(indexDataBytes, &settings); err != nil {
+	// 	return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
+	// }
+	// fmt.Printf("settings: %v\n", settings)
+	return rawSettings, nil
 }
 
 func fetchIndexMappings(index string) (map[string]interface{}, error) {
@@ -299,12 +339,12 @@ func triggerReindex(index string) error {
 	return nil
 }
 
-func createIndex(index string, settings IndexSettings, mappings map[string]interface{}) error {
+func createIndex(index string, settings map[string]interface{}, mappings map[string]interface{}) error {
 	fmt.Println("Creating index:", index)
 	url := fmt.Sprintf("http://127.0.0.1:10144/%s", index)
 
 	payload := map[string]interface{}{
-		"settings": settings[index].Settings,
+		"settings": settings,
 		"mappings": mappings,
 	}
 	payloadBytes, err := json.Marshal(payload)
