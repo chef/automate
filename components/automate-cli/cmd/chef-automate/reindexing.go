@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -25,15 +27,93 @@ type Indices []struct {
 	PriStoreSize string `json:"pri.store.size"`
 }
 
-type IndexSettings struct {
-	Settings struct {
-		Index struct {
-			Version struct {
-				CreatedString  string `json:"created_string"`
-				UpgradedString string `json:"upgraded_string"`
-			} `json:"version"`
-		} `json:"index"`
-	} `json:"settings"`
+// type IndexSettings struct {
+// 	Settings struct {
+// 		Index struct {
+// 			Version struct {
+// 				CreatedString  string `json:"created_string"`
+// 				UpgradedString string `json:"upgraded_string"`
+// 			} `json:"version"`
+// 		} `json:"index"`
+// 	} `json:"settings"`
+// }
+
+type Settings struct {
+	Index Index `json:"index"`
+}
+
+type Index struct {
+	Routing          Routing  `json:"routing"`
+	RefreshInterval  string   `json:"refresh_interval"`
+	NumberOfShards   string   `json:"number_of_shards"`
+	RoutingPartition string   `json:"routing_partition_size"`
+	Blocks           Blocks   `json:"blocks"`
+	ProvidedName     string   `json:"provided_name"`
+	Resize           Resize   `json:"resize"`
+	CreationDate     string   `json:"creation_date"`
+	Analysis         Analysis `json:"analysis"`
+	NumberOfReplicas string   `json:"number_of_replicas"`
+	UUID             string   `json:"uuid"`
+	Version          Version  `json:"version"`
+}
+
+type Routing struct {
+	Allocation Allocation `json:"allocation"`
+}
+
+type Allocation struct {
+	InitialRecovery InitialRecovery `json:"initial_recovery"`
+}
+
+type InitialRecovery struct {
+	ID interface{} `json:"_id"`
+}
+
+type Blocks struct {
+	Write string `json:"write"`
+}
+
+type Resize struct {
+	Source Source `json:"source"`
+}
+
+type Source struct {
+	Name string `json:"name"`
+	UUID string `json:"uuid"`
+}
+
+type Analysis struct {
+	Normalizer map[string]Normalizer `json:"normalizer"`
+	Analyzer   map[string]Analyzer   `json:"analyzer"`
+	Tokenizer  map[string]Tokenizer  `json:"tokenizer"`
+}
+
+type Normalizer struct {
+	Filter     []string `json:"filter"`
+	Type       string   `json:"type"`
+	CharFilter []string `json:"char_filter"`
+}
+
+type Analyzer struct {
+	Filter    []string `json:"filter"`
+	Tokenizer string   `json:"tokenizer"`
+}
+
+type Tokenizer struct {
+	TokenChars []string `json:"token_chars"`
+	MinGram    string   `json:"min_gram"`
+	Type       string   `json:"type"`
+	MaxGram    string   `json:"max_gram"`
+}
+
+type Version struct {
+	Created  string `json:"created"`
+	Upgraded string `json:"upgraded"`
+}
+
+// Define the main structure to hold the dynamic index names
+type IndexSettings map[string]struct {
+	Settings Settings `json:"settings"`
 }
 
 var infoReindexing = `
@@ -56,7 +136,7 @@ var isReindexing bool
 var mu sync.Mutex
 
 func runReindex(cmd *cobra.Command, args []string) error {
-	fmt.Println("Reindexing! Of Elasticsearch/OpenSearch indice test.")
+	fmt.Println("Reindexing Elasticsearch/OpenSearch indices.")
 	mu.Lock()
 	if isReindexing {
 		mu.Unlock()
@@ -80,17 +160,17 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	for _, index := range indices {
 		settings, err := fetchIndexSettings(index.Index)
 		if err != nil {
-			logrus.Errorf("Error fetching settings for index %s: %v\n", index, err)
+			logrus.Errorf("Error fetching settings for index %s: %v", index.Index, err)
 			continue
 		}
 
-		if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
-			logrus.Errorf("Reindexing required for index: %s\n", index)
+		if settings[index.Index].Settings.Index.Version.Created != settings[index.Index].Settings.Index.Version.Upgraded {
+			logrus.Infof("Reindexing required for index: %s", index.Index)
 			if err := triggerReindex(index.Index); err != nil {
-				logrus.Errorf("Error reindexing index %s: %v\n", index, err)
+				logrus.Errorf("Error reindexing index %s: %v", index.Index, err)
 			}
 		} else {
-			logrus.Infof("Index %s is up to date. Skipping reindex.\n", index)
+			logrus.Infof("Index %s is up to date. Skipping reindex.", index.Index)
 		}
 	}
 
@@ -99,6 +179,7 @@ func runReindex(cmd *cobra.Command, args []string) error {
 }
 
 func fetchIndices() (Indices, error) {
+	fmt.Println("Fetching indices from Elasticsearch/OpenSearch.")
 	resp, err := http.Get("http://127.0.0.1:10144/_cat/indices?format=json")
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch indices: %w", err)
@@ -117,7 +198,8 @@ func fetchIndices() (Indices, error) {
 	return indices, nil
 }
 
-func fetchIndexSettings(index string) (*IndexSettings, error) {
+func fetchIndexSettings(index string) (IndexSettings, error) {
+	fmt.Println("Fetching settings for index:", index)
 	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_settings?pretty&human", index)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -125,27 +207,177 @@ func fetchIndexSettings(index string) (*IndexSettings, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to fetch settings for index %s: received status code %d", index, resp.StatusCode)
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read settings response for index %s: %w", index, err)
 	}
 
+	fmt.Printf("body: %v\n", string(body))
+
 	var settings map[string]IndexSettings
 	if err := json.Unmarshal(body, &settings); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
 	}
-
+	fmt.Printf("settings: %v\n", settings)
 	setting, exists := settings[index]
 	if !exists {
-		return nil, errors.New("index settings not found in response")
+		return nil, fmt.Errorf("index settings not found in response for index %s", index)
 	}
-	return &setting, nil
+	return setting, nil
+}
+
+func fetchIndexMappings(index string) (map[string]interface{}, error) {
+	fmt.Println("Fetching mappings for index:", index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_mapping", index)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read mappings response for index %s: %w", index, err)
+	}
+
+	var mappings map[string]interface{}
+	if err := json.Unmarshal(body, &mappings); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal mappings for index %s: %w", index, err)
+	}
+
+	// Extract the actual mapping structure
+	if m, ok := mappings[index]; ok {
+		return m.(map[string]interface{}), nil
+	}
+	return nil, errors.New("mappings not found for index")
 }
 
 func triggerReindex(index string) error {
 	logrus.Infof("Initiating reindex for index %s\n", index)
-	// TODO: CAll the reindex API to reindex the index
+
+	tempIndex := fmt.Sprintf("%s_temp", index)
+
+	settings, err := fetchIndexSettings(index)
+	if err != nil {
+		return fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
+	}
+
+	mappings, err := fetchIndexMappings(index)
+	if err != nil {
+		return fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
+	}
+
+	if err := createIndex(tempIndex, settings, mappings); err != nil {
+		return fmt.Errorf("failed to create temporary index %s: %w", tempIndex, err)
+	}
+
+	if err := reindexData(index, tempIndex); err != nil {
+		return fmt.Errorf("failed to reindex data to temporary index %s: %w", tempIndex, err)
+	}
+
+	if err := deleteIndex(index); err != nil {
+		return fmt.Errorf("failed to delete original index %s: %w", index, err)
+	}
+
+	if err := createIndex(index, settings, mappings); err != nil {
+		return fmt.Errorf("failed to create index %s: %w", index, err)
+	}
+
+	if err := reindexData(tempIndex, index); err != nil {
+		return fmt.Errorf("failed to reindex data from temp index %s back to %s: %w", tempIndex, index, err)
+	}
+
+	if err := deleteIndex(tempIndex); err != nil {
+		logrus.Warnf("Failed to delete temporary index %s: %v", tempIndex, err)
+	}
 
 	logrus.Infof("Reindexing completed for index %s\n", index)
+	return nil
+}
+
+func createIndex(index string, settings IndexSettings, mappings map[string]interface{}) error {
+	fmt.Println("Creating index:", index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s", index)
+
+	payload := map[string]interface{}{
+		"settings": settings[index].Settings,
+		"mappings": mappings,
+	}
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal settings and mappings for index %s: %w", index, err)
+	}
+
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(payloadBytes))
+	if err != nil {
+		return fmt.Errorf("failed to create PUT request for index %s: %w", index, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to execute PUT request for index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to create index %s: %s", index, string(body))
+	}
+	return nil
+}
+
+func reindexData(source, destination string) error {
+	fmt.Println("Reindexing data from:", source, "to:", destination)
+	url := "http://127.0.0.1:10144/_reindex"
+	payload := fmt.Sprintf(`{
+        "source": { "index": "%s" },
+        "dest": { "index": "%s" }
+    }`, source, destination)
+
+	resp, err := http.Post(url, "application/json", strings.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("failed to reindex data from %s to %s: %w", source, destination, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to reindex data: %s", string(body))
+	}
+	return nil
+}
+
+func deleteIndex(index string) error {
+	fmt.Println("Deleting index:", index)
+
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s", index)
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create delete request for index %s: %w", index, err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to delete index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete index %s: %s", index, string(body))
+	}
+	return nil
+}
+
+func cloneIndex(source, destination string) error {
+	fmt.Println("Cloning index from:", source, "to:", destination)
+	if err := reindexData(source, destination); err != nil {
+		return fmt.Errorf("failed to clone data from %s to %s: %w", source, destination, err)
+	}
 	return nil
 }
