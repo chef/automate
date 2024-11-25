@@ -426,6 +426,8 @@ module "bootstrap_automate" {
   bucket_name                        = var.bucket_name_deployment
   nfs_mount_path                     = var.nfs_mount_path
   infra                              = "deployment"
+  automate_base_path                 = var.automate_base_path
+  opensearch_base_path               = var.opensearch_base_path
   depends_on = [
     module.airgap_bundle-automate
   ]
@@ -502,6 +504,8 @@ module "automate" {
   bucket_name            = var.bucket_name_deployment
   nfs_mount_path         = var.nfs_mount_path
   infra                  = "deployment"
+  automate_base_path                 = var.automate_base_path
+  opensearch_base_path               = var.opensearch_base_path
   depends_on = [
     module.bootstrap_automate
   ]
@@ -574,6 +578,8 @@ module "chef_server" {
   bucket_name                        = var.bucket_name_deployment
   nfs_mount_path                     = var.nfs_mount_path
   infra                              = "deployment"
+  automate_base_path                 = var.automate_base_path
+  opensearch_base_path               = var.opensearch_base_path
   depends_on = [
     module.bootstrap_automate
   ]

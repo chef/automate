@@ -1034,6 +1034,8 @@ func (c *HaDeployConfigGen) PromptBackup() (err error) {
 	if c.Config.External == nil || c.Config.External.Database.Type != "self-managed" {
 		isBackupNeeded, err = c.Prompt.Confirm("Configured backup during deployment", "yes", "no")
 	}
+	c.Config.InitArchitecture().InitAws().AutomateBasePath = "automate"
+	c.Config.InitArchitecture().InitAws().OpensearchBasePath = "elasticsearch"
 	if isBackupNeeded {
 		c.Config.InitArchitecture().InitExistingInfra().BackupMount = "/mnt/automate_backups"
 		c.Config.InitExternal().InitDatabase()

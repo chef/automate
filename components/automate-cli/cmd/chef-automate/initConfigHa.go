@@ -134,6 +134,8 @@ type AwsConfigInitialsToml struct {
 	ExistingElkPassword         string `toml:"existing_elk_password"`
 	BackupMount                 string `toml:"backup_mount"`
 	BackupConfig                string `toml:"backup_config"`
+	AutomateBasePath            string `toml:"automate_base_path"`
+	OpensearchBasePath          string `toml:"opensearch_base_path"`
 	S3BucketName                string `toml:"s3_bucketName"`
 	HabitatUIDGid               string `toml:"habitat_uid_gid"`
 	AutomateDcToken             string `toml:"automate_dc_token,omitempty"`
@@ -163,6 +165,8 @@ type ExistingInfraConfigInitialsToml struct {
 	HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
 	BackupConfig                string `toml:"backup_config,omitempty"`
 	AutomateDcToken             string `toml:"automate_dc_token,omitempty"`
+	AutomateBasePath            string `toml:"automate_base_path,omitempty"`
+	OpensearchBasePath          string `toml:"opensearch_base_path,omitempty"`
 }
 
 type ExistingInfraAutomateToml struct {

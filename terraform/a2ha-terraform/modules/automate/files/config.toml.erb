@@ -3229,7 +3229,7 @@ rM2p0kk=
 
   # base_path (optional):  The path within the bucket where backups should be stored
   # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "elasticsearch"
+  base_path = "<%= overrides[:opensearch_base_path] %>"
 
   # name of an s3 client configuration you create in your elasticsearch.yml
   # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
@@ -3277,7 +3277,7 @@ rM2p0kk=
 
   # base_path (optional):  The path within the bucket where backups should be stored
   # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "automate"
+  base_path = "<%= overrides[:automate_base_path] %>"
 <% end %>
 
 
@@ -3289,10 +3289,10 @@ rM2p0kk=
 [global.v1.external.opensearch.backup.fs]
   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
   # a parent directory of the setting you configure here:
-  path = "<%= overrides[:nfs_mount_path] %>/opensearch"
+  path = "<%= overrides[:nfs_mount_path] %>/<%= overrides[:opensearch_base_path] %>"
 
 [global.v1.backups.filesystem]
-  path = "<%= overrides[:nfs_mount_path] %>/backups"
+  path = "<%= overrides[:nfs_mount_path] %>/<%= overrides[:automate_base_path] %>"
 <% end %>
 
 <% if overrides[:automate_config_file] %>
@@ -3326,7 +3326,7 @@ rM2p0kk=
   bucket = "<%= overrides[:bucket_name] %>"
   # base_path (optional):  The path within the bucket where backups should be stored
   # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "elasticsearch"
+  base_path = "<%= overrides[:opensearch_base_path] %>"
   ## GCS Bucket Settings:
   # type = nearline
   # access control = uniform
@@ -3335,7 +3335,7 @@ rM2p0kk=
   location = "gcs"
 [global.v1.backups.gcs.bucket]
   name = "<%= overrides[:bucket_name] %>"
-  base_path = "automate"
+  base_path = "<%= overrides[:automate_base_path] %>"
 [global.v1.backups.gcs.credentials]
   json = '''
 <%=  File.read(File.join(overrides[:tmp_path], "googleServiceAccount.json")) %>
@@ -3354,7 +3354,7 @@ rM2p0kk=
 
   # base_path (optional):  The path within the bucket where backups should be stored
   # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "elasticsearch"
+  base_path = "<%= overrides[:opensearch_base_path] %>"
 
   # name of an s3 client configuration you create in your elasticsearch.yml
   # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
@@ -3396,7 +3396,7 @@ rM2p0kk=
 
   # base_path (optional):  The path within the bucket where backups should be stored
   # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "automate"  
+  base_path = "<%= overrides[:automate_base_path] %>"  
 <% end %>
 
 <% if services[:postgresql][:setup_managed_services] == false && overrides[:setup_self_managed_services] == false -%>

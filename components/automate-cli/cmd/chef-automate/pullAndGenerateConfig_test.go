@@ -1096,7 +1096,7 @@ func TestDetermineBkpConfig(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := determineBkpConfig(tc.a2ConfigMap, tc.currConfig, tc.s3, tc.fs)
+			result, _, err := determineBkpConfig(tc.a2ConfigMap, tc.currConfig, tc.s3, tc.fs)
 			if tc.expectedErr != nil {
 				assert.Equal(t, tc.expectedErr, err)
 			} else {

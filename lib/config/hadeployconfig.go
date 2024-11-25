@@ -57,6 +57,8 @@ type ConfigInitials struct {
 	BackupMount                 string `toml:"backup_mount,omitempty"`
 	BackupConfig                string `toml:"backup_config,omitempty"`
 	S3BucketName                string `toml:"s3_bucketName,omitempty"`
+	AutomateBasePath            string `toml:"automate_base_path,omitempty"`
+	OpensearchBasePath          string `toml:"opensearch_base_path,omitempty"`
 	HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
 	// Elk configs not being used, it's not added
 }

@@ -58,6 +58,8 @@ locals {
       chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
       postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
       opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+      automate_base_path                 = var.automate_base_path
+      opensearch_base_path               = var.opensearch_base_path
     })
   ]
 

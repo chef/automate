@@ -33,6 +33,8 @@
   opensearch_custom_certs_enabled = ${opensearch_custom_certs_enabled}
   tmp_path = "${tmp_path}"
   location = "${location}"
+  automate_base_path = "${automate_base_path}"
+  opensearch_base_path = "${opensearch_base_path}"
   
 [services]
   [services.opensearch]

@@ -22,6 +22,8 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_password ""
 
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
+automate_base_path "{{ .Architecture.ConfigInitials.AutomateBasePath }}"
+opensearch_base_path "{{ .Architecture.ConfigInitials.OpensearchBasePath }}"
 ### type "{{ .ExternalDB.Database.Type}}"
 
 {{ if .Architecture.ConfigInitials.BackupMount }} 
@@ -145,6 +147,8 @@ ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}"
 {{ if .Architecture.ConfigInitials.BackupMount }} backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}" {{ end }}
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 {{ if  .Architecture.ConfigInitials.S3BucketName }} s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ else }} # s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ end }}
+{{ if  .Architecture.ConfigInitials.AutomateBasePath }} automate_base_path "{{ .Architecture.ConfigInitials.AutomateBasePath }}" {{ else }} # automate_base_path "{{ .Architecture.ConfigInitials.AutomateBasePath }}" {{ end }}
+{{ if  .Architecture.ConfigInitials.OpensearchBasePath }} opensearch_base_path "{{ .Architecture.ConfigInitials.OpensearchBasePath }}" {{ else }} # opensearch_base_path "{{ .Architecture.ConfigInitials.OpensearchBasePath }}" {{ end }}
 {{ if .Architecture.ConfigInitials.SSHGroupName }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}" {{ else }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHUser }}" {{ end }}
 # logging_monitoring_management "true"
 # new_elk "false"

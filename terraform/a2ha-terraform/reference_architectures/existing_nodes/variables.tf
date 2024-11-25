@@ -19,6 +19,14 @@ variable "backup_config_s3" {
   default = "false"
 }
 
+variable "automate_base_path" {
+  default = "automate"
+}
+
+variable "opensearch_base_path" {
+  default = "elasticsearch"
+}
+
 variable "bucket_name" {
   default = ""
 }
