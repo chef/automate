@@ -48,6 +48,7 @@ do_setup_environment() {
   set_buildtime_env SSL_CERT_FILE "$(pkg_path_for cacerts)/ssl/cert.pem"
 }
 
+
 do_build() {
   # bundle install the required gems for smoke and integration tests
   cd $PLAN_CONTEXT/../../../test
