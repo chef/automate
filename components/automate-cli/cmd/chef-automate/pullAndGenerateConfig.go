@@ -206,6 +206,8 @@ type PullConfigs interface {
 	setExceptionIps(ips []string)
 	getOsCertsByIp(map[string]*ConfigKeys) []CertByIP
 	setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil)
+	getBackupPathFromAutomateConfig(a2ConfigMap map[string]*dc.AutomateConfig, backupLocation string) (string, error)
+	getBackupPathFromOpensearchConfig() (string, error)
 }
 
 type PullConfigsImpl struct {
@@ -1649,4 +1651,55 @@ func getGcsBackupConfig(a2ConfigMap map[string]*dc.AutomateConfig, fileUtils fil
 		}
 	}
 	return objStoage, nil
+}
+
+func (p *PullConfigsImpl) getBackupPathFromAutomateConfig(a2ConfigMap map[string]*dc.AutomateConfig, backupLocation string) (string, error) {
+	for _, ele := range a2ConfigMap {
+		path := ""
+		switch backupLocation {
+		case "fs":
+			if ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
+				path = ele.Global.V1.External.Opensearch.Backup.Fs.Path.GetValue()
+				logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+				return path, nil
+			}
+		case "s3":
+			if ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
+				ele.Global.V1.External.Opensearch.Backup.S3.Bucket != nil &&
+				ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil {
+				path = ele.Global.V1.External.Opensearch.Backup.S3.BasePath.GetValue()
+				logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+				return path, nil
+			}
+		case "gcs":
+			if ele.Global.V1.External.Opensearch.Backup.Gcs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Gcs.Bucket != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath != nil {
+				path = ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath.GetValue()
+				logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+				return path, nil
+			}
+		}
+	}
+	return "", errors.New("backup path from automate node could not be determined")
+}
+
+func (p *PullConfigsImpl) getBackupPathFromOpensearchConfig() (string, error) {
+	if len(p.infra.Outputs.OpensearchPrivateIps.Value) == 0 {
+		return "", errors.New("the cluster has no opensearch nodes")
+	}
+	ip := p.infra.Outputs.OpensearchPrivateIps.Value[0]
+	p.sshUtil.getSSHConfig().hostIP = ip
+	scriptCommands := fmt.Sprintf(GET_CONFIG, opensearch_const)
+	rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+	if err != nil {
+		return "", err
+	}
+	var src OpensearchConfig
+	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
+		return "", err
+	}
+	logrus.Debugf("backup path from opensearch config: %s", src.Path.Repo)
+	return src.Path.Repo, nil
 }
