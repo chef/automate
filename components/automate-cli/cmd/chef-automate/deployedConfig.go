@@ -72,6 +72,8 @@ func CopyExistingInfra(existingInfraConfig *ExistingInfraConfigToml) *config.HaD
 				SecretsStoreFile:            existingInfraConfigConfigInitials.SecretsStoreFile,
 				WorkspacePath:               existingInfraConfigConfigInitials.WorkspacePath,
 				SudoPassword:                "", // not fetched
+				AutomateBasePath:            existingInfraConfigConfigInitials.AutomateBasePath,
+				OpensearchBasePath:          existingInfraConfigConfigInitials.OpensearchBasePath,
 			},
 		},
 		ObjectStorage: &config.ObjectStorage{
@@ -214,6 +216,8 @@ func CopyAws(awsConfig *AwsConfigToml) *config.HaDeployConfig {
 				SecretsStoreFile:            awsConfigConfigInitials.SecretsStoreFile,
 				WorkspacePath:               awsConfigConfigInitials.WorkspacePath,
 				SudoPassword:                "", // not fetched
+				OpensearchBasePath:          awsConfigConfigInitials.OpensearchBasePath,
+				AutomateBasePath:            awsConfigConfigInitials.AutomateBasePath,
 			},
 		},
 		Automate: &config.AutomateSettings{

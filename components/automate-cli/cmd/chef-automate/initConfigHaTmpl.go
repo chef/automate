@@ -34,6 +34,11 @@ backup_config = ""
 # s3_bucketName = ""
 ## === ===
 
+# this is the path where the automate backups will be stored
+automate_base_path = "automate"
+# this is the path where the opensearch backups will be stored
+opensearch_base_path = "elasticsearch"
+
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "aws"
@@ -363,6 +368,12 @@ backup_mount = "/mnt/automate_backups"
 backup_config = ""
 # If backup_config = "object_storage" fill out [object_storage.config] as well 
 ## Object storage similar to AWS S3 Bucket
+
+# this is the path where the automate backups will be stored
+automate_base_path = "automate"
+# this is the path where the opensearch backups will be stored
+opensearch_base_path = "elasticsearch"
+
 [object_storage.config]
 # for gcs we need to provide the bucket name and service_account json file path
 # google_service_account_file = "/home/user/MY-GOOGLE-ACCOUNT-SERVICE.json"

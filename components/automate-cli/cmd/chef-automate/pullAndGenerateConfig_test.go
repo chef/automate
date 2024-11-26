@@ -1096,7 +1096,7 @@ func TestDetermineBkpConfig(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := determineBkpConfig(tc.a2ConfigMap, tc.currConfig, tc.s3, tc.fs)
+			result, _, err := determineBkpConfig(tc.a2ConfigMap, tc.currConfig, tc.s3, tc.fs)
 			if tc.expectedErr != nil {
 				assert.Equal(t, tc.expectedErr, err)
 			} else {
@@ -1259,4 +1259,41 @@ func TestFetchInfraConfig(t *testing.T) {
 		exceptionIps: []string{"198.51.100.1"},
 	}
 	pullconfig.fetchInfraConfig(true)
+}
+
+func TestFindCommonPath(t *testing.T) {
+
+	tests := []map[string][]string{
+		{
+			"test":   {"/Home/bkp", "/Home/Os"},
+			"result": {"/Home", "bkp", "Os"},
+		},
+		{
+			"test":   {"/Home/test/bkp", "/Home/test/Os"},
+			"result": {"/Home/test", "bkp", "Os"},
+		},
+		{
+			"test":   {"/fdr1/bkp", "fdr2/Os"},
+			"result": {"", "/fdr1/bkp", "fdr2/Os"},
+		},
+		{
+			"test":   {"/Home/test/bkp", "Home/test/Os"},
+			"result": {"", "/Home/test/bkp", "Home/test/Os"},
+		},
+		{
+			"test":   {"/xyz", "/abc"},
+			"result": {"/", "xyz", "abc"},
+		},
+	}
+
+	// Process each test case
+	for _, test := range tests {
+		path1, path2 := test["test"][0], test["test"][1]
+		common, unique1, unique2 := findCommonPath(path1, path2)
+		t.Log("Input:", path1, path2)
+		t.Log("Common Path:", common, "Unique1:", unique1, "Unique2:", unique2)
+		assert.Equal(t, test["result"][0], common)
+		assert.Equal(t, test["result"][1], unique1)
+		assert.Equal(t, test["result"][2], unique2)
+	}
 }

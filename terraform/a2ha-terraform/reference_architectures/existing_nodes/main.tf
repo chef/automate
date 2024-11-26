@@ -171,6 +171,7 @@ module "opensearch" {
   opensearch_nodes_dn             = var.opensearch_nodes_dn
   opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
   opensearch_certs_by_ip          = var.opensearch_certs_by_ip
+  opensearch_base_path            = var.opensearch_base_path
 }
 
 module "postgresql" {
@@ -308,6 +309,8 @@ module "bootstrap_automate" {
   google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
+  automate_base_path                 = var.automate_base_path
+  opensearch_base_path               = var.opensearch_base_path
   depends_on                         = [module.airgap_bundle-frontend, module.habitat-frontend]
 }
 
@@ -387,6 +390,8 @@ module "automate" {
   google_service_account_file = var.google_service_account_file
   infra                       = var.infra
   nfs_mount_path              = var.nfs_mount_path
+  automate_base_path          = var.automate_base_path
+  opensearch_base_path        = var.opensearch_base_path
   depends_on                  = [module.bootstrap_automate]
 }
 
@@ -462,6 +467,8 @@ module "chef_server" {
   google_service_account_file        = var.google_service_account_file
   infra                              = var.infra
   nfs_mount_path                     = var.nfs_mount_path
+  automate_base_path                 = var.automate_base_path
+  opensearch_base_path               = var.opensearch_base_path
   depends_on                         = [module.bootstrap_automate]
 }
 

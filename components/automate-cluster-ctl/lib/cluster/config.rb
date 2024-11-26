@@ -55,6 +55,8 @@ module AutomateCluster
     default :backup_mount, '/mnt/automate_backups'
     default :habitat_uid_gid, ''
     default :automate_dc_token, ''
+    default :automate_base_path, 'automate'
+    default :opensearch_base_path, "elasticsearch"
 
     config_context :automate do
       default(:admin_password, '').writes_value do |password|
@@ -157,6 +159,8 @@ module AutomateCluster
       default :lb_access_logs, 'false'
       default :backup_config, ' '
       default :s3_bucketName, 'chef-automate-ha'
+      default :automate_base_path, 'automate'
+      default :opensearch_base_path, 'elasticsearch'
       default :setup_managed_services, false
       default :managed_opensearch_domain_name, ' '
       default :managed_opensearch_domain_url, ' '

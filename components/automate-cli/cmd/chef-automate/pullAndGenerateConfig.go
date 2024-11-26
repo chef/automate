@@ -38,6 +38,8 @@ type ObjectStorageConfig struct {
 	bucketName                   string
 	RoleArn                      string
 	location                     string
+	automateBasePath             string
+	opensearchBasePath           string
 	gcsServiceAccountCredentials string
 }
 
@@ -362,7 +364,13 @@ func (p *PullConfigsImpl) pullChefServerConfigs(removeUnreachableNodes bool) (ma
 	return ipConfigMap, unreachableNodes, nil
 }
 
-func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s3, fs string) (string, error) {
+type BkpLocation string
+
+const BKP_LOCATION_S3 BkpLocation = "s3"
+const BKP_LOCATION_FS BkpLocation = "fs"
+const BKP_LOCATION_GCS BkpLocation = "gcs"
+
+func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, objectStorage, fileSystem string) (string, string, error) {
 	for _, ele := range a2ConfigMap {
 		if ele.Global.V1.External.Opensearch != nil {
 			osBkpLocation := ""
@@ -372,31 +380,31 @@ func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s
 				osBkpLocation = ele.Global.V1.External.Opensearch.Backup.Location.Value
 			}
 			if ele.Global.V1.Backups == nil && ele.Global.V1.External.Opensearch.Backup == nil {
-				return "", nil
+				return "", "", nil
 			} else if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Location != nil &&
-				ele.Global.V1.Backups.Location.Value == "s3" &&
-				osBkpLocation == "s3" {
-				return s3, nil
+				ele.Global.V1.Backups.Location.Value == string(BKP_LOCATION_S3) &&
+				osBkpLocation == string(BKP_LOCATION_S3) {
+				return objectStorage, osBkpLocation, nil
 			} else if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Filesystem != nil &&
 				ele.Global.V1.Backups.Filesystem.Path != nil &&
 				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 &&
-				osBkpLocation == "fs" {
-				return fs, nil
+				osBkpLocation == string(BKP_LOCATION_FS) {
+				return fileSystem, osBkpLocation, nil
 			} else if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Location != nil &&
-				ele.Global.V1.Backups.Location.Value == "gcs" &&
-				osBkpLocation == "gcs" {
-				return s3, nil
+				ele.Global.V1.Backups.Location.Value == string(BKP_LOCATION_GCS) &&
+				osBkpLocation == string(BKP_LOCATION_GCS) {
+				return objectStorage, osBkpLocation, nil
 			} else {
-				return "", errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
+				return "", "", errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
 			}
 		} else {
-			return "", errors.New("automate config Global.V1.External.Opensearch missing")
+			return "", "", errors.New("automate config Global.V1.External.Opensearch missing")
 		}
 	}
-	return currConfig, nil
+	return currConfig, "", nil
 }
 
 func determineDBType(a2ConfigMap map[string]*dc.AutomateConfig, dbtype string) (string, error) {
@@ -454,7 +462,7 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 		sharedConfigToml.ObjectStorage.Config.GoogleServiceAccountFile = AUTOMATE_HA_WORKSPACE_GOOGLE_SERVICE_FILE
 	}
 
-	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
+	bktype, bkpLocation, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "object_storage", "file_system")
 	if err != nil {
 		return nil, unreachableNodes, status.New(status.ConfigError, err.Error())
 	}
@@ -598,6 +606,42 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 	if len(objectStorageConfig.endpoint) > 0 {
 		sharedConfigToml.ObjectStorage.Config.Endpoint = objectStorageConfig.endpoint
 	}
+
+	if bkpLocation == string(BKP_LOCATION_S3) {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = objectStorageConfig.automateBasePath
+		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = objectStorageConfig.opensearchBasePath
+	} else if bkpLocation == string(BKP_LOCATION_FS) {
+		var fullPathA2, fullPathOS string
+		for _, ele := range a2ConfigMap {
+			if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Filesystem != nil &&
+				ele.Global.V1.Backups.Filesystem.Path != nil &&
+				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 {
+				fullPathA2 = ele.Global.V1.Backups.Filesystem.Path.Value
+			}
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
+				fullPathOS = ele.Global.V1.External.Opensearch.Backup.Fs.Path.Value
+			}
+			common, a2Base, osBase := findCommonPath(fullPathA2, fullPathOS)
+			sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = a2Base
+			sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = osBase
+			sharedConfigToml.Architecture.ConfigInitials.BackupMount = common
+		}
+	} else if bkpLocation == string(BKP_LOCATION_GCS) {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = gcsObjStorageConfig.automateBasePath
+		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = gcsObjStorageConfig.opensearchBasePath
+	}
+
+	if len(sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath) == 0 {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = "automate"
+	}
+	if len(sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath) == 0 {
+		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = "elasticsearch"
+	}
+
 	a2Fqdn := getA2fqdn(a2ConfigMap)
 	if a2Fqdn != "" {
 		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
@@ -606,6 +650,55 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
 	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
 	return sharedConfigToml, unreachableNodes, nil
+}
+
+// Function to find the common path and unique parts
+func findCommonPath(path1, path2 string) (common, unique1, unique2 string) {
+	// Check if paths start with "/"
+	hasLeadingSlash1 := strings.HasPrefix(path1, "/")
+	hasLeadingSlash2 := strings.HasPrefix(path2, "/")
+
+	// Split paths into components
+	components1 := strings.Split(filepath.Clean(path1), string(filepath.Separator))
+	components2 := strings.Split(filepath.Clean(path2), string(filepath.Separator))
+
+	// Handle leading slash explicitly
+	if hasLeadingSlash1 {
+		components1 = append([]string{""}, components1...)
+	}
+	if hasLeadingSlash2 {
+		components2 = append([]string{""}, components2...)
+	}
+
+	// Find the common prefix
+	var commonComponents []string
+	i := 0
+	for i < len(components1) && i < len(components2) && components1[i] == components2[i] {
+		commonComponents = append(commonComponents, components1[i])
+		i++
+	}
+
+	// Build the common path
+	common = filepath.Join(commonComponents...)
+	if len(commonComponents) > 0 && commonComponents[0] == "" {
+		common = "/" + common // Ensure leading slash if present in input
+	}
+
+	// Build the unique parts
+	unique1 = filepath.Join(components1[i:]...)
+	unique2 = filepath.Join(components2[i:]...)
+
+	// Adjust unique paths if no common prefix
+	if common == "" {
+		if hasLeadingSlash1 {
+			unique1 = "/" + unique1
+		}
+		if hasLeadingSlash2 {
+			unique2 = "/" + unique2
+		}
+	}
+
+	return
 }
 
 func (p *PullConfigsImpl) getOSpassword() (string, error) {
@@ -818,7 +911,7 @@ func (p *PullConfigsImpl) fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfi
 		return nil, unreachableNodes, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
 	unreachableNodes[CHEF_SERVER] = chefServerUnreachableNodes
-	bktype, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "s3", "efs")
+	bktype, bkpLocation, err := determineBkpConfig(a2ConfigMap, sharedConfigToml.Architecture.ConfigInitials.BackupConfig, "s3", "efs")
 	if err != nil {
 		return nil, unreachableNodes, err
 	}
@@ -981,6 +1074,38 @@ func (p *PullConfigsImpl) fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfi
 	}
 	if len(objStorageConfig.secrectKey) > 0 {
 		sharedConfigToml.Aws.Config.OsUserAccessKeySecret = objStorageConfig.secrectKey
+	}
+
+	if bkpLocation == string(BKP_LOCATION_S3) {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = objStorageConfig.automateBasePath
+		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = objStorageConfig.opensearchBasePath
+	} else if bkpLocation == string(BKP_LOCATION_FS) {
+		var fullPathA2, fullPathOS string
+		for _, ele := range a2ConfigMap {
+			if ele.Global.V1.Backups != nil &&
+				ele.Global.V1.Backups.Filesystem != nil &&
+				ele.Global.V1.Backups.Filesystem.Path != nil &&
+				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 {
+				fullPathA2 = ele.Global.V1.Backups.Filesystem.Path.Value
+			}
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
+				fullPathOS = ele.Global.V1.External.Opensearch.Backup.Fs.Path.Value
+			}
+			common, a2Base, osBase := findCommonPath(fullPathA2, fullPathOS)
+			sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = a2Base
+			sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = osBase
+			sharedConfigToml.Architecture.ConfigInitials.BackupMount = common
+		}
+	}
+
+	if len(sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath) == 0 {
+		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = "automate"
+	}
+	if len(sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath) == 0 {
+		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = "elasticsearch"
 	}
 
 	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
@@ -1355,6 +1480,27 @@ func getS3Bucket(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
+func getS3BucketOsBasePath(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Backup != nil && ele.Global.V1.External.Opensearch.Backup.S3 != nil && ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.S3.BasePath.Value)) > 0 {
+			return ele.Global.V1.External.Opensearch.Backup.S3.BasePath.Value
+		}
+	}
+	return ""
+}
+
+func getS3BucketA2BasePath(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.Global.V1.Backups != nil &&
+			ele.Global.V1.Backups.S3 != nil &&
+			ele.Global.V1.Backups.S3.Bucket != nil &&
+			ele.Global.V1.Backups.S3.Bucket.BasePath != nil {
+			return ele.Global.V1.Backups.S3.Bucket.BasePath.Value
+		}
+	}
+	return ""
+}
+
 func getOsRoleArn(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
 		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Backup != nil && ele.Global.V1.External.Opensearch.Backup.S3 != nil && ele.Global.V1.External.Opensearch.Backup.S3.Settings != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value)) > 0 {
@@ -1388,6 +1534,8 @@ func getOpenSearchObjectStorageConfig(config map[string]*dc.AutomateConfig) *Obj
 	objStoage.secrectKey = getOsSecretKey(config)
 	objStoage.RoleArn = getOsRoleArn(config)
 	objStoage.bucketName = getS3Bucket(config)
+	objStoage.opensearchBasePath = getS3BucketOsBasePath(config)
+	objStoage.automateBasePath = getS3BucketA2BasePath(config)
 	return objStoage
 }
 
@@ -1430,6 +1578,14 @@ func getModeOfDeployment() string {
 func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig {
 	objStoage := &ObjectStorageConfig{}
 	for _, ele := range config {
+		if ele.Global.V1.External != nil &&
+			ele.Global.V1.External.Opensearch != nil &&
+			ele.Global.V1.External.Opensearch.Backup != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil &&
+			len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.S3.BasePath.Value)) > 0 {
+			objStoage.opensearchBasePath = ele.Global.V1.External.Opensearch.Backup.S3.BasePath.Value
+		}
 		if ele.Global.V1.Backups != nil && ele.Global.V1.Backups.S3 != nil {
 			if len(strings.TrimSpace(ele.Global.V1.Backups.Location.Value)) > 0 {
 				objStoage.location = ele.Global.V1.Backups.Location.Value
@@ -1441,6 +1597,9 @@ func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig 
 			if ele.Global.V1.Backups.S3.Bucket != nil {
 				objStoage.bucketName = ele.Global.V1.Backups.S3.Bucket.Name.Value
 				objStoage.endpoint = ele.Global.V1.Backups.S3.Bucket.Endpoint.Value
+			}
+			if ele.Global.V1.Backups.S3.Bucket.BasePath != nil {
+				objStoage.automateBasePath = ele.Global.V1.Backups.S3.Bucket.BasePath.Value
 			}
 			break
 		}
@@ -1461,6 +1620,21 @@ func getGcsBackupConfig(a2ConfigMap map[string]*dc.AutomateConfig, fileUtils fil
 			if ele.Global.V1.Backups.Gcs.Bucket != nil && len(strings.TrimSpace(ele.Global.V1.Backups.Gcs.Bucket.Name.Value)) > 0 {
 				objStoage.bucketName = ele.Global.V1.Backups.Gcs.Bucket.Name.Value
 			}
+			if ele.Global.V1.Backups.Gcs.Bucket != nil &&
+				ele.Global.V1.Backups.Gcs.Bucket.BasePath != nil &&
+				len(strings.TrimSpace(ele.Global.V1.Backups.Gcs.Bucket.BasePath.Value)) > 0 {
+				objStoage.automateBasePath = ele.Global.V1.Backups.Gcs.Bucket.BasePath.Value
+			}
+
+			if ele.Global.V1.External != nil &&
+				ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Gcs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath != nil &&
+				len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath.Value)) > 0 {
+				objStoage.opensearchBasePath = ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath.Value
+			}
+
 			if ele.Global.V1.Backups.Gcs.Credentials != nil && len(strings.TrimSpace(ele.Global.V1.Backups.Gcs.Credentials.Json.Value)) > 0 {
 				objStoage.gcsServiceAccountCredentials = ele.Global.V1.Backups.Gcs.Credentials.Json.Value
 			}

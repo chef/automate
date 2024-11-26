@@ -1392,6 +1392,8 @@ func (c *AwsHaProvisionConfig) PromptBackup() (err error) {
 				return err1
 			}
 			c.Config.InitArchitecture().InitAws().S3BucketName = s3Bucket
+			c.Config.InitArchitecture().InitAws().AutomateBasePath = "automate"
+			c.Config.InitArchitecture().InitAws().OpensearchBasePath = "elasticsearch"
 		}
 
 	}

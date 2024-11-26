@@ -156,6 +156,14 @@ vsphere_linux_template = "<%= config.vsphere.linux_template %>"
  backup_config_s3 = "true"
 <% end %>
 
+<% if config.automate_base_path %>
+automate_base_path = "<%= config.automate_base_path %>"
+<% end %>
+
+<% if config.opensearch_base_path %>
+opensearch_base_path = "<%= config.opensearch_base_path %>"
+<% end %>
+
 # Existing nodes
 ################################################################################
 existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %>
@@ -256,6 +264,15 @@ google_service_account_file = "<%= config.object_storage.google_service_account_
 <% if config.s3_bucketName %>
 bucket_name_deployment = "<%= config.s3_bucketName %>"
 <% end %>
+
+<% if config.automate_base_path %>
+automate_base_path = "<%= config.automate_base_path %>"
+<% end %>
+
+<% if config.opensearch_base_path %>
+opensearch_base_path = "<%= config.opensearch_base_path %>"
+<% end %>
+
 <% if config.backup_config == 'efs' %>
  backup_config_efs_deployment = "true"
 <% end %>
