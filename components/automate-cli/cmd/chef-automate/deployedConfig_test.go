@@ -286,18 +286,20 @@ var awsConfig = &AwsConfigToml{
 }
 
 type MockPullConfigs struct {
-	fetchInfraConfigFunc      func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
-	fetchAwsConfigFunc        func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
-	pullOpensearchConfigsFunc func(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
-	pullPGConfigsFunc         func(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
-	pullAutomateConfigsFunc   func(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
-	pullChefServerConfigsFunc func(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
-	generateInfraConfigFunc   func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
-	generateAwsConfigFunc     func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
-	getExceptionIpsFunc       func() []string
-	setExceptionIpsFunc       func(ips []string)
-	getOsCertsByIpFunc        func(map[string]*ConfigKeys) []CertByIP
-	setInfraAndSSHUtilFunc    func(*AutomateHAInfraDetails, SSHUtil)
+	fetchInfraConfigFunc         	      func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	fetchAwsConfigFunc                    func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
+	pullOpensearchConfigsFunc             func(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
+	pullPGConfigsFunc                     func(removeUnreachableNodes bool) (map[string]*ConfigKeys, []string, error)
+	pullAutomateConfigsFunc               func(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
+	pullChefServerConfigsFunc             func(removeUnreachableNodes bool) (map[string]*dc.AutomateConfig, []string, error)
+	generateInfraConfigFunc               func(removeUnreachableNodes bool) (*ExistingInfraConfigToml, map[string][]string, error)
+	generateAwsConfigFunc     			  func(removeUnreachableNodes bool) (*AwsConfigToml, map[string][]string, error)
+	getExceptionIpsFunc                   func() []string
+	setExceptionIpsFunc                   func(ips []string)
+	getOsCertsByIpFunc                    func(map[string]*ConfigKeys) []CertByIP
+	setInfraAndSSHUtilFunc                func(*AutomateHAInfraDetails, SSHUtil)
+	getBackupPathFromAutomateConfigFunc   func(map[string]*dc.AutomateConfig, string) (string, error)
+	getBackupPathFromOpensearchConfigFunc func() (string, error)
 }
 
 func (m *MockPullConfigs) setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil) {
@@ -346,6 +348,16 @@ func (m *MockPullConfigs) setExceptionIps(ips []string) {
 func (m *MockPullConfigs) getOsCertsByIp(configKeysMap map[string]*ConfigKeys) []CertByIP {
 	return m.getOsCertsByIpFunc(configKeysMap)
 }
+
+func (m *MockPullConfigs) getBackupPathFromAutomateConfig(a2ConfigMap map[string]*dc.AutomateConfig, backupLocation string) (string, error) {
+	return m.getBackupPathFromAutomateConfigFunc(a2ConfigMap, backupLocation)
+}
+
+func (m *MockPullConfigs) getBackupPathFromOpensearchConfig() (string, error) {
+	return m.getBackupPathFromOpensearchConfigFunc()
+}
+
+
 
 func TestPopulateHaCommonConfig(t *testing.T) {
 	tests := []struct {
