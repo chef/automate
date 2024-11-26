@@ -171,6 +171,7 @@ module "opensearch" {
   opensearch_nodes_dn             = var.opensearch_nodes_dn
   opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
   opensearch_certs_by_ip          = var.opensearch_certs_by_ip
+  opensearch_base_path            = var.opensearch_base_path
 }
 
 module "postgresql" {

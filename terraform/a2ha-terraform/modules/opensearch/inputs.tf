@@ -142,3 +142,7 @@ variable "sudo_cmd" {
 variable "tmp_path" {
   default = "/hab/var/automate-ha"
 }
+
+variable "opensearch_base_path" {
+  default = "elasticsearch"
+}
