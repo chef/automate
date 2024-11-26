@@ -1519,6 +1519,14 @@ func getModeOfDeployment() string {
 func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig {
 	objStoage := &ObjectStorageConfig{}
 	for _, ele := range config {
+		if ele.Global.V1.External != nil &&
+			ele.Global.V1.External.Opensearch != nil &&
+			ele.Global.V1.External.Opensearch.Backup != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
+			ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil &&
+			len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.S3.BasePath.Value)) > 0 {
+			objStoage.opensearchBasePath = ele.Global.V1.External.Opensearch.Backup.S3.BasePath.Value
+		}
 		if ele.Global.V1.Backups != nil && ele.Global.V1.Backups.S3 != nil {
 			if len(strings.TrimSpace(ele.Global.V1.Backups.Location.Value)) > 0 {
 				objStoage.location = ele.Global.V1.Backups.Location.Value
