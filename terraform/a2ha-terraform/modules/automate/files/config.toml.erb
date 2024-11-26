@@ -3289,10 +3289,10 @@ rM2p0kk=
 [global.v1.external.opensearch.backup.fs]
   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
   # a parent directory of the setting you configure here:
-  path = "<%= overrides[:nfs_mount_path] %>/<%= overrides[:opensearch_base_path] %>"
+  path = "<%= overrides[:opensearch_nfs_path] %>"
 
 [global.v1.backups.filesystem]
-  path = "<%= overrides[:nfs_mount_path] %>/<%= overrides[:automate_base_path] %>"
+  path = "<%= overrides[:automate_nfs_path] %>"
 <% end %>
 
 <% if overrides[:automate_config_file] %>

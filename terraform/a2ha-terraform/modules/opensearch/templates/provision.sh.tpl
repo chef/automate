@@ -72,8 +72,8 @@ mkdir -p /hab/user/"$OPENSEARCHSIDECAR_PKG_NAME"/config
 cp -f ${tmp_path}/opensearchsidecar.toml /hab/user/"$OPENSEARCHSIDECAR_PKG_NAME"/config/user.toml
 
 # Creating mount path for elasticsearch backup 
-sudo mkdir -p ${nfs_mount_path}/${opensearch_base_path}
-sudo chown hab:hab ${nfs_mount_path}/${opensearch_base_path}/
+sudo mkdir -p ${opensearch_nfs_path}
+sudo chown hab:hab ${opensearch_nfs_path}/
 
 wait_for_aib_extraction() {
   max=20

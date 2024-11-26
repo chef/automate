@@ -21,6 +21,7 @@ locals {
       opensearch_private_key          = trimspace(contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].private_key : var.opensearch_private_key)
       opensearch_nodes_dn             = trimspace(contains(keys(var.opensearch_certs_by_ip), var.private_ips[n]) ? var.opensearch_certs_by_ip[element(var.private_ips, n)].nodes_dn : var.opensearch_nodes_dn)
       opensearch_base_path            = var.opensearch_base_path
+      opensearch_nfs_path             = var.nfs_mount_path == "" ? var.opensearch_base_path : format("%s/%s",var.nfs_mount_path,var.opensearch_base_path)
     })
   ]
   opensearchsidecar_user_toml = [
@@ -43,11 +44,13 @@ locals {
     opensearch_username             = var.opensearch_username
     opensearch_user_password        = var.opensearch_user_password
     opensearch_base_path            = var.opensearch_base_path
+    opensearch_nfs_path             = var.nfs_mount_path == "" ? var.opensearch_base_path : format("%s/%s",var.nfs_mount_path,var.opensearch_base_path)
   })
 
   efs_backup = templatefile("${path.module}/templates/efs_backup.sh.tpl", {
     nfs_mount_path       = var.nfs_mount_path
     opensearch_base_path = var.opensearch_base_path
+    opensearch_nfs_path  = var.nfs_mount_path == "" ? var.opensearch_base_path : format("%s/%s",var.nfs_mount_path,var.opensearch_base_path)
   })
 }
 

@@ -611,19 +611,24 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = objectStorageConfig.automateBasePath
 		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = objectStorageConfig.opensearchBasePath
 	} else if bkpLocation == string(BKP_LOCATION_FS) {
+		var fullPathA2, fullPathOS string
 		for _, ele := range a2ConfigMap {
-			if ele.Global.V1.External.Opensearch != nil &&
-				ele.Global.V1.External.Opensearch.Backup != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
-				sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = ele.Global.V1.External.Opensearch.Backup.Fs.Path.Value
-			}
 			if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Filesystem != nil &&
 				ele.Global.V1.Backups.Filesystem.Path != nil &&
 				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 {
-				sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = ele.Global.V1.Backups.Filesystem.Path.Value
+				fullPathA2 = ele.Global.V1.Backups.Filesystem.Path.Value
 			}
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
+				fullPathOS = ele.Global.V1.External.Opensearch.Backup.Fs.Path.Value
+			}
+			common, a2Base, osBase := findCommonPath(fullPathA2, fullPathOS)
+			sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = a2Base
+			sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = osBase
+			sharedConfigToml.Architecture.ConfigInitials.BackupMount = common
 		}
 	} else if bkpLocation == string(BKP_LOCATION_GCS) {
 		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = gcsObjStorageConfig.automateBasePath
@@ -645,6 +650,55 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 	fqdn, root_ca := getChefServerFqdnAndLBRootCA(a2ConfigMap)
 	sharedConfigToml.ChefServer.Config.Fqdn, sharedConfigToml.ChefServer.Config.RootCA = fqdn, root_ca
 	return sharedConfigToml, unreachableNodes, nil
+}
+
+// Function to find the common path and unique parts
+func findCommonPath(path1, path2 string) (common, unique1, unique2 string) {
+	// Check if paths start with "/"
+	hasLeadingSlash1 := strings.HasPrefix(path1, "/")
+	hasLeadingSlash2 := strings.HasPrefix(path2, "/")
+
+	// Split paths into components
+	components1 := strings.Split(filepath.Clean(path1), string(filepath.Separator))
+	components2 := strings.Split(filepath.Clean(path2), string(filepath.Separator))
+
+	// Handle leading slash explicitly
+	if hasLeadingSlash1 {
+		components1 = append([]string{""}, components1...)
+	}
+	if hasLeadingSlash2 {
+		components2 = append([]string{""}, components2...)
+	}
+
+	// Find the common prefix
+	var commonComponents []string
+	i := 0
+	for i < len(components1) && i < len(components2) && components1[i] == components2[i] {
+		commonComponents = append(commonComponents, components1[i])
+		i++
+	}
+
+	// Build the common path
+	common = filepath.Join(commonComponents...)
+	if len(commonComponents) > 0 && commonComponents[0] == "" {
+		common = "/" + common // Ensure leading slash if present in input
+	}
+
+	// Build the unique parts
+	unique1 = filepath.Join(components1[i:]...)
+	unique2 = filepath.Join(components2[i:]...)
+
+	// Adjust unique paths if no common prefix
+	if common == "" {
+		if hasLeadingSlash1 {
+			unique1 = "/" + unique1
+		}
+		if hasLeadingSlash2 {
+			unique2 = "/" + unique2
+		}
+	}
+
+	return
 }
 
 func (p *PullConfigsImpl) getOSpassword() (string, error) {
@@ -1026,19 +1080,24 @@ func (p *PullConfigsImpl) fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfi
 		sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = objStorageConfig.automateBasePath
 		sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = objStorageConfig.opensearchBasePath
 	} else if bkpLocation == string(BKP_LOCATION_FS) {
+		var fullPathA2, fullPathOS string
 		for _, ele := range a2ConfigMap {
-			if ele.Global.V1.External.Opensearch != nil &&
-				ele.Global.V1.External.Opensearch.Backup != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
-				sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = ele.Global.V1.External.Opensearch.Backup.Fs.Path.Value
-			}
 			if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Filesystem != nil &&
 				ele.Global.V1.Backups.Filesystem.Path != nil &&
 				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 {
-				sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = ele.Global.V1.Backups.Filesystem.Path.Value
+				fullPathA2 = ele.Global.V1.Backups.Filesystem.Path.Value
 			}
+			if ele.Global.V1.External.Opensearch != nil &&
+				ele.Global.V1.External.Opensearch.Backup != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
+				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
+				fullPathOS = ele.Global.V1.External.Opensearch.Backup.Fs.Path.Value
+			}
+			common, a2Base, osBase := findCommonPath(fullPathA2, fullPathOS)
+			sharedConfigToml.Architecture.ConfigInitials.AutomateBasePath = a2Base
+			sharedConfigToml.Architecture.ConfigInitials.OpensearchBasePath = osBase
+			sharedConfigToml.Architecture.ConfigInitials.BackupMount = common
 		}
 	}
 

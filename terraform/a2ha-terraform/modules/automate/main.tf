@@ -60,6 +60,8 @@ locals {
       opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
       automate_base_path                 = var.automate_base_path
       opensearch_base_path               = var.opensearch_base_path
+      automate_nfs_path                  = var.nfs_mount_path == "" ? var.automate_base_path : format("%s/%s",var.nfs_mount_path,var.automate_base_path)
+      opensearch_nfs_path                = var.nfs_mount_path == "" ? var.opensearch_base_path : format("%s/%s",var.nfs_mount_path,var.opensearch_base_path)
     })
   ]
 

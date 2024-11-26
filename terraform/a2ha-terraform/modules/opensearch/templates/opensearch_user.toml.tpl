@@ -18,7 +18,7 @@ ${ "${backup_config}" == "s3" ? <<EOT
 EOT 
 : "${backup_config}" == "efs" ? <<EOT
 [path]      
-  repo = "${nfs_mount_path}/${opensearch_base_path}"
+  repo = "${opensearch_nfs_path}"
 EOT 
 : "" }
 

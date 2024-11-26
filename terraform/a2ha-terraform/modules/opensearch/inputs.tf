@@ -59,6 +59,10 @@ variable "opensearch_certs_by_ip" {
   default = {}
 }
 
+variable "opensearch_base_path" {
+  default = "elasticsearch"
+}
+
 variable "opensearch_custom_certs_enabled" {
   default = false
 }
@@ -141,8 +145,4 @@ variable "sudo_cmd" {
 
 variable "tmp_path" {
   default = "/hab/var/automate-ha"
-}
-
-variable "opensearch_base_path" {
-  default = "elasticsearch"
 }

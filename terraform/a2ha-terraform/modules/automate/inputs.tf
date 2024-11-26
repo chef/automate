@@ -14,6 +14,10 @@ variable "automate_admin_password" {
 variable "automate_admin_username" {
 }
 
+variable "automate_base_path" {
+  default = "automate"
+}
+
 variable "automate_certs_by_ip" {
   type    = map(map(string))
   default = {}
@@ -79,14 +83,6 @@ variable "backup_config_efs" {
 
 variable "backup_config_s3" {
   default = "false"
-}
-
-variable "automate_base_path" {
-  default = "automate"
-}
-
-variable "opensearch_base_path" {
-  default = "elasticsearch"
 }
 
 variable "bucket_name" {
@@ -180,6 +176,10 @@ variable "managed_rds_superuser_username" {
 
 variable "nfs_mount_path" {
   default = "/mnt/automate_backups"
+}
+
+variable "opensearch_base_path" {
+  default = "elasticsearch"
 }
 
 variable "opensearch_custom_certs_enabled" {

@@ -10,6 +10,10 @@ variable "ami_filter_virt_type" {
   default = "hvm"
 }
 
+variable "automate_base_path" {
+  default = "automate"
+}
+
 variable "automate_certs_by_ip" {
   type    = map(map(string))
   default = {}
@@ -88,14 +92,6 @@ variable "backup_config_efs_deployment" {
 
 variable "backup_config_s3" {
   default = "false"
-}
-
-variable "automate_base_path" {
-  default = "automate"
-}
-
-variable "opensearch_base_path" {
-  default = "elasticsearch"
 }
 
 variable "backup_config_s3_deployment" {
@@ -222,6 +218,10 @@ variable "managed_rds_superuser_username" {
 
 variable "managed_rds_superuser_username_deployment" {
   default = ""
+}
+
+variable "opensearch_base_path" {
+  default = "elasticsearch"
 }
 
 variable "opensearch_certs_by_ip" {
