@@ -34,6 +34,7 @@
   tmp_path = "${tmp_path}"
   location = "${location}"
   automate_base_path = "${automate_base_path}"
+  opensearch_base_path = "${opensearch_base_path}"
   automate_nfs_path = "${automate_nfs_path}"
   opensearch_nfs_path = "${opensearch_nfs_path}"
   
