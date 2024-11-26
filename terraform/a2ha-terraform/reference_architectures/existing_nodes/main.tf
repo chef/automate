@@ -389,8 +389,8 @@ module "automate" {
   google_service_account_file = var.google_service_account_file
   infra                       = var.infra
   nfs_mount_path              = var.nfs_mount_path
-  automate_base_path                 = var.automate_base_path
-  opensearch_base_path               = var.opensearch_base_path
+  automate_base_path          = var.automate_base_path
+  opensearch_base_path        = var.opensearch_base_path
   depends_on                  = [module.bootstrap_automate]
 }
 
