@@ -370,7 +370,7 @@ const BKP_LOCATION_S3 BkpLocation = "s3"
 const BKP_LOCATION_FS BkpLocation = "fs"
 const BKP_LOCATION_GCS BkpLocation = "gcs"
 
-func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s3, fs string) (string, string, error) {
+func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, objectStorage, fileSystem string) (string, string, error) {
 	for _, ele := range a2ConfigMap {
 		if ele.Global.V1.External.Opensearch != nil {
 			osBkpLocation := ""
@@ -385,18 +385,18 @@ func determineBkpConfig(a2ConfigMap map[string]*dc.AutomateConfig, currConfig, s
 				ele.Global.V1.Backups.Location != nil &&
 				ele.Global.V1.Backups.Location.Value == string(BKP_LOCATION_S3) &&
 				osBkpLocation == string(BKP_LOCATION_S3) {
-				return s3, osBkpLocation, nil
+				return objectStorage, osBkpLocation, nil
 			} else if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Filesystem != nil &&
 				ele.Global.V1.Backups.Filesystem.Path != nil &&
 				len(ele.Global.V1.Backups.Filesystem.Path.Value) > 0 &&
 				osBkpLocation == string(BKP_LOCATION_FS) {
-				return fs, osBkpLocation, nil
+				return fileSystem, osBkpLocation, nil
 			} else if ele.Global.V1.Backups != nil &&
 				ele.Global.V1.Backups.Location != nil &&
 				ele.Global.V1.Backups.Location.Value == string(BKP_LOCATION_GCS) &&
 				osBkpLocation == string(BKP_LOCATION_GCS) {
-				return s3, osBkpLocation, nil
+				return objectStorage, osBkpLocation, nil
 			} else {
 				return "", "", errors.New("automate backup config mismatch in Global.V1.Backups and Global.V1.External.Opensearch.Backup")
 			}
