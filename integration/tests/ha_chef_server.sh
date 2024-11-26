@@ -174,6 +174,8 @@ required_recipe_enabled false
 reindex_endpoint "https://127.0.0.1"
 internal_server "https://$frontend1_ip:10203"
 EOH
+
+    do_apply_license
 }
 
 do_test_deploy() {
