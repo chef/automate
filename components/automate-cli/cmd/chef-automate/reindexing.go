@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+
 	"github.com/spf13/cobra"
 )
 
@@ -140,7 +140,7 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	mu.Lock()
 	if isReindexing {
 		mu.Unlock()
-		logrus.Infoln("Reindexing is already in progress. Please wait for it to complete.")
+		fmt.Println("Reindexing is already in progress. Please wait for it to complete.")
 		return nil
 	}
 	isReindexing = true
@@ -164,21 +164,21 @@ func runReindex(cmd *cobra.Command, args []string) error {
 
 		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
-			logrus.Errorf("Error fetching settings for index %s: %v", index.Index, err)
+			fmt.Errorf("Error fetching settings for index %s: %v", index.Index, err)
 			continue
 		}
 
 		if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
-			logrus.Infof("Reindexing required for index: %s", index.Index)
+			fmt.Printf("Reindexing required for index: %s\n", index.Index)
 			if err := triggerReindex(index.Index); err != nil {
-				logrus.Errorf("Error reindexing index %s: %v", index.Index, err)
+				fmt.Errorf("Error reindexing index %s: %v", index.Index, err)
 			}
 		} else {
-			logrus.Infof("Index %s is up to date. Skipping reindex.", index.Index)
+			fmt.Printf("Index %s is up to date. Skipping reindex.", index.Index)
 		}
 	}
 
-	logrus.Infoln("Reindexing process completed.")
+	fmt.Println("Reindexing process completed.")
 	return nil
 }
 
@@ -251,7 +251,6 @@ func fetchIndexSettings(index string) (map[string]interface{}, error) {
 	if err := json.Unmarshal(body, &rawSettings); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
 	}
-	fmt.Printf("rawSettings: %v\n", rawSettings)
 
 	return rawSettings, nil
 }
@@ -296,7 +295,7 @@ func fetchIndexMappings(index string) (map[string]interface{}, error) {
 }
 
 func triggerReindex(index string) error {
-	logrus.Infof("Initiating reindex for index %s\n", index)
+	fmt.Printf("Initiating reindex for index %s\n", index)
 
 	tempIndex := fmt.Sprintf("%s_temp", index)
 
@@ -330,16 +329,17 @@ func triggerReindex(index string) error {
 		return fmt.Errorf("failed to reindex data from temp index %s back to %s: %w", tempIndex, index, err)
 	}
 
+	// Optionally delete the temporary index after reindexing
 	// if err := deleteIndex(tempIndex); err != nil {
-	// 	logrus.Warnf("Failed to delete temporary index %s: %v", tempIndex, err)
+	// 	fmt.Warnf("Failed to delete temporary index %s: %v", tempIndex, err)
 	// }
 
-	logrus.Infof("Reindexing completed for index %s\n", index)
+	fmt.Printf("Reindexing completed for index %s\n", index)
 	return nil
 }
 
 func sanitizeSettings(settings map[string]interface{}, indexName string) (map[string]interface{}, error) {
-	fmt.Printf("Pre sanitized settings: %+v\n", settings)
+	// fmt.Printf("Pre sanitized settings: %+v\n", settings)
 
 	indexData, ok := settings[indexName]
 	if !ok {
@@ -369,7 +369,7 @@ func sanitizeSettings(settings map[string]interface{}, indexName string) (map[st
 	// Update settingsMap with sanitized index settings
 	settingsMap["index"] = indexSettings
 
-	fmt.Printf("Post sanitized settings: %+v\n", settingsMap)
+	// fmt.Printf("Post sanitized settings: %+v\n", settingsMap)
 	return settingsMap, nil
 }
 
@@ -421,16 +421,24 @@ func reindexData(source, destination string) error {
         "dest": { "index": "%s" }
     }`, source, destination)
 
-	resp, err := http.Post(url, "application/json", strings.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(payload))
 	if err != nil {
-		return fmt.Errorf("failed to reindex data from %s to %s: %w", source, destination, err)
+		return fmt.Errorf("failed to create reindex request from %s to %s: %w", source, destination, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to execute reindex request from %s to %s: %w", source, destination, err)
 	}
 	defer resp.Body.Close()
 
+	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("failed to reindex data: %s", string(body))
 	}
+
+	fmt.Printf("Reindexing response: %s\n", string(body))
 	return nil
 }
 
