@@ -158,6 +158,10 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, index := range indices {
+		if index.Index != "node-state-7" {
+			continue
+		}
+
 		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
 			logrus.Errorf("Error fetching settings for index %s: %v", index.Index, err)
@@ -311,20 +315,20 @@ func triggerReindex(index string) error {
 		return fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
 	}
 
-	if err := createIndex(tempIndex, settings, mappings); err != nil {
+	if err := createIndex(tempIndex, settings, mappings, index); err != nil {
 		return fmt.Errorf("failed to create temporary index %s: %w", tempIndex, err)
 	}
 
 	if err := reindexData(index, tempIndex); err != nil {
-		return fmt.Errorf("failed to reindex data to temporary index %s: %w", tempIndex, err)
+		return fmt.Errorf("failed to reindex data to temp index %s: %w", tempIndex, err)
 	}
 
 	if err := deleteIndex(index); err != nil {
 		return fmt.Errorf("failed to delete original index %s: %w", index, err)
 	}
 
-	if err := createIndex(index, settings, mappings); err != nil {
-		return fmt.Errorf("failed to create index %s: %w", index, err)
+	if err := createIndex(index, settings, mappings, index); err != nil {
+		return fmt.Errorf("failed to recreate index %s: %w", index, err)
 	}
 
 	if err := reindexData(tempIndex, index); err != nil {
@@ -339,39 +343,85 @@ func triggerReindex(index string) error {
 	return nil
 }
 
-func sanitizeSettings(settings map[string]interface{}, indexName string) map[string]interface{} {
-	// indexName := "node-state-7"
+// func sanitizeSettings(settings map[string]interface{}, indexName string) map[string]interface{} {
+// 	fmt.Printf("Pre sanitized settings for index %s: %+v\n", indexName, settings)
 
-	// Print pre sanitized settings
+// 	// Access the index-specific settings
+// 	indexSettings, ok := settings[indexName].(map[string]interface{})
+// 	if !ok {
+// 		logrus.Warnf("Index settings for %s not found or invalid", indexName)
+// 		return nil
+// 	}
+
+// 	// Access nested settings
+// 	settingsMap, ok := indexSettings["settings"].(map[string]interface{})
+// 	if !ok {
+// 		logrus.Warnf("Settings for %s are missing or invalid", indexName)
+// 		return nil
+// 	}
+
+// 	// Remove unsupported keys
+// 	for _, key := range []string{
+// 		"creation_date", "creation_date_string", "uuid",
+// 		"provided_name", "version", "blocks",
+// 	} {
+// 		delete(settingsMap, key)
+// 	}
+
+// 	fmt.Printf("Post sanitized settings for index %s: %+v\n", indexName, settingsMap)
+// 	return settingsMap
+// }
+
+func sanitizeSettings(settings map[string]interface{}) map[string]interface{} {
 	fmt.Printf("Pre sanitized settings: %+v\n", settings)
-	if indexSettings, ok := settings[indexName].(map[string]interface{}); ok {
-		delete(indexSettings, "creation_date")
-		delete(indexSettings, "creation_date_string")
-		delete(indexSettings, "uuid")
-		delete(indexSettings, "provided_name")
-		delete(indexSettings, "version")
-		delete(indexSettings, "blocks")
+
+	sanitizedSettings := make(map[string]interface{})
+
+	for indexName, indexData := range settings {
+		if indexMap, ok := indexData.(map[string]interface{}); ok {
+			if settingsMap, ok := indexMap["settings"].(map[string]interface{}); ok {
+				if indexSettings, ok := settingsMap["index"].(map[string]interface{}); ok {
+					sanitizedIndexSettings := make(map[string]interface{})
+					for key, value := range indexSettings {
+						switch key {
+						case "creation_date", "creation_date_string":
+							continue
+						default:
+							sanitizedIndexSettings[key] = value
+						}
+					}
+					settingsMap["index"] = sanitizedIndexSettings
+				}
+				indexMap["settings"] = settingsMap
+			}
+			sanitizedSettings[indexName] = indexMap
+		}
 	}
 
-	// Print post sanitized settings
-	fmt.Printf("Post sanitized settings: %+v\n", settings)
-	return settings
+	fmt.Printf("Post sanitized settings: %+v\n", sanitizedSettings)
+	return sanitizedSettings
 }
 
-func createIndex(index string, settings map[string]interface{}, mappings map[string]interface{}) error {
-	fmt.Println("Creating index:", index)
+func createIndex(index string, originalSettings map[string]interface{}, mappings map[string]interface{}, originalIndexName string) error {
+	fmt.Printf("Creating index: %s\n", index)
 	url := fmt.Sprintf("http://127.0.0.1:10144/%s", index)
 
+	sanitizedSettings := sanitizeSettings(originalSettings)
+	if sanitizedSettings == nil {
+		return fmt.Errorf("failed to sanitize settings for original index %s", originalIndexName)
+	}
+
 	payload := map[string]interface{}{
-		"settings": sanitizeSettings(settings, index),
+		"settings": sanitizedSettings,
 		"mappings": mappings,
 	}
 
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("failed to marshal settings and mappings for index %s: %w", index, err)
+		return fmt.Errorf("failed to marshal payload for index %s: %w", index, err)
 	}
 
+	// Send HTTP PUT request
 	req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create PUT request for index %s: %w", index, err)
@@ -388,6 +438,8 @@ func createIndex(index string, settings map[string]interface{}, mappings map[str
 		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("failed to create index %s: %s", index, string(body))
 	}
+
+	fmt.Printf("Index %s created successfully.\n", index)
 	return nil
 }
 
