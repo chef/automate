@@ -339,14 +339,34 @@ func triggerReindex(index string) error {
 	return nil
 }
 
+func sanitizeSettings(settings map[string]interface{}, indexName string) map[string]interface{} {
+	// indexName := "node-state-7"
+
+	// Print pre sanitized settings
+	fmt.Printf("Pre sanitized settings: %+v\n", settings)
+	if indexSettings, ok := settings[indexName].(map[string]interface{}); ok {
+		delete(indexSettings, "creation_date")
+		delete(indexSettings, "creation_date_string")
+		delete(indexSettings, "uuid")
+		delete(indexSettings, "provided_name")
+		delete(indexSettings, "version")
+		delete(indexSettings, "blocks")
+	}
+
+	// Print post sanitized settings
+	fmt.Printf("Post sanitized settings: %+v\n", settings)
+	return settings
+}
+
 func createIndex(index string, settings map[string]interface{}, mappings map[string]interface{}) error {
 	fmt.Println("Creating index:", index)
 	url := fmt.Sprintf("http://127.0.0.1:10144/%s", index)
 
 	payload := map[string]interface{}{
-		"settings": settings,
+		"settings": sanitizeSettings(settings, index),
 		"mappings": mappings,
 	}
+
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal settings and mappings for index %s: %w", index, err)
