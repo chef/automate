@@ -158,23 +158,20 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, index := range indices {
-		if index.Index != "node-state-7" {
-			continue
-		}
 
 		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
-			fmt.Errorf("Error fetching settings for index %s: %v", index.Index, err)
+			fmt.Printf("Error fetching settings for index %s: %v\n", index.Index, err)
 			continue
 		}
 
 		if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
 			fmt.Printf("Reindexing required for index: %s\n", index.Index)
 			if err := triggerReindex(index.Index); err != nil {
-				fmt.Errorf("Error reindexing index %s: %v", index.Index, err)
+				fmt.Printf("Error reindexing index %s: %v\n", index.Index, err)
 			}
 		} else {
-			fmt.Printf("Index %s is up to date. Skipping reindex.", index.Index)
+			fmt.Printf("Index %s is up to date. Skipping reindex.\n", index.Index)
 		}
 	}
 
@@ -313,26 +310,38 @@ func triggerReindex(index string) error {
 		return fmt.Errorf("failed to create temporary index %s: %w", tempIndex, err)
 	}
 
+	fmt.Println("Temporary index created successfully.")
+
 	if err := reindexData(index, tempIndex); err != nil {
 		return fmt.Errorf("failed to reindex data to temp index %s: %w", tempIndex, err)
 	}
+
+	fmt.Println("Data reindexed to temporary index successfully.")
 
 	if err := deleteIndex(index); err != nil {
 		return fmt.Errorf("failed to delete original index %s: %w", index, err)
 	}
 
+	fmt.Println("Original index deleted successfully.")
+
 	if err := createIndex(index, settings, mappings, index); err != nil {
 		return fmt.Errorf("failed to recreate index %s: %w", index, err)
 	}
+
+	fmt.Println("Original index recreated successfully.")
 
 	if err := reindexData(tempIndex, index); err != nil {
 		return fmt.Errorf("failed to reindex data from temp index %s back to %s: %w", tempIndex, index, err)
 	}
 
+	fmt.Println("Data reindexed back to original index successfully.")
+
 	// Optionally delete the temporary index after reindexing
-	// if err := deleteIndex(tempIndex); err != nil {
-	// 	fmt.Warnf("Failed to delete temporary index %s: %v", tempIndex, err)
-	// }
+	if err := deleteIndex(tempIndex); err != nil {
+		fmt.Printf("Failed to delete temporary index %s: %v\n", tempIndex, err)
+	} else {
+		fmt.Println("Temporary index deleted successfully.")
+	}
 
 	fmt.Printf("Reindexing completed for index %s\n", index)
 	return nil
