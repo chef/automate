@@ -79,10 +79,12 @@ do_deploy() {
             --bootstrap-bundle bootstrap.abb \
             --accept-terms-and-mlsa
 
+      "$cli_bin" bootstrap bundle unpack bootstrap.abb      
+
      docker exec -t "$_frontend2_container_name" \
         "$cli_bin" license apply "$A2_LICENSE"           
 
-    "$cli_bin" bootstrap bundle unpack bootstrap.abb
+    docker exec -t "$_frontend2_container_name" sleep 50 
 
     start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 

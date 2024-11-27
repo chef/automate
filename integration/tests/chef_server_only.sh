@@ -27,6 +27,7 @@ do_deploy() {
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
+    do_apply_license
 }
 
 do_test_deploy() {

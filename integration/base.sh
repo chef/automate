@@ -212,6 +212,7 @@ do_deploy() {
 
 do_apply_license(){
     chef-automate license apply "$A2_LICENSE"
+    sleep 50
 }
 
 do_deploy_default() {
