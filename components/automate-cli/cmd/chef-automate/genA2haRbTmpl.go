@@ -22,8 +22,8 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_password ""
 
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
-automate_base_path "{{ .Architecture.ConfigInitials.AutomateBasePath }}"
-opensearch_base_path "{{ .Architecture.ConfigInitials.OpensearchBasePath }}"
+{{ if  .Architecture.ConfigInitials.AutomateBasePath }} automate_base_path "{{ .Architecture.ConfigInitials.AutomateBasePath }}" {{ else }} # automate_base_path "{{ .Architecture.ConfigInitials.AutomateBasePath }}" {{ end }}
+{{ if  .Architecture.ConfigInitials.OpensearchBasePath }} opensearch_base_path "{{ .Architecture.ConfigInitials.OpensearchBasePath }}" {{ else }} # opensearch_base_path "{{ .Architecture.ConfigInitials.OpensearchBasePath }}" {{ end }}
 ### type "{{ .ExternalDB.Database.Type}}"
 
 {{ if .Architecture.ConfigInitials.BackupMount }} 
