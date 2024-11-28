@@ -29,7 +29,7 @@ with Chef Automate.
 
 {{< warning >}}
 
-Chef Server deployed and running with Automate will require license too. The Chef Automate license will cover the Chef Server license.
+The Chef Server deployed and running with Automate will also require a license. The Chef Automate license will cover the Chef Server license.
 
 {{< /warning >}}
 
@@ -253,7 +253,7 @@ On the Chef Infra Server host:
    **Commercial:** A commercial license is for customers who have purchased and are entitled to use it according to the license terms.
 
    If you do not have the license, you can use the trial license to explore the product or contact the Chef Account Team to get a commercial license.  
-   Please follow the instructions in the [Chef Automate License]({{< relref "chef_automate_license.md" >}}) documentation to apply the license.  
+   Please follow the instructions in the [Chef Automate License]({{< relref "chef_automate_license.md" >}}) documentation to apply for the license.  
 
 2. Run the following command to create a user:
 

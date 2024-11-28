@@ -20,7 +20,7 @@ Chef Automate offers two license tiers that have different entitlements:
 
 {{< warning >}}
 
-Chef Server deployed and running with Automate will require license too. The Chef Automate license will cover the Chef Server license.
+The Chef Server deployed and running with Automate will also require a license. The Chef Automate license will cover the Chef Server license.
 
 {{< /warning >}}
 
@@ -111,9 +111,9 @@ You cannot use Chef Automate features and capabilities. To continue using Chef A
 1. If you already have a license key, paste it in the popup box and check the I agree to the Terms and Service box.
 1. Select **Apply License**.
 
-
 ## Chef Server under Automate License
-Chef Server when deployed with Automate will abide by the Automate license.
-The `chef-server-ctl` command will not work if the commercial/trial license is not applied to Automate or expired.
-In case of `knife` execution or `Infra Client` execution, the Chef Server will not respond if the Automate license is not applied or expired.
+
+Chef Server, when deployed with Automat,e will abide by the Automate license.
+
+The `chef-server-ctl` command will not work if the commercial/trial license has not been applied to Automate or has expired. In the case of `knife` or `Infra Client` execution, the Chef Server will not respond if the Automate license has not been applied or expired.
  
