@@ -145,7 +145,18 @@ func (a *awsDeployment) generateConfig(state string) error {
 		}
 	}
 
+	a.setDefaultBasePath()
+
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
+}
+
+func (a *awsDeployment) setDefaultBasePath() {
+	if strings.TrimSpace(a.config.Architecture.ConfigInitials.AutomateBasePath) == "" {
+		a.config.Architecture.ConfigInitials.AutomateBasePath = "automate"
+	}
+	if strings.TrimSpace(a.config.Architecture.ConfigInitials.OpensearchBasePath) == "" {
+		a.config.Architecture.ConfigInitials.OpensearchBasePath = "elasticsearch"
+	}
 }
 
 func (a *awsDeployment) addDNTocertConfig() error {

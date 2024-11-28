@@ -94,6 +94,9 @@ func (e *existingInfra) generateConfig(state string) error {
 	if err != nil {
 		return err
 	}
+
+	e.setDefaultBasePath()
+
 	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config, state)
 }
 
@@ -114,6 +117,15 @@ type CertificateToml struct {
 	ChefServer NodeCertficate `toml:"chef_server"`
 	PostgreSQL NodeCertficate `toml:"postgresql"`
 	OpenSearch NodeCertficate `toml:"opensearch"`
+}
+
+func (e *existingInfra) setDefaultBasePath() {
+	if strings.TrimSpace(e.config.Architecture.ConfigInitials.AutomateBasePath) == "" {
+		e.config.Architecture.ConfigInitials.AutomateBasePath = "automate"
+	}
+	if strings.TrimSpace(e.config.Architecture.ConfigInitials.OpensearchBasePath) == "" {
+		e.config.Architecture.ConfigInitials.OpensearchBasePath = "elasticsearch"
+	}
 }
 
 func (e *existingInfra) populateCertificateTomlFile() error {
