@@ -82,10 +82,10 @@ func runReindex(cmd *cobra.Command, args []string) error {
 
 	for _, index := range indices {
 		// // Apply your filtering logic here
-		// if !strings.HasPrefix(index.Index, "comp") {
-		// 	fmt.Printf("Skipping index %s\n", index.Index)
-		// 	continue
-		// }
+		if strings.HasPrefix(index.Index, "security-auditlog") || strings.HasPrefix(index.Index, ".opendistro") {
+			fmt.Printf("Skipping index %s\n", index.Index)
+			continue
+		}
 
 		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
@@ -234,6 +234,14 @@ func triggerReindex(index string) error {
 		return fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
 	}
 
+	// Fetch aliases for the index
+	aliases, err := fetchAliases(index)
+	if err != nil {
+		fmt.Printf("Warning: failed to fetch aliases for index %s: %v\n", index, err)
+		aliases = []string{}
+	}
+	fmt.Printf("aliases of index %s: %v\n", index, aliases)
+
 	if err := createIndex(tempIndex, settings, mappings, index); err != nil {
 		return fmt.Errorf("failed to create temporary index %s: %w", tempIndex, err)
 	}
@@ -253,20 +261,24 @@ func triggerReindex(index string) error {
 	fmt.Println("Write block set on temporary index.")
 
 	if err := deleteIndex(index); err != nil {
-		fmt.Printf("Failed to delete the old index %s: %v\n", tempIndex, err)
-	} else {
-		fmt.Println("The old index deleted successfully.")
+		return fmt.Errorf("failed to delete original index %s: %w", index, err)
 	}
+
+	fmt.Println("Original index deleted successfully.")
 
 	if err := cloneIndex(tempIndex, index); err != nil {
 		return fmt.Errorf("failed to clone temp index %s to %s: %w", tempIndex, index, err)
 	}
 
-	if index == "node-state-7" {
-		updateAlias("node-state-7", "node-state")
-	}
-
 	fmt.Println("Temporary index cloned to original index name successfully.")
+
+	// Reassign aliases to the cloned index
+	if len(aliases) > 0 {
+		if err := updateAliases(index, aliases); err != nil {
+			return fmt.Errorf("failed to update aliases for index %s: %w", index, err)
+		}
+		fmt.Println("Aliases updated successfully.")
+	}
 
 	if err := setIndexWriteBlock(tempIndex, false); err != nil {
 		return fmt.Errorf("failed to remove write block on temporary index %s: %w", tempIndex, err)
@@ -407,18 +419,32 @@ func reindexData(source, destination string) error {
 	return nil
 }
 
-func updateAlias(oldIndex, newIndex string) error {
-	fmt.Println("Updating alias to point to the new index")
-	aliasName := fmt.Sprintf("%s_alias", oldIndex)
-	url := "http://127.0.0.1:10144/_aliases"
-	payload := fmt.Sprintf(`{
-        "actions": [
-            { "remove": { "index": "%s", "alias": "%s" } },
-            { "add":    { "index": "%s", "alias": "%s" } }
-        ]
-    }`, oldIndex, aliasName, newIndex, aliasName)
+func updateAliases(index string, aliases []string) error {
+	fmt.Printf("Updating aliases for index %s\n", index)
+	actions := []map[string]interface{}{}
 
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(payload))
+	for _, alias := range aliases {
+		action := map[string]interface{}{
+			"add": map[string]interface{}{
+				"index": index,
+				"alias": alias,
+			},
+		}
+		actions = append(actions, action)
+	}
+
+	payload := map[string]interface{}{
+		"actions": actions,
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal alias update payload: %w", err)
+	}
+
+	url := "http://127.0.0.1:10144/_aliases"
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create alias update request: %w", err)
 	}
@@ -426,16 +452,15 @@ func updateAlias(oldIndex, newIndex string) error {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to update alias: %w", err)
+		return fmt.Errorf("failed to update aliases: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("failed to update alias: %s", string(body))
+		return fmt.Errorf("failed to update aliases: %s", string(body))
 	}
 
-	fmt.Println("Alias updated successfully.")
 	return nil
 }
 
@@ -559,4 +584,44 @@ func setIndexWriteBlock(index string, readOnly bool) error {
 	}
 
 	return nil
+}
+
+func fetchAliases(index string) ([]string, error) {
+	fmt.Printf("Fetching aliases for index: %s\n", index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_alias", index)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch aliases for index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("failed to fetch aliases for index %s: %s", index, string(body))
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read aliases response for index %s: %w", index, err)
+	}
+
+	var aliasesResponse map[string]struct {
+		Aliases map[string]interface{} `json:"aliases"`
+	}
+	if err := json.Unmarshal(body, &aliasesResponse); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal aliases for index %s: %w", index, err)
+	}
+
+	indexAliases, exists := aliasesResponse[index]
+	if !exists {
+		return nil, fmt.Errorf("index %s not found in aliases response", index)
+	}
+
+	aliasesMap := indexAliases.Aliases
+	aliases := make([]string, 0, len(aliasesMap))
+	for alias := range aliasesMap {
+		aliases = append(aliases, alias)
+	}
+
+	return aliases, nil
 }
