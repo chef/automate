@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-
 	"github.com/spf13/cobra"
 )
 
@@ -38,98 +37,22 @@ type IndexSettingsVersion struct {
 	} `json:"settings"`
 }
 
-type Settings struct {
-	Index Index `json:"index"`
-}
-
-type Index struct {
-	Routing          Routing  `json:"routing"`
-	RefreshInterval  string   `json:"refresh_interval"`
-	NumberOfShards   string   `json:"number_of_shards"`
-	RoutingPartition string   `json:"routing_partition_size"`
-	Blocks           Blocks   `json:"blocks"`
-	ProvidedName     string   `json:"provided_name"`
-	Resize           Resize   `json:"resize"`
-	CreationDate     string   `json:"creation_date"`
-	Analysis         Analysis `json:"analysis"`
-	NumberOfReplicas string   `json:"number_of_replicas"`
-	UUID             string   `json:"uuid"`
-	Version          Version  `json:"version"`
-}
-
-type Routing struct {
-	Allocation Allocation `json:"allocation"`
-}
-
-type Allocation struct {
-	InitialRecovery InitialRecovery `json:"initial_recovery"`
-}
-
-type InitialRecovery struct {
-	ID interface{} `json:"_id"`
-}
-
-type Blocks struct {
-	Write string `json:"write"`
-}
-
-type Resize struct {
-	Source Source `json:"source"`
-}
-
-type Source struct {
-	Name string `json:"name"`
-	UUID string `json:"uuid"`
-}
-
-type Analysis struct {
-	Normalizer map[string]Normalizer `json:"normalizer"`
-	Analyzer   map[string]Analyzer   `json:"analyzer"`
-	Tokenizer  map[string]Tokenizer  `json:"tokenizer"`
-}
-
-type Normalizer struct {
-	Filter     []string `json:"filter"`
-	Type       string   `json:"type"`
-	CharFilter []string `json:"char_filter"`
-}
-
-type Analyzer struct {
-	Filter    []string `json:"filter"`
-	Tokenizer string   `json:"tokenizer"`
-}
-
-type Tokenizer struct {
-	TokenChars []string `json:"token_chars"`
-	MinGram    string   `json:"min_gram"`
-	Type       string   `json:"type"`
-	MaxGram    string   `json:"max_gram"`
-}
-
-type Version struct {
-	Created  string `json:"created"`
-	Upgraded string `json:"upgraded"`
-}
-
 // Define the main structure to hold the dynamic index names
-type IndexSettings map[string]struct {
-	Settings Settings `json:"settings"`
-}
+type IndexSettings map[string]interface{}
 
 var infoReindexing = `
-Reindexing! Of Elasticsearch/OpenSearch indices if needed. 
+Reindexing of Elasticsearch/OpenSearch indices if needed.
 `
 
 func init() {
-	infoCmd.SetUsageTemplate(infoReindexing)
+	reindexCmd.SetUsageTemplate(infoReindexing)
 	RootCmd.AddCommand(reindexCmd)
 }
 
 var reindexCmd = &cobra.Command{
-	Use:               "reindex",
-	Short:             "Reindex Elasticsearch indices if needed",
-	PersistentPreRunE: checkLicenseStatusForExpiry,
-	RunE:              runReindex,
+	Use:   "reindex",
+	Short: "Reindex Elasticsearch indices if needed",
+	RunE:  runReindex,
 }
 
 var isReindexing bool
@@ -158,6 +81,11 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, index := range indices {
+		// // Apply your filtering logic here
+		// if !strings.HasPrefix(index.Index, "comp") {
+		// 	fmt.Printf("Skipping index %s\n", index.Index)
+		// 	continue
+		// }
 
 		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
@@ -318,25 +246,32 @@ func triggerReindex(index string) error {
 
 	fmt.Println("Data reindexed to temporary index successfully.")
 
+	if err := setIndexWriteBlock(tempIndex, true); err != nil {
+		return fmt.Errorf("failed to set write block on temporary index %s: %w", tempIndex, err)
+	}
+
+	fmt.Println("Write block set on temporary index.")
+
 	if err := deleteIndex(index); err != nil {
-		return fmt.Errorf("failed to delete original index %s: %w", index, err)
+		fmt.Printf("Failed to delete the old index %s: %v\n", tempIndex, err)
+	} else {
+		fmt.Println("The old index deleted successfully.")
 	}
 
-	fmt.Println("Original index deleted successfully.")
-
-	if err := createIndex(index, settings, mappings, index); err != nil {
-		return fmt.Errorf("failed to recreate index %s: %w", index, err)
+	if err := cloneIndex(tempIndex, index); err != nil {
+		return fmt.Errorf("failed to clone temp index %s to %s: %w", tempIndex, index, err)
 	}
 
-	fmt.Println("Original index recreated successfully.")
-
-	if err := reindexData(tempIndex, index); err != nil {
-		return fmt.Errorf("failed to reindex data from temp index %s back to %s: %w", tempIndex, index, err)
+	if index == "node-state-7" {
+		updateAlias("node-state-7", "node-state")
 	}
 
-	fmt.Println("Data reindexed back to original index successfully.")
+	fmt.Println("Temporary index cloned to original index name successfully.")
 
-	// Optionally delete the temporary index after reindexing
+	if err := setIndexWriteBlock(tempIndex, false); err != nil {
+		return fmt.Errorf("failed to remove write block on temporary index %s: %w", tempIndex, err)
+	}
+
 	if err := deleteIndex(tempIndex); err != nil {
 		fmt.Printf("Failed to delete temporary index %s: %v\n", tempIndex, err)
 	} else {
@@ -348,8 +283,6 @@ func triggerReindex(index string) error {
 }
 
 func sanitizeSettings(settings map[string]interface{}, indexName string) (map[string]interface{}, error) {
-	// fmt.Printf("Pre sanitized settings: %+v\n", settings)
-
 	indexData, ok := settings[indexName]
 	if !ok {
 		return nil, fmt.Errorf("settings for index %s not found", indexName)
@@ -370,15 +303,23 @@ func sanitizeSettings(settings map[string]interface{}, indexName string) (map[st
 		return nil, fmt.Errorf("index key not found in settings for index %s", indexName)
 	}
 
-	// Remove unwanted keys
-	for _, key := range []string{"creation_date", "creation_date_string", "uuid", "version", "provided_name"} {
-		delete(indexSettings, key)
+	sanitizedIndexSettings := make(map[string]interface{})
+
+	for key, value := range indexSettings {
+		// Remove only settings that are not allowed during index creation
+		switch key {
+		case "creation_date", "creation_date_string", "uuid", "version", "provided_name", "resize", "routing", "store", "warmer", "flush", "merge", "sync", "translog", "query_string", "verified_before_close":
+			// Skip these keys
+			continue
+		default:
+			sanitizedIndexSettings[key] = value
+		}
 	}
 
-	// Update settingsMap with sanitized index settings
-	settingsMap["index"] = indexSettings
+	settingsMap["index"] = sanitizedIndexSettings
+	indexDataMap["settings"] = settingsMap
+	settings[indexName] = indexDataMap
 
-	// fmt.Printf("Post sanitized settings: %+v\n", settingsMap)
 	return settingsMap, nil
 }
 
@@ -424,7 +365,7 @@ func createIndex(index string, originalSettings map[string]interface{}, mappings
 
 func reindexData(source, destination string) error {
 	fmt.Println("Reindexing data from:", source, "to:", destination)
-	url := "http://127.0.0.1:10144/_reindex"
+	url := "http://127.0.0.1:10144/_reindex?wait_for_completion=true&refresh=true"
 	payload := fmt.Sprintf(`{
         "source": { "index": "%s" },
         "dest": { "index": "%s" }
@@ -447,7 +388,54 @@ func reindexData(source, destination string) error {
 		return fmt.Errorf("failed to reindex data: %s", string(body))
 	}
 
+	// Parse the response to check for failures
+	var reindexResponse struct {
+		Took     int           `json:"took"`
+		Failures []interface{} `json:"failures"`
+	}
+	if err := json.Unmarshal(body, &reindexResponse); err != nil {
+		return fmt.Errorf("failed to parse reindex response: %w", err)
+	}
+
+	if len(reindexResponse.Failures) > 0 {
+		fmt.Printf("Reindexing completed with failures: %+v\n", reindexResponse.Failures)
+	} else {
+		fmt.Println("Reindexing completed successfully with no failures.")
+	}
+
 	fmt.Printf("Reindexing response: %s\n", string(body))
+	return nil
+}
+
+func updateAlias(oldIndex, newIndex string) error {
+	fmt.Println("Updating alias to point to the new index")
+	aliasName := fmt.Sprintf("%s_alias", oldIndex)
+	url := "http://127.0.0.1:10144/_aliases"
+	payload := fmt.Sprintf(`{
+        "actions": [
+            { "remove": { "index": "%s", "alias": "%s" } },
+            { "add":    { "index": "%s", "alias": "%s" } }
+        ]
+    }`, oldIndex, aliasName, newIndex, aliasName)
+
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("failed to create alias update request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to update alias: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to update alias: %s", string(body))
+	}
+
+	fmt.Println("Alias updated successfully.")
 	return nil
 }
 
@@ -473,10 +461,102 @@ func deleteIndex(index string) error {
 	return nil
 }
 
-func cloneIndex(source, destination string) error {
-	fmt.Println("Cloning index from:", source, "to:", destination)
-	if err := reindexData(source, destination); err != nil {
-		return fmt.Errorf("failed to clone data from %s to %s: %w", source, destination, err)
+// Close an index
+func closeIndex(index string) error {
+	fmt.Printf("Closing index: %s\n", index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_close", index)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create close request for index %s: %w", index, err)
 	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to close index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to close index %s: %s", index, string(body))
+	}
+	return nil
+}
+
+func cloneIndex(sourceIndex, targetIndex string) error {
+	fmt.Printf("Cloning index from %s to %s\n", sourceIndex, targetIndex)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_clone/%s", sourceIndex, targetIndex)
+	payload := `{ "settings": { "number_of_replicas": 1 } }` // Adjust settings if needed
+
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("failed to create clone request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to clone index: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to clone index: %s", string(body))
+	}
+
+	return nil
+}
+
+// Open an index
+func openIndex(index string) error {
+	fmt.Printf("Opening index: %s\n", index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_open", index)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create open request for index %s: %w", index, err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to open index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to open index %s: %s", index, string(body))
+	}
+	return nil
+}
+
+func setIndexWriteBlock(index string, readOnly bool) error {
+	fmt.Printf("Setting index.blocks.write to %v for index: %s\n", readOnly, index)
+	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_settings", index)
+	payload := fmt.Sprintf(`{
+        "index": {
+            "blocks": {
+                "write": %v
+            }
+        }
+    }`, readOnly)
+
+	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("failed to create request to set index.blocks.write for index %s: %w", index, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to set index.blocks.write for index %s: %w", index, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to set index.blocks.write for index %s: %s", index, string(body))
+	}
+
 	return nil
 }
