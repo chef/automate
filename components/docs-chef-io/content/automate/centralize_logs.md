@@ -127,18 +127,19 @@ To configure Rate Limiter, you must patch your Automate configuration.
 
     - `redirect_sys_log`: Whether to save the system logs to a file. Set to `true` to save to a file. Default value: `false`.
     - `redirect_log_file_path`: The path to the directory that you want to save the Automate log to. This value is required if `redirect_sys_log` is `true`.
-    - `rate_limit_interval`: This defines the time interval for rate-limiting in seconds. For example, if it's set to 600s, rsyslog will track messages within each 600-seconds window. Default value will be same as the `rsyslog` default value, which is `600` [rsyslog Page](https://www.rsyslog.com/doc/configuration/modules/imjournal.html#ratelimit-interval).
-    - `rate_limit_burst`: This sets the maximum number of messages allowed within the interval defined by rate_limit_interval. If more messages are received within the interval, they will be temporarily suppressed to avoid spamming the rsyslog. Default value will be same as the `rsyslog` default value, which is `20000` [rsyslog Page](https://www.rsyslog.com/doc/configuration/modules/imjournal.html#ratelimit-burst).
+    - `rate_limit_interval`: This defines the time interval for rate-limiting in seconds. For example, if it's set to 600s, rsyslog will track messages within each 600-second window. The default value will be the same as the `rsyslog` default value, which is `600` [rsyslog Page](https://www.rsyslog.com/doc/configuration/modules/imjournal.html#ratelimit-interval).
+    - `rate_limit_burst`: This sets the maximum number of messages allowed within the interval defined by rate_limit_interval. If more messages are received within the interval, they will be temporarily suppressed to avoid spamming the rsyslog. The default value will be the same as the `rsyslog` default value, which is `20000` [rsyslog Page](https://www.rsyslog.com/doc/configuration/modules/imjournal.html#ratelimit-burst).
 
-    {{< info >}}
-    - Changing the rate_limit_burst or rate_limit_interval value will configure both journald and rsyslog settings as well.
+    {{< note >}}
+
+    - Changing the `rate_limit_burst` or `rate_limit_interval` value will configure both journald and rsyslog settings as well.
     - The default values for RateLimitInterval and RateLimitBurst in `journald` are 30 seconds and 10,000 messages, respectively.
     - In `rsyslog`, the default values for RateLimitInterval and RateLimitBurst are 600 seconds and 20,000 messages, respectively.
 
-    {{< /info >}}
+    {{< /note >}}
 
     {{< warning >}}
-    By enabling this configuration it may lead to increasing disk utilization.
+    Enabling this configuration may lead to increased disk utilization.
     {{< /warning >}}
 
 1. Patch the Chef Automate configuration.
