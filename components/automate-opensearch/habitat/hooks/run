@@ -4,6 +4,19 @@ exec 2>&1
 
 export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
 
+# Fix shebangs for portability
+for file in "${pkg_prefix}/os/bin/*"; do
+  if head -1 "$file" | grep -q '#!/usr/bin/env bash'; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      sed -i '' '1s|#!/usr/bin/env bash|#!/bin/bash|' "$file"
+    else
+      sed -i '1s|#!/usr/bin/env bash|#!/bin/bash|' "$file"
+    fi
+  fi
+done
+
+chmod +x "${pkg_prefix}/os/bin/*"
+
 {{#if cfg.disable ~}}
 while true
 do

@@ -5,12 +5,12 @@
 pkg_name="automate-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="1.3.19"
+pkg_version="2.0.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.19/opensearch-1.3.19-linux-x64.tar.gz"
-pkg_shasum=af901097211df4c3d2ef75f0c3699452d82a87adac60c240520a3ca03f969595
+pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/2.0.0/opensearch-2.0.0-linux-arm64.tar.gz"
+pkg_shasum=0ea296ab6a37e737d9a3f82750b1109ce53310fa565bee5bda5a611c9831c362  
 
 
 pkg_build_deps=(
@@ -69,10 +69,20 @@ do_install() {
   #export LD_RUN_PATH
   #sudo ./bin/opensearch-plugin install repository-s3
   rm -rf "${pkg_prefix}/os/jdk"
+  
+  # Ensure the opensearch-plugin script is executable
+  chmod +x "${pkg_prefix}/os/bin/opensearch-plugin"
 
+  # Verify if /usr/bin/env exists, if not, create a symbolic link
+  if [ ! -f /usr/bin/env ]; then
+    echo "/usr/bin/env not found, creating a symbolic link to /bin/env"
+    ln -s /bin/env /usr/bin/env
+  fi
+  
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*
+
   chmod 755 "${pkg_prefix}/os/plugins/opensearch-security/tools/securityadmin.sh"
   chmod 755 "${pkg_prefix}/os/plugins/opensearch-security/tools/install_demo_configuration.sh"
   chmod 755 "${pkg_prefix}/os/plugins/opensearch-security/tools/audit_config_migrater.sh"
