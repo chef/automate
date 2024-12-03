@@ -362,6 +362,7 @@ function build_all_changed_components() {
   hab pkg install core/coreutils >/dev/null
   mkdir -p /usr/bin
   ln -sv "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env 2>/dev/null
+  cp "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env
 
   pushd /src >/dev/null
     for component in $(./scripts/changed_components.rb)
