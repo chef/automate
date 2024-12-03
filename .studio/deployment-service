@@ -10,6 +10,8 @@ function start_deployment_service {
   local local_manifest=""
   local_manifest=$(find_local_manifest)
 
+  cp "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env
+
   chef-automate dev configure-deployment --config dev/config.toml --manifest-dir "$local_manifest"
 
   restart_gateway_if_up
