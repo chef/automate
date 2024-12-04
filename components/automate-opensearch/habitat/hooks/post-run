@@ -56,18 +56,18 @@ if [[ $(wait_until_healthy 5) -ne 0 ]]; then
   exit 1 # always exit 0 in post-run or it'll retry the hook
 fi
 
-# echo "Configuring index settings"
-# curl \
-#   -s \
-#   -i \
-#   -H 'Content-Type: application/json'\
-#   -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
-#   -k \
-#   -u admin:admin \
-#   -d '{
-#     "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
-#     "index.refresh_interval": "{{cfg.index.refresh_interval}}"
-#   }'
+echo "Configuring index settings"
+curl \
+  -s \
+  -i \
+  -H 'Content-Type: application/json'\
+  -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
+  -k \
+  --cert {{pkg.svc_config_path}}/admin.pem --key {{pkg.svc_config_path}}/admin-key.pem \
+  -d '{
+    "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
+    "index.refresh_interval": "{{cfg.index.refresh_interval}}"
+  }'
 
 # The health-check hook will return an error unless we touch sentinel file to
 # signal to the health check that this hook has completed successfully.
