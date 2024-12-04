@@ -15,6 +15,7 @@ admin:
   reserved: true
   backend_roles:
   - "admin"
+  - "security_rest_api_access"
   description: "Demo admin user"
 
 kibanaserver:
