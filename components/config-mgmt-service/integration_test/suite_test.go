@@ -56,11 +56,11 @@ const (
 // multiple tests, consider putting it here so that we have them available globally
 //
 // This struct holds:
-// * A Ingest backend client, that you can leverate to do all sorts of ingestion.
-//   => Check this for the list of things this client can do:
-//      https://github.com/github.com/chef/automate/components/ingest-service/blob/master/backend/client.go#L1
-// * A Elasticsearch client, that you can use to throw ES queries.
-//   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
+//   - A Ingest backend client, that you can leverate to do all sorts of ingestion.
+//     => Check this for the list of things this client can do:
+//     https://github.com/github.com/chef/automate/components/ingest-service/blob/master/backend/client.go#L1
+//   - A Elasticsearch client, that you can use to throw ES queries.
+//     => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
 	ingest iBackend.Client
 	client *elastic.Client
@@ -221,15 +221,17 @@ func (s *Suite) Indices() []string {
 //
 // You should call this method on every single test as the following example:
 // ```
-//  func TestGrpcFunc(t *testing.T) {
-//    // Here we are ingesting a number of nodes
-//    suite.IngestNodes(nodes)
 //
-//    // Immediately after the ingestion add the hook to clean all documents,
-//    // by using `defer` you will ensure that the next test will have clean
-//    // data regardless if this test passes or fails
-//    defer suite.DeleteAllDocuments()
-//  }
+//	func TestGrpcFunc(t *testing.T) {
+//	  // Here we are ingesting a number of nodes
+//	  suite.IngestNodes(nodes)
+//
+//	  // Immediately after the ingestion add the hook to clean all documents,
+//	  // by using `defer` you will ensure that the next test will have clean
+//	  // data regardless if this test passes or fails
+//	  defer suite.DeleteAllDocuments()
+//	}
+//
 // ```
 func (s *Suite) DeleteAllDocuments() {
 	// ES Query to match all documents
@@ -238,7 +240,7 @@ func (s *Suite) DeleteAllDocuments() {
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
 	for i, v := range indices {
-		if v == ".opendistro_security" {
+		if v == ".opendistro_security" || v == ".plugins-ml-config" || v == ".opensearch-observability" {
 			indices = append(indices[:i], indices[i+1:]...)
 			break
 		}
