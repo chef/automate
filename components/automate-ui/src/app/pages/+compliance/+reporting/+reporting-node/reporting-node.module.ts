@@ -7,7 +7,7 @@ import { ReportingNodeComponent } from './reporting-node.component';
 import { ReportingNodeRoutingModule } from './reporting-node.routing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ChefPipesModule } from '../../../../pipes/chef-pipes.module';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 @NgModule({
   imports: [
@@ -17,7 +17,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     ComplianceSharedModule,
     ChefComponentsModule,
     ChefPipesModule,
-    InfiniteScrollModule
+    InfiniteScrollDirective
   ],
   declarations: [
     ReportingNodeComponent

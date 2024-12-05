@@ -10,7 +10,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { FormBuilder } from '@angular/forms';
 import { NodeCredential, NodeCredentialTypes } from 'app/entities/node-credentials/node-credential.model';
 import { MatOptionSelectionChange } from '@angular/material/core';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
@@ -65,7 +65,7 @@ describe('NodeCredentialListComponent', () => {
       ],
       imports: [
         ChefPipesModule,
-        InfiniteScrollModule,
+        InfiniteScrollDirective,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ]
