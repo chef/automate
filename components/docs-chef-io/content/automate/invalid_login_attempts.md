@@ -16,11 +16,11 @@ Invalid Login Attempts is available only in case of local or LDAP users.
 
 Chef Automate shows error message for invalid login attempts for local or LDAP user as shown below.
 
-![Chef Automate Invalid Login Attempts](/images/automate/invalid_login_attempts_error_msg.png)
+{{< figure src="/images/automate/invalid_login_attempts_error_msg.png" width="500" alt="Chef Automate Invalid Login Attempts">}}
 
 Chef Automate shows error message for blocked local or LDAP user as shown below.
 
-![Chef Automate Blocked User](/images/automate/blockd_user_login_error_msg.png)
+{{< figure src="/images/automate/blockd_user_login_error_msg.png" width="500" alt="Chef Automate Blocked User">}}
 
 Chef Automate lets you configure **Invalid Login Attempts**, which is enabled (by default) to avoid multiple failed login attempts in a shorter time. Chef Automate also blocks the user for a specified duration (in minutes) once the maximum allowed number of invalid login attempts reached
 
