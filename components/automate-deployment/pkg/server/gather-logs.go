@@ -8,19 +8,20 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/gatherlogs"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/preflight"
-	"github.com/chef/automate/lib/platform/pg"
-
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/chef/automate/lib/platform/pg"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -170,7 +171,16 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 		}
 		if s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetAuth().GetPassword().GetSuperuser() != nil {
 			user = s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetAuth().GetPassword().GetSuperuser().GetUsername().GetValue()
-			password = s.deployment.Config.Global.V1.GetExternal().GetPostgresql().GetAuth().GetPassword().GetSuperuser().GetPassword().GetValue()
+			args := []string{
+				"show",
+				"userconfig.pg_superuser_password",
+			}
+			execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+			getPass, err := execGetPass.Output()
+			if err != nil || string(getPass) == "" {
+				return nil, err
+			}
+			password = strings.TrimSpace(string(getPass))
 		}
 		certs = pg.TLSCertPaths{
 			RootCert: "/hab/svc/automate-pg-gateway/config/_a2_platform_external_pg_root_ca.crt",

@@ -29,4 +29,5 @@ exec secrets-helper exec \
   --watch \
   --optional-secret userconfig.ldap_password \
   --optional-secret userconfig.msad_password \
+  --optional-secret userconfig.pg_dbuser_password \
   -- dex serve {{pkg.svc_var_path}}/etc/config.yml
