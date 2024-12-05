@@ -134,10 +134,11 @@ func (s *Suite) GlobalTeardown() {
 			indicesToDelete = append(indicesToDelete, index)
 		}
 	}
-	for i, v := range indicesToDelete {
-		if v == ".opendistro_security" {
-			indicesToDelete = append(indicesToDelete[:i], indicesToDelete[i+1:]...)
-			break
+	for _, v := range indices {
+		if v == ".plugins-ml-config" || v == ".opensearch-observability" || v == ".opendistro_security" {
+			continue
+		} else {
+			indicesToDelete = append(indicesToDelete, v)
 		}
 	}
 	time.Sleep(2 * time.Second)
