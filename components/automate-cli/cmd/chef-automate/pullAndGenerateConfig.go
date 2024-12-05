@@ -1656,31 +1656,34 @@ func getGcsBackupConfig(a2ConfigMap map[string]*dc.AutomateConfig, fileUtils fil
 func (p *PullConfigsImpl) getBackupPathFromAutomateConfig(a2ConfigMap map[string]*dc.AutomateConfig, backupLocation string) (string, error) {
 	for _, ele := range a2ConfigMap {
 		path := ""
-		switch backupLocation {
-		case "fs":
-			if ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
-				path = ele.Global.V1.External.Opensearch.Backup.Fs.Path.GetValue()
-				logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
-				return path, nil
-			}
-		case "s3":
-			if ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
-				ele.Global.V1.External.Opensearch.Backup.S3.Bucket != nil &&
-				ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil {
-				path = ele.Global.V1.External.Opensearch.Backup.S3.BasePath.GetValue()
-				logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
-				return path, nil
-			}
-		case "gcs":
-			if ele.Global.V1.External.Opensearch.Backup.Gcs != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Gcs.Bucket != nil &&
-				ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath != nil {
-				path = ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath.GetValue()
-				logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
-				return path, nil
+		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Backup != nil {
+			switch backupLocation {
+			case "fs":
+				if ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
+					ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
+					path = ele.Global.V1.External.Opensearch.Backup.Fs.Path.GetValue()
+					logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+					return path, nil
+				}
+			case "s3":
+				if ele.Global.V1.External.Opensearch.Backup.S3 != nil &&
+					ele.Global.V1.External.Opensearch.Backup.S3.Bucket != nil &&
+					ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil {
+					path = ele.Global.V1.External.Opensearch.Backup.S3.BasePath.GetValue()
+					logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+					return path, nil
+				}
+			case "gcs":
+				if ele.Global.V1.External.Opensearch.Backup.Gcs != nil &&
+					ele.Global.V1.External.Opensearch.Backup.Gcs.Bucket != nil &&
+					ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath != nil {
+					path = ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath.GetValue()
+					logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+					return path, nil
+				}
 			}
 		}
+		return "", errors.New("automate config Global.V1.External.Opensearch configurations are missing")
 	}
 	return "", errors.New("backup path from automate node could not be determined")
 }
