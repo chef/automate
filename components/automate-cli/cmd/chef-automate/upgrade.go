@@ -224,6 +224,29 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				if isError {
 					return nil
 				}
+			case "5":
+				ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+				if err != nil {
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
+
+				flags := majorupgradechecklist.ChecklistUpgradeFlags{
+					SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
+					OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
+				}
+				err = ci.RunChecklist(configCmdFlags.timeout, flags)
+				if err != nil {
+					exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
 			default:
 				return status.Errorf(status.UpgradeError, "invalid major version")
 			}
