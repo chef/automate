@@ -24,6 +24,8 @@ func NewChecklistManager(writer cli.FormatWriter, version string) (ChecklistMana
 		return NewV3ChecklistManager(writer, version), nil
 	case "4":
 		return NewV4ChecklistManager(writer, version), nil
+	case "5":
+		return NewV5ChecklistManager(writer, version), nil
 	default:
 		return nil, status.Errorf(status.UpgradeError, "invalid major version")
 	}

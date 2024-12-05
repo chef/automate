@@ -37,6 +37,8 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 		externalDB = IsExternalPG()
 	case "4":
 		externalDB = IsExternalElasticSearch()
+	case "5":
+		externalDB = IsExternalPG()
 	}
 
 	ci, err := NewChecklistManager(nil, version)
