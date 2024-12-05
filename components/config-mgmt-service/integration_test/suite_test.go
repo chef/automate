@@ -239,15 +239,16 @@ func (s *Suite) DeleteAllDocuments() {
 
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
+	indicesToDelete := make([]string, 0)
 	for _, v := range indices {
 		if v == ".plugins-ml-config" || v == ".opensearch-observability" || v == ".opendistro_security" {
 			continue
 		} else {
-			indices = append(indices, v)
+			indicesToDelete = append(indicesToDelete, v)
 		}
 	}
 	_, err := s.client.DeleteByQuery().
-		Index(indices...).
+		Index(indicesToDelete...).
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").
