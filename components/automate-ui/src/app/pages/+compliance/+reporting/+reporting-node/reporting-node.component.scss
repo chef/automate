@@ -618,6 +618,7 @@ dl.waiver-details {
 .wrapper {
   height: 100vh;
   width: 100%;
+  overflow-y: scroll;
 }
 
 ::ng-deep .wrapper::-webkit-scrollbar {
