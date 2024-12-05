@@ -128,14 +128,9 @@ func (s *Suite) GlobalTeardown() {
 	}
 
 	indicesToDelete := make([]string, 0)
-	for _, index := range indices {
-		//don't ever delete node run info.. we'll do that after each test when needed
-		if index != mappings.IndexNameNodeRunInfo {
-			indicesToDelete = append(indicesToDelete, index)
-		}
-	}
+
 	for _, v := range indices {
-		if v == ".plugins-ml-config" || v == ".opensearch-observability" || v == ".opendistro_security" {
+		if v == ".plugins-ml-config" || v == ".opensearch-observability" || v == ".opendistro_security" || v != mappings.IndexNameNodeRunInfo {
 			continue
 		} else {
 			indicesToDelete = append(indicesToDelete, v)
