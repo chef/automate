@@ -1571,8 +1571,9 @@ func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConf
 
 func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (string, bool, error) {
 	var isEs5Service, isEs6Service, allowRestore bool
-	var snapshotEs5ServicePath, snapshotEs6ServicePath, complianceServicePath, eventFeedServicePath, erchefServicePath, ingestServicePath string
+	var snapshotEs5ServicePath, snapshotEs6ServicePath string
 	osSnapshot, err := getSnapshotLocationsOfServices(sshUtil)
+
 	if err != nil {
 		return "", false, err
 	}
@@ -1595,30 +1596,19 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 		case "fs":
 			if isEs6Service {
 				if osSnapshot.Es6Compliance.Type == backupLocation && osSnapshot.Es6Erchef.Type == backupLocation && osSnapshot.Es6EventFeed.Type == backupLocation && osSnapshot.Es6Ingest.Type == backupLocation {
-					complianceServicePath = getSnapshotPathDetails(osSnapshot.Es6Compliance.Settings.Location)
-					erchefServicePath = getSnapshotPathDetails(osSnapshot.Es6Erchef.Settings.Location)
-					eventFeedServicePath = getSnapshotPathDetails(osSnapshot.Es6EventFeed.Settings.Location)
-					ingestServicePath = getSnapshotPathDetails(osSnapshot.Es6Ingest.Settings.Location)
-					if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
-						allowRestore = true
-						snapshotEs6ServicePath = complianceServicePath
-					}
+					snapshotEs6ServicePath, allowRestore = getSnapshotPath(getSnapshotPathDetails(osSnapshot.Es6Compliance.Settings.Location),
+						getSnapshotPathDetails(osSnapshot.Es6Erchef.Settings.Location), getSnapshotPathDetails(osSnapshot.Es6EventFeed.Settings.Location),
+						getSnapshotPathDetails(osSnapshot.Es6Ingest.Settings.Location))
 				} else {
 					err := fmt.Errorf("discrepancy in the backup types. Backup path of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_file_system/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
 					return "", false, err
 				}
-
 			}
 			if isEs5Service {
 				if osSnapshot.Es5Compliance.Type == backupLocation && osSnapshot.Es5Erchef.Type == backupLocation && osSnapshot.Es5EventFeed.Type == backupLocation && osSnapshot.Es5Ingest.Type == backupLocation {
-					complianceServicePath = getSnapshotPathDetails(osSnapshot.Es5Compliance.Settings.Location)
-					erchefServicePath = getSnapshotPathDetails(osSnapshot.Es5Erchef.Settings.Location)
-					eventFeedServicePath = getSnapshotPathDetails(osSnapshot.Es5EventFeed.Settings.Location)
-					ingestServicePath = getSnapshotPathDetails(osSnapshot.Es5Ingest.Settings.Location)
-					if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
-						allowRestore = true
-						snapshotEs5ServicePath = complianceServicePath
-					}
+					snapshotEs5ServicePath, allowRestore = getSnapshotPath(getSnapshotPathDetails(osSnapshot.Es5Compliance.Settings.Location),
+						getSnapshotPathDetails(osSnapshot.Es5Erchef.Settings.Location), getSnapshotPathDetails(osSnapshot.Es5EventFeed.Settings.Location),
+						getSnapshotPathDetails(osSnapshot.Es5Ingest.Settings.Location))
 				} else {
 					err := fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_file_system/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
 					return "", false, err
@@ -1628,14 +1618,9 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 		case "s3":
 			if isEs6Service {
 				if osSnapshot.Es6Compliance.Type == backupLocation && osSnapshot.Es6Erchef.Type == backupLocation && osSnapshot.Es6EventFeed.Type == backupLocation && osSnapshot.Es6Ingest.Type == backupLocation {
-					complianceServicePath = getSnapshotPathDetails(osSnapshot.Es6Compliance.Settings.BasePath)
-					erchefServicePath = getSnapshotPathDetails(osSnapshot.Es6Erchef.Settings.BasePath)
-					eventFeedServicePath = getSnapshotPathDetails(osSnapshot.Es6EventFeed.Settings.BasePath)
-					ingestServicePath = getSnapshotPathDetails(osSnapshot.Es6Ingest.Settings.BasePath)
-					if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
-						allowRestore = true
-						snapshotEs6ServicePath = complianceServicePath
-					}
+					snapshotEs6ServicePath, allowRestore = getSnapshotPath(getSnapshotPathDetails(osSnapshot.Es6Compliance.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es6Erchef.Settings.BasePath), getSnapshotPathDetails(osSnapshot.Es6EventFeed.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es6Ingest.Settings.BasePath))
 				} else {
 					err := fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_object_storage/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
 					return "", false, err
@@ -1643,14 +1628,9 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 			}
 			if isEs5Service {
 				if osSnapshot.Es5Compliance.Type == backupLocation && osSnapshot.Es5Erchef.Type == backupLocation && osSnapshot.Es5EventFeed.Type == backupLocation && osSnapshot.Es5Ingest.Type == backupLocation {
-					complianceServicePath = getSnapshotPathDetails(osSnapshot.Es5Compliance.Settings.BasePath)
-					erchefServicePath = getSnapshotPathDetails(osSnapshot.Es5Erchef.Settings.BasePath)
-					eventFeedServicePath = getSnapshotPathDetails(osSnapshot.Es5EventFeed.Settings.BasePath)
-					ingestServicePath = getSnapshotPathDetails(osSnapshot.Es5Ingest.Settings.BasePath)
-					if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
-						allowRestore = true
-						snapshotEs5ServicePath = complianceServicePath
-					}
+					snapshotEs5ServicePath, allowRestore = getSnapshotPath(getSnapshotPathDetails(osSnapshot.Es5Compliance.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es5Erchef.Settings.BasePath), getSnapshotPathDetails(osSnapshot.Es5EventFeed.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es5Ingest.Settings.BasePath))
 				} else {
 					err := fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_object_storage/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
 					return "", false, err
@@ -1660,14 +1640,9 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 		case "gcs":
 			if isEs6Service {
 				if osSnapshot.Es6Compliance.Type == backupLocation && osSnapshot.Es6Erchef.Type == backupLocation && osSnapshot.Es6EventFeed.Type == backupLocation && osSnapshot.Es6Ingest.Type == backupLocation {
-					complianceServicePath = getSnapshotPathDetails(osSnapshot.Es6Compliance.Settings.BasePath)
-					erchefServicePath = getSnapshotPathDetails(osSnapshot.Es6Erchef.Settings.BasePath)
-					eventFeedServicePath = getSnapshotPathDetails(osSnapshot.Es6EventFeed.Settings.BasePath)
-					ingestServicePath = getSnapshotPathDetails(osSnapshot.Es6Ingest.Settings.BasePath)
-					if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
-						allowRestore = true
-						snapshotEs6ServicePath = complianceServicePath
-					}
+					snapshotEs6ServicePath, allowRestore = getSnapshotPath(getSnapshotPathDetails(osSnapshot.Es6Compliance.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es6Erchef.Settings.BasePath), getSnapshotPathDetails(osSnapshot.Es6EventFeed.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es6Ingest.Settings.BasePath))
 				} else {
 					err := fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_object_storage/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
 					return "", false, err
@@ -1675,14 +1650,9 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 			}
 			if isEs5Service {
 				if osSnapshot.Es5Compliance.Type == backupLocation && osSnapshot.Es5Erchef.Type == backupLocation && osSnapshot.Es5EventFeed.Type == backupLocation && osSnapshot.Es5Ingest.Type == backupLocation {
-					complianceServicePath = getSnapshotPathDetails(osSnapshot.Es5Compliance.Settings.BasePath)
-					erchefServicePath = getSnapshotPathDetails(osSnapshot.Es5Erchef.Settings.BasePath)
-					eventFeedServicePath = getSnapshotPathDetails(osSnapshot.Es5EventFeed.Settings.BasePath)
-					ingestServicePath = getSnapshotPathDetails(osSnapshot.Es5Ingest.Settings.BasePath)
-					if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
-						allowRestore = true
-						snapshotEs5ServicePath = complianceServicePath
-					}
+					snapshotEs5ServicePath, allowRestore = getSnapshotPath(getSnapshotPathDetails(osSnapshot.Es5Compliance.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es5Erchef.Settings.BasePath), getSnapshotPathDetails(osSnapshot.Es5EventFeed.Settings.BasePath),
+						getSnapshotPathDetails(osSnapshot.Es5Ingest.Settings.BasePath))
 				} else {
 					err := fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_object_storage/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
 					return "", false, err
@@ -1729,7 +1699,20 @@ func getSnapshotLocationsOfServices(sshUtil SSHUtil) (*osSnapshot, error) {
 	return &oss, nil
 }
 
+func getSnapshotPath(complianceServicePath string, erchefServicePath string, eventFeedServicePath string, ingestServicePath string) (string, bool) {
+	var allowRestore bool
+	var snapshotServicePath string
+	if complianceServicePath == erchefServicePath && erchefServicePath == eventFeedServicePath && erchefServicePath == ingestServicePath {
+		allowRestore = true
+		snapshotServicePath = complianceServicePath
+	}
+	return snapshotServicePath, allowRestore
+}
+
 func getSnapshotPathDetails(snapshotPath string) string {
 	parts := strings.Split(snapshotPath, "/automate-elasticsearch-data")
-	return parts[0]
+	if len(parts) > 0 {
+		return parts[0]
+	}
+	return ""
 }
