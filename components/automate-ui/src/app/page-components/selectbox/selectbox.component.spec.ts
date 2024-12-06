@@ -9,7 +9,7 @@ import { ngrxReducers, NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { EventEmitter } from '@angular/core';
 // import { By } from '@angular/platform-browser';
 import { MockComponent } from 'ng2-mock-component';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 
 describe('SelectboxComponent', () => {
@@ -33,7 +33,7 @@ describe('SelectboxComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        InfiniteScrollModule,
+        InfiniteScrollDirective,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: []
