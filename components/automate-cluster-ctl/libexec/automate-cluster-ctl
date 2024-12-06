@@ -43,8 +43,8 @@ export _CLUSTER_CTL_VERSION="${AUTOMATE_CLUSTER_VERSION:-DEV}"
 
 # If not provided to use set it to our vendor/bundle
 if [[ -z "${GEM_PATH}" ]]; then
-  export GEM_PATH="$_CLUSTER_CTL_ROOT/vendor/bundle/ruby/3.0.0"
-  export GEM_HOME="$_CLUSTER_CTL_ROOT/vendor/bundle/ruby/3.0.0"
+  export GEM_PATH="$_CLUSTER_CTL_ROOT/vendor/bundle/ruby/3.1.0"
+  export GEM_HOME="$_CLUSTER_CTL_ROOT/vendor/bundle/ruby/3.1.0"
 fi
 
 export PATH="${libexec_path}:$PATH"

@@ -9,7 +9,7 @@ pkg_license=("Chef-MLSA")
 
 
 pkg_deps=(
-  core/ruby30
+  core/ruby31
   core/aws-cli
   core/bash
   core/coreutils
