@@ -22,7 +22,6 @@ require (
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/dave/jennifer v1.7.0
-	github.com/dexidp/dex v2.35.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/fatih/color v1.17.0
@@ -108,6 +107,8 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/bufbuild/buf v0.29.0
 	github.com/chef/automate/api/external v0.0.0-20240828051912-8c022fa4f66b
+	github.com/dexidp/dex v2.13.0+incompatible
+	github.com/dexidp/dex/api/v2 v2.0.0
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/utils v1.1.0
 	github.com/hashicorp/go-version v1.7.0
@@ -263,7 +264,7 @@ require (
 )
 
 // https://github.com/dexidp/dex/issues/1578
-replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
+// replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
 
 replace github.com/chef/automate/api/external => ./api/external/
 

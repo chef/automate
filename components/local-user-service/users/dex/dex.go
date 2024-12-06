@@ -3,7 +3,7 @@ package dex
 import (
 	"context"
 
-	"github.com/dexidp/dex/api"
+	"github.com/dexidp/dex/api/v2"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"

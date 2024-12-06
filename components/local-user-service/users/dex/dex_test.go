@@ -6,7 +6,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/dexidp/dex/api"
+	"github.com/dexidp/dex/api/v2"
 	"github.com/kylelemons/godebug/pretty"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
