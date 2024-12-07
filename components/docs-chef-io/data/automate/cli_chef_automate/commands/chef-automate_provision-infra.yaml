@@ -1,6 +1,6 @@
 name: chef-automate provision-infra
 synopsis: Provision Automate HA infra.
-usage: chef-automate provision-infra [flags]
+usage: chef-automate provision-infras [flags]
 description: Provision infra for Automate HA deployment.
 options:
     - name: airgap-bundle
