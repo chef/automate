@@ -58,6 +58,13 @@ var reindexCmd = &cobra.Command{
 var isReindexing bool
 var mu sync.Mutex
 
+var skipIndices = map[string]bool{
+	"security-auditlog":         true,
+	".opendistro":               true,
+	".plugins-ml-config":        true,
+	".opensearch-observability": true,
+}
+
 func runReindex(cmd *cobra.Command, args []string) error {
 	fmt.Println("Reindexing Elasticsearch/OpenSearch indices.")
 	mu.Lock()
@@ -80,7 +87,14 @@ func runReindex(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+Loop1:
 	for _, index := range indices {
+		for prefix := range skipIndices {
+			if strings.HasPrefix(index.Index, prefix) {
+				fmt.Printf("Skipping index %s\n", index.Index)
+				continue Loop1
+			}
+		}
 		settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
 			fmt.Printf("Error fetching settings for index %s: %v\n", index.Index, err)
