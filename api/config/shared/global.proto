@@ -189,12 +189,17 @@ message External {
 
     message Authentication {
       message PasswordAuthentication {
-        message User {
+        message SuperUser {
           google.protobuf.StringValue username = 1;
-          google.protobuf.StringValue password = 2;
+          google.protobuf.StringValue password = 2 [(chef.automate.api.secret) = { name: "pg_superuser_password" }];
         }
-        User superuser = 1;
-        User dbuser = 2;
+        
+        message DBUser {
+          google.protobuf.StringValue username = 1;
+          google.protobuf.StringValue password = 2 [(chef.automate.api.secret) = { name: "pg_dbuser_password" }];
+        }
+        SuperUser superuser = 1;
+        DBUser dbuser = 2;
       }
       google.protobuf.StringValue scheme = 1;
       PasswordAuthentication password = 2;

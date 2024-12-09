@@ -4,8 +4,10 @@
 package pg_gateway
 
 import (
+	shared "github.com/chef/automate/api/config/shared"
 	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // ServiceName returns the name of the service this config belongs to
@@ -71,15 +73,161 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 
 // ListSecrets lists all the secrets exposed by the config
 func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
-	return []a2conf.SecretInfo{}
+	return []a2conf.SecretInfo{a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_PG_SUPERUSER_PASSWORD",
+		Name:                "pg_superuser_password",
+	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_PG_DBUSER_PASSWORD",
+		Name:                "pg_dbuser_password",
+	}}
 }
 
 // GetSecret gets a secret by name. Returns nil if it is not set
 func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
-	return nil
+	if m == nil {
+		return nil
+	}
+	switch name {
+	case "pg_superuser_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Service
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.ExternalPostgresql
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.Auth
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Password
+		if v5 == nil {
+			return nil
+		}
+		v6 := v5.Superuser
+		if v6 == nil {
+			return nil
+		}
+		v7 := v6.Password
+		return v7
+	case "pg_dbuser_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Service
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.ExternalPostgresql
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.Auth
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Password
+		if v5 == nil {
+			return nil
+		}
+		v6 := v5.Dbuser
+		if v6 == nil {
+			return nil
+		}
+		v7 := v6.Password
+		return v7
+	default:
+		return nil
+	}
 }
 
 // SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist
 func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) error {
-	return a2conf.ErrSecretNotFound
+	switch name {
+	case "pg_superuser_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &ConfigRequest_V1{}
+		}
+		v1 := &(*v0).Sys
+		if *v1 == nil {
+			*v1 = &ConfigRequest_V1_System{}
+		}
+		v2 := &(*v1).Service
+		if *v2 == nil {
+			*v2 = &ConfigRequest_V1_System_Service{}
+		}
+		v3 := &(*v2).ExternalPostgresql
+		if *v3 == nil {
+			*v3 = &shared.External_Postgresql{}
+		}
+		v4 := &(*v3).Auth
+		if *v4 == nil {
+			*v4 = &shared.External_Postgresql_Authentication{}
+		}
+		v5 := &(*v4).Password
+		if *v5 == nil {
+			*v5 = &shared.External_Postgresql_Authentication_PasswordAuthentication{}
+		}
+		v6 := &(*v5).Superuser
+		if *v6 == nil {
+			*v6 = &shared.External_Postgresql_Authentication_PasswordAuthentication_SuperUser{}
+		}
+		v7 := &(*v6).Password
+		if *v7 == nil {
+			*v7 = &wrapperspb.StringValue{}
+		}
+		*v7 = value
+	case "pg_dbuser_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &ConfigRequest_V1{}
+		}
+		v1 := &(*v0).Sys
+		if *v1 == nil {
+			*v1 = &ConfigRequest_V1_System{}
+		}
+		v2 := &(*v1).Service
+		if *v2 == nil {
+			*v2 = &ConfigRequest_V1_System_Service{}
+		}
+		v3 := &(*v2).ExternalPostgresql
+		if *v3 == nil {
+			*v3 = &shared.External_Postgresql{}
+		}
+		v4 := &(*v3).Auth
+		if *v4 == nil {
+			*v4 = &shared.External_Postgresql_Authentication{}
+		}
+		v5 := &(*v4).Password
+		if *v5 == nil {
+			*v5 = &shared.External_Postgresql_Authentication_PasswordAuthentication{}
+		}
+		v6 := &(*v5).Dbuser
+		if *v6 == nil {
+			*v6 = &shared.External_Postgresql_Authentication_PasswordAuthentication_DBUser{}
+		}
+		v7 := &(*v6).Password
+		if *v7 == nil {
+			*v7 = &wrapperspb.StringValue{}
+		}
+		*v7 = value
+	default:
+		return a2conf.ErrSecretNotFound
+	}
+	return nil
 }
