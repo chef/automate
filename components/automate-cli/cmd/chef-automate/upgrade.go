@@ -753,6 +753,21 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 		if err != nil {
 			return err
 		}
+	case "5":
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
+			for index, msg := range pendingPostChecklist {
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+			}
+		}
+		err = majorupgradechecklist.SetSeenTrueForExternal()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

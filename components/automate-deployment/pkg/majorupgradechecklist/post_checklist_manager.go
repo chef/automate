@@ -12,6 +12,7 @@ type PostChecklistManager struct {
 	version      string
 	ci           ChecklistManager
 	isExternalDB bool
+	isExternalOS bool
 }
 
 type PostCheckListItem struct {
@@ -30,13 +31,13 @@ type PostChecklist struct {
 
 func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	externalDB := false
-
+	externalOS := false
 	majorVersion, _ := GetMajorVersion(version)
 	switch majorVersion {
 	case "3":
 		externalDB = IsExternalPG()
 	case "4":
-		externalDB = IsExternalElasticSearch()
+		externalOS = IsExternalElasticSearch()
 	case "5":
 		externalDB = IsExternalPG()
 	}
@@ -46,11 +47,13 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 		return &PostChecklistManager{
 			version:      majorVersion,
 			isExternalDB: externalDB,
+			isExternalOS: externalOS,
 		}, err
 	}
 	return &PostChecklistManager{
 		version:      majorVersion,
 		isExternalDB: externalDB,
+		isExternalOS: externalOS,
 		ci:           ci,
 	}, nil
 }
@@ -121,7 +124,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 		}
 
 		if showPostChecklist {
-			if pcm.isExternalDB && pcm.version != "3" {
+			if pcm.isExternalOS {
 				postCmdList = []string{"External OpenSearch Patch"}
 			} else {
 				for i := 0; i < len(res.PostChecklist); i++ {
