@@ -76,7 +76,7 @@ We do not support **Chef Manage** integration in the ongoing Automate version.
 
 Current Automate HA integrates with the following non-Chef tools:
 
-- **SQL Database:** PostgreSQL: 13.14
+- **SQL Database:** PostgreSQL: 13.18
 - **NoSQL Database:** OpenSearch: 1.3.7
 - **Load Balancer:** NGINX: 1.21.3 or HA Proxy: 2.2.18 or AWS Application Load Balancer
 

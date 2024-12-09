@@ -3127,7 +3127,7 @@ func TestCertRotateFromTemplate(t *testing.T) {
 	proxy_pkg_ident = "chef/automate-ha-haproxy/2.2.14/20240725171322"
 	opensearch_pkg_ident = "chef/automate-ha-opensearch/1.3.14/20240725173732"
 	pgleaderchk_pkg_ident = "chef/automate-ha-pgleaderchk/0.1.0/20240725172920"
-	postgresql_pkg_ident = "chef/automate-ha-postgresql/13.14.0/20240725171322"`), nil
+	postgresql_pkg_ident = "chef/automate-ha-postgresql/13.18.0/20241203070217"`), nil
 						}
 						fu := fileutils.FileSystemUtils{}
 						return fu.ReadFile(filepath)
