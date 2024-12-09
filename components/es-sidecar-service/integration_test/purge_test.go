@@ -32,7 +32,7 @@ func TestPurgeTimeSeriesIndicesByAge(t *testing.T) {
 			fmt.Sprintf("When starting with %v indices and removing older than %v days, %v remain",
 				test.startingCount, test.olderThanDays, test.expectedRemainingCount),
 			func(t *testing.T) {
-				doPurgeTest(t, TimeSeriesTestIndex, test.startingCount, test.olderThanDays, test.expectedRemainingCount+2)
+				doPurgeTest(t, TimeSeriesTestIndex, test.startingCount, test.olderThanDays, test.expectedRemainingCount+4)
 			},
 		)
 	}

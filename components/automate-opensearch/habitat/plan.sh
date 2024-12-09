@@ -5,12 +5,14 @@
 pkg_name="automate-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="1.3.19"
+pkg_version="2.18.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.19/opensearch-1.3.19-linux-x64.tar.gz"
-pkg_shasum=af901097211df4c3d2ef75f0c3699452d82a87adac60c240520a3ca03f969595
+pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/2.18.0/opensearch-2.18.0-linux-x64.tar.gz"
+pkg_shasum=ae3cb4107b2e0cdbb9b98bb4e5f2f019b736b68e995442c718e459d39ff01df1
+# pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/2.11.1/opensearch-2.11.1-linux-x64.tar.gz"
+# pkg_shasum=926eb3f99f592e7518d5dc1e250ae11d1bb45ef766a90222a8df11bb2ee35a9c
 
 
 pkg_build_deps=(
@@ -52,7 +54,20 @@ do_build() {
   return 0
 }
 
+do_after() {
+  if [ ! -f /usr/bin/env ]; then
+    echo "inside the /usr/ib/env"
+    cp $(pkg_path_for core/coreutils)/bin/env /usr/bin/env
+  fi
+
+}
+
 do_install() {
+  if [ ! -f /usr/bin/env ]; then
+    echo "inside the /isr/ib/env"
+    cp $(pkg_path_for core/coreutils)/bin/env /usr/bin/env
+  fi
+
   cd "$HAB_CACHE_SRC_PATH/opensearch-${pkg_version}"
   chown -RL hab:hab ${pkg_prefix}
   mkdir -p "${pkg_prefix}/os"

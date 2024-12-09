@@ -2,9 +2,10 @@
 
 exec 2>&1
 
+sleep 80
 # Executing opensearch securityadmin
 echo "Executing opensearch securityadmin"
-hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/root-ca.pem -nhnv -h "localhost" -p {{cfg.transport.port}}
+hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/root-ca.pem -nhnv -h "localhost" -p {{cfg.network.port}}
 echo "Done !!!! Executing opensearch securityadmin"
 
 source {{pkg.svc_config_path}}/health_check
@@ -62,7 +63,7 @@ curl \
   -H 'Content-Type: application/json'\
   -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
   -k \
-  -u admin:admin \
+  --cert {{pkg.svc_config_path}}/admin.pem --key {{pkg.svc_config_path}}/admin-key.pem \
   -d '{
     "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
     "index.refresh_interval": "{{cfg.index.refresh_interval}}"
