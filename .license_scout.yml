@@ -1764,3 +1764,13 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: gopkg.in/ldap.v2
     reason: Exception made by Chef Legal
+  - name: github.com/go-asn1-ber/asn1-ber
+    reason: Exception made by Chef Legal
+  - name: github.com/go-ldap/ldap/v3
+    reason: Exception made by Chef Legal
+  - name: github.com/googleapis/go-type-adapters
+    reason: Exception made by Chef Legal
+  - name: google.golang.org/grpc/cmd/protoc-gen-go-grpc
+    reason: Exception made by Chef Legal
+  - name: go.opentelemetry.io/proto/otlp
+    reason: Exception made by Chef Legal
