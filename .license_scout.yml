@@ -1744,3 +1744,19 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: gopkg.in/vmihailenco/msgpack.v2
     reason: Exception made by Chef Legal
+  - name: github.com/coreos/go-systemd/v22
+    reason: Exception made by Chef Legal
+  - name: github.com/go-openapi/inflect
+    reason: Exception made by Chef Legal
+  - name: github.com/oklog/run
+    reason: Exception made by Chef Legal
+  - name: go.etcd.io/etcd/api/v3
+    reason: Exception made by Chef Legal
+  - name: go.etcd.io/etcd/client/pkg/v3
+    reason: Exception made by Chef Legal
+  - name: go.etcd.io/etcd/client/v3
+    reason: Exception made by Chef Legal
+  - name: ariga.io/atlas
+    reason: Exception made by Chef Legal
+  - name: entgo.io/ent
+    reason: Exception made by Chef Legal
