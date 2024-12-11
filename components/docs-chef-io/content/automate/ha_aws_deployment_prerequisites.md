@@ -78,7 +78,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 **In AWS Managed Services**
 
--   **SQL Database:** AWS RDS PostgreSQL: 13.14
+-   **SQL Database:** AWS RDS PostgreSQL: 13.18
 -   **NoSQL Database:** AWS OpenSearch: 1.3
 -   **Load Balancer:** External not supported
 
