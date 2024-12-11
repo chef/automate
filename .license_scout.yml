@@ -1299,9 +1299,48 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/savsgio/dictpool/master/LICENSE
     license_id: Apache-2.0
     name: github.com/savsgio/dictpool
-
-
-
+  - license_content: https://raw.githubusercontent.com/Masterminds/semver/refs/heads/master/LICENSE.txt
+    license_id: BSD-3-Clause
+    name: github.com/Masterminds/semver
+  - license_content: https://raw.githubusercontent.com/coreos/go-systemd/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/coreos/go-systemd/v22
+  - license_content: https://raw.githubusercontent.com/go-asn1-ber/asn1-ber/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/go-asn1-ber/asn1-ber
+  - license_content: https://raw.githubusercontent.com/go-ldap/ldap/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/go-ldap/ldap/v3
+  - license_content: https://raw.githubusercontent.com/go-openapi/inflect/refs/heads/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/go-openapi/inflect
+  - license_content: https://raw.githubusercontent.com/googleapis/go-type-adapters/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/googleapis/go-type-adapters
+  - license_content: https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/refs/heads/main/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/grpc-ecosystem/grpc-gateway
+  - license_content: https://raw.githubusercontent.com/mattn/go-sqlite3/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/mattn/go-sqlite3
+  - license_content: https://raw.githubusercontent.com/oklog/run/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/oklog/run
+  - license_content: https://raw.githubusercontent.com/etcd-io/etcd/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.etcd.io/etcd/api/v3
+  - license_content: https://raw.githubusercontent.com/oklog/run/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.etcd.io/etcd/client/pkg/v3
+  - license_content: https://raw.githubusercontent.com/oklog/run/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.etcd.io/etcd/client/v3
+  - license_content: https://raw.githubusercontent.com/grpc/grpc-go/refs/heads/master/LICENSE
+    license_id: Apache-2.0
+    name: google.golang.org/grpc/cmd/protoc-gen-go-grpc
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-proto-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/proto/otlp
 
 exceptions:
   habitat:
@@ -1698,4 +1737,10 @@ exceptions:
   - name: gopkg.in/mgo.v2
     reason: Exception made by Chef Legal
   - name: gopkg.in/vmihailenco/msgpack.v2
+    reason: Exception made by Chef Legal
+  - name: ariga.io/atlas
+    reason: Exception made by Chef Legal
+  - name: entgo.io/ent
+    reason: Exception made by Chef Legal
+  - name: entgo.io/ent
     reason: Exception made by Chef Legal
