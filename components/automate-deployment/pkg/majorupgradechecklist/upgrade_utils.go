@@ -99,7 +99,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, version string, sk
 		case "4":
 			dbDataPath = habRootPath + "svc/automate-elasticsearch/data"
 		case "5":
-			dbDataPath = habRootPath + "svc/automate-postgresql/data/pgdata"
+			dbDataPath = habRootPath + "svc/automate-postgresql/data/pgdata13"
 		}
 	}
 	habFreeSpace, err := cm.GetFreeSpaceinGB(habRootPath)
