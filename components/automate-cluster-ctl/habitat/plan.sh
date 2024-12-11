@@ -9,9 +9,9 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 
 pkg_deps=(
-  core/ruby30
+  core/ruby31
   core/aws-cli
-  chef/inspec/4.56.61
+  # chef/inspec/4.56.61
   core/bash
   core/coreutils
   core/cacerts
@@ -100,7 +100,7 @@ do_unpack() {
 }
 
 do_setup_environment() {
-  export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/3.0.0"
+  export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/3.1.0"
   export GEM_PATH="$GEM_HOME"
 
   set_runtime_env GEM_HOME "$GEM_HOME"
