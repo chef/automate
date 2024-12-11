@@ -1341,6 +1341,12 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-proto-go/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: go.opentelemetry.io/proto/otlp
+  - license_content: https://raw.githubusercontent.com/ariga/atlas/refs/heads/master/LICENSE
+    license_id: Apache-2.0
+    name: ariga.io/atlas
+  - license_content: https://raw.githubusercontent.com/ent/ent/refs/heads/master/LICENSE
+    license_id: Apache-2.0
+    name: entgo.io/ent
 
 exceptions:
   habitat:
@@ -1737,10 +1743,4 @@ exceptions:
   - name: gopkg.in/mgo.v2
     reason: Exception made by Chef Legal
   - name: gopkg.in/vmihailenco/msgpack.v2
-    reason: Exception made by Chef Legal
-  - name: ariga.io/atlas
-    reason: Exception made by Chef Legal
-  - name: entgo.io/ent
-    reason: Exception made by Chef Legal
-  - name: entgo.io/ent
     reason: Exception made by Chef Legal
