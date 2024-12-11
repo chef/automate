@@ -1760,3 +1760,7 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: entgo.io/ent
     reason: Exception made by Chef Legal
+  - name: gopkg.in/asn1-ber.v1
+    reason: Exception made by Chef Legal
+  - name: gopkg.in/ldap.v2
+    reason: Exception made by Chef Legal
