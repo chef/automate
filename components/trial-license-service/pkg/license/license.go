@@ -6,15 +6,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/gofrs/uuid"
+	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
-
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 )
 
 const (
