@@ -54,7 +54,7 @@ func TestPurgeServer(t *testing.T) {
 				enabled:    true,
 				recurrence: rec1.String(),
 				update: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							PolicyName: server.PurgeFeedPolicyName,
 						},
@@ -65,7 +65,7 @@ func TestPurgeServer(t *testing.T) {
 				enabled:    false,
 				recurrence: rec2.String(),
 				update: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							PolicyName: server.PurgeFeedPolicyName,
 						},
@@ -87,9 +87,9 @@ func TestPurgeServer(t *testing.T) {
 			require.Equal(t, res.Enabled, c.enabled)
 			require.Equal(t, res.Recurrence, c.recurrence)
 
-			for _, s := range c.update.Es {
+			for _, s := range c.update.Os {
 				found := false
-				for _, p := range res.EsPolicies {
+				for _, p := range res.OsPolicies {
 					if p.Name == s.PolicyName {
 						found = true
 						require.Equal(t, p.OlderThanDays, s.OlderThanDays)
@@ -118,7 +118,7 @@ func TestPurgeServer(t *testing.T) {
 			Enabled:    true,
 			Recurrence: recurrence.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Os: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName: "not-a-valid-policy",
 					},
@@ -176,7 +176,7 @@ func TestPurgeServer(t *testing.T) {
 					Enabled:    true,
 					Recurrence: recurrence.String(),
 					PolicyUpdate: &data_lifecycle.PolicyUpdate{
-						Es: []*dlcAPI.EsPolicyUpdate{
+						Os: []*dlcAPI.OsPolicyUpdate{
 							{
 								PolicyName:    server.PurgeFeedPolicyName,
 								OlderThanDays: 100,

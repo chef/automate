@@ -13,19 +13,19 @@ import (
 // Policies represent the purge policies that are persisted in the workflow
 // parameters.
 type Policies struct {
-	Es map[string]EsPolicy `json:"es"`
+	Os map[string]OsPolicy `json:"os"`
 	Pg map[string]PgPolicy `json:"pg"`
 }
 
 func NewPolicies() *Policies {
 	return &Policies{
-		Es: map[string]EsPolicy{},
+		Os: map[string]OsPolicy{},
 		Pg: map[string]PgPolicy{},
 	}
 }
 
-// EsPolicy represents an elasticsearch purge policy
-type EsPolicy struct {
+// OsPolicy represents an elasticsearch purge policy
+type OsPolicy struct {
 	Name          string `json:"name"`
 	IndexName     string `json:"index_name"`
 	OlderThanDays int32  `json:"older_than_days"`
@@ -36,14 +36,14 @@ type EsPolicy struct {
 }
 
 // Purge purges based on the policy
-func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarServiceClient) error {
+func (p OsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarServiceClient) error {
 	var (
 		err    error
 		id     = time.Now().UTC().Format(time.RFC3339)
 		res    *es.PurgeResponse
 		req    = &es.PurgeRequest{}
 		logctx = log.WithFields(log.Fields{
-			"policy_type":     "elasticsearch",
+			"policy_type":     "opensearch",
 			"id":              id,
 			"older_than_days": p.OlderThanDays,
 			"index_name":      p.IndexName,
