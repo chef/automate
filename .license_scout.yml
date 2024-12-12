@@ -1425,11 +1425,9 @@ exceptions:
     reason: Chef MLSA licensed
   - name: core/attr
     reason: Exception made by Chef Legal
-  - name: core/busybox-static
-    reason: Exception made by Chef Legal
   - name: core/bash
     reason: Exception made by Chef Legal
-  - name: core/binutils-static
+  - name: core/busybox-static
     reason: Exception made by Chef Legal
   - name: core/coreutils-static
     reason: Exception made by Chef Legal
