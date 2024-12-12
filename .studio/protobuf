@@ -22,7 +22,7 @@ document "install_protoc_toolchain" <<DOC
 DOC
 function install_protoc_toolchain() {
   install_if_missing core/protobuf-cpp protoc
-  install_go_tool github.com/golang/protobuf/protoc-gen-go
+  install_go_tool google.golang.org/protobuf/cmd/protoc-gen-go
   compile_go_protobuf api/scripts/bootstrap_protoc.sh
   compile_go_protobuf components/automate-grpc/scripts/bootstrap_protoc.sh
 

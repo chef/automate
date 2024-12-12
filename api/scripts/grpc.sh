@@ -64,7 +64,7 @@ for i in external/**/; do
     list=("$i"*.proto)
     printf 'GEN: %s\n' "${list[@]}"
 
-    protoc_args=("--go_out=plugins=grpc,paths=source_relative:/src/api")
+    protoc_args=("--go_out=. ----go_opt=paths=source_relative:/src/api")
     protoc_args+=("--grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath")
     protoc_args+=("--policy_out=logtostderr=true:$fauxpath") 
 
