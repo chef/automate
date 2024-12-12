@@ -22,7 +22,6 @@ require (
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/dave/jennifer v1.7.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/fatih/color v1.17.0
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
@@ -33,7 +32,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.6.0
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
@@ -72,7 +71,7 @@ require (
 	github.com/pquerna/cachecontrol v0.2.0 // indirect
 	github.com/prometheus/client_golang v1.14.0
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	github.com/russellhaering/goxmldsig v1.1.0 // indirect
+	github.com/russellhaering/goxmldsig v1.1.1 // indirect
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.1
@@ -90,11 +89,10 @@ require (
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.15.0
-	google.golang.org/api v0.102.0
-	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6
-	google.golang.org/grpc v1.53.0-dev
+	google.golang.org/api v0.50.0
+	google.golang.org/grpc v1.52.0-dev
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
-	google.golang.org/protobuf v1.28.1
+	google.golang.org/protobuf v1.35.2
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5
 	gopkg.in/segmentio/analytics-go.v3 v3.1.0
@@ -115,6 +113,7 @@ require (
 	github.com/prashantv/gostub v1.1.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	go.uber.org/automaxprocs v1.5.3
+	google.golang.org/genproto v0.0.0-20210701133433-6b8dcf568a95
 )
 
 require (
@@ -132,16 +131,14 @@ require (
 )
 
 require (
-	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v0.7.0 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.3 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
+	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/minio/highwayhash v1.0.3 // indirect
 	github.com/nats-io/jwt/v2 v2.5.8 // indirect
@@ -156,8 +153,8 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.105.0 // indirect
-	cloud.google.com/go/storage v1.27.0
+	cloud.google.com/go v0.86.0 // indirect
+	cloud.google.com/go/storage v1.16.0
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.6 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
@@ -188,11 +185,11 @@ require (
 	github.com/go-openapi/strfmt v0.23.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/glog v1.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/wire v0.5.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.6.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
