@@ -230,6 +230,7 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 	if c.GetPostgresql() == nil {
 		return nil, errors.New("Postgresql config missing")
 	}
+	fmt.Println("SHAHID=============================================")
 
 	if c.IsExternalPG() {
 		opts := []string{}
@@ -256,7 +257,7 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 					execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 					getPass, err := execGetPass.Output()
 					if err != nil || string(getPass) == "" {
-						return nil, errors.Errorf("External postgres password auth missing password")
+						return nil, errors.Errorf("L259:External postgres password auth missing password")
 					}
 					password = strings.TrimSpace(string(getPass))
 				} else if user == passwordAuth.GetSuperuser().GetUsername().GetValue() {
@@ -267,7 +268,7 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 					execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 					getPass, err := execGetPass.Output()
 					if err != nil || string(getPass) == "" {
-						return nil, errors.Errorf("External postgres password auth missing password")
+						return nil, errors.Errorf("L270:External postgres password auth missing password")
 					}
 					password = strings.TrimSpace(string(getPass))
 				} else {
@@ -275,10 +276,10 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 				}
 
 				if user == "" {
-					return nil, errors.New("External postgres password auth missing user")
+					return nil, errors.New("L279:External postgres password auth missing user")
 				}
 				if password == "" {
-					return nil, errors.Errorf("External postgres password auth missing password")
+					return nil, errors.Errorf("L281:External postgres password auth missing password")
 				}
 
 				connURIRenderer, debugStr := externalConnURIRenderer(c.GetPostgresql().GetIp(),

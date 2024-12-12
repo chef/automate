@@ -41,10 +41,10 @@ cd {{pkg.path}} || exit
 # wasn't a problem for the ruby implementation because it was also in
 # ruby so those FD's were taken.
 exec 0<&-
-
+echo "SHAHID------> before PG.env source"
 source "{{pkg.svc_var_path}}/etc/pg.env"
 HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gemfile" \
-  secrets-helper exec --secret oc_bifrost.superuser_id -- \
+  secrets-helper exec --secret userconfig.pg_dbuser_password -- \
     bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
 
 # ruby vars are needed in order to make depselector start up

@@ -50,7 +50,7 @@ pkg_exposes=(http-port)
 
 pkg_bin_dirs=(bin)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding-go"
 automate_scaffolding_include_templates=(sqerl.config)
 
 scaffolding_go_base_path=github.com/chef
