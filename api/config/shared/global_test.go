@@ -419,8 +419,8 @@ format = "json"
 						Auth: &External_Postgresql_Authentication{
 							Scheme: w.String("password"),
 							Password: &External_Postgresql_Authentication_PasswordAuthentication{
-								Superuser: &External_Postgresql_Authentication_PasswordAuthentication_User{},
-								Dbuser:    &External_Postgresql_Authentication_PasswordAuthentication_User{},
+								Superuser: &External_Postgresql_Authentication_PasswordAuthentication_SuperUser{},
+								Dbuser:    &External_Postgresql_Authentication_PasswordAuthentication_DBUser{},
 							},
 						},
 					},
