@@ -7,3 +7,4 @@ export LDAP_BINDPW=$(secrets-helper show userconfig.ldap_password || echo "")
 export LDAP_BINDDN=$(sed 's/^\"\(.*\)\"$/\1/' {{pkg.svc_config_path}}/ldap_bind_dn)
 export LDAP_BINDPW=$(secrets-helper show userconfig.msad_password || echo "")
 {{~/if}}
+export POSTGRES_DB_PW=$(secrets-helper show userconfig.pg_dbuser_password || echo "")
