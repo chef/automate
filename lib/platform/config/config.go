@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/platform"
+	"github.com/chef/automate/api/config/shared"
 )
 
 const (
@@ -228,6 +230,7 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 	if c.GetPostgresql() == nil {
 		return nil, errors.New("Postgresql config missing")
 	}
+	fmt.Println("SHAHID=============================================")
 
 	if c.IsExternalPG() {
 		opts := []string{}
@@ -247,18 +250,36 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 				password := ""
 
 				if user == passwordAuth.GetDbuser().GetUsername().GetValue() {
-					password = passwordAuth.GetDbuser().GetPassword().GetValue()
+					args := []string{
+						"show",
+						"userconfig.pg_dbuser_password",
+					}
+					execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+					getPass, err := execGetPass.Output()
+					if err != nil || string(getPass) == "" {
+						return nil, errors.Errorf("L259:External postgres password auth missing password")
+					}
+					password = strings.TrimSpace(string(getPass))
 				} else if user == passwordAuth.GetSuperuser().GetUsername().GetValue() {
-					password = passwordAuth.GetSuperuser().GetPassword().GetValue()
+					args := []string{
+						"show",
+						"userconfig.pg_superuser_password",
+					}
+					execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+					getPass, err := execGetPass.Output()
+					if err != nil || string(getPass) == "" {
+						return nil, errors.Errorf("L270:External postgres password auth missing password")
+					}
+					password = strings.TrimSpace(string(getPass))
 				} else {
 					return nil, errors.Errorf("Invalid external postgres user %q", user)
 				}
 
 				if user == "" {
-					return nil, errors.New("External postgres password auth missing user")
+					return nil, errors.New("L279:External postgres password auth missing user")
 				}
 				if password == "" {
-					return nil, errors.Errorf("External postgres password auth missing password")
+					return nil, errors.Errorf("L281:External postgres password auth missing password")
 				}
 
 				connURIRenderer, debugStr := externalConnURIRenderer(c.GetPostgresql().GetIp(),

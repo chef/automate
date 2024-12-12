@@ -31,7 +31,7 @@ pkg_exports=(
 
 pkg_exposes=(http-port)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_download() {
