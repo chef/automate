@@ -602,34 +602,31 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 	sess := s.mgr.Load(r)
 	refreshToken, err := sess.GetString(refreshTokenKey)
 	if err != nil {
-		http.Error(w, "bad session data", http.StatusBadRequest)
+		JSONError(w, prepareError(http.StatusBadRequest, "bad session data"), http.StatusBadRequest)
 		return
 	}
-	// Note: refreshToken may be "" here (e.g. for SAML); we don't bother, since
-	// as long as the idToken doesn't expire soon,
-	// maybeExchangeRefreshTokenForIDToken will return the still-valid idToken.
 
 	// Check if the session exists
 	if alive, err := sess.GetBool(aliveKey); err != nil {
 		s.log.Error("error retrieving session alive key")
-		httpError(w, http.StatusInternalServerError)
+		JSONError(w, prepareError(http.StatusInternalServerError, "error retrieving session"), http.StatusInternalServerError)
 		return
 	} else if !alive {
 		s.log.Info("no session found")
-		httpError(w, http.StatusUnauthorized)
+		JSONError(w, prepareError(http.StatusUnauthorized, "no session found"), http.StatusUnauthorized)
 		return
 	}
 
 	idToken, err := util.ExtractBearerToken(r)
 	if err != nil {
 		s.log.Debug("no bearer token")
-		httpError(w, http.StatusUnauthorized)
+		JSONError(w, prepareError(http.StatusUnauthorized, "no bearer token"), http.StatusUnauthorized)
 		return
 	}
 
 	isBlacklisted, err := s.idTokenBlackLister.IsIdTokenBlacklisted(idToken)
 	if err != nil {
-		httpError(w, http.StatusInternalServerError)
+		JSONError(w, prepareError(http.StatusInternalServerError, "error checking token blacklist"), http.StatusInternalServerError)
 		return
 	}
 	if isBlacklisted {
@@ -638,40 +635,36 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		err = sess.Destroy(w)
 		if err != nil {
 			s.log.Debugf("failed to destroy session: %v", err)
-			http.Error(w, "failed to destroy session", http.StatusInternalServerError)
+			JSONError(w, prepareError(http.StatusInternalServerError, "failed to destroy session"), http.StatusInternalServerError)
 			return
 		}
-		httpError(w, http.StatusUnauthorized)
+		JSONError(w, prepareError(http.StatusUnauthorized, "token blacklisted"), http.StatusUnauthorized)
 		return
 	}
 
 	// Renew session: This ensures the old session is gone and cannot be re-used
-	if err := sess.RenewToken(w); err != nil { // nolint: vetshadow
-		s.log.Error("failed to renew token for session") // TODO this is too unspecific
-		// do we not know anything else to identify this request?
-		httpError(w, http.StatusInternalServerError)
+	if err := sess.RenewToken(w); err != nil {
+		s.log.Error("failed to renew token for session")
+		JSONError(w, prepareError(http.StatusInternalServerError, "failed to renew session"), http.StatusInternalServerError)
 		return
 	}
 
-	// TODO 2017/12/11 (sr): should we kill the session on failure here?
-	// token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken)
 	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, false)
-
 	if err != nil {
 		s.log.Debugf("failed to exchange token: %s", err)
-		httpError(w, http.StatusUnauthorized)
+		JSONError(w, prepareError(http.StatusUnauthorized, "failed to exchange token"), http.StatusUnauthorized)
 		return
 	}
 
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
-		http.Error(w, "no id_token in token response", http.StatusInternalServerError)
+		JSONError(w, prepareError(http.StatusInternalServerError, "no id_token in token response"), http.StatusInternalServerError)
 		return
 	}
 
 	if token.RefreshToken != "" {
 		if err := sess.PutString(w, refreshTokenKey, token.RefreshToken); err != nil {
-			http.Error(w, "failed to set refresh_token", http.StatusInternalServerError)
+			JSONError(w, prepareError(http.StatusInternalServerError, "failed to set refresh_token"), http.StatusInternalServerError)
 			return
 		}
 	}

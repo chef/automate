@@ -18,6 +18,7 @@ import (
 
 type dexAPI struct {
 	usrs []*api.Password
+	api.UnimplementedDexServer
 }
 
 func TestDexUsersAdapter(t *testing.T) {

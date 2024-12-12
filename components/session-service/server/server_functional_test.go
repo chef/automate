@@ -375,17 +375,18 @@ func newDexTestServer(t *testing.T, nowFunc func() time.Time,
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
 
+	refreshPolicy, err := dex.NewRefreshTokenPolicy(logger, true, "1h", "24h", "1m")
+	require.NoError(t, err, "create refresh token policy")
+
 	config := dex.Config{
 		SkipApprovalScreen: true,
 		Issuer:             issuerURL,
 		Storage:            memory.New(logger),
-		Web: dex.WebConfig{
-			Dir: "testdata/web",
-		},
 		Logger:             logger,
 		IDTokensValidFor:   idTokenValidity,
 		Now:                nowFunc,
 		PrometheusRegistry: prometheus.NewRegistry(),
+		RefreshTokenPolicy: refreshPolicy,
 	}
 
 	connector := storage.Connector{
@@ -407,7 +408,6 @@ func newDexTestServer(t *testing.T, nowFunc func() time.Time,
 		t.Fatalf("create client: %v", err)
 	}
 
-	var err error
 	if serv, err = dex.NewServer(ctx, config); err != nil {
 		t.Fatal(err)
 	}
