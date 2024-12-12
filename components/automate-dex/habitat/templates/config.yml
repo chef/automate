@@ -15,7 +15,7 @@ storage:
 {{- if is_external_pg }}
     {{- if eq "password" .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetScheme.GetValue }}
     user: {{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetUsername.GetValue }}
-    password: {{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetPassword.GetValue }}
+    password: $POSTGRES_DB_PW
     {{- else }}
     {{ fail "unsupported auth scheme" }}
     {{- end }}
