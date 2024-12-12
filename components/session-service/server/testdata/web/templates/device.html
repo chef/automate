@@ -1,0 +1,28 @@
+{{ template "header.html" . }}
+
+<div class="theme-panel">
+  <h2 class="theme-heading">Device Authorization</h2>
+  <div>
+    <p>Please enter your device code:</p>
+    <form method="post" action="{{ .PostURL }}">
+      <div class="theme-form-row">
+        <div class="theme-form-label">
+          <label for="deviceCode">Device Code</label>
+        </div>
+        <input tabindex="2" required id="deviceCode" name="code" type="text" class="theme-form-input" placeholder="Enter device code" {{ if .Invalid }}autofocus{{ end }}/>
+      </div>
+
+      {{ if .Invalid }}
+      <div id="login-error" class="dex-error-box">
+        Invalid device code.
+      </div>
+      {{ end }}
+
+      <button tabindex="3" id="submit-login" type="submit" class="dex-btn theme-btn--primary">
+        <span class="dex-btn-text">Submit</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+{{ template "footer.html" . }}
