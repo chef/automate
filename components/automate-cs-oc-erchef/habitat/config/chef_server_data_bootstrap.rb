@@ -82,6 +82,8 @@ class ChefServerDataBootstrap
       f = IO.for_fd(fd.to_i)
       secrets = JSON.parse(f.read())
       secrets['oc_bifrost']['superuser_id']
+      #'4ec7b32289315a9cd0e706da627eaa4d'
+      # ENV['POSTGRES_DB_PW']
     else
       raise "No secrets data found in environment"
     end

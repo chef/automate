@@ -20,7 +20,7 @@ pkg_deps=(
   #core/runit/2.1.2/20200403133549
   core/runit
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "${local_platform_tools_origin:-jashaik}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_erchef/15.10.21/20241126093701"
 )

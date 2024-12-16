@@ -28,5 +28,6 @@ fi
 
 
 secrets-helper generate oc_bifrost.superuser_id 32 --if-not-exists
-
+echo "Superuser_id show======> bifrost"
+echo $(secrets-helper show oc_bifrost.superuser_id)
 exec secrets-helper exec --secret oc_bifrost.superuser_id -- oc_bifrost foreground
