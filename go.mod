@@ -138,7 +138,6 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.3 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
@@ -272,4 +271,3 @@ replace github.com/chef/automate/api/external => ./api/external/
 replace github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.5.0
 
 //replace go.uber.org/automaxprocs => ./automaxprocs-excluded
-
