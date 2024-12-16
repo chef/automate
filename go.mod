@@ -272,3 +272,4 @@ replace github.com/chef/automate/api/external => ./api/external/
 replace github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.5.0
 
 //replace go.uber.org/automaxprocs => ./automaxprocs-excluded
+
