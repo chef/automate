@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -44,15 +46,34 @@ var infoReindexing = `
 Reindexing of Elasticsearch/OpenSearch indices if needed.
 `
 
+type ReindexStatus struct {
+	IsRunning     bool     `json:"is_running"`
+	CurrentIndex  string   `json:"current_index,omitempty"`
+	Completed     []string `json:"completed,omitempty"`
+	LastUpdatedAt string   `json:"last_updated_at"`
+}
+
+var (
+	reindexStatusFile = "/hab/reindex_status.json"
+	statusMu          sync.Mutex
+)
+
 func init() {
 	reindexCmd.SetUsageTemplate(infoReindexing)
 	RootCmd.AddCommand(reindexCmd)
+	RootCmd.AddCommand(statusCmd)
 }
 
 var reindexCmd = &cobra.Command{
 	Use:   "reindex",
 	Short: "Reindex Elasticsearch indices if needed",
 	RunE:  runReindex,
+}
+
+var statusCmd = &cobra.Command{
+	Use:   "status",
+	Short: "Check the reindexing status",
+	RunE:  checkReindexingStatus,
 }
 
 var isReindexing bool
@@ -66,27 +87,32 @@ var skipIndices = map[string]bool{
 }
 
 func runReindex(cmd *cobra.Command, args []string) error {
-	fmt.Println("Reindexing Elasticsearch/OpenSearch indices.")
-	mu.Lock()
-	if isReindexing {
-		mu.Unlock()
-		fmt.Println("Reindexing is already in progress. Please wait for it to complete.")
+	fmt.Println("Starting reindexing process...")
+
+	statusMu.Lock()
+	status := loadReindexStatus()
+	if status.IsRunning {
+		statusMu.Unlock()
+		fmt.Println("Reindexing is already in progress. Current status:")
+		printReindexStatus(status)
 		return nil
 	}
-	isReindexing = true
-	mu.Unlock()
 
-	defer func() {
-		mu.Lock()
-		isReindexing = false
-		mu.Unlock()
-	}()
+	// Mark reindexing as started
+	status.IsRunning = true
+	status.LastUpdatedAt = time.Now().Format(time.RFC3339)
+	saveReindexStatus(status)
+	statusMu.Unlock()
 
+	fmt.Println("Reindexing process started.")
 	indices, err := fetchIndices()
 	if err != nil {
+		fmt.Printf("Error fetching indices: %v\n", err)
 		return err
 	}
 
+	// Create a channel to handle reindexing concurrently
+	done := make(chan string)
 Loop1:
 	for _, index := range indices {
 		for prefix := range skipIndices {
@@ -95,24 +121,112 @@ Loop1:
 				continue Loop1
 			}
 		}
-		settings, err := fetchIndexSettingsVersion(index.Index)
+
+		// settings, err := fetchIndexSettingsVersion(index.Index)
 		if err != nil {
 			fmt.Printf("Error fetching settings for index %s: %v\n", index.Index, err)
 			continue
 		}
 
-		if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
-			fmt.Printf("Reindexing required for index: %s\n", index.Index)
-			if err := triggerReindex(index.Index); err != nil {
-				fmt.Printf("Error reindexing index %s: %v\n", index.Index, err)
+		// if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
+		fmt.Printf("Reindexing required for index: %s\n", index.Index)
+		go func(idx string) {
+			if err := reindexIndex(idx); err != nil {
+				fmt.Printf("Failed to reindex %s: %v\n", idx, err)
 			}
-		} else {
-			fmt.Printf("Index %s is up to date. Skipping reindex.\n", index.Index)
-		}
+			done <- idx
+		}(index.Index)
+		// } else {
+		// 	fmt.Printf("Index %s is up to date. Skipping reindex.\n", index.Index)
+		// }
 	}
+
+	// Wait for reindexing to complete
+	for range indices {
+		completedIndex := <-done
+		statusMu.Lock()
+		status.Completed = append(status.Completed, completedIndex)
+		status.LastUpdatedAt = time.Now().Format(time.RFC3339)
+		saveReindexStatus(status)
+		statusMu.Unlock()
+	}
+
+	// Mark reindexing as finished
+	statusMu.Lock()
+	status.IsRunning = false
+	status.CurrentIndex = ""
+	status.LastUpdatedAt = time.Now().Format(time.RFC3339)
+	saveReindexStatus(status)
+	statusMu.Unlock()
 
 	fmt.Println("Reindexing process completed.")
 	return nil
+}
+
+func reindexIndex(index string) error {
+	fmt.Printf("Reindexing index: %s\n", index)
+
+	// Trigger the actual reindexing logic (placeholder)
+	err := triggerReindex(index)
+	if err != nil {
+		return fmt.Errorf("reindexing failed for index %s: %v", index, err)
+	}
+
+	fmt.Printf("Reindexing completed for index: %s\n", index)
+	return nil
+}
+
+func checkReindexingStatus(cmd *cobra.Command, args []string) error {
+	status := loadReindexStatus()
+	printReindexStatus(status)
+	return nil
+}
+
+func printReindexStatus(status ReindexStatus) {
+	fmt.Println("Reindexing Status:")
+	fmt.Printf("  Is Running: %v\n", status.IsRunning)
+	if status.IsRunning {
+		fmt.Printf("  Current Index: %s\n", status.CurrentIndex)
+	}
+	fmt.Printf("  Completed Indices: %v\n", status.Completed)
+	fmt.Printf("  Last Updated At: %s\n", status.LastUpdatedAt)
+}
+
+func loadReindexStatus() ReindexStatus {
+	statusMu.Lock()
+	defer statusMu.Unlock()
+
+	var status ReindexStatus
+	data, err := os.ReadFile(reindexStatusFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return status // Return default status if file doesn't exist
+		}
+		fmt.Printf("Failed to read reindex status: %v\n", err)
+		return status
+	}
+
+	if err := json.Unmarshal(data, &status); err != nil {
+		fmt.Printf("Failed to parse reindex status: %v\n", err)
+		return status
+	}
+
+	return status
+}
+
+func saveReindexStatus(status ReindexStatus) {
+	statusMu.Lock()
+	defer statusMu.Unlock()
+
+	data, err := json.MarshalIndent(status, "", "  ")
+	if err != nil {
+		fmt.Printf("Failed to serialize reindex status: %v\n", err)
+		return
+	}
+
+	if err := os.WriteFile(reindexStatusFile, data, 0644); err != nil {
+		fmt.Printf("Failed to save reindex status: %v\n", err)
+	}
 }
 
 func fetchIndices() (Indices, error) {
