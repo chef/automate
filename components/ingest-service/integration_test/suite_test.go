@@ -265,14 +265,16 @@ func (s *Suite) DeleteAllDocuments() {
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
-	for i, v := range indices {
-		if v == ".opendistro_security" {
-			indices = append(indices[:i], indices[i+1:]...)
-			break
+	indicesToDelete := make([]string, 0)
+	for _, v := range indices {
+		if v == ".plugins-ml-config" || v == ".opensearch-observability" || v == ".opendistro_security" {
+			continue
+		} else {
+			indicesToDelete = append(indicesToDelete, v)
 		}
 	}
 	_, err := s.client.DeleteByQuery().
-		Index(indices...).
+		Index(indicesToDelete...).
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").
