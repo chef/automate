@@ -43,7 +43,7 @@ do_before() {
 }
 
 do_prepare() {
-  gem update --system --no-document
+  # gem update --system --no-document
   gem install bundler -v "$(grep -A 1 "BUNDLED WITH" $PLAN_CONTEXT/Gemfile.lock | tail -n 1)"
 
   export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/3.0.0"
