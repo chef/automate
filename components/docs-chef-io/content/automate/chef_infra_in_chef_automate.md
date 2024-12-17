@@ -52,6 +52,7 @@ The list of parameters are as follows:
 | opscode_erchef['reindex_sleep_min_ms']          | 500                                       | 500                                 | ```[erchef.v1.sys.index]```<br>```reindex_sleep_min_ms=500```      |
 | opscode_erchef['reindex_sleep_max_ms']          | 2000                                      | 2000                                | ```[erchef.v1.sys.index]```<br>```reindex_sleep_max_ms=2000```      |
 | opscode_erchef['reindex_item_retries']          | 3                                         | 3                                   | ```[erchef.v1.sys.index]```<br>```reindex_item_retries=3```      |
+| opscode_erchef['track_total_hits']              | FALSE                                     | FALSE                               | ```[erchef.v1.sys.index]```<br>```track_total_hits=false```          |
 | opscode_erchef['cbv_cache_enabled']             | FALSE                                     | FALSE                               | ```[erchef.v1.sys.api]```<br>```cbv_cache_enabled=false```           |
 | opscode_erchef['search_queue_mode']             | batch                                     | batch                               | ```[erchef.v1.sys.index]```<br>```search_queue_mode="batch"```         |
 | opscode_erchef['s3_enabled']             | FALSE                                     | FALSE                                      | ```[erchef.v1.sys.api]```<br>```s3_enabled="true"```         |
