@@ -1300,8 +1300,124 @@ fallbacks:
     license_id: Apache-2.0
     name: github.com/savsgio/dictpool
 
+  - license_content: https://raw.githubusercontent.com/Azure/go-ansiterm/master/LICENSE
+    license_id: MIT
+    name: github.com/Azure/go-ansiterm
 
+  - license_content: https://raw.githubusercontent.com/Microsoft/hcsshim/master/LICENSE
+    license_id: MIT
+    name: github.com/Microsoft/hcsshim
 
+  - license_content: https://raw.githubusercontent.com/armon/consul-api/master/LICENSE
+    license_id: MPL-2.0
+    name: github.com/armon/consul-api
+  - license_content: https://raw.githubusercontent.com/cenkalti/backoff/master/LICENSE
+    license_id: MIT
+    name: github.com/cenkalti/backoff
+  - license_content: https://raw.githubusercontent.com/cockroachdb/datadriven/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/cockroachdb/datadriven
+
+  - license_content: https://raw.githubusercontent.com/containerd/cgroups/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/cgroups
+  - license_content: https://raw.githubusercontent.com/containerd/console/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/console
+  - license_content: https://raw.githubusercontent.com/containerd/containerd/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/containerd
+  - license_content: https://raw.githubusercontent.com/containerd/continuity/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/continuity
+  - license_content: https://raw.githubusercontent.com/containerd/fifo/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/fifo
+  - license_content: https://raw.githubusercontent.com/containerd/go-runc/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/go-runc
+  - license_content: https://raw.githubusercontent.com/containerd/ttrpc/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/ttrpc
+  - license_content: https://raw.githubusercontent.com/containerd/typeurl/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/typeurl
+
+  - license_content: https://raw.githubusercontent.com/coreos/go-etcd/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/coreos/go-etcd
+  - license_content: https://raw.githubusercontent.com/docker/distribution/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/docker/distribution
+
+  - license_content: https://raw.githubusercontent.com/go-redis/redis/master/LICENSE
+    license_id: BSD-2-Clause
+    name: github.com/go-redis/redis
+  - license_content: https://raw.githubusercontent.com/mattn/go-sqlite3/master/LICENSE
+    license_id: MIT
+    name: github.com/mattn/go-sqlite3
+
+  - license_content: https://raw.githubusercontent.com/godbus/dbus/master/LICENSE
+    license_id: BSD-2-Clause
+    name: github.com/godbus/dbus
+  - license_content: https://raw.githubusercontent.com/gorilla/context/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/gorilla/context
+  - license_content: https://raw.githubusercontent.com/morikuni/aec/master/LICENSE
+    license_id: MIT
+    name: github.com/morikuni/aec
+
+  - license_content: https://raw.githubusercontent.com/opencontainers/runc/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/opencontainers/runc
+  - license_content: https://raw.githubusercontent.com/opencontainers/runtime-spec/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/opencontainers/runtime-spec
+  - license_content: https://raw.githubusercontent.com/opencontainers/runtime-tools/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/opencontainers/runtime-tools
+
+  - license_content: https://raw.githubusercontent.com/satori/go.uuid/master/LICENSE
+    license_id: MIT
+    name: github.com/satori/go.uuid
+  - license_content: https://raw.githubusercontent.com/syndtr/gocapability/master/LICENSE
+    license_id: BSD-2-Clause
+    name: github.com/syndtr/gocapability
+  - license_content: https://raw.githubusercontent.com/testcontainers/testcontainers-go/master/LICENSE
+    license_id: MIT
+    name: github.com/testcontainers/testcontainers-go
+  - license_content: https://raw.githubusercontent.com/urfave/cli/master/LICENSE
+    license_id: MIT
+    name: github.com/urfave/cli
+
+  - license_content: https://raw.githubusercontent.com/xeipuuv/gojsonpointer/master/LICENSE-APACHE-2.0.txt
+    license_id: Apache-2.0
+    name: github.com/xeipuuv/gojsonpointer
+  - license_content: https://raw.githubusercontent.com/xeipuuv/gojsonreference/master/LICENSE-APACHE-2.0.txt
+    license_id: Apache-2.0
+    name: github.com/xeipuuv/gojsonreference
+  - license_content: https://raw.githubusercontent.com/xeipuuv/gojsonschema/master/LICENSE-APACHE-2.0.txt
+    license_id: Apache-2.0
+    name: github.com/xeipuuv/gojsonschema
+  - license_content: https://raw.githubusercontent.com/xordataexchange/crypt/master/LICENSE
+    license_id: MIT
+    name: github.com/xordataexchange/crypt
+
+  - license_content: https://raw.githubusercontent.com/etcd-io/etcd/master/LICENSE
+    license_id: Apache-2.0
+    name: go.etcd.io/etcd
+  - license_content: https://raw.githubusercontent.com/gotestyourself/gotest.tools/master/LICENSE
+    license_id: Apache-2.0
+    name: gotest.tools
+  - license_content: https://raw.githubusercontent.com/kubernetes/kubernetes/master/LICENSE
+    license_id: Apache-2.0
+    name: k8s.io/kubernetes
+  - license_content: https://raw.githubusercontent.com/kubernetes-sigs/testing_frameworks/master/LICENSE
+    license_id: Apache-2.0
+    name: sigs.k8s.io/testing_frameworks
+  - license_content: https://raw.githubusercontent.com/kubernetes-sigs/yaml/master/LICENSE
+    license_id: MIT
+    name: sigs.k8s.io/yaml
 
 exceptions:
   habitat:
