@@ -71,6 +71,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Index.ReindexSleepMinMs = w.Int32(500)
 	c.V1.Sys.Index.ReindexSleepMaxMs = w.Int32(2000)
 	c.V1.Sys.Index.ReindexItemRetries = w.Int32(3)
+	c.V1.Sys.Index.TrackTotalHits = w.Bool(false)
 
 	c.V1.Sys.Authz.Fanout = w.Int32(20)
 	c.V1.Sys.Authz.Timeout = w.Int32(2000)
