@@ -48,6 +48,7 @@ do_setup_environment() {
 
 do_prepare() {
   # gem update --system --no-document
+  gem i rubygems-update -v '<3.6' && update_rubygems
   gem install bundler -v "$(grep -A 1 "BUNDLED WITH" $PLAN_CONTEXT/../Gemfile.lock | tail -n 1)"
 }
 
