@@ -11,6 +11,7 @@ import (
 
 	natsd "github.com/nats-io/nats-server/v2/server"
 	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
+
 	stores "github.com/nats-io/nats-streaming-server/stores"
 	nats "github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
