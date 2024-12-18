@@ -33,7 +33,7 @@ ensure_dir_ownership() {
   fi
   echo "Ensuring proper ownership: $ownership_command"
   $ownership_command
-  chmod 0700 {{pkg.svc_data_path}}/pgdata13
+  chmod 0700 {{pkg.svc_data_path}}/pgdata17
 }
 
 ensure_key_ownership() {
