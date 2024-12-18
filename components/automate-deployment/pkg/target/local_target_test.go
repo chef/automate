@@ -329,7 +329,7 @@ func TestInstallHabitat(t *testing.T) {
 		mockExec.Expect("CombinedOutput", command.ExpectedCommand{
 			Env:  []string{fmt.Sprintf("TMPDIR=%s/tmp", tempDir)},
 			Cmd:  "bash",
-			Args: []string{filename, "-v", "0.54.0"},
+			Args: []string{filename, "-v", "0.54.0/20180221022026"},
 		}).Return("", installError).Once()
 	}
 
