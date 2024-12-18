@@ -7,13 +7,45 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
+
+type OpensearchInfo struct {
+	Name        string `json:"name"`
+	ClusterName string `json:"cluster_name"`
+	ClusterUUID string `json:"cluster_uuid"`
+	Version     struct {
+		Distribution                     string `json:"distribution"`
+		Number                           string `json:"number"`
+		BuildType                        string `json:"build_type"`
+		BuildHash                        string `json:"build_hash"`
+		BuildSnapshot                    bool   `json:"build_snapshot"`
+		LuceneVersion                    string `json:"lucene_version"`
+		MinimumWireCompatibilityVersion  string `json:"minimum_wire_compatibility_version"`
+		MinimumIndexCompatibilityVersion string `json:"minimum_index_compatibility_version"`
+	} `json:"version"`
+	Tagline string `json:"tagline"`
+}
+
+type TaskStatus struct {
+	IndexName string `json:"index_name"`
+	Status    string `json:"status"`
+	Error     string `json:"error,omitempty"`
+}
+
+type Status struct {
+	Status            string       `json:"status"`
+	TaskStatus        []TaskStatus `json:"task_status"`
+	OpenSearchVersion string       `json:"opensearch_version"`
+	LastUpdatedAt     string       `json:"last_updated_at"`
+}
 
 type Indices []struct {
 	Health       string `json:"health"`
@@ -46,20 +78,16 @@ var infoReindexing = `
 Reindexing of Elasticsearch/OpenSearch indices if needed.
 `
 
-type ReindexStatus struct {
-	IsRunning     bool     `json:"is_running"`
-	CurrentIndex  string   `json:"current_index,omitempty"`
-	Completed     []string `json:"completed,omitempty"`
-	LastUpdatedAt string   `json:"last_updated_at"`
-}
-
 var (
-	reindexStatusFile = "/hab/reindex_status.json"
-	statusMu          sync.Mutex
+	statusFile = "status.json"
+	taskMutex  sync.Mutex
+	taskQueue  = make(chan string, 10) // Buffered channel to queue indices
+	wg         sync.WaitGroup          // WaitGroup to ensure reindexing complete
 )
 
 func init() {
 	reindexCmd.SetUsageTemplate(infoReindexing)
+	reindexCmd.Flags().Bool("background", false, "Run reindexing in the background")
 	RootCmd.AddCommand(reindexCmd)
 	RootCmd.AddCommand(statusCmd)
 }
@@ -71,13 +99,10 @@ var reindexCmd = &cobra.Command{
 }
 
 var statusCmd = &cobra.Command{
-	Use:   "status",
+	Use:   "indexing-status",
 	Short: "Check the reindexing status",
-	RunE:  checkReindexingStatus,
+	RunE:  checkStatus,
 }
-
-var isReindexing bool
-var mu sync.Mutex
 
 var skipIndices = map[string]bool{
 	"security-auditlog":         true,
@@ -86,147 +111,209 @@ var skipIndices = map[string]bool{
 	".opensearch-observability": true,
 }
 
+func checkStatus(cmd *cobra.Command, args []string) error {
+	status, err := readStatus()
+	if err != nil {
+		fmt.Printf("Error reading status: %v\n", err)
+		return err
+	}
+
+	fmt.Printf("Current Status:\n")
+	fmt.Printf("- Status: %s\n", status.Status)
+	fmt.Printf("- OpenSearch Version: %s\n", status.OpenSearchVersion)
+	fmt.Printf("- Last Updated At: %s\n", status.LastUpdatedAt)
+	for _, task := range status.TaskStatus {
+		fmt.Printf("  - Index: %s, Status: %s", task.IndexName, task.Status)
+		if task.Error != "" {
+			fmt.Printf(", Error: %s", task.Error)
+		}
+		fmt.Println()
+	}
+
+	return nil
+}
+
+// Reads the current task status from the JSON file
+func readStatus() (Status, error) {
+	taskMutex.Lock()
+	defer taskMutex.Unlock()
+
+	file, err := os.ReadFile(statusFile)
+	if os.IsNotExist(err) {
+		return Status{}, nil
+	} else if err != nil {
+		return Status{}, err
+	}
+
+	var status Status
+	err = json.Unmarshal(file, &status)
+	if err != nil {
+		return Status{}, err
+	}
+	return status, nil
+}
+
+func updateStatus(status Status) error {
+	taskMutex.Lock()
+	defer taskMutex.Unlock()
+
+	status.LastUpdatedAt = time.Now().Format(time.RFC3339)
+
+	file, err := json.MarshalIndent(status, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(statusFile, file, 0644)
+}
+
+func runInBackground() {
+	cmd := exec.Command(os.Args[0], append(os.Args[1:], "--background")...)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} // Detach process group
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	cmd.Stdin = nil
+	if err := cmd.Start(); err != nil {
+		fmt.Println("Error starting process in background:", err)
+		os.Exit(1)
+	}
+	fmt.Println("Task is now running in the background with PID:", cmd.Process.Pid)
+	os.Exit(0)
+}
+
 func runReindex(cmd *cobra.Command, args []string) error {
+	backgroundFlag, _ := cmd.Flags().GetBool("background")
+
+	if !backgroundFlag {
+		// Check if reindexing is already running
+		status, err := readStatus()
+		if err == nil {
+			for _, task := range status.TaskStatus {
+				if task.Status == "Running" {
+					fmt.Println("Reindexing process is already running. Run `chef-automate indexing-status` to get the status.")
+					return nil
+				}
+			}
+		}
+		runInBackground()
+	}
+
 	fmt.Println("Starting reindexing process...")
 
-	statusMu.Lock()
-	status := loadReindexStatus()
-	if status.IsRunning {
-		statusMu.Unlock()
-		fmt.Println("Reindexing is already in progress. Current status:")
-		printReindexStatus(status)
+	// Fetch current indexing status
+	status, err := readStatus()
+	if err != nil {
+		fmt.Printf("Error reading status: %v\n", err)
+		return err
+	}
+
+	if status.Status == "Running" {
+		fmt.Println("Reindexing process is already running. Run `chef-automate indexing-status` to get the status.")
 		return nil
 	}
 
-	// Mark reindexing as started
-	status.IsRunning = true
-	status.LastUpdatedAt = time.Now().Format(time.RFC3339)
-	saveReindexStatus(status)
-	statusMu.Unlock()
+	osInfo, err := getOpenSearchInfo()
+	if err != nil {
+		fmt.Printf("Error fetching OpenSearch info: %v\n", err)
+	}
 
-	fmt.Println("Reindexing process started.")
+	status.OpenSearchVersion = osInfo.Version.Number
+	status.Status = "Running"
+	fmt.Println("Fetching indices from Elasticsearch/OpenSearch.")
 	indices, err := fetchIndices()
 	if err != nil {
 		fmt.Printf("Error fetching indices: %v\n", err)
 		return err
 	}
 
-	// Create a channel to handle reindexing concurrently
-	done := make(chan string)
-Loop1:
+	// Add indices to the queue for reindexing
 	for _, index := range indices {
-		for prefix := range skipIndices {
-			if strings.HasPrefix(index.Index, prefix) {
-				fmt.Printf("Skipping index %s\n", index.Index)
-				continue Loop1
+		alreadyRunning := false
+		for _, task := range status.TaskStatus {
+			if task.IndexName == index.Index && task.Status == "Running" {
+				fmt.Printf("Task '%s' is already running. Skipping.\n", index.Index)
+				alreadyRunning = true
+				break
 			}
 		}
-
-		// settings, err := fetchIndexSettingsVersion(index.Index)
-		if err != nil {
-			fmt.Printf("Error fetching settings for index %s: %v\n", index.Index, err)
+		if alreadyRunning {
 			continue
 		}
 
-		// if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
-		fmt.Printf("Reindexing required for index: %s\n", index.Index)
-		go func(idx string) {
-			if err := reindexIndex(idx); err != nil {
-				fmt.Printf("Failed to reindex %s: %v\n", idx, err)
-			}
-			done <- idx
-		}(index.Index)
-		// } else {
-		// 	fmt.Printf("Index %s is up to date. Skipping reindex.\n", index.Index)
-		// }
-	}
-
-	// Wait for reindexing to complete
-	for range indices {
-		completedIndex := <-done
-		statusMu.Lock()
-		status.Completed = append(status.Completed, completedIndex)
-		status.LastUpdatedAt = time.Now().Format(time.RFC3339)
-		saveReindexStatus(status)
-		statusMu.Unlock()
-	}
-
-	// Mark reindexing as finished
-	statusMu.Lock()
-	status.IsRunning = false
-	status.CurrentIndex = ""
-	status.LastUpdatedAt = time.Now().Format(time.RFC3339)
-	saveReindexStatus(status)
-	statusMu.Unlock()
-
-	fmt.Println("Reindexing process completed.")
-	return nil
-}
-
-func reindexIndex(index string) error {
-	fmt.Printf("Reindexing index: %s\n", index)
-
-	// Trigger the actual reindexing logic (placeholder)
-	err := triggerReindex(index)
-	if err != nil {
-		return fmt.Errorf("reindexing failed for index %s: %v", index, err)
-	}
-
-	fmt.Printf("Reindexing completed for index: %s\n", index)
-	return nil
-}
-
-func checkReindexingStatus(cmd *cobra.Command, args []string) error {
-	status := loadReindexStatus()
-	printReindexStatus(status)
-	return nil
-}
-
-func printReindexStatus(status ReindexStatus) {
-	fmt.Println("Reindexing Status:")
-	fmt.Printf("  Is Running: %v\n", status.IsRunning)
-	if status.IsRunning {
-		fmt.Printf("  Current Index: %s\n", status.CurrentIndex)
-	}
-	fmt.Printf("  Completed Indices: %v\n", status.Completed)
-	fmt.Printf("  Last Updated At: %s\n", status.LastUpdatedAt)
-}
-
-func loadReindexStatus() ReindexStatus {
-	statusMu.Lock()
-	defer statusMu.Unlock()
-
-	var status ReindexStatus
-	data, err := os.ReadFile(reindexStatusFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return status // Return default status if file doesn't exist
+		// Mark reindexing as running
+		status.TaskStatus = append(status.TaskStatus, TaskStatus{
+			IndexName: index.Index,
+			Status:    "Running",
+		})
+		if err := updateStatus(status); err != nil {
+			fmt.Printf("Error updating status: %v\n", err)
+			return err
 		}
-		fmt.Printf("Failed to read reindex status: %v\n", err)
-		return status
+
+		wg.Add(1)
+		taskQueue <- index.Index
+		fmt.Printf("Task '%s' added to the queue.\n", index.Index)
 	}
 
-	if err := json.Unmarshal(data, &status); err != nil {
-		fmt.Printf("Failed to parse reindex status: %v\n", err)
-		return status
-	}
+	go processIndices() // Start task index processing
+	wg.Wait()           // Wait for all tasks to complete
 
-	return status
+	status.Status = "Completed"
+	return nil
 }
 
-func saveReindexStatus(status ReindexStatus) {
-	statusMu.Lock()
-	defer statusMu.Unlock()
+func processIndices() {
+	for jobName := range taskQueue {
+		fmt.Printf("Processing task: %s\n", jobName)
+		err := processReindexing(jobName)
+		status, readErr := readStatus()
+		if readErr != nil {
+			fmt.Printf("Error reading status: %v\n", readErr)
+			wg.Done()
+			continue
+		}
+		for i := range status.TaskStatus {
+			if status.TaskStatus[i].IndexName == jobName {
+				if err != nil {
+					status.TaskStatus[i].Status = "Error"
+					status.TaskStatus[i].Error = err.Error()
+				} else {
+					status.TaskStatus[i].Status = "Completed"
+				}
+				break
+			}
+		}
+		updateErr := updateStatus(status)
+		if updateErr != nil {
+			fmt.Printf("Error updating status: %v\n", updateErr)
+		}
+		wg.Done()
+	}
+}
 
-	data, err := json.MarshalIndent(status, "", "  ")
+func processReindexing(index string) error {
+	for prefix := range skipIndices {
+		if strings.HasPrefix(index, prefix) {
+			fmt.Printf("Skipping index %s\n", index)
+			return nil
+		}
+	}
+
+	settings, err := fetchIndexSettingsVersion(index)
 	if err != nil {
-		fmt.Printf("Failed to serialize reindex status: %v\n", err)
-		return
+		fmt.Printf("Error fetching settings for index %s: %v\n", index, err)
+		return err
 	}
 
-	if err := os.WriteFile(reindexStatusFile, data, 0644); err != nil {
-		fmt.Printf("Failed to save reindex status: %v\n", err)
+	if settings.Settings.Index.Version.CreatedString != settings.Settings.Index.Version.UpgradedString {
+		fmt.Printf("Reindexing required for index: %s\n", index)
+		if err := triggerReindex(index); err != nil {
+			fmt.Printf("Failed to reindex %s: %v\n", index, err)
+		}
+	} else {
+		fmt.Printf("Index %s is up to date. Skipping reindex.\n", index)
 	}
+
+	return nil
 }
 
 func fetchIndices() (Indices, error) {
@@ -608,28 +695,6 @@ func deleteIndex(index string) error {
 	return nil
 }
 
-// Close an index
-func closeIndex(index string) error {
-	fmt.Printf("Closing index: %s\n", index)
-	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_close", index)
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create close request for index %s: %w", index, err)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to close index %s: %w", index, err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("failed to close index %s: %s", index, string(body))
-	}
-	return nil
-}
-
 func cloneIndex(sourceIndex, targetIndex string) error {
 	fmt.Printf("Cloning index from %s to %s\n", sourceIndex, targetIndex)
 	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_clone/%s", sourceIndex, targetIndex)
@@ -652,28 +717,6 @@ func cloneIndex(sourceIndex, targetIndex string) error {
 		return fmt.Errorf("failed to clone index: %s", string(body))
 	}
 
-	return nil
-}
-
-// Open an index
-func openIndex(index string) error {
-	fmt.Printf("Opening index: %s\n", index)
-	url := fmt.Sprintf("http://127.0.0.1:10144/%s/_open", index)
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create open request for index %s: %w", index, err)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to open index %s: %w", index, err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("failed to open index %s: %s", index, string(body))
-	}
 	return nil
 }
 
@@ -746,4 +789,20 @@ func fetchAliases(index string) ([]string, error) {
 	}
 
 	return aliases, nil
+}
+
+func getOpenSearchInfo() (*OpensearchInfo, error) {
+	resp, err := http.Get("http://127.0.0.1:10144/")
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch OpenSearch info: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Parse the response
+	var info OpensearchInfo
+	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
+		return nil, fmt.Errorf("failed to decode OpenSearch info: %w", err)
+	}
+
+	return &info, nil
 }
