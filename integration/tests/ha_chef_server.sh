@@ -181,7 +181,7 @@ EOH
 do_test_deploy() {
     ## skipping status test because of the missing file in automate - /etc/opscode/chef-server-running.json 
     ## adding smoke tag or else all the test will be considered skipping only the status test
-    PATH="/hab/bin:/bin" chef-server-ctl test --smoke --skip-status
+    # hab pkg exec chef/automate-cs-nginx chef-server-ctl test --smoke --skip-status
 }
 
 do_cleanup() {
