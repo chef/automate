@@ -23,7 +23,7 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/dave/jennifer v1.7.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/envoyproxy/protoc-gen-validate v0.4.0
+	github.com/envoyproxy/protoc-gen-validate v0.10.1
 	github.com/fatih/color v1.17.0
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 	github.com/go-chef/chef v0.30.1
@@ -89,11 +89,11 @@ require (
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.15.0
-	google.golang.org/api v0.102.0
-	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6
-	google.golang.org/grpc v1.53.0-dev
+	google.golang.org/api v0.110.0
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
+	google.golang.org/grpc v1.56.3
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
-	google.golang.org/protobuf v1.28.1
+	google.golang.org/protobuf v1.30.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5
 	gopkg.in/segmentio/analytics-go.v3 v3.1.0
@@ -132,7 +132,7 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v0.7.0 // indirect
+	cloud.google.com/go/iam v0.13.0 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
@@ -143,6 +143,7 @@ require (
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
+	github.com/lyft/protoc-gen-star/v2 v2.0.1 // indirect
 	github.com/mattermost/xml-roundtrip-validator v0.0.0-20201204154048-1a8688af4cf1 // indirect
 	github.com/minio/highwayhash v1.0.3 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
@@ -161,8 +162,8 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.105.0 // indirect
-	cloud.google.com/go/storage v1.27.0
+	cloud.google.com/go v0.110.0 // indirect
+	cloud.google.com/go/storage v1.28.1
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.6 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
@@ -197,7 +198,7 @@ require (
 	github.com/golang/glog v1.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/wire v0.5.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.6.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/handlers v1.4.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
