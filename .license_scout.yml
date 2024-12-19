@@ -1418,6 +1418,9 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/kubernetes-sigs/yaml/master/LICENSE
     license_id: MIT
     name: sigs.k8s.io/yaml
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/googleapis/google-cloud-go 
 
 exceptions:
   habitat:
