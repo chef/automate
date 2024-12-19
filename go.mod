@@ -93,7 +93,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.56.3
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5
 	gopkg.in/segmentio/analytics-go.v3 v3.1.0
