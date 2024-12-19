@@ -30,7 +30,7 @@ namespace :oauth_application do
 
   desc "Task to generate a file with the details of all the registered oauth application under OC-ID"
   task :save_registered_app_details_to_file => :environment do
-    registered_apps = Doorkeeper::Application.select(:name, :redirect_uri, :uid, :secret).map(&:attributes).group_by{|app| app["name"]}
+    registered_apps = Doorkeeper::Application.select(:name, :redirect_uri, :uid, :secret).group_by(&:name).as_json
     yaml_file_content = registered_apps.to_yaml
     file_path = ENV['REGISTERED_OAUTH_APPS_FILE_PATH']
     begin
