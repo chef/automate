@@ -22,7 +22,7 @@ const (
 )
 
 var DefaultPurgePolicies = &purge.Policies{
-	Es: map[string]purge.EsPolicy{
+	Os: map[string]purge.OsPolicy{
 		PurgeFeedPolicyName: {
 			Name:             PurgeFeedPolicyName,
 			IndexName:        PurgeFeedIndexName,
@@ -40,9 +40,9 @@ func ConfigureJobManager(man *cereal.Manager, config *config.EventFeed) error {
 	// new default policies are added and/or existing policies indices are
 	// updated in case they have been migrated.
 
-	p := DefaultPurgePolicies.Es[PurgeFeedPolicyName]
+	p := DefaultPurgePolicies.Os[PurgeFeedPolicyName]
 	p.OlderThanDays = int32(config.DefaultPurgeAfterDays)
-	DefaultPurgePolicies.Es[PurgeFeedPolicyName] = p
+	DefaultPurgePolicies.Os[PurgeFeedPolicyName] = p
 
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.DAILY,
