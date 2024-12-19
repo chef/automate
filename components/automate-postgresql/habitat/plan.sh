@@ -17,8 +17,8 @@ pg_version="17.2"
 ident="20241203071443"
 
 pkg_deps=(
-  core/coreutils
-  chef/mlsa
+  core/coreutils/9.4/20241017111752
+  chef/mlsa/1.0.1/20241018111404
   ${vendor_origin}/postgresql17/${pg_version}/${ident}
 )
 
