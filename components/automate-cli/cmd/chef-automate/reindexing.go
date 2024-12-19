@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -78,6 +79,8 @@ var infoReindexing = `
 Reindexing of Elasticsearch/OpenSearch indices if needed.
 `
 
+const lockFile = "/tmp/reindex.lock"
+
 var (
 	statusFile = "/hab/status.json"
 	taskMutex  sync.Mutex
@@ -99,7 +102,7 @@ var reindexCmd = &cobra.Command{
 }
 
 var statusCmd = &cobra.Command{
-	Use:   "indexing-status",
+	Use:   "index-status",
 	Short: "Check the reindexing status",
 	RunE:  checkStatus,
 }
@@ -160,17 +163,49 @@ func readStatus() (Status, error) {
 }
 
 func updateStatus(status *Status) error {
-	// taskMutex.Lock()
-	// defer taskMutex.Unlock()
-
 	status.LastUpdatedAt = time.Now().Format(time.RFC3339)
 
 	file, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
 		return err
 	}
-	fmt.Printf("file: %v\n", string(file))
+
 	return os.WriteFile(statusFile, file, 0644)
+}
+
+func isProcessRunning() bool {
+	data, err := os.ReadFile(lockFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false // No lock file means no process is running
+		}
+		fmt.Printf("Error reading lock file: %v\n", err)
+		return false
+	}
+
+	pid := strings.TrimSpace(string(data))
+	pidInt, err := strconv.Atoi(pid)
+	if err != nil {
+		fmt.Printf("Error converting PID to integer: %v\n", err)
+		return false
+	}
+	process, err := os.FindProcess(pidInt)
+	if err != nil {
+		return false // Process not found
+	}
+
+	// Check if the process is still alive
+	err = process.Signal(syscall.Signal(0))
+	return err == nil
+}
+
+func createLockFile() error {
+	pid := fmt.Sprintf("%d\n", os.Getpid())
+	return os.WriteFile(lockFile, []byte(pid), 0644)
+}
+
+func removeLockFile() {
+	os.Remove(lockFile) // Ignore errors during cleanup
 }
 
 func runInBackground() {
@@ -191,20 +226,20 @@ func runReindex(cmd *cobra.Command, args []string) error {
 	backgroundFlag, _ := cmd.Flags().GetBool("background")
 
 	if !backgroundFlag {
-		// Check if reindexing is already running
-		if reindexStatus.Status == "Running" {
-			fmt.Println("Reindexing process is already running. Run `chef-automate indexing-status` to get the status.")
+		if isProcessRunning() {
+			fmt.Println("Reindexing process is already running. Run `chef-automate index-status` to get the status.")
 			return nil
 		}
+
 		runInBackground()
 	}
 
-	fmt.Println("Starting reindexing process...")
-
-	if reindexStatus.Status == "Running" {
-		fmt.Println("Reindexing process is already running. Run `chef-automate indexing-status` to get the status.")
-		return nil
+	if err := createLockFile(); err != nil {
+		return fmt.Errorf("failed to create lock file: %v", err)
 	}
+	defer removeLockFile() // Ensure cleanup after reindexing completes
+
+	fmt.Println("Starting reindexing process...")
 
 	osInfo, err := getOpenSearchInfo()
 	if err != nil {
@@ -213,19 +248,19 @@ func runReindex(cmd *cobra.Command, args []string) error {
 
 	reindexStatus.OpenSearchVersion = osInfo.Version.Number
 	reindexStatus.Status = "Running"
-	fmt.Println("Fetching indices from Elasticsearch/OpenSearch.")
+
 	indices, err := fetchIndices()
 	if err != nil {
 		fmt.Printf("Error fetching indices: %v\n", err)
 		return err
 	}
 
-	// Add indices to the queue for reindexing
+OuterLoop:
 	for _, index := range indices {
 		for prefix := range skipIndices {
 			if strings.HasPrefix(index.Index, prefix) {
 				fmt.Printf("Skipping index %s\n", index.Index)
-				continue
+				continue OuterLoop
 			}
 		}
 
@@ -238,12 +273,12 @@ func runReindex(cmd *cobra.Command, args []string) error {
 			reindexStatus.CompletedIndex = append(reindexStatus.CompletedIndex, index.Index)
 		}
 
+		fmt.Printf("reindexStatus: %v\n", reindexStatus)
 	}
 
 	reindexStatus.Status = "Completed"
-	if err := updateStatus(reindexStatus); err != nil {
-		fmt.Printf("Error updating status: %v\n", err)
-	}
+	updateStatus(reindexStatus)
+	fmt.Println("Reindexing process completed.")
 	return nil
 }
 
