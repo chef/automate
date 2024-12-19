@@ -79,13 +79,16 @@ func (suite *Suite) DeleteAllIndices() {
 	if err != nil {
 		fmt.Printf("Could not retrieve index list: %s\n", err)
 	}
-	for i, v := range indices {
-		if v == ".opendistro_security" {
-			indices = append(indices[:i], indices[i+1:]...)
-			break
+
+	indicesToDelete := make([]string, 0)
+	for _, v := range indices {
+		if v == ".plugins-ml-config" || v == ".opensearch-observability" || v == ".opendistro_security" {
+			continue
+		} else {
+			indicesToDelete = append(indicesToDelete, v)
 		}
 	}
-	suite.esClient.DeleteIndex(indices...).Do(context.Background())
+	suite.esClient.DeleteIndex(indicesToDelete...).Do(context.Background())
 }
 
 func (suite Suite) GlobalTeardown() {

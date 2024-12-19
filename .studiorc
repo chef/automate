@@ -159,6 +159,9 @@ DOC
 start_all_services() {
   start_deployment_service
   chef-automate dev deployinate
+
+  cp "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env
+
   if [[ -f "/src/dev/license.jwt" ]]; then
      chef-automate license apply "/src/dev/license.jwt"
   fi
