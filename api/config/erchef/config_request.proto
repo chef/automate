@@ -88,6 +88,7 @@ message ConfigRequest {
 				google.protobuf.StringValue search_queue_mode = 12;
 				google.protobuf.StringValue search_auth_username = 13;
 				google.protobuf.StringValue search_auth_password = 14;
+				google.protobuf.BoolValue track_total_hits = 15;
 			}
 
 			message Authz {
