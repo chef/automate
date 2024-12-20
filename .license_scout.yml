@@ -102,6 +102,9 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/golang/term/master/LICENSE
     license_id: BSD-3-Clause
     name: golang.org/x/term
+  - license_content: https://go.googlesource.com/telemetry/+/refs/heads/master/LICENSE
+    license_id: BSD-3-Clause
+    name: golang.org/x/telemetry
   - license_content: https://raw.githubusercontent.com/golang/oauth2/master/LICENSE
     license_id: BSD-3-Clause
     name: golang.org/x/oauth2
@@ -1815,3 +1818,6 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: gopkg.in/vmihailenco/msgpack.v2
     reason: Exception made by Chef Legal
+  - name: golang.org/x/telemetry
+    reason: Exception made by Chef Legal
+
