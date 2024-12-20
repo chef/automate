@@ -1818,3 +1818,6 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: gopkg.in/vmihailenco/msgpack.v2
     reason: Exception made by Chef Legal
+  - name: golang.org/x/telemetry
+    reason: Exception made by Chef Legal
+
