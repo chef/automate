@@ -409,13 +409,12 @@ func triggerReindex(index string) error {
 		return fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
 	}
 
-	// Fetch aliases for the index
 	aliases, err := fetchAliases(index)
 	if err != nil {
 		fmt.Printf("Warning: failed to fetch aliases for index %s: %v\n", index, err)
 		aliases = []string{}
 	}
-	fmt.Printf("aliases of index %s: %v\n", index, aliases)
+	fmt.Printf("Aliases of index %s: %v\n", index, aliases)
 
 	if err := createIndex(tempIndex, settings, mappings, index); err != nil {
 		return fmt.Errorf("failed to create temporary index %s: %w", tempIndex, err)
@@ -442,12 +441,21 @@ func triggerReindex(index string) error {
 	fmt.Println("Original index deleted successfully.")
 
 	if err := cloneIndex(tempIndex, index); err != nil {
-		return fmt.Errorf("failed to clone temp index %s to %s: %w", tempIndex, index, err)
+		// If cloning fails, redirect aliases to the temporary index
+		fmt.Printf("Failed to clone temp index %s to %s: %v\n", tempIndex, index, err)
+		fmt.Println("Redirecting aliases to the temporary index to prevent data loss.")
+
+		if len(aliases) > 0 {
+			if aliasErr := updateAliases(tempIndex, []string{"index"}); aliasErr != nil {
+				return fmt.Errorf("failed to update aliases for temp index %s: %w", tempIndex, aliasErr)
+			}
+			fmt.Println("Aliases updated to point to the temporary index.")
+		}
+		return fmt.Errorf("failed to clone index; aliases redirected to temporary index")
 	}
 
 	fmt.Println("Temporary index cloned to original index name successfully.")
 
-	// Reassign aliases to the cloned index
 	if len(aliases) > 0 {
 		if err := updateAliases(index, aliases); err != nil {
 			return fmt.Errorf("failed to update aliases for index %s: %w", index, err)
@@ -456,7 +464,7 @@ func triggerReindex(index string) error {
 	}
 
 	if err := setIndexWriteBlock(index, false); err != nil {
-		return fmt.Errorf("failed to remove write block on temporary index %s: %w", tempIndex, err)
+		return fmt.Errorf("failed to remove write block on index %s: %w", index, err)
 	}
 
 	if err := deleteIndex(tempIndex); err != nil {
