@@ -82,7 +82,8 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
 
 {{< note >}}
 
-To create self-signed certificate for FQDN make sure to provide proper DNS and CN value. The DNS in Subject Alternative Name should match with the CN (Comman Name) 
+- To create self-signed certificate for FQDN make sure to provide proper DNS and CN value. The DNS in Subject Alternative Name should match with the CN (Common Name).
+- CN (Common Name) should be the same for all certificates in Opensearch nodes.
 
 {{< /note >}}
 

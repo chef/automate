@@ -41,6 +41,7 @@ To understand how to generate certificates, refer to the [Certificate Generation
 - If you want to use certificates stored in another node of the HA cluster, you can provide the remote path to the certificates using the `<IP_ADDRESS_OF_NODE>:<ABSOLUTE_PATH_TO_THE_CERT_FILE>` format instead of the local path.
 - `--wait-timeout` This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process.
 - Certificate rotation should be done in down-time window as service will restart.
+- CN (Common Name) should be the same for all certificates in Opensearch nodes.
 {{< /note >}}
 
 ### Rotate Cluster Certificates
