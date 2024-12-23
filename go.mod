@@ -33,7 +33,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.6.0
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
@@ -93,7 +93,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.56.3
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.35.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5
 	gopkg.in/segmentio/analytics-go.v3 v3.1.0
@@ -105,7 +105,7 @@ require (
 	github.com/ansrivas/fiberprometheus/v2 v2.6.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/bufbuild/buf v0.29.0
-	github.com/chef/automate/api/external v0.0.0-20240828051912-8c022fa4f66b
+	github.com/chef/automate/api/external v0.0.0-00010101000000-000000000000
 	github.com/dexidp/dex v2.35.0+incompatible
 	github.com/dexidp/dex/api/v2 v2.0.0
 	github.com/gofiber/fiber/v2 v2.52.5

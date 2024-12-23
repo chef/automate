@@ -6,7 +6,7 @@ replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200513
 
 require (
 	github.com/golang/mock v1.1.1
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/lib/pq v1.10.9
 	github.com/olivere/elastic/v7 v7.0.28
@@ -15,7 +15,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.56.3
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.35.0
 )
 
 require (
