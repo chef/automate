@@ -456,7 +456,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		compRIndex           = fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
 		compRName            = "compliance-reports"
 		defaultPurgePolicies = &purge.Policies{
-			Es: map[string]purge.EsPolicy{
+			Os: map[string]purge.OsPolicy{
 				compSName: {
 					Name:          compSName,
 					IndexName:     compSIndex,
@@ -480,12 +480,12 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 	// new default policies are added and/or existing policies indices are
 	// updated in case they have been migrated.
 
-	for i, p := range defaultPurgePolicies.Es {
+	for i, p := range defaultPurgePolicies.Os {
 		if conf.ComplianceReportDays < 0 {
 			p.Disabled = true
 		}
 		p.OlderThanDays = conf.ComplianceReportDays
-		defaultPurgePolicies.Es[i] = p
+		defaultPurgePolicies.Os[i] = p
 	}
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
