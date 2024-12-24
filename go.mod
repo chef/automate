@@ -178,7 +178,6 @@ require (
 	github.com/google/go-containerregistry v0.20.2 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.3 // indirect
-	github.com/hashicorp/go-msgpack v1.1.5 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
 	github.com/jdx/go-netrc v1.0.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
