@@ -2,8 +2,6 @@ module github.com/chef/automate
 
 go 1.22.0
 
-toolchain go1.22.5
-
 require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.29
