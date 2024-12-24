@@ -11,8 +11,8 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.10.27"
 pkg_deps=(
-  core/coreutils
-  chef/mlsa
+  core/coreutils/8.32/20240105213308
+  chef/mlsa/1.0.1/20240125084021
   # TODO 2020-05-12: PIN PIN PIN
   #
   # All dependencies that are shared between this package and the
