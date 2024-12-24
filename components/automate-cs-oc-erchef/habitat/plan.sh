@@ -20,7 +20,7 @@ pkg_deps=(
   #core/runit/2.1.2/20200403133549
   core/runit
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "${local_platform_tools_origin:-jashaik}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_erchef/15.10.21/20241126093701"
 )
@@ -50,7 +50,7 @@ pkg_exposes=(http-port)
 
 pkg_bin_dirs=(bin)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding-go"
 automate_scaffolding_include_templates=(sqerl.config)
 
 scaffolding_go_base_path=github.com/chef
