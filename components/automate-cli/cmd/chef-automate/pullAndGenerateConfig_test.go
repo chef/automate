@@ -1297,3 +1297,138 @@ func TestFindCommonPath(t *testing.T) {
 		assert.Equal(t, test["result"][2], unique2)
 	}
 }
+func TestGetBackupPathFromAutomateConfig(t *testing.T) {
+	tests := []struct {
+		testCaseDescription string
+		a2ConfigMap         map[string]*dc.AutomateConfig
+		backupLocation      string
+		expectedResult      string
+		expectedError       error
+	}{
+		{
+			testCaseDescription: "when backupLocation is fs",
+			backupLocation:      "fs",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "fs",
+								},
+								Filesystem: &shared.Backups_Filesystem{
+									Path: &wrapperspb.StringValue{
+										Value: "/mnt/automate_backups/opensearch",
+									},
+								},
+							},
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "fs",
+										},
+										Fs: &shared.External_Opensearch_Backup_FsSettings{
+											Path: &wrapperspb.StringValue{
+												Value: "/mnt/automate_backups/opensearch",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedResult: "/mnt/automate_backups/opensearch",
+			expectedError:  nil,
+		},
+		{
+			testCaseDescription: "when backupLocation is s3",
+			backupLocation:      "s3",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "s3",
+								},
+							},
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "s3",
+										},
+										S3: &shared.External_Opensearch_Backup_S3Settings{
+											Bucket: &wrapperspb.StringValue{
+												Value: "s3-test-bucketname",
+											},
+											BasePath: &wrapperspb.StringValue{
+												Value: "opensearch",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedResult: "opensearch",
+			expectedError:  nil,
+		},
+		{
+			testCaseDescription: "when backupLocation is gcs",
+			backupLocation:      "gcs",
+			a2ConfigMap: map[string]*dc.AutomateConfig{
+				"config": {
+					Global: &shared.GlobalConfig{
+						V1: &shared.V1{
+							Backups: &shared.Backups{
+								Location: &wrapperspb.StringValue{
+									Value: "gcs",
+								},
+							},
+							External: &shared.External{
+								Opensearch: &shared.External_Opensearch{
+									Backup: &shared.External_Opensearch_Backup{
+										Location: &wrapperspb.StringValue{
+											Value: "gcs",
+										},
+										Gcs: &shared.External_Opensearch_Backup_GCSSettings{
+											Bucket: &wrapperspb.StringValue{
+												Value: "gcs-test-bucketname",
+											},
+											BasePath: &wrapperspb.StringValue{
+												Value: "opensearch",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedResult: "opensearch",
+			expectedError:  nil,
+		},
+	}
+	pullconfig := &PullConfigsImpl{
+		infra:        NewMockInfra(),
+		sshUtil:      GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+		exceptionIps: []string{"198.51.100.1"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			result, err := pullconfig.getBackupPathFromAutomateConfig(tc.a2ConfigMap, tc.backupLocation)
+			if tc.expectedError != nil {
+				assert.Equal(t, tc.expectedError, err)
+			} else {
+				assert.Equal(t, tc.expectedResult, result)
+			}
+		})
+	}
+}
