@@ -2,7 +2,7 @@
 # stable channel
 
 
-UPSTREAM_PKG_IDENT="core/postgresql13/13.18"
+UPSTREAM_PKG_IDENT="core/postgresql13/13.18/20241203070217"
 pkg_name="automate-ha-postgresql"
 pkg_description="Wrapper package for core/postgresql13"
 pkg_origin="chef"
@@ -13,8 +13,8 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
 pkg_deps=(
-  chef/mlsa
-  core/bash
+  chef/mlsa/1.0.1/20240125084021
+  core/bash/5.1/20240105214248
   "${UPSTREAM_PKG_IDENT}"
 )
 
