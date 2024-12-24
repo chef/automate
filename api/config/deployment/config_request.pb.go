@@ -1162,7 +1162,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_Health); i {
+			switch v := v.(*ConfigRequest_V1_AdminUser); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1174,7 +1174,7 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_AdminUser); i {
+			switch v := v.(*ConfigRequest_V1_System_Service); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1198,18 +1198,6 @@ func file_config_deployment_config_request_proto_init() {
 			}
 		}
 		file_config_deployment_config_request_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigRequest_V1_System_Log); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_config_deployment_config_request_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ConfigRequest_V1_System_GatherLogs); i {
 			case 0:
 				return &v.state
@@ -1221,7 +1209,7 @@ func file_config_deployment_config_request_proto_init() {
 				return nil
 			}
 		}
-		file_config_deployment_config_request_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_config_deployment_config_request_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ConfigRequest_V1_System_Proxy); i {
 			case 0:
 				return &v.state
@@ -1233,7 +1221,7 @@ func file_config_deployment_config_request_proto_init() {
 				return nil
 			}
 		}
-		file_config_deployment_config_request_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_config_deployment_config_request_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ConfigRequest_V1_System_Backup); i {
 			case 0:
 				return &v.state
@@ -1245,7 +1233,7 @@ func file_config_deployment_config_request_proto_init() {
 				return nil
 			}
 		}
-		file_config_deployment_config_request_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_config_deployment_config_request_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ConfigRequest_V1_System_Backup_Filesystem); i {
 			case 0:
 				return &v.state
