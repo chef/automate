@@ -105,6 +105,9 @@ fallbacks:
   - license_content: https://go.googlesource.com/telemetry/+/refs/heads/master/LICENSE
     license_id: BSD-3-Clause
     name: golang.org/x/telemetry
+  - license_content: https://raw.githubusercontent.com/dgrijalva/jwt-go/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/dgrijalva/jwt-go
   - license_content: https://raw.githubusercontent.com/golang/oauth2/master/LICENSE
     license_id: BSD-3-Clause
     name: golang.org/x/oauth2
