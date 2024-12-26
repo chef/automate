@@ -16,11 +16,9 @@ func (pd *ExternalPGUpgradeCheckInspection) ShowInfo(index *int) error {
 	if pd.isExternalPG {
 		res, err := pd.writer.Confirm(fmt.Sprintf("%d. Upgrade your PostgreSQL 13.5 to 17.0 with the help of your Database Administrator", *index))
 		if err != nil {
-			pd.writer.Error(err.Error())
 			return status.Errorf(status.InvalidCommandArgsError, err.Error())
 		}
 		if !res {
-			pd.writer.Error(backupError)
 			return status.New(status.InvalidCommandArgsError, downTimeError)
 		}
 		*index++

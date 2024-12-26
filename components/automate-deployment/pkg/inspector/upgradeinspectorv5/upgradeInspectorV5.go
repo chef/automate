@@ -1,6 +1,7 @@
 package upgradeinspectorv5
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -24,16 +25,46 @@ type UpgradeInspectorV5 struct {
 }
 
 const (
-	HAB_DIR            string = "/hab"
-	UPGRADE_TERMINATED string = "Upgrade process terminated."
+	HAB_DIR                              string = "/hab"
+	UPGRADE_TERMINATED                   string = "Upgrade process terminated."
+	run_chef_automate_upgrade_status_cmd        = `chef-automate upgrade status`
+	run_chef_automate_upgrade_status            = `Check the status of your upgrade using:  
+     $ ` + run_chef_automate_upgrade_status_cmd + `
+   This should return: Automate is up-to-date`
+	ui_check       = `Check Automate UI everything is running and all data is visible`
+	patch_new_conf = `If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using:
+     $ chef-automate config patch config.toml`
+	run_chef_automate_status = `Check all services are running using: 
+     $ chef-automate status`
+	run_pg_data_migrate_cmd = `chef-automate post-major-upgrade migrate --data=pg`
+	run_pg_data_migrate     = `Migrate Data from PG 13.5 to PG 17.0 using this command:
+     $ ` + run_pg_data_migrate_cmd
+	run_pg_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 13.5 Data by running: 
+     $ ` + run_pg_data_cleanup_cmd
+	run_pg_data_cleanup_cmd = `chef-automate post-major-upgrade clear-data --data=PG`
+	POST_UPGRADE_HEADER     = `Post Upgrade Steps:
+===================
+`
+	initMsg = `This is a Major upgrade. 
+========================
+
+  1) Embedded OpenSearch v1.x will be upgraded to OpenSearch v2.x
+  2) Embedded PostgreSQL v13.5 will be upgraded to version v17.0
+
+===== Your installation is using %s PostgreSQL and %s Opensearch =====
+`
 )
 
 func (ui *UpgradeInspectorV5) ShowInfo() error {
-	ui.writer.Println(`This is a major upgrade! 
-	In this Release
-1) Embedded OpenSearch v4 will be upgraded to OpenSearch v5.
-2) Embedded PostgreSQL v13.5 will be upgraded to version v17.0
-`)
+	dbType := "Embedded"
+	osType := "Embedded"
+	if ui.isExternalPG {
+		dbType = "External"
+	}
+	if ui.isExternalOS {
+		osType = "External"
+	}
+	ui.writer.Println(fmt.Sprintf(initMsg, dbType, osType))
 	if len(ui.inspections) > 0 {
 		ui.writer.Println("Before proceeding, please ensure:")
 	}
@@ -221,6 +252,24 @@ func (ui *UpgradeInspectorV5) printContactSupport() {
 	ui.writer.Println("Please contact support if you are not sure how to resolve this.")
 }
 
+func (ui *UpgradeInspectorV5) postUpgradeCheckList() {
+	checkList := []string{
+		run_chef_automate_upgrade_status,
+		ui_check,
+	}
+
+	if ui.isExternalPG {
+		checkList = append(checkList, patch_new_conf, run_chef_automate_status)
+	} else {
+		checkList = append(checkList, run_pg_data_migrate, run_pg_data_cleanup)
+	}
+
+	ui.writer.Println(POST_UPGRADE_HEADER)
+	for i, check := range checkList {
+		ui.writer.Println(fmt.Sprintf("%d", i+1) + ") " + check + "\n")
+	}
+}
+
 func (ui *UpgradeInspectorV5) RunUpgradeInspector(osDestDir string, skipStorageCheck bool) (isError bool) {
 	errArray := []error{}
 	ui.SetOSDestDir(osDestDir)
@@ -250,5 +299,6 @@ func (ui *UpgradeInspectorV5) RunUpgradeInspector(osDestDir string, skipStorageC
 		ui.writer.Println(UPGRADE_TERMINATED)
 		return true
 	}
+	ui.postUpgradeCheckList()
 	return false
 }

@@ -14,11 +14,9 @@ type PlannedDownTimeInspection struct {
 func (pd *PlannedDownTimeInspection) ShowInfo(index *int) error {
 	res, err := pd.writer.Confirm(fmt.Sprintf("%d. You have scheduled downtime for the duration of the upgrade.", *index))
 	if err != nil {
-		pd.writer.Error(err.Error())
 		return status.Errorf(status.InvalidCommandArgsError, err.Error())
 	}
 	if !res {
-		pd.writer.Error(downTimeError)
 		return status.New(status.InvalidCommandArgsError, downTimeError)
 	}
 	*index++

@@ -58,11 +58,9 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 	res, err := ds.writer.Confirm(fmt.Sprintf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)",
 		*index, ds.habDir, ds.requiredHabSpace, ds.currentHabSpace))
 	if err != nil {
-		ds.writer.Error(err.Error())
 		return status.Errorf(status.InvalidCommandArgsError, err.Error())
 	}
 	if !res {
-		ds.writer.Error(fmt.Sprintf(diskSpaceError, ds.requiredHabSpace))
 		return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceError, ds.requiredHabSpace))
 	}
 	*index++
@@ -75,11 +73,9 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 		res, err := ds.writer.Confirm(fmt.Sprintf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)",
 			*index, ds.osDestDir, ds.requiredOSDestSpace, ds.currentSpaceInOSDir))
 		if err != nil {
-			ds.writer.Error(err.Error())
 			return status.Errorf(status.InvalidCommandArgsError, err.Error())
 		}
 		if !res {
-			ds.writer.Error(fmt.Sprintf(diskSpaceError, ds.requiredOSDestSpace))
 			return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceError, ds.requiredOSDestSpace))
 		}
 		*index++
@@ -93,11 +89,9 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 		res, err := ds.writer.Confirm(fmt.Sprintf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)",
 			*index, ds.pgDestDir, ds.requiredPGDestSpace, ds.currentSpaceInPGDir))
 		if err != nil {
-			ds.writer.Error(err.Error())
 			return status.Errorf(status.InvalidCommandArgsError, err.Error())
 		}
 		if !res {
-			ds.writer.Error(fmt.Sprintf(diskSpaceError, ds.requiredPGDestSpace))
 			return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceError, ds.requiredPGDestSpace))
 		}
 		*index++
@@ -307,8 +301,11 @@ func (ds *DiskSpaceInspection) GetShortInfo() []string {
 	msgs := []string{
 		fmt.Sprintf(MIN_REQ_SPACE_STR, ds.habDir, ds.requiredHabSpace),
 	}
-	if ds.hasOSDestDir() {
+	if !ds.isExternalOS && ds.hasOSDestDir() {
 		msgs = append(msgs, fmt.Sprintf(MIN_REQ_SPACE_STR, ds.osDestDir, ds.requiredOSDestSpace))
+	}
+	if !ds.isExternalPG {
+		msgs = append(msgs, fmt.Sprintf(MIN_REQ_SPACE_STR, ds.pgDestDir, ds.requiredPGDestSpace))
 	}
 	return msgs
 }

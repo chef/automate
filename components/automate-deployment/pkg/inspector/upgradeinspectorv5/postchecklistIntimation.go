@@ -14,11 +14,9 @@ type PostChecklistIntimationCheckInspection struct {
 func (pd *PostChecklistIntimationCheckInspection) ShowInfo(index *int) error {
 	res, err := pd.writer.Confirm(fmt.Sprintf("%d. After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use", *index))
 	if err != nil {
-		pd.writer.Error(err.Error())
 		return status.Errorf(status.InvalidCommandArgsError, err.Error())
 	}
 	if !res {
-		pd.writer.Error(postChecklistIntimationError)
 		return status.New(status.InvalidCommandArgsError, postChecklistIntimationError)
 	}
 	*index++

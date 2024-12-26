@@ -16,11 +16,9 @@ func (tb *TakeBackupInspection) ShowInfo(index *int) error {
 	res, err := tb.writer.Confirm(fmt.Sprintf("%d. You have taken a backup by running the command: "+
 		color.New(color.Bold).Sprint("chef automate backup create")+".", *index))
 	if err != nil {
-		tb.writer.Error(err.Error())
 		return status.Errorf(status.InvalidCommandArgsError, err.Error())
 	}
 	if !res {
-		tb.writer.Error(backupError)
 		return status.New(status.InvalidCommandArgsError, backupError)
 	}
 	*index++
