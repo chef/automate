@@ -349,6 +349,11 @@ var ProductMetadataJSON = `
             "type": "secret",
             "optional": false,
             "secret_spec": "oc_bifrost.superuser_id"
+          },
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "userconfig.pg_superuser_pass"
           }
         ]
       }

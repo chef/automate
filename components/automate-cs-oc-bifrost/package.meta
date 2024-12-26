@@ -4,6 +4,10 @@
     {
       "type": "secret",
       "secret_spec": "oc_bifrost.superuser_id"
+    },
+    { 
+      "type": "secret", 
+      "secret_spec": "userconfig.pg_superuser_pass" 
     }
   ],
   "uses_platform_scaffolding": true
