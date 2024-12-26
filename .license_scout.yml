@@ -158,8 +158,8 @@ fallbacks:
     name: honnef.co/go/tools
   - license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
     license_id: BSD-Source-Code
-    license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
-  - name: github.com/tinylib/msgp
+    name: github.com/shirou/gopsutil
+  - license_content: https://raw.githubusercontent.com/tinylib/msgp/master/LICENSE
     license_id: MIT
     name: github.com/tinylib/msgp
   - license_content: https://raw.githubusercontent.com/golang/crypto/master/LICENSE
@@ -443,35 +443,65 @@ fallbacks:
     name: github.com/kr/text
   - license_content: https://raw.githubusercontent.com/mattn/go-ieproxy/master/LICENSE
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/mattn/go-ieproxy/master/LICENSE
-  - name: github.com/mattn/goveralls
-    license_id: MIT
-    license_content: https://raw.githubusercontent.com/mattn/goveralls/master/LICENSE
-  - name: github.com/mitchellh/cli
+    name: github.com/mattn/go-ieproxy
+  - license_content: https://raw.githubusercontent.com/mitchellh/cli/main/LICENSE
     license_id: MPL-2.0
-    license_content: https://raw.githubusercontent.com/mitchellh/cli/main/LICENSE
-  - name: github.com/mitchellh/copystructure
+    name: github.com/mitchellh/cli
+  - license_content: https://raw.githubusercontent.com/mitchellh/go-testing-interface/master/LICENSE
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/mitchellh/copystructure/master/LICENSE
-  - name: github.com/mitchellh/go-testing-interface
-    license_id: MIT
-    license_content: https://raw.githubusercontent.com/mitchellh/go-testing-interface/master/LICENSE
-  - name: github.com/mitchellh/gox
+    name: github.com/mitchellh/go-testing-interface
+  - license_content: https://raw.githubusercontent.com/mitchellh/gox/master/LICENSE
     license_id: MPL-2.0
-    license_content: https://raw.githubusercontent.com/mitchellh/gox/master/LICENSE
-  - name: github.com/mitchellh/iochan
+    name: github.com/mitchellh/gox
+  - license_content: https://raw.githubusercontent.com/mitchellh/iochan/master/LICENSE.md
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/mitchellh/iochan/master/LICENSE.md
-  - name: github.com/mitchellh/reflectwalk
-    license_id: MIT
-    license_content: https://raw.githubusercontent.com/mitchellh/reflectwalk/main/LICENSE
-  - name: github.com/mwitkow/go-conntrack
+    name: github.com/mitchellh/iochan
+  - license_content: https://raw.githubusercontent.com/mwitkow/go-conntrack/master/LICENSE
     license_id: Apache-2.0
-    license_content: https://raw.githubusercontent.com/mwitkow/go-conntrack/master/LICENSE
-  - name: github.com/nishanths/predeclared
+    name: github.com/mwitkow/go-conntrack
+  - license_content: https://raw.githubusercontent.com/nishanths/predeclared/master/LICENSE
     license_id: BSD-3-Clause
-    license_content: https://raw.githubusercontent.com/nishanths/predeclared/master/LICENSE
-  - name: github.com/oklog/run
+    name: github.com/nishanths/predeclared
+  - license_content: https://raw.githubusercontent.com/oklog/ulid/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/oklog/ulid
+  - license_content: https://raw.githubusercontent.com/olekukonko/tablewriter/master/LICENSE.md
+    license_id: MIT
+    name: github.com/olekukonko/tablewriter
+  - license_content: https://raw.githubusercontent.com/onsi/ginkgo/master/LICENSE
+    license_id: MIT
+    name: github.com/onsi/ginkgo
+  - license_content: https://raw.githubusercontent.com/onsi/gomega/master/LICENSE
+    license_id: MIT
+    name: github.com/onsi/gomega
+  - license_content: https://raw.githubusercontent.com/philhofer/fwd/master/LICENSE.md
+    license_id: MIT
+    name: github.com/philhofer/fwd
+  - license_content: https://raw.githubusercontent.com/pkg/sftp/master/LICENSE
+    license_id: BSD-2-Clause
+    name: github.com/pkg/sftp
+  - license_content: https://raw.githubusercontent.com/posener/complete/v1/LICENSE.txt
+    license_id: MIT
+    name: github.com/posener/complete
+  - license_content: https://raw.githubusercontent.com/prometheus-junkyard/tsdb/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/prometheus/tsdb
+  - license_content: https://raw.githubusercontent.com/r3labs/diff/master/LICENSE
+    license_id: MPL-2.0
+    name: github.com/r3labs/diff
+  - license_content: https://raw.githubusercontent.com/rogpeppe/fastuuid/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/rogpeppe/fastuuid
+  - license_content: https://raw.githubusercontent.com/rogpeppe/go-internal/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/rogpeppe/go-internal
+  - license_content: https://raw.githubusercontent.com/ryanuber/columnize/master/LICENSE
+    license_id: MIT
+    name: github.com/ryanuber/columnize
+  - license_content: https://raw.githubusercontent.com/shurcooL/sanitized_anchor_name/master/LICENSE
+    license_id: MIT
+    name: github.com/shurcooL/sanitized_anchor_name
+  - license_content: https://raw.githubusercontent.com/soheilhy/cmux/master/LICENSE
     license_id: Apache-2.0
     name: github.com/soheilhy/cmu
   - license_content: https://raw.githubusercontent.com/spaolacci/murmur3/master/LICENSE
@@ -958,7 +988,23 @@ fallbacks:
     license_id: BSD-3-Clause
     name: github.com/Sereal/Sereal/Go/sereal
   - license_content: https://raw.githubusercontent.com/ajstarks/svgo/master/LICENSE
+    name: github.com/Sereal/Sereal/Go/sereal
+  - license_content: https://raw.githubusercontent.com/ajstarks/svgo/master/LICENSE
     license_id: BSD-3-Clause
+    name: github.com/ajstarks/svgo
+  - license_content: https://raw.githubusercontent.com/alecthomas/kingpin/master/COPYING
+    license_id: BSD-3-Clause
+    name: github.com/alecthomas/kingpin/v2
+  - license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/apparentlymart/go-textseg/v13
+  - license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/apparentlymart/go-textseg/v15
+  - license_content: https://raw.githubusercontent.com/aws/aws-sdk-go/main/LICENSE.txt
+    license_id: Apache-2.0
+    name: github.com/aws/aws-sdk-go
+  - license_content: https://raw.githubusercontent.com/benbjohnson/clock/master/LICENSE
     name: github.com/ajstarks/svgo
   - license_content: https://raw.githubusercontent.com/alecthomas/kingpin/master/COPYING
     license_id: BSD-3-Clause
@@ -976,19 +1022,30 @@ fallbacks:
     license_id: MIT
     name: github.com/benbjohnson/clock
   - license_content: https://raw.githubusercontent.com/chromedp/cdproto/master/LICENSE
+    name: github.com/benbjohnson/clock
+  - license_content: https://raw.githubusercontent.com/chromedp/cdproto/master/LICENSE
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/ryanuber/go-glob/master/LICENSE
-  - name: github.com/sergi/go-diff
+    name: github.com/chromedp/cdproto
+  - license_content: https://raw.githubusercontent.com/chromedp/chromedp/master/LICENSE
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/sergi/go-diff/master/LICENSE
-  - name: github.com/shurcooL/sanitized_anchor_name
+    name: github.com/chromedp/chromedp
+  - license_content: https://raw.githubusercontent.com/chromedp/sysutil/master/LICENSE
     license_id: MIT
+    name: github.com/chromedp/sysutil
+  - license_content: https://raw.githubusercontent.com/cncf/xds/main/LICENSE
     name: github.com/chromedp/sysutil
   - license_content: https://raw.githubusercontent.com/cncf/xds/main/LICENSE
     license_id: Apache-2.0
     name: github.com/cncf/xds/go
   - license_content: https://raw.githubusercontent.com/creack/pty/master/LICENSE
+    name: github.com/cncf/xds/go
+  - license_content: https://raw.githubusercontent.com/creack/pty/master/LICENSE
     license_id: BSD-3-Clause
+    name: github.com/creack/pty
+  - license_content: https://raw.githubusercontent.com/davecgh/go-spew/master/LICENSE
+    license_id: ISC
+    name: github.com/davecgh/go-spew
+  - license_content: https://raw.githubusercontent.com/davecgh/go-xdr/master/LICENSE
     name: github.com/creack/pty
   - license_content: https://raw.githubusercontent.com/davecgh/go-spew/master/LICENSE
     license_id: ISC
@@ -1006,10 +1063,23 @@ fallbacks:
     license_id: BSD-3-Clause
     name: github.com/frankban/quicktest
   - license_content: https://raw.githubusercontent.com/gin-contrib/sse/master/LICENSE
+    name: github.com/davecgh/go-xdr
+  - license_content: https://raw.githubusercontent.com/denisenkom/go-mssqldb/master/LICENSE.txt
+    license_id: BSD-3-Clause
+    name: github.com/denisenkom/go-mssqldb
+  - license_content: https://raw.githubusercontent.com/fogleman/gg/master/LICENSE.md
+    license_id: BSD-3-Clause
+    name: github.com/fogleman/gg
+  - license_content: https://raw.githubusercontent.com/frankban/quicktest/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/frankban/quicktest
+  - license_content: https://raw.githubusercontent.com/gin-contrib/sse/master/LICENSE
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/tmc/grpc-websocket-proxy/master/LICENSE
-  - name: github.com/tv42/httpunix
+    name: github.com/gin-contrib/sse
+  - license_content: https://raw.githubusercontent.com/gin-gonic/gin/master/LICENSE
     license_id: MIT
+    name: github.com/gin-gonic/gin
+  - license_content: https://raw.githubusercontent.com/gin-gonic/gin/master/LICENSE
     name: github.com/gin-gonic/gin
   - license_content: https://raw.githubusercontent.com/gin-gonic/gin/master/LICENSE
     license_id: MIT
@@ -1018,9 +1088,14 @@ fallbacks:
     license_id: Apache-2.0
     name: github.com/go-logr/stdr
   - license_content: https://raw.githubusercontent.com/go-playground/assert/master/LICENSE
+    name: github.com/go-logr/logr
+  - license_content: https://raw.githubusercontent.com/go-logr/stdr/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/go-logr/stdr
+  - license_content: https://raw.githubusercontent.com/go-playground/assert/master/LICENSE
     license_id: MIT
-    license_content: https://raw.githubusercontent.com/yuin/goldmark/master/LICENSE
-  - name: go.uber.org/tools
+    name: github.com/go-playground/assert/v2
+  - license_content: https://raw.githubusercontent.com/go-playground/locales/master/LICENSE
     license_id: MIT
     name: github.com/go-playground/locales
   - license_content: https://raw.githubusercontent.com/go-playground/universal-translator/master/LICENSE
@@ -1042,10 +1117,50 @@ fallbacks:
     license_id: MIT
     name: github.com/golang-sql/civil
   - license_content: https://raw.githubusercontent.com/golang/freetype/master/LICENSE
+    name: github.com/go-playground/locales
+  - license_content: https://raw.githubusercontent.com/go-playground/universal-translator/master/LICENSE
+    license_id: MIT
+    name: github.com/go-playground/universal-translator
+  - license_content: https://raw.githubusercontent.com/go-playground/validator/master/LICENSE
+    license_id: MIT
+    name: github.com/go-playground/validator/v10
+  - license_content: https://raw.githubusercontent.com/gobwas/httphead/master/LICENSE
+    license_id: MIT
+    name: github.com/gobwas/httphead
+  - license_content: https://raw.githubusercontent.com/gobwas/pool/master/LICENSE
+    license_id: MIT
+    name: github.com/gobwas/pool
+  - license_content: https://raw.githubusercontent.com/gobwas/ws/master/LICENSE
+    license_id: MIT
+    name: github.com/gobwas/ws
+  - license_content: https://raw.githubusercontent.com/golang-sql/civil/master/LICENSE
+    license_id: MIT
+    name: github.com/golang-sql/civil
+  - license_content: https://raw.githubusercontent.com/golang/freetype/master/LICENSE
     license_id: BSD-3-Clause
-    license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
-  - name: github.com/nats-io/jwt/v2
+    name: github.com/golang/freetype
+  - license_content: https://raw.githubusercontent.com/golang/glog/master/LICENSE
     license_id: Apache-2.0
+    name: github.com/golang/glog
+  - license_content: https://raw.githubusercontent.com/golang/groupcache/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/groupcache
+  - license_content: https://raw.githubusercontent.com/golang/mock/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/mock
+  - license_content: https://raw.githubusercontent.com/golang/snappy/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/golang/snappy
+  - license_content: https://raw.githubusercontent.com/google/go-pkcs11/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/google/go-pkcs11
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go-testing/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/googleapis/google-cloud-go-testing
+  - license_content: https://raw.githubusercontent.com/json-iterator/go/master/LICENSE
+    license_id: MIT
+    name: github.com/json-iterator/go
+  - license_content: https://raw.githubusercontent.com/jstemmer/go-junit-report/master/LICENSE
     name: github.com/golang/glog
   - license_content: https://raw.githubusercontent.com/golang/groupcache/master/LICENSE
     license_id: Apache-2.0
@@ -1229,11 +1344,11 @@ fallbacks:
     name: go.uber.org/goleak
   - license_content: https://raw.githubusercontent.com/gonum/gonum/master/LICENSE
     license_id: BSD-3-Clause
-    license_content: https://raw.githubusercontent.com/rsc/binaryregexp/master/LICENSE
-  - name: rsc.io/goversion
+    name: gonum.org/v1/gonum
+  - license_content: https://raw.githubusercontent.com/gonum/netlib/master/LICENSE
     license_id: BSD-3-Clause
-    license_content: https://raw.githubusercontent.com/rsc/goversion/master/LICENSE
-  - name: rsc.io/quote/v3
+    name: gonum.org/v1/netlib
+  - license_content: https://raw.githubusercontent.com/gonum/plot/master/LICENSE
     license_id: BSD-3-Clause
     name: gonum.org/v1/plot
   - license_content: https://raw.githubusercontent.com/googleapis/go-genproto/main/LICENSE
@@ -1489,6 +1604,33 @@ exceptions:
     reason: Ruby license (previously shipped in Automate 1)
   - name: core/ruby27
     reason: Exception made for chef server upgrade
+  - name: core/acl
+    reason: Exception made by Chef Legal
+  - name: core/diffutils
+    reason: Exception made by Chef Legal
+  - name: core/file
+    reason: Exception made by Chef Legal
+  - name: core/libxau
+    reason: Exception made by Chef Legal
+  - name: core/libxcb
+    reason: Exception made by Chef Legal
+  - name: core/libxdmcp
+    reason: Exception made by Chef Legal 
+  - name: core/libxi
+    reason: Exception made by Chef Legal
+  - name: core/libxrender
+    reason: Exception made by Chef Legal
+  - name: core/libxtst
+    reason: Exception made by Chef Legal
+  - name: core/lzo
+    reason: Exception made by Chef Legal
+  - name: core/lzop
+    reason: Exception made by Chef Legal  
+   - name: core/ncurses
+    reason: Exception made by Chef Legal
+  - name: core/sqlite
+    reason: Exception made by Chef Legal    
+
 
   ruby:
   - name: highline
@@ -1913,23 +2055,4 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: k8s.io/apimachinery
     reason: Exception made by Chef Legal
-  - name: k8s.io/apiserver
-    reason: Exception made by Chef Legal
-  - name: k8s.io/client-go
-    reason: Exception made by Chef Legal
-  - name: k8s.io/component-base
-    reason: Exception made by Chef Legal
-  - name: k8s.io/cri-api
-    reason: Exception made by Chef Legal
-  - name: k8s.io/klog/v2
-    reason: Exception made by Chef Legal
-  - name: k8s.io/utils
-    reason: Exception made by Chef Legal
-  - name: oras.land/oras-go/v2
-    reason: Exception made by Chef Legal
-  - name: sigs.k8s.io/json
-    reason: Exception made by Chef Legal
-  - name: sigs.k8s.io/structured-merge-diff/v4
-    reason: Exception made by Chef Legal
-  - name: tags.cncf.io/container-device-interface/specs-go
-    reason: Exception made by Chef Legal
+
