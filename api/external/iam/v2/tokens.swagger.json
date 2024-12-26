@@ -24,7 +24,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -46,7 +46,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -86,7 +86,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -117,7 +117,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -148,7 +148,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -206,7 +206,6 @@
         },
         "active": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "value": {
@@ -313,7 +312,6 @@
         },
         "active": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Active state. Defaults to true.\nIf set to false, token will not authenticate."
         },
         "created_at": {
@@ -354,7 +352,6 @@
         },
         "active": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "projects": {
