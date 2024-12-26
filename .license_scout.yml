@@ -60,7 +60,7 @@ habitat:
   - origin: chef
     channel: dev
   - origin: core
-    channel: stable
+    channel: LTS-2024
 allowed_licenses:
 - 0BSD
 - Apache-1.0
