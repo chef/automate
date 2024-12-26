@@ -1557,7 +1557,7 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: core/lzop
     reason: Exception made by Chef Legal  
-   - name: core/ncurses
+  - name: core/ncurses
     reason: Exception made by Chef Legal
   - name: core/sqlite
     reason: Exception made by Chef Legal    
