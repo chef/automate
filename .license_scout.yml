@@ -927,6 +927,102 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
     license_id: Apache-2.0
     name: cloud.google.com/go/lifesciences
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/apigeeregistry
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/dataproc/v2
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/errorreporting
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/logging
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/longrunning
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/maps
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/pubsublite
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/spanner
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/vmwareengine
+  - license_content: https://raw.githubusercontent.com/AdaLogics/go-fuzz-headers/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/AdaLogics/go-fuzz-headers
+  - license_content: https://raw.githubusercontent.com/andreyvit/diff/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/andreyvit/diff
+  - license_content: https://raw.githubusercontent.com/arbovm/levenshtein/refs/heads/master/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/arbovm/levenshtein
+  - license_content: https://raw.githubusercontent.com/bytecodealliance/wasmtime-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/bytecodealliance/wasmtime-go/v3
+  - license_content: https://raw.githubusercontent.com/cenkalti/backoff/refs/heads/v5/LICENSE
+    license_id: MIT
+    name: github.com/cenkalti/backoff/v4
+  - license_content: https://raw.githubusercontent.com/containerd/log/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/containerd/log
+  - license_content: https://raw.githubusercontent.com/dgraph-io/badger/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/dgraph-io/badger/v3
+  - license_content: https://raw.githubusercontent.com/dgraph-io/ristretto/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/dgraph-io/ristretto
+  - license_content: https://raw.githubusercontent.com/dgryski/go-farm/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/dgryski/go-farm
+  - license_content: https://raw.githubusercontent.com/dgryski/trifles/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/dgryski/trifles
+  - license_content: https://raw.githubusercontent.com/foxcpp/go-mockdns/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/foxcpp/go-mockdns
+  - license_content: https://raw.githubusercontent.com/google/flatbuffers/refs/heads/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/google/flatbuffers
+  - license_content: https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/refs/heads/main/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/grpc-ecosystem/grpc-gateway/v2
+  - license_content: https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/refs/heads/main/LICENSE
+    license_id: BSD-3-Clause
+    name: github.com/grpc-ecosystem/grpc-gateway
+  - license_content: https://raw.githubusercontent.com/moby/locker/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/moby/locker
+  - license_content: https://raw.githubusercontent.com/opencontainers/go-digest/refs/heads/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/opencontainers/go-digest
+  - license_content: https://raw.githubusercontent.com/opencontainers/image-spec/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/opencontainers/image-spec
+  - license_content: https://raw.githubusercontent.com/sergi/go-diff/refs/heads/master/LICENSE
+    license_id: MIT
+    name: github.com/sergi/go-diff
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/otel/exporters/otlp/otlptrace
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-proto-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/proto/otlp
+  - license_content: https://raw.githubusercontent.com/googleapis/go-genproto/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: google.golang.org/genproto/googleapis/bytestream
+  - license_content: https://raw.githubusercontent.com/oras-project/oras-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: oras.land/oras-go/v2
 #  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
 #    license_id: Apache-2.0
 #    name: cloud.google.com/go/longrunning
