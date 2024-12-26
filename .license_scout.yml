@@ -1875,6 +1875,8 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/webrisk
     reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/apigeeregistry
+    reason: Exception made by Chef Legal
   - name: cloud.google.com/go/websecurityscanner
     reason: Exception made by Chef Legal
   - name: github.com/DataDog/zstd
@@ -1919,4 +1921,6 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: golang.org/x/telemetry
     reason: Exception made by Chef Legal
+
+
 
