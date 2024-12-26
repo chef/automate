@@ -1921,6 +1921,66 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: golang.org/x/telemetry
     reason: Exception made by Chef Legal
-
-
+  - name: cloud.google.com/go/dataproc/v2
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/errorreporting
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/logging
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/longrunning
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/maps
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/pubsublite
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/spanner
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/vmwareengine
+    reason: Exception made by Chef Legal
+  - name: github.com/AdaLogics/go-fuzz-headers
+    reason: Exception made by Chef Legal
+  - name: github.com/andreyvit/diff
+    reason: Exception made by Chef Legal
+  - name: github.com/arbovm/levenshtein
+    reason: Exception made by Chef Legal
+  - name: github.com/bytecodealliance/wasmtime-go/v3
+    reason: Exception made by Chef Legal
+  - name: github.com/cenkalti/backoff/v4
+    reason: Exception made by Chef Legal
+  - name: github.com/containerd/log
+    reason: Exception made by Chef Legal
+  - name: github.com/dgraph-io/badger/v3
+    reason: Exception made by Chef Legal
+  - name: github.com/dgraph-io/ristretto
+    reason: Exception made by Chef Legal
+  - name: github.com/dgryski/go-farm
+    reason: Exception made by Chef Legal
+  - name: github.com/dgryski/trifles
+    reason: Exception made by Chef Legal
+  - name: github.com/foxcpp/go-mockdns
+    reason: Exception made by Chef Legal
+  - name: github.com/google/flatbuffers
+    reason: Exception made by Chef Legal
+  - name: github.com/grpc-ecosystem/grpc-gateway/v2
+    reason: Exception made by Chef Legal
+  - name: github.com/grpc-ecosystem/grpc-gateway
+    reason: Exception made by Chef Legal
+  - name: github.com/moby/locker
+    reason: Exception made by Chef Legal
+  - name: github.com/opencontainers/go-digest
+    reason: Exception made by Chef Legal
+  - name: github.com/opencontainers/image-spec
+    reason: Exception made by Chef Legal
+  - name: github.com/sergi/go-diff
+    reason: Exception made by Chef Legal
+  - name: go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
+    reason: Exception made by Chef Legal
+  - name: go.opentelemetry.io/otel/exporters/otlp/otlptrace
+    reason: Exception made by Chef Legal
+  - name: go.opentelemetry.io/proto/otlp
+    reason: Exception made by Chef Legal
+  - name: google.golang.org/genproto/googleapis/bytestream
+    reason: Exception made by Chef Legal
+  - name: oras.land/oras-go/v2
+    reason: Exception made by Chef Legal
 
