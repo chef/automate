@@ -36,4 +36,9 @@ else
 fi
 
 
-exec secrets-helper exec --secret bookshelf.access_key_id --secret bookshelf.secret_access_key -- bookshelf foreground
+exec secrets-helper exec \
+     --secret userconfig.pg_dbuser_password \
+     --secret bookshelf.access_key_id \
+     --secret bookshelf.secret_access_key \
+     -- \
+     bookshelf foreground
