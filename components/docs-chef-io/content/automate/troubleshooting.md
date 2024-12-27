@@ -180,3 +180,39 @@ max_shards_per_node = 1000
 ```
 
 Once done, run the chef-automate config patch `</path/to/your-file.toml>` to deploy your change.
+
+## Issue: Knife Search Limits at 10000 Records
+
+### Details
+
+The knife node list and knife node search commands are inconsistent in terms of the number of records they return. Specifically, knife search is limited to a maximum of **10000** records by default.
+
+### Fixes
+
+This happens because OpenSearch,by default, limits the maximum number of records(or document) returned in a single query to **10000**. This is a safeguard to prevent large queries from overloading the system. If you are trying to retrive more than **10000** records, this approach will do that.
+
+Change the max_result_window to accomodate more than **10000** records.
+
+```bash
+curl -XPUT "http://127.0.0.1:10144/chef/_settings" \
+    -d '{
+          "index": {
+            "max_result_window": 50000
+          }
+        }' \
+    -H "Content-Type: application/json"
+```
+Changes can be verified by doing:
+
+```bash
+curl http://127.0.0.1:10144/_settings?pretty
+```
+
+To set the value of tracking total hits in OpenSearch, patch the following configuration in the `.toml` file.
+
+```bash
+[erchef.v1.sys.index]
+ track_total_hits = true
+```
+
+Once done, run the chef-automate config patch `</path/to/your-file.toml>` to deploy your change.
