@@ -28,6 +28,7 @@ fi
 
 
 secrets-helper generate oc_bifrost.superuser_id 32 --if-not-exists
+secrets-helper generate userconfig.pg_dbuser_password 32 --if-not-exists
 
 exec secrets-helper exec \
      --secret oc_bifrost.superuser_id \
