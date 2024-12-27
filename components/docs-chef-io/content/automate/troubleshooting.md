@@ -189,9 +189,9 @@ The knife node list and knife node search commands are inconsistent in terms of 
 
 ### Fixes
 
-This happens because OpenSearch,by default, limits the maximum number of records(or document) returned in a single query to **10000**. This is a safeguard to prevent large queries from overloading the system. If you are trying to retrive more than **10000** records, this approach will do that.
+This happens because OpenSearch, by default, limits the maximum number of records (or documents) returned in a single query to **10000**. This is a safeguard to prevent large queries from overloading the system. If you are trying to retrieve more than **10000** records, this approach will do that.
 
-Change the max_result_window to accomodate more than **10000** records.
+Change the max_result_window to accommodate more than **10000** records.
 
 ```bash
 curl -XPUT "http://127.0.0.1:10144/chef/_settings" \
