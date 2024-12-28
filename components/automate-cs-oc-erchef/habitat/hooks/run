@@ -76,7 +76,7 @@ exec secrets-helper exec \
      --secret bookshelf.access_key_id \
      --secret bookshelf.secret_access_key \
      --secret chef-server.webui_pub_key \
-     --secret userconfig.pg_dbuser_password \
+     --secret userconfig.pg_superuser_password \
      --optional-secret data_collector.token \
      -- \
      {{~#if cfg.memory.max_bytes}}
