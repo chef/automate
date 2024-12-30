@@ -11,7 +11,7 @@ desired_golang_version() {
 export GOPROXY="https://proxy.golang.org,direct" 
 export GOSUMDB="sum.golang.org"
 
-hab pkg install -b core/git ore/ruby/3.0.6/20240108025751 core/jq-static core/shellcheck core/cacerts
+hab pkg install -b core/git core/ruby/3.0.6/20240108025751 core/jq-static core/shellcheck core/cacerts
 hab pkg install -b "core/go1_22/1.22.5"
 
 echo "Checking Go Dependencies And Vendored Protos"
