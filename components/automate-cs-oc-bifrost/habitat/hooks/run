@@ -28,10 +28,9 @@ fi
 
 
 secrets-helper generate oc_bifrost.superuser_id 32 --if-not-exists
-secrets-helper generate userconfig.pg_superuser_password 32 --if-not-exists
 
 exec secrets-helper exec \
      --secret oc_bifrost.superuser_id \
-     --secret userconfig.pg_superuser_password \
+     --optional-secret userconfig.pg_superuser_password \
      -- \
      oc_bifrost foreground
