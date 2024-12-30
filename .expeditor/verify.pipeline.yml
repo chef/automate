@@ -303,8 +303,7 @@ steps:
           privileged: true
 
   - label: "[unit] automate-gateway"
-    command:
-      - git config --global --add safe.directory /go/src/github.com/chef/automate    
+    command:  
       - hab studio run "source .studiorc && go_component_unit automate-gateway"
       - cd components/automate-gateway
       - make lint fmt

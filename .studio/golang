@@ -32,6 +32,8 @@ DOC
 function go_component_unit() {
   install_go
 
+  GOFLAGS=-buildvcs=fals
+
   VERBOSE_TESTS=
   if [[ "$1" == "-v" ]]; then
       VERBOSE_TESTS=$1
