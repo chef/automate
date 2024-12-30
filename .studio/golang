@@ -271,7 +271,7 @@ function go_component_lint() {
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
-  install_golangci && run_golangci components/$component/...
+  export GOFLAGS=-buildvcs=false && install_golangci && run_golangci components/$component/...
 }
 
 complete -F _component_auto_complete go_component_lint
