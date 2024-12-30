@@ -63,7 +63,9 @@ document "verify_products_generation" <<DOC
 DOC
 function verify_products_generation() {
   install_if_missing core/git git
-
+  git config --global --add safe.directory /go/src/github.com/chef/automate
+  git config --global --add safe.directory '*'
+  
   deployment_generate || return $?
 
   git add .

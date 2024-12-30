@@ -21,7 +21,6 @@ steps:
   #
   - label: "[codegen] A2 protobufs"
     command:
-      - git config --global --add safe.directory /go/src/github.com/chef/automate
       - hab studio run "source .studiorc && verify_all_protobuf_components"
     timeout_in_minutes: 10
     soft_fail: true
