@@ -358,7 +358,7 @@ function build_all_changed_components() {
   local whitelist=$*
 
   install_if_missing core/git git
-  install_if_missing core/ruby ruby
+  install_if_missing core/ruby/3.0.6/20240108025751 ruby
   hab pkg binlink core/ruby gem
   gem install toml
   hab pkg install core/coreutils >/dev/null
