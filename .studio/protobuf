@@ -240,7 +240,8 @@ document "verify_all_protobuf_components" <<DOC
 DOC
 function verify_all_protobuf_components() {
   install_if_missing core/git git
-
+  git config --global --add safe.directory /go/src/github.com/chef/automate
+  git config --global --add safe.directory '*'
   clean_all_compiled_protos || return $?
   bootstrap_proto_compilers || return $?
   compile_all_protobuf_components || return $?
