@@ -12,6 +12,9 @@ export GOPROXY="https://proxy.golang.org,direct"
 export GOSUMDB="sum.golang.org"
 
 hab pkg install -b core/git core/ruby/3.0.6/20240108025751 core/jq-static core/shellcheck core/cacerts
+
+git config --global --add safe.directory /go/src/github.com/chef/automate
+git config --global --add safe.directory '*'
 hab pkg install -b "core/go1_22/1.22.5"
 
 echo "Checking Go Dependencies And Vendored Protos"

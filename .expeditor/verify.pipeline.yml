@@ -41,7 +41,6 @@ steps:
   #
   - label: "[codegen] A2 products generation"
     command:
-      - git config --global --add safe.directory /go/src/github.com/chef/automate
       - hab studio run "source .studiorc && verify_products_generation"
     timeout_in_minutes: 10
     retry:
@@ -168,7 +167,7 @@ steps:
       - rm -rf /bin/zdump
       - rm -rf /bin/sprof
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
-      - scripts/install_hab_pkg.sh core/opa
+      - scripts/install_hab_pkg.sh core/opa/0.34.2/20240106123544
       - cd components/authz-service/engine/opa/policy
       - make static unit
     timeout_in_minutes: 10
