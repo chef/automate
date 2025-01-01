@@ -37,7 +37,7 @@ fi
 
 
 exec secrets-helper exec \
-     --secret userconfig.pg_superuser_password \
+     --optional-secret userconfig.pg_superuser_password \
      --secret bookshelf.access_key_id \
      --secret bookshelf.secret_access_key \
      -- \
