@@ -32,7 +32,7 @@ export GATEWAY_PORT=2000
 export CGO_ENABLED=0
 export GOPROXY="https://proxy.golang.org,direct" 
 export GOSUMDB="sum.golang.org"
-
+export SSL_CERT_FILE="/hab/pkgs/$(hab pkg list core/cacerts)/ssl/cert.pem"
 # Go >= 1.13 will assume this but we have tools like protoc extensions that
 # look for it.
 export GO111MODULE=on
