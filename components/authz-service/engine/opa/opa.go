@@ -232,13 +232,22 @@ func (s *State) ProjectsAuthorized(
 	resource engine.Resource,
 	projects engine.Projects) ([]string, error) {
 
-	subs := make(ast.Array, len(subjects))
-	for i, sub := range subjects {
-		subs[i] = ast.NewTerm(ast.String(sub))
+	var subs *ast.Array
+	for _, sub := range subjects {
+		if subs == nil {
+			subs = ast.NewArray(ast.NewTerm(ast.String(sub)))
+		} else {
+			subs = subs.Append(ast.NewTerm(ast.String(sub)))
+		}
 	}
-	projs := make(ast.Array, len(projects))
-	for i, proj := range projects {
-		projs[i] = ast.NewTerm(ast.String(proj))
+
+	var projs *ast.Array
+	for _, proj := range projects {
+		if projs == nil {
+			projs = ast.NewArray(ast.NewTerm(ast.String(proj)))
+		} else {
+			projs = projs.Append(ast.NewTerm(ast.String(proj)))
+		}
 	}
 	input := ast.NewObject(
 		[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
