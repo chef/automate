@@ -68,13 +68,7 @@ build_commands=""
 for component in "${changed_components[@]}"; do
     if [[ "$component" == "components/automate-builder-memcached" || 
     "$component" == "components/automate-builder-api" || 
-    "$component" == "components/automate-builder-api-proxy" || 
-    "$component" == "components/automate-backend-opensearch" || 
-    "$component" == "components/automate-backend-elasticsidecar" || 
-    "$component" == "components/automate-ha-pgleaderchk" || 
-    "$component" == "components/automate-backend-ctl" || 
-    "$component" == "components/automate-cluster-ctl" || 
-    "$component" == "components/automate-backend-deployment" || 
+    "$component" == "components/automate-builder-api-proxy" ||
     "$component" == "components/automate-ui" ]]; then
         echo "Skipping component: $component"
         continue
