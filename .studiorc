@@ -8,7 +8,7 @@ RECOMMENDED_HAB_VERSION="1.6.1205"
 GOLANGCILINTVERSION=1.60.1
 
 # TODO(ssd) 2019-11-19: https://github.com/habitat-sh/habitat/issues/7219
-# unset SSL_CERT_FILE
+#unset SSL_CERT_FILE
 
 # TODO (tc) Let's get rid of this hard-coded config long-term.
 # Opensearch

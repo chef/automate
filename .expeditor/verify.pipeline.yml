@@ -7,6 +7,7 @@ env:
   GOPROXY: "https://proxy.golang.org,direct"
   GOSUMDB: "sum.golang.org"
   PGGSSENCMODE: "disable"
+  SSL_CERT_FILE: /hab/pkgs/core/cacerts/2021.10.26/20240105224256/ssl/cert.pem
   
 expeditor:
   defaults:
