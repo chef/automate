@@ -1629,7 +1629,9 @@ exceptions:
   - name: core/ncurses
     reason: Exception made by Chef Legal
   - name: core/sqlite
-    reason: Exception made by Chef Legal    
+    reason: Exception made by Chef Legal 
+  - name: core/ruby3_1
+    reason: Ruby license (previously shipped in Automate 1)   
 
   ruby:
   - name: highline

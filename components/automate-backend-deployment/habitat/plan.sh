@@ -31,7 +31,7 @@ pkg_deps=(
    # core/python ( core/python/3.10.0/20231020105702 core/python/3.10.0/20220817121853 )
    #
 pkg_build_deps=(
-  core/gcc
+  core/gcc/9.5.0/20240105175314
 )
 
 # workaround for https://github.com/habitat-sh/habitat/issues/6341
