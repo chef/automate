@@ -4,6 +4,9 @@
 test_name="ha_chef_server"
 test_external_services=(ha_backend)
 
+export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
+export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
+
 source integration/services/common.sh
 
 _frontend1_container_name="$(service_container_name "cs1")"
@@ -187,4 +190,20 @@ do_test_deploy() {
 do_cleanup() {
     docker stop "$_frontend1_container_name"
     docker stop "$_frontend2_container_name"
+}
+
+do_dump_logs() {
+  do_dump_logs_default
+    
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend1_container_name"
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend2_container_name"
+
+
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "logs/*"
+        then
+            echo "Failed to frontend conatiner logs"
+        fi
+    fi
+    rm -r "$tmpdir"
 }
