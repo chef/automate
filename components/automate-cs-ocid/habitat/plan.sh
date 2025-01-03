@@ -43,9 +43,10 @@ do_download() {
   return 0
 }
 
-do_build() {
-  return 0
-}
+# Testing with removing this callback as we don't need to build anything
+# do_build() {
+#   return 0
+# }
 
 do_install() {
   return 0
