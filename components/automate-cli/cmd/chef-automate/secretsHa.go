@@ -17,7 +17,7 @@ func init() {
 }
 
 var secretsCmd = &cobra.Command{
-	Use:   "secrets",
+	Use:   "ha-secrets",
 	Short: "Set secrets to Automate HA",
 	Long:  "Set secrets for Automate sudo password and admin password in HA mode.",
 	Annotations: map[string]string{
