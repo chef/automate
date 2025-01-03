@@ -66,9 +66,7 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
-    if [[ "$component" == "components/automate-builder-api" || 
-    "$component" == "components/automate-builder-api-proxy" ||
-    "$component" == "components/automate-ui" ]]; then
+    if [[ "$component" == "components/automate-ui" ]]; then
         echo "Skipping component: $component"
         continue
     fi
