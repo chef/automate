@@ -7,18 +7,21 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_svc_user="root" # so we can start nginx properly
 pkg_deps=(
-  core/coreutils
-  core/curl
-  chef/mlsa
+  core/coreutils/8.32/20240105213308
+  core/curl/8.7.1/20240614090648
+  chef/mlsa/1.0.1/20240125084021
   core/nginx/1.25.4/20240314072919
-  core/jq-static
+  core/jq-static/1.6/20240107004905
 )
+
 pkg_build_deps=(
-  core/git
-  core/make
+  core/git/2.33.1/20240614092831
+  core/make/4.3/20240105222044
   core/node18/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
-  core/rsync
+  core/rsync/3.2.3/20240107034222
 )
+
+
 pkg_exports=(
   [port]=service.port
   [host]=service.host
