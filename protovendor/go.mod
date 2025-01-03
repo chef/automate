@@ -10,7 +10,6 @@ require (
 require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
-	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/googleapis/googleapis v0.0.0-20200727200613-a94df49e8f20 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/lyft/protoc-gen-star v0.5.1 // indirect

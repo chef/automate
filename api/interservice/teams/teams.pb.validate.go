@@ -11,11 +11,12 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,25 +31,57 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
-// define the regex for a UUID once up-front
-var _teams_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-
 // Validate checks the field values on Team with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
 func (m *Team) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Team with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in TeamMultiError, or nil if none found.
+func (m *Team) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Team) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Id
 
 	// no validation rules for Name
 
+	if len(errors) > 0 {
+		return TeamMultiError(errors)
+	}
+
 	return nil
 }
+
+// TeamMultiError is an error wrapping multiple validation errors returned by
+// Team.ValidateAll() if the designated constraints aren't met.
+type TeamMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TeamMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TeamMultiError) AllErrors() []error { return m }
 
 // TeamValidationError is the validation error returned by Team.Validate if the
 // designated constraints aren't met.
@@ -105,21 +138,60 @@ var _ interface {
 } = TeamValidationError{}
 
 // Validate checks the field values on GetTeamReq with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *GetTeamReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTeamReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetTeamReqMultiError, or
+// nil if none found.
+func (m *GetTeamReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTeamReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_GetTeamReq_Id_Pattern.MatchString(m.GetId()) {
-		return GetTeamReqValidationError{
+		err := GetTeamReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"\\\\S\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetTeamReqMultiError(errors)
 	}
 
 	return nil
 }
+
+// GetTeamReqMultiError is an error wrapping multiple validation errors
+// returned by GetTeamReq.ValidateAll() if the designated constraints aren't met.
+type GetTeamReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTeamReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTeamReqMultiError) AllErrors() []error { return m }
 
 // GetTeamReqValidationError is the validation error returned by
 // GetTeamReq.Validate if the designated constraints aren't met.
@@ -178,14 +250,47 @@ var _ interface {
 var _GetTeamReq_Id_Pattern = regexp.MustCompile("\\S")
 
 // Validate checks the field values on GetTeamResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *GetTeamResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTeamResp with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetTeamRespMultiError, or
+// nil if none found.
+func (m *GetTeamResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTeamResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTeam()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GetTeamRespValidationError{
 				field:  "Team",
@@ -195,8 +300,28 @@ func (m *GetTeamResp) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return GetTeamRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// GetTeamRespMultiError is an error wrapping multiple validation errors
+// returned by GetTeamResp.ValidateAll() if the designated constraints aren't met.
+type GetTeamRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTeamRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTeamRespMultiError) AllErrors() []error { return m }
 
 // GetTeamRespValidationError is the validation error returned by
 // GetTeamResp.Validate if the designated constraints aren't met.
@@ -253,15 +378,49 @@ var _ interface {
 } = GetTeamRespValidationError{}
 
 // Validate checks the field values on ListTeamsReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ListTeamsReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTeamsReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListTeamsReqMultiError, or
+// nil if none found.
+func (m *ListTeamsReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTeamsReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListTeamsReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListTeamsReqMultiError is an error wrapping multiple validation errors
+// returned by ListTeamsReq.ValidateAll() if the designated constraints aren't met.
+type ListTeamsReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTeamsReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTeamsReqMultiError) AllErrors() []error { return m }
 
 // ListTeamsReqValidationError is the validation error returned by
 // ListTeamsReq.Validate if the designated constraints aren't met.
@@ -318,17 +477,50 @@ var _ interface {
 } = ListTeamsReqValidationError{}
 
 // Validate checks the field values on ListTeamsResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ListTeamsResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTeamsResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListTeamsRespMultiError, or
+// nil if none found.
+func (m *ListTeamsResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTeamsResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	for idx, item := range m.GetTeams() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListTeamsRespValidationError{
+						field:  fmt.Sprintf("Teams[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListTeamsRespValidationError{
+						field:  fmt.Sprintf("Teams[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ListTeamsRespValidationError{
 					field:  fmt.Sprintf("Teams[%v]", idx),
@@ -340,8 +532,29 @@ func (m *ListTeamsResp) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return ListTeamsRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ListTeamsRespMultiError is an error wrapping multiple validation errors
+// returned by ListTeamsResp.ValidateAll() if the designated constraints
+// aren't met.
+type ListTeamsRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTeamsRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTeamsRespMultiError) AllErrors() []error { return m }
 
 // ListTeamsRespValidationError is the validation error returned by
 // ListTeamsResp.Validate if the designated constraints aren't met.
@@ -398,18 +611,36 @@ var _ interface {
 } = ListTeamsRespValidationError{}
 
 // Validate checks the field values on UpdateTeamReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *UpdateTeamReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateTeamReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UpdateTeamReqMultiError, or
+// nil if none found.
+func (m *UpdateTeamReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateTeamReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_UpdateTeamReq_Id_Pattern.MatchString(m.GetId()) {
-		return UpdateTeamReqValidationError{
+		err := UpdateTeamReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"\\\\S\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for Name
@@ -420,25 +651,54 @@ func (m *UpdateTeamReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _UpdateTeamReq_Projects_Unique[item]; exists {
-			return UpdateTeamReqValidationError{
+			err := UpdateTeamReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_UpdateTeamReq_Projects_Unique[item] = struct{}{}
 		}
 
 		if !_UpdateTeamReq_Projects_Pattern.MatchString(item) {
-			return UpdateTeamReqValidationError{
+			err := UpdateTeamReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return UpdateTeamReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// UpdateTeamReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateTeamReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateTeamReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateTeamReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateTeamReqMultiError) AllErrors() []error { return m }
 
 // UpdateTeamReqValidationError is the validation error returned by
 // UpdateTeamReq.Validate if the designated constraints aren't met.
@@ -499,14 +759,47 @@ var _UpdateTeamReq_Id_Pattern = regexp.MustCompile("\\S")
 var _UpdateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on UpdateTeamResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *UpdateTeamResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateTeamResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UpdateTeamRespMultiError,
+// or nil if none found.
+func (m *UpdateTeamResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateTeamResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTeam()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return UpdateTeamRespValidationError{
 				field:  "Team",
@@ -516,8 +809,29 @@ func (m *UpdateTeamResp) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return UpdateTeamRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// UpdateTeamRespMultiError is an error wrapping multiple validation errors
+// returned by UpdateTeamResp.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateTeamRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateTeamRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateTeamRespMultiError) AllErrors() []error { return m }
 
 // UpdateTeamRespValidationError is the validation error returned by
 // UpdateTeamResp.Validate if the designated constraints aren't met.
@@ -574,22 +888,61 @@ var _ interface {
 } = UpdateTeamRespValidationError{}
 
 // Validate checks the field values on DeleteTeamReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *DeleteTeamReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteTeamReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DeleteTeamReqMultiError, or
+// nil if none found.
+func (m *DeleteTeamReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteTeamReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_DeleteTeamReq_Id_Pattern.MatchString(m.GetId()) {
-		return DeleteTeamReqValidationError{
+		err := DeleteTeamReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"\\\\S\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DeleteTeamReqMultiError(errors)
 	}
 
 	return nil
 }
+
+// DeleteTeamReqMultiError is an error wrapping multiple validation errors
+// returned by DeleteTeamReq.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteTeamReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteTeamReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteTeamReqMultiError) AllErrors() []error { return m }
 
 // DeleteTeamReqValidationError is the validation error returned by
 // DeleteTeamReq.Validate if the designated constraints aren't met.
@@ -648,14 +1001,47 @@ var _ interface {
 var _DeleteTeamReq_Id_Pattern = regexp.MustCompile("\\S")
 
 // Validate checks the field values on DeleteTeamResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *DeleteTeamResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteTeamResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DeleteTeamRespMultiError,
+// or nil if none found.
+func (m *DeleteTeamResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteTeamResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTeam()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeleteTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeleteTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeleteTeamRespValidationError{
 				field:  "Team",
@@ -665,8 +1051,29 @@ func (m *DeleteTeamResp) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return DeleteTeamRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// DeleteTeamRespMultiError is an error wrapping multiple validation errors
+// returned by DeleteTeamResp.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteTeamRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteTeamRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteTeamRespMultiError) AllErrors() []error { return m }
 
 // DeleteTeamRespValidationError is the validation error returned by
 // DeleteTeamResp.Validate if the designated constraints aren't met.
@@ -723,18 +1130,36 @@ var _ interface {
 } = DeleteTeamRespValidationError{}
 
 // Validate checks the field values on CreateTeamReq with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *CreateTeamReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreateTeamReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CreateTeamReqMultiError, or
+// nil if none found.
+func (m *CreateTeamReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateTeamReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_CreateTeamReq_Id_Pattern.MatchString(m.GetId()) {
-		return CreateTeamReqValidationError{
+		err := CreateTeamReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for Name
@@ -745,25 +1170,54 @@ func (m *CreateTeamReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _CreateTeamReq_Projects_Unique[item]; exists {
-			return CreateTeamReqValidationError{
+			err := CreateTeamReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_CreateTeamReq_Projects_Unique[item] = struct{}{}
 		}
 
 		if !_CreateTeamReq_Projects_Pattern.MatchString(item) {
-			return CreateTeamReqValidationError{
+			err := CreateTeamReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return CreateTeamReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// CreateTeamReqMultiError is an error wrapping multiple validation errors
+// returned by CreateTeamReq.ValidateAll() if the designated constraints
+// aren't met.
+type CreateTeamReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateTeamReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateTeamReqMultiError) AllErrors() []error { return m }
 
 // CreateTeamReqValidationError is the validation error returned by
 // CreateTeamReq.Validate if the designated constraints aren't met.
@@ -824,14 +1278,47 @@ var _CreateTeamReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 var _CreateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on CreateTeamResp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *CreateTeamResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreateTeamResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CreateTeamRespMultiError,
+// or nil if none found.
+func (m *CreateTeamResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateTeamResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTeam()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CreateTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CreateTeamRespValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CreateTeamRespValidationError{
 				field:  "Team",
@@ -841,8 +1328,29 @@ func (m *CreateTeamResp) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return CreateTeamRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// CreateTeamRespMultiError is an error wrapping multiple validation errors
+// returned by CreateTeamResp.ValidateAll() if the designated constraints
+// aren't met.
+type CreateTeamRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateTeamRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateTeamRespMultiError) AllErrors() []error { return m }
 
 // CreateTeamRespValidationError is the validation error returned by
 // CreateTeamResp.Validate if the designated constraints aren't met.
@@ -899,25 +1407,47 @@ var _ interface {
 } = CreateTeamRespValidationError{}
 
 // Validate checks the field values on AddTeamMembersReq with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *AddTeamMembersReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddTeamMembersReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddTeamMembersReqMultiError, or nil if none found.
+func (m *AddTeamMembersReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddTeamMembersReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_AddTeamMembersReq_Id_Pattern.MatchString(m.GetId()) {
-		return AddTeamMembersReqValidationError{
+		err := AddTeamMembersReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"\\\\S\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(m.GetUserIds()) < 1 {
-		return AddTeamMembersReqValidationError{
+		err := AddTeamMembersReqValidationError{
 			field:  "UserIds",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_AddTeamMembersReq_UserIds_Unique := make(map[string]struct{}, len(m.GetUserIds()))
@@ -926,25 +1456,54 @@ func (m *AddTeamMembersReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _AddTeamMembersReq_UserIds_Unique[item]; exists {
-			return AddTeamMembersReqValidationError{
+			err := AddTeamMembersReqValidationError{
 				field:  fmt.Sprintf("UserIds[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_AddTeamMembersReq_UserIds_Unique[item] = struct{}{}
 		}
 
 		if !_AddTeamMembersReq_UserIds_Pattern.MatchString(item) {
-			return AddTeamMembersReqValidationError{
+			err := AddTeamMembersReqValidationError{
 				field:  fmt.Sprintf("UserIds[%v]", idx),
 				reason: "value does not match regex pattern \"^[[:alnum:]_.+@-]+$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return AddTeamMembersReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// AddTeamMembersReqMultiError is an error wrapping multiple validation errors
+// returned by AddTeamMembersReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddTeamMembersReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddTeamMembersReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddTeamMembersReqMultiError) AllErrors() []error { return m }
 
 // AddTeamMembersReqValidationError is the validation error returned by
 // AddTeamMembersReq.Validate if the designated constraints aren't met.
@@ -1008,14 +1567,49 @@ var _AddTeamMembersReq_UserIds_Pattern = regexp.MustCompile("^[[:alnum:]_.+@-]+$
 
 // Validate checks the field values on AddTeamMembersResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *AddTeamMembersResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddTeamMembersResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddTeamMembersRespMultiError, or nil if none found.
+func (m *AddTeamMembersResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddTeamMembersResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return AddTeamMembersRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// AddTeamMembersRespMultiError is an error wrapping multiple validation errors
+// returned by AddTeamMembersResp.ValidateAll() if the designated constraints
+// aren't met.
+type AddTeamMembersRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddTeamMembersRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddTeamMembersRespMultiError) AllErrors() []error { return m }
 
 // AddTeamMembersRespValidationError is the validation error returned by
 // AddTeamMembersResp.Validate if the designated constraints aren't met.
@@ -1075,24 +1669,46 @@ var _ interface {
 
 // Validate checks the field values on RemoveTeamMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RemoveTeamMembersReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemoveTeamMembersReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemoveTeamMembersReqMultiError, or nil if none found.
+func (m *RemoveTeamMembersReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemoveTeamMembersReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_RemoveTeamMembersReq_Id_Pattern.MatchString(m.GetId()) {
-		return RemoveTeamMembersReqValidationError{
+		err := RemoveTeamMembersReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"\\\\S\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(m.GetUserIds()) < 1 {
-		return RemoveTeamMembersReqValidationError{
+		err := RemoveTeamMembersReqValidationError{
 			field:  "UserIds",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	_RemoveTeamMembersReq_UserIds_Unique := make(map[string]struct{}, len(m.GetUserIds()))
@@ -1101,25 +1717,54 @@ func (m *RemoveTeamMembersReq) Validate() error {
 		_, _ = idx, item
 
 		if _, exists := _RemoveTeamMembersReq_UserIds_Unique[item]; exists {
-			return RemoveTeamMembersReqValidationError{
+			err := RemoveTeamMembersReqValidationError{
 				field:  fmt.Sprintf("UserIds[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		} else {
 			_RemoveTeamMembersReq_UserIds_Unique[item] = struct{}{}
 		}
 
 		if !_RemoveTeamMembersReq_UserIds_Pattern.MatchString(item) {
-			return RemoveTeamMembersReqValidationError{
+			err := RemoveTeamMembersReqValidationError{
 				field:  fmt.Sprintf("UserIds[%v]", idx),
 				reason: "value does not match regex pattern \"^[[:alnum:]_.+@-]+$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return RemoveTeamMembersReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// RemoveTeamMembersReqMultiError is an error wrapping multiple validation
+// errors returned by RemoveTeamMembersReq.ValidateAll() if the designated
+// constraints aren't met.
+type RemoveTeamMembersReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemoveTeamMembersReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemoveTeamMembersReqMultiError) AllErrors() []error { return m }
 
 // RemoveTeamMembersReqValidationError is the validation error returned by
 // RemoveTeamMembersReq.Validate if the designated constraints aren't met.
@@ -1183,14 +1828,49 @@ var _RemoveTeamMembersReq_UserIds_Pattern = regexp.MustCompile("^[[:alnum:]_.+@-
 
 // Validate checks the field values on RemoveTeamMembersResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RemoveTeamMembersResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemoveTeamMembersResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemoveTeamMembersRespMultiError, or nil if none found.
+func (m *RemoveTeamMembersResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemoveTeamMembersResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return RemoveTeamMembersRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// RemoveTeamMembersRespMultiError is an error wrapping multiple validation
+// errors returned by RemoveTeamMembersResp.ValidateAll() if the designated
+// constraints aren't met.
+type RemoveTeamMembersRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemoveTeamMembersRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemoveTeamMembersRespMultiError) AllErrors() []error { return m }
 
 // RemoveTeamMembersRespValidationError is the validation error returned by
 // RemoveTeamMembersResp.Validate if the designated constraints aren't met.
@@ -1250,21 +1930,60 @@ var _ interface {
 
 // Validate checks the field values on GetTeamsForMemberReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GetTeamsForMemberReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTeamsForMemberReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTeamsForMemberReqMultiError, or nil if none found.
+func (m *GetTeamsForMemberReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTeamsForMemberReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_GetTeamsForMemberReq_UserId_Pattern.MatchString(m.GetUserId()) {
-		return GetTeamsForMemberReqValidationError{
+		err := GetTeamsForMemberReqValidationError{
 			field:  "UserId",
 			reason: "value does not match regex pattern \"^[[:alnum:]_.+@-]+$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetTeamsForMemberReqMultiError(errors)
 	}
 
 	return nil
 }
+
+// GetTeamsForMemberReqMultiError is an error wrapping multiple validation
+// errors returned by GetTeamsForMemberReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetTeamsForMemberReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTeamsForMemberReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTeamsForMemberReqMultiError) AllErrors() []error { return m }
 
 // GetTeamsForMemberReqValidationError is the validation error returned by
 // GetTeamsForMemberReq.Validate if the designated constraints aren't met.
@@ -1326,16 +2045,49 @@ var _GetTeamsForMemberReq_UserId_Pattern = regexp.MustCompile("^[[:alnum:]_.+@-]
 
 // Validate checks the field values on GetTeamsForMemberResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GetTeamsForMemberResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTeamsForMemberResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTeamsForMemberRespMultiError, or nil if none found.
+func (m *GetTeamsForMemberResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTeamsForMemberResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	for idx, item := range m.GetTeams() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetTeamsForMemberRespValidationError{
+						field:  fmt.Sprintf("Teams[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetTeamsForMemberRespValidationError{
+						field:  fmt.Sprintf("Teams[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return GetTeamsForMemberRespValidationError{
 					field:  fmt.Sprintf("Teams[%v]", idx),
@@ -1347,8 +2099,29 @@ func (m *GetTeamsForMemberResp) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return GetTeamsForMemberRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// GetTeamsForMemberRespMultiError is an error wrapping multiple validation
+// errors returned by GetTeamsForMemberResp.ValidateAll() if the designated
+// constraints aren't met.
+type GetTeamsForMemberRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTeamsForMemberRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTeamsForMemberRespMultiError) AllErrors() []error { return m }
 
 // GetTeamsForMemberRespValidationError is the validation error returned by
 // GetTeamsForMemberResp.Validate if the designated constraints aren't met.
@@ -1408,21 +2181,60 @@ var _ interface {
 
 // Validate checks the field values on GetTeamMembershipReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GetTeamMembershipReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTeamMembershipReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTeamMembershipReqMultiError, or nil if none found.
+func (m *GetTeamMembershipReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTeamMembershipReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if !_GetTeamMembershipReq_Id_Pattern.MatchString(m.GetId()) {
-		return GetTeamMembershipReqValidationError{
+		err := GetTeamMembershipReqValidationError{
 			field:  "Id",
 			reason: "value does not match regex pattern \"\\\\S\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetTeamMembershipReqMultiError(errors)
 	}
 
 	return nil
 }
+
+// GetTeamMembershipReqMultiError is an error wrapping multiple validation
+// errors returned by GetTeamMembershipReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetTeamMembershipReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTeamMembershipReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTeamMembershipReqMultiError) AllErrors() []error { return m }
 
 // GetTeamMembershipReqValidationError is the validation error returned by
 // GetTeamMembershipReq.Validate if the designated constraints aren't met.
@@ -1484,14 +2296,49 @@ var _GetTeamMembershipReq_Id_Pattern = regexp.MustCompile("\\S")
 
 // Validate checks the field values on GetTeamMembershipResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GetTeamMembershipResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTeamMembershipResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTeamMembershipRespMultiError, or nil if none found.
+func (m *GetTeamMembershipResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTeamMembershipResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return GetTeamMembershipRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// GetTeamMembershipRespMultiError is an error wrapping multiple validation
+// errors returned by GetTeamMembershipResp.ValidateAll() if the designated
+// constraints aren't met.
+type GetTeamMembershipRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTeamMembershipRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTeamMembershipRespMultiError) AllErrors() []error { return m }
 
 // GetTeamMembershipRespValidationError is the validation error returned by
 // GetTeamMembershipResp.Validate if the designated constraints aren't met.
@@ -1550,15 +2397,50 @@ var _ interface {
 } = GetTeamMembershipRespValidationError{}
 
 // Validate checks the field values on UpgradeToV2Req with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *UpgradeToV2Req) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeToV2Req with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UpgradeToV2ReqMultiError,
+// or nil if none found.
+func (m *UpgradeToV2Req) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeToV2Req) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpgradeToV2ReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// UpgradeToV2ReqMultiError is an error wrapping multiple validation errors
+// returned by UpgradeToV2Req.ValidateAll() if the designated constraints
+// aren't met.
+type UpgradeToV2ReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeToV2ReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeToV2ReqMultiError) AllErrors() []error { return m }
 
 // UpgradeToV2ReqValidationError is the validation error returned by
 // UpgradeToV2Req.Validate if the designated constraints aren't met.
@@ -1615,15 +2497,50 @@ var _ interface {
 } = UpgradeToV2ReqValidationError{}
 
 // Validate checks the field values on UpgradeToV2Resp with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *UpgradeToV2Resp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeToV2Resp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpgradeToV2RespMultiError, or nil if none found.
+func (m *UpgradeToV2Resp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeToV2Resp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpgradeToV2RespMultiError(errors)
+	}
+
 	return nil
 }
+
+// UpgradeToV2RespMultiError is an error wrapping multiple validation errors
+// returned by UpgradeToV2Resp.ValidateAll() if the designated constraints
+// aren't met.
+type UpgradeToV2RespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeToV2RespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeToV2RespMultiError) AllErrors() []error { return m }
 
 // UpgradeToV2RespValidationError is the validation error returned by
 // UpgradeToV2Resp.Validate if the designated constraints aren't met.
@@ -1680,15 +2597,49 @@ var _ interface {
 } = UpgradeToV2RespValidationError{}
 
 // Validate checks the field values on ResetToV1Req with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ResetToV1Req) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResetToV1Req with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ResetToV1ReqMultiError, or
+// nil if none found.
+func (m *ResetToV1Req) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResetToV1Req) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ResetToV1ReqMultiError(errors)
+	}
+
 	return nil
 }
+
+// ResetToV1ReqMultiError is an error wrapping multiple validation errors
+// returned by ResetToV1Req.ValidateAll() if the designated constraints aren't met.
+type ResetToV1ReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResetToV1ReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResetToV1ReqMultiError) AllErrors() []error { return m }
 
 // ResetToV1ReqValidationError is the validation error returned by
 // ResetToV1Req.Validate if the designated constraints aren't met.
@@ -1745,15 +2696,50 @@ var _ interface {
 } = ResetToV1ReqValidationError{}
 
 // Validate checks the field values on ResetToV1Resp with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ResetToV1Resp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResetToV1Resp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ResetToV1RespMultiError, or
+// nil if none found.
+func (m *ResetToV1Resp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResetToV1Resp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return ResetToV1RespMultiError(errors)
+	}
+
 	return nil
 }
+
+// ResetToV1RespMultiError is an error wrapping multiple validation errors
+// returned by ResetToV1Resp.ValidateAll() if the designated constraints
+// aren't met.
+type ResetToV1RespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResetToV1RespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResetToV1RespMultiError) AllErrors() []error { return m }
 
 // ResetToV1RespValidationError is the validation error returned by
 // ResetToV1Resp.Validate if the designated constraints aren't met.
@@ -1811,16 +2797,51 @@ var _ interface {
 
 // Validate checks the field values on PurgeUserMembershipReq with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *PurgeUserMembershipReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PurgeUserMembershipReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PurgeUserMembershipReqMultiError, or nil if none found.
+func (m *PurgeUserMembershipReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PurgeUserMembershipReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	// no validation rules for UserId
+
+	if len(errors) > 0 {
+		return PurgeUserMembershipReqMultiError(errors)
+	}
 
 	return nil
 }
+
+// PurgeUserMembershipReqMultiError is an error wrapping multiple validation
+// errors returned by PurgeUserMembershipReq.ValidateAll() if the designated
+// constraints aren't met.
+type PurgeUserMembershipReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PurgeUserMembershipReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PurgeUserMembershipReqMultiError) AllErrors() []error { return m }
 
 // PurgeUserMembershipReqValidationError is the validation error returned by
 // PurgeUserMembershipReq.Validate if the designated constraints aren't met.
@@ -1880,14 +2901,49 @@ var _ interface {
 
 // Validate checks the field values on PurgeUserMembershipResp with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *PurgeUserMembershipResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PurgeUserMembershipResp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PurgeUserMembershipRespMultiError, or nil if none found.
+func (m *PurgeUserMembershipResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PurgeUserMembershipResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return PurgeUserMembershipRespMultiError(errors)
+	}
+
 	return nil
 }
+
+// PurgeUserMembershipRespMultiError is an error wrapping multiple validation
+// errors returned by PurgeUserMembershipResp.ValidateAll() if the designated
+// constraints aren't met.
+type PurgeUserMembershipRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PurgeUserMembershipRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PurgeUserMembershipRespMultiError) AllErrors() []error { return m }
 
 // PurgeUserMembershipRespValidationError is the validation error returned by
 // PurgeUserMembershipResp.Validate if the designated constraints aren't met.

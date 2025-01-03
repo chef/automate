@@ -8,8 +8,8 @@ package main
 
 import (
 	_ "github.com/bufbuild/buf/cmd/buf"
-	_ "github.com/bufbuild/buf/cmd/protoc-gen-buf-check-breaking"
-	_ "github.com/bufbuild/buf/cmd/protoc-gen-buf-check-lint"
+	_ "github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking"
+	_ "github.com/bufbuild/buf/cmd/protoc-gen-buf-lint"
 	_ "github.com/ckaznocha/protoc-gen-lint"
 	_ "github.com/envoyproxy/protoc-gen-validate"
 	_ "github.com/go-delve/delve/cmd/dlv"
