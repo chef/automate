@@ -14,7 +14,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_svc_user="root"
 
 pkg_deps=(
-  core/coreutils/9.4/20241017111752
+  core/coreutils/8.32/20240105213308
   core/bash/5.1/20240105214248
   chef/mlsa/1.0.1/20240125084021
   chef/automate-platform-tools/0.1.0/20241212061203
