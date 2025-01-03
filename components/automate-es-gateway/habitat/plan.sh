@@ -50,7 +50,7 @@ pkg_deps=(
   core/coreutils/8.32/20240105213308
   chef/mlsa/1.0.1/20240125084021
   core/bash/5.1/20240105214248
-  core/curl/8.7.1/20240614090648# health_check
+  core/curl/8.7.1/20240614090648 #health_check
   chef/automate-platform-tools/0.1.0/20241212061203
 )
 
