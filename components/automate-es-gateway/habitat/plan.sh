@@ -39,26 +39,26 @@ chef_automate_hab_binding_mode="relaxed"
 pkg_svc_user="root"
 
 pkg_deps=(
-  core/glibc
-  core/libedit
-  core/ncurses
-  core/zlib
-  core/bzip2
-  core/openssl/3.0.9
-  core/pcre2
-
-  core/coreutils
-  chef/mlsa
-  core/bash
-  core/curl # health_check
-  chef/automate-platform-tools
+  core/glibc/2.35/20240105171810
+  core/libedit/20210910-3.1/20240106023704
+  core/ncurses/6.2/20240105212325
+  core/zlib/1.3/20240105173710
+  core/bzip2/1.0.8/20240105212113
+  core/openssl/1.0.2zi/20240105224424
+  #core/pcre2
+  core/pcre/8.45/20240105213900
+  core/coreutils/8.32/20240105213308
+  chef/mlsa/1.0.1/20240125084021
+  core/bash/5.1/20240105214248
+  core/curl/8.7.1/20240614090648# health_check
+  chef/automate-platform-tools/0.1.0/20241212061203
 )
 
 
 pkg_build_deps=(
-  core/gcc
-  core/make
-  core/coreutils
+  core/gcc/9.5.0/20240105175314
+  core/make/4.3/20240105222044
+  core/coreutils/8.32/20240105213308
 )
 
 pkg_lib_dirs=(lib)

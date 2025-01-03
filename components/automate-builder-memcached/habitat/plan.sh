@@ -11,17 +11,17 @@ pkg_source="http://www.memcached.org/files/${pkg_distname}-${pkg_version}.tar.gz
 pkg_shasum=f291a35f82ef9756ed1d952879ef5f4be870f932bdfcb2ab61356609abf82346
 
 pkg_deps=(
-  core/bash
-  core/glibc
-  core/libevent
-  core/openssl11
+  core/bash/5.1/20240105214248
+  core/glibc/2.35/20240105171810
+  core/libevent/2.1.12/20240106023556
+  core/openssl11/1.1.1w/20240106015742
 )
 
 
 pkg_build_deps=(
-  core/git
-  core/gcc
-  core/make
+  core/git/2.33.1/20240614092831
+  core/gcc/9.5.0/20240105175314
+  core/make/4.3/20240105222044
 )
 pkg_bin_dirs=(bin)
 pkg_include_dirs=(include)
