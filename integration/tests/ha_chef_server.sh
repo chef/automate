@@ -4,8 +4,8 @@
 test_name="ha_chef_server"
 test_external_services=(ha_backend)
 
-export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
-export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
+export SSL_CERT_FILE={{pkgPathFor core/cacerts}}/ssl/cert.pem
+export SSL_CERT_DIR={{pkgPathFor core/cacerts}}/ssl/certs
 
 source integration/services/common.sh
 
