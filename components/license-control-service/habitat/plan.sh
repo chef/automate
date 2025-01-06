@@ -13,7 +13,7 @@ pkg_license=('Chef-MLSA')
 pkg_deps=(
   chef/mlsa
   chef/automate-platform-tools
-  chef/license-audit
+  chef/license-audit/1.0.36/20240729060411
 )
 pkg_svc_user=root
 pkg_svc_group=root

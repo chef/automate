@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-UPSTREAM_PKG_IDENT="chef/knife-ec-backup/3.0.1"
+UPSTREAM_PKG_IDENT="chef/knife-ec-backup/3.0.1/20240201071926"
 pkg_name="automate-knife-ec-backup"
 pkg_description="Wrapper package for chef/knife-ec-backup"
 pkg_origin="chef"
@@ -13,7 +13,7 @@ pkg_svc_user=root
 pkg_svc_group=root
 
 pkg_deps=(
-  chef/mlsa
+  chef/mlsa/1.0.1/20240125084021
   "${UPSTREAM_PKG_IDENT}"
 )
 
