@@ -23,5 +23,7 @@ studio_secrets:
     value: "LTS-2024"
   HAB_FALLBACK_CHANNEL:
     value: "stable"
+  HAB_STUDIO_SECRET_HAB_FEAT_OFFLINE_INSTALL:
+    value: "true"  
   GOPROXY:
     value: "https://proxy.golang.org,direct"
