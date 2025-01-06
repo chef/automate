@@ -12,7 +12,7 @@
 
 cert_auth_tests() {
     log_info "Starting the Certificate Authentication test suite"
-    hab pkg install core/curl -c stable
+    hab pkg install core/curl
     #shellcheck disable=SC2154
     log_info "Generating policy to allow ${authorized_service_name} to GET the data collector endpoint"
     grant_permissions
