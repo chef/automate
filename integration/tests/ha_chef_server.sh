@@ -4,9 +4,6 @@
 test_name="ha_chef_server"
 test_external_services=(ha_backend)
 
-export SSL_CERT_FILE={{pkgPathFor core/cacerts}}/ssl/cert.pem
-export SSL_CERT_DIR={{pkgPathFor core/cacerts}}/ssl/certs
-
 source integration/services/common.sh
 
 _frontend1_container_name="$(service_container_name "cs1")"
