@@ -181,19 +181,19 @@ max_shards_per_node = 1000
 
 Once done, run the chef-automate config patch `</path/to/your-file.toml>` to deploy your change.
 
-## Issue: Knife Search Limits at 10000 Records
+## Issue: Knife search limits at 10000 records
 
 ### Details
 
-The knife node list and knife node search commands are inconsistent in terms of the number of records they return. Specifically, knife search is limited to a maximum of **10000** records by default.
+The knife node list and knife node search commands are inconsistent in the number of records they return. By default, knife search returns a maximum of 10,000 records.
 
 ### Fixes
 
-This happens because OpenSearch, by default, limits the maximum number of records (or documents) returned in a single query to **10000**. This is a safeguard to prevent large queries from overloading the system. If you are trying to retrieve more than **10000** records, this approach will do that.
+This issue occurs because OpenSearch, by default, limits the maximum number of records (or documents) returned in a single query to 10,000. This safeguard prevents large queries from overloading the system. This approach will do that if you try to retrieve more than 10,000 records.
 
-#### Step 1:  Increase the max_result_window to retrieve more than **10000** records.
+#### Step 1: Increase the max_result_window to retrieve more than **10000** records.
 
-In case of embedded opensearch:
+In the case of embedded opensearch:
 
 ```bash
 curl -XPUT "http://127.0.0.1:10144/chef/_settings" \
@@ -204,13 +204,14 @@ curl -XPUT "http://127.0.0.1:10144/chef/_settings" \
         }' \
     -H "Content-Type: application/json"
 ```
-Changes can be verified by doing:
+
+Changes can be verified by doing the following:
 
 ```bash
 curl http://127.0.0.1:10144/_settings?pretty
 ```
 
-For external OpenSearch, ensure the max_result_window is also increased accordingly.
+For external OpenSearch, ensure the `max_result_window` is also increased accordingly.
 
 #### Step 2: Patch the config in Automate
 
