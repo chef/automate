@@ -86,3 +86,9 @@ do_install() {
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby31)!g" "$wrapper_bin_path/knife"
 }
 
+
+
+do_before() {
+  do_default_before
+  git config --global --add safe.directory /src
+}
