@@ -207,11 +207,13 @@ Success: Restored backup 20180517223558
 
 ## Troubleshooting
 
-Set the log level to `debug` before re-running a failed restore to output debug info to the Chef Automate log:
+1. Set the log level to `debug` before re-running a failed restore to output debug info to the Chef Automate log:
 
-```shell
-chef-automate debug set-log-level deployment-service debug
-```
+     ```shell
+     chef-automate debug set-log-level deployment-service debug
+     ```
+
+1. To restore a backup on a different host with an existing Automate deployment, ensure the `.tmp` folder located in the `/var/opt/chef-automate/backups` directory is deleted before proceeding.
 
 ## References
 
