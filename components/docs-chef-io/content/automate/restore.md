@@ -207,11 +207,13 @@ Success: Restored backup 20180517223558
 
 ## Troubleshooting
 
-Set the log level to `debug` before re-running a failed restore to output debug info to the Chef Automate log:
+1. Set the log level to `debug` before re-running a failed restore to output debug info to the Chef Automate log:
 
-```shell
-chef-automate debug set-log-level deployment-service debug
-```
+     ```shell
+     chef-automate debug set-log-level deployment-service debug
+     ```
+
+1. If you have already deployed Chef Automate and are getting this error in the logs while restoring: `The Access Key ID you provided does not exist in our records`. Before proceeding, delete the `.tmp` folder in the configured backup directory (the default directory is `/var/opt/chef-automate/backups`).
 
 ## References
 
