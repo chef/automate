@@ -213,7 +213,7 @@ Success: Restored backup 20180517223558
      chef-automate debug set-log-level deployment-service debug
      ```
 
-1. To restore a backup on a different host with an existing Automate deployment, delete the `.tmp` folder in the configured backup directory before proceeding (the default directory is `/var/opt/chef-automate/backups`).
+1. If you already deployed Chef Automate and while restoring you are getting this error in logs: `The Access Key Id you provided does not exist in our records.`, then delete the `.tmp` folder in the configured backup directory before proceeding (the default directory is `/var/opt/chef-automate/backups`).
 
 ## References
 
