@@ -213,7 +213,7 @@ Success: Restored backup 20180517223558
      chef-automate debug set-log-level deployment-service debug
      ```
 
-1. To restore a backup on a different host with an existing Automate deployment, ensure the `.tmp` folder located in the configured backup directory (default directory: `/var/opt/chef-automate/backups`) is deleted before proceeding.
+1. To restore a backup on a different host with an existing Automate deployment, delete the `.tmp` folder in the configured backup directory before proceeding (the default directory is `/var/opt/chef-automate/backups`).
 
 ## References
 
