@@ -38,4 +38,3 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
-
