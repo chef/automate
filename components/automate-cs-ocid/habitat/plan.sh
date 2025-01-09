@@ -51,3 +51,10 @@ do_install() {
   return 0
 }
 
+do_end() {
+  if [ -d "/root/.bundle" ]; then
+    # Remove the .bundle directory
+    rm -rf /root/.bundle
+    echo ".bundle directory in /root has been removed."
+  fi
+}
