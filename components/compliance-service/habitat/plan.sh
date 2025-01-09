@@ -94,7 +94,6 @@ do_install() {
   cp -r firejail/* "${pkg_prefix}/data/firejail"
 
 
-
 }
 
 do_strip() {
