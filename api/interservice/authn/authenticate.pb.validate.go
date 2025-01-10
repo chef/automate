@@ -11,11 +11,12 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,22 +31,55 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
+	_ = sort.Sort
 )
-
-// define the regex for a UUID once up-front
-var _authenticate_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // Validate checks the field values on AuthenticateRequest with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *AuthenticateRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AuthenticateRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AuthenticateRequestMultiError, or nil if none found.
+func (m *AuthenticateRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AuthenticateRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return AuthenticateRequestMultiError(errors)
+	}
+
 	return nil
 }
+
+// AuthenticateRequestMultiError is an error wrapping multiple validation
+// errors returned by AuthenticateRequest.ValidateAll() if the designated
+// constraints aren't met.
+type AuthenticateRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AuthenticateRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AuthenticateRequestMultiError) AllErrors() []error { return m }
 
 // AuthenticateRequestValidationError is the validation error returned by
 // AuthenticateRequest.Validate if the designated constraints aren't met.
@@ -105,18 +139,53 @@ var _ interface {
 
 // Validate checks the field values on AuthenticateResponse with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *AuthenticateResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AuthenticateResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AuthenticateResponseMultiError, or nil if none found.
+func (m *AuthenticateResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AuthenticateResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Subject
 
 	// no validation rules for Requestor
 
+	if len(errors) > 0 {
+		return AuthenticateResponseMultiError(errors)
+	}
+
 	return nil
 }
+
+// AuthenticateResponseMultiError is an error wrapping multiple validation
+// errors returned by AuthenticateResponse.ValidateAll() if the designated
+// constraints aren't met.
+type AuthenticateResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AuthenticateResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AuthenticateResponseMultiError) AllErrors() []error { return m }
 
 // AuthenticateResponseValidationError is the validation error returned by
 // AuthenticateResponse.Validate if the designated constraints aren't met.

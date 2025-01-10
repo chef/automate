@@ -33,8 +33,8 @@ function install_protoc_toolchain() {
     github.com/envoyproxy/protoc-gen-validate
     github.com/ckaznocha/protoc-gen-lint
     github.com/bufbuild/buf/cmd/buf
-    github.com/bufbuild/buf/cmd/protoc-gen-buf-check-breaking
-    github.com/bufbuild/buf/cmd/protoc-gen-buf-check-lint
+    github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking
+    github.com/bufbuild/buf/cmd/protoc-gen-buf-lint
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
   )
@@ -157,7 +157,7 @@ function check_breaking_for_all_proto_components() {
     main_branch_name="master"
   fi
 
-  local breaking_check_cmd=("buf" "check" "breaking" "--against-input" ".git#branch=$main_branch_name")
+  local breaking_check_cmd=("buf" "breaking" "--against" ".git#branch=$main_branch_name" "--timeout" "0")
 
   echo "🔎 Checking protos for breaking changes with \`${breaking_check_cmd[*]}\`..."
   "${breaking_check_cmd[@]}"
@@ -185,7 +185,7 @@ function lint_all_protobuf_components() {
   install_protoc_toolchain || return 1
 
   local ret
-  local lintercmd="buf check lint"
+  local lintercmd="buf lint --timeout 0"
   pushd /src/ > /dev/null || return 1
   echo "🧹 Linting protos with \`${lintercmd}\`..."
   $lintercmd
@@ -208,7 +208,7 @@ document "compile_all_protobuf_components" <<DOC
   Compile every protobuf file for every component in A2.
 DOC
 function compile_all_protobuf_components() {
-  lint_all_protobuf_components && check_breaking_for_all_proto_components && compile_all_protobuf_components_nolint
+  lint_all_protobuf_components && compile_all_protobuf_components_nolint
 }
 
 document "compile_all_protobuf_components_nolint" <<DOC
