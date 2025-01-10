@@ -22,7 +22,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -51,8 +51,7 @@
           "type": "string"
         },
         "telemetry_enabled": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "telemetry_url": {
           "type": "string"

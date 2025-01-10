@@ -25,7 +25,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -57,7 +57,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -89,7 +89,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -121,7 +121,7 @@ func init() {
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -144,8 +144,7 @@ func init() {
           "type": "string"
         },
         "running": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       },
       "description": "SchedulerConfig\nThe job message to configure the Delete Node Job\nevery - It accepts '1h30m', '1m', '2h30m', ..."
@@ -163,8 +162,7 @@ func init() {
       "type": "object",
       "properties": {
         "running": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "name": {
           "type": "string"
@@ -193,8 +191,7 @@ func init() {
       "type": "object",
       "properties": {
         "running": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "jobs": {
           "type": "array",
