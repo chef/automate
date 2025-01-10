@@ -11,9 +11,8 @@ cp "{{pkg.svc_config_path}}/tasks/oauth_application.rake" $(hab pkg path "chef/o
 cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
 # Suspecting that the bundle path is not getting set correctly due to which .bundle is getting created in the root directory
-# Set the BUNDLE_APP_CONFIG environment variable to a ocid directory
-# export BUNDLE_APP_CONFIG="{{pkgPathFor "chef/oc_id"}}/oc_id/.bundle"
-bundle config path "vendor/bundle"
+# Suspecting that the bundle path is not getting set correctly due to which .bundle is getting created in the root directory
+bundle config set --local path "vendor/bundle"
 
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
