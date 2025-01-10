@@ -1661,8 +1661,6 @@ exceptions:
     reason: Exception made by Chef Legal
 
   golang:
-  - name: bazil.org/fuse
-    reason: Exception made by Chef Legal
   - name: buf.build/gen/go/bufbuild/bufplugin/connectrpc/go
     reason: Exception made by Chef Legal
   - name: buf.build/gen/go/bufbuild/protovalidate/connectrpc/go
@@ -1699,8 +1697,6 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/beyondcorp
     reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/bigquery
-    reason: Exception made by Chef Legal
   - name: cloud.google.com/go/billing
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/binaryauthorization
@@ -1715,13 +1711,9 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/cloudtasks
     reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/compute
-    reason: Exception made by Chef Legal
   - name: cloud.google.com/go/contactcenterinsights
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/containeranalysis
-    reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/container
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/datacatalog
     reason: Exception made by Chef Legal
@@ -1738,8 +1730,6 @@ exceptions:
   - name: cloud.google.com/go/dataproc/v2
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/dataqna
-    reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/datastore
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/datastream
     reason: Exception made by Chef Legal
@@ -1762,8 +1752,6 @@ exceptions:
   - name: cloud.google.com/go/eventarc
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/filestore
-    reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/firestore
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/functions
     reason: Exception made by Chef Legal
@@ -1831,8 +1819,6 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/pubsublite
     reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/pubsub
-    reason: Exception made by Chef Legal
   - name: cloud.google.com/go/recaptchaenterprise/v2
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/recommendationengine
@@ -1854,8 +1840,6 @@ exceptions:
   - name: cloud.google.com/go/secretmanager
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/securitycenter
-    reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/security
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/servicedirectory
     reason: Exception made by Chef Legal
@@ -1879,8 +1863,6 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/videointelligence
     reason: Exception made by Chef Legal
-  - name: cloud.google.com/go/video
-    reason: Exception made by Chef Legal
   - name: cloud.google.com/go/vision/v2
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/vmmigration
@@ -1895,45 +1877,11 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: cloud.google.com/go/workflows
     reason: Exception made by Chef Legal
-  - name: cloud.google.com/go
-    reason: Exception made by Chef Legal
-  - name: contrib.go.opencensus.io/exporter/aws
-    reason: Exception made by Chef Legal
-  - name: contrib.go.opencensus.io/exporter/stackdriver
-    reason: Exception made by Chef Legal
-  - name: contrib.go.opencensus.io/integrations/ocsql
-    reason: Exception made by Chef Legal
   - name: dario.cat/mergo
-    reason: Exception made by Chef Legal
-  - name: dmitri.shuralyov.com/gpu/mtl
-    reason: Exception made by Chef Legal
-  - name: github.com/AdaLogics/go-fuzz-headers
     reason: Exception made by Chef Legal
   - name: github.com/AdamKorcz/go-118-fuzz-build
     reason: Exception made by Chef Legal
-  - name: github.com/Azure/azure-amqp-common-go/v3
-    reason: Exception made by Chef Legal
-  - name: github.com/Azure/azure-pipeline-go
-    reason: Exception made by Chef Legal
-  - name: github.com/Azure/azure-service-bus-go
-    reason: Exception made by Chef Legal
-  - name: github.com/Azure/azure-storage-blob-go
-    reason: Exception made by Chef Legal
-  - name: github.com/Azure/go-amqp
-    reason: Exception made by Chef Legal
-  - name: github.com/Azure/go-autorest/autorest/mocks
-    reason: Exception made by Chef Legal
-  - name: github.com/BurntSushi/toml
-    reason: Exception made by Chef Legal
-  - name: github.com/BurntSushi/xgb
-    reason: Exception made by Chef Legal
-  - name: github.com/DATA-DOG/go-sqlmock
-    reason: Exception made by Chef Legal
-  - name: github.com/DataDog/datadog-go
-    reason: Exception made by Chef Legal
   - name: github.com/DataDog/zstd
-    reason: Exception made by Chef Legal
-  - name: github.com/GoogleCloudPlatform/cloudsql-proxy
     reason: Exception made by Chef Legal
   - name: github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp
     reason: Exception made by Chef Legal
@@ -1943,99 +1891,31 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: github.com/Sereal/Sereal/Go/sereal
     reason: Exception made by Chef Legal
-  - name: github.com/aclements/go-gg
-    reason: Exception made by Chef Legal
-  - name: github.com/aclements/go-moremath
-    reason: Exception made by Chef Legal
-  - name: github.com/ajstarks/svgo
-    reason: Exception made by Chef Legal
   - name: github.com/akavel/rsrc
     reason: Exception made by Chef Legal
   - name: github.com/alecthomas/kingpin/v2
     reason: Exception made by Chef Legal
-  - name: github.com/alecthomas/template
-    reason: Exception made by Chef Legal
-  - name: github.com/alecthomas/units
-    reason: Exception made by Chef Legal
   - name: github.com/andreyvit/diff
-    reason: Exception made by Chef Legal
-  - name: github.com/antihax/optional
     reason: Exception made by Chef Legal
   - name: github.com/apparentlymart/go-textseg/v13
     reason: Exception made by Chef Legal
-  - name: github.com/apparentlymart/go-textseg/v15
-    reason: Exception made by Chef Legal
-  - name: github.com/arbovm/levenshtein
-    reason: Exception made by Chef Legal
-  - name: github.com/armon/consul-api
-    reason: Exception made by Chef Legal
-  - name: github.com/aws/aws-sdk-go
-    reason: Exception made by Chef Legal
-  - name: github.com/benbjohnson/clock
-    reason: Exception made by Chef Legal
-  - name: github.com/bgentry/speakeasy
-    reason: Exception made by Chef Legal
   - name: github.com/blang/semver/v4
     reason: Exception made by Chef Legal
-  - name: github.com/bmizerany/assert
-    reason: Exception made by Chef Legal
-  - name: github.com/bytecodealliance/wasmtime-go/v3
-    reason: Exception made by Chef Legal
-  - name: github.com/cenkalti/backoff/v4
-    reason: Exception made by Chef Legal
-  - name: github.com/cenkalti/backoff
-    reason: Exception made by Chef Legal
-  - name: github.com/census-instrumentation/opencensus-proto
-    reason: Exception made by Chef Legal
-  - name: github.com/cespare/xxhash
-    reason: Exception made by Chef Legal
-  - name: github.com/chromedp/cdproto
-    reason: Exception made by Chef Legal
-  - name: github.com/chromedp/chromedp
-    reason: Exception made by Chef Legal
-  - name: github.com/chromedp/sysutil
-    reason: Exception made by Chef Legal
-  - name: github.com/chzyer/logex
-    reason: Exception made by Chef Legal
-  - name: github.com/chzyer/test
-    reason: Exception made by Chef Legal
   - name: github.com/cilium/ebpf
-    reason: Exception made by Chef Legal
-  - name: github.com/circonus-labs/circonus-gometrics
-    reason: Exception made by Chef Legal
-  - name: github.com/circonus-labs/circonusllhist
-    reason: Exception made by Chef Legal
-  - name: github.com/client9/misspell
-    reason: Exception made by Chef Legal
-  - name: github.com/cncf/udpa/go
-    reason: Exception made by Chef Legal
-  - name: github.com/cncf/xds/go
-    reason: Exception made by Chef Legal
-  - name: github.com/cockroachdb/datadriven
     reason: Exception made by Chef Legal
   - name: github.com/containerd/aufs
     reason: Exception made by Chef Legal
   - name: github.com/containerd/btrfs/v2
     reason: Exception made by Chef Legal
-  - name: github.com/containerd/cgroups
-    reason: Exception made by Chef Legal
-  - name: github.com/containerd/console
-    reason: Exception made by Chef Legal
   - name: github.com/containerd/containerd/api
     reason: Exception made by Chef Legal
-  - name: github.com/containerd/fifo
-    reason: Exception made by Chef Legal
   - name: github.com/containerd/go-cni
-    reason: Exception made by Chef Legal
-  - name: github.com/containerd/go-runc
     reason: Exception made by Chef Legal
   - name: github.com/containerd/imgcrypt
     reason: Exception made by Chef Legal
   - name: github.com/containerd/nri
     reason: Exception made by Chef Legal
   - name: github.com/containerd/protobuild
-    reason: Exception made by Chef Legal
-  - name: github.com/containerd/typeurl
     reason: Exception made by Chef Legal
   - name: github.com/containerd/zfs
     reason: Exception made by Chef Legal
@@ -2045,245 +1925,41 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: github.com/containers/ocicrypt
     reason: Exception made by Chef Legal
-  - name: github.com/coreos/etcd
-    reason: Exception made by Chef Legal
-  - name: github.com/coreos/go-etcd
-    reason: Exception made by Chef Legal
-  - name: github.com/coreos/go-semver
-    reason: Exception made by Chef Legal
   - name: github.com/coreos/go-systemd/v22
     reason: Exception made by Chef Legal
-  - name: github.com/coreos/go-systemd
-    reason: Exception made by Chef Legal
-  - name: github.com/coreos/pkg
-    reason: Exception made by Chef Legal
-  - name: github.com/cpuguy83/go-md2man
-    reason: Exception made by Chef Legal
-  - name: github.com/creack/pty
-    reason: Exception made by Chef Legal
-  - name: github.com/ctdk/goiardi
-    reason: Exception made by Chef Legal
   - name: github.com/danieljoos/wincred
-    reason: Exception made by Chef Legal
-  - name: github.com/davecgh/go-spew
     reason: Exception made by Chef Legal
   - name: github.com/davecgh/go-xdr
     reason: Exception made by Chef Legal
   - name: github.com/decred/dcrd/dcrec/secp256k1/v4
     reason: Exception made by Chef Legal
-  - name: github.com/denisenkom/go-mssqldb
-    reason: Exception made by Chef Legal
-  - name: github.com/devigned/tab
-    reason: Exception made by Chef Legal
-  - name: github.com/dgraph-io/badger/v3
-    reason: Exception made by Chef Legal
-  - name: github.com/dgraph-io/ristretto
-    reason: Exception made by Chef Legal
-  - name: github.com/dgrijalva/jwt-go
-    reason: Exception made by Chef Legal
   - name: github.com/dgryski/go-farm
-    reason: Exception made by Chef Legal
-  - name: github.com/dgryski/trifles
     reason: Exception made by Chef Legal
   - name: github.com/docker/go-events
     reason: Exception made by Chef Legal
   - name: github.com/docker/go-metrics
     reason: Exception made by Chef Legal
-  - name: github.com/dustin/go-humanize
-    reason: Exception made by Chef Legal
   - name: github.com/emicklei/go-restful/v3
-    reason: Exception made by Chef Legal
-  - name: github.com/envoyproxy/go-control-plane
-    reason: Exception made by Chef Legal
-  - name: github.com/envoyproxy/protoc-gen-validate
-    reason: Exception made by Chef Legal
-  - name: github.com/fogleman/gg
-    reason: Exception made by Chef Legal
-  - name: github.com/form3tech-oss/jwt-go
-    reason: Exception made by Chef Legal
-  - name: github.com/fortytw2/leaktest
-    reason: Exception made by Chef Legal
-  - name: github.com/foxcpp/go-mockdns
     reason: Exception made by Chef Legal
   - name: github.com/francoispqt/gojay
     reason: Exception made by Chef Legal
-  - name: github.com/frankban/quicktest
-    reason: Exception made by Chef Legal
   - name: github.com/fxamacker/cbor/v2
-    reason: Exception made by Chef Legal
-  - name: github.com/ghodss/yaml
-    reason: Exception made by Chef Legal
-  - name: github.com/gin-contrib/sse
-    reason: Exception made by Chef Legal
-  - name: github.com/gin-gonic/gin
-    reason: Exception made by Chef Legal
-  - name: github.com/globalsign/mgo
-    reason: Exception made by Chef Legal
-  - name: github.com/go-gl/glfw/v3.3/glfw
-    reason: Exception made by Chef Legal
-  - name: github.com/go-gl/glfw
     reason: Exception made by Chef Legal
   - name: github.com/go-jose/go-jose/v3
     reason: Exception made by Chef Legal
-  - name: github.com/go-kit/kit
-    reason: Exception made by Chef Legal
-  - name: github.com/go-kit/log
-    reason: Exception made by Chef Legal
-  - name: github.com/go-logfmt/logfmt
-    reason: Exception made by Chef Legal
-  - name: github.com/go-playground/assert/v2
-    reason: Exception made by Chef Legal
-  - name: github.com/go-playground/locales
-    reason: Exception made by Chef Legal
-  - name: github.com/go-playground/universal-translator
-    reason: Exception made by Chef Legal
-  - name: github.com/go-playground/validator/v10
-    reason: Exception made by Chef Legal
-  - name: github.com/go-redis/redis
-    reason: Exception made by Chef Legal
-  - name: github.com/go-sql-driver/mysql
-    reason: Exception made by Chef Legal
-  - name: github.com/go-stack/stack
-    reason: Exception made by Chef Legal
-  - name: github.com/go-task/slim-sprig
-    reason: Exception made by Chef Legal
-  - name: github.com/go-test/deep
-    reason: Exception made by Chef Legal
-  - name: github.com/gobwas/httphead
-    reason: Exception made by Chef Legal
-  - name: github.com/gobwas/pool
-    reason: Exception made by Chef Legal
-  - name: github.com/gobwas/ws
-    reason: Exception made by Chef Legal
   - name: github.com/godbus/dbus/v5
-    reason: Exception made by Chef Legal
-  - name: github.com/godbus/dbus
-    reason: Exception made by Chef Legal
-  - name: github.com/gogo/protobuf
-    reason: Exception made by Chef Legal
-  - name: github.com/golang-migrate/migrate
-    reason: Exception made by Chef Legal
-  - name: github.com/golang-sql/civil
-    reason: Exception made by Chef Legal
-  - name: github.com/golang/freetype
-    reason: Exception made by Chef Legal
-  - name: github.com/golang/glog
-    reason: Exception made by Chef Legal
-  - name: github.com/golang/groupcache
-    reason: Exception made by Chef Legal
-  - name: github.com/golang/mock
-    reason: Exception made by Chef Legal
-  - name: github.com/golang/protobuf
-    reason: Exception made by Chef Legal
-  - name: github.com/golang/snappy
-    reason: Exception made by Chef Legal
-  - name: github.com/gonum/blas
-    reason: Exception made by Chef Legal
-  - name: github.com/gonum/floats
-    reason: Exception made by Chef Legal
-  - name: github.com/gonum/internal
-    reason: Exception made by Chef Legal
-  - name: github.com/gonum/lapack
-    reason: Exception made by Chef Legal
-  - name: github.com/gonum/matrix
-    reason: Exception made by Chef Legal
-  - name: github.com/google/btree
-    reason: Exception made by Chef Legal
-  - name: github.com/google/flatbuffers
-    reason: Exception made by Chef Legal
-  - name: github.com/google/go-cmp
     reason: Exception made by Chef Legal
   - name: github.com/google/go-pkcs11
     reason: Exception made by Chef Legal
-  - name: github.com/google/go-replayers/grpcreplay
-    reason: Exception made by Chef Legal
-  - name: github.com/google/go-replayers/httpreplay
-    reason: Exception made by Chef Legal
-  - name: github.com/google/gofuzz
-    reason: Exception made by Chef Legal
-  - name: github.com/google/martian/v3
-    reason: Exception made by Chef Legal
-  - name: github.com/google/martian
-    reason: Exception made by Chef Legal
-  - name: github.com/google/renameio
-    reason: Exception made by Chef Legal
-  - name: github.com/google/subcommands
-    reason: Exception made by Chef Legal
-  - name: github.com/google/uuid
-    reason: Exception made by Chef Legal
-  - name: github.com/googleapis/gax-go
-    reason: Exception made by Chef Legal
-  - name: github.com/googleapis/google-cloud-go-testing
-    reason: Exception made by Chef Legal
-  - name: github.com/gordonklaus/ineffassign
-    reason: Exception made by Chef Legal
-  - name: github.com/gorilla/context
-    reason: Exception made by Chef Legal
-  - name: github.com/gorilla/websocket
-    reason: Exception made by Chef Legal
-  - name: github.com/grpc-ecosystem/grpc-gateway/v2
-    reason: Exception made by Chef Legal
-  - name: github.com/grpc-ecosystem/grpc-gateway
-    reason: Exception made by Chef Legal
   - name: github.com/hashicorp/consul/api
-    reason: Exception made by Chef Legal
-  - name: github.com/hashicorp/errwrap
-    reason: Exception made by Chef Legal
-  - name: github.com/hashicorp/go-cleanhttp
-    reason: Exception made by Chef Legal
-  - name: github.com/hashicorp/go-multierror
-    reason: Exception made by Chef Legal
-  - name: github.com/hashicorp/go-retryablehttp
     reason: Exception made by Chef Legal
   - name: github.com/hashicorp/go-rootcerts
     reason: Exception made by Chef Legal
-  - name: github.com/hashicorp/go-uuid
-    reason: Exception made by Chef Legal
   - name: github.com/hashicorp/serf
-    reason: Exception made by Chef Legal
-  - name: github.com/ianlancetaylor/demangle
     reason: Exception made by Chef Legal
   - name: github.com/intel/goresctrl
     reason: Exception made by Chef Legal
-  - name: github.com/jhump/protoreflect/v2
-    reason: Exception made by Chef Legal
-  - name: github.com/jmespath/go-jmespath/internal/testify
-    reason: Exception made by Chef Legal
-  - name: github.com/jmespath/go-jmespath
-    reason: Exception made by Chef Legal
-  - name: github.com/joho/godotenv
-    reason: Exception made by Chef Legal
   - name: github.com/josephspurrier/goversioninfo
-    reason: Exception made by Chef Legal
-  - name: github.com/jpillora/backoff
-    reason: Exception made by Chef Legal
-  - name: github.com/json-iterator/go
-    reason: Exception made by Chef Legal
-  - name: github.com/jstemmer/go-junit-report
-    reason: Exception made by Chef Legal
-  - name: github.com/julienschmidt/httprouter
-    reason: Exception made by Chef Legal
-  - name: github.com/jung-kurt/gofpdf
-    reason: Exception made by Chef Legal
-  - name: github.com/kevinburke/go-bindata
-    reason: Exception made by Chef Legal
-  - name: github.com/kisielk/errcheck
-    reason: Exception made by Chef Legal
-  - name: github.com/kisielk/gotool
-    reason: Exception made by Chef Legal
-  - name: github.com/klauspost/compress
-    reason: Exception made by Chef Legal
-  - name: github.com/konsorten/go-windows-terminal-sequences
-    reason: Exception made by Chef Legal
-  - name: github.com/kr/fs
-    reason: Exception made by Chef Legal
-  - name: github.com/kr/logfmt
-    reason: Exception made by Chef Legal
-  - name: github.com/kr/pty
-    reason: Exception made by Chef Legal
-  - name: github.com/ledongthuc/pdf
-    reason: Exception made by Chef Legal
-  - name: github.com/leodido/go-urn
     reason: Exception made by Chef Legal
   - name: github.com/lestrrat-go/backoff/v2
     reason: Exception made by Chef Legal
@@ -2297,21 +1973,11 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: github.com/lestrrat-go/option
     reason: Exception made by Chef Legal
-  - name: github.com/lib/pq
-    reason: Exception made by Chef Legal
   - name: github.com/linuxkit/virtsock
     reason: Exception made by Chef Legal
   - name: github.com/magefile/mage
     reason: Exception made by Chef Legal
-  - name: github.com/mattn/go-ieproxy
-    reason: Exception made by Chef Legal
   - name: github.com/mattn/go-shellwords
-    reason: Exception made by Chef Legal
-  - name: github.com/mattn/go-sqlite3
-    reason: Exception made by Chef Legal
-  - name: github.com/matttproud/golang_protobuf_extensions
-    reason: Exception made by Chef Legal
-  - name: github.com/miekg/dns
     reason: Exception made by Chef Legal
   - name: github.com/miekg/pkcs11
     reason: Exception made by Chef Legal
@@ -2325,101 +1991,17 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: github.com/moby/sys/symlink
     reason: Exception made by Chef Legal
-  - name: github.com/modern-go/concurrent
-    reason: Exception made by Chef Legal
-  - name: github.com/modern-go/reflect2
-    reason: Exception made by Chef Legal
   - name: github.com/montanaflynn/stats
-    reason: Exception made by Chef Legal
-  - name: github.com/munnerz/goautoneg
-    reason: Exception made by Chef Legal
-  - name: github.com/mwitkow/go-conntrack
-    reason: Exception made by Chef Legal
-  - name: github.com/niemeyer/pretty
-    reason: Exception made by Chef Legal
-  - name: github.com/nishanths/predeclared
-    reason: Exception made by Chef Legal
-  - name: github.com/olekukonko/tablewriter
-    reason: Exception made by Chef Legal
-  - name: github.com/onsi/ginkgo
-    reason: Exception made by Chef Legal
-  - name: github.com/onsi/gomega
-    reason: Exception made by Chef Legal
-  - name: github.com/opencontainers/runc
-    reason: Exception made by Chef Legal
-  - name: github.com/opencontainers/runtime-tools
-    reason: Exception made by Chef Legal
-  - name: github.com/opencontainers/selinux
-    reason: Exception made by Chef Legal
-  - name: github.com/orisano/pixelmatch
-    reason: Exception made by Chef Legal
-  - name: github.com/pascaldekloe/goe
-    reason: Exception made by Chef Legal
-  - name: github.com/philhofer/fwd
-    reason: Exception made by Chef Legal
-  - name: github.com/pkg/diff
-    reason: Exception made by Chef Legal
-  - name: github.com/pkg/sftp
     reason: Exception made by Chef Legal
   - name: github.com/planetscale/vtprotobuf
     reason: Exception made by Chef Legal
-  - name: github.com/pmezard/go-difflib
-    reason: Exception made by Chef Legal
   - name: github.com/pquerna/ffjson
-    reason: Exception made by Chef Legal
-  - name: github.com/prometheus/client_model
-    reason: Exception made by Chef Legal
-  - name: github.com/r3labs/diff
-    reason: Exception made by Chef Legal
-  - name: github.com/rcrowley/go-metrics
-    reason: Exception made by Chef Legal
-  - name: github.com/rogpeppe/fastuuid
-    reason: Exception made by Chef Legal
-  - name: github.com/russross/blackfriday/v2
-    reason: Exception made by Chef Legal
-  - name: github.com/russross/blackfriday
     reason: Exception made by Chef Legal
   - name: github.com/sagikazarmark/crypt
     reason: Exception made by Chef Legal
-  - name: github.com/satori/go.uuid
-    reason: Exception made by Chef Legal
-  - name: github.com/savsgio/dictpool
-    reason: Exception made by Chef Legal
-  - name: github.com/savsgio/gotils
-    reason: Exception made by Chef Legal
   - name: github.com/sergi/go-diff
     reason: Exception made by Chef Legal
-  - name: github.com/shirou/gopsutil
-    reason: Exception made by Chef Legal
-  - name: github.com/smartystreets/assertions
-    reason: Exception made by Chef Legal
-  - name: github.com/smartystreets/go-aws-auth
-    reason: Exception made by Chef Legal
-  - name: github.com/smartystreets/gunit
-    reason: Exception made by Chef Legal
-  - name: github.com/soheilhy/cmux
-    reason: Exception made by Chef Legal
-  - name: github.com/spf13/jwalterweatherman
-    reason: Exception made by Chef Legal
   - name: github.com/stefanberger/go-pkcs11uri
-    reason: Exception made by Chef Legal
-  - name: github.com/stretchr/testify
-    reason: Exception made by Chef Legal
-  - name: github.com/syndtr/gocapability
-    reason: Exception made by Chef Legal
-  - name: github.com/testcontainers/testcontainers-go
-    reason: Exception made by Chef Legal
-  - name: github.com/tinylib/msgp
-    reason: Exception made by Chef Legal
-  - name: github.com/tmc/grpc-websocket-proxy
-    reason: Exception made by Chef Legal
-  - name: github.com/tv42/httpunix
-    reason: Exception made by Chef Legal
-  - name: github.com/ugorji/go/codec
-    reason: Exception made by Chef Legal
-  - name: github.com/ugorji/go
-    reason: Exception made by Chef Legal
-  - name: github.com/urfave/cli
     reason: Exception made by Chef Legal
   - name: github.com/veraison/go-cose
     reason: Exception made by Chef Legal
@@ -2439,25 +2021,9 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: github.com/xdg-go/stringprep
     reason: Exception made by Chef Legal
-  - name: github.com/xeipuuv/gojsonpointer
-    reason: Exception made by Chef Legal
-  - name: github.com/xeipuuv/gojsonreference
-    reason: Exception made by Chef Legal
-  - name: github.com/xeipuuv/gojsonschema
-    reason: Exception made by Chef Legal
   - name: github.com/xhit/go-str2duration/v2
     reason: Exception made by Chef Legal
-  - name: github.com/xiang90/probing
-    reason: Exception made by Chef Legal
-  - name: github.com/xordataexchange/crypt
-    reason: Exception made by Chef Legal
   - name: github.com/youmark/pkcs8
-    reason: Exception made by Chef Legal
-  - name: github.com/yuin/goldmark
-    reason: Exception made by Chef Legal
-  - name: github.com/zclconf/go-cty-debug
-    reason: Exception made by Chef Legal
-  - name: github.com/ziutek/mymysql
     reason: Exception made by Chef Legal
   - name: go.etcd.io/etcd/api/v3
     reason: Exception made by Chef Legal
@@ -2467,109 +2033,27 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: go.etcd.io/etcd/client/v3
     reason: Exception made by Chef Legal
-  - name: go.etcd.io/etcd
-    reason: Exception made by Chef Legal
   - name: go.etcd.io/gofail
     reason: Exception made by Chef Legal
   - name: go.mozilla.org/pkcs7
     reason: Exception made by Chef Legal
-  - name: go.opencensus.io
-    reason: Exception made by Chef Legal
   - name: go.opentelemetry.io/contrib/detectors/gcp
-    reason: Exception made by Chef Legal
-  - name: go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
-    reason: Exception made by Chef Legal
-  - name: go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp
-    reason: Exception made by Chef Legal
-  - name: go.opentelemetry.io/otel/exporters/otlp/otlptrace
-    reason: Exception made by Chef Legal
-  - name: go.opentelemetry.io/otel/sdk/metric
-    reason: Exception made by Chef Legal
-  - name: go.opentelemetry.io/proto/otlp
-    reason: Exception made by Chef Legal
-  - name: go.uber.org/goleak
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/crypto
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/image
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/lint
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/mobile
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/net
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/oauth2
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/sync
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/sys
     reason: Exception made by Chef Legal
   - name: golang.org/x/telemetry
     reason: Exception made by Chef Legal
-  - name: golang.org/x/term
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/text
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/tools
-    reason: Exception made by Chef Legal
-  - name: golang.org/x/xerrors
-    reason: Exception made by Chef Legal
-  - name: gonum.org/v1/gonum
-    reason: Exception made by Chef Legal
-  - name: gonum.org/v1/netlib
-    reason: Exception made by Chef Legal
-  - name: gonum.org/v1/plot
-    reason: Exception made by Chef Legal
-  - name: google.golang.org/appengine
-    reason: Exception made by Chef Legal
   - name: google.golang.org/genproto/googleapis/bytestream
-    reason: Exception made by Chef Legal
-  - name: google.golang.org/genproto
     reason: Exception made by Chef Legal
   - name: google.golang.org/grpc/cmd/protoc-gen-go-grpc
     reason: Exception made by Chef Legal
-  - name: google.golang.org/grpc
-    reason: Exception made by Chef Legal
-  - name: google.golang.org/protobuf
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/airbrake/gobrake.v2
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/alecthomas/kingpin.v2
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/asn1-ber.v1
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/check.v1
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/errgo.v2
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/gemnasium/logrus-airbrake-hook.v2
-    reason: Exception made by Chef Legal
   - name: gopkg.in/inf.v0
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/ldap.v2
     reason: Exception made by Chef Legal
   - name: gopkg.in/mgo.v2
     reason: Exception made by Chef Legal
-  - name: gopkg.in/resty.v1
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/tomb.v1
-    reason: Exception made by Chef Legal
   - name: gopkg.in/vmihailenco/msgpack.v2
-    reason: Exception made by Chef Legal
-  - name: gopkg.in/yaml.v2
-    reason: Exception made by Chef Legal
-  - name: gotest.tools/v3
-    reason: Exception made by Chef Legal
-  - name: gotest.tools
-    reason: Exception made by Chef Legal
-  - name: honnef.co/go/tools
     reason: Exception made by Chef Legal
   - name: k8s.io/apimachinery
     reason: Exception made by Chef Legal
   - name: k8s.io/apiserver
-    reason: Exception made by Chef Legal
-  - name: k8s.io/api
     reason: Exception made by Chef Legal
   - name: k8s.io/client-go
     reason: Exception made by Chef Legal
@@ -2579,32 +2063,13 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: k8s.io/klog/v2
     reason: Exception made by Chef Legal
-  - name: k8s.io/kubernetes
-    reason: Exception made by Chef Legal
   - name: k8s.io/utils
     reason: Exception made by Chef Legal
-  - name: nhooyr.io/websocket
-    reason: Exception made by Chef Legal
   - name: oras.land/oras-go/v2
-    reason: Exception made by Chef Legal
-  - name: rsc.io/binaryregexp
-    reason: Exception made by Chef Legal
-  - name: rsc.io/pdf
-    reason: Exception made by Chef Legal
-  - name: rsc.io/quote/v3
-    reason: Exception made by Chef Legal
-  - name: rsc.io/sampler
     reason: Exception made by Chef Legal
   - name: sigs.k8s.io/json
     reason: Exception made by Chef Legal
   - name: sigs.k8s.io/structured-merge-diff/v4
     reason: Exception made by Chef Legal
-  - name: sigs.k8s.io/testing_frameworks
-    reason: Exception made by Chef Legal
-  - name: sigs.k8s.io/yaml
-    reason: Exception made by Chef Legal
   - name: tags.cncf.io/container-device-interface/specs-go
     reason: Exception made by Chef Legal
-  - name: tags.cncf.io/container-device-interface
-    reason: Exception made by Chef Legal
-
