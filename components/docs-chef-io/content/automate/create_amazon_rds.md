@@ -42,7 +42,7 @@ Before proceeding, make sure you have the following prerequisites in place:
 1. Click on **Create database** button in the Amazon RDS dashboard.
 1. On the **Choose a database creation method** page, select the **Standard Create** option.
 1. Under the **Engine options** section, select **PostgreSQL** as the database engine.
-1. Choose **PostgreSQL 13.5-R1**.
+1. Choose **PostgreSQL 13.18-R1**.
 1. Under the **Templates** section, select the template that suits your needs or choose the default template.
 1. In the **Settings** section, provide the following information:
    - **DB instance identifier**: Enter a unique identifier for your RDS instance.

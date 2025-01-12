@@ -185,6 +185,16 @@ ensure_dir_ownership() {
   if [ -f "$server_key" ]; then
     chmod 0600 "$server_key"
   fi
+  # set pg_log directory permissions to 744
+  pg_log_dir={{pkg.svc_var_path}}/pg_log
+  if [ -d "$pg_log_dir" ]; then
+    chmod 0744 "$pg_log_dir"
+  else
+    echo "pg_log directory does not exist"
+    mkdir -p "$pg_log_dir"
+    chmod 0744 "$pg_log_dir"
+    ls -l "$pg_log_dir"
+  fi
 }
 
 promotion_trigger_file() {

@@ -32,7 +32,7 @@
         password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
     [global.v1.external.opensearch.ssl]
     <% if overrides[:opensearch_custom_certs_enabled] == true -%>
-      server_name = ""
+      server_name = "<%= cn(svc_configs[:opensearch]['tls']['ssl_cert']) -%>"
       root_cert = """<%= overrides[:opensearch_root_ca] -%>"""
     <% else %>
       server_name = "<%= cn(svc_configs[:opensearch]['tls']['ssl_cert']) -%>"

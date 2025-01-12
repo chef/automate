@@ -5,12 +5,12 @@
 pkg_name="automate-ha-opensearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="1.3.19"
+pkg_version="1.3.20"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.19/opensearch-1.3.19-linux-x64.tar.gz"
-pkg_shasum=af901097211df4c3d2ef75f0c3699452d82a87adac60c240520a3ca03f969595
+pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.20/opensearch-1.3.20-linux-x64.tar.gz"
+pkg_shasum=a786fe52b4d25db85cc49f34df6118f19c434b25935f28bd98c0f874ae77ccc3
 pkg_build_deps=(
   core/patchelf
   core/make
@@ -26,7 +26,7 @@ pkg_deps=(
   core/curl # health_check
   chef/automate-openjdk
   chef/automate-platform-tools
-  core/ruby30
+  core/ruby31
 )
 pkg_interpreters=(bin/ruby)
 pkg_bin_dirs=(os/bin)

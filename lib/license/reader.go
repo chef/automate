@@ -22,7 +22,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/golang-jwt/jwt"
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
