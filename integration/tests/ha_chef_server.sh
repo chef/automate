@@ -193,22 +193,3 @@ do_cleanup() {
     docker stop "$_frontend1_container_name"
     docker stop "$_frontend2_container_name"
 }
-
-do_dump_logs() {
-  do_dump_logs_default
-    
-    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend1_container_name"
-    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend2_container_name"
-
-    docker exec -t "$_frontend1_container_name" cp /hab/svc/automate-cs-oc-bifrost/var/etc/sqerl.config > "logs/sqerl.config" 
-    docker exec -t "$_frontend1_container_name" cp /hab/svc/automate-cs-oc-erchef/var/etc/sqerl.config > "logs/sqerl_erchef.config" 
-    # docker exec -t "$_frontend1_container_name" cp /hab/svc/automate-cs-oc-bifrost/config/* > "logs/"
-
-    if command -v buildkite-agent; then
-        if ! buildkite-agent artifact upload "logs/*"
-        then
-            echo "Failed to frontend conatiner logs"
-        fi
-    fi
-    rm -r "$tmpdir"
-}
