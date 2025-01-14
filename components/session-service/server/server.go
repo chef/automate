@@ -16,6 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
@@ -333,24 +334,42 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("no code in request: %q", r.Form), http.StatusBadRequest)
 		return
 	}
-	state := r.FormValue("state")
-	if state == "" {
+
+	// Get state from URL
+	urlState := r.FormValue("state")
+	if urlState == "" {
 		s.log.Debugf("no state in request: %q", r.Form)
 		http.Error(w, fmt.Sprintf("no state in request: %q", r.Form), http.StatusBadRequest)
 		return
 	}
-	knownRelayState, err := sess.GetBool(relayStateKeyPrefix + state)
-	if err != nil {
-		s.log.Debugf("bad session data (relay state): %v", err)
-		http.Error(w, "bad session data (relay state)", http.StatusBadRequest)
-		return
+
+	// Try to get relay state using URL state first
+	knownRelayState, err := sess.GetBool(relayStateKeyPrefix + urlState)
+	if err != nil || !knownRelayState {
+		// If not found, try getting it directly from session cookies
+		for _, cookie := range r.Cookies() {
+			if strings.HasPrefix(cookie.Name, relayStateKeyPrefix) {
+				// Extract state from cookie name
+				stateFromCookie := strings.TrimPrefix(cookie.Name, relayStateKeyPrefix)
+				cookieRelayState, cookieErr := sess.GetBool(relayStateKeyPrefix + stateFromCookie)
+				if cookieErr == nil && cookieRelayState {
+					// Use this state instead
+					urlState = stateFromCookie
+					knownRelayState = true
+					err = nil
+					s.log.Debugf("using state from session cookie: %s", stateFromCookie)
+					break
+				}
+			}
+		}
 	}
+
 	if !knownRelayState {
-		s.log.Debugf("unknown relay state: %q", state)
-		http.Error(w, fmt.Sprintf("unknown relay state in request: %q", state), http.StatusBadRequest)
+		s.log.Debugf("unknown relay state: %q", urlState)
+		http.Error(w, fmt.Sprintf("unknown relay state in request: %q", urlState), http.StatusBadRequest)
 		return
 	}
-	s.log.Debugf("relay state %q known", state)
+	s.log.Debugf("relay state %q known", urlState)
 
 	redirectURI, err := sess.GetString(redirectURIKey)
 	s.log.Infof("retrieved redirectURI %q", redirectURI)
@@ -360,7 +379,7 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clientState, err := sess.GetString(clientStateKeyPrefix + state)
+	clientState, err := sess.GetString(clientStateKeyPrefix + urlState)
 	s.log.Debugf("retrieved clientState %q", clientState)
 	if err != nil {
 		s.log.Debugf("bad session data (client state): %v", err)
@@ -424,12 +443,12 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// remove used relay_state + client_state
-	if err := sess.Remove(w, relayStateKeyPrefix+state); err != nil { // nolint: vetshadow
+	if err := sess.Remove(w, relayStateKeyPrefix+urlState); err != nil { // nolint: vetshadow
 		s.log.Debugf("failed to remove relay state: %v", err)
 		http.Error(w, errors.Wrap(err, "failed to remove relay state").Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := sess.Remove(w, clientStateKeyPrefix+state); err != nil { // nolint: vetshadow
+	if err := sess.Remove(w, clientStateKeyPrefix+urlState); err != nil { // nolint: vetshadow
 		s.log.Debugf("failed to remove client state: %v", err)
 		http.Error(w, errors.Wrap(err, "failed to remove client state").Error(), http.StatusInternalServerError)
 		return
