@@ -392,21 +392,6 @@ function test_knife() {
   done
 }
 
-document "ohai_time" <<DOC
-  Gets ohai_time for a converged node. Assumes converge_chef_client has already run.
-DOC
-function ohai_time() {
-  set_up_chef_server_test_environment
-
-  CHEF_LICENSE=accept-no-persist hab pkg exec chef/chef-dk knife node show test-admin \
-    --server-url "${chef_server_url}" \
-    --key        "${chef_server_test_admin_key_path_path}" \
-    -c           "${chef_server_pivotal_rb_path}" \
-    --user       test-admin \
-    -a           ohai_time \
-      | grep ohai_time | cut -f2 -d":" | xargs
-}
-
 hab_curl() {
   hab pkg exec core/curl curl "$@";
 }
@@ -416,7 +401,7 @@ document "test_if_login_working_with_correct_credentials" <<DOC
 DOC
 test_if_login_working_with_correct_credentials() {
   bootstrap_chef_user_data || return 1
-  local url="https://${chef_server_hostname}/id/signin"
+  local url="https://${chef_server_hostname}/id/auth/chef/callback"
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" "$url" \
               --header 'x-requested-with: XMLHttpRequest' \
@@ -439,7 +424,7 @@ document "test_if_login_failing_with_incorrect_credentials" <<DOC
 DOC
 test_if_login_failing_with_incorrect_credentials() {
   bootstrap_chef_user_data || return 1
-  local url="https://${chef_server_hostname}/id/signin"
+  local url="https://${chef_server_hostname}/id/auth/chef/callback"
   local incorrect_password='incorrect-password'
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" "$url" \
@@ -540,6 +525,21 @@ test_if_webui_key_is_patched() {
     echo "The content of the PEM file does not match."
     return 1
   fi
+}
+
+document "ohai_time" <<DOC
+  Gets ohai_time for a converged node. Assumes converge_chef_client has already run.
+DOC
+function ohai_time() {
+  set_up_chef_server_test_environment
+
+  CHEF_LICENSE=accept-no-persist hab pkg exec chef/chef-dk knife node show test-admin \
+    --server-url "${chef_server_url}" \
+    --key        "${chef_server_test_admin_key_path_path}" \
+    -c           "${chef_server_pivotal_rb_path}" \
+    --user       test-admin \
+    -a           ohai_time \
+      | grep ohai_time | cut -f2 -d":" | xargs
 }
 
 document "test_if_env_vars_are_configured_after_patch" <<DOC
