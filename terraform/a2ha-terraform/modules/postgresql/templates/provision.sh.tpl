@@ -2,63 +2,15 @@
 
 set -Eeuo pipefail
 
-# Function to check SELinux status and mode
-check_selinux() {
-    # Check if /etc/selinux exists (common to RHEL, CentOS, Fedora)
-    if [ -e /etc/selinux/config ]; then
-        echo "SELinux configuration file found."
-
-        # Check for SELinux status and mode
-        selinux_status=$(getenforce)
-        selinux_mode=$(awk -F= '/^SELINUX=/ {print $2}' /etc/selinux/config)
-
-        echo "SELinux Status: $selinux_status"
-        echo "SELinux Mode: $selinux_mode"
-
-        # If SELinux is enabled (Enforcing), set it to Permissive
-        if [ "$selinux_status" == "Enforcing" ]; then
-            echo "SELinux is currently in Enforcing mode. Changing to Permissive..."
-            setenforce Permissive
-            echo "SELinux mode set to Permissive."
-        fi
-
-    # Check if /etc/selinux does not exist (common to Debian, Ubuntu)
-    elif [ -e /etc/default/grub ]; then
-        echo "SELinux configuration file not found."
-
-        # Check if "selinux=1" is present in grub (Enforcing)
-        if grep -q "selinux=1" /etc/default/grub; then
-            echo "SELinux is enabled (Enforcing) in GRUB."
-
-            # Change GRUB to Permissive
-            sed -i 's/selinux=1/selinux=0/' /etc/default/grub
-            # update-grub
-            # echo "GRUB configuration updated to Permissive."
-        # fi
-
-        # SELinux not found in grub (Disabled or Permissive)
-        else
-            echo "SELinux is not found or is already disabled in GRUB."
-        fi
-
-    # SELinux configuration file not found (SUSE, Amazon Linux, etc.)
-    else
-        echo "SELinux configuration file not found."
-    fi
-}
-
-# Check SELinux
-check_selinux
-
 umask 0022
 
 export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE=accept-no-persist
 
-PG_ORIGIN_NAME=$(echo "${postgresql_pkg_ident}" | awk -F/ '{print $1}')
+PG_ORIGIN_NAME=$(echo "vivek-shankar/automate-ha-postgresql" | awk -F/ '{print $1}')
 export PG_ORIGIN_NAME
-PG_PKG_NAME=$(echo "${postgresql_pkg_ident}" | awk -F/ '{print $2}')
+PG_PKG_NAME=$(echo "vivek-shankar/automate-ha-postgresql" | awk -F/ '{print $2}')
 export PG_PKG_NAME
 
 PGLEADERCHK_ORIGIN_NAME=$(echo "${pgleaderchk_pkg_ident}" | awk -F/ '{print $1}')
@@ -103,14 +55,14 @@ wait_for_aib_extraction
 export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 
 if [ -e /hab/sup/default/specs/"$PG_PKG_NAME".spec ]; then
-  if ! grep -q "ident *= *\"${postgresql_pkg_ident}\"" /hab/sup/default/specs/"$PG_PKG_NAME".spec; then
+  if ! grep -q "ident *= *\"vivek-shankar/automate-ha-postgresql\"" /hab/sup/default/specs/"$PG_PKG_NAME".spec; then
      # unload the old pkg_ident and then load in the new
      hab svc unload "$PG_ORIGIN_NAME/$PG_PKG_NAME"
      sleep 10
-     bash -c 'eval hab svc load ${postgresql_pkg_ident} ${postgresql_svc_load_args} "$LOGCMD"'
+     bash -c 'eval hab svc load vivek-shankar/automate-ha-postgresql ${postgresql_svc_load_args} "$LOGCMD"'
   fi
 else
-  bash -c 'eval hab svc load ${postgresql_pkg_ident} ${postgresql_svc_load_args} "$LOGCMD"'
+  bash -c 'eval hab svc load vivek-shankar/automate-ha-postgresql ${postgresql_svc_load_args} "$LOGCMD"'
 fi
 
 if [ -e /hab/sup/default/specs/"$PGLEADERCHK_PKG_NAME".spec ]; then
