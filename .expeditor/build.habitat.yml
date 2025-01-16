@@ -19,7 +19,9 @@ studio_secrets:
   OPENSEARCH_NODE1_KEY_PEM:
     path: secret/a2/a2ha/opensearch
     field: node1-key.pem
+  HAB_BLDR_CHANNEL:
+    value : "chef-automate-habitat-build-test"
   HAB_FALLBACK_CHANNEL:
-    value: "stable"
+    value: "LTS-2024"
   GOPROXY:
     value: "https://proxy.golang.org,direct"

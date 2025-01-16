@@ -17,8 +17,8 @@ pg_version="13.18"
 ident="20241203070217"
 
 pkg_deps=(
-  core/coreutils
-  chef/mlsa
+  core/coreutils/8.32/20240105213308
+  chef/mlsa/1.0.1/20240125084021
   ${vendor_origin}/postgresql13/${pg_version}/${ident}
 )
 
@@ -40,4 +40,5 @@ do_build() {
 do_install() {
   return 0
 }
+
 
