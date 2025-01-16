@@ -1535,6 +1535,10 @@ exceptions:
     reason: Ruby license (previously shipped in Automate 1)
   - name: core/ruby27
     reason: Exception made for chef server upgrade
+  - name: core/libmpc
+    reason: Exception made for notifications-service upgrade
+  - name: core/ruby3_1
+    reason: Ruby license (previously shipped in Automate 1)  
 
   ruby:
   - name: highline
