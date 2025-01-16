@@ -311,7 +311,7 @@ module "bootstrap_automate" {
   nfs_mount_path                     = var.nfs_mount_path
   automate_base_path                 = var.automate_base_path
   opensearch_base_path               = var.opensearch_base_path
-  depends_on                         = [module.airgap_bundle-frontend, module.habitat-frontend]
+  depends_on                         = [module.airgap_bundle-frontend, module.habitat-frontend, module.postgresql, module.opensearch]
 }
 
 module "automate" {

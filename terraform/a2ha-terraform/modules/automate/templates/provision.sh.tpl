@@ -8,6 +8,11 @@ check_selinux() {
     if [ -e /etc/selinux/config ]; then
         echo "SELinux configuration file found."
 
+        # check if getenforce command exists otherwise throw error
+        if ! command -v getenforce &> /dev/null; then
+            echo "SELinux commands not found. Please install the getenforce command."
+            exit 1
+        fi
         # Check for SELinux status and mode
         selinux_status=$(getenforce)
         selinux_mode=$(awk -F= '/^SELINUX=/ {print $2}' /etc/selinux/config)
@@ -17,6 +22,11 @@ check_selinux() {
 
         # If SELinux is enabled (Enforcing), set it to Permissive
         if [ "$selinux_status" == "Enforcing" ]; then
+            # check if setenforce command exists otherwise throw error
+            if ! command -v setenforce &> /dev/null; then
+                echo "SELinux commands not found. Please install the setenforce command."
+                exit 1
+            fi
             echo "SELinux is currently in Enforcing mode. Changing to Permissive..."
             setenforce Permissive
             echo "SELinux mode set to Permissive."
