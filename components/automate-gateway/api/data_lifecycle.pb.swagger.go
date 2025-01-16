@@ -459,44 +459,6 @@ func init() {
     }
   },
   "definitions": {
-    "chef.automate.api.data_lifecycle.EsPolicy": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "index": {
-          "type": "string"
-        },
-        "older_than_days": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "custom_purge_field": {
-          "type": "string"
-        },
-        "disabled": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "chef.automate.api.data_lifecycle.EsPolicyUpdate": {
-      "type": "object",
-      "properties": {
-        "policy_name": {
-          "type": "string"
-        },
-        "disabled": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "older_than_days": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
     "chef.automate.api.data_lifecycle.GetComplianceStatusResponse": {
       "type": "object",
       "properties": {
@@ -621,6 +583,44 @@ func init() {
       },
       "description": "JobStatus presents the current configuration of job, when it will be executed,\nand details about it's most recent execution."
     },
+    "chef.automate.api.data_lifecycle.OsPolicy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "index": {
+          "type": "string"
+        },
+        "older_than_days": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "custom_purge_field": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "chef.automate.api.data_lifecycle.OsPolicyUpdate": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "older_than_days": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "chef.automate.api.data_lifecycle.PgPolicy": {
       "type": "object",
       "properties": {
@@ -648,10 +648,10 @@ func init() {
     "chef.automate.api.data_lifecycle.PurgePolicies": {
       "type": "object",
       "properties": {
-        "elasticsearch": {
+        "opensearch": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.data_lifecycle.EsPolicy"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.OsPolicy"
           }
         },
         "postgres": {
@@ -666,10 +666,10 @@ func init() {
     "chef.automate.api.data_lifecycle.PurgePolicyUpdate": {
       "type": "object",
       "properties": {
-        "elasticsearch": {
+        "opensearch": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.data_lifecycle.EsPolicyUpdate"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.OsPolicyUpdate"
           }
         },
         "postgres": {
