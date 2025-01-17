@@ -57,7 +57,6 @@ do_build() {
   bundle install --path vendor/bundle
 }
 
-
 do_install() {
   $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/../../../scripts/cert.sh
   mkdir -p $pkg_prefix/workspace
