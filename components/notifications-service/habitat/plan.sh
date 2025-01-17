@@ -14,7 +14,7 @@ pkg_deps=(
   # bash is required by distillery
   core/bash/5.1/20240105214248
   chef/mlsa/1.0.1/20240125084021
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
+  chef/automate-platform-tools/0.1.0/20241212061203
   core/busybox-static/1.34.1/20240105230035
 )
 pkg_build_deps=(
@@ -79,7 +79,6 @@ do_unpack() {
 do_prepare() {
   localedef -i en_US -f UTF-8 en_US.UTF-8
   export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-
   export MIX_HOME="${CACHE_PATH}/.mix"
   export HEX_HOME="${CACHE_PATH}/.hex"
   mix local.hex --force
