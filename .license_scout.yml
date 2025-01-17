@@ -1562,7 +1562,9 @@ exceptions:
   - name: core/sqlite
     reason: Exception made by Chef Legal 
   - name: core/ruby3_1
-    reason: Ruby license (previously shipped in Automate 1)   
+    reason: Ruby license (previously shipped in Automate 1)
+  - name : core/libmpc   
+    reason: Exception made by Chef Legal    
 
   ruby:
   - name: highline
