@@ -8,9 +8,9 @@ export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE=accept-no-persist
 
-PG_ORIGIN_NAME=$(echo "vivek-shankar/automate-ha-postgresql" | awk -F/ '{print $1}')
+PG_ORIGIN_NAME=$(echo "${postgresql_pkg_ident}" | awk -F/ '{print $1}')
 export PG_ORIGIN_NAME
-PG_PKG_NAME=$(echo "vivek-shankar/automate-ha-postgresql" | awk -F/ '{print $2}')
+PG_PKG_NAME=$(echo "${postgresql_pkg_ident}" | awk -F/ '{print $2}')
 export PG_PKG_NAME
 
 PGLEADERCHK_ORIGIN_NAME=$(echo "${pgleaderchk_pkg_ident}" | awk -F/ '{print $1}')
@@ -55,14 +55,14 @@ wait_for_aib_extraction
 export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 
 if [ -e /hab/sup/default/specs/"$PG_PKG_NAME".spec ]; then
-  if ! grep -q "ident *= *\"vivek-shankar/automate-ha-postgresql\"" /hab/sup/default/specs/"$PG_PKG_NAME".spec; then
+  if ! grep -q "ident *= *\"${postgresql_pkg_ident}\"" /hab/sup/default/specs/"$PG_PKG_NAME".spec; then
      # unload the old pkg_ident and then load in the new
      hab svc unload "$PG_ORIGIN_NAME/$PG_PKG_NAME"
      sleep 10
-     bash -c 'eval hab svc load vivek-shankar/automate-ha-postgresql ${postgresql_svc_load_args} "$LOGCMD"'
+     bash -c 'eval hab svc load ${postgresql_pkg_ident} ${postgresql_svc_load_args} "$LOGCMD"'
   fi
 else
-  bash -c 'eval hab svc load vivek-shankar/automate-ha-postgresql ${postgresql_svc_load_args} "$LOGCMD"'
+  bash -c 'eval hab svc load ${postgresql_pkg_ident} ${postgresql_svc_load_args} "$LOGCMD"'
 fi
 
 if [ -e /hab/sup/default/specs/"$PGLEADERCHK_PKG_NAME".spec ]; then
