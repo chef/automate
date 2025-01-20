@@ -19,7 +19,7 @@ pkg_deps=(
   # chef-server-* packages are pinned to the versions required by the
   # chef-server-* packages.
   #
-  core/curl
+  core/curl/8.7.1/20240614090648
   core/ruby31/3.1.6/20240912144513
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/15.10.27/20250102025712"
