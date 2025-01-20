@@ -208,7 +208,7 @@ document "compile_all_protobuf_components" <<DOC
   Compile every protobuf file for every component in A2.
 DOC
 function compile_all_protobuf_components() {
-  lint_all_protobuf_components && compile_all_protobuf_components_nolint
+  lint_all_protobuf_components && check_breaking_for_all_proto_components && compile_all_protobuf_components_nolint
 }
 
 document "compile_all_protobuf_components_nolint" <<DOC
