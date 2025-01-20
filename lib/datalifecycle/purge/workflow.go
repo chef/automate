@@ -74,14 +74,14 @@ func CreateOrUpdatePurgeWorkflow(
 
 		// Update existing policy indices or migrate a new default policy into
 		// the policies.
-		for name, dp := range defaultPolicies.Es {
-			p, ok := currentPolicies.Es[name]
+		for name, dp := range defaultPolicies.Os {
+			p, ok := currentPolicies.Os[name]
 			if ok {
 				p.IndexName = dp.IndexName
 				p.CustomPurgeField = dp.CustomPurgeField
-				currentPolicies.Es[name] = p
+				currentPolicies.Os[name] = p
 			} else {
-				currentPolicies.Es[name] = dp
+				currentPolicies.Os[name] = dp
 			}
 		}
 
@@ -194,7 +194,7 @@ func (t *Task) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 		return nil, errors.Wrap(err, "could not get purge policy parameters")
 	}
 
-	for _, p := range policies.Es {
+	for _, p := range policies.Os {
 		err = p.Purge(ctx, t.EsSidecarClient)
 		if err != nil {
 			return nil, err

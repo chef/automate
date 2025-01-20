@@ -55,7 +55,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    true,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Os: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -83,7 +83,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    false,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Os: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -110,7 +110,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    true,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Os: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -156,7 +156,7 @@ func verifyInspecJobs(t *testing.T, status *ingest.JobSchedulerStatus) {
 
 func verifyPurgeJobs(t *testing.T, status *ingest.JobSchedulerStatus) {
 	// Purge jobs
-	for _, pp := range server.DefaultPurgePolicies.Es {
+	for _, pp := range server.DefaultPurgePolicies.Os {
 		for _, job := range status.Jobs {
 			name := strings.ReplaceAll(pp.Name, "-", "_")
 			name = fmt.Sprintf("%s_%s", server.PurgeWorkflowName, name)

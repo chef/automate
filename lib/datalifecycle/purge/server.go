@@ -47,7 +47,7 @@ func NewServer(
 	}
 
 	hasDefaultPolicies := false
-	if len(s.defaultPolicies.Es) > 0 {
+	if len(s.defaultPolicies.Os) > 0 {
 		hasDefaultPolicies = true
 
 		if s.esSidecarClient == nil {
@@ -129,7 +129,7 @@ func (server *Server) Show(ctx context.Context,
 		err          error
 		sched        *cereal.Schedule
 		policies     Policies
-		dsEsPolicies = []*dlcAPI.EsPolicy{}
+		dsOsPolicies = []*dlcAPI.OsPolicy{}
 		dsPgPolicies = []*dlcAPI.PgPolicy{}
 	)
 
@@ -144,8 +144,8 @@ func (server *Server) Show(ctx context.Context,
 		return res, status.Error(codes.Internal, err.Error())
 	}
 
-	for _, policy := range policies.Es {
-		dsEsPolicies = append(dsEsPolicies, &dlcAPI.EsPolicy{
+	for _, policy := range policies.Os {
+		dsOsPolicies = append(dsOsPolicies, &dlcAPI.OsPolicy{
 			Name:             policy.Name,
 			Index:            policy.IndexName,
 			OlderThanDays:    policy.OlderThanDays,
@@ -164,7 +164,7 @@ func (server *Server) Show(ctx context.Context,
 	res.InstanceName = server.scheduleName
 	res.WorkflowName = server.workflowName.String()
 	res.Enabled = sched.Enabled
-	res.EsPolicies = dsEsPolicies
+	res.OsPolicies = dsOsPolicies
 	res.PgPolicies = dsPgPolicies
 	res.Recurrence = sched.Recurrence
 	nextDue, err := ptypes.TimestampProto(sched.NextDueAt)
@@ -211,7 +211,7 @@ func (server *Server) Configure(ctx context.Context,
 		updated    = false
 		err        error
 		policies   = Policies{
-			Es: map[string]EsPolicy{},
+			Os: map[string]OsPolicy{},
 			Pg: map[string]PgPolicy{},
 		}
 	)
@@ -245,7 +245,7 @@ func (server *Server) Configure(ctx context.Context,
 	// Generate desired policies based on current or default policies and the
 	// desired policy update.
 	var up bool
-	policies, up, err = server.updateEsPolicies(req.GetPolicyUpdate().GetEs(), policies)
+	policies, up, err = server.updateEsPolicies(req.GetPolicyUpdate().GetOs(), policies)
 	if up == true {
 		updated = true
 	}
@@ -310,18 +310,18 @@ func (server *Server) Configure(ctx context.Context,
 // updateEsPolicies takes in desired policy update and the current policies set
 // and return updated policy set, a boolean that indicates that the set was updated, and
 // an error if the policy update refers to an unknown policy.
-func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.EsPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
+func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.OsPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
 	var (
 		updated     = false
 		newPolicies = Policies{
-			Es: map[string]EsPolicy{},
+			Os: map[string]OsPolicy{},
 		}
 	)
 
 	for _, update := range esUpdates {
 		found := false
 		// If our current policies match a desired policy update we'll update it
-		for _, p := range currentPolicies.Es {
+		for _, p := range currentPolicies.Os {
 			if p.Name == update.PolicyName {
 				found = true
 
@@ -335,7 +335,7 @@ func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.EsPolicyUpdate, curre
 					p.Disabled = update.Disabled
 				}
 
-				newPolicies.Es[p.Name] = p
+				newPolicies.Os[p.Name] = p
 				break
 			}
 		}
@@ -343,14 +343,14 @@ func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.EsPolicyUpdate, curre
 		if !found {
 			// Check to see if the desired policy update matches an allowed
 			// policy that we've been configured with.
-			for _, p := range server.defaultPolicies.Es {
+			for _, p := range server.defaultPolicies.Os {
 				if p.Name == update.PolicyName {
 					found = true
 					updated = true
 
 					p.OlderThanDays = update.OlderThanDays
 					p.Disabled = update.Disabled
-					newPolicies.Es[p.Name] = p
+					newPolicies.Os[p.Name] = p
 
 					break
 				}
@@ -375,18 +375,18 @@ func (server Server) updatePgPolicies(pgUpdate []*dlcAPI.PgPolicyUpdate, current
 }
 
 func (server *Server) validatePolicyUpdatePolicyNames(pu *data_lifecycle.PolicyUpdate) error {
-	allowedEsNames := make([]string, len(server.defaultPolicies.Es))
+	allowedEsNames := make([]string, len(server.defaultPolicies.Os))
 	allowedPgNames := make([]string, len(server.defaultPolicies.Pg))
 
 	for _, n := range server.defaultPolicies.Pg {
 		allowedPgNames = append(allowedPgNames, n.Name)
 	}
 
-	for _, n := range server.defaultPolicies.Es {
+	for _, n := range server.defaultPolicies.Os {
 		allowedEsNames = append(allowedEsNames, n.Name)
 	}
 
-	for _, update := range pu.GetEs() {
+	for _, update := range pu.GetOs() {
 		if !stringutils.SliceContains(allowedEsNames, update.PolicyName) {
 			return errors.Errorf("'%s' is not a valid ES policy name", update.PolicyName)
 		}

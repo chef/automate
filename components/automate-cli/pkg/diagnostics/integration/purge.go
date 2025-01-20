@@ -38,7 +38,7 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "feed",
@@ -63,9 +63,9 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			res, err := client.Show(context.Background(), &data_lifecycle.ShowRequest{})
 			require.NoError(t, err)
 
-			require.Equal(t, 1, len(res.EsPolicies), "there should be one event-feed policies")
+			require.Equal(t, 1, len(res.OsPolicies), "there should be one event-feed policies")
 
-			for _, p := range res.EsPolicies {
+			for _, p := range res.OsPolicies {
 				require.Truef(t, p.Disabled, "%s event-feed purge policy should be disabled", p.Name)
 				require.Equal(t, int32(123), p.OlderThanDays, "older than days for %s ingest purge policy should be 123, not %d", p.Name, p.OlderThanDays)
 			}
@@ -87,12 +87,12 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{},
+					Os: []*dlcAPI.OsPolicyUpdate{},
 				},
 			}
 
-			for _, p := range show.EsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.EsPolicyUpdate{
+			for _, p := range show.OsPolicies {
+				req.PolicyUpdate.Os = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,
@@ -127,7 +127,7 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "compliance-reports",
@@ -157,9 +157,9 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			res, err := client.Show(context.Background(), &data_lifecycle.ShowRequest{})
 			require.NoError(t, err)
 
-			require.Equal(t, 2, len(res.EsPolicies), "there should be two compliance policies")
+			require.Equal(t, 2, len(res.OsPolicies), "there should be two compliance policies")
 
-			for _, p := range res.EsPolicies {
+			for _, p := range res.OsPolicies {
 				require.Truef(t, p.Disabled, "%s compliance purge policy should be disabled", p.Name)
 				require.Equal(t, int32(456), p.OlderThanDays, "older than days for %s ingest purge policy should be 456, not %d", p.Name, p.OlderThanDays)
 			}
@@ -181,12 +181,12 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{},
+					Os: []*dlcAPI.OsPolicyUpdate{},
 				},
 			}
 
-			for _, p := range show.EsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.EsPolicyUpdate{
+			for _, p := range show.OsPolicies {
+				req.PolicyUpdate.Os = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,
@@ -221,7 +221,7 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "actions",
@@ -251,9 +251,9 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			res, err := client.Show(context.Background(), &data_lifecycle.ShowRequest{})
 			require.NoError(t, err)
 
-			require.Equal(t, 2, len(res.EsPolicies), "there should be two ingest policies")
+			require.Equal(t, 2, len(res.OsPolicies), "there should be two ingest policies")
 
-			for _, p := range res.EsPolicies {
+			for _, p := range res.OsPolicies {
 				require.Truef(t, p.Disabled, "%s ingest purge policy should be disabled", p.Name)
 				require.Equal(t, int32(789), p.OlderThanDays, "older than days for %s ingest purge policy should be 789, not %d", p.Name, p.OlderThanDays)
 			}
@@ -275,12 +275,12 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{},
+					Os: []*dlcAPI.OsPolicyUpdate{},
 				},
 			}
 
-			for _, p := range show.EsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.EsPolicyUpdate{
+			for _, p := range show.OsPolicies {
+				req.PolicyUpdate.Os = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,

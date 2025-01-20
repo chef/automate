@@ -28,7 +28,7 @@ message ShowRequest { }
 message ShowResponse {
 	string instance_name = 1;
 	string workflow_name = 2;
-	repeated chef.automate.api.data_lifecycle.EsPolicy es_policies = 3;
+	repeated chef.automate.api.data_lifecycle.OsPolicy os_policies = 3;
 	repeated chef.automate.api.data_lifecycle.PgPolicy pg_policies = 4;
 	string recurrence = 5;
 	google.protobuf.Timestamp next_due_at = 6;
@@ -39,7 +39,7 @@ message ShowResponse {
 }
 
 message PolicyUpdate {
-	repeated chef.automate.api.data_lifecycle.EsPolicyUpdate es = 1;
+	repeated chef.automate.api.data_lifecycle.OsPolicyUpdate os = 1;
 	repeated chef.automate.api.data_lifecycle.PgPolicyUpdate pg = 2;
 }
 
