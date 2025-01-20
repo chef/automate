@@ -430,7 +430,9 @@ module "bootstrap_automate" {
   automate_base_path                 = var.automate_base_path
   opensearch_base_path               = var.opensearch_base_path
   depends_on = [
-    module.airgap_bundle-automate
+    module.airgap_bundle-automate,
+    module.postgresql,
+    module.opensearch
   ]
 }
 
