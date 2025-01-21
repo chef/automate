@@ -233,9 +233,6 @@ fallbacks:
     name: github.com/antihax/optional
   - license_content: https://raw.githubusercontent.com/armon/circbuf/master/LICENSE
     license_id: MIT
-    name: github.com/armon/circbuf
-  - license_content: https://github.com/armon/go-radix/blob/master/LICENSE
-    license_id: MIT
     name: github.com/armon/go-radix
   - license_content: https://raw.githubusercontent.com/bgentry/speakeasy/master/LICENSE
     license_id: MIT
