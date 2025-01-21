@@ -1480,7 +1480,7 @@ func file_interservice_notifications_service_rules_proto_rawDescGZIP() []byte {
 
 var file_interservice_notifications_service_rules_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_interservice_notifications_service_rules_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_interservice_notifications_service_rules_proto_goTypes = []interface{}{
+var file_interservice_notifications_service_rules_proto_goTypes = []any{
 	(Rule_Event)(0),                 // 0: chef.automate.domain.notifications.service.Rule.Event
 	(URLValidationResponse_Code)(0), // 1: chef.automate.domain.notifications.service.URLValidationResponse.Code
 	(RuleUpdateResponse_Code)(0),    // 2: chef.automate.domain.notifications.service.RuleUpdateResponse.Code
@@ -1538,7 +1538,7 @@ func file_interservice_notifications_service_rules_proto_init() {
 		(*Rule_WebhookAlert)(nil),
 		(*Rule_ServiceNowAlert)(nil),
 	}
-	file_interservice_notifications_service_rules_proto_msgTypes[7].OneofWrappers = []interface{}{
+	file_interservice_notifications_service_rules_proto_msgTypes[7].OneofWrappers = []any{
 		(*URLValidationRequest_UsernamePassword)(nil),
 		(*URLValidationRequest_SecretId)(nil),
 		(*URLValidationRequest_None)(nil),

@@ -85,7 +85,7 @@ func file_external_ingest_response_chef_proto_rawDescGZIP() []byte {
 }
 
 var file_external_ingest_response_chef_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_ingest_response_chef_proto_goTypes = []interface{}{
+var file_external_ingest_response_chef_proto_goTypes = []any{
 	(*ProcessChefRunResponse)(nil), // 0: chef.automate.api.ingest.response.ProcessChefRunResponse
 }
 var file_external_ingest_response_chef_proto_depIdxs = []int32{

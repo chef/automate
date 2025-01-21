@@ -281,7 +281,7 @@ func (*ConfigRequest_V1_System_Service) Descriptor() ([]byte, []int) {
 	return file_config_event_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 0}
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/event/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetHost() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Host
@@ -617,7 +617,7 @@ func file_config_event_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_event_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_config_event_config_request_proto_goTypes = []interface{}{
+var file_config_event_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                             // 0: chef.automate.domain.event.ConfigRequest
 	(*ConfigRequest_V1)(nil),                          // 1: chef.automate.domain.event.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),                   // 2: chef.automate.domain.event.ConfigRequest.V1.System

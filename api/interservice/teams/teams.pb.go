@@ -1372,7 +1372,7 @@ func file_interservice_teams_teams_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_teams_teams_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
-var file_interservice_teams_teams_proto_goTypes = []interface{}{
+var file_interservice_teams_teams_proto_goTypes = []any{
 	(*Team)(nil),                       // 0: chef.automate.domain.teams.Team
 	(*GetTeamReq)(nil),                 // 1: chef.automate.domain.teams.GetTeamReq
 	(*GetTeamResp)(nil),                // 2: chef.automate.domain.teams.GetTeamResp

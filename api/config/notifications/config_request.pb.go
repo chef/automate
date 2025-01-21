@@ -258,7 +258,7 @@ func (*ConfigRequest_V1_Service) Descriptor() ([]byte, []int) {
 type ConfigRequest_V1_System_Service struct {
 	state        protoimpl.MessageState  `protogen:"open.v1"`
 	ExternalFqdn *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=external_fqdn,json=externalFqdn,proto3" json:"external_fqdn,omitempty" toml:"external_fqdn,omitempty" mapstructure:"external_fqdn,omitempty"`
-	// Deprecated: Do not use.
+	// Deprecated: Marked as deprecated in config/notifications/config_request.proto.
 	Host                *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty" toml:"host,omitempty" mapstructure:"host,omitempty"` // The listen host is no longer setable(localhost only)
 	Port                *wrapperspb.Int32Value  `protobuf:"bytes,3,opt,name=port,proto3" json:"port,omitempty" toml:"port,omitempty" mapstructure:"port,omitempty"`
 	DedupeWindowSeconds *wrapperspb.Int32Value  `protobuf:"bytes,4,opt,name=dedupe_window_seconds,json=dedupeWindowSeconds,proto3" json:"dedupe_window_seconds,omitempty" toml:"dedupe_window_seconds,omitempty" mapstructure:"dedupe_window_seconds,omitempty"`
@@ -303,7 +303,7 @@ func (x *ConfigRequest_V1_System_Service) GetExternalFqdn() *wrapperspb.StringVa
 	return nil
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/notifications/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetHost() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Host
@@ -451,7 +451,7 @@ func (*ConfigRequest_V1_System_Migration) Descriptor() ([]byte, []int) {
 	return file_config_notifications_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 3}
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/notifications/config_request.proto.
 func (x *ConfigRequest_V1_System_Migration) GetRuleStoreFile() *wrapperspb.StringValue {
 	if x != nil {
 		return x.RuleStoreFile
@@ -636,7 +636,7 @@ func file_config_notifications_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_notifications_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_config_notifications_config_request_proto_goTypes = []interface{}{
+var file_config_notifications_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                     // 0: chef.automate.domain.notifications.ConfigRequest
 	(*ConfigRequest_V1)(nil),                  // 1: chef.automate.domain.notifications.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),           // 2: chef.automate.domain.notifications.ConfigRequest.V1.System

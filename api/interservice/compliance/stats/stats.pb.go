@@ -524,7 +524,7 @@ func (*Stats) Descriptor() ([]byte, []int) {
 	return file_interservice_compliance_stats_stats_proto_rawDescGZIP(), []int{5}
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in interservice/compliance/stats/stats.proto.
 func (x *Stats) GetNodes() int64 {
 	if x != nil {
 		return x.Nodes
@@ -1957,7 +1957,7 @@ func file_interservice_compliance_stats_stats_proto_rawDescGZIP() []byte {
 
 var file_interservice_compliance_stats_stats_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_interservice_compliance_stats_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
-var file_interservice_compliance_stats_stats_proto_goTypes = []interface{}{
+var file_interservice_compliance_stats_stats_proto_goTypes = []any{
 	(Query_OrderType)(0),                    // 0: chef.automate.domain.compliance.stats.Query.OrderType
 	(*ListFilter)(nil),                      // 1: chef.automate.domain.compliance.stats.ListFilter
 	(*Query)(nil),                           // 2: chef.automate.domain.compliance.stats.Query

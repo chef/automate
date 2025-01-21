@@ -604,7 +604,7 @@ func file_interservice_local_user_users_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_local_user_users_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_interservice_local_user_users_proto_goTypes = []interface{}{
+var file_interservice_local_user_users_proto_goTypes = []any{
 	(*Email)(nil),          // 0: chef.automate.domain.local_user.Email
 	(*GetUsersReq)(nil),    // 1: chef.automate.domain.local_user.GetUsersReq
 	(*User)(nil),           // 2: chef.automate.domain.local_user.User

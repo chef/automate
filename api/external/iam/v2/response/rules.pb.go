@@ -568,7 +568,7 @@ func file_external_iam_v2_response_rules_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_response_rules_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_external_iam_v2_response_rules_proto_goTypes = []interface{}{
+var file_external_iam_v2_response_rules_proto_goTypes = []any{
 	(*CreateRuleResp)(nil),          // 0: chef.automate.api.iam.v2.CreateRuleResp
 	(*UpdateRuleResp)(nil),          // 1: chef.automate.api.iam.v2.UpdateRuleResp
 	(*GetRuleResp)(nil),             // 2: chef.automate.api.iam.v2.GetRuleResp

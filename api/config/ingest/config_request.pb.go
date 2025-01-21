@@ -234,9 +234,9 @@ type ConfigRequest_V1_System_Service struct {
 	// to the purge cereal workflows.
 	// Setting these values is prevented in the Validate() callback.
 	//
-	// Deprecated: Do not use.
+	// Deprecated: Marked as deprecated in config/ingest/config_request.proto.
 	PurgeConvergeHistoryAfterDays *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=purge_converge_history_after_days,json=purgeConvergeHistoryAfterDays,proto3" json:"purge_converge_history_after_days,omitempty" toml:"purge_converge_history_after_days,omitempty" mapstructure:"purge_converge_history_after_days,omitempty"`
-	// Deprecated: Do not use.
+	// Deprecated: Marked as deprecated in config/ingest/config_request.proto.
 	PurgeActionsAfterDays                 *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=purge_actions_after_days,json=purgeActionsAfterDays,proto3" json:"purge_actions_after_days,omitempty" toml:"purge_actions_after_days,omitempty" mapstructure:"purge_actions_after_days,omitempty"`
 	MaxNumberOfBundledRunMsgs             *wrapperspb.Int32Value `protobuf:"bytes,6,opt,name=max_number_of_bundled_run_msgs,json=maxNumberOfBundledRunMsgs,proto3" json:"max_number_of_bundled_run_msgs,omitempty" toml:"max_number_of_bundled_run_msgs,omitempty" mapstructure:"max_number_of_bundled_run_msgs,omitempty"`
 	MaxNumberOfBundledActionMsgs          *wrapperspb.Int32Value `protobuf:"bytes,7,opt,name=max_number_of_bundled_action_msgs,json=maxNumberOfBundledActionMsgs,proto3" json:"max_number_of_bundled_action_msgs,omitempty" toml:"max_number_of_bundled_action_msgs,omitempty" mapstructure:"max_number_of_bundled_action_msgs,omitempty"`
@@ -280,7 +280,7 @@ func (*ConfigRequest_V1_System_Service) Descriptor() ([]byte, []int) {
 	return file_config_ingest_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 0}
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/ingest/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetHost() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Host
@@ -295,7 +295,7 @@ func (x *ConfigRequest_V1_System_Service) GetPort() *wrapperspb.Int32Value {
 	return nil
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/ingest/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetPurgeConvergeHistoryAfterDays() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.PurgeConvergeHistoryAfterDays
@@ -303,7 +303,7 @@ func (x *ConfigRequest_V1_System_Service) GetPurgeConvergeHistoryAfterDays() *wr
 	return nil
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/ingest/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetPurgeActionsAfterDays() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.PurgeActionsAfterDays
@@ -567,7 +567,7 @@ func file_config_ingest_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_ingest_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_config_ingest_config_request_proto_goTypes = []interface{}{
+var file_config_ingest_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.ingest.ConfigRequest
 	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.ingest.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.ingest.ConfigRequest.V1.System

@@ -392,7 +392,7 @@ func file_external_infra_proxy_request_policyfiles_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_request_policyfiles_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_external_infra_proxy_request_policyfiles_proto_goTypes = []interface{}{
+var file_external_infra_proxy_request_policyfiles_proto_goTypes = []any{
 	(*Policyfiles)(nil),         // 0: chef.automate.api.infra_proxy.request.Policyfiles
 	(*Policyfile)(nil),          // 1: chef.automate.api.infra_proxy.request.Policyfile
 	(*DeletePolicyfile)(nil),    // 2: chef.automate.api.infra_proxy.request.DeletePolicyfile

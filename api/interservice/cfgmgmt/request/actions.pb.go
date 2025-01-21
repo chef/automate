@@ -278,7 +278,7 @@ func file_interservice_cfgmgmt_request_actions_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_request_actions_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_interservice_cfgmgmt_request_actions_proto_goTypes = []interface{}{
+var file_interservice_cfgmgmt_request_actions_proto_goTypes = []any{
 	(*PolicyRevision)(nil),     // 0: chef.automate.domain.cfgmgmt.request.PolicyRevision
 	(*PolicyUpdateAction)(nil), // 1: chef.automate.domain.cfgmgmt.request.PolicyUpdateAction
 	(*PolicyCookbookLock)(nil), // 2: chef.automate.domain.cfgmgmt.request.PolicyCookbookLock

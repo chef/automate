@@ -396,7 +396,7 @@ func file_interservice_compliance_status_status_proto_rawDescGZIP() []byte {
 
 var file_interservice_compliance_status_status_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_interservice_compliance_status_status_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_interservice_compliance_status_status_proto_goTypes = []interface{}{
+var file_interservice_compliance_status_status_proto_goTypes = []any{
 	(MigrationStatus_Status)(0),             // 0: chef.automate.domain.compliance.status.MigrationStatus.Status
 	(ControlIndexMigrationStatus_Status)(0), // 1: chef.automate.domain.compliance.status.ControlIndexMigrationStatus.Status
 	(*MigrationStatus)(nil),                 // 2: chef.automate.domain.compliance.status.MigrationStatus

@@ -7394,7 +7394,7 @@ func file_interservice_deployment_automate_deployment_proto_rawDescGZIP() []byte
 
 var file_interservice_deployment_automate_deployment_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
 var file_interservice_deployment_automate_deployment_proto_msgTypes = make([]protoimpl.MessageInfo, 113)
-var file_interservice_deployment_automate_deployment_proto_goTypes = []interface{}{
+var file_interservice_deployment_automate_deployment_proto_goTypes = []any{
 	(UpgradeStatusResponse_UpgradeState)(0),                // 0: chef.automate.domain.deployment.UpgradeStatusResponse.UpgradeState
 	(DeployEvent_Status)(0),                                // 1: chef.automate.domain.deployment.DeployEvent.Status
 	(DeployEvent_PhaseID)(0),                               // 2: chef.automate.domain.deployment.DeployEvent.PhaseID

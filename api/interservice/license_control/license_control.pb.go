@@ -1022,7 +1022,7 @@ func file_interservice_license_control_license_control_proto_rawDescGZIP() []byt
 }
 
 var file_interservice_license_control_license_control_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
-var file_interservice_license_control_license_control_proto_goTypes = []interface{}{
+var file_interservice_license_control_license_control_proto_goTypes = []any{
 	(*LicenseRequest)(nil),          // 0: chef.automate.domain.license_control.LicenseRequest
 	(*LicenseResponse)(nil),         // 1: chef.automate.domain.license_control.LicenseResponse
 	(*PolicyRequest)(nil),           // 2: chef.automate.domain.license_control.PolicyRequest

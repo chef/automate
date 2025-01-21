@@ -242,7 +242,7 @@ type ConfigRequest_V1_System_Service struct {
 	GrpcPort        *wrapperspb.Int32Value       `protobuf:"bytes,4,opt,name=grpc_port,json=grpcPort,proto3" json:"grpc_port,omitempty" toml:"grpc_port,omitempty" mapstructure:"grpc_port,omitempty"`
 	TrialLicenseUrl *wrapperspb.StringValue      `protobuf:"bytes,5,opt,name=trial_license_url,json=trialLicenseUrl,proto3" json:"trial_license_url,omitempty" toml:"trial_license_url,omitempty" mapstructure:"trial_license_url,omitempty"`
 	Log             *ConfigRequest_V1_System_Log `protobuf:"bytes,6,opt,name=log,proto3" json:"log,omitempty" toml:"log,omitempty" mapstructure:"log,omitempty"` // backwards compat with old log level config
-	// Deprecated: Do not use.
+	// Deprecated: Marked as deprecated in config/gateway/config_request.proto.
 	AuthMiddleware *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=auth_middleware,json=authMiddleware,proto3" json:"auth_middleware,omitempty" toml:"auth_middleware,omitempty" mapstructure:"auth_middleware,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -278,7 +278,7 @@ func (*ConfigRequest_V1_System_Service) Descriptor() ([]byte, []int) {
 	return file_config_gateway_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 0}
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/gateway/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetHost() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Host
@@ -321,7 +321,7 @@ func (x *ConfigRequest_V1_System_Service) GetLog() *ConfigRequest_V1_System_Log 
 	return nil
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/gateway/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetAuthMiddleware() *wrapperspb.StringValue {
 	if x != nil {
 		return x.AuthMiddleware
@@ -609,7 +609,7 @@ func file_config_gateway_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_gateway_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_config_gateway_config_request_proto_goTypes = []interface{}{
+var file_config_gateway_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                                 // 0: chef.automate.api.config.ConfigRequest
 	(*ConfigRequest_V1)(nil),                              // 1: chef.automate.api.config.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),                       // 2: chef.automate.api.config.ConfigRequest.V1.System

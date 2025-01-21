@@ -578,7 +578,7 @@ var file_interservice_infra_proxy_service_infra_proxy_proto_rawDesc = []byte{
 	0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_interservice_infra_proxy_service_infra_proxy_proto_goTypes = []interface{}{
+var file_interservice_infra_proxy_service_infra_proxy_proto_goTypes = []any{
 	(*request.CreateServer)(nil),            // 0: chef.automate.domain.infra_proxy.request.CreateServer
 	(*request.DeleteServer)(nil),            // 1: chef.automate.domain.infra_proxy.request.DeleteServer
 	(*request.UpdateServer)(nil),            // 2: chef.automate.domain.infra_proxy.request.UpdateServer

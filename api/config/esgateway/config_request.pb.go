@@ -1228,7 +1228,7 @@ func file_config_esgateway_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_esgateway_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_config_esgateway_config_request_proto_goTypes = []interface{}{
+var file_config_esgateway_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                                // 0: chef.automate.infra.esgateway.ConfigRequest
 	(*ConfigRequest_V1)(nil),                             // 1: chef.automate.infra.esgateway.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),                      // 2: chef.automate.infra.esgateway.ConfigRequest.V1.System

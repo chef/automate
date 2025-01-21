@@ -925,7 +925,7 @@ func file_interservice_event_event_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_event_event_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_interservice_event_event_proto_goTypes = []interface{}{
+var file_interservice_event_event_proto_goTypes = []any{
 	(*EventType)(nil),             // 0: chef.automate.domain.event.api.EventType
 	(*Producer)(nil),              // 1: chef.automate.domain.event.api.Producer
 	(*Actor)(nil),                 // 2: chef.automate.domain.event.api.Actor

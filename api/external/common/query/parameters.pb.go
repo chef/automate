@@ -408,7 +408,7 @@ func file_external_common_query_parameters_proto_rawDescGZIP() []byte {
 
 var file_external_common_query_parameters_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_external_common_query_parameters_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_external_common_query_parameters_proto_goTypes = []interface{}{
+var file_external_common_query_parameters_proto_goTypes = []any{
 	(SortOrder)(0),     // 0: chef.automate.api.common.query.SortOrder
 	(*Pagination)(nil), // 1: chef.automate.api.common.query.Pagination
 	(*Sorting)(nil),    // 2: chef.automate.api.common.query.Sorting

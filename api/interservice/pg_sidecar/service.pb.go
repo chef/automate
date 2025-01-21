@@ -1248,7 +1248,7 @@ func file_interservice_pg_sidecar_service_proto_rawDescGZIP() []byte {
 
 var file_interservice_pg_sidecar_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_interservice_pg_sidecar_service_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
-var file_interservice_pg_sidecar_service_proto_goTypes = []interface{}{
+var file_interservice_pg_sidecar_service_proto_goTypes = []any{
 	(ErrorDetails_Codes)(0),        // 0: chef.automate.infra.pg_sidecar.ErrorDetails.Codes
 	(*ErrorDetails)(nil),           // 1: chef.automate.infra.pg_sidecar.ErrorDetails
 	(*MigrateTablesReq)(nil),       // 2: chef.automate.infra.pg_sidecar.MigrateTablesReq

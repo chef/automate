@@ -344,7 +344,7 @@ func file_external_infra_proxy_request_cookbooks_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_request_cookbooks_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_external_infra_proxy_request_cookbooks_proto_goTypes = []interface{}{
+var file_external_infra_proxy_request_cookbooks_proto_goTypes = []any{
 	(*Cookbooks)(nil),           // 0: chef.automate.api.infra_proxy.request.Cookbooks
 	(*CookbookVersions)(nil),    // 1: chef.automate.api.infra_proxy.request.CookbookVersions
 	(*Cookbook)(nil),            // 2: chef.automate.api.infra_proxy.request.Cookbook

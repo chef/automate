@@ -699,7 +699,7 @@ func file_interservice_authn_tokens_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_authn_tokens_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
-var file_interservice_authn_tokens_proto_goTypes = []interface{}{
+var file_interservice_authn_tokens_proto_goTypes = []any{
 	(*CreateTokenReq)(nil),          // 0: chef.automate.domain.authn.CreateTokenReq
 	(*CreateTokenWithValueReq)(nil), // 1: chef.automate.domain.authn.CreateTokenWithValueReq
 	(*UpdateTokenReq)(nil),          // 2: chef.automate.domain.authn.UpdateTokenReq

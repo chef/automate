@@ -1180,7 +1180,7 @@ func file_interservice_infra_proxy_response_policyfiles_proto_rawDescGZIP() []by
 }
 
 var file_interservice_infra_proxy_response_policyfiles_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_interservice_infra_proxy_response_policyfiles_proto_goTypes = []interface{}{
+var file_interservice_infra_proxy_response_policyfiles_proto_goTypes = []any{
 	(*Policyfiles)(nil),          // 0: chef.automate.domain.infra_proxy.response.Policyfiles
 	(*PolicyfileListItem)(nil),   // 1: chef.automate.domain.infra_proxy.response.PolicyfileListItem
 	(*Policyfile)(nil),           // 2: chef.automate.domain.infra_proxy.response.Policyfile

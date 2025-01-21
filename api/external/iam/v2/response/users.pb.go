@@ -329,7 +329,7 @@ func file_external_iam_v2_response_users_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_response_users_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_external_iam_v2_response_users_proto_goTypes = []interface{}{
+var file_external_iam_v2_response_users_proto_goTypes = []any{
 	(*CreateUserResp)(nil), // 0: chef.automate.api.iam.v2.CreateUserResp
 	(*ListUsersResp)(nil),  // 1: chef.automate.api.iam.v2.ListUsersResp
 	(*DeleteUserResp)(nil), // 2: chef.automate.api.iam.v2.DeleteUserResp

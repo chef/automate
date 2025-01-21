@@ -291,7 +291,7 @@ func file_external_cds_request_root_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cds_request_root_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_external_cds_request_root_proto_goTypes = []interface{}{
+var file_external_cds_request_root_proto_goTypes = []any{
 	(*ContentItems)(nil),        // 0: chef.automate.api.cds.request.ContentItems
 	(*InstallContentItem)(nil),  // 1: chef.automate.api.cds.request.InstallContentItem
 	(*DownloadContentItem)(nil), // 2: chef.automate.api.cds.request.DownloadContentItem

@@ -1261,7 +1261,7 @@ func file_external_iam_v2_request_policy_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_request_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
-var file_external_iam_v2_request_policy_proto_goTypes = []interface{}{
+var file_external_iam_v2_request_policy_proto_goTypes = []any{
 	(*CreatePolicyReq)(nil),         // 0: chef.automate.api.iam.v2.CreatePolicyReq
 	(*GetPolicyReq)(nil),            // 1: chef.automate.api.iam.v2.GetPolicyReq
 	(*ListPoliciesReq)(nil),         // 2: chef.automate.api.iam.v2.ListPoliciesReq

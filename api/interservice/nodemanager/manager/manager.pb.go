@@ -1561,7 +1561,7 @@ func file_interservice_nodemanager_manager_manager_proto_rawDescGZIP() []byte {
 
 var file_interservice_nodemanager_manager_manager_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_interservice_nodemanager_manager_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
-var file_interservice_nodemanager_manager_manager_proto_goTypes = []interface{}{
+var file_interservice_nodemanager_manager_manager_proto_goTypes = []any{
 	(NodeState_State)(0),            // 0: chef.automate.domain.nodemanager.manager.NodeState.State
 	(Query_OrderType)(0),            // 1: chef.automate.domain.nodemanager.manager.Query.OrderType
 	(*Id)(nil),                      // 2: chef.automate.domain.nodemanager.manager.Id

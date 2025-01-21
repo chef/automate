@@ -372,7 +372,7 @@ func file_external_iam_v2_request_tokens_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_request_tokens_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_external_iam_v2_request_tokens_proto_goTypes = []interface{}{
+var file_external_iam_v2_request_tokens_proto_goTypes = []any{
 	(*CreateTokenReq)(nil),       // 0: chef.automate.api.iam.v2.CreateTokenReq
 	(*GetTokenReq)(nil),          // 1: chef.automate.api.iam.v2.GetTokenReq
 	(*UpdateTokenReq)(nil),       // 2: chef.automate.api.iam.v2.UpdateTokenReq

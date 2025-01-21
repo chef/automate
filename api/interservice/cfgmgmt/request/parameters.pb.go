@@ -275,7 +275,7 @@ func file_interservice_cfgmgmt_request_parameters_proto_rawDescGZIP() []byte {
 
 var file_interservice_cfgmgmt_request_parameters_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_interservice_cfgmgmt_request_parameters_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_interservice_cfgmgmt_request_parameters_proto_goTypes = []interface{}{
+var file_interservice_cfgmgmt_request_parameters_proto_goTypes = []any{
 	(Order)(0),         // 0: chef.automate.domain.cfgmgmt.request.Order
 	(*Pagination)(nil), // 1: chef.automate.domain.cfgmgmt.request.Pagination
 	(*Sorting)(nil),    // 2: chef.automate.domain.cfgmgmt.request.Sorting

@@ -115,7 +115,7 @@ func file_external_iam_v2_common_teams_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_common_teams_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_iam_v2_common_teams_proto_goTypes = []interface{}{
+var file_external_iam_v2_common_teams_proto_goTypes = []any{
 	(*Team)(nil), // 0: chef.automate.api.iam.v2.Team
 }
 var file_external_iam_v2_common_teams_proto_depIdxs = []int32{

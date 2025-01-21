@@ -182,7 +182,7 @@ func file_interservice_ingest_automate_event_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_ingest_automate_event_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_ingest_automate_event_proto_goTypes = []interface{}{
+var file_interservice_ingest_automate_event_proto_goTypes = []any{
 	(*ProjectUpdateStatusReq)(nil),  // 0: chef.automate.domain.ingest.ProjectUpdateStatusReq
 	(*ProjectUpdateStatusResp)(nil), // 1: chef.automate.domain.ingest.ProjectUpdateStatusResp
 	(*timestamppb.Timestamp)(nil),   // 2: google.protobuf.Timestamp

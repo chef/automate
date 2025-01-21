@@ -395,7 +395,7 @@ func file_interservice_infra_proxy_request_servers_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_infra_proxy_request_servers_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_interservice_infra_proxy_request_servers_proto_goTypes = []interface{}{
+var file_interservice_infra_proxy_request_servers_proto_goTypes = []any{
 	(*CreateServer)(nil),    // 0: chef.automate.domain.infra_proxy.request.CreateServer
 	(*UpdateServer)(nil),    // 1: chef.automate.domain.infra_proxy.request.UpdateServer
 	(*DeleteServer)(nil),    // 2: chef.automate.domain.infra_proxy.request.DeleteServer

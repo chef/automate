@@ -752,7 +752,7 @@ func file_interservice_authz_authz_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_authz_authz_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_interservice_authz_authz_proto_goTypes = []interface{}{
+var file_interservice_authz_authz_proto_goTypes = []any{
 	(*IsAuthorizedReq)(nil),               // 0: chef.automate.domain.authz.IsAuthorizedReq
 	(*GetVersionReq)(nil),                 // 1: chef.automate.domain.authz.GetVersionReq
 	(*ProjectsAuthorizedReq)(nil),         // 2: chef.automate.domain.authz.ProjectsAuthorizedReq

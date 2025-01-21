@@ -195,7 +195,7 @@ func file_interservice_cfgmgmt_request_root_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_request_root_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_interservice_cfgmgmt_request_root_proto_goTypes = []interface{}{
+var file_interservice_cfgmgmt_request_root_proto_goTypes = []any{
 	(*VersionInfo)(nil),   // 0: chef.automate.domain.cfgmgmt.request.VersionInfo
 	(*Health)(nil),        // 1: chef.automate.domain.cfgmgmt.request.Health
 	(*Organizations)(nil), // 2: chef.automate.domain.cfgmgmt.request.Organizations

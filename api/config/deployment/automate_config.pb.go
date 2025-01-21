@@ -851,7 +851,7 @@ func file_config_deployment_automate_config_proto_rawDescGZIP() []byte {
 }
 
 var file_config_deployment_automate_config_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_config_deployment_automate_config_proto_goTypes = []interface{}{
+var file_config_deployment_automate_config_proto_goTypes = []any{
 	(*AutomateConfig)(nil),                  // 0: chef.automate.domain.deployment.AutomateConfig
 	(*shared.GlobalConfig)(nil),             // 1: chef.automate.infra.config.GlobalConfig
 	(*authn.ConfigRequest)(nil),             // 2: chef.automate.domain.authn.ConfigRequest

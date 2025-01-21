@@ -512,7 +512,7 @@ func file_interservice_data_lifecycle_purge_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_data_lifecycle_purge_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_interservice_data_lifecycle_purge_proto_goTypes = []interface{}{
+var file_interservice_data_lifecycle_purge_proto_goTypes = []any{
 	(*RunRequest)(nil),                    // 0: chef.automate.infra.data_lifecycle.api.RunRequest
 	(*RunResponse)(nil),                   // 1: chef.automate.infra.data_lifecycle.api.RunResponse
 	(*ConfigureRequest)(nil),              // 2: chef.automate.infra.data_lifecycle.api.ConfigureRequest

@@ -415,7 +415,7 @@ func file_config_sample_data_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_sample_data_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_config_sample_data_config_request_proto_goTypes = []interface{}{
+var file_config_sample_data_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.sample_data.ConfigRequest
 	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.sample_data.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.sample_data.ConfigRequest.V1.System

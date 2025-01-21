@@ -498,7 +498,7 @@ func file_external_ingest_request_job_scheduler_proto_rawDescGZIP() []byte {
 }
 
 var file_external_ingest_request_job_scheduler_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_external_ingest_request_job_scheduler_proto_goTypes = []interface{}{
+var file_external_ingest_request_job_scheduler_proto_goTypes = []any{
 	(*SchedulerConfig)(nil),                       // 0: chef.automate.api.ingest.request.SchedulerConfig
 	(*GetStatusJobScheduler)(nil),                 // 1: chef.automate.api.ingest.request.GetStatusJobScheduler
 	(*DeleteMarkedNodes)(nil),                     // 2: chef.automate.api.ingest.request.DeleteMarkedNodes

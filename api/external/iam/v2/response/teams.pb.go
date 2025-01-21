@@ -631,7 +631,7 @@ func file_external_iam_v2_response_teams_proto_rawDescGZIP() []byte {
 }
 
 var file_external_iam_v2_response_teams_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_external_iam_v2_response_teams_proto_goTypes = []interface{}{
+var file_external_iam_v2_response_teams_proto_goTypes = []any{
 	(*GetTeamResp)(nil),               // 0: chef.automate.api.iam.v2.GetTeamResp
 	(*ListTeamsResp)(nil),             // 1: chef.automate.api.iam.v2.ListTeamsResp
 	(*CreateTeamResp)(nil),            // 2: chef.automate.api.iam.v2.CreateTeamResp

@@ -236,7 +236,7 @@ type ConfigRequest_V1_System_Service struct {
 	// config to to the purge cereal workflows.
 	// Setting this values is prevented in the Validate() callback.
 	//
-	// Deprecated: Do not use.
+	// Deprecated: Marked as deprecated in config/event_feed/config_request.proto.
 	PurgeEventFeedAfterDays *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=purge_event_feed_after_days,json=purgeEventFeedAfterDays,proto3" json:"purge_event_feed_after_days,omitempty" toml:"purge_event_feed_after_days,omitempty" mapstructure:"purge_event_feed_after_days,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
@@ -272,7 +272,7 @@ func (*ConfigRequest_V1_System_Service) Descriptor() ([]byte, []int) {
 	return file_config_event_feed_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 0}
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/event_feed/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetHost() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Host
@@ -287,7 +287,7 @@ func (x *ConfigRequest_V1_System_Service) GetPort() *wrapperspb.Int32Value {
 	return nil
 }
 
-// Deprecated: Do not use.
+// Deprecated: Marked as deprecated in config/event_feed/config_request.proto.
 func (x *ConfigRequest_V1_System_Service) GetPurgeEventFeedAfterDays() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.PurgeEventFeedAfterDays
@@ -430,7 +430,7 @@ func file_config_event_feed_config_request_proto_rawDescGZIP() []byte {
 }
 
 var file_config_event_feed_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_config_event_feed_config_request_proto_goTypes = []interface{}{
+var file_config_event_feed_config_request_proto_goTypes = []any{
 	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.event_feed.ConfigRequest
 	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.event_feed.ConfigRequest.V1
 	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.event_feed.ConfigRequest.V1.System

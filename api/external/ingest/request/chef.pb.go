@@ -884,7 +884,7 @@ func file_external_ingest_request_chef_proto_rawDescGZIP() []byte {
 }
 
 var file_external_ingest_request_chef_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_external_ingest_request_chef_proto_goTypes = []interface{}{
+var file_external_ingest_request_chef_proto_goTypes = []any{
 	(*Run)(nil),             // 0: chef.automate.api.ingest.request.Run
 	(*Deprecation)(nil),     // 1: chef.automate.api.ingest.request.Deprecation
 	(*ExpandedRunList)(nil), // 2: chef.automate.api.ingest.request.ExpandedRunList

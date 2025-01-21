@@ -273,7 +273,7 @@ func file_interservice_cfgmgmt_response_inventory_nodes_proto_rawDescGZIP() []by
 }
 
 var file_interservice_cfgmgmt_response_inventory_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_cfgmgmt_response_inventory_nodes_proto_goTypes = []interface{}{
+var file_interservice_cfgmgmt_response_inventory_nodes_proto_goTypes = []any{
 	(*InventoryNodes)(nil),        // 0: chef.automate.domain.cfgmgmt.response.InventoryNodes
 	(*InventoryNode)(nil),         // 1: chef.automate.domain.cfgmgmt.response.InventoryNode
 	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp

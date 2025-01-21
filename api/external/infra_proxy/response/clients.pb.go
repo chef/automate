@@ -567,7 +567,7 @@ func file_external_infra_proxy_response_clients_proto_rawDescGZIP() []byte {
 }
 
 var file_external_infra_proxy_response_clients_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_external_infra_proxy_response_clients_proto_goTypes = []interface{}{
+var file_external_infra_proxy_response_clients_proto_goTypes = []any{
 	(*Clients)(nil),         // 0: chef.automate.api.infra_proxy.response.Clients
 	(*ClientListItem)(nil),  // 1: chef.automate.api.infra_proxy.response.ClientListItem
 	(*Client)(nil),          // 2: chef.automate.api.infra_proxy.response.Client

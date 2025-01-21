@@ -72,7 +72,7 @@ var file_external_annotations_iam_annotations_proto_rawDesc = []byte{
 	0x61, 0x6d, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_external_annotations_iam_annotations_proto_goTypes = []interface{}{
+var file_external_annotations_iam_annotations_proto_goTypes = []any{
 	(*descriptorpb.MethodOptions)(nil), // 0: google.protobuf.MethodOptions
 	(*PolicyInfo)(nil),                 // 1: chef.automate.api.iam.PolicyInfo
 }

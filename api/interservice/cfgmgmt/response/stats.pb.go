@@ -315,7 +315,7 @@ func file_interservice_cfgmgmt_response_stats_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_response_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_interservice_cfgmgmt_response_stats_proto_goTypes = []interface{}{
+var file_interservice_cfgmgmt_response_stats_proto_goTypes = []any{
 	(*RunsCounts)(nil),              // 0: chef.automate.domain.cfgmgmt.response.RunsCounts
 	(*NodesCounts)(nil),             // 1: chef.automate.domain.cfgmgmt.response.NodesCounts
 	(*CheckInCountsTimeSeries)(nil), // 2: chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries

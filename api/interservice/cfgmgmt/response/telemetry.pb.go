@@ -147,7 +147,7 @@ func file_interservice_cfgmgmt_response_telemetry_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_cfgmgmt_response_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_interservice_cfgmgmt_response_telemetry_proto_goTypes = []interface{}{
+var file_interservice_cfgmgmt_response_telemetry_proto_goTypes = []any{
 	(*UpdateTelemetryReportedResponse)(nil), // 0: chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse
 	(*GetNodesUsageCountResponse)(nil),      // 1: chef.automate.domain.cfgmgmt.response.GetNodesUsageCountResponse
 }

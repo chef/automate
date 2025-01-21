@@ -603,7 +603,7 @@ func file_config_platform_config_proto_rawDescGZIP() []byte {
 }
 
 var file_config_platform_config_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_config_platform_config_proto_goTypes = []interface{}{
+var file_config_platform_config_proto_goTypes = []any{
 	(*Config)(nil),                     // 0: chef.automate.platform.Config
 	(*Config_TLS)(nil),                 // 1: chef.automate.platform.Config.TLS
 	(*Config_Service)(nil),             // 2: chef.automate.platform.Config.Service

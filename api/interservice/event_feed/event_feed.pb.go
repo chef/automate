@@ -1446,7 +1446,7 @@ func file_interservice_event_feed_event_feed_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_event_feed_event_feed_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
-var file_interservice_event_feed_event_feed_proto_goTypes = []interface{}{
+var file_interservice_event_feed_event_feed_proto_goTypes = []any{
 	(*FeedRequest)(nil),           // 0: chef.automate.domain.event_feed.api.FeedRequest
 	(*FeedResponse)(nil),          // 1: chef.automate.domain.event_feed.api.FeedResponse
 	(*FeedEntry)(nil),             // 2: chef.automate.domain.event_feed.api.FeedEntry

@@ -95,7 +95,7 @@ func file_external_cfgmgmt_request_actions_proto_rawDescGZIP() []byte {
 }
 
 var file_external_cfgmgmt_request_actions_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_cfgmgmt_request_actions_proto_goTypes = []interface{}{
+var file_external_cfgmgmt_request_actions_proto_goTypes = []any{
 	(*PolicyRevision)(nil), // 0: chef.automate.api.cfgmgmt.request.PolicyRevision
 }
 var file_external_cfgmgmt_request_actions_proto_depIdxs = []int32{

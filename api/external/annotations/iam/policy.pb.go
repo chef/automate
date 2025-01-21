@@ -103,7 +103,7 @@ func file_external_annotations_iam_policy_proto_rawDescGZIP() []byte {
 }
 
 var file_external_annotations_iam_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_external_annotations_iam_policy_proto_goTypes = []interface{}{
+var file_external_annotations_iam_policy_proto_goTypes = []any{
 	(*PolicyInfo)(nil), // 0: chef.automate.api.iam.PolicyInfo
 }
 var file_external_annotations_iam_policy_proto_depIdxs = []int32{

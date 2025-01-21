@@ -1784,7 +1784,7 @@ func file_interservice_notifications_service_events_proto_rawDescGZIP() []byte {
 }
 
 var file_interservice_notifications_service_events_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
-var file_interservice_notifications_service_events_proto_goTypes = []interface{}{
+var file_interservice_notifications_service_events_proto_goTypes = []any{
 	(*ExceptionInfo)(nil),                   // 0: chef.automate.domain.notifications.service.ExceptionInfo
 	(*TimeInfo)(nil),                        // 1: chef.automate.domain.notifications.service.TimeInfo
 	(*Profile)(nil),                         // 2: chef.automate.domain.notifications.service.Profile
