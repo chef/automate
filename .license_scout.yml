@@ -120,9 +120,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
     license_id: Apache-2.0
     name: cloud.google.com/go/apigeeconnect
-  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
-    license_id: Apache-2.0
-    name: cloud.google.com/go/apigeeregistry
   - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
     license_id: Apache-2.0
     name: cloud.google.com/go/appengine
