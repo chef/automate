@@ -104,9 +104,6 @@ fallbacks:
     name: bazil.org/fuse
   - license_content: https://raw.githubusercontent.com/bufbuild/buf/refs/heads/main/LICENSE
     license_id: Apache-2.0
-    name: buf.build/gen/go/bufbuild/bufplugin/connectrpc/go
-  - license_content: https://raw.githubusercontent.com/bufbuild/buf/refs/heads/main/LICENSE
-    license_id: Apache-2.0
     name: buf.build/gen/go/bufbuild/protovalidate/connectrpc/go
   - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/main/LICENSE
     license_id: Apache-2.0
