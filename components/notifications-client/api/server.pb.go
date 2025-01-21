@@ -72,7 +72,7 @@ var file_server_proto_rawDesc = []byte{
 	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_server_proto_goTypes = []interface{}{
+var file_server_proto_goTypes = []any{
 	(*Event)(nil),                 // 0: notifications.Event
 	(*Rule)(nil),                  // 1: notifications.Rule
 	(*RuleIdentifier)(nil),        // 2: notifications.RuleIdentifier
