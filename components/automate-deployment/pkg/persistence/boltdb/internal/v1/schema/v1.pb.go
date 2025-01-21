@@ -520,7 +520,7 @@ func file_components_automate_deployment_pkg_persistence_boltdb_internal_v1_sche
 
 var file_components_automate_deployment_pkg_persistence_boltdb_internal_v1_schema_v1_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_components_automate_deployment_pkg_persistence_boltdb_internal_v1_schema_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_components_automate_deployment_pkg_persistence_boltdb_internal_v1_schema_v1_proto_goTypes = []interface{}{
+var file_components_automate_deployment_pkg_persistence_boltdb_internal_v1_schema_v1_proto_goTypes = []any{
 	(Service_DeploymentState)(0),  // 0: Service.DeploymentState
 	(Service_InstallType)(0),      // 1: Service.InstallType
 	(*Deployment)(nil),            // 2: Deployment
