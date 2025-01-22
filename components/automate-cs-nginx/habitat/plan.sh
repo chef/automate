@@ -11,7 +11,7 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.10.27"
 pkg_deps=(
-  core/coreutils/8.32/20240105213308
+  core/coreutils/9.4/202410171117528
   chef/mlsa/1.0.1/20240125084021
   # TODO 2020-05-12: PIN PIN PIN
   #
@@ -20,7 +20,7 @@ pkg_deps=(
   # chef-server-* packages.
   #
   core/curl/8.7.1/20240614090648
-  core/ruby31/3.1.6/20240912144513
+  core/ruby3_1
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/15.10.27/20250102025712"
   "${vendor_origin}/chef-server-ctl/15.10.27/20250102025130"
