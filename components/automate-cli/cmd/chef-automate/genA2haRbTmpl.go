@@ -304,5 +304,14 @@ aws do
   ### DEPRECATED: AWS Tag: Production flag - set true for production environment
   {{ if .Aws.Config.XProduction }} production "{{ .Aws.Config.XProduction }}" {{ else }}  production "{{ .Aws.Config.XProduction }}" {{ end }}
   tags({"X-Contact"=>"{{ .Aws.Config.XContact }}", "X-Dept"=>"{{ .Aws.Config.XDept }}", "X-Project"=>"{{ .Aws.Config.XProject }}", "X-Customer"=>"{{ .Aws.Config.XCustomer }}", "X-Production"=>"{{ .Aws.Config.XProduction }}"})
+  
+  ### DEPRECATED: Below tags are used for CHEF AWS infrastructure tagging
+  {{ if .Aws.Config.XEphemeral }} ephemeral "{{ .Aws.Config.XEphemeral }}" {{ else }} # ephemeral "{{ .Aws.Config.XEphemeral }}" {{ end }}
+  {{ if .Aws.Config.XTeam }} team "{{ .Aws.Config.XTeam }}" {{ else }} # team "{{ .Aws.Config.XTeam }}" {{ end }}
+  {{ if .Aws.Config.XOwner }} owner "{{ .Aws.Config.XOwner }}" {{ else }} # owner "{{ .Aws.Config.XOwner }}" {{ end }}
+  {{ if .Aws.Config.XApplication }} application "{{ .Aws.Config.XApplication }}" {{ else }} # application "{{ .Aws.Config.XApplication }}" {{ end }}
+  {{ if .Aws.Config.XSolutions }} solutions "{{ .Aws.Config.XSolutions }}" {{ else }} # solutions "{{ .Aws.Config.XSolutions }}" {{ end }}
+  {{ if .Aws.Config.XName }} Name "{{ .Aws.Config.XName }}" {{ else }} # Name "{{ .Aws.Config.XName }}" {{ end }}
+  {{ if .Aws.Config.XExpiration }} expiration "{{ .Aws.Config.XExpiration }}" {{ else }} # expiration "{{ .Aws.Config.XExpiration }}" {{ end }}
 end
 `

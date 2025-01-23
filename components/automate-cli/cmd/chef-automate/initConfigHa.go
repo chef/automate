@@ -101,6 +101,13 @@ type ConfigToml struct {
 	XProject                     string   `toml:"X-Project"`
 	XProduction                  string   `toml:"X-Production"`
 	XCustomer                    string   `toml:"X-Customer"`
+	XEphemeral                   string   `toml:"ephemeral"`
+	XTeam                        string   `toml:"team"`
+	XOwner                       string   `toml:"owner"`
+	XApplication                 string   `toml:"application"`
+	XSolutions                   string   `toml:"solutions"`
+	XName                        string   `toml:"Name"`
+	XExpiration                  string   `toml:"expiration"`
 	AwsAutomateRoute53Prefix     string   `toml:"aws_automate_route53_prefix"`
 	AwsChefServerRoute53Prefix   string   `toml:"aws_chef_server_route53_prefix"`
 	AwsRoute53HostedZone         string   `toml:"aws_route53_hosted_zone"`
