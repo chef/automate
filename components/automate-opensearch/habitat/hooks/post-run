@@ -1,4 +1,5 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
+#shellcheck disable=SC2086
 
 exec 2>&1
 
@@ -56,17 +57,53 @@ if [[ $(wait_until_healthy 5) -ne 0 ]]; then
 fi
 
 echo "Configuring index settings"
-curl \
-  -s \
-  -i \
-  -H 'Content-Type: application/json'\
-  -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
-  -k \
-  -u admin:admin \
+
+# Getting all indices 
+indices=$(curl -k -XGET https://${HOST}:{{cfg.network.port}}/_cat/indices -u "admin:admin" | awk '{print $3}' | awk '!/^(\.)/' | awk '!/security/')
+echo -e "list of indices\n$indices"
+
+# Looping over each index individually and patching "number_of_replica" from config (toml)
+for index in $indices;do
+echo -e " snapshot status for $index\n"
+echo -e "number_of_replicas: {{cfg.index.number_of_replicas}}"
+curl -X PUT \
+  "https://${HOST}:{{cfg.network.port}}/$index/_settings?pretty=" \
+  -k -u admin:admin \
+  -H 'content-type: application/json' \
   -d '{
-    "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
-    "index.refresh_interval": "{{cfg.index.refresh_interval}}"
-  }'
+      "index" : {
+        "number_of_replicas" : "{{cfg.index.number_of_replicas}}",
+        "refresh_interval": "{{cfg.index.refresh_interval}}"
+      }
+    }'
+done
+
+# Commenting the following template update changes 
+# to align with previous version post-run hook and 
+# to fix pipeline errors
+
+# # Getting all templates
+# templates=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_cat/templates -k -u 'admin:admin'| awk '{print $1}')
+# echo -e "list of templates\n$templates"
+
+# # Looping over each template individually and patching "number_of_replica" from config (toml)
+# for template in $templates;do
+# echo -e " snapshot status for $template\n"
+# index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/"$template"?pretty -u 'admin:admin' --insecure | jq -r ".[\"${template}\"].index_patterns[]")
+# echo -e "Index Pattern: $index_patterns"
+# echo -e " snapshot status for $template"
+# JSON_STRING=$( jq -r -n --arg ip $index_patterns '{
+#                     "index_patterns" : [$ip],
+#                     "settings" : {
+#                       "index" : {
+#                         "number_of_replicas" : "{{cfg.index.number_of_replicas}}",
+#                         "refresh_interval" : "{{cfg.index.refresh_interval}}"
+#                       }
+#                     }}' )
+# echo -e "JSON STRING: $JSON_STRING"
+# curl --location --request PUT "https://${HOST}:{{cfg.network.port}}/_template/$template" --header 'content-type: application/json' -k -u admin:admin -d "${JSON_STRING}"
+
+# done
 
 # The health-check hook will return an error unless we touch sentinel file to
 # signal to the health check that this hook has completed successfully.
