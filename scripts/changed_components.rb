@@ -29,8 +29,12 @@ config = TOML.load_file(".bldr.toml")
 
 changed_files = `git diff --name-only $(scripts/git_difference_expression.rb)`.split("\n")
 
+puts "Changed files*: #{changed_files}"
+
+
 build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all") || ENV["BUILD_ALL"] == "true"
 
+puts "Build all*: #{build_all}"
 #
 # The goal here is to produce the same builds that Expeditor would produce
 # should the PR be merged. That way we can know whether or not this PR would
