@@ -92,10 +92,10 @@ EOF
 invalid_cert_test_gateway() {
     local result
     result=$(hab_curl -o /dev/null -sS --insecure --cert "$(invalid_cert_path)" --key "$(invalid_key_path)" "https://localhost:2000/events/data-collector" || echo "$?")
-    if [ "$result" != "35" ]; then
+    if [ "$result" != "56" ]; then
         cat <<EOF
         ...Failed
-        Expected curl exit code 35 (SSL connect error. The SSL handshaking failed.)
+        Expected curl exit code 56 (SSL connect error. The SSL handshaking failed.)
 
         Got:
         ${result}

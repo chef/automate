@@ -21,7 +21,7 @@ document "install_protoc_toolchain" <<DOC
   Install all the protobuf plugins, linters, etc. we use to compile and vet our protobufs.
 DOC
 function install_protoc_toolchain() {
-  install_if_missing core/protobuf-cpp protoc
+  install_if_missing core/protobuf-cpp/3.19.0/20240106033100 protoc
   install_go_tool github.com/golang/protobuf/protoc-gen-go
   compile_go_protobuf api/scripts/bootstrap_protoc.sh
   compile_go_protobuf components/automate-grpc/scripts/bootstrap_protoc.sh
@@ -240,7 +240,8 @@ document "verify_all_protobuf_components" <<DOC
 DOC
 function verify_all_protobuf_components() {
   install_if_missing core/git git
-
+  git config --global --add safe.directory /go/src/github.com/chef/automate
+  git config --global --add safe.directory '*'
   clean_all_compiled_protos || return $?
   bootstrap_proto_compilers || return $?
   compile_all_protobuf_components || return $?

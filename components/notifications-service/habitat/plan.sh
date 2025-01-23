@@ -10,30 +10,30 @@ pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate"
 
 pkg_deps=(
-  core/coreutils
+  core/coreutils/8.32/20240105213308
   # bash is required by distillery
-  core/bash
-  chef/mlsa
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
-  core/busybox-static
+  core/bash/5.1/20240105214248
+  chef/mlsa/1.0.1/20240125084021
+  chef/automate-platform-tools/0.1.0/20241212061203
+  core/busybox-static/1.34.1/20240105230035
 )
 pkg_build_deps=(
-  core/git
+  core/git/2.33.1/20240614092831
 
   # Node(kallol) 2022-01-28:
   #
   # We have seen failures with notification service http request
   # with external services. This is because the erlang version was bumped to
   # v23.2. Hence pinning the version till we have a fix.
-  core/erlang25
+  core/erlang25/25.0.4/20240108042737
 
   # NOTE(ssd) 2019-07-03: PIN PIN PIN
   #
   # elixir 1.9.0 shipped with a number of changes to how releases
   # work. This appears to have broken the build. Pinning until we can
   # sort out the required changes.
-  core/elixir
-  core/glibc
+  core/elixir/1.14.0/20240108043326
+  core/glibc/2.35/20240105171810
 )
 
 pkg_binds=(
@@ -65,7 +65,7 @@ pkg_srcs=(
   # TODO: VERSION should be in this list
 )
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="chef/automate-scaffolding/0.1.0/20241128083033"
 
 do_unpack() {
   mkdir -p "${CACHE_PATH}/server"
@@ -79,7 +79,6 @@ do_unpack() {
 do_prepare() {
   localedef -i en_US -f UTF-8 en_US.UTF-8
   export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-
   export MIX_HOME="${CACHE_PATH}/.mix"
   export HEX_HOME="${CACHE_PATH}/.hex"
   mix local.hex --force

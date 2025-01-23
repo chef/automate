@@ -12,21 +12,21 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/1.3.20/opensearch-1.3.20-linux-x64.tar.gz"
 pkg_shasum=a786fe52b4d25db85cc49f34df6118f19c434b25935f28bd98c0f874ae77ccc3
 pkg_build_deps=(
-  core/patchelf
-  core/make
-  core/gcc
+  core/patchelf/0.13/20240105212025
+  core/make/4.3/20240105222044
+  core/gcc/9.5.0/20240105175314
 )
 
 pkg_deps=(
-  core/coreutils
-  core/glibc
-  core/zlib
-  core/bash # hooks
-  chef/mlsa
-  core/curl # health_check
+  core/coreutils/8.32/20240105213308
+  core/glibc/2.35/20240105171810
+  core/zlib/1.3/20240105173710
+  core/bash/5.1/20240105214248 # hooks
+  chef/mlsa/1.0.1/20240125084021
+  core/curl/8.7.1/20240614090648 #healthcheck
   chef/automate-openjdk
-  chef/automate-platform-tools
-  core/ruby31
+  chef/automate-platform-tools/0.1.0/20241212061203
+  core/ruby31/3.1.6/20240912144513
 )
 pkg_interpreters=(bin/ruby)
 pkg_bin_dirs=(os/bin)

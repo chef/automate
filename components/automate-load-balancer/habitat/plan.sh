@@ -30,8 +30,8 @@ pkg_deps=(
   core/ncurses
   core/zlib
   core/bzip2
-  core/openssl/1.0.2zi
-  core/pcre
+  core/openssl/3.0.9
+  core/pcre2
   chef/mlsa
   core/bash
 )
@@ -65,7 +65,7 @@ pkg_binds_optional=(
 )
 
 do_download() {
-  cp -f cacert.pem /hab/pkgs/core/cacerts/2021.10.26/20240105224256/ssl/certs/cacert.pem
+  cp -f cacert.pem /hab/pkgs/core/cacerts/2023.12.12/20241017111624/ssl/certs/cacert.pem
   do_default_download
   pushd "${HAB_CACHE_SRC_PATH}" || return 1
   download_file "${headers_more_source}" "${headers_more_filename}" "${headers_more_shasum}"
@@ -128,4 +128,6 @@ do_install() {
   mkdir -p "${pkg_prefix}/sbin"
   cp "${HAB_CACHE_SRC_PATH}/${pkg_dirname}/objs/nginx" "${pkg_prefix}/sbin"
 }
+
+
 

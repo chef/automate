@@ -63,7 +63,9 @@ document "verify_products_generation" <<DOC
 DOC
 function verify_products_generation() {
   install_if_missing core/git git
-
+  git config --global --add safe.directory /go/src/github.com/chef/automate
+  git config --global --add safe.directory '*'
+  
   deployment_generate || return $?
 
   git add .
@@ -98,7 +100,7 @@ function link_component_bin() {
 }
 
 function desired_golang_ident() {
-    echo "core/go22/$(cat /src/GOLANG_VERSION)"
+    echo "core/go1_22/$(cat /src/GOLANG_VERSION)"
 }
 
 function verify_components_have_platform_config() {
@@ -202,13 +204,15 @@ EOF
 function build() {
   local hab_build
   #set HAB_BLDR_CHANNEL to dev as part of the hab package refresh
-  local HAB_BLDR_CHANNEL=dev
+  local HAB_BLDR_CHANNEL=LTS-2024
   
   # Support for hab v.0.63.0
   if [ -f /bin/build ]; then
     hab_build=/bin/build
   fi
 
+  echo "Building from channel: $HAB_BLDR_CHANNEL"
+  
   # Support prior hab versions
   if [ -f /hab/bin/build ]; then
     hab_build=/hab/bin/build
@@ -217,7 +221,7 @@ function build() {
   if [ -z "$hab_build" ]; then
     exit_with "Hab build binary not found. Verify the 'build' wrapper inside the studio." 22
   else
-    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:-dev} $hab_build "$@"
+    HAB_FEAT_IGNORE_LOCAL=false HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:-LTS-2024} $hab_build "$@"
   fi
 }
 
@@ -356,7 +360,7 @@ function build_all_changed_components() {
   local whitelist=$*
 
   install_if_missing core/git git
-  install_if_missing core/ruby ruby
+  install_if_missing core/ruby/3.0.6/20240108025751 ruby
   hab pkg binlink core/ruby gem
   gem install toml
   hab pkg install core/coreutils >/dev/null

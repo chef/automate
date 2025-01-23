@@ -13,19 +13,19 @@ do_before() {
 }
 
 pkg_deps=(
-  core/ruby31
-  core/libffi
-  chef/mlsa
-  core/bash
-  core/coreutils
-  core/glibc
-  core/postgresql-client
+  core/ruby31/3.1.6/20240912144513
+  core/libffi/3.4.2/20240105233930
+  chef/mlsa/1.0.1/20240125084021
+  core/bash/5.1/20240105214248
+  core/coreutils/8.32/20240105213308
+  core/glibc/2.35/20240105171810
+  core/postgresql-client/9.6.24/20240106122111
 )
 
 pkg_build_deps=(
-  core/make
-  core/gcc
-  core/rsync
+  core/make/4.3/20240105222044
+  core/gcc/9.5.0/20240105175314
+  core/rsync/3.2.3/20240107034222
 )
 
 pkg_bin_dirs=(bin)
@@ -100,4 +100,5 @@ exec $(pkg_path_for ruby31)/bin/ruby -I $pkg_prefix/lib ${bin}.real \$@
 EOF
   chmod -v 755 "$bin"
 }
+
 

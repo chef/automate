@@ -20,6 +20,6 @@ studio_secrets:
     path: secret/a2/a2ha/opensearch
     field: node1-key.pem
   HAB_FALLBACK_CHANNEL:
-    value: "stable"
+    value: "LTS-2024"
   GOPROXY:
     value: "https://proxy.golang.org,direct"

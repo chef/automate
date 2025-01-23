@@ -11,15 +11,15 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.10.27"
 pkg_deps=(
-  core/coreutils
-  chef/mlsa
+  core/coreutils/8.32/20240105213308
+  chef/mlsa/1.0.1/20240125084021
   # TODO 2020-05-12: PIN PIN PIN
   #
   # All dependencies that are shared between this package and the
   # chef-server-* packages are pinned to the versions required by the
   # chef-server-* packages.
   #
-  core/curl
+  core/curl/8.7.1/20240614090648
   core/ruby31/3.1.6/20240912144513
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/15.10.27/20250102025712"
@@ -86,3 +86,9 @@ do_install() {
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby31)!g" "$wrapper_bin_path/knife"
 }
 
+
+
+do_before() {
+  do_default_before
+  git config --global --add safe.directory /src
+}

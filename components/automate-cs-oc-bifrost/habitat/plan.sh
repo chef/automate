@@ -14,8 +14,9 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
-  chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  chef/mlsa/1.0.1/20240125084021
+  #"${local_platform_tools_origin:-chef}/automate-platform-tools"
+  chef/automate-platform-tools/0.1.0/20241212061203
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_bifrost/15.10.27/20250102025130"
 )

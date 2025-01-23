@@ -1,11 +1,12 @@
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
-  HAB_BLDR_CHANNEL: "stable"
+  HAB_BLDR_CHANNEL: "LTS-2024"
   HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
   # Use the Go module mirror and checksum database by default.
   # See https://proxy.golang.org for details.
   GOPROXY: "https://proxy.golang.org,direct"
   GOSUMDB: "sum.golang.org"
+  PGGSSENCMODE: "disable"
   
 expeditor:
   defaults:
@@ -165,7 +166,7 @@ steps:
       - rm -rf /bin/zdump
       - rm -rf /bin/sprof
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
-      - scripts/install_hab_pkg.sh core/opa
+      - scripts/install_hab_pkg.sh core/opa/0.34.2/20240106123544
       - cd components/authz-service/engine/opa/policy
       - make static unit
     timeout_in_minutes: 10
@@ -301,7 +302,7 @@ steps:
           privileged: true
 
   - label: "[unit] automate-gateway"
-    command:
+    command:  
       - hab studio run "source .studiorc && go_component_unit automate-gateway"
       - cd components/automate-gateway
       - make lint fmt
@@ -420,6 +421,7 @@ steps:
 
   - label: "[unit] event-feed-service"
     command:
+      - git config --global --add safe.directory /go/src/github.com/chef/automate
       - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service && go_component_lint event-feed-service"
     timeout_in_minutes: 10
     retry:
@@ -435,6 +437,7 @@ steps:
 
   - label: "[unit] ingest-service"
     command:
+      - git config --global --add safe.directory /go/src/github.com/chef/automate
       - hab studio run "source .studiorc && go_component_unit ingest-service && go_component_static_tests ingest-service && go_component_lint ingest-service"
     timeout_in_minutes: 10
     retry:
