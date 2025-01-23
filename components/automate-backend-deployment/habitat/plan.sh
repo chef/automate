@@ -24,7 +24,7 @@ pkg_deps=(
   core/rsync/3.2.3/20240107034222
   core/terraform1/1.5.7/20240106055300
   core/busybox-static/1.34.1/20240105230035
-  chef/automate-ha-cluster-ctl/0.1.0/20250109090656
+  chef/automate-ha-cluster-ctl
 )
 #core/aws-cli ( core/aws-cli/1.21.11/20231020110846 core/aws-cli/1.21.11/20220817123642 )
    # core/openssl11 ( core/openssl11/1.1.1w/20231020105352 core/openssl11/1.1.1k/20220311131131 )
