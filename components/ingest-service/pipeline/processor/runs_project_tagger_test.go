@@ -1106,7 +1106,7 @@ func TestBundlerSingleMessage(t *testing.T) {
 		t.Fatal("Test timed out waiting for the out channel to close")
 	}
 
-	assert.Equal(t, 1, listProjectRulesCount) // Check if the mock was called
+	assert.Equal(t, 1, listProjectRulesCount)
 }
 
 // When 5 messages are in the inbox the ListRulesForAllProjects function is only called once.
