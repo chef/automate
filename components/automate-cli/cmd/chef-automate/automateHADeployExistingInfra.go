@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
@@ -96,6 +97,7 @@ func (e *existingInfra) generateConfig(state string) error {
 	}
 
 	e.setDefaultBasePath()
+	e.encodePasswordFields()
 
 	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config, state)
 }
@@ -775,4 +777,19 @@ func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAcc
 	//fmt.Printf("Service Account JSON written to %s\n", filePath)
 	return nil
 
+}
+
+func (e *existingInfra) encodePasswordFields() {
+	if isManagedServicesOn() {
+
+		if len(e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) > 0 {
+			e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword)))
+		}
+		if len(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword) > 0 {
+			e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)))
+		}
+		if len(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword) > 0 {
+			e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)))
+		}
+	}
 }
