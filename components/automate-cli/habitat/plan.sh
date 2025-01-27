@@ -43,3 +43,8 @@ do_after() {
     sha256sum "${bin_path}" | cut -d ' ' -f1 > "${bin_sha_path}"
   done
 }
+
+do_before() {
+  do_default_before
+  git config --global --add safe.directory /src
+}
