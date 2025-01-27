@@ -406,4 +406,5 @@ message Nginx {
 
 message Http {
   google.protobuf.BoolValue include_x_forwarded_for = 1;
+  google.protobuf.StringValue x_xss_protection = 2;
 }
