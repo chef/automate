@@ -12,41 +12,29 @@ import (
 
 var encodePasswordCmdFlags = struct {
 	config string
-	overwrite bool
-	updatedConfig string
 }{}
 
-func newEncodePasswordCmd() *cobra.Command {
-    encodePasswordCmd := &cobra.Command{
-		Use:   "encodePassword [/path/to/config.toml]",
-		Short: "Encodes the password fields",
-		Long:  "Encodes the password fields in the specified config.toml file",
-		RunE:  runEncodePasswordCmd,
-		Args:  cobra.ExactArgs(1),
-		Hidden: true,
-		Annotations: map[string]string{
-			docs.Tag: docs.BastionHost,
-		},
-	}
-    encodePasswordCmd.PersistentFlags().StringVarP(
+var encodePasswordCmd = &cobra.Command{
+	Use:    "encode-password [/path/to/config.toml]",
+	Short:  "Encodes the password fields",
+	Long:   "Encodes the password fields in the specified config.toml file",
+	RunE:   runEncodePasswordCmd,
+	Args:   cobra.ExactArgs(1),
+	Hidden: true,
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
+
+func init() {
+	RootCmd.AddCommand(encodePasswordCmd)
+	encodePasswordCmd.PersistentFlags().StringVarP(
 		&encodePasswordCmdFlags.config,
 		"config",
 		"c",
 		"",
 		"Config file that needs to be updated with encoded passwords")
 
-	encodePasswordCmd.Flags().BoolVarP(
-		&encodePasswordCmdFlags.overwrite,
-		"overwrite",
-		"o",
-		false,
-		"Overwrite existing config file with the encoded password",
-	)
-	return encodePasswordCmd
-}
-
-func init() {
-	RootCmd.AddCommand(newEncodePasswordCmd())
 }
 
 func runEncodePasswordCmd(cmd *cobra.Command, args []string) error {
@@ -85,9 +73,9 @@ func runEncodePasswordCmd(cmd *cobra.Command, args []string) error {
 						}
 					}
 					_, err := fileutils.CreateTomlFileFromConfig(&config, configFile)
-		            if err != nil {
-			           return err
-		            }
+					if err != nil {
+						return err
+					}
 
 				}
 			}

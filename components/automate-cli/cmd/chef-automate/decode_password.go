@@ -12,41 +12,28 @@ import (
 
 var decodePasswordCmdFlags = struct {
 	config string
-	overwrite bool
-	updatedConfig string
 }{}
 
-func newDecodePasswordCmd() *cobra.Command {
-    decodePasswordCmd := &cobra.Command{
-		Use:   "decodePassword [/path/to/config.toml]",
-		Short: "Decodes the password fields",
-		Long:  "Decodes the password fields in the specified config.toml file",
-		RunE:  runDecodePasswordCmd,
-		Args:  cobra.ExactArgs(1),
-		Hidden: true,
-		Annotations: map[string]string{
-			docs.Tag: docs.BastionHost,
-		},
-	}
-    decodePasswordCmd.PersistentFlags().StringVarP(
+func init() {
+	RootCmd.AddCommand(decodePasswordCmd)
+	decodePasswordCmd.PersistentFlags().StringVarP(
 		&decodePasswordCmdFlags.config,
 		"config",
 		"c",
 		"",
 		"Config file that needs to be updated with decoded passwords")
-
-	decodePasswordCmd.Flags().BoolVarP(
-		&encodePasswordCmdFlags.overwrite,
-		"overwrite",
-		"o",
-		false,
-		"Overwrite existing config file with the decoded password",
-	)
-	return decodePasswordCmd
 }
 
-func init() {
-	RootCmd.AddCommand(newDecodePasswordCmd())
+var decodePasswordCmd = &cobra.Command{
+	Use:    "decode-password [/path/to/config.toml]",
+	Short:  "Decodes the password fields",
+	Long:   "Decodes the password fields in the specified config.toml file",
+	RunE:   runDecodePasswordCmd,
+	Args:   cobra.ExactArgs(1),
+	Hidden: true,
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
 }
 
 func runDecodePasswordCmd(cmd *cobra.Command, args []string) error {
@@ -68,7 +55,7 @@ func runDecodePasswordCmd(cmd *cobra.Command, args []string) error {
 								superUserPswd, decErr := base64.StdEncoding.DecodeString(superUserPassword)
 								if decErr != nil {
 									return decErr
-								 }
+								}
 								config.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value = string(superUserPswd)
 							}
 						}
@@ -78,7 +65,7 @@ func runDecodePasswordCmd(cmd *cobra.Command, args []string) error {
 								dbUserPswd, decErr := base64.StdEncoding.DecodeString(dbUserPassword)
 								if decErr != nil {
 									return decErr
-								 }
+								}
 								config.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value = string(dbUserPswd)
 							}
 						}
@@ -89,14 +76,14 @@ func runDecodePasswordCmd(cmd *cobra.Command, args []string) error {
 							userPswd, decErr := base64.StdEncoding.DecodeString(userPassword)
 							if decErr != nil {
 								return decErr
-							 }
+							}
 							config.Global.V1.External.Opensearch.Auth.BasicAuth.Password.Value = string(userPswd)
 						}
 					}
 					_, err := fileutils.CreateTomlFileFromConfig(&config, configFile)
-		            if err != nil {
-			           return err
-		            }
+					if err != nil {
+						return err
+					}
 
 				}
 			}

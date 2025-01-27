@@ -402,9 +402,9 @@ else
   # Skip checks for the hab user as we create and manage that separately.
   # Fixes issues when the hab user/group is setup via LDAP in nsswitch configs.
   export CHEF_AUTOMATE_SKIP_HAB_USER=true
-  chef-automate decodePassword /etc/chef-automate/config.toml
+  chef-automate decode-password /etc/chef-automate/config.toml
   chef-automate deploy /etc/chef-automate/config.toml $DEPLOY_BUNDLES --accept-terms-and-mlsa | grep --line-buffered -v "\┤\|\┘\|\└\|\┴\|\├\|\┌\|\┬\|\┴\|\┐"
-  chef-automate encodePassword /etc/chef-automate/config.toml
+  chef-automate encode-password /etc/chef-automate/config.toml
 fi
 
 create_bootstrap_bundle
