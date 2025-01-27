@@ -48,4 +48,8 @@ do_install() {
   cp -r storage/postgres/datamigration/sql "${pkg_prefix}/data-migrations"
 }
 
+do_before() {
+  do_default_before
+  git config --global --add safe.directory /src
+}
 

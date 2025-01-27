@@ -53,4 +53,9 @@ do_install() {
   cp -r dao/migration/sql/* "${pkg_prefix}/migrations"
 }
 
+do_before() {
+  do_default_before
+  git config --global --add safe.directory /src
+}
+
 
