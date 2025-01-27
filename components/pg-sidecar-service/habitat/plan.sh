@@ -18,12 +18,12 @@ pkg_exports=(
 )
 pkg_exposes=(port)
 pkg_deps=(
-  chef/mlsa
+  chef/mlsa/1.0.1/20240125084021
   chef/automate-platform-tools
   # Pin postgresql, sqitch_pg, and postgresql client until automate-postgresql
   # is updated.
-  core/postgresql13/13.18 # for psql and pg_dump
-  core/postgresql13-client/13.18
+  core/postgresql13/13.18/20241203070217 # for psql and pg_dump
+  core/postgresql13-client/13.18/20241203070721
   core/sqitch_pg
 )
 pkg_bin_dirs=(bin)
