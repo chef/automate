@@ -24,7 +24,7 @@ pkg_deps=(
   # is updated.
   core/postgresql13/13.18/20241203070217 # for psql and pg_dump
   core/postgresql13-client/13.18/20241203070721
-  core/sqitch_pg
+  core/sqitch_pg/3.15.0/20240614112821
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
