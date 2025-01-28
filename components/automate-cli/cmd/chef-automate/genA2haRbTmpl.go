@@ -303,7 +303,7 @@ aws do
   {{ if .Aws.Config.XCustomer }} customer "{{ .Aws.Config.XCustomer }}" {{ else }}  customer "{{ .Aws.Config.XCustomer }}" {{ end }}
   ### DEPRECATED: AWS Tag: Production flag - set true for production environment
   {{ if .Aws.Config.XProduction }} production "{{ .Aws.Config.XProduction }}" {{ else }}  production "{{ .Aws.Config.XProduction }}" {{ end }}
-  tags({"X-Contact"=>"{{ .Aws.Config.XContact }}", "X-Dept"=>"{{ .Aws.Config.XDept }}", "X-Project"=>"{{ .Aws.Config.XProject }}", "X-Customer"=>"{{ .Aws.Config.XCustomer }}", "X-Production"=>"{{ .Aws.Config.XProduction }}"})
+  tags({"X-Contact"=>"{{ .Aws.Config.XContact }}", "X-Dept"=>"{{ .Aws.Config.XDept }}", "X-Project"=>"{{ .Aws.Config.XProject }}", "X-Customer"=>"{{ .Aws.Config.XCustomer }}", "X-Production"=>"{{ .Aws.Config.XProduction }}", "ephemeral"=>"{{ .Aws.Config.XEphemeral }}", "team"=>"{{ .Aws.Config.XTeam }}", "owner"=>"{{ .Aws.Config.XOwner }}", "application"=>"{{ .Aws.Config.XApplication }}", "solutions"=>"{{ .Aws.Config.XSolutions }}, "expiration"=>"{{ .Aws.Config.XExpiration }}"})
   
   ### DEPRECATED: Below tags are used for CHEF AWS infrastructure tagging
   {{ if .Aws.Config.XEphemeral }} ephemeral "{{ .Aws.Config.XEphemeral }}" {{ else }} # ephemeral "{{ .Aws.Config.XEphemeral }}" {{ end }}
