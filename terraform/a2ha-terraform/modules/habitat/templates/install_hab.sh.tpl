@@ -157,7 +157,7 @@ if  which hab-sup &> /dev/null; then
 fi
 
 # For frontend and backend nodes
-for pkg in ${tmp_path}/aib_workspace/hab/cache/artifacts/{core-hab,*automate-ha-ctl,chef-automate-cli}*hart; do
+for pkg in ${tmp_path}/aib_workspace/hab/cache/artifacts/{core-hab,*automate-ha-ctl,*automate-cli}*hart; do
   export pkg
   bash -c 'eval hab pkg install --force --binlink --binlink-dir /bin $pkg "$LOGCMD"' || true
 done
