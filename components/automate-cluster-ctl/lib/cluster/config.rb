@@ -210,14 +210,7 @@ module AutomateCluster
         {
           "X-Contact" => configuration[:contact],
           "X-Dept" => configuration[:dept],
-          "X-Project" => configuration[:project],
-          "ephemeral" => configuration[:ephemeral],
-          "team" => configuration[:team],
-          "owner" => configuration[:owner],
-          "application" => configuration[:application],
-          "solutions" => configuration[:solutions],
-          "Name" => configuration[:Name],
-          "expiration" => configuration[:expiration],
+          "X-Project" => configuration[:project]
         }
       end
     end
