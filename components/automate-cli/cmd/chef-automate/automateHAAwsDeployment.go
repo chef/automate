@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/gofiber/fiber/v2/log"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
@@ -147,7 +148,11 @@ func (a *awsDeployment) generateConfig(state string) error {
 	}
 
 	a.setDefaultBasePath()
+	writer.Println("Before Encoding Password Fields")
+	log.Debug("Before Encoding Password Fields")
 	a.encodePasswordFields()
+	writer.Println("After Encoding Password Fields")
+	log.Debug("Before Encoding Password Fields")
 
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }

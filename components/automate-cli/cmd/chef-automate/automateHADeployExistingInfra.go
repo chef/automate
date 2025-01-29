@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
+	"github.com/gofiber/fiber/v2/log"
 	ptoml "github.com/pelletier/go-toml"
 )
 
@@ -97,7 +98,11 @@ func (e *existingInfra) generateConfig(state string) error {
 	}
 
 	e.setDefaultBasePath()
+	writer.Println("Before Encoding Password Fields")
+	log.Debug("Before Encoding Password Fields")
 	e.encodePasswordFields()
+	writer.Println("After Encoding Password Fields")
+	log.Debug("Before Encoding Password Fields")
 
 	return writeHAConfigFiles(existingNodesA2harbTemplate, e.config, state)
 }
