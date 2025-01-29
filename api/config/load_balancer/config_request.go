@@ -74,6 +74,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.ProxyBusyBuffersSize = w.String("16k")
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
 	c.V1.Sys.StaticConfig.Products = []string{"automate"}
+	c.V1.Sys.Ngx.Http.XXssProtection = w.String("1; mode=block")
+	c.V1.Sys.Ngx.Http.ContentSecurityPolicy = w.String("default-src 'self';frame-ancestors 'self';")
 	return c
 }
 
@@ -171,6 +173,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if xFwd := g.GetV1().GetSys().GetNgx().GetHttp().GetIncludeXForwardedFor(); xFwd != nil {
 		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xFwd
+	}
+
+	if xxssProtection := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtection != nil {
+		c.V1.Sys.Ngx.Http.XXssProtection = xxssProtection
 	}
 
 }
