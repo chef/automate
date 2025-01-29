@@ -104,6 +104,7 @@ message ConfigRequest {
 					google.protobuf.BoolValue enable_param = 30;
 					google.protobuf.BoolValue include_x_forwarded_for = 31;
 					google.protobuf.StringValue x_xss_protection = 32;
+					google.protobuf.StringValue content_security_policy = 33;
 		
 				}
 

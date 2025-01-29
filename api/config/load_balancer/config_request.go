@@ -75,6 +75,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
 	c.V1.Sys.StaticConfig.Products = []string{"automate"}
 	c.V1.Sys.Ngx.Http.XXssProtection = w.String("1; mode=block")
+	c.V1.Sys.Ngx.Http.ContentSecurityPolicy = w.String("default-src 'self';frame-ancestors 'self';")
 	return c
 }
 
@@ -176,6 +177,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtextion != nil {
 		c.V1.Sys.Ngx.Http.XXssProtection = xxssProtextion
+	}
+
+	if csp := g.GetV1().GetSys().GetNgx().GetHttp().ContentSecurityPolicy; csp != nil {
+		c.V1.Sys.Ngx.Http.ContentSecurityPolicy = csp
 	}
 
 }
