@@ -63,7 +63,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	}
 
 	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtextion != nil {
-		c.V1.Sys.Ngx.Http.XXssProtection = xxssProtextion
+		c.V1.Sys.Http.XXssProtection = xxssProtextion
 	}
 }
 
