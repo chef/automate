@@ -780,16 +780,23 @@ func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAcc
 }
 
 func (e *existingInfra) encodePasswordFields() {
+	e.log.Debug("RT Value of isManagedServicesOn", isManagedServicesOn())
 	if isManagedServicesOn() {
-
+        e.log.Debug("RT Inside ManagedServices", isManagedServicesOn()) 
 		if len(e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) > 0 {
+			e.log.Debug("RT OS SUP", e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) 
 			e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword)))
+			e.log.Debug("RT OS SUP Encoded", e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) 
 		}
 		if len(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword) > 0 {
+			e.log.Debug("RT PS SUP", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)
 			e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)))
+			e.log.Debug("RT PS SUP Encoded", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)
 		}
 		if len(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword) > 0 {
+			e.log.Debug("RT PS DBUP", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)
 			e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)))
+			e.log.Debug("RT PS DBUP Encoded", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)
 		}
 	}
 }
