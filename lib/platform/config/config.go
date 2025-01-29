@@ -211,9 +211,9 @@ func externalConnURIRenderer(ip string, port int, user string, password string, 
 	}
 	debugStr := fmt.Sprintf(fmtStr, userInfoDebugStr, ip, port, "<database>", strings.Join(opts, "&"))
 
-	userInfo := url.UserPassword(user, password)
+	_ = url.UserPassword(user, password)
 	return func(dbname string) string {
-		return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
+		return fmt.Sprintf(fmtStr, userInfoDebugStr, ip, port, dbname, strings.Join(opts, "&"))
 	}, debugStr
 }
 
