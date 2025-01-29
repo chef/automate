@@ -206,7 +206,16 @@ function build() {
   local hab_build
   #set HAB_BLDR_CHANNEL to dev as part of the hab package refresh
   local HAB_BLDR_CHANNEL=dev
-  
+  local HAB_FALLBACK
+
+  if [ -z $HAB_FALLBACK_CHANNEL ]; then
+    HAB_FALLBACK=LTS-2024
+  else 
+    HAB_FALLBACK=$HAB_FALLBACK_CHANNEL
+  fi 
+
+  echo HAB_FALLBACK_CHANNEL=${HAB_FALLBACK}
+
   # Support for hab v.0.63.0
   if [ -f /bin/build ]; then
     hab_build=/bin/build
@@ -220,7 +229,7 @@ function build() {
   if [ -z "$hab_build" ]; then
     exit_with "Hab build binary not found. Verify the 'build' wrapper inside the studio." 22
   else
-    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:dev} HAB_FALLBACK_CHANNEL=${HAB_FALLBACK_CHANNEL:LTS-2024} $hab_build "$@"
+    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=${HAB_BLDR_CHANNEL:dev} HAB_FALLBACK_CHANNEL=${HAB_FALLBACK} $hab_build "$@"
   fi
 }
 
