@@ -178,11 +178,6 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtextion != nil {
 		c.V1.Sys.Ngx.Http.XXssProtection = xxssProtextion
 	}
-
-	if csp := g.GetV1().GetSys().GetNgx().GetHttp().ContentSecurityPolicy; csp != nil {
-		c.V1.Sys.Ngx.Http.ContentSecurityPolicy = csp
-	}
-
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
