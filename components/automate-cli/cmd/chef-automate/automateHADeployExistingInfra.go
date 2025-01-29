@@ -780,23 +780,23 @@ func writeGoogleserviceJsonFile(filePath string, serviceAccount GoogleServiceAcc
 }
 
 func (e *existingInfra) encodePasswordFields() {
-	e.log.Debug("RT Value of isManagedServicesOn", isManagedServicesOn())
+	writer.Printf("\nRT Inside encodePasswordFields, Value of isManagedServicesOn %s", strconv.FormatBool(isManagedServicesOn()))
 	if isManagedServicesOn() {
-        e.log.Debug("RT Inside ManagedServices", isManagedServicesOn()) 
+        writer.Printf("\nRT Inside ManagedServices %s", strconv.FormatBool(isManagedServicesOn()))
 		if len(e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) > 0 {
-			e.log.Debug("RT OS SUP", e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) 
+			writer.Printf("\nRT OS SUP %s", e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) 
 			e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword)))
-			e.log.Debug("RT OS SUP Encoded", e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) 
+			writer.Printf("\nRT OS SUP Encoded %s", e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword) 
 		}
 		if len(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword) > 0 {
-			e.log.Debug("RT PS SUP", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)
+			writer.Printf("\nRT PS SUP %s", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)
 			e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)))
-			e.log.Debug("RT PS SUP Encoded", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)
+			writer.Printf("\nRT PS SUP Encoded %s", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)
 		}
 		if len(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword) > 0 {
-			e.log.Debug("RT PS DBUP", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)
+			writer.Printf("\nRT PS DBUP %s", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)
 			e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = base64.StdEncoding.EncodeToString([]byte((e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)))
-			e.log.Debug("RT PS DBUP Encoded", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)
+			writer.Printf("\nRT PS DBUP Encoded %s", e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)
 		}
 	}
 }
