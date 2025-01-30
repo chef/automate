@@ -62,7 +62,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = config.GlobalLogLevelToNginxLevel(logLevel)
 	}
 
-	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtextion != nil {
+	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().GetXXssProtection(); xxssProtextion != nil {
 		c.V1.Sys.Http.XXssProtection = xxssProtextion
 	}
 }

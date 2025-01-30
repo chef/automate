@@ -175,7 +175,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 		c.V1.Sys.Ngx.Http.IncludeXForwardedFor = xFwd
 	}
 
-	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtextion != nil {
+	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().GetXXssProtection(); xxssProtextion != nil {
 		c.V1.Sys.Ngx.Http.XXssProtection = xxssProtextion
 	}
 }
