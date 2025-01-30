@@ -30,6 +30,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	c.V1.Sys.Http.SslCiphers = w.String(config.InternalCipherSuite)
 	c.V1.Sys.Http.SslVerifyDepth = w.Int32(2)
+	c.V1.Sys.Http.XXssProtection = w.String("1; mode=block")
 	return c
 }
 
@@ -59,6 +60,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = config.GlobalLogLevelToNginxLevel(logLevel)
+	}
+
+	if xxssProtextion := g.GetV1().GetSys().GetNgx().GetHttp().XXssProtection; xxssProtextion != nil {
+		c.V1.Sys.Http.XXssProtection = xxssProtextion
 	}
 }
 

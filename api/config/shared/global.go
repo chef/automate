@@ -61,6 +61,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 				Ngx: &Nginx{
 					Http: &Http{
 						IncludeXForwardedFor: w.Bool(false),
+						XXssProtection:       w.String("1; mode=block"),
 					},
 				},
 			},
