@@ -110,9 +110,7 @@ class ChefServerDataBootstrap
 
   def bootstrap
     # TODO: Need to cleanly guard that we only do this in one instance of chef-server-ctl
-    puts "SHAHID=======> TO be removed"
     dbname = get_pg_database_uri()
-    puts "SHAHID---- TO BE removed #{dbname}"
 
     puts "Bootstrapping Chef Server Data"
     # This is done in a few stages. First we will see if the pivotal user exist
