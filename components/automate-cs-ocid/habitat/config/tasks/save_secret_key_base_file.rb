@@ -21,7 +21,7 @@ class SecretKeyBaseGenerator
         
         secret_key_base_file_path = ENV['SECRET_KEY_BASE_FILE_PATH']
         
-        if File.exists?(secret_key_base_file_path)
+        if File.exist?(secret_key_base_file_path)
           puts "SECRET_KEY_BASE file exists. File will be overwritten.."
         else
           puts "SECRET_KEY_BASE file doesn't exist. It will be generated.."
