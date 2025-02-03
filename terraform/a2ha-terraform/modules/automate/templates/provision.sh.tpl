@@ -128,7 +128,11 @@ failure() {
 
 # Creating mount path for elasticsearch backup 
 sudo mkdir -p ${nfs_mount_path}
-sudo chown hab:hab -RL ${nfs_mount_path}/
+
+if [ ! -e "/hab/user/deployment-service/config/user.toml" ]; then
+  sudo chown hab:hab -RL ${nfs_mount_path}/
+fi
+
 ADMIN_PASSWORD_SET="admin.password.done"
 # When we truncate the file we need to preserve the file permisssions
 truncate_with_timestamp() {
