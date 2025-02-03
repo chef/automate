@@ -20,7 +20,7 @@ pkg_deps=(
   # chef-server-* packages.
   #
   core/curl
-  core/ruby31/3.1.6/20240912144513
+  core/ruby3_1/3.1.6
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/15.10.27/20250102025712"
   "${vendor_origin}/chef-server-ctl/15.10.27/20250102025130"
