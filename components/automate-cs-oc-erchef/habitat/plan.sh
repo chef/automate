@@ -18,7 +18,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   #core/runit/2.1.2/20200403133549
-  core/runit/20240805170405 #glic 2.36
+  core/runit/2.1.2/20241018035314 #glic 2.36
   chef/mlsa
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools/0.1.0/20241212061203
