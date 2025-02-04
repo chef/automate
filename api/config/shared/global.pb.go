@@ -2714,9 +2714,9 @@ func (x *External_Postgresql_SSL) GetEnable() *wrapperspb.BoolValue {
 }
 
 type External_Postgresql_Authentication_PasswordAuthentication struct {
-	state         protoimpl.MessageState                                          `protogen:"open.v1"`
-	Superuser     *External_Postgresql_Authentication_PasswordAuthentication_User `protobuf:"bytes,1,opt,name=superuser,proto3" json:"superuser,omitempty" toml:"superuser,omitempty" mapstructure:"superuser,omitempty"`
-	Dbuser        *External_Postgresql_Authentication_PasswordAuthentication_User `protobuf:"bytes,2,opt,name=dbuser,proto3" json:"dbuser,omitempty" toml:"dbuser,omitempty" mapstructure:"dbuser,omitempty"`
+	state         protoimpl.MessageState                                               `protogen:"open.v1"`
+	Superuser     *External_Postgresql_Authentication_PasswordAuthentication_SuperUser `protobuf:"bytes,1,opt,name=superuser,proto3" json:"superuser,omitempty" toml:"superuser,omitempty" mapstructure:"superuser,omitempty"`
+	Dbuser        *External_Postgresql_Authentication_PasswordAuthentication_DBUser    `protobuf:"bytes,2,opt,name=dbuser,proto3" json:"dbuser,omitempty" toml:"dbuser,omitempty" mapstructure:"dbuser,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2765,7 +2765,7 @@ func (x *External_Postgresql_Authentication_PasswordAuthentication) GetDbuser() 
 	return nil
 }
 
-type External_Postgresql_Authentication_PasswordAuthentication_User struct {
+type External_Postgresql_Authentication_PasswordAuthentication_SuperUser struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	Username      *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty" toml:"username,omitempty" mapstructure:"username,omitempty"`
 	Password      *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty" toml:"password,omitempty" mapstructure:"password,omitempty"`
@@ -2773,8 +2773,8 @@ type External_Postgresql_Authentication_PasswordAuthentication_User struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *External_Postgresql_Authentication_PasswordAuthentication_User) Reset() {
-	*x = External_Postgresql_Authentication_PasswordAuthentication_User{}
+func (x *External_Postgresql_Authentication_PasswordAuthentication_SuperUser) Reset() {
+	*x = External_Postgresql_Authentication_PasswordAuthentication_SuperUser{}
 	mi := &file_config_shared_global_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
@@ -2818,21 +2818,18 @@ func (x *External_Postgresql_Authentication_PasswordAuthentication_SuperUser) Ge
 }
 
 type External_Postgresql_Authentication_PasswordAuthentication_DBUser struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Username      *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty" toml:"username,omitempty" mapstructure:"username,omitempty"`
+	Password      *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty" toml:"password,omitempty" mapstructure:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
-
-	Username *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty" toml:"username,omitempty" mapstructure:"username,omitempty"`
-	Password *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty" toml:"password,omitempty" mapstructure:"password,omitempty"`
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication_DBUser) Reset() {
 	*x = External_Postgresql_Authentication_PasswordAuthentication_DBUser{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[44]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
+	mi := &file_config_shared_global_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
 }
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication_DBUser) String() string {
@@ -2843,7 +2840,7 @@ func (*External_Postgresql_Authentication_PasswordAuthentication_DBUser) ProtoMe
 
 func (x *External_Postgresql_Authentication_PasswordAuthentication_DBUser) ProtoReflect() protoreflect.Message {
 	mi := &file_config_shared_global_proto_msgTypes[44]
-	if protoimpl.UnsafeEnabled && x != nil {
+	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
 			ms.StoreMessageInfo(mi)
@@ -2882,7 +2879,7 @@ type External_Automate_Authentication struct {
 
 func (x *External_Automate_Authentication) Reset() {
 	*x = External_Automate_Authentication{}
-	mi := &file_config_shared_global_proto_msgTypes[44]
+	mi := &file_config_shared_global_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2894,7 +2891,7 @@ func (x *External_Automate_Authentication) String() string {
 func (*External_Automate_Authentication) ProtoMessage() {}
 
 func (x *External_Automate_Authentication) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[44]
+	mi := &file_config_shared_global_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2934,7 +2931,7 @@ type External_Automate_SSL struct {
 
 func (x *External_Automate_SSL) Reset() {
 	*x = External_Automate_SSL{}
-	mi := &file_config_shared_global_proto_msgTypes[45]
+	mi := &file_config_shared_global_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2946,7 +2943,7 @@ func (x *External_Automate_SSL) String() string {
 func (*External_Automate_SSL) ProtoMessage() {}
 
 func (x *External_Automate_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[45]
+	mi := &file_config_shared_global_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2987,7 +2984,7 @@ type Backups_Filesystem struct {
 
 func (x *Backups_Filesystem) Reset() {
 	*x = Backups_Filesystem{}
-	mi := &file_config_shared_global_proto_msgTypes[46]
+	mi := &file_config_shared_global_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2999,7 +2996,7 @@ func (x *Backups_Filesystem) String() string {
 func (*Backups_Filesystem) ProtoMessage() {}
 
 func (x *Backups_Filesystem) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[46]
+	mi := &file_config_shared_global_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3049,7 +3046,7 @@ type Backups_S3 struct {
 
 func (x *Backups_S3) Reset() {
 	*x = Backups_S3{}
-	mi := &file_config_shared_global_proto_msgTypes[47]
+	mi := &file_config_shared_global_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3061,7 +3058,7 @@ func (x *Backups_S3) String() string {
 func (*Backups_S3) ProtoMessage() {}
 
 func (x *Backups_S3) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[47]
+	mi := &file_config_shared_global_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3124,7 +3121,7 @@ type Backups_GCS struct {
 
 func (x *Backups_GCS) Reset() {
 	*x = Backups_GCS{}
-	mi := &file_config_shared_global_proto_msgTypes[48]
+	mi := &file_config_shared_global_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3136,7 +3133,7 @@ func (x *Backups_GCS) String() string {
 func (*Backups_GCS) ProtoMessage() {}
 
 func (x *Backups_GCS) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[48]
+	mi := &file_config_shared_global_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3191,7 +3188,7 @@ type Backups_S3_AWSCredentials struct {
 
 func (x *Backups_S3_AWSCredentials) Reset() {
 	*x = Backups_S3_AWSCredentials{}
-	mi := &file_config_shared_global_proto_msgTypes[49]
+	mi := &file_config_shared_global_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3203,7 +3200,7 @@ func (x *Backups_S3_AWSCredentials) String() string {
 func (*Backups_S3_AWSCredentials) ProtoMessage() {}
 
 func (x *Backups_S3_AWSCredentials) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[49]
+	mi := &file_config_shared_global_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3266,7 +3263,7 @@ type Backups_S3_Elasticsearch struct {
 
 func (x *Backups_S3_Elasticsearch) Reset() {
 	*x = Backups_S3_Elasticsearch{}
-	mi := &file_config_shared_global_proto_msgTypes[50]
+	mi := &file_config_shared_global_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3278,7 +3275,7 @@ func (x *Backups_S3_Elasticsearch) String() string {
 func (*Backups_S3_Elasticsearch) ProtoMessage() {}
 
 func (x *Backups_S3_Elasticsearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[50]
+	mi := &file_config_shared_global_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3418,7 +3415,7 @@ type Backups_S3_Opensearch struct {
 
 func (x *Backups_S3_Opensearch) Reset() {
 	*x = Backups_S3_Opensearch{}
-	mi := &file_config_shared_global_proto_msgTypes[51]
+	mi := &file_config_shared_global_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3430,7 +3427,7 @@ func (x *Backups_S3_Opensearch) String() string {
 func (*Backups_S3_Opensearch) ProtoMessage() {}
 
 func (x *Backups_S3_Opensearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[51]
+	mi := &file_config_shared_global_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3555,7 +3552,7 @@ type Backups_S3_Bucket struct {
 
 func (x *Backups_S3_Bucket) Reset() {
 	*x = Backups_S3_Bucket{}
-	mi := &file_config_shared_global_proto_msgTypes[52]
+	mi := &file_config_shared_global_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3567,7 +3564,7 @@ func (x *Backups_S3_Bucket) String() string {
 func (*Backups_S3_Bucket) ProtoMessage() {}
 
 func (x *Backups_S3_Bucket) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[52]
+	mi := &file_config_shared_global_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3613,7 +3610,7 @@ type Backups_S3_SSL struct {
 
 func (x *Backups_S3_SSL) Reset() {
 	*x = Backups_S3_SSL{}
-	mi := &file_config_shared_global_proto_msgTypes[53]
+	mi := &file_config_shared_global_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3625,7 +3622,7 @@ func (x *Backups_S3_SSL) String() string {
 func (*Backups_S3_SSL) ProtoMessage() {}
 
 func (x *Backups_S3_SSL) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[53]
+	mi := &file_config_shared_global_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3657,7 +3654,7 @@ type Backups_GCS_GCPCredentials struct {
 
 func (x *Backups_GCS_GCPCredentials) Reset() {
 	*x = Backups_GCS_GCPCredentials{}
-	mi := &file_config_shared_global_proto_msgTypes[54]
+	mi := &file_config_shared_global_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3669,7 +3666,7 @@ func (x *Backups_GCS_GCPCredentials) String() string {
 func (*Backups_GCS_GCPCredentials) ProtoMessage() {}
 
 func (x *Backups_GCS_GCPCredentials) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[54]
+	mi := &file_config_shared_global_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3710,7 +3707,7 @@ type Backups_GCS_Elasticsearch struct {
 
 func (x *Backups_GCS_Elasticsearch) Reset() {
 	*x = Backups_GCS_Elasticsearch{}
-	mi := &file_config_shared_global_proto_msgTypes[55]
+	mi := &file_config_shared_global_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3722,7 +3719,7 @@ func (x *Backups_GCS_Elasticsearch) String() string {
 func (*Backups_GCS_Elasticsearch) ProtoMessage() {}
 
 func (x *Backups_GCS_Elasticsearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[55]
+	mi := &file_config_shared_global_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3805,7 +3802,7 @@ type Backups_GCS_Opensearch struct {
 
 func (x *Backups_GCS_Opensearch) Reset() {
 	*x = Backups_GCS_Opensearch{}
-	mi := &file_config_shared_global_proto_msgTypes[56]
+	mi := &file_config_shared_global_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3817,7 +3814,7 @@ func (x *Backups_GCS_Opensearch) String() string {
 func (*Backups_GCS_Opensearch) ProtoMessage() {}
 
 func (x *Backups_GCS_Opensearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[56]
+	mi := &file_config_shared_global_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3892,7 +3889,7 @@ type Backups_GCS_Bucket struct {
 
 func (x *Backups_GCS_Bucket) Reset() {
 	*x = Backups_GCS_Bucket{}
-	mi := &file_config_shared_global_proto_msgTypes[57]
+	mi := &file_config_shared_global_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3904,7 +3901,7 @@ func (x *Backups_GCS_Bucket) String() string {
 func (*Backups_GCS_Bucket) ProtoMessage() {}
 
 func (x *Backups_GCS_Bucket) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[57]
+	mi := &file_config_shared_global_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4954,7 +4951,7 @@ func file_config_shared_global_proto_rawDescGZIP() []byte {
 	return file_config_shared_global_proto_rawDescData
 }
 
-var file_config_shared_global_proto_msgTypes = make([]protoimpl.MessageInfo, 58)
+var file_config_shared_global_proto_msgTypes = make([]protoimpl.MessageInfo, 59)
 var file_config_shared_global_proto_goTypes = []any{
 	(*GlobalConfig)(nil),                  // 0: chef.automate.infra.config.GlobalConfig
 	(*V1)(nil),                            // 1: chef.automate.infra.config.V1
