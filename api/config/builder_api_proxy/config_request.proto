@@ -55,6 +55,7 @@ message ConfigRequest {
 				google.protobuf.StringValue ssl_ciphers = 4;
 				google.protobuf.StringValue ssl_protocols = 5;
 				google.protobuf.Int32Value ssl_verify_depth = 6;
+				google.protobuf.StringValue x_xss_protection = 7;
 			}
 
 			message Web {
