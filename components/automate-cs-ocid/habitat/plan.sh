@@ -8,7 +8,7 @@ pkg_description="Wrapper package for chef/ocid"
 pkg_origin="chef"
 
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="15.10.27"
+pkg_version="15.10.28"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -23,7 +23,9 @@ pkg_deps=(
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools/0.1.0/20241212061203
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_id/15.10.27/20250102025130"
+  "${local_platform_tools_origin:-jashaik}/automate-platform-tools"
+  # WARNING: Version pin managed by .expeditor/update_chef_server.sh
+  "${vendor_origin}/oc_id/15.10.28/20250110073641"
 )
 
 pkg_binds=(
@@ -37,7 +39,7 @@ pkg_exports=(
 
 pkg_exposes=(http-port)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_download() {

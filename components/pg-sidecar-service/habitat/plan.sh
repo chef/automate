@@ -27,7 +27,7 @@ pkg_deps=(
   core/sqitch_pg/3.15.0/20240614112821
 )
 pkg_bin_dirs=(bin)
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

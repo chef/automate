@@ -22,6 +22,7 @@ pkg_deps=(
   chef/mlsa/1.0.1/20240125084021
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools/0.1.0/20241212061203
+  ${local_platform_tools_origin:-jashaik}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_erchef/15.10.27/20250102025130"
 )
@@ -51,7 +52,7 @@ pkg_exposes=(http-port)
 
 pkg_bin_dirs=(bin)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding-go"
 automate_scaffolding_include_templates=(sqerl.config)
 
 scaffolding_go_base_path=github.com/chef

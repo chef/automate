@@ -9,7 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="15.10.27"
+pkg_version="15.10.28"
 pkg_deps=(
   core/coreutils/8.32/20240105213308
   chef/mlsa/1.0.1/20240125084021
@@ -22,8 +22,8 @@ pkg_deps=(
   core/curl/8.7.1/20240614090648
   core/ruby31/3.1.6/20240912144513
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/15.10.27/20250102025712"
-  "${vendor_origin}/chef-server-ctl/15.10.27/20250102025130"
+  "${vendor_origin}/chef-server-nginx/15.10.28/20250110074239"
+  "${vendor_origin}/chef-server-ctl/15.10.28/20250110073640"
 )
 
 
@@ -56,7 +56,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 # the other nginx instances in A2 at the moment:
 pkg_svc_user="root"
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

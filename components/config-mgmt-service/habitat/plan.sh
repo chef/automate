@@ -14,7 +14,7 @@ pkg_deps=(
   core/grpcurl
   core/jq-static
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "${local_platform_tools_origin:-jashaik}/automate-platform-tools"
 )
 pkg_exports=(
   [port]=service.port
@@ -27,7 +27,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
 )
 pkg_bin_dirs=(bin)
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

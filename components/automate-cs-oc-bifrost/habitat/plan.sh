@@ -17,6 +17,7 @@ pkg_deps=(
   chef/mlsa/1.0.1/20240125084021
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools/0.1.0/20241212061203
+  "${local_platform_tools_origin:-jashaik}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_bifrost/15.10.27/20250102025130"
 )
@@ -32,7 +33,7 @@ pkg_exports=(
 
 pkg_exposes=(http-port)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-jashaik}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_download() {
