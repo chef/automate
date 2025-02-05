@@ -47,3 +47,5 @@ tcp_nopush = "on"
 tcp_nodelay = "on"
 enable_csp_header = false
 enable_param = false
+x_xss_protection = "1; mode=block"
+content_security_policy = "default-src 'self';frame-ancestors 'self';"

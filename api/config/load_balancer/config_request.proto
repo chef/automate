@@ -99,6 +99,8 @@ message ConfigRequest {
 					google.protobuf.StringValue proxy_buffers = 27;
 					google.protobuf.StringValue proxy_busy_buffers_size = 28;
 					google.protobuf.BoolValue enable_csp_header = 29;
+					google.protobuf.StringValue x_xss_protection = 32;
+					google.protobuf.StringValue content_security_policy = 33;
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;
 					google.protobuf.BoolValue enable_param = 30;
