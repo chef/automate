@@ -87,10 +87,31 @@ class ChefServerDataBootstrap
     end
   end
 
+  def pg_superuser_id_from_env
+    fd = ENV['CHEF_SECRETS_FD']
+    if fd
+      f = IO.for_fd(fd.to_i)
+      secrets = JSON.parse(f.read())
+      secrets['userconfig']['pg_superuser_password']
+    else
+      raise "No PG secrets data found in environment"
+    end
+  end
+
+  def get_pg_database_uri()
+    dbname = ENV['PGDATABASE']
+    if dbname.match('redacted') != nil
+      userpass = pg_superuser_id_from_env()
+      dbname.dup.sub!('<redacted>',userpass)
+    else
+      dbname
+    end
+  end
+
   def bootstrap
     # TODO: Need to cleanly guard that we only do this in one instance of chef-server-ctl
 
-    dbname = ENV['PGDATABASE']
+    dbname = get_pg_database_uri()
 
     puts "Bootstrapping Chef Server Data"
     # This is done in a few stages. First we will see if the pivotal user exist
