@@ -177,7 +177,7 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 			}
 			execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 			getPass, err := execGetPass.Output()
-			if err != nil || string(getPass) == "" {
+			if err != nil || strings.TrimSpace(string(getPass)) == "" {
 				return nil, err
 			}
 			password = strings.TrimSpace(string(getPass))
