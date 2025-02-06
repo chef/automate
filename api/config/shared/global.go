@@ -260,7 +260,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				}
 				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()
-				if err != nil || string(getPass) == "" {
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
 					cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.password")
 				}
 			}
@@ -271,7 +271,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.username")
 			}
 			if p == "" {
-				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.password")
+				args := []string{
+					"show",
+					"userconfig.aws_es_password",
+				}
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.password")
+				}
 			}
 		case "":
 		default:
@@ -317,7 +325,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				}
 				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()
-				if err != nil || string(getPass) == "" {
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
 					cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.password")
 				}
 			}
@@ -328,7 +336,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.username")
 			}
 			if p == "" {
-				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.password")
+				args := []string{
+					"show",
+					"userconfig.aws_os_password",
+				}
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.password")
+				}
 			}
 		case "":
 		default:
@@ -355,7 +371,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				}
 				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()
-				if err != nil || string(getPass) == "" {
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
 					cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.password")
 				}
 			}
@@ -373,7 +389,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				}
 				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()
-				if err != nil || string(getPass) == "" {
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
 					cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.password")
 				}
 			}

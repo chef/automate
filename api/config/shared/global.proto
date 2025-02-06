@@ -89,7 +89,7 @@ message External {
         // needed for making snapshot repos, but if not provided, we can use the
         // instance creds.
         google.protobuf.StringValue username = 1;
-        google.protobuf.StringValue password = 2;
+        google.protobuf.StringValue password = 2 [(chef.automate.api.secret) = { name: "aws_es_password" }];
         google.protobuf.StringValue access_key = 3;
         google.protobuf.StringValue secret_key = 4;
       }
@@ -153,7 +153,7 @@ message External {
         // needed for making snapshot repos, but if not provided, we can use the
         // instance creds.
         google.protobuf.StringValue username = 1;
-        google.protobuf.StringValue password = 2;
+        google.protobuf.StringValue password = 2 [(chef.automate.api.secret) = { name: "aws_os_password" }];
         google.protobuf.StringValue access_key = 3;
         google.protobuf.StringValue secret_key = 4;
       }
