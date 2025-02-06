@@ -25,11 +25,10 @@ document "applications_set_service_seq_to_int_max" <<DOC
   32bit to 64bit.
 DOC
 function applications_set_service_seq_to_int_max() {
-  
-  chef-automate dev psql chef_applications_service -- -c "ALTER SEQUENCE service_full_id_seq AS BIGINT;"
-
-  chef-automate dev psql chef_applications_service -- -c "SELECT setval('service_full_id_seq', (SELECT MAX(id) FROM service_full));"
+  chef-automate dev psql chef_applications_service -- -c "SELECT setval('service_full_id_seq', 9223372036854775807)"
 }
+
+
 document "applications_list_services" <<DOC
   List all the applications-service services
 DOC

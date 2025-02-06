@@ -1,0 +1,1 @@
+ALTER SEQUENCE service_full_id_seq AS BIGINT;
