@@ -179,11 +179,24 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(endpoints) == 1 {
 				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = endpoints[0].Address
 			}
+			password := auth.GetAwsOs().GetPassword().GetValue()
+			if password == "" {
+				args := []string{
+					"show",
+					"userconfig.aws_os_password",
+				}
+				execGetPass := exec.Command(ac.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					return
+				}
+				password = strings.TrimSpace(string(getPass))
+			}
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
 					auth.GetAwsOs().GetUsername().GetValue(),
-					auth.GetAwsOs().GetPassword().GetValue(),
+					password,
 				),
 			)))
 		default:
