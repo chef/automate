@@ -13,6 +13,7 @@ cd {{pkgPathFor "chef/oc_id"}}/oc_id
 bundle config path "vendor/bundle"
 
 export RAILS_ENV="{{cfg.rails_env}}"
+
 export RACK_ENV="{{cfg.rack_env}}"
 
 export HOME={{pkg.svc_var_path}}
@@ -28,6 +29,20 @@ if [ ! -f /hab/.skip_migration ]; then
 fi
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
+
+
+secrets-helper generate oc_id.superuser_id 32 --if-not-exists
+
+output=$(secrets-helper exec \
+  --secret oc_id.superuser_id \
+  --optional-secret userconfig.pg_superuser_password \
+  -- \
+  bundle exec ruby "{{pkg.svc_config_path}}/tasks/set_pg_secrets.rb"
+)
+
+if [ -n "$output" ]; then
+  export DATABASE_URL=$output
+fi
 
 export OCID_PKG_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
 
@@ -47,7 +62,11 @@ source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
 # pls make sure export happens after the file is updated.
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-bundle exec bin/rake db:migrate
+secrets-helper exec \
+  --secret oc_id.superuser_id \
+  --optional-secret userconfig.pg_superuser_password \
+  -- \
+  bundle exec bin/rake db:migrate
 
 # Registering oauth applications
 export OAUTH_APPS_CONFIG_JSON='{{toJson cfg.ocid.oauth_application_config}}'
@@ -58,4 +77,3 @@ bundle exec bin/rake oauth_application:save_registered_app_details_to_file
 
 bundle exec bin/unicorn -p "{{cfg.network.port}}"
 
-secrets-helper generate oc_id.superuser_id 32 --if-not-exists
