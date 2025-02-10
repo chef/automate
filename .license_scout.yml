@@ -2105,5 +2105,3 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: tags.cncf.io/container-device-interface/specs-go
     reason: Exception made by Chef Legal
-  - name: github.com/googleapis/googleapis
-    reason: Exception made by Chef Legal

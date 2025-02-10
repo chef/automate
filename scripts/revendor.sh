@@ -45,7 +45,7 @@ envoyproxyModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/envoyproxy/p
 # happened to get on a particular day. We have to lock to *a* version, because
 # the version ends up in the go.mod file and we check whether that file is
 # properly up-to-date in Ci.
-go get github.com/googleapis/googleapis@a94df49e8f20
+go get github.com/googleapis/googleapis@v0.0.0-20240205020701-9d1dd5ee9d3f
 googleAPIsModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/googleapis/googleapis")
 
 mkdir -p $grpcGatewayVendorPath
