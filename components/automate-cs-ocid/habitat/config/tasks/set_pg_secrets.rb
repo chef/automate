@@ -9,7 +9,8 @@ class PGDatabaseConfig
       secrets = JSON.parse(f.read())
       secrets['userconfig']['pg_superuser_password']
     else
-        raise "No PG secrets data found in environment"
+      STDERR.puts "No PG secrets data found in environment"
+      raise "No PG secrets data found in environment"
     end
   end
 
@@ -19,6 +20,7 @@ class PGDatabaseConfig
       userpass = pg_superuser_id_from_env
       puts dbURL.dup.sub!('<redacted>',userpass)
     else
+      puts dbURL
       dbURL
     end
   end

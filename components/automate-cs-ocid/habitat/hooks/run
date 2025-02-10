@@ -30,7 +30,6 @@ fi
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
 
-
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
 
 output=$(secrets-helper exec \
