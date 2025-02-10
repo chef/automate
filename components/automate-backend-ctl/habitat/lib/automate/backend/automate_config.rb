@@ -1,5 +1,6 @@
 require 'erb'
 require 'openssl'
+require 'base64'
 
 module Automate
   module Backend
@@ -62,6 +63,10 @@ module Automate
         fqdn_cert.add_extension(ef.create_extension('subjectKeyIdentifier','hash',false))
         fqdn_cert.sign(fqdn_key, OpenSSL::Digest::SHA256.new)
         [fqdn_key.to_pem, fqdn_cert.to_pem]
+      end
+
+      def encode_string(input_string)
+        encoded_string = Base64.encode64(input_string).chomp
       end
 
       def render
