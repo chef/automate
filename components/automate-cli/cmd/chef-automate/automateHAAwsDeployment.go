@@ -3,6 +3,7 @@ package main
 import (
 	"container/list"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"net/http"
@@ -146,6 +147,7 @@ func (a *awsDeployment) generateConfig(state string) error {
 	}
 
 	a.setDefaultBasePath()
+	a.encodePasswordFields()
 
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }
@@ -546,4 +548,19 @@ func (a *awsDeployment) isIamRolePresent() error {
 		return errors.New("Please check if Bastion has attached an IAM Role to it")
 	}
 	return nil
+}
+
+func (a *awsDeployment) encodePasswordFields() {
+	if a.config.Aws.Config.SetupManagedServices {
+		writer.Println("Encoding password fields")
+		if len(a.config.Aws.Config.OpensearchUserPassword) > 0 {
+			a.config.Aws.Config.OpensearchUserPassword = base64.StdEncoding.EncodeToString([]byte((a.config.Aws.Config.OpensearchUserPassword)))
+		}
+		if len(a.config.Aws.Config.RDSSuperUserPassword) > 0 {
+			a.config.Aws.Config.RDSSuperUserPassword = base64.StdEncoding.EncodeToString([]byte((a.config.Aws.Config.RDSSuperUserPassword)))
+		}
+		if len(a.config.Aws.Config.RDSDBUserPassword) > 0 {
+			a.config.Aws.Config.RDSDBUserPassword = base64.StdEncoding.EncodeToString([]byte((a.config.Aws.Config.RDSDBUserPassword)))
+		}
+	}
 }
