@@ -485,7 +485,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 ### X-XSS-Protection
 
-The HTTP X-XSS-Protection response header was a feature of Internet Explorer, Chrome and Safari that stopped pages from loading when they detected reflected cross-site scripting (XSS) attacks.
+The HTTP X-XSS-Protection response header is a feature of Internet Explorer, Chrome and Safari that stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
 
 Refer: https://www.keycdn.com/blog/x-xss-protection
 
