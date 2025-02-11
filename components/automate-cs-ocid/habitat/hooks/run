@@ -61,11 +61,7 @@ source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
 # pls make sure export happens after the file is updated.
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-secrets-helper exec \
-  --secret oc_id.superuser_id \
-  --optional-secret userconfig.pg_superuser_password \
-  -- \
-  bundle exec bin/rake db:migrate
+bundle exec bin/rake db:migrate
 
 # Registering oauth applications
 export OAUTH_APPS_CONFIG_JSON='{{toJson cfg.ocid.oauth_application_config}}'
