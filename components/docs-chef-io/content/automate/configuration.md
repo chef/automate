@@ -474,6 +474,8 @@ In Chef Automate, enable the Content Security Policy header by patching the foll
 Enabling the CSP header may break the SAML login. This may happen if the IDP Login page has inline javascript, which the CSP header prevents from getting evaluated by default.
 {{< /warning >}}
 
+The default value of the Content Security Policy (CSP) is default-src 'self'; frame-ancestors 'self';. This value will be present in the HTTP response header and in the /hab/svc/automate-load-balancer/config/nginx.conf file only after you enable the CSP header.
+
 To configure the value of Content Security Policy, the following configuration needs to be patched:
 
 ```toml
@@ -488,6 +490,8 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 The HTTP X-XSS-Protection response header is a feature of Internet Explorer, Chrome and Safari that stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
 
 Refer: https://www.keycdn.com/blog/x-xss-protection
+
+The default value of the X-XSS-Protection header is 1; mode=block. This value can be seen in the HTTP response header and in the /hab/svc/automate-load-balancer/config/nginx.conf file.
 
 To configure the value of X-XSS-Protection, the following configuration needs to be patched:
  
