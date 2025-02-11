@@ -6,6 +6,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	toml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 // Enum jobs
@@ -41,6 +42,32 @@ type OldJobConfig struct {
 
 type Config struct {
 	JobsConfig []JobConfig `toml:"jobs_config"`
+	Storage    Storage     `mapstructure:"storage"`
+}
+
+type Storage struct {
+	URI          string `mapstructure:"uri"`
+	DBUser       string `mapstructure:"user"`
+	Database     string `mapstructure:"database"`
+	SchemaPath   string `mapstructure:"schema_path"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
+}
+
+func Load(configPath string) (*Config, error) {
+	v := viper.New()
+	v.SetConfigFile(configPath)
+
+	if err := v.ReadInConfig(); err != nil {
+		return nil, errors.Wrap(err, "error reading config file")
+	}
+
+	var cfg Config
+	if err := v.Unmarshal(&cfg); err != nil {
+		return nil, errors.Wrap(err, "error unmarshaling config")
+	}
+
+	return &cfg, nil
 }
 
 // ConfigForJob returns the configuration for the given job index. The
