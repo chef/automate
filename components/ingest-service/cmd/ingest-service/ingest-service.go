@@ -8,8 +8,6 @@ package main
 import "github.com/chef/automate/components/ingest-service/cmd/ingest-service/commands"
 
 func main() {
-
 	// Start the ingest service
 	commands.Execute()
-
 }
