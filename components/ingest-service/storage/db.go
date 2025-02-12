@@ -53,13 +53,16 @@ func ConnectAndMigrate(dbConf *config.Storage) (*DB, error) {
 		"uri":    dbConf.URI,
 		"schema": dbConf.SchemaPath,
 	}).Debug("Initializing database")
+
 	err = runMigrations(dbConf)
+	if err != nil {
+		return nil, errors.Wrap(err, "Migration failed")
+	}
 
 	db := &DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
-
-	return db, err
+	return db, nil
 }
 
 // connect opens a connection to the database

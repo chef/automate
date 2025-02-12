@@ -8,9 +8,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/grpc"
 	"github.com/chef/automate/components/ingest-service/rest"
 	"github.com/chef/automate/components/ingest-service/serveropts"
+	"github.com/chef/automate/components/ingest-service/storage"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
@@ -35,6 +37,21 @@ var serveCmd = &cobra.Command{
 
 		// construct GRPC endpoint for gateway
 		endpoint := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
+		dbConfig := &config.Storage{
+			URI:          conf.Storage.URI,
+			DBUser:       conf.Storage.DBUser,
+			Database:     conf.Storage.Database,
+			SchemaPath:   conf.Storage.SchemaPath,
+			MaxOpenConns: conf.Storage.MaxOpenConns,
+			MaxIdleConns: conf.Storage.MaxIdleConns,
+		}
+
+		// Initialize PostgreSQL connection and run migrations
+		_, err = storage.ConnectAndMigrate(dbConfig)
+		if err != nil {
+			logrus.WithError(err).Fatal("Error connecting to DB and running migrations")
+		}
+		logrus.Info("Database connection and migrations successful!")
 
 		// Spawn a gRPC Client in a goroutine
 		//
@@ -44,14 +61,15 @@ var serveCmd = &cobra.Command{
 		//
 		// TODO: Figure out how to respawn if client crashes?
 		if os.Getenv(devModeEnvVar) == "true" {
-			go rest.Spawn(endpoint, conf) // nolint: errcheck
+			go rest.Spawn(endpoint, conf) // Modified to pass `db`
 		}
 
 		// Start the gRPC Server
-		err = grpc.Spawn(conf)
+		err = grpc.Spawn(conf) // Modified to pass `db`
 		if err != nil {
 			logrus.WithError(err).Fatal("spawn failed")
 		}
+
 	},
 }
 
@@ -113,6 +131,14 @@ func readCliParams() *serveropts.Opts {
 		Jobs: serveropts.JobsConfig{
 			MissingNodesForDeletionRunningDefault: missingNodesForDeletionRunningDefault,
 			NodesMissingRunningDefault:            nodesMissingRunningDefault,
+		},
+		Storage: serveropts.StorageConfig{ //Added Storage Configuration
+			URI:          viper.GetString("postgresql-url"),
+			DBUser:       viper.GetString("postgresql-user"),
+			Database:     viper.GetString("postgresql-database"),
+			SchemaPath:   viper.GetString("postgresql-schema-path"),
+			MaxOpenConns: viper.GetInt("postgresql-max-open-conns"),
+			MaxIdleConns: viper.GetInt("postgresql-max-idle-conns"),
 		},
 		ConnFactory: factory,
 	}
