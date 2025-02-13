@@ -131,14 +131,14 @@ func readCliParams() *serveropts.Opts {
 			MissingNodesForDeletionRunningDefault: missingNodesForDeletionRunningDefault,
 			NodesMissingRunningDefault:            nodesMissingRunningDefault,
 		},
-		// Storage: serveropts.StorageConfig{ //Added Storage Configuration
-		// 	URI:          viper.GetString("postgresql-url"),
-		// 	DBUser:       viper.GetString("postgresql-user"),
-		// 	Database:     viper.GetString("postgresql-database"),
-		// 	SchemaPath:   viper.GetString("postgresql-schema-path"),
-		// 	MaxOpenConns: viper.GetInt("postgresql-max-open-conns"),
-		// 	MaxIdleConns: viper.GetInt("postgresql-max-idle-conns"),
-		// },
+		Storage: serveropts.StorageConfig{ //Added Storage Configuration
+			// 	URI:          viper.GetString("postgresql-url"),
+			// 	DBUser:       viper.GetString("postgresql-user"),
+			// 	Database:     viper.GetString("postgresql-database"),
+			SchemaPath: viper.GetString("schema-path"),
+			// 	MaxOpenConns: viper.GetInt("postgresql-max-open-conns"),
+			// 	MaxIdleConns: viper.GetInt("postgresql-max-idle-conns"),
+		},
 		ConnFactory: factory,
 	}
 }
@@ -156,6 +156,7 @@ func init() {
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
 	serveCmd.Flags().String("config-mgmt-address", "localhost:10119", "address of config-mgmt-service (domain:<port>)")
 	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")
+	serveCmd.Flags().String("schema-path", "", "../../../storage/schema")
 	serveCmd.Flags().String("postgresql-database", "chef_ingest_service", "PG Database name")
 	serveCmd.Flags().Int32("converge-history-days", 30, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int32("actions-days", 30, "Number of days to keep actions for. A number less than or equal to 0 means data should never be deleted")
