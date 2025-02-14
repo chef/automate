@@ -115,6 +115,7 @@ func readCliParams() *serveropts.Opts {
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
 		ConfigMgmtAddress:             viper.GetString("config-mgmt-address"),
 		LogLevel:                      viper.GetString("log-level"),
+		SchemmaPath:                   viper.GetString("schema-path"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
 		ChefIngestServerConfig: serveropts.ChefIngestServerConfig{

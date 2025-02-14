@@ -74,7 +74,7 @@ func Spawn(opts *serveropts.Opts) error {
 		return fmt.Errorf("invalid database URL")
 	}
 
-	if opts.Storage.SchemaPath == "" {
+	if opts.SchemmaPath == "" {
 		log.Fatal("Schema path is missing in configuration")
 		return fmt.Errorf("schema path cannot be empty")
 	}
@@ -85,7 +85,7 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 	storageConfig := &config.Storage{
 		URI:        pgURL,
-		SchemaPath: opts.Storage.SchemaPath,
+		SchemaPath: opts.SchemmaPath,
 	}
 
 	err = storage.RunMigrations(storageConfig) // Call the migration function
