@@ -43,8 +43,13 @@ var serveCmd = &cobra.Command{
 		// the client should also be up.
 		//
 		// TODO: Figure out how to respawn if client crashes?
+		// Spawn a gRPC Client in a goroutine
 		if os.Getenv(devModeEnvVar) == "true" {
-			go rest.Spawn(endpoint, conf)
+			go func() {
+				if err := rest.Spawn(endpoint, conf); err != nil {
+					logrus.WithError(err).Error("Failed to spawn REST server")
+				}
+			}()
 		}
 
 		// Start the gRPC Server
