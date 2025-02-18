@@ -53,22 +53,6 @@ type Storage struct {
 	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
 
-// func Load(configPath string) (*Config, error) {
-// 	v := viper.New()
-// 	v.SetConfigFile(configPath)
-
-// 	if err := v.ReadInConfig(); err != nil {
-// 		return nil, errors.Wrap(err, "error reading config file")
-// 	}
-
-// 	var cfg Config
-// 	if err := v.Unmarshal(&cfg); err != nil {
-// 		return nil, errors.Wrap(err, "error unmarshaling config")
-// 	}
-
-// 	return &cfg, nil
-// }
-
 // ConfigForJob returns the configuration for the given job index. The
 // job indexes are constants in this package and reflect this
 // historical structure of the on-disk job configuration. The default
