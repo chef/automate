@@ -474,33 +474,31 @@ In Chef Automate, enable the Content Security Policy header by patching the foll
 Enabling the CSP header may break the SAML login. This may happen if the IDP Login page has inline javascript, which the CSP header prevents from getting evaluated by default.
 {{< /warning >}}
 
-The default value of the Content Security Policy is default-src 'self'; frame-ancestors 'self';.
+The default value of the content security policy is `default-src 'self'; frame-ancestors 'self';`.
 
-To configure the value of Content Security Policy, the following configuration needs to be patched:
+To configure the value of the content security policy, patch the following configuration:
 
 ```toml
 [load_balancer.v1.sys.ngx.http]
   content_security_policy = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';"
 ```
 
-Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+Run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
 
 ### X-XSS-Protection
 
-The HTTP X-XSS-Protection response header is a feature of Internet Explorer, Chrome and Safari that stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
+The HTTP [X-XSS-Protection](https://www.keycdn.com/blog/x-xss-protection) response header is a feature of Internet Explorer, Chrome, and Safari that stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
 
-Refer: https://www.keycdn.com/blog/x-xss-protection
+The default value of the X-XSS-Protection header is `1; mode=block`.
 
-The default value of the X-XSS-Protection header is 1; mode=block.
-
-To configure the value of X-XSS-Protection, the following configuration needs to be patched:
+To configure the value of the X-XSS-Protection, patch the following configuration:
  
 ```toml
 [global.v1.sys.ngx.http]
   x_xss_protection = "0"
 ```
  
-Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+Run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
 
 ### Troubleshooting
 
