@@ -324,7 +324,7 @@ CHEF_USERNAME=your-chef-ad-username scripts/get_secrets.sh
 3. Setup your environment to run `vault`:
 
 ```
-export VAULT_ADDR=https://vault.chef.co:8200
+export VAULT_ADDR=https://vault.ps.chef.co
 # If you are in the studio, install the cacerts:
 export VAULT_CACERT="$(hab pkg path core/cacerts)/ssl/certs/cacert.pem"
 ```
