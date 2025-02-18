@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -46,10 +47,25 @@ import (
 //
 // Maybe even spawn multiple servers
 func Spawn(opts *serveropts.Opts) error {
+
+	// err := os.Chdir("/hab/svc/ingest-service")
+	// if err != nil {
+	// 	log.WithError(err).Error("Failed to change working directory")
+	// } else {
+	// 	log.Info("Changed working directory to /hab/svc/ingest-service")
+	// }
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.WithError(err).Error("Failed to get current working directory")
+	} else {
+		log.Infof("Current working directory: %s", cwd)
+	}
+
 	var client backend.Client
 
 	// Initialize the backend client
-	client, err := elastic.New(opts.ElasticSearchUrl)
+	client, err = elastic.New(opts.ElasticSearchUrl)
 
 	if err != nil {
 		log.WithFields(log.Fields{
