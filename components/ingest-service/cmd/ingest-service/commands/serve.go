@@ -36,22 +36,6 @@ var serveCmd = &cobra.Command{
 		// construct GRPC endpoint for gateway
 		endpoint := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 
-		// dbConfig := &config.Storage{
-		// 	URI:          conf.Storage.URI,
-		// 	DBUser:       conf.Storage.DBUser,
-		// 	Database:     conf.Storage.Database,
-		// 	SchemaPath:   conf.Storage.SchemaPath,
-		// 	MaxOpenConns: conf.Storage.MaxOpenConns,
-		// 	MaxIdleConns: conf.Storage.MaxIdleConns,
-		// }
-
-		// // Initialize PostgreSQL connection and run migrations
-		// _, err = storage.ConnectAndMigrate(dbConfig)
-		// if err != nil {
-		// 	logrus.WithError(err).Fatal("Error connecting to DB and running migrations")
-		// }
-		// logrus.Info("Database connection and migrations successful!")
-
 		// Spawn a gRPC Client in a goroutine
 		//
 		// This goroutine will be attach to the main routine that
@@ -132,14 +116,6 @@ func readCliParams() *serveropts.Opts {
 		Jobs: serveropts.JobsConfig{
 			MissingNodesForDeletionRunningDefault: missingNodesForDeletionRunningDefault,
 			NodesMissingRunningDefault:            nodesMissingRunningDefault,
-		},
-		Storage: serveropts.StorageConfig{ //Added Storage Configuration
-			// 	URI:          viper.GetString("postgresql-url"),
-			// 	DBUser:       viper.GetString("postgresql-user"),
-			// 	Database:     viper.GetString("postgresql-database"),
-			SchemaPath: viper.GetString("schema-path"),
-			// 	MaxOpenConns: viper.GetInt("postgresql-max-open-conns"),
-			// 	MaxIdleConns: viper.GetInt("postgresql-max-idle-conns"),
 		},
 		ConnFactory: factory,
 	}
