@@ -57,7 +57,6 @@ var serveCmd = &cobra.Command{
 }
 
 func readCliParams() *serveropts.Opts {
-	fmt.Println("--------" + viper.GetString("schema-path"))
 	tlsConfig := certs.TLSConfig{
 		CertPath:       viper.GetString("cert"),
 		KeyPath:        viper.GetString("key"),
