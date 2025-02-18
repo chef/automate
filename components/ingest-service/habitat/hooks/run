@@ -66,6 +66,8 @@ CONFIG="$CONFIG --config {{pkg.svc_data_path}}/.ingest-service.toml"
 
 CONFIG="$CONFIG --postgresql-database $DBNAME"
 
+CONFIG="$CONFIG --schema-path {{pkg.path}}/schema"
+
 # Listen to what our gossip protocol whispers
 #
 # We have modified our plan to have a hard dependency to
