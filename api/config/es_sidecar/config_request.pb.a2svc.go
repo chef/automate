@@ -4,8 +4,10 @@
 package es_sidecar
 
 import (
+	shared "github.com/chef/automate/api/config/shared"
 	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // ServiceName returns the name of the service this config belongs to
@@ -71,15 +73,77 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 
 // ListSecrets lists all the secrets exposed by the config
 func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
-	return []a2conf.SecretInfo{}
+	return []a2conf.SecretInfo{a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_AWS_OS_PASSWORD",
+		Name:                "aws_os_password",
+	}}
 }
 
 // GetSecret gets a secret by name. Returns nil if it is not set
 func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
-	return nil
+	if m == nil {
+		return nil
+	}
+	switch name {
+	case "aws_os_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Backups
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.S3
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.AwsAuth
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Password
+		return v5
+	default:
+		return nil
+	}
 }
 
 // SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist
 func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) error {
-	return a2conf.ErrSecretNotFound
+	switch name {
+	case "aws_os_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &ConfigRequest_V1{}
+		}
+		v1 := &(*v0).Sys
+		if *v1 == nil {
+			*v1 = &ConfigRequest_V1_System{}
+		}
+		v2 := &(*v1).Backups
+		if *v2 == nil {
+			*v2 = &ConfigRequest_V1_System_Backups{}
+		}
+		v3 := &(*v2).S3
+		if *v3 == nil {
+			*v3 = &ConfigRequest_V1_System_Backups_S3Settings{}
+		}
+		v4 := &(*v3).AwsAuth
+		if *v4 == nil {
+			*v4 = &shared.External_Opensearch_Authentication_AwsOpensearchAuth{}
+		}
+		v5 := &(*v4).Password
+		if *v5 == nil {
+			*v5 = &wrapperspb.StringValue{}
+		}
+		*v5 = value
+	default:
+		return a2conf.ErrSecretNotFound
+	}
+	return nil
 }

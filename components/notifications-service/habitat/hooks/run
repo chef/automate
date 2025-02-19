@@ -27,4 +27,8 @@ if [[ ! -f "$erl_cookie" ]]; then
     chmod 400 "$erl_cookie"
 fi
 
-exec "{{pkg.path}}/bin/notifications" start
+# exec "{{pkg.path}}/bin/notifications" start
+exec secrets-helper exec \
+  --watch \
+  --optional-secret userconfig.pg_dbuser_password \
+  -- "{{pkg.path}}/bin/notifications" start

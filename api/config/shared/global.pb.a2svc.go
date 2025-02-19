@@ -42,8 +42,20 @@ func (m *GlobalConfig) ListSecrets() []a2conf.SecretInfo {
 		EnvironmentVariable: "AUTOMATE_SECRET_ES_PASSWORD",
 		Name:                "es_password",
 	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_AWS_ES_PASSWORD",
+		Name:                "aws_es_password",
+	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_PG_SUPERUSER_PASSWORD",
+		Name:                "pg_superuser_password",
+	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_PG_DBUSER_PASSWORD",
+		Name:                "pg_dbuser_password",
+	}, a2conf.SecretInfo{
 		EnvironmentVariable: "AUTOMATE_SECRET_OS_PASSWORD",
 		Name:                "os_password",
+	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_AWS_OS_PASSWORD",
+		Name:                "aws_os_password",
 	}, a2conf.SecretInfo{
 		EnvironmentVariable: "AUTOMATE_SECRET_LCR_MINIO_PASSWORD",
 		Name:                "lcr_minio_password",
@@ -79,6 +91,83 @@ func (m *GlobalConfig) GetSecret(name string) *wrappers.StringValue {
 		}
 		v5 := v4.Password
 		return v5
+	case "aws_es_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.External
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Elasticsearch
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.Auth
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.AwsEs
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Password
+		return v5
+	case "pg_superuser_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.External
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Postgresql
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.Auth
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.Password
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Superuser
+		if v5 == nil {
+			return nil
+		}
+		v6 := v5.Password
+		return v6
+	case "pg_dbuser_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.External
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Postgresql
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.Auth
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.Password
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Dbuser
+		if v5 == nil {
+			return nil
+		}
+		v6 := v5.Password
+		return v6
 	case "os_password":
 		v0 := m.V1
 		if v0 == nil {
@@ -97,6 +186,29 @@ func (m *GlobalConfig) GetSecret(name string) *wrappers.StringValue {
 			return nil
 		}
 		v4 := v3.BasicAuth
+		if v4 == nil {
+			return nil
+		}
+		v5 := v4.Password
+		return v5
+	case "aws_os_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.External
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Opensearch
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.Auth
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.AwsOs
 		if v4 == nil {
 			return nil
 		}
@@ -151,6 +263,92 @@ func (m *GlobalConfig) SetSecret(name string, value *wrappers.StringValue) error
 			*v5 = &wrapperspb.StringValue{}
 		}
 		*v5 = value
+	case "aws_es_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &V1{}
+		}
+		v1 := &(*v0).External
+		if *v1 == nil {
+			*v1 = &External{}
+		}
+		v2 := &(*v1).Elasticsearch
+		if *v2 == nil {
+			*v2 = &External_Elasticsearch{}
+		}
+		v3 := &(*v2).Auth
+		if *v3 == nil {
+			*v3 = &External_Elasticsearch_Authentication{}
+		}
+		v4 := &(*v3).AwsEs
+		if *v4 == nil {
+			*v4 = &External_Elasticsearch_Authentication_AwsElasticsearchAuth{}
+		}
+		v5 := &(*v4).Password
+		if *v5 == nil {
+			*v5 = &wrapperspb.StringValue{}
+		}
+		*v5 = value
+	case "pg_superuser_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &V1{}
+		}
+		v1 := &(*v0).External
+		if *v1 == nil {
+			*v1 = &External{}
+		}
+		v2 := &(*v1).Postgresql
+		if *v2 == nil {
+			*v2 = &External_Postgresql{}
+		}
+		v3 := &(*v2).Auth
+		if *v3 == nil {
+			*v3 = &External_Postgresql_Authentication{}
+		}
+		v4 := &(*v3).Password
+		if *v4 == nil {
+			*v4 = &External_Postgresql_Authentication_PasswordAuthentication{}
+		}
+		v5 := &(*v4).Superuser
+		if *v5 == nil {
+			*v5 = &External_Postgresql_Authentication_PasswordAuthentication_SuperUser{}
+		}
+		v6 := &(*v5).Password
+		if *v6 == nil {
+			*v6 = &wrapperspb.StringValue{}
+		}
+		*v6 = value
+	case "pg_dbuser_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &V1{}
+		}
+		v1 := &(*v0).External
+		if *v1 == nil {
+			*v1 = &External{}
+		}
+		v2 := &(*v1).Postgresql
+		if *v2 == nil {
+			*v2 = &External_Postgresql{}
+		}
+		v3 := &(*v2).Auth
+		if *v3 == nil {
+			*v3 = &External_Postgresql_Authentication{}
+		}
+		v4 := &(*v3).Password
+		if *v4 == nil {
+			*v4 = &External_Postgresql_Authentication_PasswordAuthentication{}
+		}
+		v5 := &(*v4).Dbuser
+		if *v5 == nil {
+			*v5 = &External_Postgresql_Authentication_PasswordAuthentication_DBUser{}
+		}
+		v6 := &(*v5).Password
+		if *v6 == nil {
+			*v6 = &wrapperspb.StringValue{}
+		}
+		*v6 = value
 	case "os_password":
 		v0 := &m.V1
 		if *v0 == nil {
@@ -171,6 +369,32 @@ func (m *GlobalConfig) SetSecret(name string, value *wrappers.StringValue) error
 		v4 := &(*v3).BasicAuth
 		if *v4 == nil {
 			*v4 = &External_Opensearch_Authentication_BasicAuth{}
+		}
+		v5 := &(*v4).Password
+		if *v5 == nil {
+			*v5 = &wrapperspb.StringValue{}
+		}
+		*v5 = value
+	case "aws_os_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &V1{}
+		}
+		v1 := &(*v0).External
+		if *v1 == nil {
+			*v1 = &External{}
+		}
+		v2 := &(*v1).Opensearch
+		if *v2 == nil {
+			*v2 = &External_Opensearch{}
+		}
+		v3 := &(*v2).Auth
+		if *v3 == nil {
+			*v3 = &External_Opensearch_Authentication{}
+		}
+		v4 := &(*v3).AwsOs
+		if *v4 == nil {
+			*v4 = &External_Opensearch_Authentication_AwsOpensearchAuth{}
 		}
 		v5 := &(*v4).Password
 		if *v5 == nil {
