@@ -17,7 +17,7 @@ test_commandline() {
     if [[ -n "$VAULT_UTIL_SECRETS" ]]; then
         echo "    # When on the Chef VPN"
         echo "    CHEF_USERNAME=yourusername scripts/get_secrets.sh"
-        echo "    export VAULT_ADDR=https://vault.chef.co:8200"
+        echo "    export VAULT_ADDR=https://vault.ps.chef.co"
        # jq -r 'to_entries | map("    export " + .key + "=$(vault kv get -field=" + .value.field + " " + .value.path + ")")[]' <<<"$VAULT_UTIL_SECRETS"
     fi
 
