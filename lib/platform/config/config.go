@@ -216,7 +216,7 @@ func externalConnURIRenderer(ip string, port int, user string, password string, 
 		if dbname == "automate-cs-oc-erchef" || dbname == "automate-cs-ocid" {
 			return fmt.Sprintf(fmtStr, userInfoDebugStr, ip, port, dbname, strings.Join(opts, "&"))
 		} else {
-			return fmt.Sprintf(fmtStr, userInfo, ip, port, dbname, strings.Join(opts, "&"))
+			return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
 		}
 	}, debugStr
 }
