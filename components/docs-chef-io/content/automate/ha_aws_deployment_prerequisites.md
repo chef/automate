@@ -127,8 +127,8 @@ The first column in the table below represents the source of the connection. The
 
 |                        | Chef Automate        | Chef Infra Server    | PostgreSQL                                | OpenSearch                           | Bastion | Automate Load Balancer |
 |------------------------|----------------------|----------------------|-------------------------------------------|--------------------------------------|---------|------------------------|
-| Chef Automate          |                      |                      | 7432, 9631                                | 9200, 9631                           |         |                        |
-| Infra Server           |                      |                      | 7432, 9631                                | 9200, 9631                           |         | 443                    |
+| Chef Automate          |                      |                      | 5432, 6432, 7432, 9631                                | 9200, 9631                           |         |                        |
+| Infra Server           |                      |                      | 5432, 6432, 7432, 9631                                | 9200, 9631                           |         | 443                    |
 | PostgreSQL             |                      |                      | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |                        |
 | OpenSearch             |                      |                      |                                           | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |                        |
 | Bastion                | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7799 | 22, 9631, 9638, 7432, 7799                | 22, 9631, 9638, 9200, 7799           |         | 22                     |
