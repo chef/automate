@@ -43,8 +43,13 @@ var serveCmd = &cobra.Command{
 		// the client should also be up.
 		//
 		// TODO: Figure out how to respawn if client crashes?
+		// Spawn a gRPC Client in a goroutine
 		if os.Getenv(devModeEnvVar) == "true" {
-			go rest.Spawn(endpoint, conf) // nolint: errcheck
+			go func() {
+				if err := rest.Spawn(endpoint, conf); err != nil {
+					logrus.WithError(err).Error("Failed to spawn REST server")
+				}
+			}()
 		}
 
 		// Start the gRPC Server
@@ -52,6 +57,7 @@ var serveCmd = &cobra.Command{
 		if err != nil {
 			logrus.WithError(err).Fatal("spawn failed")
 		}
+
 	},
 }
 
@@ -98,6 +104,7 @@ func readCliParams() *serveropts.Opts {
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
 		ConfigMgmtAddress:             viper.GetString("config-mgmt-address"),
 		LogLevel:                      viper.GetString("log-level"),
+		SchemmaPath:                   viper.GetString("schema-path"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
 		ChefIngestServerConfig: serveropts.ChefIngestServerConfig{
@@ -131,6 +138,7 @@ func init() {
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
 	serveCmd.Flags().String("config-mgmt-address", "localhost:10119", "address of config-mgmt-service (domain:<port>)")
 	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")
+	serveCmd.Flags().String("schema-path", "storage/schema", "schemma storage path")
 	serveCmd.Flags().String("postgresql-database", "chef_ingest_service", "PG Database name")
 	serveCmd.Flags().Int32("converge-history-days", 30, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int32("actions-days", 30, "Number of days to keep actions for. A number less than or equal to 0 means data should never be deleted")

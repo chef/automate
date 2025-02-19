@@ -43,6 +43,14 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
+do_install() {
+  do_default_install
+
+  build_line "Copying schema sql files"
+  mkdir "${pkg_prefix}/schema"
+  cp -r storage/schema/sql/* "${pkg_prefix}/schema"
+}
+
 do_strip() {
   if [[ "${CHEF_DEV_ENVIRONMENT}" != "true" ]]; then
     do_default_strip

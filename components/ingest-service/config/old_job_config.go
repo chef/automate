@@ -41,6 +41,16 @@ type OldJobConfig struct {
 
 type Config struct {
 	JobsConfig []JobConfig `toml:"jobs_config"`
+	Storage    Storage     `mapstructure:"storage"`
+}
+
+type Storage struct {
+	URI          string `mapstructure:"uri"`
+	DBUser       string `mapstructure:"user"`
+	Database     string `mapstructure:"database"`
+	SchemaPath   string `mapstructure:"schema_path"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
 
 // ConfigForJob returns the configuration for the given job index. The
