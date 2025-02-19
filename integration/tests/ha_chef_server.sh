@@ -6,6 +6,11 @@ test_external_services=(ha_backend)
 
 source integration/services/common.sh
 
+SSL_CERT_FILE="/hab/pkgs/$(hab pkg list core/cacerts)/ssl/cert.pem"
+export SSL_CERT_FILE
+SSL_CERT_DIR="/hab/pkgs/$(hab pkg list core/cacerts)/ssl/cert"
+export SSL_CERT_DIR
+
 _frontend1_container_name="$(service_container_name "cs1")"
 _frontend2_container_name="$(service_container_name "cs2")"
 

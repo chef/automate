@@ -213,7 +213,11 @@ func externalConnURIRenderer(ip string, port int, user string, password string, 
 
 	userInfo := url.UserPassword(user, password)
 	return func(dbname string) string {
-		return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
+		if dbname == "automate-cs-oc-erchef" || dbname == "automate-cs-ocid" {
+			return fmt.Sprintf(fmtStr, userInfoDebugStr, ip, port, dbname, strings.Join(opts, "&"))
+		} else {
+			return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
+		}
 	}, debugStr
 }
 
