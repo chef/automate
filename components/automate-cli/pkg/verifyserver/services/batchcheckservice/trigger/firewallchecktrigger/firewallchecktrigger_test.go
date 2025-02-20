@@ -261,11 +261,11 @@ func TestMakeRequests(t *testing.T) {
 	makeRequests(config, mapRequests)
 	requestsForautomate, ok := mapRequests[constants.AUTOMATE]
 	assert.True(t, ok)
-	assert.Equal(t, 16, len(requestsForautomate))
+	assert.Equal(t, 24, len(requestsForautomate))
 
 	requestsForchefServer, ok := mapRequests[constants.CHEF_INFRA_SERVER]
 	assert.True(t, ok)
-	assert.Equal(t, 8, len(requestsForchefServer))
+	assert.Equal(t, 12, len(requestsForchefServer))
 
 	//As there are two postgress nodes which needs to interact with eachother
 	requestsForPostgres, ok := mapRequests[constants.POSTGRESQL]
