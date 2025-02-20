@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -159,6 +160,19 @@ func (c *Config) PGSuperUser() (string, error) {
 	return defaultPGSuperuserName, nil
 }
 
+func (c *Config) GetPGURIForCS(dbname string) (string, error) {
+	svcUser, err := c.PGServiceUser()
+	if err != nil {
+		return "", err
+	}
+	uri, err := c.GetPGURIForUser(dbname, svcUser)
+	if err != nil {
+		return "", err
+	}
+	var re = regexp.MustCompile(`(?<=:)(?!\/\/)(?!@).*?(?=@)`)
+	return re.ReplaceAllString(uri, `<redacted>`), nil
+}
+
 func (c *Config) GetPGURI(dbname string) (string, error) {
 	svcUser, err := c.PGServiceUser()
 	if err != nil {
@@ -213,11 +227,7 @@ func externalConnURIRenderer(ip string, port int, user string, password string, 
 
 	userInfo := url.UserPassword(user, password)
 	return func(dbname string) string {
-		if dbname == "automate-cs-oc-erchef" || dbname == "automate-cs-ocid" {
-			return fmt.Sprintf(fmtStr, userInfoDebugStr, ip, port, dbname, strings.Join(opts, "&"))
-		} else {
-			return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
-		}
+		return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
 	}, debugStr
 }
 
