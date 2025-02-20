@@ -62,8 +62,6 @@ To store backups offline in single-file archives, single-file archives must incl
 
 The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
 
-A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
-
 To provide externally-deployed OpenSearch nodes access to Chef Automate's built-in backup storage services, you must [configure OpenSearch backup]({{< relref "install.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
 
 ## Backup to AWS S3
