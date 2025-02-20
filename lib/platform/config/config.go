@@ -169,7 +169,13 @@ func (c *Config) GetPGURIForCS(dbname string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var re = regexp.MustCompile(`(?<=:)(?!\/\/)(?!@).*?(?=@)`)
+	fmt.Println("==========================================")
+	fmt.Println(uri)
+	fmt.Println("==================END======================")
+	re, err := regexp.Compile(`(?<=:)(?!\/\/)(?!@).*?(?=@)`)
+	if err != nil {
+		return uri, nil
+	}
 	return re.ReplaceAllString(uri, `<redacted>`), nil
 }
 

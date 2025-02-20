@@ -67,6 +67,9 @@ func (c *Config) builtinFuncs(opts *templateOptions) template.FuncMap {
 			return val
 		},
 		"pg_uri": func(dbname string) (string, error) {
+			return c.GetPGURI(dbname)
+		},
+		"pg_uri_cs": func(dbname string) (string, error) {
 			return c.GetPGURIForCS(dbname)
 		},
 		"pg_root_ca_cert_path": func() string {
