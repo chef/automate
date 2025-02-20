@@ -67,7 +67,7 @@ func TestAppliedLicense(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.GetLicense())
 		assert.NotNil(t, res.License.Id, "License should include a license ID")
-		assert.Equal(t, "44c6e9d1-98f6-4b4a-857f-d15da015f05f", res.License.CustomerId, "License should be valid")
+		assert.Equal(t, "B34F041B-4B24-4257-9A81-69D73493FD32", res.License.CustomerId, "License should be valid")
 	})
 	t.Run("Policy() with a valid license applied", func(t *testing.T) {
 		res, err := srv.Policy(
@@ -97,7 +97,7 @@ func TestAppliedLicense(t *testing.T) {
 		)
 
 		assert.Equal(
-			t, "Chef CD Pipelines", res.CustomerName,
+			t, "Automate license for pipelines", res.CustomerName,
 			"Expected customer name to match fixture",
 		)
 
