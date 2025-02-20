@@ -853,11 +853,9 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 	}
 
 	if remoteService == OPENSEARCH {
-		if flagsObj.node == "" {
-			isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
-			isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert) && isCertsSame
-			isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminKey) == newCerts.adminKey) && isCertsSame
-		}
+		isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
+		isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert) && isCertsSame
+		isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminKey) == newCerts.adminKey) && isCertsSame
 		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.OpensearchCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
