@@ -330,10 +330,11 @@ wait_for_backend_ctl
 
 mkdir -p /etc/chef-automate
 timestamp=$(date +"%Y%m%d%H%M%S")
+config="/etc/chef-automate/config.toml"
 export timestamp
 
-[ -e "/etc/chef-automate/config.toml" ] && cp -f /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$timestamp
-mv ${tmp_path}/automate_conf.toml /etc/chef-automate/config.toml
+[ -e "/etc/chef-automate/config.toml" ] && cp -f $config /etc/chef-automate/config.toml.$timestamp
+mv ${tmp_path}/automate_conf.toml $config
 chmod 0600 /etc/chef-automate/config.toml*
 rm ${automate_custom_config}
 
@@ -392,11 +393,11 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
    chef-automate upgrade run --airgap-bundle ${frontend_aib_file}
 
    wait_for_upgrade
-
+  chef-automate decode-password $config
   # Below command is commented as patch is not required during upgrade and add/remove node
   # Also when it is being applied, it was reverting patched configs (automate) to the older ones
-  echo "Applying /etc/chef-automate/config.toml"
-  chef-automate config patch /etc/chef-automate/config.toml
+  echo "Applying $config"
+  chef-automate config patch $config
 
   echo "MAINTENANCE MODE OFF"
   chef-automate maintenance off
@@ -406,9 +407,11 @@ else
   # Skip checks for the hab user as we create and manage that separately.
   # Fixes issues when the hab user/group is setup via LDAP in nsswitch configs.
   export CHEF_AUTOMATE_SKIP_HAB_USER=true
-  chef-automate deploy /etc/chef-automate/config.toml $DEPLOY_BUNDLES --accept-terms-and-mlsa | grep --line-buffered -v "\┤\|\┘\|\└\|\┴\|\├\|\┌\|\┬\|\┴\|\┐"
+  chef-automate decode-password $config
+  chef-automate deploy $config $DEPLOY_BUNDLES --accept-terms-and-mlsa | grep --line-buffered -v "\┤\|\┘\|\└\|\┴\|\├\|\┌\|\┬\|\┴\|\┐"
 fi
 
+chef-automate encode-password $config
 create_bootstrap_bundle
 
 save_space

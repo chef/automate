@@ -29,7 +29,7 @@
       scheme = "basic_auth"
       [global.v1.external.opensearch.auth.basic_auth]
         username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
-        password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
+        password = "<%= encode_string(svc_configs[:opensearch]['opensearch_auth']['admin_password']) -%>"
     [global.v1.external.opensearch.ssl]
     <% if overrides[:opensearch_custom_certs_enabled] == true -%>
       server_name = "<%= cn(svc_configs[:opensearch]['tls']['ssl_cert']) -%>"
@@ -2679,11 +2679,11 @@ rM2p0kk=
 
   [global.v1.external.postgresql.auth.password.superuser]
     username = "<%= svc_configs[:postgresql]['superuser']['name'] -%>"
-    password = "<%= svc_configs[:postgresql]['superuser']['password'] -%>"
+    password = "<%= encode_string(svc_configs[:postgresql]['superuser']['password']) -%>"
 
   [global.v1.external.postgresql.auth.password.dbuser]
     username = "<%= svc_configs[:postgresql]['superuser']['name'] -%>"
-    password = "<%= svc_configs[:postgresql]['superuser']['password'] -%>"
+    password = "<%= encode_string(svc_configs[:postgresql]['superuser']['password']) -%>"
 
   [global.v1.external.postgresql.backup]
     enable = true
