@@ -114,6 +114,22 @@ const (
 					"error_msg": "",
 					"resolution_msg": "",
 				  	"skipped": false
+				},
+				{
+					"title": "Check for reachability of service at destination port from the source node",
+					"passed": true,
+					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable from <source_node_ip>",
+					"error_msg": "",
+					"resolution_msg": "",
+				  	"skipped": false
+				},
+				{
+					"title": "Check for reachability of service at destination port from the source node",
+					"passed": true,
+					"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable from <source_node_ip>",
+					"error_msg": "",
+					"resolution_msg": "",
+				  	"skipped": false
 				}
 			  ],
 			  "skipped": false
@@ -133,6 +149,22 @@ const (
 				"msg": "",
 				"check": "",
 				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>",
+						"skipped": false
+					},
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings and provide access to port <destination_node_port> on <destination_node_ip> from <source_node_ip>",
+						"skipped": false
+					},
 					{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
