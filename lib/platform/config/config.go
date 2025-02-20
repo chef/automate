@@ -172,11 +172,12 @@ func (c *Config) GetPGURIForCS(dbname string) (string, error) {
 	fmt.Println("==========================================")
 	fmt.Println(uri)
 	fmt.Println("==================END======================")
-	re, err := regexp.Compile(`(?<=:)(?!\/\/)(?!@).*?(?=@)`)
+	// re, err := regexp.Compile(`/(?<=:)(?!\/\/)(?!@).*?(?=@)`)
+	re, err := regexp.Compile(`(postgresql://[^:]+):[^@]+(@.*)`)
 	if err != nil {
 		return uri, nil
 	}
-	return re.ReplaceAllString(uri, `<redacted>`), nil
+	return re.ReplaceAllString(uri, `$1:<redacted>$2`), nil
 }
 
 func (c *Config) GetPGURI(dbname string) (string, error) {
