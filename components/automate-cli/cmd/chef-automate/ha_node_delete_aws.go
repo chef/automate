@@ -11,7 +11,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -267,27 +266,6 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 			return errors.Wrap(err, syncErr.Error())
 		}
 		return syncErr
-	}
-
-	// Restart all PostgreSQL nodes in order to apply the new configuration
-	if dna.nodeType == POSTGRESQL {
-		infra, err := getAutomateHAInfraDetailsFunc()
-		if err != nil {
-			return err
-		}
-		level := "info"
-		if globalOpts.debug {
-			level = "debug"
-		}
-		log, err := logger.NewLogger("text", level)
-		if err != nil {
-			return err
-		}
-		fileUtils := &fileutils.FileSystemUtils{}
-		err = dna.nodeUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *dna.sshUtil.getSSHConfig(), fileUtils, log)
-		if err != nil {
-			return err
-		}
 	}
 
 	return err

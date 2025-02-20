@@ -13,8 +13,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
-	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
 )
 
@@ -196,18 +194,7 @@ func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult, nu NodeOp
 			err: err,
 		}
 	}
-	level := "info"
-	if globalOpts.debug {
-		level = "debug"
-	}
 
-	log, err := logger.NewLogger("text", level)
-	if err != nil {
-		restartCmdResults <- restartCmdResult{
-			err: err,
-		}
-	}
-	fileUtils := &fileutils.FileSystemUtils{}
 	sshConfig.timeout = DEFAULT_TIMEOUT
 
 	// restart pg nodes in a sequence of follower nodes first and then leader node
@@ -220,19 +207,12 @@ func restartAndReloadPgConfig(restartCmdResults chan restartCmdResult, nu NodeOp
 	}
 	// restart done
 
-	// reloading the pg config to make sure all nodes of pg have correct config
-	err = nu.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *sshConfig, fileUtils, log)
-	if err != nil {
-		restartCmdResults <- restartCmdResult{
-			err: err,
-		}
-	}
 	cmdResult := []*CmdResult{}
 	for _, v := range infra.Outputs.PostgresqlPrivateIps.Value {
 		cmdResult = append(cmdResult, &CmdResult{
-			ScriptName: "restart and reload pg",
+			ScriptName: "restart pg",
 			HostIP:     v,
-			Output:     "successfully restared and reloaded postgresql node",
+			Output:     "successfully restarted postgresql node",
 		})
 	}
 	restartCmdResults <- restartCmdResult{

@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -12,13 +11,10 @@ import (
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
-	"github.com/chef/automate/components/automate-cli/pkg/remotescripts"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
-	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
@@ -84,7 +80,6 @@ type NodeOpUtils interface {
 	saveConfigToBastion() error
 	syncConfigToAllNodes(unreachableNodes map[string][]string) error
 	restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error
-	postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error
 }
 
 type NodeUtilsImpl struct {
@@ -499,71 +494,6 @@ func (nu *NodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string,
 			}
 			break
 		}
-	}
-	return nil
-}
-
-func (nu *NodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-
-	content, err := fileUtils.ReadFile(MANIFEST_AUTO_TFVARS)
-	if err != nil {
-		return fmt.Errorf("failed to get manifest auto tfvars: %v", err)
-	}
-
-	contentStr := string(content)
-
-	pgIdentVal, err := findIdentValue(contentStr, PG_IDENT)
-	if err != nil {
-		return fmt.Errorf("failed to get %s: %v", PG_IDENT, err)
-	}
-	pgLeaderIdentVal, err := findIdentValue(contentStr, PG_LEADER_IDENT)
-	if err != nil {
-		return fmt.Errorf("failed to get %s: %v", PG_LEADER_IDENT, err)
-	}
-	haProxyIdentVal, err := findIdentValue(contentStr, HA_PROXY_IDENT)
-	if err != nil {
-		return fmt.Errorf("failed to get %s: %v", HA_PROXY_IDENT, err)
-	}
-
-	scriptContent := fmt.Sprintf(remotescripts.POST_CERT_ROTATE_PG, pgIdentVal, pgLeaderIdentVal, haProxyIdentVal)
-	filename, err := fileUtils.CreateTempFile(scriptContent, "pg-restart-*.sh", HAB_TMP_DIR)
-	if err != nil {
-		return fmt.Errorf("failed to create file %v", err)
-	}
-	defer fileUtils.RemoveFile(filename)
-
-	conf := sshutils.SSHConfig{
-		SshUser:    sshconfig.sshUser,
-		SshPort:    sshconfig.sshPort,
-		SshKeyFile: sshconfig.sshKeyFile,
-		Timeout:    sshconfig.timeout,
-	}
-	sshUtilPkg := sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor())
-
-	excuteResults := sshUtilPkg.CopyFileToRemoteConcurrently(conf, filename, PG_SCRIPT_NAME, PG_SCRIPT_PATH, false, pgIps)
-
-	var isErr bool
-	for _, result := range excuteResults {
-		printCertRotateOutput(result, POSTGRESQL, writer)
-		if result.Error != nil {
-			isErr = true
-		}
-	}
-
-	if isErr {
-		return fmt.Errorf("failed to copy file to remote")
-	}
-
-	command := fmt.Sprintf(`sudo bash -s < %s`, path.Join(PG_SCRIPT_PATH, PG_SCRIPT_NAME))
-	excuteResults = sshUtilPkg.ExecuteConcurrently(conf, command, pgIps)
-	for _, result := range excuteResults {
-		printCertRotateOutput(result, POSTGRESQL, writer)
-		if result.Error != nil {
-			isErr = true
-		}
-	}
-	if isErr {
-		return fmt.Errorf("failed to execute post rotate pg script on remote")
 	}
 	return nil
 }

@@ -153,7 +153,6 @@ type certRotateFlow struct {
 	writer      *cli.Writer
 	pullConfigs PullConfigs
 	log         logger.Logger
-	nodeUtils   NodeOpUtils
 }
 
 type NodeIpHealth struct {
@@ -161,14 +160,13 @@ type NodeIpHealth struct {
 	Health string
 }
 
-func NewCertRotateFlow(fileUtils fileutils.FileUtils, sshUtil sshutils.SSHUtil, writer *cli.Writer, pullConfigs PullConfigs, log logger.Logger, nodeUtils *NodeUtilsImpl) *certRotateFlow {
+func NewCertRotateFlow(fileUtils fileutils.FileUtils, sshUtil sshutils.SSHUtil, writer *cli.Writer, pullConfigs PullConfigs, log logger.Logger) *certRotateFlow {
 	return &certRotateFlow{
 		fileUtils:   fileUtils,
 		sshUtil:     sshUtil,
 		writer:      writer,
 		pullConfigs: pullConfigs,
 		log:         log,
-		nodeUtils:   nodeUtils,
 	}
 }
 
@@ -242,7 +240,7 @@ func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args 
 		if err != nil {
 			return err
 		}
-		c := NewCertRotateFlow(&fileutils.FileSystemUtils{}, sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer, NewPullConfigs(&AutomateHAInfraDetails{}, &SSHUtilImpl{}), log, &NodeUtilsImpl{})
+		c := NewCertRotateFlow(&fileutils.FileSystemUtils{}, sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer, NewPullConfigs(&AutomateHAInfraDetails{}, &SSHUtilImpl{}), log)
 		return c.certRotate(cmd, args, flagsObj)
 	}
 }
@@ -855,19 +853,15 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 	}
 
 	if remoteService == OPENSEARCH {
-		if flagsObj.node == "" {
-			isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
-			isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert) && isCertsSame
-			isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminKey) == newCerts.adminKey) && isCertsSame
-		}
+		isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
+		isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert) && isCertsSame
+		isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminKey) == newCerts.adminKey) && isCertsSame
 		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.OpensearchCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
 
 	if remoteService == POSTGRESQL {
-		if flagsObj.node == "" {
-			isCertsSame = strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newCerts.rootCA
-		}
+		isCertsSame = strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newCerts.rootCA
 		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.PostgresqlCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -169,14 +168,4 @@ func markGlobalFlagsHiddenExcept(command *cobra.Command, unhidden ...string) {
 			f.Hidden = true
 		}
 	})
-}
-
-func findIdentValue(content, val string) (string, error) {
-	re := regexp.MustCompile(fmt.Sprintf(`%s\s*=\s*"([^"]+)"`, val))
-	matches := re.FindStringSubmatch(content)
-	if len(matches) > 1 {
-		return matches[1], nil
-	} else {
-		return "", fmt.Errorf("failed to find value")
-	}
 }

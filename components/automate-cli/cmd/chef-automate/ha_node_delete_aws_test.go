@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -738,9 +737,6 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			return nil
 		},
 		restartPgNodesFunc: func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
-			return nil
-		},
-		postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
 			return nil
 		},
 	}

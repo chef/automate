@@ -202,13 +202,7 @@ func (c *certRotateFlow) rotatePGCertAndRestartPGNode(pgIps []IP, statusSummary 
 		return err
 	}
 	c.writer.Println("rotating leader node certificate")
-	err = c.rotatePGLeaderNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, false)
-	if err != nil {
-		return err
-	}
-	c.writer.Println("restarting postgres service and reloading ha proxy")
-
-	return c.nodeUtils.postPGCertRotate(infra.Outputs.PostgresqlPrivateIps.Value, *sshUtil.getSSHConfig(), c.fileUtils, c.log)
+	return c.rotatePGLeaderNodeCert(pgIps, pgLeaderIpAndHealth, infra, sshUtil, currentCertsInfo, pgRootCA, false)
 }
 
 func (c *certRotateFlow) rotatePGLeaderNodeCert(pgIps []IP, pgLeaderIpAndHealth *NodeIpHealth, infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, concurrent bool) error {

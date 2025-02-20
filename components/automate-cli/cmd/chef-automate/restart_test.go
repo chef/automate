@@ -5,8 +5,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -107,9 +105,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-			return nil
-		},
 		getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
 			return &MockPullConfigs{}, nil
 		},
@@ -160,9 +155,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				},
 				isManagedServicesOnFunc: func() bool {
 					return false
-				},
-				postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-					return nil
 				},
 				getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
 					return &MockPullConfigs{}, nil
@@ -237,9 +229,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				isManagedServicesOnFunc: func() bool {
 					return true
 				},
-				postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-					return nil
-				},
 				getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
 					return &MockPullConfigs{}, nil
 				},
@@ -268,9 +257,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				},
 				isManagedServicesOnFunc: func() bool {
 					return true
-				},
-				postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-					return nil
 				},
 				getConfigPullerFunc: func(sshUtil *SSHUtil) (PullConfigs, error) {
 					return &MockPullConfigs{}, nil

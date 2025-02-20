@@ -1,10 +1,5 @@
 package main
 
-import (
-	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/logger"
-)
-
 type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc    func(command string, args []string, helpDocs string) error
 	getHaInfraDetailsfunc                        func() (*AutomateHAInfraDetails, *SSHConfig, error)
@@ -34,7 +29,6 @@ type MockNodeUtilsImpl struct {
 	saveConfigToBastionFunc                      func() error
 	syncConfigToAllNodesFunc                     func(unreachableNodes map[string][]string) error
 	restartPgNodesFunc                           func(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error
-	postPGCertRotateFunc                         func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -127,7 +121,4 @@ func (mnu *MockNodeUtilsImpl) syncConfigToAllNodes(unreachableNodes map[string][
 }
 func (mnu *MockNodeUtilsImpl) restartPgNodes(leaderNode NodeIpHealth, pgIps []string, infra *AutomateHAInfraDetails, statusSummary StatusSummary) error {
 	return mnu.restartPgNodesFunc(leaderNode, pgIps, infra, statusSummary)
-}
-func (mnu *MockNodeUtilsImpl) postPGCertRotate(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-	return mnu.postPGCertRotateFunc(pgIps, sshconfig, fileUtils, log)
 }

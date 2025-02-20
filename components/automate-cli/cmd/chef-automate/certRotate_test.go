@@ -2494,7 +2494,7 @@ func NewMockInfra() *AutomateHAInfraDetails {
 
 func NewCertRotate() *certRotateFlow {
 	log, _ := logger.NewLogger("text", "debug")
-	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log, &NodeUtilsImpl{})
+	c := NewCertRotateFlow(mockFS(), &sshutils.MockSSHUtilsImpl{}, writer, &MockPullConfigs{}, log)
 	return c
 }
 
@@ -3115,11 +3115,6 @@ func TestCertRotateFromTemplate(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
 			c := certRotateFlow{
-				nodeUtils: &MockNodeUtilsImpl{
-					postPGCertRotateFunc: func(pgIps []string, sshconfig SSHConfig, fileUtils fileutils.FileUtils, log logger.Logger) error {
-						return nil
-					},
-				},
 				fileUtils: &fileutils.MockFileSystemUtils{
 					ReadFileFunc: func(filepath string) ([]byte, error) {
 						if strings.Contains(filepath, "a2ha_manifest.auto.tfvars") {
