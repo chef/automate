@@ -44,8 +44,11 @@ exec 0<&-
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
 HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gemfile" \
-  secrets-helper exec --secret oc_bifrost.superuser_id -- \
-    bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
+  secrets-helper exec \
+  --secret oc_bifrost.superuser_id \
+  --optional-secret userconfig.pg_superuser_password \
+  -- \
+  bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
 
 # ruby vars are needed in order to make depselector start up
 export PATH={{pkgPathFor "core/ruby31"}}/bin:${PATH}
@@ -76,6 +79,7 @@ exec secrets-helper exec \
      --secret bookshelf.access_key_id \
      --secret bookshelf.secret_access_key \
      --secret chef-server.webui_pub_key \
+     --optional-secret userconfig.pg_superuser_password \
      --optional-secret data_collector.token \
      -- \
      {{~#if cfg.memory.max_bytes}}

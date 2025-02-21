@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -157,6 +158,22 @@ func (c *Config) PGSuperUser() (string, error) {
 		}
 	}
 	return defaultPGSuperuserName, nil
+}
+
+func (c *Config) GetPGURIForCS(dbname string) (string, error) {
+	svcUser, err := c.PGServiceUser()
+	if err != nil {
+		return "", err
+	}
+	uri, err := c.GetPGURIForUser(dbname, svcUser)
+	if err != nil {
+		return "", err
+	}
+	re, err := regexp.Compile(`([^:]+:\/\/[^:]+):.+(@.*)`)
+	if err != nil {
+		return uri, nil
+	}
+	return re.ReplaceAllString(uri, `$1:<redacted>$2`), nil
 }
 
 func (c *Config) GetPGURI(dbname string) (string, error) {
