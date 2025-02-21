@@ -476,14 +476,13 @@ Enabling the CSP header may break the SAML login. This may happen if the IDP Log
 
 The default value of the content security policy is `default-src 'self'; frame-ancestors 'self';`.
 
-To configure the value of the content security policy, patch the following configuration:
+To configure the value of the content security policy, create a TOML file that contains the partial configuration below,
+and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [load_balancer.v1.sys.ngx.http]
   content_security_policy = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';"
 ```
-
-Run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
 
 ### X-XSS-Protection
 
@@ -491,14 +490,13 @@ The HTTP [X-XSS-Protection](https://www.keycdn.com/blog/x-xss-protection) respon
 
 The default value of the X-XSS-Protection header is `1; mode=block`.
 
-To configure the value of the X-XSS-Protection, patch the following configuration:
- 
+To configure the value of the X-XSS-Protection, create a TOML file that contains the partial configuration below,
+and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+
 ```toml
 [global.v1.sys.ngx.http]
   x_xss_protection = "0"
 ```
- 
-Run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
 
 ### Troubleshooting
 
