@@ -394,7 +394,14 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 
 #### Encrypt Cookies with Custom Secret Key in OC-ID Service
 
-Now, you can configure and integrate an existing private Supermarket with Chef Automate. `secret_key_base` is an attribute introduced as optional setting in OC-ID service of Automate which will be used to encrypt the cookies and other information. By default a unique `secret_key_base` gets generated internally for the OC-ID service running as part of Chef Automate. If you want to set it to something custom you can assign it a random string which will be used by OC-ID as the `secret_key_base`. Below is the syntax to set the configuration for the OC-ID service.
+Now, you can configure and integrate an existing private Supermarket with Chef Automate.
+is an attribute
+introduced as optional setting in OC-ID service of Automate
+which will be used to encrypt the cookies and other information.
+By default, a unique `secret_key_base` gets generated internally for the OC-ID service running as part of Chef Automate.
+If you want to set it to something custom you can assign it a random string
+which will be used by OC-ID as the `secret_key_base`.
+Below is the syntax to set the configuration for the OC-ID service.
 
 ```toml
 [ocid.v1.sys.ocid]
