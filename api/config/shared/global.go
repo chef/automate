@@ -61,6 +61,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 				Ngx: &Nginx{
 					Http: &Http{
 						IncludeXForwardedFor: w.Bool(false),
+						XXssProtection:       w.String("1; mode=block"),
 					},
 				},
 			},
@@ -257,9 +258,9 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 					"show",
 					"userconfig.es_password",
 				}
-				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()
-				if err != nil || string(getPass) == "" {
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
 					cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.password")
 				}
 			}
@@ -270,7 +271,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.username")
 			}
 			if p == "" {
-				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.password")
+				args := []string{
+					"show",
+					"userconfig.aws_es_password",
+				}
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.password")
+				}
 			}
 		case "":
 		default:
@@ -314,9 +323,9 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 					"show",
 					"userconfig.os_password",
 				}
-				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()
-				if err != nil || string(getPass) == "" {
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
 					cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.password")
 				}
 			}
@@ -327,7 +336,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.username")
 			}
 			if p == "" {
-				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.password")
+				args := []string{
+					"show",
+					"userconfig.aws_os_password",
+				}
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.password")
+				}
 			}
 		case "":
 		default:
@@ -348,7 +365,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.username")
 			}
 			if sp == "" {
-				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.password")
+				args := []string{
+					"show",
+					"userconfig.pg_superuser_password",
+				}
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.password")
+				}
 			}
 
 			// dbuser username and password
@@ -358,7 +383,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.username")
 			}
 			if dp == "" {
-				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.password")
+				args := []string{
+					"show",
+					"userconfig.pg_dbuser_password",
+				}
+				execGetPass := exec.Command(GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || strings.TrimSpace(string(getPass)) == "" {
+					cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.password")
+				}
 			}
 		}
 	}
@@ -448,7 +481,7 @@ func (c *GlobalConfig) ValidateReDirectSysLogConfig() error {
 	return nil
 }
 
-func getLatestPlatformToolsPath() string {
+func GetLatestPlatformToolsPath() string {
 	cmd, err := exec.Command("/bin/sh", "-c", habPkgPlatformToolsPath).Output()
 	if err != nil {
 		fmt.Printf("error %s", err)
