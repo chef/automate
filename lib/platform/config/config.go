@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/platform"
+	"github.com/chef/automate/api/config/shared"
 )
 
 const (
@@ -157,6 +160,22 @@ func (c *Config) PGSuperUser() (string, error) {
 	return defaultPGSuperuserName, nil
 }
 
+func (c *Config) GetPGURIForCS(dbname string) (string, error) {
+	svcUser, err := c.PGServiceUser()
+	if err != nil {
+		return "", err
+	}
+	uri, err := c.GetPGURIForUser(dbname, svcUser)
+	if err != nil {
+		return "", err
+	}
+	re, err := regexp.Compile(`([^:]+:\/\/[^:]+):.+(@.*)`)
+	if err != nil {
+		return uri, nil
+	}
+	return re.ReplaceAllString(uri, `$1:<redacted>$2`), nil
+}
+
 func (c *Config) GetPGURI(dbname string) (string, error) {
 	svcUser, err := c.PGServiceUser()
 	if err != nil {
@@ -247,9 +266,27 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 				password := ""
 
 				if user == passwordAuth.GetDbuser().GetUsername().GetValue() {
-					password = passwordAuth.GetDbuser().GetPassword().GetValue()
+					args := []string{
+						"show",
+						"userconfig.pg_dbuser_password",
+					}
+					execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+					getPass, err := execGetPass.Output()
+					if err != nil || strings.TrimSpace(string(getPass)) == "" {
+						return nil, errors.Errorf("External postgres password auth missing password")
+					}
+					password = strings.TrimSpace(string(getPass))
 				} else if user == passwordAuth.GetSuperuser().GetUsername().GetValue() {
-					password = passwordAuth.GetSuperuser().GetPassword().GetValue()
+					args := []string{
+						"show",
+						"userconfig.pg_superuser_password",
+					}
+					execGetPass := exec.Command(shared.GetLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+					getPass, err := execGetPass.Output()
+					if err != nil || strings.TrimSpace(string(getPass)) == "" {
+						return nil, errors.Errorf("External postgres password auth missing password")
+					}
+					password = strings.TrimSpace(string(getPass))
 				} else {
 					return nil, errors.Errorf("Invalid external postgres user %q", user)
 				}
