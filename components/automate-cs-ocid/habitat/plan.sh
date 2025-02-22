@@ -19,9 +19,9 @@ pkg_svc_run="return 0"
 
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
-  chef/mlsa/1.0.1/20240125084021
+  chef/mlsa
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
-  chef/automate-platform-tools/0.1.0/20241212061203
+  chef/automate-platform-tools
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_id/15.10.33/20250220084329"
 )
