@@ -11,7 +11,7 @@
     <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
   </button>
   <chef-click-outside (clickOutside)="handleClickOutside()">
-    <chef-dropdown [attr.visible]="dropdownState === 'open'">
+    <chef-dropdown *ngIf="dropdownState === 'open'" [attr.visible]="dropdownState === 'open'">
 
       <div id="filter-container">
         <input chefInput
