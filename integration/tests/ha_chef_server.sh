@@ -6,11 +6,6 @@ test_external_services=(ha_backend)
 
 source integration/services/common.sh
 
-SSL_CERT_FILE="/hab/pkgs/$(hab pkg list core/cacerts)/ssl/cert.pem"
-export SSL_CERT_FILE
-SSL_CERT_DIR="/hab/pkgs/$(hab pkg list core/cacerts)/ssl/cert"
-export SSL_CERT_DIR
-
 _frontend1_container_name="$(service_container_name "cs1")"
 _frontend2_container_name="$(service_container_name "cs2")"
 
@@ -192,4 +187,20 @@ do_test_deploy() {
 do_cleanup() {
     docker stop "$_frontend1_container_name"
     docker stop "$_frontend2_container_name"
+}
+
+do_dump_logs() {
+  do_dump_logs_default
+    
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend1_container_name"
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend2_container_name"
+
+ 
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "logs/*"
+        then
+            echo "Failed to frontend conatiner logs"
+        fi
+    fi
+    rm -r "$tmpdir"
 }
