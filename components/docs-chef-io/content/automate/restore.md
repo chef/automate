@@ -25,19 +25,15 @@ Before restoring a Chef Automate installation, see how to [configure your backup
         curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
-1. To restore from **filesystem backups**,
-   Chef Automate requires access to a backup directory
-   contains timestamp-based directory and `automate-elasticsearch-data` directory in the
-   [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
+1. To restore from **filesystem backups**, Chef Automate requires access to a backup directory containing a timestamp-based directory and an `automate-elasticsearch-data` directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
+
 Ensure access for the backup type used:
 
      1. To restore [a network-attached filesystem backup]({{< ref "backup.md#backup-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
      1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#backup-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
      1. To restore a [single-file backup archive]({{< ref "backup.md#store-a-filesystem-backup-in-a-single-file-archive" >}}), copy your archive to the restore host and extract it to the configured backup directory.
    
-   With this step complete,
-   the `ls` command should show a timestamp-based directory and an `automate-elasticsearch-data` directory in the backup directory.
-   
+   With this step complete, the `ls` command should show a timestamp-based directory and an `automate-elasticsearch-data` directory in the backup directory.
 
 1. To restore a backup to a host with a different fully qualified domain name (FQDN) than the original backup host, create a `patch.toml` file that specifies the new FQDN and provide it at restore time:
 
