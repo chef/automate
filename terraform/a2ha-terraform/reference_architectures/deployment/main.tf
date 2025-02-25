@@ -338,6 +338,28 @@ module "postgresql" {
   ]
 }
 
+module "postgresql_config_sync" {
+  count                           = var.setup_managed_services ? 0 : 1
+  source                          = "./modules/postgresqlconfigsync"
+  postgresql_instance_count       = var.postgresql_instance_count
+  private_ips                     = var.postgresql_private_ips
+  postgresql_svc_load_args        = var.postgresql_svc_load_args
+  postgresql_pkg_ident            = var.postgresql_pkg_ident
+  pgleaderchk_listen_port         = var.pgleaderchk_listen_port
+  pgleaderchk_pkg_ident           = var.pgleaderchk_pkg_ident
+  pgleaderchk_svc_load_args       = var.pgleaderchk_svc_load_args
+  proxy_listen_port               = var.proxy_listen_port
+  proxy_pkg_ident                 = var.proxy_pkg_ident
+  proxy_svc_load_args             = var.proxy_svc_load_args
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
+  tmp_path                        = var.tmp_path
+  depends_on                      = [module.postgresql]
+}
+
 module "bootstrap_automate" {
   source                             = "./modules/automate"
   airgap_info                        = module.airgap_bundle-automate.airgap_info
