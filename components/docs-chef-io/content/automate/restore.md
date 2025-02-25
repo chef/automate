@@ -73,7 +73,6 @@ Ensure access for the backup type used:
 
 {{< /note >}}
 
-
 ## Restore From a Filesystem Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
@@ -82,7 +81,6 @@ Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before
 
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory.
 Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
 
 To restore on a new host, run:
 
