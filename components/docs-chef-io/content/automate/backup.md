@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 10
 +++
 
-Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
-The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra_server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on_prem_builder.md" >}}).
+Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure. The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra_server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on_prem_builder.md" >}}).
 By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
+The backup command stores the configuration data in the timestamp-based directory and the reporting data in the `automate-elasticsearch-data` directory. Both these directories are in the configured backup directory.
 You can also configure Chef Automate to store backups in AWS S3 buckets or in Google Cloud Storage (GCS) buckets.
 
 After configuring your backups, see how to [restore]({{< ref "restore.md" >}}) a Chef Automate installation.
@@ -58,11 +58,19 @@ To configure your Chef Automate installation's backup directory to another locat
 
 ### Store a Filesystem Backup in a Single-file Archive
 
-To store backups offline in single-file archives, single-file archives must include both the configuration data and the reporting data contained in the standard backup.
+Offline backups can be stored in single-file archives, which must include the configuration and reporting data in the standard backup.
 
-The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
+The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains the following directories
+1. The timestamp-based directory has the configuration data.
+2. `automate-elasticsearch-data` directory having reporting data stored.
 
-To provide externally-deployed OpenSearch nodes access to Chef Automate's built-in backup storage services, you must [configure OpenSearch backup]({{< relref "install.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
+To create a single-file archive, use the `tar` command to create a tarball of the backup directory:
+
+```shell
+tar -czvf automate-backup.tar.gz /path/to/configured/backup/directory
+```
+
+To provide externally deployed OpenSearch nodes access to Chef Automate's built-in backup storage services, you must [configure OpenSearch backup]({{< relref "install.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
 
 ## Backup to AWS S3
 
