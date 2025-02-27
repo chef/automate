@@ -12,9 +12,9 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_version="2.2.14"
 pkg_build_deps=("${UPSTREAM_PKG_IDENT}")
 pkg_deps=(
-  chef/mlsa
-  core/bash
-  core/netcat-openbsd
+  chef/mlsa/1.0.1/20240125084021
+  core/bash/5.1/20240105214248
+  core/netcat-openbsd/1.226/20240106172343
   "${UPSTREAM_PKG_IDENT}"
 )
 
