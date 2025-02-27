@@ -2,7 +2,7 @@
 # stable channel
 
 
-UPSTREAM_PKG_IDENT="core/haproxy"
+UPSTREAM_PKG_IDENT="core/haproxy/2.2.29/20240106203532"
 pkg_name="automate-ha-haproxy"
 pkg_description="Wrapper package for core/haproxy"
 vendor_origin="chef"
