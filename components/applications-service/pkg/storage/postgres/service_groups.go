@@ -281,7 +281,7 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 			return "", err
 		}
 		if err1 != nil {
-			return "", err
+			return "", err1
 		}
 	}
 
