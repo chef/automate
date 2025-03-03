@@ -69,4 +69,23 @@ service ChefIngester {
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };
+  //inserting dummy values in insert_request and insert_request_details tables
+  rpc InsertDummy (ingest.request.InsertRequest) returns (ingest.response.InsertRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/ingest/events/chef/insert_request"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "ingest:nodes:{request_id}:insert_request";
+    option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
+  };
+  rpc InsertDummyDetails (ingest.request.InsertRequestDetails) returns (ingest.response.InsertRequestDetailsResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/ingest/events/chef/insert_request_details"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "ingest:nodes:{request_id}:insert_request_details";
+    option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
+  };
 }
+
+
