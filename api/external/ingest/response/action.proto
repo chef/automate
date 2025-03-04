@@ -14,3 +14,11 @@ message ProcessNodeDeleteResponse {
 message ProcessMultipleNodeDeleteResponse {
 
 }
+
+message InsertRequestResponse {
+
+}
+
+message InsertRequestDetailsResponse {
+
+}

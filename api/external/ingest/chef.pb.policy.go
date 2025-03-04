@@ -153,4 +153,40 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.ingest.ChefIngester/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/api/v0/ingest/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.ingest.ChefIngester/InsertDummy", "ingest:nodes:{request_id}:insert_request", "ingest:nodes:create", "POST", "/api/v0/ingest/events/chef/insert_request", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.InsertRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "status":
+					return m.Status
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.ingest.ChefIngester/InsertDummyDetails", "ingest:nodes:{request_id}:insert_request_details", "ingest:nodes:create", "POST", "/api/v0/ingest/events/chef/insert_request_details", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.InsertRequestDetails); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "index":
+					return m.Index
+				case "from_version":
+					return m.FromVersion
+				case "to_version":
+					return m.ToVersion
+				case "stage":
+					return m.Stage
+				case "os_task_id":
+					return m.OsTaskId
+				case "alias_list":
+					return m.AliasList
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }
