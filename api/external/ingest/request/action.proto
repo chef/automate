@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package chef.automate.api.ingest.request;
 option go_package = "github.com/chef/automate/api/external/ingest/request";
+import "google/protobuf/timestamp.proto";
 
 message Action {
   // ID of the action message itself
@@ -47,4 +48,26 @@ message Delete {
 
 message MultipleNodeDeleteRequest {
   repeated string node_ids = 1;
+}
+
+message InsertRequest {
+  int32 request_id = 1;
+  string status = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp last_updated = 4;
+}
+
+message InsertRequestDetails {
+  int32 id = 1;
+  int32 request_id = 2;
+  string index = 3;
+  string from_version = 4;
+  string to_version = 5;
+  string stage = 6;
+  string os_task_id = 7;
+  google.protobuf.Timestamp heartbeat = 8;
+  bool having_alias = 9;
+  string alias_list = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
 }

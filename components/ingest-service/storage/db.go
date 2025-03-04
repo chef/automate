@@ -61,10 +61,13 @@ func (db *DB) UpdateReindexRequest(requestID int, status string) error {
 }
 
 // Fetch a reindex request by ID
-func (db *DB) GetReindexRequest(requestID int) (*ReindexRequest, error) {
-	var request ReindexRequest
-	err := db.SelectOne(&request, getReindexRequest, requestID)
-	return &request, err
+func (db *DB) GetStatusReindexRequest(requestID int, lastUpdated time.Time) ([]*ReindexRequest, error) {
+	var request []*ReindexRequest
+	_, err := db.Select(&request, getstatusReindexRequest, requestID, lastUpdated)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in fetching the reindex request status from db")
+	}
+	return request, err
 }
 
 // Insert reindex request detailed entry
@@ -74,9 +77,12 @@ func (db *DB) InsertReindexRequestDetailed(detail ReindexRequestDetailed) error 
 }
 
 // Fetch reindex request details
-func (db *DB) GetReindexRequestDetails(requestID int) ([]*ReindexRequestDetailed, error) {
+func (db *DB) GetStatusReindexRequestDetails(requestID int, updatedat time.Time) ([]*ReindexRequestDetailed, error) {
 	var details []*ReindexRequestDetailed
-	_, err := db.Select(&details, getReindexRequestDetails, requestID)
+	_, err := db.Select(&details, getstatusReindexRequestDetails, requestID, updatedat)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in fetching the reindex request details status from db")
+	}
 	return details, err
 }
 
@@ -100,14 +106,14 @@ VALUES ($1, $2, $3, $4);`
 const updateReindexRequest = `
 UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE request_id = $3;`
 
-const getReindexRequest = `
+const getstatusReindexRequest = `
 SELECT request_id, status, created_at, last_updated FROM reindex_requests WHERE request_id = $1;`
 
 const insertReindexRequestDetailed = `
 INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
 
-const getReindexRequestDetails = `
+const getstatusReindexRequestDetails = `
 SELECT id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at FROM reindex_request_detailed WHERE request_id = $1;`
 
 const deleteReindexRequest = `
