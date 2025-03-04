@@ -57,6 +57,46 @@ func (mr *MockChefIngesterServiceClientMockRecorder) GetVersion(ctx, in interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).GetVersion), varargs...)
 }
 
+// InsertDummy mocks base method.
+func (m *MockChefIngesterServiceClient) InsertDummy(ctx context.Context, in *request.InsertRequest, opts ...grpc.CallOption) (*response.InsertRequestResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "InsertDummy", varargs...)
+	ret0, _ := ret[0].(*response.InsertRequestResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertDummy indicates an expected call of InsertDummy.
+func (mr *MockChefIngesterServiceClientMockRecorder) InsertDummy(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDummy", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).InsertDummy), varargs...)
+}
+
+// InsertDummyDetails mocks base method.
+func (m *MockChefIngesterServiceClient) InsertDummyDetails(ctx context.Context, in *request.InsertRequestDetails, opts ...grpc.CallOption) (*response.InsertRequestDetailsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "InsertDummyDetails", varargs...)
+	ret0, _ := ret[0].(*response.InsertRequestDetailsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertDummyDetails indicates an expected call of InsertDummyDetails.
+func (mr *MockChefIngesterServiceClientMockRecorder) InsertDummyDetails(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDummyDetails", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).InsertDummyDetails), varargs...)
+}
+
 // ProcessChefAction mocks base method.
 func (m *MockChefIngesterServiceClient) ProcessChefAction(ctx context.Context, in *request.Action, opts ...grpc.CallOption) (*response.ProcessChefActionResponse, error) {
 	m.ctrl.T.Helper()
@@ -193,6 +233,36 @@ func (m *MockChefIngesterServiceServer) GetVersion(arg0 context.Context, arg1 *V
 func (mr *MockChefIngesterServiceServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).GetVersion), arg0, arg1)
+}
+
+// InsertDummy mocks base method.
+func (m *MockChefIngesterServiceServer) InsertDummy(arg0 context.Context, arg1 *request.InsertRequest) (*response.InsertRequestResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertDummy", arg0, arg1)
+	ret0, _ := ret[0].(*response.InsertRequestResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertDummy indicates an expected call of InsertDummy.
+func (mr *MockChefIngesterServiceServerMockRecorder) InsertDummy(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDummy", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).InsertDummy), arg0, arg1)
+}
+
+// InsertDummyDetails mocks base method.
+func (m *MockChefIngesterServiceServer) InsertDummyDetails(arg0 context.Context, arg1 *request.InsertRequestDetails) (*response.InsertRequestDetailsResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertDummyDetails", arg0, arg1)
+	ret0, _ := ret[0].(*response.InsertRequestDetailsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertDummyDetails indicates an expected call of InsertDummyDetails.
+func (mr *MockChefIngesterServiceServerMockRecorder) InsertDummyDetails(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDummyDetails", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).InsertDummyDetails), arg0, arg1)
 }
 
 // ProcessChefAction mocks base method.

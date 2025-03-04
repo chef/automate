@@ -168,7 +168,7 @@ var file_interservice_ingest_chef_proto_rawDesc = []byte{
 	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
 	0x65, 0x12, 0x10, 0x0a, 0x03, 0x73, 0x68, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
 	0x73, 0x68, 0x61, 0x22, 0x10, 0x0a, 0x0e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0xc8, 0x07, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x66, 0x49, 0x6e,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0xc7, 0x0a, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x66, 0x49, 0x6e,
 	0x67, 0x65, 0x73, 0x74, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x96, 0x01,
 	0x0a, 0x0e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x43, 0x68, 0x65, 0x66, 0x52, 0x75, 0x6e,
 	0x12, 0x25, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
@@ -229,10 +229,34 @@ var file_interservice_ingest_chef_proto_rawDesc = []byte{
 	0x6e, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
 	0x22, 0x1e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x18, 0x12, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76,
 	0x30, 0x2f, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
-	0x42, 0x32, 0x5a, 0x30, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63,
-	0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e,
-	0x67, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0xae, 0x01, 0x0a, 0x0b, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x44, 0x75, 0x6d, 0x6d, 0x79,
+	0x12, 0x2f, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2e, 0x72, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x2e, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x38, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
+	0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2e, 0x72, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x34, 0x82, 0xd3, 0xe4,
+	0x93, 0x02, 0x2e, 0x3a, 0x01, 0x2a, 0x22, 0x29, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x30, 0x2f,
+	0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x2f, 0x63, 0x68,
+	0x65, 0x66, 0x2f, 0x69, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0xcb, 0x01, 0x0a, 0x12, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x44, 0x75, 0x6d, 0x6d,
+	0x79, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x12, 0x36, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e,
+	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x67,
+	0x65, 0x73, 0x74, 0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x49, 0x6e, 0x73, 0x65,
+	0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73,
+	0x1a, 0x3f, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2e, 0x72, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x3c, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x36, 0x3a, 0x01, 0x2a, 0x22, 0x31, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x76, 0x30, 0x2f, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2f, 0x65, 0x76, 0x65,
+	0x6e, 0x74, 0x73, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x69, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x5f,
+	0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x5f, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x42,
+	0x32, 0x5a, 0x30, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68,
+	0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x67,
+	0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -256,11 +280,15 @@ var file_interservice_ingest_chef_proto_goTypes = []any{
 	(*request.Liveness)(nil),                           // 4: chef.automate.api.ingest.request.Liveness
 	(*request.MultipleNodeDeleteRequest)(nil),          // 5: chef.automate.api.ingest.request.MultipleNodeDeleteRequest
 	(*request.Delete)(nil),                             // 6: chef.automate.api.ingest.request.Delete
-	(*response.ProcessChefRunResponse)(nil),            // 7: chef.automate.api.ingest.response.ProcessChefRunResponse
-	(*response.ProcessChefActionResponse)(nil),         // 8: chef.automate.api.ingest.response.ProcessChefActionResponse
-	(*response.ProcessLivenessResponse)(nil),           // 9: chef.automate.api.ingest.response.ProcessLivenessResponse
-	(*response.ProcessMultipleNodeDeleteResponse)(nil), // 10: chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
-	(*response.ProcessNodeDeleteResponse)(nil),         // 11: chef.automate.api.ingest.response.ProcessNodeDeleteResponse
+	(*request.InsertRequest)(nil),                      // 7: chef.automate.api.ingest.request.InsertRequest
+	(*request.InsertRequestDetails)(nil),               // 8: chef.automate.api.ingest.request.InsertRequestDetails
+	(*response.ProcessChefRunResponse)(nil),            // 9: chef.automate.api.ingest.response.ProcessChefRunResponse
+	(*response.ProcessChefActionResponse)(nil),         // 10: chef.automate.api.ingest.response.ProcessChefActionResponse
+	(*response.ProcessLivenessResponse)(nil),           // 11: chef.automate.api.ingest.response.ProcessLivenessResponse
+	(*response.ProcessMultipleNodeDeleteResponse)(nil), // 12: chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
+	(*response.ProcessNodeDeleteResponse)(nil),         // 13: chef.automate.api.ingest.response.ProcessNodeDeleteResponse
+	(*response.InsertRequestResponse)(nil),             // 14: chef.automate.api.ingest.response.InsertRequestResponse
+	(*response.InsertRequestDetailsResponse)(nil),      // 15: chef.automate.api.ingest.response.InsertRequestDetailsResponse
 }
 var file_interservice_ingest_chef_proto_depIdxs = []int32{
 	2,  // 0: chef.automate.domain.ingest.ChefIngesterService.ProcessChefRun:input_type -> chef.automate.api.ingest.request.Run
@@ -269,14 +297,18 @@ var file_interservice_ingest_chef_proto_depIdxs = []int32{
 	5,  // 3: chef.automate.domain.ingest.ChefIngesterService.ProcessMultipleNodeDeletes:input_type -> chef.automate.api.ingest.request.MultipleNodeDeleteRequest
 	6,  // 4: chef.automate.domain.ingest.ChefIngesterService.ProcessNodeDelete:input_type -> chef.automate.api.ingest.request.Delete
 	1,  // 5: chef.automate.domain.ingest.ChefIngesterService.GetVersion:input_type -> chef.automate.domain.ingest.VersionRequest
-	7,  // 6: chef.automate.domain.ingest.ChefIngesterService.ProcessChefRun:output_type -> chef.automate.api.ingest.response.ProcessChefRunResponse
-	8,  // 7: chef.automate.domain.ingest.ChefIngesterService.ProcessChefAction:output_type -> chef.automate.api.ingest.response.ProcessChefActionResponse
-	9,  // 8: chef.automate.domain.ingest.ChefIngesterService.ProcessLivenessPing:output_type -> chef.automate.api.ingest.response.ProcessLivenessResponse
-	10, // 9: chef.automate.domain.ingest.ChefIngesterService.ProcessMultipleNodeDeletes:output_type -> chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
-	11, // 10: chef.automate.domain.ingest.ChefIngesterService.ProcessNodeDelete:output_type -> chef.automate.api.ingest.response.ProcessNodeDeleteResponse
-	0,  // 11: chef.automate.domain.ingest.ChefIngesterService.GetVersion:output_type -> chef.automate.domain.ingest.Version
-	6,  // [6:12] is the sub-list for method output_type
-	0,  // [0:6] is the sub-list for method input_type
+	7,  // 6: chef.automate.domain.ingest.ChefIngesterService.InsertDummy:input_type -> chef.automate.api.ingest.request.InsertRequest
+	8,  // 7: chef.automate.domain.ingest.ChefIngesterService.InsertDummyDetails:input_type -> chef.automate.api.ingest.request.InsertRequestDetails
+	9,  // 8: chef.automate.domain.ingest.ChefIngesterService.ProcessChefRun:output_type -> chef.automate.api.ingest.response.ProcessChefRunResponse
+	10, // 9: chef.automate.domain.ingest.ChefIngesterService.ProcessChefAction:output_type -> chef.automate.api.ingest.response.ProcessChefActionResponse
+	11, // 10: chef.automate.domain.ingest.ChefIngesterService.ProcessLivenessPing:output_type -> chef.automate.api.ingest.response.ProcessLivenessResponse
+	12, // 11: chef.automate.domain.ingest.ChefIngesterService.ProcessMultipleNodeDeletes:output_type -> chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
+	13, // 12: chef.automate.domain.ingest.ChefIngesterService.ProcessNodeDelete:output_type -> chef.automate.api.ingest.response.ProcessNodeDeleteResponse
+	0,  // 13: chef.automate.domain.ingest.ChefIngesterService.GetVersion:output_type -> chef.automate.domain.ingest.Version
+	14, // 14: chef.automate.domain.ingest.ChefIngesterService.InsertDummy:output_type -> chef.automate.api.ingest.response.InsertRequestResponse
+	15, // 15: chef.automate.domain.ingest.ChefIngesterService.InsertDummyDetails:output_type -> chef.automate.api.ingest.response.InsertRequestDetailsResponse
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -325,6 +357,10 @@ type ChefIngesterServiceClient interface {
 	ProcessMultipleNodeDeletes(ctx context.Context, in *request.MultipleNodeDeleteRequest, opts ...grpc.CallOption) (*response.ProcessMultipleNodeDeleteResponse, error)
 	ProcessNodeDelete(ctx context.Context, in *request.Delete, opts ...grpc.CallOption) (*response.ProcessNodeDeleteResponse, error)
 	GetVersion(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*Version, error)
+	// Inserts dummy data into reindex_requests table
+	InsertDummy(ctx context.Context, in *request.InsertRequest, opts ...grpc.CallOption) (*response.InsertRequestResponse, error)
+	// Inserts dummy data into reindex_request_detailed table
+	InsertDummyDetails(ctx context.Context, in *request.InsertRequestDetails, opts ...grpc.CallOption) (*response.InsertRequestDetailsResponse, error)
 }
 
 type chefIngesterServiceClient struct {
@@ -389,6 +425,24 @@ func (c *chefIngesterServiceClient) GetVersion(ctx context.Context, in *VersionR
 	return out, nil
 }
 
+func (c *chefIngesterServiceClient) InsertDummy(ctx context.Context, in *request.InsertRequest, opts ...grpc.CallOption) (*response.InsertRequestResponse, error) {
+	out := new(response.InsertRequestResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.ingest.ChefIngesterService/InsertDummy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *chefIngesterServiceClient) InsertDummyDetails(ctx context.Context, in *request.InsertRequestDetails, opts ...grpc.CallOption) (*response.InsertRequestDetailsResponse, error) {
+	out := new(response.InsertRequestDetailsResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.ingest.ChefIngesterService/InsertDummyDetails", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChefIngesterServiceServer is the server API for ChefIngesterService service.
 type ChefIngesterServiceServer interface {
 	ProcessChefRun(context.Context, *request.Run) (*response.ProcessChefRunResponse, error)
@@ -397,6 +451,10 @@ type ChefIngesterServiceServer interface {
 	ProcessMultipleNodeDeletes(context.Context, *request.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error)
 	ProcessNodeDelete(context.Context, *request.Delete) (*response.ProcessNodeDeleteResponse, error)
 	GetVersion(context.Context, *VersionRequest) (*Version, error)
+	// Inserts dummy data into reindex_requests table
+	InsertDummy(context.Context, *request.InsertRequest) (*response.InsertRequestResponse, error)
+	// Inserts dummy data into reindex_request_detailed table
+	InsertDummyDetails(context.Context, *request.InsertRequestDetails) (*response.InsertRequestDetailsResponse, error)
 }
 
 // UnimplementedChefIngesterServiceServer can be embedded to have forward compatible implementations.
@@ -420,6 +478,12 @@ func (*UnimplementedChefIngesterServiceServer) ProcessNodeDelete(context.Context
 }
 func (*UnimplementedChefIngesterServiceServer) GetVersion(context.Context, *VersionRequest) (*Version, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedChefIngesterServiceServer) InsertDummy(context.Context, *request.InsertRequest) (*response.InsertRequestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertDummy not implemented")
+}
+func (*UnimplementedChefIngesterServiceServer) InsertDummyDetails(context.Context, *request.InsertRequestDetails) (*response.InsertRequestDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertDummyDetails not implemented")
 }
 
 func RegisterChefIngesterServiceServer(s *grpc.Server, srv ChefIngesterServiceServer) {
@@ -534,6 +598,42 @@ func _ChefIngesterService_GetVersion_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChefIngesterService_InsertDummy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.InsertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChefIngesterServiceServer).InsertDummy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.ingest.ChefIngesterService/InsertDummy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChefIngesterServiceServer).InsertDummy(ctx, req.(*request.InsertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ChefIngesterService_InsertDummyDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.InsertRequestDetails)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChefIngesterServiceServer).InsertDummyDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.ingest.ChefIngesterService/InsertDummyDetails",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChefIngesterServiceServer).InsertDummyDetails(ctx, req.(*request.InsertRequestDetails))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ChefIngesterService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.ingest.ChefIngesterService",
 	HandlerType: (*ChefIngesterServiceServer)(nil),
@@ -561,6 +661,14 @@ var _ChefIngesterService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVersion",
 			Handler:    _ChefIngesterService_GetVersion_Handler,
+		},
+		{
+			MethodName: "InsertDummy",
+			Handler:    _ChefIngesterService_InsertDummy_Handler,
+		},
+		{
+			MethodName: "InsertDummyDetails",
+			Handler:    _ChefIngesterService_InsertDummyDetails_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
