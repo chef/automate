@@ -20,3 +20,4 @@ CREATE TABLE IF NOT EXISTS reindex_request_detailed (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (request_id) REFERENCES reindex_requests(request_id) ON DELETE CASCADE
 );
+
