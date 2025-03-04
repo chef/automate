@@ -128,6 +128,78 @@ func (*ProcessMultipleNodeDeleteResponse) Descriptor() ([]byte, []int) {
 	return file_external_ingest_response_action_proto_rawDescGZIP(), []int{2}
 }
 
+type InsertRequestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InsertRequestResponse) Reset() {
+	*x = InsertRequestResponse{}
+	mi := &file_external_ingest_response_action_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InsertRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InsertRequestResponse) ProtoMessage() {}
+
+func (x *InsertRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_external_ingest_response_action_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InsertRequestResponse.ProtoReflect.Descriptor instead.
+func (*InsertRequestResponse) Descriptor() ([]byte, []int) {
+	return file_external_ingest_response_action_proto_rawDescGZIP(), []int{3}
+}
+
+type InsertRequestDetailsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InsertRequestDetailsResponse) Reset() {
+	*x = InsertRequestDetailsResponse{}
+	mi := &file_external_ingest_response_action_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InsertRequestDetailsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InsertRequestDetailsResponse) ProtoMessage() {}
+
+func (x *InsertRequestDetailsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_external_ingest_response_action_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InsertRequestDetailsResponse.ProtoReflect.Descriptor instead.
+func (*InsertRequestDetailsResponse) Descriptor() ([]byte, []int) {
+	return file_external_ingest_response_action_proto_rawDescGZIP(), []int{4}
+}
+
 var File_external_ingest_response_action_proto protoreflect.FileDescriptor
 
 var file_external_ingest_response_action_proto_rawDesc = []byte{
@@ -141,11 +213,15 @@ var file_external_ingest_response_action_proto_rawDesc = []byte{
 	0x73, 0x73, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70,
 	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x23, 0x0a, 0x21, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x4d,
 	0x75, 0x6c, 0x74, 0x69, 0x70, 0x6c, 0x65, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x65, 0x6c, 0x65, 0x74,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x37, 0x5a, 0x35, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74,
-	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e,
-	0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x17, 0x0a, 0x15, 0x49, 0x6e, 0x73,
+	0x65, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x1e, 0x0a, 0x1c, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x42, 0x37, 0x5a, 0x35, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x67, 0x65,
+	0x73, 0x74, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -160,11 +236,13 @@ func file_external_ingest_response_action_proto_rawDescGZIP() []byte {
 	return file_external_ingest_response_action_proto_rawDescData
 }
 
-var file_external_ingest_response_action_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_external_ingest_response_action_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_external_ingest_response_action_proto_goTypes = []any{
 	(*ProcessChefActionResponse)(nil),         // 0: chef.automate.api.ingest.response.ProcessChefActionResponse
 	(*ProcessNodeDeleteResponse)(nil),         // 1: chef.automate.api.ingest.response.ProcessNodeDeleteResponse
 	(*ProcessMultipleNodeDeleteResponse)(nil), // 2: chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
+	(*InsertRequestResponse)(nil),             // 3: chef.automate.api.ingest.response.InsertRequestResponse
+	(*InsertRequestDetailsResponse)(nil),      // 4: chef.automate.api.ingest.response.InsertRequestDetailsResponse
 }
 var file_external_ingest_response_action_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -185,7 +263,7 @@ func file_external_ingest_response_action_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_external_ingest_response_action_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

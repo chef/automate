@@ -43,6 +43,71 @@
         ]
       }
     },
+    "/api/v0/ingest/events/chef/insert_request": {
+      "post": {
+        "summary": "inserting dummy values in insert_request and insert_request_details tables",
+        "operationId": "ChefIngester_InsertDummy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.ingest.response.InsertRequestResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.ingest.request.InsertRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ChefIngester"
+        ]
+      }
+    },
+    "/api/v0/ingest/events/chef/insert_request_details": {
+      "post": {
+        "operationId": "ChefIngester_InsertDummyDetails",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.ingest.response.InsertRequestDetailsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.ingest.request.InsertRequestDetails"
+            }
+          }
+        ],
+        "tags": [
+          "ChefIngester"
+        ]
+      }
+    },
     "/api/v0/ingest/events/chef/liveness": {
       "post": {
         "operationId": "ChefIngester_ProcessLivenessPing",
@@ -369,6 +434,72 @@
         }
       }
     },
+    "chef.automate.api.ingest.request.InsertRequest": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "chef.automate.api.ingest.request.InsertRequestDetails": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "request_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "index": {
+          "type": "string"
+        },
+        "from_version": {
+          "type": "string"
+        },
+        "to_version": {
+          "type": "string"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "os_task_id": {
+          "type": "string"
+        },
+        "heartbeat": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "having_alias": {
+          "type": "boolean"
+        },
+        "alias_list": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "chef.automate.api.ingest.request.Liveness": {
       "type": "object",
       "properties": {
@@ -572,6 +703,12 @@
           }
         }
       }
+    },
+    "chef.automate.api.ingest.response.InsertRequestDetailsResponse": {
+      "type": "object"
+    },
+    "chef.automate.api.ingest.response.InsertRequestResponse": {
+      "type": "object"
     },
     "chef.automate.api.ingest.response.ProcessChefActionResponse": {
       "type": "object"

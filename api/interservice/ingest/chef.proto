@@ -58,4 +58,19 @@ service ChefIngesterService {
 	rpc GetVersion (VersionRequest) returns (Version) {
 		option (google.api.http).get = "/api/v0/ingest/version";
 	};
+	// Inserts dummy data into reindex_requests table
+    rpc InsertDummy (api.ingest.request.InsertRequest) returns (api.ingest.response.InsertRequestResponse) {
+      	option (google.api.http) = {
+      		post: "/api/v0/ingest/events/chef/insert_request"
+      		body: "*"
+    	};
+    };
+
+     // Inserts dummy data into reindex_request_detailed table
+    rpc InsertDummyDetails (api.ingest.request.InsertRequestDetails) returns (api.ingest.response.InsertRequestDetailsResponse) {
+    	option (google.api.http) = {
+      		post: "/api/v0/ingest/events/chef/insert_request_details"
+     		body: "*"
+   		};
+ 	};
 }
