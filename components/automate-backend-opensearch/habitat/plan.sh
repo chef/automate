@@ -26,7 +26,7 @@ pkg_deps=(
   core/curl/8.7.1/20240614090648 #healthcheck
   chef/automate-openjdk
   chef/automate-platform-tools/0.1.0/20241212061203
-  core/ruby31/3.1.6/20240912144513
+  core/ruby3_4
 )
 pkg_interpreters=(bin/ruby)
 pkg_bin_dirs=(os/bin)
