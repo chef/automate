@@ -21,3 +21,4 @@ CREATE TABLE IF NOT EXISTS reindex_request_detailed (
     FOREIGN KEY (request_id) REFERENCES reindex_requests(request_id) ON DELETE CASCADE
 );
 
+
