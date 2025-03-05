@@ -14,11 +14,11 @@ do_before() {
 
 pkg_deps=(
   core/ruby3_4
-  core/libffi/3.4.2/20240105233930
+  core/libffi/3.4.4/20241017125515
   chef/mlsa/1.0.1/20240125084021
-  core/bash/5.1/20240105214248
-  core/coreutils/8.32/20240105213308
-  core/glibc/2.35/20240105171810
+  core/bash/5.2.21/20241017111154
+  core/coreutils/9.4/20241017111752
+  core/glibc/2.36/20241017094131
   core/postgresql-client/9.6.24/20240106122111
 )
 
