@@ -151,7 +151,7 @@ GEM
     plist (3.5.0)
     proxifier (1.0.3)
     public_suffix (4.0.6)
-    rack (2.2.8.1)
+    rack (2.2.11)
     retryable (3.0.5)
     rubyntlm (0.6.2)
     rubyzip (2.2.0)
@@ -237,8 +237,8 @@ PLATFORMS
 DEPENDENCIES
   berkshelf
   kitchen-vagrant
-  rack (= 2.2.8.1)
+  rack (= 2.2.11)
   test-kitchen
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
