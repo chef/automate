@@ -1,7 +1,5 @@
 #stable channel
 
-HAB_BLDR_CHANNEL=LTS-2024
-
 pkg_name="automate-ha-ctl"
 pkg_origin="chef"
 pkg_version="0.1.0"
