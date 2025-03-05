@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/chef/automate/components/ingest-service/config"
@@ -60,24 +61,10 @@ func (db *DB) UpdateReindexRequest(requestID int, status string) error {
 	return err
 }
 
-// Fetch a reindex request by ID
-func (db *DB) GetReindexRequest(requestID int) (*ReindexRequest, error) {
-	var request ReindexRequest
-	err := db.SelectOne(&request, getReindexRequest, requestID)
-	return &request, err
-}
-
 // Insert reindex request detailed entry
 func (db *DB) InsertReindexRequestDetailed(detail ReindexRequestDetailed) error {
 	_, err := db.Exec(insertReindexRequestDetailed, detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, detail.Stage, detail.OsTaskID, detail.Heartbeat, detail.HavingAlias, detail.AliasList, time.Now(), time.Now())
 	return err
-}
-
-// Fetch reindex request details
-func (db *DB) GetReindexRequestDetails(requestID int) ([]*ReindexRequestDetailed, error) {
-	var details []*ReindexRequestDetailed
-	_, err := db.Select(&details, getReindexRequestDetails, requestID)
-	return details, err
 }
 
 // Delete a reindex request
@@ -92,6 +79,40 @@ func (db *DB) DeleteReindexRequestDetail(id int) error {
 	return err
 }
 
+// Get reindex request status
+func (db *DB) GetReindexStatus(requestID int) ([]*ReindexRequest, []*ReindexRequestDetailed, string, error) {
+	var request []*ReindexRequest
+	_, err := db.Select(&request, getstatusReindexRequest, requestID)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "error fetching reindex request status from db")
+	}
+
+	var details []*ReindexRequestDetailed
+	_, err = db.Select(&details, getstatusReindexRequestDetails, requestID)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "error fetching reindex request details from db")
+	}
+
+	status := map[string]interface{}{
+		"overall_status": request[0].Status, // Using request[0] since it's a slice
+		"indexes":        []map[string]string{},
+	}
+
+	for _, detail := range details {
+		status["indexes"] = append(status["indexes"].([]map[string]string), map[string]string{
+			"index": detail.Index,
+			"stage": detail.Stage,
+		})
+	}
+
+	statusJSON, err := json.Marshal(status)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "error marshalling reindex status to JSON")
+	}
+
+	return request, details, string(statusJSON), nil
+}
+
 // SQL Queries
 const insertReindexRequest = `
 INSERT INTO reindex_requests(request_id, status, created_at, last_updated)
@@ -100,14 +121,14 @@ VALUES ($1, $2, $3, $4);`
 const updateReindexRequest = `
 UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE request_id = $3;`
 
-const getReindexRequest = `
+const getstatusReindexRequest = `
 SELECT request_id, status, created_at, last_updated FROM reindex_requests WHERE request_id = $1;`
 
 const insertReindexRequestDetailed = `
 INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
 
-const getReindexRequestDetails = `
+const getstatusReindexRequestDetails = `
 SELECT id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at FROM reindex_request_detailed WHERE request_id = $1;`
 
 const deleteReindexRequest = `
