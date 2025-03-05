@@ -21,10 +21,12 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
+	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
+	"github.com/chef/automate/components/ingest-service/storage"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
@@ -45,7 +47,6 @@ import (
 // Maybe even spawn multiple servers
 func Spawn(opts *serveropts.Opts) error {
 	var client backend.Client
-
 	// Initialize the backend client
 	client, err := elastic.New(opts.ElasticSearchUrl)
 
@@ -67,15 +68,31 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	pgURL, err := pgURL(opts.PGURL, opts.PGDatabase)
-	if err != nil {
+	if err != nil || pgURL == "" {
 		log.WithError(err).Fatal("could not get PG URL")
-		return err
+		return fmt.Errorf("invalid database URL")
+	}
+
+	if opts.SchemmaPath == "" {
+		log.Fatal("Schema path is missing in configuration")
+		return fmt.Errorf("schema path cannot be empty")
 	}
 
 	db, err := libdb.PGOpen(pgURL)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to open database with uri: %s", pgURL)
 	}
+	storageConfig := &config.Storage{
+		URI:        pgURL,
+		SchemaPath: opts.SchemmaPath,
+	}
+
+	err = storage.RunMigrations(storageConfig) // Call the migration function
+	if err != nil {
+		log.WithError(err).Fatal("Migration failed")
+		return err
+	}
+	log.Info("Database connection and migrations successful!")
 
 	// Authz Interface
 	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)

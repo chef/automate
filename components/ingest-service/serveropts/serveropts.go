@@ -33,6 +33,7 @@ type Opts struct {
 	RestPort                      int
 	ElasticSearchUrl              string
 	EsSidecarAddress              string
+	SchemmaPath                   string
 	PGURL                         string
 	PGDatabase                    string
 	AuthzAddress                  string

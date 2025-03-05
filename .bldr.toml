@@ -766,6 +766,7 @@ paths = [
   "lib/elasticutil/*",
   "lib/grpc/*",
   "lib/io/*",
+  "lib/logger/*",
   "lib/platform/config/*",
   "lib/platform/sys/*",
   "lib/proc/*",
