@@ -15,7 +15,7 @@ do_before() {
 pkg_deps=(
   core/ruby3_4
   core/libffi
-  chef/mlsa
+  chef/mlsa/1.0.1/20240125084021
   core/bash
   core/coreutils
   core/glibc
