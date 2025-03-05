@@ -1,5 +1,6 @@
 #stable channel
 
+HAB_BLDR_CHANNEL=LTS-2024
 
 pkg_name="automate-ha-ctl"
 pkg_origin="chef"
@@ -12,14 +13,15 @@ do_before() {
   update_pkg_version
 }
 
+
 pkg_deps=(
   core/ruby3_4
-  core/libffi/3.4.4/20241017125515
-  chef/mlsa/1.0.1/20240125084021
-  core/bash/5.2.21/20241017111154
-  core/coreutils/9.4/20241017111752
-  core/glibc/2.36/20241017094131
-  core/postgresql-client/9.6.24/20240106122111
+  core/libffi
+  chef/mlsa
+  core/bash
+  core/coreutils
+  core/glibc
+  core/postgresql-client
 )
 
 pkg_build_deps=(
