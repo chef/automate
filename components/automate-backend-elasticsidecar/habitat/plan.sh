@@ -11,13 +11,13 @@ pkg_license=("Chef-MLSA")
 pkg_version="0.1.0"
 pkg_upstream_url="http://github.com/chef/automate/components/automate-backend-elasticsidecar"
 pkg_deps=(
-  core/bash/5.1/20240105214248
+  core/bash
   chef/automate-openjdk
   chef/automate-ha-opensearch
 )
 pkg_build_deps=(
-  core/make/4.3/20240105222044
-  core/gcc/9.5.0/20240105175314
+  core/make
+  core/gcc
 )
 
 pkg_binds=(
