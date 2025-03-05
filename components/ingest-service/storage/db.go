@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/chef/automate/components/ingest-service/config"
@@ -60,30 +61,10 @@ func (db *DB) UpdateReindexRequest(requestID int, status string) error {
 	return err
 }
 
-// Fetch a reindex request by ID
-func (db *DB) GetStatusReindexRequest(requestID int, lastUpdated time.Time) ([]*ReindexRequest, error) {
-	var request []*ReindexRequest
-	_, err := db.Select(&request, getstatusReindexRequest, requestID, lastUpdated)
-	if err != nil {
-		return nil, errors.Wrap(err, "error in fetching the reindex request status from db")
-	}
-	return request, err
-}
-
 // Insert reindex request detailed entry
 func (db *DB) InsertReindexRequestDetailed(detail ReindexRequestDetailed) error {
 	_, err := db.Exec(insertReindexRequestDetailed, detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, detail.Stage, detail.OsTaskID, detail.Heartbeat, detail.HavingAlias, detail.AliasList, time.Now(), time.Now())
 	return err
-}
-
-// Fetch reindex request details
-func (db *DB) GetStatusReindexRequestDetails(requestID int, updatedat time.Time) ([]*ReindexRequestDetailed, error) {
-	var details []*ReindexRequestDetailed
-	_, err := db.Select(&details, getstatusReindexRequestDetails, requestID, updatedat)
-	if err != nil {
-		return nil, errors.Wrap(err, "error in fetching the reindex request details status from db")
-	}
-	return details, err
 }
 
 // Delete a reindex request
@@ -96,6 +77,40 @@ func (db *DB) DeleteReindexRequest(requestID int) error {
 func (db *DB) DeleteReindexRequestDetail(id int) error {
 	_, err := db.Exec(deleteReindexRequestDetail, id)
 	return err
+}
+
+// Get reindex request status
+func (db *DB) GetReindexStatus(requestID int) ([]*ReindexRequest, []*ReindexRequestDetailed, string, error) {
+	var request []*ReindexRequest
+	_, err := db.Select(&request, getstatusReindexRequest, requestID)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "error fetching reindex request status from db")
+	}
+
+	var details []*ReindexRequestDetailed
+	_, err = db.Select(&details, getstatusReindexRequestDetails, requestID)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "error fetching reindex request details from db")
+	}
+
+	status := map[string]interface{}{
+		"overall_status": request[0].Status, // Using request[0] since it's a slice
+		"indexes":        []map[string]string{},
+	}
+
+	for _, detail := range details {
+		status["indexes"] = append(status["indexes"].([]map[string]string), map[string]string{
+			"index": detail.Index,
+			"stage": detail.Stage,
+		})
+	}
+
+	statusJSON, err := json.Marshal(status)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "error marshalling reindex status to JSON")
+	}
+
+	return request, details, string(statusJSON), nil
 }
 
 // SQL Queries
