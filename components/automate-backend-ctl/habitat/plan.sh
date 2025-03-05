@@ -13,13 +13,13 @@ do_before() {
 }
 
 pkg_deps=(
-  core/ruby31/3.1.6/20240912144513
-  core/libffi/3.4.2/20240105233930
-  chef/mlsa/1.0.1/20240125084021
-  core/bash/5.1/20240105214248
-  core/coreutils/8.32/20240105213308
-  core/glibc/2.35/20240105171810
-  core/postgresql-client/9.6.24/20240106122111
+  core/ruby3_4
+  core/libffi
+  chef/mlsa
+  core/bash
+  core/coreutils
+  core/glibc
+  core/postgresql-client
 )
 
 pkg_build_deps=(
