@@ -19,19 +19,19 @@ pkg_description=('Eclipse Temurin is the open source Java SE build based upon Op
 pkg_upstream_url=https://adoptium.net/
 
 pkg_deps=(
-  core/gcc-libs/9.5.0/20240105173910
-  core/glibc/2.35/20240105171810
-  core/libxext/1.3.4/20240108124758
-  core/libxi/1.7.10/20240108173246
-  core/libxrender/0.9.10/20240108173201
-  core/libxtst/1.2.3/20240108190320
-  core/xlib/1.7.2/20240108124426
-  core/zlib/1.3/20240105173710
+  core/gcc-libs
+  core/glibc
+  core/libxext
+  core/libxi
+  core/libxrender
+  core/libxtst
+  core/xlib
+  core/zlib
 )
 
 pkg_build_deps=(
-  core/patchelf/0.13/20240105212025
-  core/rsync/3.2.3/20240107034222
+  core/patchelf
+  core/rsync
 )
 pkg_bin_dirs=(bin)
 pkg_lib_dirs=(lib)
