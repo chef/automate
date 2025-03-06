@@ -168,7 +168,7 @@ var file_interservice_ingest_chef_proto_rawDesc = []byte{
 	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
 	0x65, 0x12, 0x10, 0x0a, 0x03, 0x73, 0x68, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
 	0x73, 0x68, 0x61, 0x22, 0x10, 0x0a, 0x0e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0xc8, 0x07, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x66, 0x49, 0x6e,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0xfc, 0x08, 0x0a, 0x13, 0x43, 0x68, 0x65, 0x66, 0x49, 0x6e,
 	0x67, 0x65, 0x73, 0x74, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x96, 0x01,
 	0x0a, 0x0e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x43, 0x68, 0x65, 0x66, 0x52, 0x75, 0x6e,
 	0x12, 0x25, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
@@ -229,10 +229,21 @@ var file_interservice_ingest_chef_proto_rawDesc = []byte{
 	0x6e, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
 	0x22, 0x1e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x18, 0x12, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76,
 	0x30, 0x2f, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
-	0x42, 0x32, 0x5a, 0x30, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63,
-	0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e,
-	0x67, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0xb1, 0x01, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x52, 0x65, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x53,
+	0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x39, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74,
+	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74,
+	0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x69, 0x6e,
+	0x64, 0x65, 0x78, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x3b, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x2e, 0x72, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x53,
+	0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x25, 0x82,
+	0xd3, 0xe4, 0x93, 0x02, 0x1f, 0x12, 0x1d, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x30, 0x2f, 0x69,
+	0x6e, 0x67, 0x65, 0x73, 0x74, 0x2f, 0x72, 0x65, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x2f, 0x73, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x42, 0x32, 0x5a, 0x30, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
+	0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
+	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x2f, 0x69, 0x6e, 0x67, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -256,11 +267,13 @@ var file_interservice_ingest_chef_proto_goTypes = []any{
 	(*request.Liveness)(nil),                           // 4: chef.automate.api.ingest.request.Liveness
 	(*request.MultipleNodeDeleteRequest)(nil),          // 5: chef.automate.api.ingest.request.MultipleNodeDeleteRequest
 	(*request.Delete)(nil),                             // 6: chef.automate.api.ingest.request.Delete
-	(*response.ProcessChefRunResponse)(nil),            // 7: chef.automate.api.ingest.response.ProcessChefRunResponse
-	(*response.ProcessChefActionResponse)(nil),         // 8: chef.automate.api.ingest.response.ProcessChefActionResponse
-	(*response.ProcessLivenessResponse)(nil),           // 9: chef.automate.api.ingest.response.ProcessLivenessResponse
-	(*response.ProcessMultipleNodeDeleteResponse)(nil), // 10: chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
-	(*response.ProcessNodeDeleteResponse)(nil),         // 11: chef.automate.api.ingest.response.ProcessNodeDeleteResponse
+	(*request.GetReindexStatusRequest)(nil),            // 7: chef.automate.api.ingest.request.GetReindexStatusRequest
+	(*response.ProcessChefRunResponse)(nil),            // 8: chef.automate.api.ingest.response.ProcessChefRunResponse
+	(*response.ProcessChefActionResponse)(nil),         // 9: chef.automate.api.ingest.response.ProcessChefActionResponse
+	(*response.ProcessLivenessResponse)(nil),           // 10: chef.automate.api.ingest.response.ProcessLivenessResponse
+	(*response.ProcessMultipleNodeDeleteResponse)(nil), // 11: chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
+	(*response.ProcessNodeDeleteResponse)(nil),         // 12: chef.automate.api.ingest.response.ProcessNodeDeleteResponse
+	(*response.GetReindexStatusResponse)(nil),          // 13: chef.automate.api.ingest.response.GetReindexStatusResponse
 }
 var file_interservice_ingest_chef_proto_depIdxs = []int32{
 	2,  // 0: chef.automate.domain.ingest.ChefIngesterService.ProcessChefRun:input_type -> chef.automate.api.ingest.request.Run
@@ -269,14 +282,16 @@ var file_interservice_ingest_chef_proto_depIdxs = []int32{
 	5,  // 3: chef.automate.domain.ingest.ChefIngesterService.ProcessMultipleNodeDeletes:input_type -> chef.automate.api.ingest.request.MultipleNodeDeleteRequest
 	6,  // 4: chef.automate.domain.ingest.ChefIngesterService.ProcessNodeDelete:input_type -> chef.automate.api.ingest.request.Delete
 	1,  // 5: chef.automate.domain.ingest.ChefIngesterService.GetVersion:input_type -> chef.automate.domain.ingest.VersionRequest
-	7,  // 6: chef.automate.domain.ingest.ChefIngesterService.ProcessChefRun:output_type -> chef.automate.api.ingest.response.ProcessChefRunResponse
-	8,  // 7: chef.automate.domain.ingest.ChefIngesterService.ProcessChefAction:output_type -> chef.automate.api.ingest.response.ProcessChefActionResponse
-	9,  // 8: chef.automate.domain.ingest.ChefIngesterService.ProcessLivenessPing:output_type -> chef.automate.api.ingest.response.ProcessLivenessResponse
-	10, // 9: chef.automate.domain.ingest.ChefIngesterService.ProcessMultipleNodeDeletes:output_type -> chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
-	11, // 10: chef.automate.domain.ingest.ChefIngesterService.ProcessNodeDelete:output_type -> chef.automate.api.ingest.response.ProcessNodeDeleteResponse
-	0,  // 11: chef.automate.domain.ingest.ChefIngesterService.GetVersion:output_type -> chef.automate.domain.ingest.Version
-	6,  // [6:12] is the sub-list for method output_type
-	0,  // [0:6] is the sub-list for method input_type
+	7,  // 6: chef.automate.domain.ingest.ChefIngesterService.GetReindexStatus:input_type -> chef.automate.api.ingest.request.GetReindexStatusRequest
+	8,  // 7: chef.automate.domain.ingest.ChefIngesterService.ProcessChefRun:output_type -> chef.automate.api.ingest.response.ProcessChefRunResponse
+	9,  // 8: chef.automate.domain.ingest.ChefIngesterService.ProcessChefAction:output_type -> chef.automate.api.ingest.response.ProcessChefActionResponse
+	10, // 9: chef.automate.domain.ingest.ChefIngesterService.ProcessLivenessPing:output_type -> chef.automate.api.ingest.response.ProcessLivenessResponse
+	11, // 10: chef.automate.domain.ingest.ChefIngesterService.ProcessMultipleNodeDeletes:output_type -> chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse
+	12, // 11: chef.automate.domain.ingest.ChefIngesterService.ProcessNodeDelete:output_type -> chef.automate.api.ingest.response.ProcessNodeDeleteResponse
+	0,  // 12: chef.automate.domain.ingest.ChefIngesterService.GetVersion:output_type -> chef.automate.domain.ingest.Version
+	13, // 13: chef.automate.domain.ingest.ChefIngesterService.GetReindexStatus:output_type -> chef.automate.api.ingest.response.GetReindexStatusResponse
+	7,  // [7:14] is the sub-list for method output_type
+	0,  // [0:7] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -325,6 +340,7 @@ type ChefIngesterServiceClient interface {
 	ProcessMultipleNodeDeletes(ctx context.Context, in *request.MultipleNodeDeleteRequest, opts ...grpc.CallOption) (*response.ProcessMultipleNodeDeleteResponse, error)
 	ProcessNodeDelete(ctx context.Context, in *request.Delete, opts ...grpc.CallOption) (*response.ProcessNodeDeleteResponse, error)
 	GetVersion(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*Version, error)
+	GetReindexStatus(ctx context.Context, in *request.GetReindexStatusRequest, opts ...grpc.CallOption) (*response.GetReindexStatusResponse, error)
 }
 
 type chefIngesterServiceClient struct {
@@ -389,6 +405,15 @@ func (c *chefIngesterServiceClient) GetVersion(ctx context.Context, in *VersionR
 	return out, nil
 }
 
+func (c *chefIngesterServiceClient) GetReindexStatus(ctx context.Context, in *request.GetReindexStatusRequest, opts ...grpc.CallOption) (*response.GetReindexStatusResponse, error) {
+	out := new(response.GetReindexStatusResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.ingest.ChefIngesterService/GetReindexStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChefIngesterServiceServer is the server API for ChefIngesterService service.
 type ChefIngesterServiceServer interface {
 	ProcessChefRun(context.Context, *request.Run) (*response.ProcessChefRunResponse, error)
@@ -397,6 +422,7 @@ type ChefIngesterServiceServer interface {
 	ProcessMultipleNodeDeletes(context.Context, *request.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error)
 	ProcessNodeDelete(context.Context, *request.Delete) (*response.ProcessNodeDeleteResponse, error)
 	GetVersion(context.Context, *VersionRequest) (*Version, error)
+	GetReindexStatus(context.Context, *request.GetReindexStatusRequest) (*response.GetReindexStatusResponse, error)
 }
 
 // UnimplementedChefIngesterServiceServer can be embedded to have forward compatible implementations.
@@ -420,6 +446,9 @@ func (*UnimplementedChefIngesterServiceServer) ProcessNodeDelete(context.Context
 }
 func (*UnimplementedChefIngesterServiceServer) GetVersion(context.Context, *VersionRequest) (*Version, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedChefIngesterServiceServer) GetReindexStatus(context.Context, *request.GetReindexStatusRequest) (*response.GetReindexStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetReindexStatus not implemented")
 }
 
 func RegisterChefIngesterServiceServer(s *grpc.Server, srv ChefIngesterServiceServer) {
@@ -534,6 +563,24 @@ func _ChefIngesterService_GetVersion_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChefIngesterService_GetReindexStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.GetReindexStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChefIngesterServiceServer).GetReindexStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.ingest.ChefIngesterService/GetReindexStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChefIngesterServiceServer).GetReindexStatus(ctx, req.(*request.GetReindexStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ChefIngesterService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.ingest.ChefIngesterService",
 	HandlerType: (*ChefIngesterServiceServer)(nil),
@@ -561,6 +608,10 @@ var _ChefIngesterService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVersion",
 			Handler:    _ChefIngesterService_GetVersion_Handler,
+		},
+		{
+			MethodName: "GetReindexStatus",
+			Handler:    _ChefIngesterService_GetReindexStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

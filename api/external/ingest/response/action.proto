@@ -14,3 +14,7 @@ message ProcessNodeDeleteResponse {
 message ProcessMultipleNodeDeleteResponse {
 
 }
+
+message GetReindexStatusResponse {
+  string status_json = 1;
+}

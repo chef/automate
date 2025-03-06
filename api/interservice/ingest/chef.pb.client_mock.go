@@ -37,6 +37,26 @@ func (m *MockChefIngesterServiceClient) EXPECT() *MockChefIngesterServiceClientM
 	return m.recorder
 }
 
+// GetReindexStatus mocks base method.
+func (m *MockChefIngesterServiceClient) GetReindexStatus(ctx context.Context, in *request.GetReindexStatusRequest, opts ...grpc.CallOption) (*response.GetReindexStatusResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetReindexStatus", varargs...)
+	ret0, _ := ret[0].(*response.GetReindexStatusResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetReindexStatus indicates an expected call of GetReindexStatus.
+func (mr *MockChefIngesterServiceClientMockRecorder) GetReindexStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReindexStatus", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).GetReindexStatus), varargs...)
+}
+
 // GetVersion mocks base method.
 func (m *MockChefIngesterServiceClient) GetVersion(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*Version, error) {
 	m.ctrl.T.Helper()
@@ -178,6 +198,21 @@ func NewMockChefIngesterServiceServer(ctrl *gomock.Controller) *MockChefIngester
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockChefIngesterServiceServer) EXPECT() *MockChefIngesterServiceServerMockRecorder {
 	return m.recorder
+}
+
+// GetReindexStatus mocks base method.
+func (m *MockChefIngesterServiceServer) GetReindexStatus(arg0 context.Context, arg1 *request.GetReindexStatusRequest) (*response.GetReindexStatusResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetReindexStatus", arg0, arg1)
+	ret0, _ := ret[0].(*response.GetReindexStatusResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetReindexStatus indicates an expected call of GetReindexStatus.
+func (mr *MockChefIngesterServiceServerMockRecorder) GetReindexStatus(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReindexStatus", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).GetReindexStatus), arg0, arg1)
 }
 
 // GetVersion mocks base method.

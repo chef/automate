@@ -58,4 +58,8 @@ service ChefIngesterService {
 	rpc GetVersion (VersionRequest) returns (Version) {
 		option (google.api.http).get = "/api/v0/ingest/version";
 	};
+	rpc GetReindexStatus (api.ingest.request.GetReindexStatusRequest) returns (api.ingest.response.GetReindexStatusResponse) {
+        option (google.api.http).get =  "/api/v0/ingest/reindex/status";
+    };
+
 }
