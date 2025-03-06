@@ -100,7 +100,7 @@ do_unpack() {
 }
 
 do_setup_environment() {
-  export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/3.1.0"
+  export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/3.4.0"
   export GEM_PATH="$GEM_HOME"
 
   set_runtime_env GEM_HOME "$GEM_HOME"
