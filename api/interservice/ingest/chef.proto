@@ -29,6 +29,14 @@ message Version {
 message VersionRequest {
 }
 
+message GetReindexStatusResponse {
+  string status_json = 1;
+}
+
+message GetReindexStatusRequest {
+  int32 request_id = 1;
+}
+
 service ChefIngesterService {
 	rpc ProcessChefRun (api.ingest.request.Run) returns (api.ingest.response.ProcessChefRunResponse) {
 		option (google.api.http) = {
@@ -58,7 +66,7 @@ service ChefIngesterService {
 	rpc GetVersion (VersionRequest) returns (Version) {
 		option (google.api.http).get = "/api/v0/ingest/version";
 	};
-	rpc GetReindexStatus (api.ingest.request.GetReindexStatusRequest) returns (api.ingest.response.GetReindexStatusResponse) {
+	rpc GetReindexStatus (GetReindexStatusRequest) returns (GetReindexStatusResponse) {
         option (google.api.http).get =  "/api/v0/ingest/reindex/status";
     };
 

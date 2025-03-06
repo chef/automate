@@ -38,14 +38,14 @@ func (m *MockChefIngesterServiceClient) EXPECT() *MockChefIngesterServiceClientM
 }
 
 // GetReindexStatus mocks base method.
-func (m *MockChefIngesterServiceClient) GetReindexStatus(ctx context.Context, in *request.GetReindexStatusRequest, opts ...grpc.CallOption) (*response.GetReindexStatusResponse, error) {
+func (m *MockChefIngesterServiceClient) GetReindexStatus(ctx context.Context, in *GetReindexStatusRequest, opts ...grpc.CallOption) (*GetReindexStatusResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetReindexStatus", varargs...)
-	ret0, _ := ret[0].(*response.GetReindexStatusResponse)
+	ret0, _ := ret[0].(*GetReindexStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -201,10 +201,10 @@ func (m *MockChefIngesterServiceServer) EXPECT() *MockChefIngesterServiceServerM
 }
 
 // GetReindexStatus mocks base method.
-func (m *MockChefIngesterServiceServer) GetReindexStatus(arg0 context.Context, arg1 *request.GetReindexStatusRequest) (*response.GetReindexStatusResponse, error) {
+func (m *MockChefIngesterServiceServer) GetReindexStatus(arg0 context.Context, arg1 *GetReindexStatusRequest) (*GetReindexStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReindexStatus", arg0, arg1)
-	ret0, _ := ret[0].(*response.GetReindexStatusResponse)
+	ret0, _ := ret[0].(*GetReindexStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

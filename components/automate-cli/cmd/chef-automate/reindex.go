@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
-	"github.com/chef/automate/api/external/ingest"
-	"github.com/chef/automate/api/external/ingest/request"
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -28,29 +28,52 @@ var reindexStatusCmd = &cobra.Command{
 	PersistentPreRunE: preReindexCmd,
 }
 
-// runReindexStatusCmd connects to ingest-service and fetches reindex status
+// ReindexDSClient defines the required RPC methods for deployment-service
+type ReindexDSClient interface {
+	GetReindexStatus(ctx context.Context, in *api.GetReindexStatusRequest, opts ...grpc.CallOption) (*api.GetReindexStatusResponse, error)
+	Close() error
+}
+
+// ReindexFlow manages the CLI flow for reindexing
+type ReindexFlow struct {
+	DsClient ReindexDSClient
+	Writer   *cli.Writer
+}
+
+// runReindexStatusCmd connects to deployment-service and fetches reindex status
 func runReindexStatusCmd(cmd *cobra.Command, args []string) error {
-	// Connect to ingest-service
-	conn, err := grpc.Dial("localhost:10122", grpc.WithInsecure())
+	rf, err := NewReindexFlow(writer)
 	if err != nil {
-		log.Fatalf("Failed to connect to ingest service: %v", err)
+		return err
 	}
-	defer conn.Close()
+	return rf.GetReindexStatus()
+}
 
-	client := ingest.NewChefIngesterServiceClient(conn)
-
-	// Create request with a hardcoded RequestId for now
-	req := &request.GetReindexStatusRequest{RequestId: 1}
-	resp, err := client.GetReindexStatus(context.Background(), req)
+// NewReindexFlow establishes a connection to deployment-service
+func NewReindexFlow(writer *cli.Writer) (*ReindexFlow, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
-		log.Fatalf("Failed to get reindex status: %v", err)
+		return nil, err
+	}
+	return &ReindexFlow{DsClient: connection, Writer: writer}, nil
+}
+
+// GetReindexStatus fetches and prints the reindexing status
+func (rf *ReindexFlow) GetReindexStatus() error {
+	defer rf.DsClient.Close()
+
+	req := &api.GetReindexStatusRequest{RequestId: 1} // Adjust as needed
+
+	resp, err := rf.DsClient.GetReindexStatus(context.Background(), req)
+	if err != nil {
+		return status.Wrap(err, status.DeploymentServiceCallError, "Failed to get reindex status")
 	}
 
 	// Parse and print the response
 	var statusData map[string]interface{}
 	err = json.Unmarshal([]byte(resp.StatusJson), &statusData)
 	if err != nil {
-		log.Fatalf("Failed to parse JSON response: %v", err)
+		return fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
 	fmt.Println("Reindex Status:")

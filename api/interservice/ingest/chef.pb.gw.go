@@ -193,7 +193,7 @@ var (
 )
 
 func request_ChefIngesterService_GetReindexStatus_0(ctx context.Context, marshaler runtime.Marshaler, client ChefIngesterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.GetReindexStatusRequest
+	var protoReq GetReindexStatusRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -209,7 +209,7 @@ func request_ChefIngesterService_GetReindexStatus_0(ctx context.Context, marshal
 }
 
 func local_request_ChefIngesterService_GetReindexStatus_0(ctx context.Context, marshaler runtime.Marshaler, server ChefIngesterServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.GetReindexStatusRequest
+	var protoReq GetReindexStatusRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {

@@ -70,9 +70,3 @@ service ChefIngester {
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
   };
 }
-
-service ChefIngesterService {
-    rpc GetReindexStatus (ingest.request.GetReindexStatusRequest) returns (ingest.response.GetReindexStatusResponse) {
-        option (google.api.http).get = "/api/v0/ingest/reindex/status";
-    };
-}

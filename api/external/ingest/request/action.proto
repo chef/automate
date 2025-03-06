@@ -49,7 +49,3 @@ message MultipleNodeDeleteRequest {
   repeated string node_ids = 1;
 }
 
-message GetReindexStatusRequest {
-  int32 request_id = 1;
-}
-

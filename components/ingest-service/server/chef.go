@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/api/external/ingest/request"
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/api/external/ingest/response"
 	"github.com/chef/automate/api/interservice/authz"
@@ -239,19 +238,18 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
-func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *request.GetReindexStatusRequest) (*response.GetReindexStatusResponse, error) {
+func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
 	if s.db == nil {
 		return nil, fmt.Errorf("database connection is not initialized")
 	}
 
-	// Call DB function properly on the DB instance
+	// Fetch reindex status from the database
 	_, _, statusJSON, err := s.db.GetReindexStatus(int(req.RequestId))
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch reindex status: %w", err)
-
 	}
 
-	return &response.GetReindexStatusResponse{
+	return &ingest.GetReindexStatusResponse{
 		StatusJson: statusJSON,
 	}, nil
 }

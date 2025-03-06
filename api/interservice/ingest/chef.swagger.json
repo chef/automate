@@ -146,7 +146,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.ingest.response.GetReindexStatusResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.GetReindexStatusResponse"
             }
           },
           "default": {
@@ -544,14 +544,6 @@
         }
       }
     },
-    "chef.automate.api.ingest.response.GetReindexStatusResponse": {
-      "type": "object",
-      "properties": {
-        "status_json": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.ingest.response.ProcessChefActionResponse": {
       "type": "object"
     },
@@ -566,6 +558,14 @@
     },
     "chef.automate.api.ingest.response.ProcessNodeDeleteResponse": {
       "type": "object"
+    },
+    "chef.automate.domain.ingest.GetReindexStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status_json": {
+          "type": "string"
+        }
+      }
     },
     "chef.automate.domain.ingest.Version": {
       "type": "object",
