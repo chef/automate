@@ -48,3 +48,4 @@ message Delete {
 message MultipleNodeDeleteRequest {
   repeated string node_ids = 1;
 }
+

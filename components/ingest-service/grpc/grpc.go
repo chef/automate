@@ -194,10 +194,10 @@ func Spawn(opts *serveropts.Opts) error {
 			"If this is an error, remove the lock from postgresql with the "+
 			"'SELECT pg_advisory_unlock(%d);' command inside the chef_ingest_service database.", migration.PgMigrationLockID)
 	}
-
+	dbInstance := storage.NewDB()
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
-		nodesServiceClient, chefActionPipeline, chefRunPipeline)
+		nodesServiceClient, chefActionPipeline, chefRunPipeline, dbInstance)
 
 	ingest.RegisterChefIngesterServiceServer(grpcServer, chefIngest)
 

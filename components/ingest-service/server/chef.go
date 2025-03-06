@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -16,6 +17,7 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline"
+	"github.com/chef/automate/components/ingest-service/storage"
 	"github.com/chef/automate/lib/version"
 )
 
@@ -26,6 +28,7 @@ type ChefIngestServer struct {
 	authzClient        authz.ProjectsServiceClient
 	nodeMgrClient      manager.NodeManagerServiceClient
 	nodesClient        nodes.NodesServiceClient
+	db                 *storage.DB // Added field for database access
 }
 
 // NewChefIngestServer creates a new server instance and it automatically
@@ -35,7 +38,8 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 	nodeMgrClient manager.NodeManagerServiceClient,
 	nodesClient nodes.NodesServiceClient,
 	actionPipeline pipeline.ChefActionPipeline,
-	chefRunPipeline pipeline.ChefRunPipeline) *ChefIngestServer {
+	chefRunPipeline pipeline.ChefRunPipeline,
+	db *storage.DB) *ChefIngestServer { // Added db parameter
 	return &ChefIngestServer{
 		chefRunPipeline:    chefRunPipeline,
 		chefActionPipeline: actionPipeline,
@@ -43,6 +47,7 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 		authzClient:        authzClient,
 		nodeMgrClient:      nodeMgrClient,
 		nodesClient:        nodesClient,
+		db:                 db, // Initialize db
 	}
 }
 
@@ -232,6 +237,21 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	}
 
 	return &response.ProcessNodeDeleteResponse{}, nil
+}
+func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
+	if s.db == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	// Fetch reindex status from the database
+	_, _, statusJSON, err := s.db.GetReindexStatus(int(req.RequestId))
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch reindex status: %w", err)
+	}
+
+	return &ingest.GetReindexStatusResponse{
+		StatusJson: statusJSON,
+	}, nil
 }
 
 // GetVersion returns the service version
