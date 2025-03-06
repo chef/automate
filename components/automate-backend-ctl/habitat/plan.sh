@@ -19,7 +19,7 @@ pkg_deps=(
   core/bash/5.2.21/20241017111154
   core/coreutils/9.4/20241017111752
   core/glibc/2.36/20241017094131
-  core/postgresql-client/9.6.24/20250303090744
+  core/postgresql-client
 )
 
 pkg_build_deps=(
