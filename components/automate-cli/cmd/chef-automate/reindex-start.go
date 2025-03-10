@@ -5,6 +5,7 @@ import (
 	"os"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -13,19 +14,16 @@ import (
 )
 
 var reindexCmd = &cobra.Command{
-	Use:   "reindex",
-	Short: "Manage OpenSearch reindexing",
+	Use:               "reindex COMMAND",
+	Short:             "Manage OpenSearch reindexing",
+	Long:              "Commands for managing OpenSearch reindexing within Chef Automate.",
+	PersistentPreRunE: preReindexCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
 }
 
 // reindexStartCmd triggers the reindexing process
-var reindexStartCmd = &cobra.Command{
-	Use:               "start",
-	Short:             "Start OpenSearch reindexing",
-	RunE:              runReindexStartCmd,
-	PersistentPreRunE: preReindexCmd,
-}
-
-// ReindexFlow manages the CLI flow for reindexing
 type ReindexFlow struct {
 	DsClient ReindexDSClient
 	Writer   *cli.Writer
@@ -35,6 +33,17 @@ type ReindexFlow struct {
 type ReindexDSClient interface {
 	StartReindex(ctx context.Context, in *api.StartReindexRequest, opts ...grpc.CallOption) (*api.StartReindexResponse, error)
 	Close() error
+}
+
+var reindexStartCmd = &cobra.Command{
+	Use:               "start",
+	Short:             "Start OpenSearch reindexing",
+	PersistentPreRunE: checkLicenseStatusForExpiry, // Enforce license check before execution
+	RunE:              runReindexStartCmd,
+	Args:              cobra.NoArgs,
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
 }
 
 // runReindexStartCmd connects to deployment-service and triggers reindexing
