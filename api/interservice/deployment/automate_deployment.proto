@@ -59,6 +59,14 @@ service Deployment {
 	rpc GetCLIExecutable(GetCLIExecutableRequest) returns (stream GetCLIExecutableResponse);
 	rpc BootstrapBundle (BootstrapBundleRequest) returns (stream BootstrapBundleResponse);
 	rpc ControlIndexUpgradeStatus(google.protobuf.Empty) returns (ControlIndexUpgradeStatusResponse);
+	rpc StartReindex(StartReindexRequest) returns (StartReindexResponse);
+}
+
+message StartReindexRequest {
+}
+
+message StartReindexResponse {
+  string message = 1;
 }
 
 message ControlIndexUpgradeStatusResponse {

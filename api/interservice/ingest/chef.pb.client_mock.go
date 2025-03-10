@@ -157,6 +157,26 @@ func (mr *MockChefIngesterServiceClientMockRecorder) ProcessNodeDelete(ctx, in i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessNodeDelete", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).ProcessNodeDelete), varargs...)
 }
 
+// StartReindex mocks base method.
+func (m *MockChefIngesterServiceClient) StartReindex(ctx context.Context, in *StartReindexRequest, opts ...grpc.CallOption) (*StartReindexResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StartReindex", varargs...)
+	ret0, _ := ret[0].(*StartReindexResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartReindex indicates an expected call of StartReindex.
+func (mr *MockChefIngesterServiceClientMockRecorder) StartReindex(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartReindex", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).StartReindex), varargs...)
+}
+
 // MockChefIngesterServiceServer is a mock of ChefIngesterServiceServer interface.
 type MockChefIngesterServiceServer struct {
 	ctrl     *gomock.Controller
@@ -268,4 +288,19 @@ func (m *MockChefIngesterServiceServer) ProcessNodeDelete(arg0 context.Context, 
 func (mr *MockChefIngesterServiceServerMockRecorder) ProcessNodeDelete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessNodeDelete", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).ProcessNodeDelete), arg0, arg1)
+}
+
+// StartReindex mocks base method.
+func (m *MockChefIngesterServiceServer) StartReindex(arg0 context.Context, arg1 *StartReindexRequest) (*StartReindexResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartReindex", arg0, arg1)
+	ret0, _ := ret[0].(*StartReindexResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartReindex indicates an expected call of StartReindex.
+func (mr *MockChefIngesterServiceServerMockRecorder) StartReindex(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartReindex", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).StartReindex), arg0, arg1)
 }
