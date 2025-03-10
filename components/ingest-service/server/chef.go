@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -238,16 +237,31 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
+
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
+	log.WithFields(log.Fields{"func": "GetReindexStatus"}).Debug("RPC call received")
+
+	// Validate request
+	if req == nil || req.RequestId == 0 {
+		errMsg := "Invalid request: RequestId is required"
+		log.WithFields(log.Fields{"error": errMsg}).Error("Validation failed")
+		return nil, status.Errorf(codes.InvalidArgument, errMsg)
+	}
+
 	if s.db == nil {
-		return nil, fmt.Errorf("database connection is not initialized")
+		errMsg := "database connection is not initialized"
+		log.WithFields(log.Fields{"error": errMsg}).Error("DB error")
+		return nil, status.Errorf(codes.Internal, errMsg)
 	}
 
 	// Fetch reindex status from the database
 	_, _, statusJSON, err := s.db.GetReindexStatus(int(req.RequestId))
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch reindex status: %w", err)
+		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch reindex status")
+		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %v", err)
 	}
+
+	log.WithFields(log.Fields{"status": statusJSON}).Debug("Reindex status fetched successfully")
 
 	return &ingest.GetReindexStatusResponse{
 		StatusJson: statusJSON,
