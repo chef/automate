@@ -29,18 +29,24 @@ type ReindexRequest struct {
 
 // ReindexRequestDetailed represents the reindex_request_detailed table
 type ReindexRequestDetailed struct {
-	ID          int                          `db:"id"`
-	RequestID   int                          `db:"request_id"`
-	Index       string                       `db:"index"`
-	FromVersion string                       `db:"from_version"`
-	ToVersion   string                       `db:"to_version"`
-	Stage       map[string]map[string]string `db:"stage"`
-	OsTaskID    string                       `db:"os_task_id"`
-	Heartbeat   time.Time                    `db:"heartbeat"`
-	HavingAlias bool                         `db:"having_alias"`
-	AliasList   string                       `db:"alias_list"`
-	CreatedAt   time.Time                    `db:"created_at"`
-	UpdatedAt   time.Time                    `db:"updated_at"`
+	ID          int           `db:"id"`
+	RequestID   int           `db:"request_id"`
+	Index       string        `db:"index"`
+	FromVersion string        `db:"from_version"`
+	ToVersion   string        `db:"to_version"`
+	Stage       []StageDetail `db:"stage"`
+	OsTaskID    string        `db:"os_task_id"`
+	Heartbeat   time.Time     `db:"heartbeat"`
+	HavingAlias bool          `db:"having_alias"`
+	AliasList   string        `db:"alias_list"`
+	CreatedAt   time.Time     `db:"created_at"`
+	UpdatedAt   time.Time     `db:"updated_at"`
+}
+
+type StageDetail struct {
+	Stage     string    `json:"stage"`
+	Status    string    `json:"status"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func RunMigrations(dbConf *config.Storage) error {
@@ -67,11 +73,31 @@ func (db *DB) UpdateReindexRequest(requestID int, status string, currentTime tim
 
 // Insert reindex request detailed entry
 func (db *DB) InsertReindexRequestDetailed(detail ReindexRequestDetailed, currentTime time.Time) error {
-	stageJSON, err := json.Marshal(detail.Stage)
+	// Fetch existing stages
+	var stageJSON string
+	err := db.DbMap.SelectOne(&stageJSON, "SELECT stage FROM reindex_request_detailed WHERE request_id = $1 AND index = $2 ORDER BY updated_at DESC LIMIT 1", detail.RequestID, detail.Index)
+	if err != nil && err != sql.ErrNoRows {
+		return errors.Wrap(err, "error fetching existing stages")
+	}
+
+	var existingStages []StageDetail
+	if stageJSON != "" {
+		if err := json.Unmarshal([]byte(stageJSON), &existingStages); err != nil {
+			return errors.Wrap(err, "error unmarshalling existing stages")
+		}
+	}
+
+	// Append new stage
+	existingStages = append(existingStages, detail.Stage...)
+
+	// Marshal stages to JSON
+	stageJSONBytes, err := json.Marshal(existingStages)
 	if err != nil {
 		return errors.Wrap(err, "error marshalling stage to JSON")
 	}
-	_, err = db.Exec(insertReindexRequestDetailed, detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, detail.Heartbeat, detail.HavingAlias, detail.AliasList, currentTime, currentTime)
+
+	// Insert or update the reindex request detailed entry
+	_, err = db.Exec(insertReindexRequestDetailed, detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSONBytes, detail.OsTaskID, detail.Heartbeat, detail.HavingAlias, detail.AliasList, currentTime, currentTime)
 	return err
 }
 
@@ -87,7 +113,7 @@ func (db *DB) DeleteReindexRequestDetail(id int) error {
 	return err
 }
 
-// Get reindex request status
+// Get the latest reindex request status for a given request
 func (db *DB) GetReindexStatus(requestID int) (string, error) {
 	// Fetch the latest reindex request
 	var request ReindexRequest
@@ -115,27 +141,46 @@ func (db *DB) GetReindexStatus(requestID int) (string, error) {
 			return "", errors.Wrap(err, "error scanning reindex request detail row")
 		}
 
-		err = json.Unmarshal([]byte(stageJSON), &detail.Stage)
-		if err != nil {
+		// Convert stage JSON back to a slice of StageDetail
+		var stages []StageDetail
+		if err := json.Unmarshal([]byte(stageJSON), &stages); err != nil {
 			return "", errors.Wrap(err, "error unmarshalling stage JSON")
 		}
 
+		// Find the latest stage
+		var latestStage StageDetail
+		for _, stage := range stages {
+			if stage.UpdatedAt.After(latestStage.UpdatedAt) {
+				latestStage = stage
+			}
+		}
+
+		detail.Stage = []StageDetail{latestStage} // Only keep the latest stage
 		details = append(details, detail)
 	}
 
-	// Determine the overall status based on the stages of the individual indexes
+	// If no details are found, return a JSON response with an empty indexes array
+	if len(details) == 0 {
+		statusResponse := map[string]interface{}{
+			"request_id": request.RequestID,
+			"status":     request.Status,
+			"indexes":    []map[string]interface{}{},
+		}
+		statusJSON, err := json.Marshal(statusResponse)
+		if err != nil {
+			return "", errors.Wrap(err, "error marshalling reindex status to JSON")
+		}
+		return string(statusJSON), nil
+	}
+
+	// Determine the overall status based on the latest stage of individual indexes
 	overallStatus := "completed"
 	for _, detail := range details {
-		for _, stage := range detail.Stage {
-			if stage["status"] == "failed" {
-				overallStatus = "failed"
-				break
-			} else if stage["status"] == "running" && overallStatus != "failed" {
-				overallStatus = "running"
-			}
-		}
-		if overallStatus == "failed" {
+		if detail.Stage[0].Status == "failed" {
+			overallStatus = "failed"
 			break
+		} else if detail.Stage[0].Status == "running" && overallStatus != "failed" {
+			overallStatus = "running"
 		}
 	}
 
@@ -149,17 +194,18 @@ func (db *DB) GetReindexStatus(requestID int) (string, error) {
 	for _, detail := range details {
 		indexDetail := map[string]interface{}{
 			"index":  detail.Index,
-			"stages": detail.Stage,
+			"stage":  detail.Stage[0].Stage,
+			"status": detail.Stage[0].Status,
 		}
 		statusResponse["indexes"] = append(statusResponse["indexes"].([]map[string]interface{}), indexDetail)
 	}
 
-	// Marshal the status to JSON
 	statusJSON, err := json.Marshal(statusResponse)
 	if err != nil {
 		return "", errors.Wrap(err, "error marshalling reindex status to JSON")
 	}
 	fmt.Println("********Generated JSON Response:", string(statusJSON))
+
 	return string(statusJSON), nil
 }
 

@@ -99,7 +99,7 @@ func TestInsertReindexRequestDetailedSuccess(t *testing.T) {
 		Index:       "index1",
 		FromVersion: "1.0",
 		ToVersion:   "2.0",
-		Stage:       map[string]map[string]string{"stage1": {"status": "running"}},
+		Stage:       []storage.StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
 		OsTaskID:    "task1",
 		Heartbeat:   time.Now(),
 		HavingAlias: true,
@@ -111,6 +111,12 @@ func TestInsertReindexRequestDetailedSuccess(t *testing.T) {
 	stageJSON, err := json.Marshal(detail.Stage)
 	assert.NoError(t, err)
 
+	// Mock the query to fetch existing stages
+	selectQuery := `SELECT stage FROM reindex_request_detailed WHERE request_id = $1 AND index = $2 ORDER BY updated_at DESC LIMIT 1`
+	mock.ExpectQuery(selectQuery).WithArgs(detail.RequestID, detail.Index).
+		WillReturnRows(sqlmock.NewRows([]string{"stage"}).AddRow(`[]`))
+
+	// Mock the insert query
 	query := `INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
 	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -132,7 +138,7 @@ func TestInsertReindexRequestDetailedFailure(t *testing.T) {
 		Index:       "index1",
 		FromVersion: "1.0",
 		ToVersion:   "2.0",
-		Stage:       map[string]map[string]string{"stage1": {"status": "running"}},
+		Stage:       []storage.StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
 		OsTaskID:    "task1",
 		Heartbeat:   time.Now(),
 		HavingAlias: true,
@@ -144,6 +150,12 @@ func TestInsertReindexRequestDetailedFailure(t *testing.T) {
 	stageJSON, err := json.Marshal(detail.Stage)
 	assert.NoError(t, err)
 
+	// Mock the query to fetch existing stages
+	selectQuery := `SELECT stage FROM reindex_request_detailed WHERE request_id = $1 AND index = $2 ORDER BY updated_at DESC LIMIT 1`
+	mock.ExpectQuery(selectQuery).WithArgs(detail.RequestID, detail.Index).
+		WillReturnRows(sqlmock.NewRows([]string{"stage"}).AddRow(`[]`))
+
+	// Mock the insert query to return an error
 	query := `INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
 	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(fmt.Errorf("insert error"))
 
@@ -240,8 +252,8 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	detailColumns := []string{"id", "request_id", "index", "from_version", "to_version", "stage", "os_task_id", "heartbeat", "having_alias", "alias_list", "created_at", "updated_at"}
 	mock.ExpectQuery(detailQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(detailColumns).
-			AddRow(1, requestID, "index1", "1.0", "2.0", `{"stage1": {"status": "running"}}`, "task1", heartbeat, true, "alias1,alias2", createdAt, updatedAt).
-			AddRow(2, requestID, "index2", "2.0", "3.0", `{"stage1": {"status": "completed"}}`, "task2", heartbeat, false, "", createdAt, updatedAt))
+			AddRow(1, requestID, "index1", "1.0", "2.0", `[{"stage":"stage1","status":"running","updated_at":"`+updatedAt.Format(time.RFC3339)+`"}]`, "task1", heartbeat, true, "alias1,alias2", createdAt, updatedAt).
+			AddRow(2, requestID, "index2", "2.0", "3.0", `[{"stage":"stage1","status":"completed","updated_at":"`+updatedAt.Format(time.RFC3339)+`"}]`, "task2", heartbeat, false, "", createdAt, updatedAt))
 
 	// Call the function
 	statusJSON, err := db.GetReindexStatus(requestID)
@@ -253,7 +265,7 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify the JSON response
-	expectedJSON := `{"request_id":1,"status":"running","indexes":[{"index":"index1","stages":{"stage1":{"status":"running"}}},{"index":"index2","stages":{"stage1":{"status":"completed"}}}]}`
+	expectedJSON := `{"request_id":1,"status":"running","indexes":[{"index":"index1","stage":"stage1","status":"running"},{"index":"index2","stage":"stage1","status":"completed"}]}`
 	assert.JSONEq(t, expectedJSON, statusJSON)
 }
 
