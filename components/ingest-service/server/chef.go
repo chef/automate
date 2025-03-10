@@ -234,6 +234,13 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
+func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
+	log.Info("Received request to start reindexing")
+	return &ingest.StartReindexResponse{
+		Message: "Reindexing started successfully",
+	}, nil
+}
+
 // GetVersion returns the service version
 func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.VersionRequest) (*ingest.Version, error) {
 	return &ingest.Version{

@@ -139,6 +139,28 @@
         ]
       }
     },
+    "/api/v0/ingest/reindex/start": {
+      "post": {
+        "operationId": "ChefIngesterService_StartReindex",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.domain.ingest.StartReindexResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "ChefIngesterService"
+        ]
+      }
+    },
     "/api/v0/ingest/version": {
       "get": {
         "operationId": "ChefIngesterService_GetVersion",
@@ -527,6 +549,14 @@
     },
     "chef.automate.api.ingest.response.ProcessNodeDeleteResponse": {
       "type": "object"
+    },
+    "chef.automate.domain.ingest.StartReindexResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "chef.automate.domain.ingest.Version": {
       "type": "object",
