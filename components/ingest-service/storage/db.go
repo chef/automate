@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/chef/automate/components/ingest-service/config"
@@ -100,9 +101,20 @@ func (db *DB) GetReindexStatus(requestID int) ([]*ReindexRequest, []*ReindexRequ
 		return nil, nil, "", errors.Wrap(err, "error fetching reindex request details from db")
 	}
 
+	// Determine the overall status based on the stages of the individual indexes
+	overallStatus := "completed"
+	for _, detail := range details {
+		if detail.Stage == "failed" {
+			overallStatus = "failed"
+			break
+		} else if detail.Stage == "running" && overallStatus != "failed" {
+			overallStatus = "running"
+		}
+	}
+
 	// Prepare the status response
 	status := map[string]interface{}{
-		"overall_status": request[0].Status, // Using the latest reindex request status
+		"overall_status": overallStatus, // overall status of the reindex request
 		"indexes":        []map[string]string{},
 	}
 
@@ -118,7 +130,7 @@ func (db *DB) GetReindexStatus(requestID int) ([]*ReindexRequest, []*ReindexRequ
 	if err != nil {
 		return nil, nil, "", errors.Wrap(err, "error marshalling reindex status to JSON")
 	}
-
+	fmt.Println("********Generated JSON Response:", string(statusJSON))
 	return request, details, string(statusJSON), nil
 }
 

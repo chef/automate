@@ -232,11 +232,14 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	detailColumns := []string{"id", "request_id", "index", "from_version", "to_version", "stage", "os_task_id", "heartbeat", "having_alias", "alias_list", "created_at", "updated_at"}
 	mock.ExpectQuery(detailQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(detailColumns).
-			AddRow(1, requestID, "index1", "1.0", "2.0", "running", "task1", heartbeat, true, "alias1,alias2", createdAt, updatedAt).
+			AddRow(1, requestID, "index1", "1.0", "2.0", "failed", "task1", heartbeat, true, "alias1,alias2", createdAt, updatedAt).
 			AddRow(2, requestID, "index2", "2.0", "3.0", "completed", "task2", heartbeat, false, "", createdAt, updatedAt))
 
 	// Call the function
 	requests, details, statusJSON, err := db.GetReindexStatus(requestID)
+
+	// Log the JSON response
+	t.Log("Generated JSON Response:", statusJSON)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -255,7 +258,7 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	assert.Equal(t, "index1", details[0].Index)
 	assert.Equal(t, "1.0", details[0].FromVersion)
 	assert.Equal(t, "2.0", details[0].ToVersion)
-	assert.Equal(t, "running", details[0].Stage)
+	assert.Equal(t, "failed", details[0].Stage)
 	assert.Equal(t, "task1", details[0].OsTaskID)
 	assert.Equal(t, heartbeat, details[0].Heartbeat)
 	assert.Equal(t, true, details[0].HavingAlias)
@@ -277,7 +280,7 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	assert.Equal(t, updatedAt, details[1].UpdatedAt)
 
 	// Verify the JSON response
-	expectedJSON := `{"indexes":[{"index":"index1","stage":"running"},{"index":"index2","stage":"completed"}],"overall_status":"completed"}`
+	expectedJSON := `{"indexes":[{"index":"index1","stage":"failed"},{"index":"index2","stage":"completed"}],"overall_status":"failed"}`
 	assert.JSONEq(t, expectedJSON, statusJSON)
 }
 
