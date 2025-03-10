@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS reindex_request_detailed (
     index TEXT NOT NULL,
     from_version TEXT NOT NULL,
     to_version TEXT NOT NULL,
-    stage VARCHAR(50) CHECK (stage IN ('running', 'failed', 'completed')),
+    stage JSONB NOT NULL,
     os_task_id TEXT,
     heartbeat TIMESTAMP,
     having_alias BOOLEAN,
