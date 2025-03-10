@@ -1,6 +1,7 @@
 package storage_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -23,10 +24,11 @@ func TestInsertReindexRequestSuccess(t *testing.T) {
 	createdAt := time.Now()
 
 	query := `INSERT INTO reindex_requests(request_id, status, created_at, last_updated) VALUES ($1, $2, $3, $4);`
-	mock.ExpectExec(query).WithArgs(1, "running", createdAt, createdAt).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), "running", createdAt, createdAt).WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = db.InsertReindexRequest(1, "running", createdAt)
+	requestID, err := db.InsertReindexRequest("running", createdAt)
 	assert.NoError(t, err)
+	assert.NotZero(t, requestID)
 }
 
 func TestInsertReindexRequestFailure(t *testing.T) {
@@ -41,9 +43,9 @@ func TestInsertReindexRequestFailure(t *testing.T) {
 	createdAt := time.Now()
 
 	query := `INSERT INTO reindex_requests(request_id, status, created_at, last_updated) VALUES ($1, $2, $3, $4);`
-	mock.ExpectExec(query).WithArgs(1, "running", createdAt, createdAt).WillReturnError(fmt.Errorf("insert error"))
+	mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), "running", createdAt, createdAt).WillReturnError(fmt.Errorf("insert error"))
 
-	err = db.InsertReindexRequest(1, "running", createdAt)
+	_, err = db.InsertReindexRequest("running", createdAt)
 	assert.Equal(t, "insert error", err.Error())
 }
 
@@ -97,7 +99,7 @@ func TestInsertReindexRequestDetailedSuccess(t *testing.T) {
 		Index:       "index1",
 		FromVersion: "1.0",
 		ToVersion:   "2.0",
-		Stage:       "running",
+		Stage:       map[string]map[string]string{"stage1": {"status": "running"}},
 		OsTaskID:    "task1",
 		Heartbeat:   time.Now(),
 		HavingAlias: true,
@@ -106,8 +108,11 @@ func TestInsertReindexRequestDetailedSuccess(t *testing.T) {
 		UpdatedAt:   time.Now(),
 	}
 
+	stageJSON, err := json.Marshal(detail.Stage)
+	assert.NoError(t, err)
+
 	query := `INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
-	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, detail.Stage, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err = db.InsertReindexRequestDetailed(detail, detail.CreatedAt)
 	assert.NoError(t, err)
@@ -127,7 +132,7 @@ func TestInsertReindexRequestDetailedFailure(t *testing.T) {
 		Index:       "index1",
 		FromVersion: "1.0",
 		ToVersion:   "2.0",
-		Stage:       "running",
+		Stage:       map[string]map[string]string{"stage1": {"status": "running"}},
 		OsTaskID:    "task1",
 		Heartbeat:   time.Now(),
 		HavingAlias: true,
@@ -136,8 +141,11 @@ func TestInsertReindexRequestDetailedFailure(t *testing.T) {
 		UpdatedAt:   time.Now(),
 	}
 
+	stageJSON, err := json.Marshal(detail.Stage)
+	assert.NoError(t, err)
+
 	query := `INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
-	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, detail.Stage, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(fmt.Errorf("insert error"))
+	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(fmt.Errorf("insert error"))
 
 	err = db.InsertReindexRequestDetailed(detail, detail.CreatedAt)
 	assert.Equal(t, "insert error", err.Error())
@@ -232,55 +240,20 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	detailColumns := []string{"id", "request_id", "index", "from_version", "to_version", "stage", "os_task_id", "heartbeat", "having_alias", "alias_list", "created_at", "updated_at"}
 	mock.ExpectQuery(detailQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(detailColumns).
-			AddRow(1, requestID, "index1", "1.0", "2.0", "failed", "task1", heartbeat, true, "alias1,alias2", createdAt, updatedAt).
-			AddRow(2, requestID, "index2", "2.0", "3.0", "completed", "task2", heartbeat, false, "", createdAt, updatedAt))
+			AddRow(1, requestID, "index1", "1.0", "2.0", `{"stage1": {"status": "running"}}`, "task1", heartbeat, true, "alias1,alias2", createdAt, updatedAt).
+			AddRow(2, requestID, "index2", "2.0", "3.0", `{"stage1": {"status": "completed"}}`, "task2", heartbeat, false, "", createdAt, updatedAt))
 
 	// Call the function
-	requests, details, statusJSON, err := db.GetReindexStatus(requestID)
+	statusJSON, err := db.GetReindexStatus(requestID)
 
 	// Log the JSON response
 	t.Log("Generated JSON Response:", statusJSON)
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(requests))
-	assert.Equal(t, 2, len(details))
-
-	// Verify the reindex request
-	assert.Equal(t, requestID, requests[0].RequestID)
-	assert.Equal(t, "completed", requests[0].Status)
-	assert.Equal(t, createdAt, requests[0].CreatedAt)
-	assert.Equal(t, updatedAt, requests[0].LastUpdated)
-
-	// Verify the reindex request details
-	assert.Equal(t, 1, details[0].ID)
-	assert.Equal(t, requestID, details[0].RequestID)
-	assert.Equal(t, "index1", details[0].Index)
-	assert.Equal(t, "1.0", details[0].FromVersion)
-	assert.Equal(t, "2.0", details[0].ToVersion)
-	assert.Equal(t, "failed", details[0].Stage)
-	assert.Equal(t, "task1", details[0].OsTaskID)
-	assert.Equal(t, heartbeat, details[0].Heartbeat)
-	assert.Equal(t, true, details[0].HavingAlias)
-	assert.Equal(t, "alias1,alias2", details[0].AliasList)
-	assert.Equal(t, createdAt, details[0].CreatedAt)
-	assert.Equal(t, updatedAt, details[0].UpdatedAt)
-
-	assert.Equal(t, 2, details[1].ID)
-	assert.Equal(t, requestID, details[1].RequestID)
-	assert.Equal(t, "index2", details[1].Index)
-	assert.Equal(t, "2.0", details[1].FromVersion)
-	assert.Equal(t, "3.0", details[1].ToVersion)
-	assert.Equal(t, "completed", details[1].Stage)
-	assert.Equal(t, "task2", details[1].OsTaskID)
-	assert.Equal(t, heartbeat, details[1].Heartbeat)
-	assert.Equal(t, false, details[1].HavingAlias)
-	assert.Equal(t, "", details[1].AliasList)
-	assert.Equal(t, createdAt, details[1].CreatedAt)
-	assert.Equal(t, updatedAt, details[1].UpdatedAt)
 
 	// Verify the JSON response
-	expectedJSON := `{"indexes":[{"index":"index1","stage":"failed"},{"index":"index2","stage":"completed"}],"overall_status":"failed"}`
+	expectedJSON := `{"request_id":1,"status":"running","indexes":[{"index":"index1","stages":{"stage1":{"status":"running"}}},{"index":"index2","stages":{"stage1":{"status":"completed"}}}]}`
 	assert.JSONEq(t, expectedJSON, statusJSON)
 }
 
@@ -300,7 +273,7 @@ func TestGetReindexStatusFailure(t *testing.T) {
 	mock.ExpectQuery(requestQuery).WithArgs(requestID).WillReturnError(fmt.Errorf("query error"))
 
 	// Call the function
-	_, _, _, err = db.GetReindexStatus(requestID)
+	_, err = db.GetReindexStatus(requestID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -333,14 +306,12 @@ func TestGetReindexStatusNoDetails(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows(detailColumns))
 
 	// Call the function
-	requests, details, statusJSON, err := db.GetReindexStatus(requestID)
+	statusJSON, err := db.GetReindexStatus(requestID)
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(requests))
-	assert.Equal(t, 0, len(details))
 
 	// Verify the JSON response
-	expectedJSON := `{"indexes":[],"overall_status":"completed"}`
+	expectedJSON := `{"request_id":1,"status":"completed","indexes":[]}`
 	assert.JSONEq(t, expectedJSON, statusJSON)
 }

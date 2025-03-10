@@ -1,8 +1,10 @@
 package storage
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/chef/automate/components/ingest-service/config"
@@ -27,18 +29,18 @@ type ReindexRequest struct {
 
 // ReindexRequestDetailed represents the reindex_request_detailed table
 type ReindexRequestDetailed struct {
-	ID          int       `db:"id"`
-	RequestID   int       `db:"request_id"`
-	Index       string    `db:"index"`
-	FromVersion string    `db:"from_version"`
-	ToVersion   string    `db:"to_version"`
-	Stage       string    `db:"stage"`
-	OsTaskID    string    `db:"os_task_id"`
-	Heartbeat   time.Time `db:"heartbeat"`
-	HavingAlias bool      `db:"having_alias"`
-	AliasList   string    `db:"alias_list"`
-	CreatedAt   time.Time `db:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at"`
+	ID          int                          `db:"id"`
+	RequestID   int                          `db:"request_id"`
+	Index       string                       `db:"index"`
+	FromVersion string                       `db:"from_version"`
+	ToVersion   string                       `db:"to_version"`
+	Stage       map[string]map[string]string `db:"stage"`
+	OsTaskID    string                       `db:"os_task_id"`
+	Heartbeat   time.Time                    `db:"heartbeat"`
+	HavingAlias bool                         `db:"having_alias"`
+	AliasList   string                       `db:"alias_list"`
+	CreatedAt   time.Time                    `db:"created_at"`
+	UpdatedAt   time.Time                    `db:"updated_at"`
 }
 
 func RunMigrations(dbConf *config.Storage) error {
@@ -50,10 +52,11 @@ func RunMigrations(dbConf *config.Storage) error {
 
 // CRUD Operations
 
-// Create a new reindex request
-func (db *DB) InsertReindexRequest(requestID int, status string, currentTime time.Time) error {
+// Create a new reindex request with a random request_id
+func (db *DB) InsertReindexRequest(status string, currentTime time.Time) (int, error) {
+	requestID := rand.Int()
 	_, err := db.Exec(insertReindexRequest, requestID, status, currentTime, currentTime)
-	return err
+	return requestID, err
 }
 
 // Update an existing reindex request
@@ -64,7 +67,11 @@ func (db *DB) UpdateReindexRequest(requestID int, status string, currentTime tim
 
 // Insert reindex request detailed entry
 func (db *DB) InsertReindexRequestDetailed(detail ReindexRequestDetailed, currentTime time.Time) error {
-	_, err := db.Exec(insertReindexRequestDetailed, detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, detail.Stage, detail.OsTaskID, detail.Heartbeat, detail.HavingAlias, detail.AliasList, currentTime, currentTime)
+	stageJSON, err := json.Marshal(detail.Stage)
+	if err != nil {
+		return errors.Wrap(err, "error marshalling stage to JSON")
+	}
+	_, err = db.Exec(insertReindexRequestDetailed, detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, detail.Heartbeat, detail.HavingAlias, detail.AliasList, currentTime, currentTime)
 	return err
 }
 
@@ -81,57 +88,79 @@ func (db *DB) DeleteReindexRequestDetail(id int) error {
 }
 
 // Get reindex request status
-func (db *DB) GetReindexStatus(requestID int) ([]*ReindexRequest, []*ReindexRequestDetailed, string, error) {
+func (db *DB) GetReindexStatus(requestID int) (string, error) {
 	// Fetch the latest reindex request
-	var request []*ReindexRequest
-	_, err := db.Select(&request, getLatestReindexRequest, requestID)
+	var request ReindexRequest
+	err := db.SelectOne(&request, getLatestReindexRequest, requestID)
 	if err != nil {
-		return nil, nil, "", errors.Wrap(err, "error fetching reindex request status from db")
-	}
-
-	// Handle case where no records are found
-	if len(request) == 0 {
-		return nil, nil, "", errors.New("no reindex request found for the given requestID")
+		if err == sql.ErrNoRows {
+			return "", errors.New("no reindex request found for the given requestID")
+		}
+		return "", errors.Wrap(err, "error fetching reindex request status from db")
 	}
 
 	// Fetch the latest reindex request details for each index
-	var details []*ReindexRequestDetailed
-	_, err = db.Select(&details, getLatestReindexRequestDetails, requestID)
+	var details []ReindexRequestDetailed
+	rows, err := db.DbMap.Db.Query(getLatestReindexRequestDetails, requestID)
 	if err != nil {
-		return nil, nil, "", errors.Wrap(err, "error fetching reindex request details from db")
+		return "", errors.Wrap(err, "error fetching reindex request details from db")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var detail ReindexRequestDetailed
+		var stageJSON string
+		err := rows.Scan(&detail.ID, &detail.RequestID, &detail.Index, &detail.FromVersion, &detail.ToVersion, &stageJSON, &detail.OsTaskID, &detail.Heartbeat, &detail.HavingAlias, &detail.AliasList, &detail.CreatedAt, &detail.UpdatedAt)
+		if err != nil {
+			return "", errors.Wrap(err, "error scanning reindex request detail row")
+		}
+
+		err = json.Unmarshal([]byte(stageJSON), &detail.Stage)
+		if err != nil {
+			return "", errors.Wrap(err, "error unmarshalling stage JSON")
+		}
+
+		details = append(details, detail)
 	}
 
 	// Determine the overall status based on the stages of the individual indexes
 	overallStatus := "completed"
 	for _, detail := range details {
-		if detail.Stage == "failed" {
-			overallStatus = "failed"
+		for _, stage := range detail.Stage {
+			if stage["status"] == "failed" {
+				overallStatus = "failed"
+				break
+			} else if stage["status"] == "running" && overallStatus != "failed" {
+				overallStatus = "running"
+			}
+		}
+		if overallStatus == "failed" {
 			break
-		} else if detail.Stage == "running" && overallStatus != "failed" {
-			overallStatus = "running"
 		}
 	}
 
 	// Prepare the status response
-	status := map[string]interface{}{
-		"overall_status": overallStatus, // overall status of the reindex request
-		"indexes":        []map[string]string{},
+	statusResponse := map[string]interface{}{
+		"request_id": request.RequestID,
+		"status":     overallStatus,
+		"indexes":    []map[string]interface{}{},
 	}
 
 	for _, detail := range details {
-		status["indexes"] = append(status["indexes"].([]map[string]string), map[string]string{
-			"index": detail.Index,
-			"stage": detail.Stage,
-		})
+		indexDetail := map[string]interface{}{
+			"index":  detail.Index,
+			"stages": detail.Stage,
+		}
+		statusResponse["indexes"] = append(statusResponse["indexes"].([]map[string]interface{}), indexDetail)
 	}
 
 	// Marshal the status to JSON
-	statusJSON, err := json.Marshal(status)
+	statusJSON, err := json.Marshal(statusResponse)
 	if err != nil {
-		return nil, nil, "", errors.Wrap(err, "error marshalling reindex status to JSON")
+		return "", errors.Wrap(err, "error marshalling reindex status to JSON")
 	}
 	fmt.Println("********Generated JSON Response:", string(statusJSON))
-	return request, details, string(statusJSON), nil
+	return string(statusJSON), nil
 }
 
 // SQL Queries
