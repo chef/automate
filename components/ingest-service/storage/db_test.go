@@ -248,7 +248,7 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows(requestColumns).AddRow(requestID, "completed", createdAt, updatedAt))
 
 	// Mock the reindex_request_detailed table query
-	detailQuery := `SELECT DISTINCT ON (index) id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at FROM reindex_request_detailed WHERE request_id = $1 ORDER BY index, updated_at DESC;`
+	detailQuery := `SELECT id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at FROM reindex_request_detailed WHERE request_id = $1 ORDER BY updated_at DESC;`
 	detailColumns := []string{"id", "request_id", "index", "from_version", "to_version", "stage", "os_task_id", "heartbeat", "having_alias", "alias_list", "created_at", "updated_at"}
 	mock.ExpectQuery(detailQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(detailColumns).
@@ -256,17 +256,17 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 			AddRow(2, requestID, "index2", "2.0", "3.0", `[{"stage":"stage1","status":"completed","updated_at":"`+updatedAt.Format(time.RFC3339)+`"}]`, "task2", heartbeat, false, "", createdAt, updatedAt))
 
 	// Call the function
-	statusJSON, err := db.GetReindexStatus(requestID)
+	statusResponse, err := db.GetReindexStatus(requestID)
+	assert.NoError(t, err)
 
 	// Log the JSON response
-	t.Log("Generated JSON Response:", statusJSON)
-
-	// Assertions
+	statusJSON, err := json.Marshal(statusResponse)
 	assert.NoError(t, err)
+	t.Log("Generated JSON Response:", string(statusJSON))
 
 	// Verify the JSON response
 	expectedJSON := `{"request_id":1,"status":"running","indexes":[{"index":"index1","stage":"stage1","status":"running"},{"index":"index2","stage":"stage1","status":"completed"}]}`
-	assert.JSONEq(t, expectedJSON, statusJSON)
+	assert.JSONEq(t, expectedJSON, string(statusJSON))
 }
 
 func TestGetReindexStatusFailure(t *testing.T) {
@@ -312,18 +312,20 @@ func TestGetReindexStatusNoDetails(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows(requestColumns).AddRow(requestID, "completed", createdAt, updatedAt))
 
 	// Mock the reindex_request_detailed table query to return no rows
-	detailQuery := `SELECT DISTINCT ON (index) id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at FROM reindex_request_detailed WHERE request_id = $1 ORDER BY index, updated_at DESC;`
+	detailQuery := `SELECT id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at FROM reindex_request_detailed WHERE request_id = $1 ORDER BY updated_at DESC;`
 	detailColumns := []string{"id", "request_id", "index", "from_version", "to_version", "stage", "os_task_id", "heartbeat", "having_alias", "alias_list", "created_at", "updated_at"}
 	mock.ExpectQuery(detailQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(detailColumns))
 
 	// Call the function
-	statusJSON, err := db.GetReindexStatus(requestID)
+	statusResponse, err := db.GetReindexStatus(requestID)
 
 	// Assertions
 	assert.NoError(t, err)
 
 	// Verify the JSON response
+	statusJSON, err := json.Marshal(statusResponse)
+	assert.NoError(t, err)
 	expectedJSON := `{"request_id":1,"status":"completed","indexes":[]}`
-	assert.JSONEq(t, expectedJSON, statusJSON)
+	assert.JSONEq(t, expectedJSON, string(statusJSON))
 }
