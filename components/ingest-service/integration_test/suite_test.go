@@ -37,6 +37,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
+	"github.com/chef/automate/components/ingest-service/storage"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/datalifecycle/purge"
@@ -79,6 +80,7 @@ type Suite struct {
 	nodesServiceClientMock     *nodes.MockNodesServiceClient
 	cfgmgmtClientMock          *cfgmgmt.MockCfgMgmtServiceClient
 	cleanup                    func() error
+	db                         *storage.DB
 }
 
 // Initialize the test suite
@@ -345,7 +347,7 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline)
+		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline, s.db)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient)
