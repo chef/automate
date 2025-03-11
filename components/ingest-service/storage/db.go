@@ -20,6 +20,10 @@ type DB struct {
 	*gorp.DbMap
 }
 
+func NewDB() *DB {
+	return &DB{}
+}
+
 // ReindexRequest represents the reindex_requests table
 type ReindexRequest struct {
 	RequestID   int       `db:"request_id"`

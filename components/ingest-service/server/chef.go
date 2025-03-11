@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -16,6 +17,7 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline"
+	"github.com/chef/automate/components/ingest-service/storage"
 	"github.com/chef/automate/lib/version"
 )
 
@@ -26,6 +28,7 @@ type ChefIngestServer struct {
 	authzClient        authz.ProjectsServiceClient
 	nodeMgrClient      manager.NodeManagerServiceClient
 	nodesClient        nodes.NodesServiceClient
+	db                 *storage.DB // Added field for database access
 }
 
 // NewChefIngestServer creates a new server instance and it automatically
@@ -35,7 +38,8 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 	nodeMgrClient manager.NodeManagerServiceClient,
 	nodesClient nodes.NodesServiceClient,
 	actionPipeline pipeline.ChefActionPipeline,
-	chefRunPipeline pipeline.ChefRunPipeline) *ChefIngestServer {
+	chefRunPipeline pipeline.ChefRunPipeline,
+	db *storage.DB) *ChefIngestServer { // Added db parameter
 	return &ChefIngestServer{
 		chefRunPipeline:    chefRunPipeline,
 		chefActionPipeline: actionPipeline,
@@ -43,6 +47,7 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 		authzClient:        authzClient,
 		nodeMgrClient:      nodeMgrClient,
 		nodesClient:        nodesClient,
+		db:                 db, // Initialize db
 	}
 }
 
@@ -238,6 +243,42 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
+	}, nil
+}
+
+func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
+	log.WithFields(log.Fields{"func": "GetReindexStatus"}).Debug("RPC call received")
+
+	// Validate request
+	if req == nil || req.RequestId == 0 {
+		errMsg := "Invalid request: RequestId is required"
+		log.WithFields(log.Fields{"error": errMsg}).Error("Validation failed")
+		return nil, status.Errorf(codes.InvalidArgument, "%s", errMsg)
+	}
+
+	if s.db == nil {
+		errMsg := "database connection is not initialized"
+		log.WithFields(log.Fields{"error": errMsg}).Error("DB error")
+		return nil, status.Errorf(codes.Internal, "%s", errMsg)
+	}
+
+	// Fetch reindex status from the database
+	statusResponse, err := s.db.GetReindexStatus(int(req.RequestId))
+	if err != nil {
+		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch reindex status")
+		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %v", err)
+	}
+
+	statusJSON, err := json.Marshal(statusResponse)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to marshal status response")
+		return nil, status.Errorf(codes.Internal, "failed to marshal status response: %v", err)
+	}
+
+	log.WithFields(log.Fields{"status": string(statusJSON)}).Debug("Reindex status fetched successfully")
+
+	return &ingest.GetReindexStatusResponse{
+		StatusJson: string(statusJSON),
 	}, nil
 }
 
