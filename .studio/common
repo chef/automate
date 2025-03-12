@@ -205,11 +205,11 @@ function build() {
   install_if_missing "$(desired_golang_ident)" go
   local hab_build
   #set HAB_BLDR_CHANNEL to dev as part of the hab package refresh
-  local HAB_BLDR_CHANNEL=dev
+  local HAB_BLDR_CHANNEL=LTS-2024
   local HAB_FALLBACK
 
   if [ -z $HAB_FALLBACK_CHANNEL ]; then
-    HAB_FALLBACK=LTS-2024
+    HAB_FALLBACK=dev
   else 
     HAB_FALLBACK=$HAB_FALLBACK_CHANNEL
   fi 

@@ -11,16 +11,16 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.10.33"
 pkg_deps=(
-  core/coreutils/8.32/20240105213308
-  chef/mlsa/1.0.1/20240125084021
+  core/coreutils
+  chef/mlsa
   # TODO 2020-05-12: PIN PIN PIN
   #
   # All dependencies that are shared between this package and the
   # chef-server-* packages are pinned to the versions required by the
   # chef-server-* packages.
   #
-  core/curl/8.7.1/20240614090648
-  core/ruby31/3.1.6/20240912144513
+  core/curl
+  core/ruby3_4
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/15.10.33/20250220085109"
   "${vendor_origin}/chef-server-ctl/15.10.33/20250220084439"
@@ -67,7 +67,7 @@ scaffolding_go_binary_list=(
 chef_automate_hab_binding_mode="relaxed"
 
 do_prepare() {
-  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby31)"
+  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby3_4)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
   GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
@@ -83,7 +83,7 @@ do_install() {
   install "$PLAN_CONTEXT/bin/knife" "$wrapper_bin_path/knife"
 
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__!$(pkg_path_for chef/chef-server-ctl)!g" "$wrapper_bin_path/knife"
-  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby31)!g" "$wrapper_bin_path/knife"
+  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby3_4)!g" "$wrapper_bin_path/knife"
 }
 
 
