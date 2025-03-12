@@ -12,6 +12,12 @@ draft = false
 
 You can configure Chef Automate to use Elasticsearch clusters that are not deployed via Chef Automate itself.
 
+{{< warning >}}
+
+However, none of this content indicates support for designing/installing custom topologies not managed by Chef products and not already covered in the docs. When you make the choice to run external systems, you become responsible for the maintenance/management/upgrades/etc for those systems. Production systems should be installed using a product that does the install, is responsible for maintaining the config and data over time, and that is aware of the current state of the entire system. This content makes none of those guarantees.
+
+{{< /warning >}}
+
 ## Configure External Elasticsearch
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
