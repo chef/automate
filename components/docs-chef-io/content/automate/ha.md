@@ -46,7 +46,7 @@ Chef Automate HA for Managed Services has default port 5432 for Managed PostgreS
 
 {{< note >}}
 
-The above depiction is a 5 node cluster, a Progress-supported deployment pattern.
+The above depiction is a 5-node cluster, a Progress-supported deployment pattern. However, please work with your Progress technical teams to determine the appropriate cluster configuration for optimum performance based on parameters like node count and data size.
 
 {{< /note >}}
 
