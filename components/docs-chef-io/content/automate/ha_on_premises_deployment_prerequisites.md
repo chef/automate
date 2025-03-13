@@ -101,7 +101,10 @@ Current Automate HA integrates with the following non-Chef tools:
 | Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
 
 {{< note >}}
-For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
+
+- The above hardware requirement is for an 11-node cluster, an Automate HA deployment pattern.
+
+- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 {{< /note >}}
 
 ### Load Balancer
@@ -165,7 +168,7 @@ The on-premises deployment specific pre-requisites are as follows:
 
 ### Infra Server
 
-- Chef Automate HA comes with a bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected.
+- Chef Automate HA comes with a bundled Infra Server.
 
 ### Access
 
