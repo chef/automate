@@ -1,4 +1,4 @@
-FROM nginx
+FROM nginx:1-bullseye
 COPY dist /usr/share/nginx/html
 
 # run container with
