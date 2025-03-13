@@ -195,7 +195,7 @@ func Spawn(opts *serveropts.Opts) error {
 			"'SELECT pg_advisory_unlock(%d);' command inside the chef_ingest_service database.", migration.PgMigrationLockID)
 	}
 
-	dbInstance := storage.NewDB()
+	dbInstance := storage.NewDB(db)
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
 		nodesServiceClient, chefActionPipeline, chefRunPipeline, dbInstance)

@@ -3,7 +3,6 @@ package storage
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"sort"
 	"time"
@@ -14,14 +13,15 @@ import (
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type DB struct {
 	*gorp.DbMap
 }
 
-func NewDB() *DB {
-	return &DB{}
+func NewDB(dbConn *sql.DB) *DB {
+	return &DB{DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}}}
 }
 
 // ReindexRequest represents the reindex_requests table
@@ -133,14 +133,25 @@ func (db *DB) DeleteReindexRequestDetail(id int) error {
 
 // Get the latest reindex request status for a given request
 func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
+	logrus.Info("-------------1) calling get reindex status of ingest service db.go...")
+	logrus.WithFields(logrus.Fields{
+		"requestID": requestID,
+	}).Info("Fetching reindex status for requestID")
 	var request ReindexRequest
 	err := db.SelectOne(&request, getLatestReindexRequest, requestID)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			logrus.WithFields(logrus.Fields{
+				"requestID": requestID,
+			}).Error("No reindex request found for the given requestID")
 			return nil, errors.New("no reindex request found for the given requestID")
 		}
 		return nil, errors.Wrap(err, "error fetching reindex request status from db")
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"request": request,
+	}).Info("Fetched reindex request")
 
 	var details []ReindexRequestDetailed
 	rows, err := db.Query(getLatestReindexRequestDetails, requestID)
@@ -210,7 +221,11 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 		Indexes:   indexes,
 	}
 
-	fmt.Println("********Generated Response:", statusResponse)
+	logrus.WithFields(logrus.Fields{
+		"request_id": statusResponse.RequestID,
+		"status":     statusResponse.Status,
+		"indexes":    statusResponse.Indexes,
+	}).Info("*****************Generated Response")
 
 	return statusResponse, nil
 }
