@@ -92,7 +92,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ### Minimum Hardware Requirement
 
-The hardware requirement is for an 11-node cluster Automate HA deployment pattern.
+An eleven-node Automate HA cluster has the following minimum hardware requirements.
 
 | Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | AZURE Machine Type | GCP Machine Type | Additional Space      |
 | ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ------------------ | ---------------- | -----------------     |
@@ -159,9 +159,7 @@ Generate the certificates using recommended tools and supported algorithms and v
 - OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
 - Certificate Format: X509 V3(PEM format) ,Private key is in PKCS8 format
 
-
 To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
-
 
 ## Deployment Specific Pre-requisites
 
@@ -263,7 +261,7 @@ To know more about the on-premises deployment disaster recovery, visit our [Disa
 | Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration |
 |-----------------|----------------------|---------------------------------|-----------|------------------------------|
 | Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to the Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. |
-| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 | Chef Backend using PostgreSQL storage for Cookbooks should only migrate to Automate HA. | 
+| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 | Chef Backend using PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
 | Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 | Chef Infra Server using PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
 | A2HA | PS Lead A2HA On-Premises Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
