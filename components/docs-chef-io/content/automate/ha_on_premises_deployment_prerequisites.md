@@ -92,6 +92,8 @@ Current Automate HA integrates with the following non-Chef tools:
 
 ### Minimum Hardware Requirement
 
+The hardware requirement is for an 11-node cluster Automate HA deployment pattern.
+
 | Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | AZURE Machine Type | GCP Machine Type | Additional Space      |
 | ----------------- | ----- | ---- | --- | ------------------ | ---------------- | ------------------ | ---------------- | -----------------     |
 | Chef Automate     | 2     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
@@ -102,9 +104,8 @@ Current Automate HA integrates with the following non-Chef tools:
 
 {{< note >}}
 
-- The above hardware requirement is for an 11-node cluster Automate HA deployment pattern.
+For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 
-- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 {{< /note >}}
 
 ### Load Balancer
