@@ -102,7 +102,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 {{< note >}}
 
-- The above hardware requirement is for an 11-node cluster, an Automate HA deployment pattern.
+- The above hardware requirement is for an 11-node cluster Automate HA deployment pattern.
 
 - For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 {{< /note >}}
