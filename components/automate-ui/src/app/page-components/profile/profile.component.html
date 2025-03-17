@@ -11,7 +11,7 @@
 </button>
 
 <chef-click-outside omit="dropdown-toggle" (clickOutside)="closeDropdown()">
-  <chef-dropdown class="dropdown" [attr.visible]="dropdownVisible" (keydown.esc)="closeDropdown()">
+  <chef-dropdown class="dropdown" *ngIf="dropdownVisible" [attr.visible]="dropdownVisible" (keydown.esc)="closeDropdown()">
     <ul class="dropdown-list">
       <li class="dropdown-list-item">
         Signed in as <strong class="dropdown-display-name">{{ displayName }}</strong>
