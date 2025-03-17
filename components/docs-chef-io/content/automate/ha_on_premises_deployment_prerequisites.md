@@ -102,11 +102,7 @@ An eleven-node Automate HA cluster has the following minimum hardware requiremen
 | OpenSearch DB     | 3     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
 | Bastion Machine   | 1     | 2    | 8   | 200 GB             | m5.large         | Standard_D2as_v4   | n2-standard-2    | /var/tmp=5% /root=20% |
 
-{{< note >}}
-
-For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
-
-{{< /note >}}
+{{< note >}} For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. {{< /note >}}
 
 ### Load Balancer
 
