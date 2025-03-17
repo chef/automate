@@ -28,7 +28,7 @@ The Chef Automate HA equates to reliability, efficiency, and productivity, built
 
 HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *PostgreSQL*, and *OpenSearch*.
 
-### Chef Automate HA Architecture for On Premises / Cloud Non-Managed
+### Chef Automate HA Architecture for OnPremise / Cloud Non-Managed
 
 ![High Availability Architecture](/images/automate/ha_arch_onprem.png)
 
@@ -40,9 +40,7 @@ HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *Pos
 Chef Automate HA for Managed Services has default port 5432 for Managed PostgreSQL and 9200 for Managed OpenSearch. You can also change to your custom port.
 {{< /note >}}
 
-### Chef Automate HA Architecture for On-Premises Non-Managed Minimum Node Cluster
-
-The following shows a five-node cluster, which is a supported deployment pattern. Work with your Progress technical teams to determine the appropriate cluster configuration for optimal performance based on parameters such as node count and data size.
+### Chef Automate HA Architecture for OnPremise Non-Managed Minimum Node Cluster
 
 ![High Availability Architecture](/images/automate/ha_arch_minnode_cluster.png)
 
@@ -69,22 +67,21 @@ The Chef Automate HA Architecture involves the following clusters as part of the
 
 ## Provisioning
 
-Chef Automate's high availability solution can run on cloud providers and on-premises infrastructure systems. Appropriately provisioned backend, frontend, and bastion systems ensure a smooth deployment and installation experience.
+Chef Automate's high availability solution can run on cloud providers and on-premise infrastructure systems. Appropriately provisioned backend, frontend, and bastion systems will help ensure a smooth deployment and installation experience.
 
-- On-premises provisioning
-- Cloud provisioning
+  - On-premise provisioning
+  - Cloud provisioning
 
-### On-premises provisioning
+### On-premise provisioning
 
   The customer can provision virtual machines or bare metal machines on a supported operating system with the required system settings to deploy the Automate HA solution.
 
-### Cloud provisioning
+### Cloud provisioing
+  Systems and services from the following cloud providers are supported:
 
-Systems and services from the following cloud providers are supported:
-
-- [AWS](https://docs.chef.io/automate/ha_aws_deploy_steps/#steps-to-provision)
-- Azure
-- Google
+  - [AWS](https://docs.chef.io/automate/ha_aws_deploy_steps/#steps-to-provision)
+  - Azure
+  - Google
 
 Deploy the Automate HA on the cloud infrastructure after provisioning the cloud systems. We have a simplified provisioning utility for AWS, Azure, and Google, and we expect to provision the systems manually.
 
@@ -92,16 +89,16 @@ Deploy the Automate HA on the cloud infrastructure after provisioning the cloud 
 
 Chef Automate High Availability (HA) supports two types of deployment:
 
-- [on-premises Deployment (Existing Node) Deployment](/automate/ha_onprim_deployment_procedure/)
+- [On-premise Deployment (Existing Node) Deployment](/automate/ha_onprim_deployment_procedure/)
 - [Amazon Web Services (AWS) Deployment](/automate/ha_aws_deploy_steps/)
 
-### On-premises Deployment (Existing Node/Bare Infrastructure)
+### On-premise Deployment (Existing Node/Bare Infrastructure)
 
 In this, we expect VM (Virtual machine) or Bare Metal machines (Physical machine) that are already created and have initial Operating System (OS) setup done. Including Ports and Security policies changed according to requirements.
 
 After this, installation steps will Deploy Chef Automate, Chef Infra Server, PostgreSQL DB, and OpenSearch DB to the relevant VMs or Physical Machines as provided in Config.
 
-See the [performance benchmarking documentation](https://docs.chef.io/automate/ha_performance_benchmarks/#performance-benchmarks) for more information.
+Please refer [Performance Bench marking](https://docs.chef.io/automate/ha_performance_benchmarks/#performance-benchmarks) for more info.
 
 ### Cloud Deployment using Amazon Web Services (AWS)
 
@@ -116,7 +113,7 @@ The two-step deployment process is as shown below:
 The two-step deployment process is as shown below:
 
 - Provisioning Infrastructure: Manually provision the infrastructure
-- Deployment of services on the provisioned infrastructure (follow the [on-premises deployment procedure](/automate/ha_onprim_deployment_procedure/)).
+- Deployment of services on the provisioned infrastructure (follow the [On-premise Deployment steps](/automate/ha_onprim_deployment_procedure/)).
   - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
 - Only File System Backup and Restore are supported.
 
@@ -125,7 +122,7 @@ The two-step deployment process is as shown below:
 The two-step deployment process is as shown below:
 
 - Provisioning Infrastructure: Manually provision the infrastructure
-- Deployment of services on the provisioned infrastructure (follow the [on-premises deployment procedure](/automate/ha_onprim_deployment_procedure/)).
+- Deployment of services on the provisioned infrastructure (follow the [On-premise Deployment steps](/automate/ha_onprim_deployment_procedure/)).
   - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, and *Chef Infra Server* will be done in this step.
 
 ## Performance (Benchmarking)
