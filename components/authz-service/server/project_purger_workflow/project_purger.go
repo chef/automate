@@ -8,7 +8,6 @@ import (
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -58,7 +57,7 @@ func RegisterCerealProjectPurgerWithDomainServices(manager *cereal.Manager, log 
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
 	}
 
-	domainServicesWorkflowExecutor, err := NewProjectPurgerWorkflowExecutor()
+	domainServicesWorkflowExecutor, err := NewProjectPurgerWorkflowExecutor(log)
 	if err != nil {
 		return nil, err
 	}
@@ -180,11 +179,11 @@ func (m *cerealProjectPurger) GraveyardingCompleted(projectID string) (bool, err
 // | +---------------------------------------------+        +---------------------------------------------+         +---------------------------------------------+      |
 // |                                                                                                                                                                     |
 // +---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-func NewProjectPurgerWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
+func NewProjectPurgerWorkflowExecutor(log logger.Logger) (*patterns.ChainWorkflowExecutor, error) {
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
 
-	moveProjectToGraveyardExecutor := NewMoveProjectToGraveyardWorkflowExecutor()
+	moveProjectToGraveyardExecutor := NewMoveProjectToGraveyardWorkflowExecutor(log)
 
 	domainSvcExecutor := patterns.NewParallelWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
 		lock.Lock()
@@ -192,14 +191,14 @@ func NewProjectPurgerWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error)
 		if workflowExecutor, ok := workflowMap[key]; ok {
 			return workflowExecutor, true
 		}
-		logrus.Infof("creating workflow executor for %q", key)
-		workflowExecutor := project_purge.NewWorkflowExecutorForDomainService(key)
+		log.Infof("creating workflow executor for %q", key)
+		workflowExecutor := project_purge.NewWorkflowExecutorForDomainService(key, log)
 		workflowMap[key] = workflowExecutor
 		return workflowExecutor, true
 	})
 
 	deleteProjectFromGraveyardExecutor :=
-		NewDeleteProjectFromGraveyardWorkflowExecutor()
+		NewDeleteProjectFromGraveyardWorkflowExecutor(log)
 
 	return patterns.NewChainWorkflowExecutor(
 		moveProjectToGraveyardExecutor, domainSvcExecutor, deleteProjectFromGraveyardExecutor)

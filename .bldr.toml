@@ -1026,6 +1026,7 @@ paths = [
   "lib/elasticutil/*",
   "lib/grpc/*",
   "lib/io/*",
+  "lib/logger/*",
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
