@@ -19,7 +19,7 @@ This page lists the commands that aid in upgrading the Chef Automate High Availa
 - The upgrade of the backend nodes restarts ElasticSearch and PostgreSQL services.
 - You cannot downgrade the Automate version. If you intend to install the lower version of the Chef Automate High Availability (HA) system, uninstall the existing version of the same, and destroy the terraform.
 
-{{< note/ >}}
+{{< /note >}}
 
 ## Command List
 
