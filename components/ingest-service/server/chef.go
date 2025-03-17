@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"encoding/json"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -21,6 +21,13 @@ import (
 	"github.com/chef/automate/lib/version"
 )
 
+var skipIndices = map[string]bool{
+	"security-auditlog":         true,
+	".opendistro":               true,
+	".plugins-ml-config":        true,
+	".opensearch-observability": true,
+}
+
 type ChefIngestServer struct {
 	chefRunPipeline    pipeline.ChefRunPipeline
 	chefActionPipeline pipeline.ChefActionPipeline
@@ -28,7 +35,7 @@ type ChefIngestServer struct {
 	authzClient        authz.ProjectsServiceClient
 	nodeMgrClient      manager.NodeManagerServiceClient
 	nodesClient        nodes.NodesServiceClient
-	db                 *storage.DB // Added field for database access
+	reindex            storage.Reindex
 }
 
 // NewChefIngestServer creates a new server instance and it automatically
@@ -39,7 +46,7 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 	nodesClient nodes.NodesServiceClient,
 	actionPipeline pipeline.ChefActionPipeline,
 	chefRunPipeline pipeline.ChefRunPipeline,
-	db *storage.DB) *ChefIngestServer { // Added db parameter
+	reindex storage.Reindex) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline:    chefRunPipeline,
 		chefActionPipeline: actionPipeline,
@@ -47,7 +54,7 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 		authzClient:        authzClient,
 		nodeMgrClient:      nodeMgrClient,
 		nodesClient:        nodesClient,
-		db:                 db, // Initialize db
+		reindex:            reindex,
 	}
 }
 
@@ -241,51 +248,59 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
+	indices, err := s.client.GetIndices(context.Background())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+	requestID := int(time.Now().Unix())
+	// Reindexing request
+	if err := s.reindex.InsertReindexRequest(requestID, "running"); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+	}
+
+OuterLoop:
+	for _, index := range indices {
+		for prefix := range skipIndices {
+			if strings.HasPrefix(index.Index, prefix) {
+				log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index")
+				continue OuterLoop
+			}
+		}
+
+		settings, err := s.client.GetIndexSettingsVersion(index.Index)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
+		}
+
+		// Is reindexing needed?
+		if settings.Settings.Index.Version.CreatedString == settings.Settings.Index.Version.UpgradedString {
+			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
+			continue
+		}
+
+		if err := s.reindex.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
+			RequestID:   requestID,
+			Index:       index.Index,
+			FromVersion: settings.Settings.Index.Version.CreatedString,
+			ToVersion:   settings.Settings.Index.Version.UpgradedString,
+			Stage:       "running",
+			OsTaskID:    "",
+			Heartbeat:   time.Now(),
+			HavingAlias: false,
+			AliasList:   "",
+		}); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+		}
+
+		if err := s.client.TriggerReindex(index.Index); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to reindex index %s: %s", index.Index, err)
+		}
+	}
+
+	log.Info("Reindexing started successfully")
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
-	}, nil
-}
-
-func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
-	log.WithFields(log.Fields{"func": "GetReindexStatus"}).Debug("RPC call received")
-	if s.db == nil {
-		errMsg := "database connection is not initialized"
-		log.WithFields(log.Fields{"error": errMsg}).Error("DB error")
-		return nil, status.Errorf(codes.Internal, "%s", errMsg)
-	}
-	var requestID int
-	// If RequestId is missing (0), fetch the latest request ID
-	if req == nil || req.RequestId == 0 {
-		log.Debug("RequestId is missing, fetching the latest request ID")
-
-		latestRequestID, err := s.db.GetLatestReindexRequestID()
-		if err != nil {
-			log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch latest reindex request ID")
-			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %v", err)
-		}
-		requestID = latestRequestID
-		log.WithFields(log.Fields{"requestID": requestID}).Debug("Fetched latest request ID successfully")
-	} else {
-		requestID = int(req.RequestId)
-	}
-
-	// Fetch reindex status from the database
-	statusResponse, err := s.db.GetReindexStatus(requestID)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch reindex status")
-		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %v", err)
-	}
-
-	statusJSON, err := json.Marshal(statusResponse)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to marshal status response")
-		return nil, status.Errorf(codes.Internal, "failed to marshal status response: %v", err)
-	}
-
-	log.WithFields(log.Fields{"status": string(statusJSON)}).Debug("Reindex status fetched successfully")
-
-	return &ingest.GetReindexStatusResponse{
-		StatusJson: string(statusJSON),
 	}, nil
 }
 
