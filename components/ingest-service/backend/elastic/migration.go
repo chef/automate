@@ -3,10 +3,12 @@ package elastic
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
 	elastic "github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/ingest-service/backend"
@@ -478,7 +480,7 @@ func (es *Backend) RemoveAlias(ctx context.Context, aliasName string, indexName 
 	return err
 }
 
-//GetNodeCount - count how many node-state documents are in an index
+// GetNodeCount - count how many node-state documents are in an index
 func (es *Backend) GetNodeCount(ctx context.Context, indexName string) (int64, error) {
 	count, err := es.client.Count(indexName).Type("node-state").Do(ctx)
 	if err != nil {
@@ -486,4 +488,54 @@ func (es *Backend) GetNodeCount(ctx context.Context, indexName string) (int64, e
 		return 0, err
 	}
 	return count, err
+}
+
+func (es *Backend) GetIndices(ctx context.Context) (backend.Indices, error) {
+	fmt.Println("Fetching indices from Elasticsearch/OpenSearch.")
+	catIndicesService := es.client.CatIndices()
+	resp, err := catIndicesService.Do(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch indices: %w", err)
+	}
+
+	bx, err := json.Marshal(resp)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read indices response: %w", err)
+	}
+
+	var indices backend.Indices
+	if err = json.Unmarshal(bx, &indices); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal indices response: %w", err)
+	}
+
+	return indices, nil
+}
+
+func (es *Backend) GetIndexSettingsVersion(index string) (*backend.IndexSettingsVersion, error) {
+	fmt.Println("Fetching settings version for index:", index)
+	resp, err := es.client.IndexGetSettings(index).Do(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
+	}
+
+	settings, exists := resp[index]
+	if !exists {
+		return nil, errors.New("index settings not found in response")
+	}
+
+	settingsJSON, err := json.Marshal(settings)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal settings for index %s: %w", index, err)
+	}
+
+	var setting backend.IndexSettingsVersion
+	if err := json.Unmarshal(settingsJSON, &setting); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
+	}
+
+	return &setting, nil
+}
+
+func (es *Backend) TriggerReindex(index string) error {
+	return nil
 }

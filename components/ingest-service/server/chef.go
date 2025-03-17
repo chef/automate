@@ -284,7 +284,6 @@ OuterLoop:
 			Index:       index.Index,
 			FromVersion: settings.Settings.Index.Version.CreatedString,
 			ToVersion:   settings.Settings.Index.Version.UpgradedString,
-			Stage:       "running",
 			OsTaskID:    "",
 			Heartbeat:   time.Now(),
 			HavingAlias: false,

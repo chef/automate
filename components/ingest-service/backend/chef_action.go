@@ -26,3 +26,27 @@ type InternalChefAction struct {
 	Data             string    `json:"data,omitempty"`
 	Projects         []string  `json:"projects"`
 }
+
+type Indices []struct {
+	Health       string `json:"health"`
+	Status       string `json:"status"`
+	Index        string `json:"index"`
+	UUID         string `json:"uuid"`
+	Pri          string `json:"pri"`
+	Rep          string `json:"rep"`
+	DocsCount    string `json:"docs.count"`
+	DocsDeleted  string `json:"docs.deleted"`
+	StoreSize    string `json:"store.size"`
+	PriStoreSize string `json:"pri.store.size"`
+}
+
+type IndexSettingsVersion struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString  string `json:"created_string"`
+				UpgradedString string `json:"upgraded_string"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}

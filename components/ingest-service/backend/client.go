@@ -94,4 +94,8 @@ type Client interface {
 	ReindexNodeStateToLatest(context.Context, string) (string, error)
 	GetActions(string, int, time.Time, string, bool) ([]InternalChefAction, int64, error)
 	DeleteAllIndexesWithPrefix(string, context.Context) error
+
+	GetIndices(ctx context.Context) (Indices, error)
+	GetIndexSettingsVersion(index string) (*IndexSettingsVersion, error)
+	TriggerReindex(index string) error
 }
