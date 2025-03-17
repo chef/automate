@@ -248,22 +248,29 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
 	log.WithFields(log.Fields{"func": "GetReindexStatus"}).Debug("RPC call received")
-
-	// Validate request
-	if req == nil || req.RequestId == 0 {
-		errMsg := "Invalid request: RequestId is required"
-		log.WithFields(log.Fields{"error": errMsg}).Error("Validation failed")
-		return nil, status.Errorf(codes.InvalidArgument, "%s", errMsg)
-	}
-
 	if s.db == nil {
 		errMsg := "database connection is not initialized"
 		log.WithFields(log.Fields{"error": errMsg}).Error("DB error")
 		return nil, status.Errorf(codes.Internal, "%s", errMsg)
 	}
+	var requestID int
+	// If RequestId is missing (0), fetch the latest request ID
+	if req == nil || req.RequestId == 0 {
+		log.Debug("RequestId is missing, fetching the latest request ID")
+
+		latestRequestID, err := s.db.GetLatestReindexRequestID()
+		if err != nil {
+			log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch latest reindex request ID")
+			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %v", err)
+		}
+		requestID = latestRequestID
+		log.WithFields(log.Fields{"requestID": requestID}).Debug("Fetched latest request ID successfully")
+	} else {
+		requestID = int(req.RequestId)
+	}
 
 	// Fetch reindex status from the database
-	statusResponse, err := s.db.GetReindexStatus(int(req.RequestId))
+	statusResponse, err := s.db.GetReindexStatus(requestID)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch reindex status")
 		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %v", err)

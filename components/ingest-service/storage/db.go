@@ -133,7 +133,6 @@ func (db *DB) DeleteReindexRequestDetail(id int) error {
 
 // Get the latest reindex request status for a given request
 func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
-	logrus.Info("-------------1) calling get reindex status of ingest service db.go...")
 	logrus.WithFields(logrus.Fields{
 		"requestID": requestID,
 	}).Info("Fetching reindex status for requestID")
@@ -158,7 +157,11 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching reindex request details from db")
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			logrus.WithError(err).Error("Error closing rows")
+		}
+	}()
 
 	for rows.Next() {
 		var detail ReindexRequestDetailed
@@ -203,7 +206,6 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 
 		if latestStage.Status == "failed" {
 			overallStatus = "failed"
-			break
 		} else if latestStage.Status == "running" && overallStatus != "failed" {
 			overallStatus = "running"
 		}
@@ -228,6 +230,28 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 	}).Info("*****************Generated Response")
 
 	return statusResponse, nil
+}
+
+func (db *DB) GetLatestReindexRequestID() (int, error) {
+	if db == nil || db.DbMap == nil {
+		logrus.Error("DB connection is not initialized")
+		return 0, errors.New("database connection is not initialized")
+	}
+	var requestID int
+	err := db.QueryRow("SELECT request_id FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logrus.Error("No reindex requests found in the database")
+			return 0, errors.New("no reindex requests found")
+		}
+		return 0, errors.Wrap(err, "error fetching latest request ID")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"latestRequestID": requestID,
+	}).Info("Fetched latest reindex request ID")
+
+	return requestID, nil
 }
 
 // SQL Queries

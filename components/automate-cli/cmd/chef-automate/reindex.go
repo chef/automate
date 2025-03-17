@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -67,11 +68,10 @@ func runReindexStatusCmd(cmd *cobra.Command, args []string) error {
 	return rf.GetReindexStatus()
 }
 
-// GetReindexStatus fetches and prints the reindexing status
 func (rf *ReindexFlow) GetReindexStatus() error {
 	defer rf.DsClient.Close()
-
-	req := &api.GetReindexStatusRequest{RequestId: 1} // Adjust as needed
+	logrus.Info("Fetching reindex status...")
+	req := &api.GetReindexStatusRequest{RequestId: 0} // Pass 0 to trigger latest request ID lookup
 
 	resp, err := rf.DsClient.GetReindexStatus(context.Background(), req)
 	if err != nil {
@@ -85,7 +85,6 @@ func (rf *ReindexFlow) GetReindexStatus() error {
 		return fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
-	fmt.Println("Reindex Status:")
 	printReindexStatus(statusData)
 
 	return nil
@@ -93,7 +92,9 @@ func (rf *ReindexFlow) GetReindexStatus() error {
 
 // printReindexStatus formats and prints the reindex status
 func printReindexStatus(statusData map[string]interface{}) {
-	overallStatus, _ := statusData["overall_status"].(string)
+	requestID, _ := statusData["request_id"].(float64)
+	overallStatus, _ := statusData["status"].(string)
+	fmt.Printf("Request ID: %.0f\n", requestID)
 	fmt.Printf("Overall Status: %s\n", overallStatus)
 
 	indexes, ok := statusData["indexes"].([]interface{})
@@ -105,7 +106,8 @@ func printReindexStatus(statusData map[string]interface{}) {
 	fmt.Println("Index Details:")
 	for _, index := range indexes {
 		if indexMap, ok := index.(map[string]interface{}); ok {
-			fmt.Printf("- Index: %s, Stage: %s\n", indexMap["index"], indexMap["stage"])
+			fmt.Printf("- Index: %s, Stage: %s, Status: %s\n",
+				indexMap["index"], indexMap["stage"], indexMap["status"])
 		}
 	}
 }
@@ -139,13 +141,15 @@ func runReindexStartCmd(cmd *cobra.Command, args []string) error {
 	return rf.StartReindex()
 }
 
-// NewReindexFlow establishes a connection to deployment-service
 func NewReindexFlow(writer *cli.Writer) (*ReindexFlow, error) {
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
 		return nil, status.Wrap(err, status.DeploymentServiceCallError, "Failed to establish connection to deployment-service")
 	}
-	return &ReindexFlow{DsClient: connection, Writer: writer}, nil
+	return &ReindexFlow{
+		DsClient: connection,
+		Writer:   writer,
+	}, nil
 }
 
 // StartReindex triggers reindexing via deployment-service
