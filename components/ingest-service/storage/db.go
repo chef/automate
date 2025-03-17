@@ -3,7 +3,6 @@ package storage
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"sort"
 	"time"
@@ -14,10 +13,15 @@ import (
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type DB struct {
 	*gorp.DbMap
+}
+
+func NewDB(dbConn *sql.DB) *DB {
+	return &DB{DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}}}
 }
 
 // ReindexRequest represents the reindex_requests table
@@ -129,21 +133,35 @@ func (db *DB) DeleteReindexRequestDetail(id int) error {
 
 // Get the latest reindex request status for a given request
 func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
+	logrus.WithFields(logrus.Fields{
+		"requestID": requestID,
+	}).Info("Fetching reindex status for requestID")
 	var request ReindexRequest
 	err := db.SelectOne(&request, getLatestReindexRequest, requestID)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			logrus.WithFields(logrus.Fields{
+				"requestID": requestID,
+			}).Error("No reindex request found for the given requestID")
 			return nil, errors.New("no reindex request found for the given requestID")
 		}
 		return nil, errors.Wrap(err, "error fetching reindex request status from db")
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"request": request,
+	}).Info("Fetched reindex request")
 
 	var details []ReindexRequestDetailed
 	rows, err := db.Query(getLatestReindexRequestDetails, requestID)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching reindex request details from db")
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			logrus.WithError(err).Error("Error closing rows")
+		}
+	}()
 
 	for rows.Next() {
 		var detail ReindexRequestDetailed
@@ -188,7 +206,6 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 
 		if latestStage.Status == "failed" {
 			overallStatus = "failed"
-			break
 		} else if latestStage.Status == "running" && overallStatus != "failed" {
 			overallStatus = "running"
 		}
@@ -206,9 +223,35 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 		Indexes:   indexes,
 	}
 
-	fmt.Println("********Generated Response:", statusResponse)
+	logrus.WithFields(logrus.Fields{
+		"request_id": statusResponse.RequestID,
+		"status":     statusResponse.Status,
+		"indexes":    statusResponse.Indexes,
+	}).Info("*****************Generated Response")
 
 	return statusResponse, nil
+}
+
+func (db *DB) GetLatestReindexRequestID() (int, error) {
+	if db == nil || db.DbMap == nil {
+		logrus.Error("DB connection is not initialized")
+		return 0, errors.New("database connection is not initialized")
+	}
+	var requestID int
+	err := db.QueryRow("SELECT request_id FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logrus.Error("No reindex requests found in the database")
+			return 0, errors.New("no reindex requests found")
+		}
+		return 0, errors.Wrap(err, "error fetching latest request ID")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"latestRequestID": requestID,
+	}).Info("Fetched latest reindex request ID")
+
+	return requestID, nil
 }
 
 // SQL Queries

@@ -36,6 +36,15 @@ message StartReindexResponse {
   string message = 1;
 }
 
+
+message GetReindexStatusResponse {
+	string status_json = 1;
+}
+  
+message GetReindexStatusRequest {
+	int32 request_id = 1;
+}
+
 service ChefIngesterService {
 	rpc ProcessChefRun (api.ingest.request.Run) returns (api.ingest.response.ProcessChefRunResponse) {
 		option (google.api.http) = {
@@ -67,5 +76,8 @@ service ChefIngesterService {
 	};
 	rpc StartReindex(StartReindexRequest) returns (StartReindexResponse) {
         option (google.api.http).post = "/api/v0/ingest/reindex/start";
+    };
+	rpc GetReindexStatus (GetReindexStatusRequest) returns (GetReindexStatusResponse) {
+        option (google.api.http).get =  "/api/v0/ingest/reindex/status";
     };
 }
