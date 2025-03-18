@@ -288,7 +288,7 @@ OuterLoop:
 			Heartbeat:   time.Now(),
 			HavingAlias: false,
 			AliasList:   "",
-		}); err != nil {
+		}, time.Now()); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
 
@@ -301,6 +301,12 @@ OuterLoop:
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
+}
+
+func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
+	log.Info("Implement this function")
+
+	return &ingest.GetReindexStatusResponse{}, nil
 }
 
 // GetVersion returns the service version

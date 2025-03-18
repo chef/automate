@@ -92,12 +92,12 @@ func RunMigrations(dbConf *config.Storage) error {
 
 type Reindex interface {
 	InsertReindexRequest(requestID int, status string) error
-	UpdateReindexRequest(requestID int, status string) error
-	GetReindexRequest(requestID int) (*ReindexRequest, error)
-	InsertReindexRequestDetailed(detail ReindexRequestDetailed) error
-	GetReindexRequestDetails(requestID int) ([]*ReindexRequestDetailed, error)
+	UpdateReindexRequest(requestID int, status string, currentTime time.Time) error
+	InsertReindexRequestDetailed(detail ReindexRequestDetailed, currentTime time.Time) error
 	DeleteReindexRequest(requestID int) error
 	DeleteReindexRequestDetail(id int) error
+	GetReindexStatus(requestID int) (*StatusResponse, error)
+	GetLatestReindexRequestID() (int, error)
 }
 
 // Create a new reindex request
