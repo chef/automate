@@ -60,6 +60,15 @@ service Deployment {
 	rpc BootstrapBundle (BootstrapBundleRequest) returns (stream BootstrapBundleResponse);
 	rpc ControlIndexUpgradeStatus(google.protobuf.Empty) returns (ControlIndexUpgradeStatusResponse);
 	rpc StartReindex(StartReindexRequest) returns (StartReindexResponse);
+	rpc GetReindexStatus (GetReindexStatusRequest) returns (GetReindexStatusResponse);
+}
+
+message GetReindexStatusResponse {
+  string status_json = 1;
+}
+
+message GetReindexStatusRequest {
+  int32 request_id = 1;
 }
 
 message StartReindexRequest {
