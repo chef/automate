@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS reindex_requests (
+    id SERIAL,
     request_id INT PRIMARY KEY,
     status VARCHAR(50) CHECK (status IN ('running', 'failed', 'completed')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -6,7 +7,7 @@ CREATE TABLE IF NOT EXISTS reindex_requests (
 );
 
 CREATE TABLE IF NOT EXISTS reindex_request_detailed (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     request_id INT NOT NULL,
     index TEXT NOT NULL,
     from_version TEXT NOT NULL,

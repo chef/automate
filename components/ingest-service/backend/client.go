@@ -97,5 +97,6 @@ type Client interface {
 
 	GetIndices(ctx context.Context) (Indices, error)
 	GetIndexSettingsVersion(index string) (*IndexSettingsVersion, error)
+
 	TriggerReindex(index string) error
 }
