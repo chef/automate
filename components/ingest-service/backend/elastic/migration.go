@@ -491,7 +491,6 @@ func (es *Backend) GetNodeCount(ctx context.Context, indexName string) (int64, e
 }
 
 func (es *Backend) GetIndices(ctx context.Context) (backend.Indices, error) {
-	fmt.Println("Fetching indices from Elasticsearch/OpenSearch.")
 	catIndicesService := es.client.CatIndices()
 	resp, err := catIndicesService.Do(ctx)
 	if err != nil {
@@ -512,7 +511,6 @@ func (es *Backend) GetIndices(ctx context.Context) (backend.Indices, error) {
 }
 
 func (es *Backend) GetIndexSettingsVersion(index string) (*backend.IndexSettingsVersion, error) {
-	fmt.Println("Fetching settings version for index:", index)
 	resp, err := es.client.IndexGetSettings(index).Do(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
