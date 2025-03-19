@@ -347,7 +347,7 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline, nil)
+		s.managerServiceClientMock, s.nodesServiceClientMock, chefActionPipeline, chefRunPipeline, s.db)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient)
