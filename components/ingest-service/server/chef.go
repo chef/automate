@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 	"time"
 
@@ -35,7 +36,7 @@ type ChefIngestServer struct {
 	authzClient        authz.ProjectsServiceClient
 	nodeMgrClient      manager.NodeManagerServiceClient
 	nodesClient        nodes.NodesServiceClient
-	reindex            storage.Reindex
+	db                 *storage.DB // Added field for database access
 }
 
 // NewChefIngestServer creates a new server instance and it automatically
@@ -46,7 +47,7 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 	nodesClient nodes.NodesServiceClient,
 	actionPipeline pipeline.ChefActionPipeline,
 	chefRunPipeline pipeline.ChefRunPipeline,
-	reindex storage.Reindex) *ChefIngestServer {
+	db *storage.DB) *ChefIngestServer { // Added db parameter
 	return &ChefIngestServer{
 		chefRunPipeline:    chefRunPipeline,
 		chefActionPipeline: actionPipeline,
@@ -54,7 +55,7 @@ func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServic
 		authzClient:        authzClient,
 		nodeMgrClient:      nodeMgrClient,
 		nodesClient:        nodesClient,
-		reindex:            reindex,
+		db:                 db, // Initialize db
 	}
 }
 
@@ -253,9 +254,9 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
 	}
 
-	requestID := int(time.Now().Unix())
 	// Reindexing request
-	if err := s.reindex.InsertReindexRequest(requestID, "running"); err != nil {
+	requestID, err := s.db.InsertReindexRequest("running", time.Now())
+	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 	}
 
@@ -279,7 +280,7 @@ OuterLoop:
 			continue
 		}
 
-		if err := s.reindex.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
+		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
 			Index:       index.Index,
 			FromVersion: settings.Settings.Index.Version.CreatedString,
@@ -295,6 +296,7 @@ OuterLoop:
 		if err := s.client.TriggerReindex(index.Index); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to reindex index %s: %s", index.Index, err)
 		}
+
 	}
 
 	log.Info("Reindexing started successfully")
@@ -304,9 +306,46 @@ OuterLoop:
 }
 
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
-	log.Info("Implement this function")
+	log.WithFields(log.Fields{"func": "GetReindexStatus"}).Debug("RPC call received")
+	if s.db == nil {
+		errMsg := "database connection is not initialized"
+		log.WithFields(log.Fields{"error": errMsg}).Error("DB error")
+		return nil, status.Errorf(codes.Internal, "%s", errMsg)
+	}
+	var requestID int
+	// If RequestId is missing (0), fetch the latest request ID
+	if req == nil || req.RequestId == 0 {
+		log.Debug("RequestId is missing, fetching the latest request ID")
 
-	return &ingest.GetReindexStatusResponse{}, nil
+		latestRequestID, err := s.db.GetLatestReindexRequestID()
+		if err != nil {
+			log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch latest reindex request ID")
+			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %v", err)
+		}
+		requestID = latestRequestID
+		log.WithFields(log.Fields{"requestID": requestID}).Debug("Fetched latest request ID successfully")
+	} else {
+		requestID = int(req.RequestId)
+	}
+
+	// Fetch reindex status from the database
+	statusResponse, err := s.db.GetReindexStatus(requestID)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch reindex status")
+		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %v", err)
+	}
+
+	statusJSON, err := json.Marshal(statusResponse)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to marshal status response")
+		return nil, status.Errorf(codes.Internal, "failed to marshal status response: %v", err)
+	}
+
+	log.WithFields(log.Fields{"status": string(statusJSON)}).Debug("Reindex status fetched successfully")
+
+	return &ingest.GetReindexStatusResponse{
+		StatusJson: string(statusJSON),
+	}, nil
 }
 
 // GetVersion returns the service version

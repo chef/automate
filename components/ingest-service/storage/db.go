@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"encoding/json"
+	"math/rand"
 	"sort"
 	"time"
 
@@ -66,21 +67,6 @@ type IndexStatusDetail struct {
 	Status string `json:"status"`
 }
 
-func InitializeDB(dbConf *config.Storage) (*DB, error) {
-	db, err := sql.Open("postgres", dbConf.URI)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect to the database")
-	}
-
-	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
-
-	if err := RunMigrations(dbConf); err != nil {
-		return nil, err
-	}
-
-	return &DB{DbMap: dbMap}, nil
-}
-
 func RunMigrations(dbConf *config.Storage) error {
 	if err := migrator.Migrate(dbConf.URI, dbConf.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
 		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", dbConf.SchemaPath)
@@ -88,22 +74,11 @@ func RunMigrations(dbConf *config.Storage) error {
 	return nil
 }
 
-// CRUD Operations
-
-type Reindex interface {
-	InsertReindexRequest(requestID int, status string) error
-	UpdateReindexRequest(requestID int, status string, currentTime time.Time) error
-	InsertReindexRequestDetailed(detail ReindexRequestDetailed, currentTime time.Time) error
-	DeleteReindexRequest(requestID int) error
-	DeleteReindexRequestDetail(id int) error
-	GetReindexStatus(requestID int) (*StatusResponse, error)
-	GetLatestReindexRequestID() (int, error)
-}
-
-// Create a new reindex request
-func (db *DB) InsertReindexRequest(requestID int, status string) error {
-	_, err := db.Exec(insertReindexRequest, requestID, status, time.Now(), time.Now())
-	return err
+// Create a new reindex request with a random request_id
+func (db *DB) InsertReindexRequest(status string, currentTime time.Time) (int, error) {
+	requestID := rand.Int()
+	_, err := db.Exec(insertReindexRequest, requestID, status, currentTime, currentTime)
+	return requestID, err
 }
 
 // Update an existing reindex request
