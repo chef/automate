@@ -247,17 +247,11 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
-func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
-	log.Info("Received request to start reindexing")
+func (s *ChefIngestServer) GetIndicesEligableForReindexing() (map[string]backend.IndexSettingsVersion, error) {
+	var eligableIndices = make(map[string]backend.IndexSettingsVersion)
 	indices, err := s.client.GetIndices(context.Background())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
-	}
-
-	// Reindexing request
-	requestID, err := s.db.InsertReindexRequest("running", time.Now())
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 	}
 
 OuterLoop:
@@ -280,11 +274,33 @@ OuterLoop:
 			continue
 		}
 
+		eligableIndices[index.Index] = *versionSettings
+	}
+
+	return eligableIndices, nil
+}
+
+func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
+	log.Info("Received request to start reindexing")
+
+	indices, err := s.GetIndicesEligableForReindexing()
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+	// Add to the database that indexing request is running
+	requestID, err := s.db.InsertReindexRequest("running", time.Now())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+	}
+
+	for key, value := range indices {
 		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
-			Index:       index.Index,
-			FromVersion: versionSettings.Settings.Index.Version.CreatedString,
-			ToVersion:   versionSettings.Settings.Index.Version.UpgradedString,
+			Index:       key,
+			FromVersion: value.Settings.Index.Version.CreatedString,
+			ToVersion:   value.Settings.Index.Version.UpgradedString,
 			OsTaskID:    "",
 			Heartbeat:   time.Now(),
 			HavingAlias: false,
@@ -292,11 +308,6 @@ OuterLoop:
 		}, time.Now()); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
-
-		if err := s.client.TriggerReindex(index.Index); err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to reindex index %s: %s", index.Index, err)
-		}
-
 	}
 
 	log.Info("Reindexing started successfully")
