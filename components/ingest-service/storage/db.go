@@ -3,7 +3,6 @@ package storage
 import (
 	"database/sql"
 	"encoding/json"
-	"math/rand"
 	"sort"
 	"time"
 
@@ -26,7 +25,7 @@ func NewDB(dbConn *sql.DB) *DB {
 
 // ReindexRequest represents the reindex_requests table
 type ReindexRequest struct {
-	RequestID   int       `db:"request_id"`
+	ID          int       `db:"id"`
 	Status      string    `db:"status"`
 	CreatedAt   time.Time `db:"created_at"`
 	LastUpdated time.Time `db:"last_updated"`
@@ -76,9 +75,12 @@ func RunMigrations(dbConf *config.Storage) error {
 
 // Create a new reindex request with a random request_id
 func (db *DB) InsertReindexRequest(status string, currentTime time.Time) (int, error) {
-	requestID := rand.Int()
-	_, err := db.Exec(insertReindexRequest, requestID, status, currentTime, currentTime)
-	return requestID, err
+	var requestID int
+	err := db.QueryRow(insertReindexRequest, status, currentTime, currentTime).Scan(&requestID)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to insert reindex request")
+	}
+	return requestID, nil
 }
 
 // Update an existing reindex request
@@ -182,7 +184,7 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 	// If no details are found, return a JSON response with an empty indexes array
 	if len(details) == 0 {
 		return &StatusResponse{
-			RequestID: request.RequestID,
+			RequestID: request.ID,
 			Status:    request.Status,
 			Indexes:   []IndexStatusDetail{},
 		}, nil
@@ -218,7 +220,7 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 	}
 
 	statusResponse := &StatusResponse{
-		RequestID: request.RequestID,
+		RequestID: request.ID,
 		Status:    overallStatus,
 		Indexes:   indexes,
 	}
@@ -238,7 +240,7 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 		return 0, errors.New("database connection is not initialized")
 	}
 	var requestID int
-	err := db.QueryRow("SELECT request_id FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID)
+	err := db.QueryRow("SELECT id FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logrus.Error("No reindex requests found in the database")
@@ -256,16 +258,17 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 
 // SQL Queries
 const insertReindexRequest = `
-INSERT INTO reindex_requests(request_id, status, created_at, last_updated)
-VALUES ($1, $2, $3, $4);`
+INSERT INTO reindex_requests(status, created_at, last_updated)
+VALUES ($1, $2, $3)
+RETURNING id;`
 
 const updateReindexRequest = `
-UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE request_id = $3;`
+UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE id = $3;`
 
 const getLatestReindexRequest = `
-SELECT request_id, status, created_at, last_updated 
+SELECT id, status, created_at, last_updated 
 FROM reindex_requests 
-WHERE request_id = $1 
+WHERE id = $1 
 ORDER BY last_updated DESC 
 LIMIT 1;`
 
@@ -280,7 +283,7 @@ WHERE request_id = $1
 ORDER BY updated_at DESC;`
 
 const deleteReindexRequest = `
-DELETE FROM reindex_requests WHERE request_id = $1;`
+DELETE FROM reindex_requests WHERE id = $1;`
 
 const deleteReindexRequestDetail = `
 DELETE FROM reindex_request_detailed WHERE id = $1;`

@@ -269,13 +269,13 @@ OuterLoop:
 			}
 		}
 
-		settings, err := s.client.GetIndexSettingsVersion(index.Index)
+		versionSettings, err := s.client.GetIndexSettingsVersion(index.Index)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
 		}
 
 		// Is reindexing needed?
-		if settings.Settings.Index.Version.CreatedString == settings.Settings.Index.Version.UpgradedString {
+		if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
 			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
 			continue
 		}
@@ -283,8 +283,8 @@ OuterLoop:
 		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
 			Index:       index.Index,
-			FromVersion: settings.Settings.Index.Version.CreatedString,
-			ToVersion:   settings.Settings.Index.Version.UpgradedString,
+			FromVersion: versionSettings.Settings.Index.Version.CreatedString,
+			ToVersion:   versionSettings.Settings.Index.Version.UpgradedString,
 			OsTaskID:    "",
 			Heartbeat:   time.Now(),
 			HavingAlias: false,
@@ -313,16 +313,16 @@ func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.Get
 		return nil, status.Errorf(codes.Internal, "%s", errMsg)
 	}
 	var requestID int
+	var err error
 	// If RequestId is missing (0), fetch the latest request ID
 	if req == nil || req.RequestId == 0 {
 		log.Debug("RequestId is missing, fetching the latest request ID")
 
-		latestRequestID, err := s.db.GetLatestReindexRequestID()
+		requestID, err = s.db.GetLatestReindexRequestID()
 		if err != nil {
 			log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch latest reindex request ID")
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %v", err)
 		}
-		requestID = latestRequestID
 		log.WithFields(log.Fields{"requestID": requestID}).Debug("Fetched latest request ID successfully")
 	} else {
 		requestID = int(req.RequestId)

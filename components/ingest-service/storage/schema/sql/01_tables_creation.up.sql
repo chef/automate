@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS reindex_requests (
-    id SERIAL,
-    request_id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     status VARCHAR(50) CHECK (status IN ('running', 'failed', 'completed')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -19,6 +18,5 @@ CREATE TABLE IF NOT EXISTS reindex_request_detailed (
     alias_list TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (request_id) REFERENCES reindex_requests(request_id) ON DELETE CASCADE
+    FOREIGN KEY (request_id) REFERENCES reindex_requests(id) ON DELETE CASCADE
 );
-

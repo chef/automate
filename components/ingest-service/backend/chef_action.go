@@ -44,8 +44,8 @@ type IndexSettingsVersion struct {
 	Settings struct {
 		Index struct {
 			Version struct {
-				CreatedString  string `json:"created_string"`
-				UpgradedString string `json:"upgraded_string"`
+				CreatedString  string `json:"created"`
+				UpgradedString string `json:"upgraded"`
 			} `json:"version"`
 		} `json:"index"`
 	} `json:"settings"`
