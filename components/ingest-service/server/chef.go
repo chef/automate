@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -20,6 +21,13 @@ import (
 	"github.com/chef/automate/components/ingest-service/storage"
 	"github.com/chef/automate/lib/version"
 )
+
+var skipIndices = map[string]bool{
+	"security-auditlog":         true,
+	".opendistro":               true,
+	".plugins-ml-config":        true,
+	".opensearch-observability": true,
+}
 
 type ChefIngestServer struct {
 	chefRunPipeline    pipeline.ChefRunPipeline
@@ -239,8 +247,76 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
+func (s *ChefIngestServer) GetIndicesEligableForReindexing(ctx context.Context) (map[string]backend.IndexSettingsVersion, error) {
+	var eligableIndices = make(map[string]backend.IndexSettingsVersion)
+	indices, err := s.client.GetIndices(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+OuterLoop:
+	for _, index := range indices {
+		for prefix := range skipIndices {
+			if strings.HasPrefix(index.Index, prefix) {
+				log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index")
+				continue OuterLoop
+			}
+		}
+
+		versionSettings, err := s.client.GetIndexVersionSettings(index.Index)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
+		}
+
+		// Is reindexing needed?
+		if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
+			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
+			continue
+		}
+
+		eligableIndices[index.Index] = *versionSettings
+	}
+
+	return eligableIndices, nil
+}
+
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
+
+	indices, err := s.GetIndicesEligableForReindexing(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+	if len(indices) == 0 {
+		log.Info("No indices found that need reindexing")
+		return &ingest.StartReindexResponse{
+			Message: "No indices found that need reindexing",
+		}, nil
+	}
+
+	// Add to the database that indexing request is running
+	requestID, err := s.db.InsertReindexRequest("running", time.Now())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+	}
+
+	for key, value := range indices {
+		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
+			RequestID:   requestID,
+			Index:       key,
+			FromVersion: value.Settings.Index.Version.CreatedString,
+			ToVersion:   value.Settings.Index.Version.UpgradedString,
+			OsTaskID:    "",
+			Heartbeat:   time.Now(),
+			HavingAlias: false,
+			AliasList:   "",
+		}, time.Now()); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+		}
+	}
+
+	log.Info("Reindexing started successfully")
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
@@ -254,16 +330,16 @@ func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.Get
 		return nil, status.Errorf(codes.Internal, "%s", errMsg)
 	}
 	var requestID int
+	var err error
 	// If RequestId is missing (0), fetch the latest request ID
 	if req == nil || req.RequestId == 0 {
 		log.Debug("RequestId is missing, fetching the latest request ID")
 
-		latestRequestID, err := s.db.GetLatestReindexRequestID()
+		requestID, err = s.db.GetLatestReindexRequestID()
 		if err != nil {
 			log.WithFields(log.Fields{"error": err.Error()}).Error("Failed to fetch latest reindex request ID")
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %v", err)
 		}
-		requestID = latestRequestID
 		log.WithFields(log.Fields{"requestID": requestID}).Debug("Fetched latest request ID successfully")
 	} else {
 		requestID = int(req.RequestId)

@@ -23,8 +23,8 @@ func TestInsertReindexRequestSuccess(t *testing.T) {
 
 	createdAt := time.Now()
 
-	query := `INSERT INTO reindex_requests(request_id, status, created_at, last_updated) VALUES ($1, $2, $3, $4);`
-	mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), "running", createdAt, createdAt).WillReturnResult(sqlmock.NewResult(1, 1))
+	query := `INSERT INTO reindex_requests(status, created_at, last_updated) VALUES ($1, $2, $3) RETURNING id;`
+	mock.ExpectQuery(query).WithArgs("running", createdAt, createdAt).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
 	requestID, err := db.InsertReindexRequest("running", createdAt)
 	assert.NoError(t, err)
@@ -42,11 +42,11 @@ func TestInsertReindexRequestFailure(t *testing.T) {
 
 	createdAt := time.Now()
 
-	query := `INSERT INTO reindex_requests(request_id, status, created_at, last_updated) VALUES ($1, $2, $3, $4);`
-	mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), "running", createdAt, createdAt).WillReturnError(fmt.Errorf("insert error"))
+	query := `INSERT INTO reindex_requests(status, created_at, last_updated) VALUES ($1, $2, $3) RETURNING id;`
+	mock.ExpectQuery(query).WithArgs("running", createdAt, createdAt).WillReturnError(fmt.Errorf("insert error"))
 
 	_, err = db.InsertReindexRequest("running", createdAt)
-	assert.Equal(t, "insert error", err.Error())
+	assert.Equal(t, "failed to insert reindex request: insert error", err.Error())
 }
 
 func TestUpdateReindexRequestSuccess(t *testing.T) {
@@ -60,7 +60,7 @@ func TestUpdateReindexRequestSuccess(t *testing.T) {
 
 	updatedAt := time.Now()
 
-	query := `UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE request_id = $3;`
+	query := `UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE id = $3;`
 	mock.ExpectExec(query).WithArgs("completed", updatedAt, 1).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err = db.UpdateReindexRequest(1, "completed", updatedAt)
@@ -78,7 +78,7 @@ func TestUpdateReindexRequestFailure(t *testing.T) {
 
 	updatedAt := time.Now()
 
-	query := `UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE request_id = $3;`
+	query := `UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE id = $3;`
 	mock.ExpectExec(query).WithArgs("completed", updatedAt, 1).WillReturnError(fmt.Errorf("update error"))
 
 	err = db.UpdateReindexRequest(1, "completed", updatedAt)
@@ -172,7 +172,7 @@ func TestDeleteReindexRequestSuccess(t *testing.T) {
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
-	query := `DELETE FROM reindex_requests WHERE request_id = $1;`
+	query := `DELETE FROM reindex_requests WHERE id = $1;`
 	mock.ExpectExec(query).WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err = db.DeleteReindexRequest(1)
@@ -188,7 +188,7 @@ func TestDeleteReindexRequestFailure(t *testing.T) {
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
-	query := `DELETE FROM reindex_requests WHERE request_id = $1;`
+	query := `DELETE FROM reindex_requests WHERE id = $1;`
 	mock.ExpectExec(query).WithArgs(1).WillReturnError(fmt.Errorf("delete error"))
 
 	err = db.DeleteReindexRequest(1)
@@ -242,8 +242,8 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	heartbeat := time.Now()
 
 	// Mock the reindex_requests table query
-	requestQuery := `SELECT request_id, status, created_at, last_updated FROM reindex_requests WHERE request_id = $1 ORDER BY last_updated DESC LIMIT 1;`
-	requestColumns := []string{"request_id", "status", "created_at", "last_updated"}
+	requestQuery := `SELECT id, status, created_at, last_updated FROM reindex_requests WHERE id = $1 ORDER BY last_updated DESC LIMIT 1;`
+	requestColumns := []string{"id", "status", "created_at", "last_updated"}
 	mock.ExpectQuery(requestQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(requestColumns).AddRow(requestID, "completed", createdAt, updatedAt))
 
@@ -281,7 +281,7 @@ func TestGetReindexStatusFailure(t *testing.T) {
 	requestID := 1
 
 	// Mock the reindex_requests table query to return an error
-	requestQuery := `SELECT request_id, status, created_at, last_updated FROM reindex_requests WHERE request_id = $1 ORDER BY last_updated DESC LIMIT 1;`
+	requestQuery := `SELECT id, status, created_at, last_updated FROM reindex_requests WHERE id = $1 ORDER BY last_updated DESC LIMIT 1;`
 	mock.ExpectQuery(requestQuery).WithArgs(requestID).WillReturnError(fmt.Errorf("query error"))
 
 	// Call the function
@@ -306,8 +306,8 @@ func TestGetReindexStatusNoDetails(t *testing.T) {
 	updatedAt := time.Now()
 
 	// Mock the reindex_requests table query
-	requestQuery := `SELECT request_id, status, created_at, last_updated FROM reindex_requests WHERE request_id = $1 ORDER BY last_updated DESC LIMIT 1;`
-	requestColumns := []string{"request_id", "status", "created_at", "last_updated"}
+	requestQuery := `SELECT id, status, created_at, last_updated FROM reindex_requests WHERE id = $1 ORDER BY last_updated DESC LIMIT 1;`
+	requestColumns := []string{"id", "status", "created_at", "last_updated"}
 	mock.ExpectQuery(requestQuery).WithArgs(requestID).
 		WillReturnRows(sqlmock.NewRows(requestColumns).AddRow(requestID, "completed", createdAt, updatedAt))
 
