@@ -387,6 +387,18 @@ func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex s
 	return startTaskResult.TaskId, nil
 }
 
+func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error) {
+	src := elastic.NewReindexSource().Index(srcIndex)
+	dst := elastic.NewReindexDestination().Index(dstIndex)
+
+	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to start reindex from %s to %s: %w", srcIndex, dstIndex, err)
+	}
+
+	return startTaskResult.TaskId, nil
+}
+
 func (es *Backend) storeExists(ctx context.Context, indexName string) bool {
 	exists, err := es.client.IndexExists().Index([]string{indexName}).Do(ctx)
 

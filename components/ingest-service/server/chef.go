@@ -239,8 +239,42 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
+func (s *ChefIngestServer) processReindexing(ctx context.Context, requestID int, indexList []string) {
+	for _, index := range indexList {
+		srcIndex := index
+		dstIndex := index + "_temp"
+
+		// Trigger the reindexing process asynchronously
+		taskID, err := s.client.ReindexIndices(ctx, srcIndex, dstIndex)
+		if err != nil {
+			log.Errorf("Failed to start reindexing for index %s: %s", srcIndex, err)
+			continue // Move to the next index
+		}
+
+		log.Infof("Reindexing started for index %s with task ID %s", srcIndex, taskID)
+
+		// Update the task ID in the database
+		err = s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update task ID for index %s: %s", srcIndex, err)
+		}
+	}
+
+	log.Info("Reindexing process completed for all eligible indexes")
+}
+
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
+
+	// Hardcoded index list for testing
+	indexList := []string{"index_1", "index_2", "index_3"}
+
+	// Hardcoded request ID for testing
+	requestID := 12345 // Directly use an integer value
+
+	// Call processReindexing asynchronously
+	go s.processReindexing(ctx, requestID, indexList)
+
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
