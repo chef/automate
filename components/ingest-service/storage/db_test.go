@@ -85,6 +85,84 @@ func TestUpdateReindexRequestFailure(t *testing.T) {
 	assert.Equal(t, "update error", err.Error())
 }
 
+func TestInsertReindexRequestDetailedSuccess(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	detail := storage.ReindexRequestDetailed{
+		RequestID:   1,
+		Index:       "index1",
+		FromVersion: "1.0",
+		ToVersion:   "2.0",
+		Stage:       []storage.StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
+		OsTaskID:    "task1",
+		Heartbeat:   time.Now(),
+		HavingAlias: true,
+		AliasList:   "alias1,alias2",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	stageJSON, err := json.Marshal(detail.Stage)
+	assert.NoError(t, err)
+
+	// Mock the query to fetch existing stages
+	selectQuery := `SELECT stage FROM reindex_request_detailed WHERE request_id = $1 AND index = $2 ORDER BY updated_at DESC LIMIT 1`
+	mock.ExpectQuery(selectQuery).WithArgs(detail.RequestID, detail.Index).
+		WillReturnRows(sqlmock.NewRows([]string{"stage"}).AddRow(`[]`))
+
+	// Mock the insert query
+	query := `INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
+	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = db.InsertReindexRequestDetailed(detail, detail.CreatedAt)
+	assert.NoError(t, err)
+}
+
+func TestInsertReindexRequestDetailedFailure(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	detail := storage.ReindexRequestDetailed{
+		RequestID:   1,
+		Index:       "index1",
+		FromVersion: "1.0",
+		ToVersion:   "2.0",
+		Stage:       []storage.StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
+		OsTaskID:    "task1",
+		Heartbeat:   time.Now(),
+		HavingAlias: true,
+		AliasList:   "alias1,alias2",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	stageJSON, err := json.Marshal(detail.Stage)
+	assert.NoError(t, err)
+
+	// Mock the query to fetch existing stages
+	selectQuery := `SELECT stage FROM reindex_request_detailed WHERE request_id = $1 AND index = $2 ORDER BY updated_at DESC LIMIT 1`
+	mock.ExpectQuery(selectQuery).WithArgs(detail.RequestID, detail.Index).
+		WillReturnRows(sqlmock.NewRows([]string{"stage"}).AddRow(`[]`))
+
+	// Mock the insert query to return an error
+	query := `INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
+	mock.ExpectExec(query).WithArgs(detail.RequestID, detail.Index, detail.FromVersion, detail.ToVersion, stageJSON, detail.OsTaskID, sqlmock.AnyArg(), detail.HavingAlias, detail.AliasList, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(fmt.Errorf("insert error"))
+
+	err = db.InsertReindexRequestDetailed(detail, detail.CreatedAt)
+	assert.Equal(t, "insert error", err.Error())
+}
+
 func TestDeleteReindexRequestSuccess(t *testing.T) {
 	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
@@ -114,6 +192,38 @@ func TestDeleteReindexRequestFailure(t *testing.T) {
 	mock.ExpectExec(query).WithArgs(1).WillReturnError(fmt.Errorf("delete error"))
 
 	err = db.DeleteReindexRequest(1)
+	assert.Equal(t, "delete error", err.Error())
+}
+
+func TestDeleteReindexRequestDetailSuccess(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	query := `DELETE FROM reindex_request_detailed WHERE id = $1;`
+	mock.ExpectExec(query).WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = db.DeleteReindexRequestDetail(1)
+	assert.NoError(t, err)
+}
+
+func TestDeleteReindexRequestDetailFailure(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	query := `DELETE FROM reindex_request_detailed WHERE id = $1;`
+	mock.ExpectExec(query).WithArgs(1).WillReturnError(fmt.Errorf("delete error"))
+
+	err = db.DeleteReindexRequestDetail(1)
 	assert.Equal(t, "delete error", err.Error())
 }
 
