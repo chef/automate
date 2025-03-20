@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -240,37 +241,60 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 }
 
 func (s *ChefIngestServer) processReindexing(ctx context.Context, requestID int, indexList []string) {
+	logrus.WithFields(logrus.Fields{
+		"requestID": requestID,
+		"indexList": indexList,
+	}).Info("Starting reindexing process")
+
 	for _, index := range indexList {
 		srcIndex := index
 		dstIndex := index + "_temp"
 
+		logrus.WithFields(logrus.Fields{
+			"srcIndex": srcIndex,
+			"dstIndex": dstIndex,
+		}).Info("Initiating reindexing")
+
 		// Trigger the reindexing process asynchronously
 		taskID, err := s.client.ReindexIndices(ctx, srcIndex, dstIndex)
 		if err != nil {
-			log.Errorf("Failed to start reindexing for index %s: %s", srcIndex, err)
+			logrus.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
 			continue // Move to the next index
 		}
 
-		log.Infof("Reindexing started for index %s with task ID %s", srcIndex, taskID)
+		logrus.WithFields(logrus.Fields{
+			"srcIndex": srcIndex,
+			"taskID":   taskID,
+		}).Info("Reindexing started successfully")
 
 		// Update the task ID in the database
 		err = s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now())
 		if err != nil {
-			log.Errorf("Failed to update task ID for index %s: %s", srcIndex, err)
+			logrus.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"srcIndex": srcIndex,
+				"taskID":   taskID,
+			}).Info("Task ID updated in the database")
 		}
 	}
 
-	log.Info("Reindexing process completed for all eligible indexes")
+	logrus.Info("Reindexing process completed for all eligible indexes")
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
-	log.Info("Received request to start reindexing")
+	logrus.Info("Received request to start reindexing")
 
 	// Hardcoded index list for testing
 	indexList := []string{"index_1", "index_2", "index_3"}
 
 	// Hardcoded request ID for testing
 	requestID := 12345 // Directly use an integer value
+
+	logrus.WithFields(logrus.Fields{
+		"requestID": requestID,
+		"indexList": indexList,
+	}).Info("Triggering processReindexing")
 
 	// Call processReindexing asynchronously
 	go s.processReindexing(ctx, requestID, indexList)

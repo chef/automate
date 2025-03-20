@@ -7,6 +7,7 @@ import (
 
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -388,13 +389,28 @@ func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex s
 }
 
 func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error) {
+	logrus.WithFields(logrus.Fields{
+		"srcIndex": srcIndex,
+		"dstIndex": dstIndex,
+	}).Info("Starting reindex process")
+
+	// Use context.Background() to ensure the request is not canceled prematurely
+	reindexCtx := context.Background()
+
 	src := elastic.NewReindexSource().Index(srcIndex)
 	dst := elastic.NewReindexDestination().Index(dstIndex)
 
-	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
+	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(reindexCtx)
 	if err != nil {
+		logrus.WithError(err).Errorf("Failed to start reindex from %s to %s", srcIndex, dstIndex)
 		return "", fmt.Errorf("failed to start reindex from %s to %s: %w", srcIndex, dstIndex, err)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"taskID": startTaskResult.TaskId,
+		"src":    srcIndex,
+		"dst":    dstIndex,
+	}).Info("Reindex task started successfully")
 
 	return startTaskResult.TaskId, nil
 }

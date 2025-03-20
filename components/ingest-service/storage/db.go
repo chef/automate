@@ -256,6 +256,12 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 }
 
 func (db *DB) UpdateTaskIDForReindexRequest(requestID int, indexName string, taskID string, currentTime time.Time) error {
+	logrus.WithFields(logrus.Fields{
+		"requestID": requestID,
+		"indexName": indexName,
+		"taskID":    taskID,
+	}).Info("Updating task ID in database")
+
 	query := `
         UPDATE reindex_request_detailed
         SET os_task_id = $1, updated_at = $2
@@ -267,10 +273,22 @@ func (db *DB) UpdateTaskIDForReindexRequest(requestID int, indexName string, tas
 	err := db.QueryRow(query, taskID, currentTime, requestID, indexName).Scan(&updatedRequestID)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			logrus.WithFields(logrus.Fields{
+				"requestID": requestID,
+				"indexName": indexName,
+			}).Warn("No matching record found for reindexing")
 			return fmt.Errorf("no matching record found for request_id: %d, index: %s", requestID, indexName)
 		}
+		logrus.WithError(err).Errorf("Failed to update task ID for request_id: %d, index: %s", requestID, indexName)
 		return errors.Wrapf(err, "failed to update task ID for request_id: %d, index: %s", requestID, indexName)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"requestID": requestID,
+		"indexName": indexName,
+		"taskID":    taskID,
+	}).Info("Task ID updated successfully in database")
+
 	return nil
 }
 
