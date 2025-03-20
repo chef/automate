@@ -3,12 +3,10 @@ package elastic
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
 	elastic "github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/ingest-service/backend"
@@ -490,50 +488,22 @@ func (es *Backend) GetNodeCount(ctx context.Context, indexName string) (int64, e
 	return count, err
 }
 
-func (es *Backend) GetIndices(ctx context.Context) ([]backend.Index, error) {
-	catIndicesService := es.client.CatIndices()
-	resp, err := catIndicesService.Do(ctx)
+func (es *Backend) GetAliases(ctx context.Context, index string) ([]string, bool, error) {
+
+	aliasesResult, err := es.client.Aliases().Index(index).Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch indices: %w", err)
+		return nil, false, err
 	}
 
-	bx, err := json.Marshal(resp)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read indices response: %w", err)
+	// Extract aliases from the result
+	var aliases []string
+
+	if indexAliases, ok := aliasesResult.Indices[index]; ok {
+		for _, alias := range indexAliases.Aliases {
+			aliases = append(aliases, alias.AliasName)
+		}
 	}
 
-	var indices []backend.Index
-	if err = json.Unmarshal(bx, &indices); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal indices response: %w", err)
-	}
-
-	return indices, nil
-}
-
-func (es *Backend) GetIndexVersionSettings(index string) (*backend.IndexSettingsVersion, error) {
-	resp, err := es.client.IndexGetSettings(index).Do(context.Background())
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
-	}
-
-	settings, exists := resp[index]
-	if !exists {
-		return nil, errors.New("index settings not found in response")
-	}
-
-	settingsJSON, err := json.Marshal(settings)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal settings for index %s: %w", index, err)
-	}
-
-	var setting backend.IndexSettingsVersion
-	if err := json.Unmarshal(settingsJSON, &setting); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal settings for index %s: %w", index, err)
-	}
-
-	return &setting, nil
-}
-
-func (es *Backend) TriggerReindex(index string) error {
-	return nil
+	hasAliases := len(aliases) > 0
+	return aliases, hasAliases, nil
 }
