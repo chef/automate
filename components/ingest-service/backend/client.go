@@ -95,7 +95,7 @@ type Client interface {
 	GetActions(string, int, time.Time, string, bool) ([]InternalChefAction, int64, error)
 	DeleteAllIndexesWithPrefix(string, context.Context) error
 
-	GetIndices(ctx context.Context) ([]Indices, error)
+	GetIndices(ctx context.Context) ([]Index, error)
 	GetIndexVersionSettings(index string) (*IndexSettingsVersion, error)
 
 	TriggerReindex(index string) error

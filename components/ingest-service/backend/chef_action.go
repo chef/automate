@@ -27,7 +27,7 @@ type InternalChefAction struct {
 	Projects         []string  `json:"projects"`
 }
 
-type Indices struct {
+type Index struct {
 	Health       string `json:"health"`
 	Status       string `json:"status"`
 	Index        string `json:"index"`
