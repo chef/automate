@@ -490,7 +490,7 @@ func (es *Backend) GetNodeCount(ctx context.Context, indexName string) (int64, e
 	return count, err
 }
 
-func (es *Backend) GetIndices(ctx context.Context) (backend.Indices, error) {
+func (es *Backend) GetIndices(ctx context.Context) ([]backend.Indices, error) {
 	catIndicesService := es.client.CatIndices()
 	resp, err := catIndicesService.Do(ctx)
 	if err != nil {
@@ -502,7 +502,7 @@ func (es *Backend) GetIndices(ctx context.Context) (backend.Indices, error) {
 		return nil, fmt.Errorf("failed to read indices response: %w", err)
 	}
 
-	var indices backend.Indices
+	var indices []backend.Indices
 	if err = json.Unmarshal(bx, &indices); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal indices response: %w", err)
 	}
@@ -510,7 +510,7 @@ func (es *Backend) GetIndices(ctx context.Context) (backend.Indices, error) {
 	return indices, nil
 }
 
-func (es *Backend) GetIndexSettingsVersion(index string) (*backend.IndexSettingsVersion, error) {
+func (es *Backend) GetIndexVersionSettings(index string) (*backend.IndexSettingsVersion, error) {
 	resp, err := es.client.IndexGetSettings(index).Do(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)

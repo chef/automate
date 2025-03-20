@@ -263,7 +263,7 @@ OuterLoop:
 			}
 		}
 
-		versionSettings, err := s.client.GetIndexSettingsVersion(index.Index)
+		versionSettings, err := s.client.GetIndexVersionSettings(index.Index)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
 		}
@@ -277,11 +277,6 @@ OuterLoop:
 		eligableIndices[index.Index] = *versionSettings
 	}
 
-	if len(eligableIndices) == 0 {
-		log.Info("No indices are eligable for reindexing")
-		return nil, status.Errorf(codes.NotFound, "no indices are eligable for reindexing")
-	}
-
 	return eligableIndices, nil
 }
 
@@ -289,9 +284,15 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 
 	indices, err := s.GetIndicesEligableForReindexing(ctx)
-
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+	if len(indices) == 0 {
+		log.Info("No indices found that need reindexing")
+		return &ingest.StartReindexResponse{
+			Message: "No indices found that need reindexing",
+		}, nil
 	}
 
 	// Add to the database that indexing request is running
