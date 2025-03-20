@@ -247,9 +247,9 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
-func (s *ChefIngestServer) GetIndicesEligableForReindexing() (map[string]backend.IndexSettingsVersion, error) {
+func (s *ChefIngestServer) GetIndicesEligableForReindexing(ctx context.Context) (map[string]backend.IndexSettingsVersion, error) {
 	var eligableIndices = make(map[string]backend.IndexSettingsVersion)
-	indices, err := s.client.GetIndices(context.Background())
+	indices, err := s.client.GetIndices(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
 	}
@@ -277,13 +277,18 @@ OuterLoop:
 		eligableIndices[index.Index] = *versionSettings
 	}
 
+	if len(eligableIndices) == 0 {
+		log.Info("No indices are eligable for reindexing")
+		return nil, status.Errorf(codes.NotFound, "no indices are eligable for reindexing")
+	}
+
 	return eligableIndices, nil
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
 
-	indices, err := s.GetIndicesEligableForReindexing()
+	indices, err := s.GetIndicesEligableForReindexing(ctx)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
