@@ -389,7 +389,8 @@ func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex s
 
 func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error) {
 	// Use context.Background() to ensure the request is not canceled prematurely
-	reindexCtx := context.Background()
+	reindexCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	src := elastic.NewReindexSource().Index(srcIndex)
 	dst := elastic.NewReindexDestination().Index(dstIndex)
