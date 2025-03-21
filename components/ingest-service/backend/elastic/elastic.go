@@ -389,7 +389,7 @@ func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex s
 
 func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error) {
 	// Inherit the parent context to avoid premature cancellation
-	reindexCtx, cancel := context.WithTimeout(ctx, 30*time.Minute)
+	reindexCtx, cancel := context.WithTimeout(ctx, 45*time.Minute)
 	defer cancel()
 
 	src := elastic.NewReindexSource().Index(srcIndex)
