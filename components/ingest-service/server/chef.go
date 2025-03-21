@@ -257,8 +257,6 @@ func (s *ChefIngestServer) GetIndicesEligableForReindexing(ctx context.Context) 
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
 	}
 
-	log.WithFields(log.Fields{"indices": indices}).Info("Fetched indices from OpenSearch")
-
 OuterLoop:
 	for _, index := range indices {
 		for prefix := range skipIndices {
@@ -282,25 +280,14 @@ OuterLoop:
 
 		eligableIndices[index.Index] = *versionSettings
 	}
-
-	log.WithFields(log.Fields{"eligible_indices": eligableIndices}).Info("Identified indices eligible for reindexing")
 	return eligableIndices, nil
 }
 
 func (s *ChefIngestServer) processReindexing(ctx context.Context, requestID int, indexList []string) {
-	logrus.WithFields(logrus.Fields{
-		"requestID": requestID,
-		"indexList": indexList,
-	}).Info("Starting reindexing process")
-
+	// Iterate over the list of indices and trigger reindexing for each
 	for _, index := range indexList {
 		srcIndex := index
 		dstIndex := index + "_temp"
-
-		logrus.WithFields(logrus.Fields{
-			"srcIndex": srcIndex,
-			"dstIndex": dstIndex,
-		}).Info("Initiating reindexing")
 
 		// Trigger the reindexing process asynchronously
 		taskID, err := s.client.ReindexIndices(ctx, srcIndex, dstIndex)
@@ -308,11 +295,6 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, requestID int,
 			logrus.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
 			continue // Move to the next index
 		}
-
-		logrus.WithFields(logrus.Fields{
-			"srcIndex": srcIndex,
-			"taskID":   taskID,
-		}).Info("Reindexing started successfully")
 
 		// Update the task ID in the database
 		err = s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now())
@@ -325,8 +307,6 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, requestID int,
 			}).Info("Task ID updated in the database")
 		}
 	}
-
-	logrus.Info("Reindexing process completed for all eligible indexes")
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
@@ -350,9 +330,6 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		indexList = append(indexList, index)
 	}
 
-	// Log the list of indices before proceeding
-	log.WithFields(log.Fields{"indexList": indexList}).Info("Final list of indices to be reindexed")
-
 	// Add to the database that indexing request is running
 	requestID, err := s.db.InsertReindexRequest("running", time.Now())
 	if err != nil {
@@ -373,10 +350,8 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
 	}
-
 	// Call processReindexing to start the actual reindexing process
 	go s.processReindexing(ctx, requestID, indexList) // Run asynchronously
-	log.WithFields(log.Fields{"requestID": requestID}).Info("Reindexing started successfully")
 
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",

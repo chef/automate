@@ -389,11 +389,6 @@ func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex s
 }
 
 func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error) {
-	logrus.WithFields(logrus.Fields{
-		"srcIndex": srcIndex,
-		"dstIndex": dstIndex,
-	}).Info("Starting reindex process")
-
 	// Use context.Background() to ensure the request is not canceled prematurely
 	reindexCtx := context.Background()
 
@@ -405,13 +400,6 @@ func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string
 		logrus.WithError(err).Errorf("Failed to start reindex from %s to %s", srcIndex, dstIndex)
 		return "", fmt.Errorf("failed to start reindex from %s to %s: %w", srcIndex, dstIndex, err)
 	}
-
-	logrus.WithFields(logrus.Fields{
-		"taskID": startTaskResult.TaskId,
-		"src":    srcIndex,
-		"dst":    dstIndex,
-	}).Info("Reindex task started successfully")
-
 	return startTaskResult.TaskId, nil
 }
 
