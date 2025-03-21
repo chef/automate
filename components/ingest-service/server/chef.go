@@ -381,7 +381,7 @@ func (s *ChefIngestServer) GetAliases(ctx context.Context, indexes map[string]ba
 	log.Info("Fetching aliases for indexes")
 	for index := range indexes {
 		log.Info("Fetching aliases for index: ", index)
-		alias, hasAlias, err := s.client.GetAliases(context.Background(), index)
+		alias, hasAlias, err := s.client.GetAliases(ctx, index)
 		if err != nil {
 			log.Info("Failed to fetch aliases for index: ", index)
 			return err
