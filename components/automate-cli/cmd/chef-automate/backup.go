@@ -42,11 +42,22 @@ either all services are up (chef-automate restart-services)
 or all services are down (chef-automate stop) before retrying the restore.`
 
 var allPassedFlags string = ""
+var isSkipMigrationFileExist bool = false
 
 const (
 	AUTOMATE_CMD_STOP  = "sudo systemctl stop chef-automate"
 	AUTOMATE_CMD_START = "sudo systemctl start chef-automate"
 	BACKUP_CONFIG      = "file_system"
+	CREATE_SKIP_MIGRATION_FILE = "sudo touch /hab/.skip_migration"
+	DELETE_SKIP_MIGRATION_FILE_IF_EXISTS = `
+	    file="/hab/.skip_migration"
+		if [ -f $file ]; then
+			echo ".skip_migration file exists, so deleting the file"
+			sudo rm -rf $file
+		else
+			echo ".skip_migration file does not exist"
+		fi
+		`
 )
 
 type BackupFromBashtion interface {
@@ -332,6 +343,7 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 		os.Exit(1)
 	}
 	if strings.Contains(cmd.CommandPath(), "restore") {
+        deleteSkipMigrationFileIfExists(infra) 
 		if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
 			yes, err := writer.Confirm(strings.TrimSpace(a2AlreadyDeployedMessage))
 			if err != nil {
@@ -1319,6 +1331,12 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 					writer.Errorf("error in getting backup stream status %s \n%s\n", err.Error(), streamRes)
 				}
 			}
+			defer func() {
+				if subCommand == "restore" && isSkipMigrationFileExist {
+					writer.Body("Creating .skip_migration file")
+					createSkipMigrationFile()
+				}
+			}() 
 			writer.Printf("\nBackup %s execution completed \n", subCommand)
 			break
 		}
@@ -1387,3 +1405,53 @@ func getBackupStatusAsCompletedOrFailed(backup *api.BackupTask) bool {
 	return false
 
 }
+
+func deleteSkipMigrationFileIfExists(infra *AutomateHAInfraDetails) (error) {
+	sshUtil, err := getSshUtilConfig(infra)
+	if err != nil {
+		return err
+	}
+    result, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(DELETE_SKIP_MIGRATION_FILE_IF_EXISTS)
+	if err != nil {
+		writer.Error(err.Error())
+		return err
+	}
+	if strings.Contains(result, "skip migration file exists") {
+		isSkipMigrationFileExist = true
+	} else {
+		isSkipMigrationFileExist = false
+	}
+	return nil
+}
+
+func createSkipMigrationFile() (error) {
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	sshUtil, err := getSshUtilConfig(infra)
+	if err != nil {
+		return err
+	}
+    _, err = sshUtil.connectAndExecuteCommandOnRemote(CREATE_SKIP_MIGRATION_FILE, true)
+	if err != nil {
+		writer.Error(err.Error())
+		return err
+	}
+	return nil
+}
+
+func getSshUtilConfig(infra *AutomateHAInfraDetails) (SSHUtil, error) {
+	sshconfig := &SSHConfig{}
+	sshconfig.sshUser = infra.Outputs.SSHUser.Value
+	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+	sshconfig.sshPort = infra.Outputs.SSHPort.Value
+	sshUtil := NewSSHUtil(sshconfig)
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	if automateIps == nil || len(automateIps) < 1 {
+		return nil, status.Errorf(status.ConfigError, "Invalid deployment config")
+	}
+	sshUtil.getSSHConfig().hostIP = automateIps[0]
+	return sshUtil, nil
+}
+
