@@ -7,7 +7,6 @@ import (
 
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -397,7 +396,7 @@ func (es *Backend) ReindexIndices(ctx context.Context, srcIndex, dstIndex string
 
 	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(reindexCtx)
 	if err != nil {
-		logrus.WithError(err).Errorf("Failed to start reindex from %s to %s", srcIndex, dstIndex)
+		log.WithError(err).Errorf("Failed to start reindex from %s to %s", srcIndex, dstIndex)
 		return "", fmt.Errorf("failed to start reindex from %s to %s: %w", srcIndex, dstIndex, err)
 	}
 	return startTaskResult.TaskId, nil

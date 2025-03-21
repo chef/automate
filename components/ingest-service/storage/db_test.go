@@ -1,6 +1,7 @@
 package storage_test
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -328,4 +329,90 @@ func TestGetReindexStatusNoDetails(t *testing.T) {
 	assert.NoError(t, err)
 	expectedJSON := `{"request_id":1,"status":"completed","indexes":[]}`
 	assert.JSONEq(t, expectedJSON, string(statusJSON))
+}
+
+func TestUpdateTaskIDForReindexRequestSuccess(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	currentTime := time.Now()
+	requestID := 1
+	indexName := "index1"
+	taskID := "task123"
+
+	query := `
+        UPDATE reindex_request_detailed
+        SET os_task_id = $1, updated_at = $2
+        WHERE request_id = $3 AND "index" = $4
+        RETURNING request_id
+    `
+	mock.ExpectQuery(query).
+		WithArgs(taskID, currentTime, requestID, indexName).
+		WillReturnRows(sqlmock.NewRows([]string{"request_id"}).AddRow(requestID))
+
+	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
+	assert.NoError(t, err)
+}
+
+func TestUpdateTaskIDForReindexRequestNoRowsFound(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	currentTime := time.Now()
+	requestID := 1
+	indexName := "index1"
+	taskID := "task123"
+
+	query := `
+        UPDATE reindex_request_detailed
+        SET os_task_id = $1, updated_at = $2
+        WHERE request_id = $3 AND "index" = $4
+        RETURNING request_id
+    `
+	mock.ExpectQuery(query).
+		WithArgs(taskID, currentTime, requestID, indexName).
+		WillReturnError(sql.ErrNoRows)
+
+	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
+	assert.Error(t, err)
+	assert.Equal(t, fmt.Sprintf("no matching record found for request_id: %d, index: %s", requestID, indexName), err.Error())
+}
+
+func TestUpdateTaskIDForReindexRequestQueryFailure(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	currentTime := time.Now()
+	requestID := 1
+	indexName := "index1"
+	taskID := "task123"
+
+	query := `
+        UPDATE reindex_request_detailed
+        SET os_task_id = $1, updated_at = $2
+        WHERE request_id = $3 AND "index" = $4
+        RETURNING request_id
+    `
+	mock.ExpectQuery(query).
+		WithArgs(taskID, currentTime, requestID, indexName).
+		WillReturnError(fmt.Errorf("database error"))
+
+	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to update task ID")
 }
