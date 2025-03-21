@@ -282,10 +282,41 @@ OuterLoop:
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
-
-	err := s.GetAliases([]string{"reindexing", "reindexing-new"})
+	indices, err := s.GetIndicesEligableForReindexing(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+	if len(indices) == 0 {
+		log.Info("No indices found that need reindexing")
+		return &ingest.StartReindexResponse{
+			Message: "No indices found that need reindexing",
+		}, nil
+	}
+
+	// Add to the database that indexing request is running
+	requestID, err := s.db.InsertReindexRequest("running", time.Now())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+	}
+
+	for key, value := range indices {
+		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
+			RequestID:   requestID,
+			Index:       key,
+			FromVersion: value.Settings.Index.Version.CreatedString,
+			ToVersion:   value.Settings.Index.Version.UpgradedString,
+			OsTaskID:    "",
+			Heartbeat:   time.Now(),
+			HavingAlias: false,
+			AliasList:   "",
+		}, time.Now()); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+		}
+	}
+	err = s.GetAliases(indices)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get aliases for indices: %s", err)
 	}
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
@@ -346,18 +377,18 @@ func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.Version
 }
 
 // Get aliases for indexes
-func (s *ChefIngestServer) GetAliases(index []string) error {
+func (s *ChefIngestServer) GetAliases(indexes map[string]backend.IndexSettingsVersion) error {
 	log.Info("Fetching aliases for indexes")
-	for _, indice := range index {
-		log.Info("Fetching aliases for index: ", indice)
-		alias, hasAlias, err := s.client.GetAliases(context.Background(), indice)
+	for index, _ := range indexes {
+		log.Info("Fetching aliases for index: ", index)
+		alias, hasAlias, err := s.client.GetAliases(context.Background(), index)
 		if err != nil {
-			log.Info("Failed to fetch aliases for index: ", indice)
+			log.Info("Failed to fetch aliases for index: ", index)
 			return err
 		}
-		err = s.db.UpdateAliasesForIndex(indice, hasAlias, alias)
+		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias)
 		if err != nil {
-			log.Info("Failed to update aliases for index: ", indice)
+			log.Info("Failed to update aliases for index: ", index)
 			return err
 		}
 	}
