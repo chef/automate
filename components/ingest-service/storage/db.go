@@ -257,14 +257,10 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 	return requestID, nil
 }
 
-func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string) error {
-	if db == nil || db.DbMap == nil {
-		logrus.Error("DB connection is not initialized")
-		return errors.New("database connection is not initialized")
-	}
+func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int) error {
 	if hasAlias {
 		aliasString := strings.Join(alias, ",")
-		_, err := db.Exec(updateReindexRequestDetailed, hasAlias, aliasString, index)
+		_, err := db.Exec(updateReindexRequestDetailed, hasAlias, aliasString, requestID, index)
 		return err
 	}
 
@@ -304,4 +300,4 @@ const deleteReindexRequestDetail = `
 DELETE FROM reindex_request_detailed WHERE id = $1;`
 
 const updateReindexRequestDetailed = `
-UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE index = $3;`
+UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE request_id = $3 AND index = $4;`

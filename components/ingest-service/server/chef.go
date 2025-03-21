@@ -314,7 +314,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
 	}
-	err = s.GetAliases(indices)
+	err = s.GetAliases(indices, requestID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get aliases for indices: %s", err)
 	}
@@ -377,16 +377,16 @@ func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.Version
 }
 
 // Get aliases for indexes
-func (s *ChefIngestServer) GetAliases(indexes map[string]backend.IndexSettingsVersion) error {
+func (s *ChefIngestServer) GetAliases(indexes map[string]backend.IndexSettingsVersion, requestID int) error {
 	log.Info("Fetching aliases for indexes")
-	for index, _ := range indexes {
+	for index := range indexes {
 		log.Info("Fetching aliases for index: ", index)
 		alias, hasAlias, err := s.client.GetAliases(context.Background(), index)
 		if err != nil {
 			log.Info("Failed to fetch aliases for index: ", index)
 			return err
 		}
-		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias)
+		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID)
 		if err != nil {
 			log.Info("Failed to update aliases for index: ", index)
 			return err
