@@ -329,3 +329,19 @@ func TestGetReindexStatusNoDetails(t *testing.T) {
 	expectedJSON := `{"request_id":1,"status":"completed","indexes":[]}`
 	assert.JSONEq(t, expectedJSON, string(statusJSON))
 }
+
+func TestUpdateAliasesForIndex(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	query := `UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE index = $3;`
+	mock.ExpectExec(query).WithArgs(true, "test,test2", "reindexing").WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = db.UpdateAliasesForIndex("reindexing", true, []string{"test", "test2"})
+	assert.NoError(t, err)
+}

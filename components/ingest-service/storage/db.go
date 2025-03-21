@@ -267,8 +267,8 @@ func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string)
 		_, err := db.Exec(updateReindexRequestDetailed, hasAlias, aliasString, index)
 		return err
 	}
-	_, err := db.Exec(updateReindexRequestDetailedNew, hasAlias, index)
-	return err
+
+	return nil
 }
 
 // SQL Queries
@@ -305,6 +305,3 @@ DELETE FROM reindex_request_detailed WHERE id = $1;`
 
 const updateReindexRequestDetailed = `
 UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE index = $3;`
-
-const updateReindexRequestDetailedNew = `
-UPDATE reindex_request_detailed SET having_alias = $1 WHERE index = $2;`
