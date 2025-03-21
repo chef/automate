@@ -257,10 +257,10 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 	return requestID, nil
 }
 
-func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int) error {
+func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int, currentTime time.Time) error {
 	if hasAlias {
 		aliasString := strings.Join(alias, ",")
-		_, err := db.Exec(updateReindexRequestDetailed, hasAlias, aliasString, requestID, index)
+		_, err := db.Exec(updateReindexRequestDetailed, hasAlias, aliasString, currentTime, requestID, index)
 		return err
 	}
 
@@ -300,4 +300,4 @@ const deleteReindexRequestDetail = `
 DELETE FROM reindex_request_detailed WHERE id = $1;`
 
 const updateReindexRequestDetailed = `
-UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE request_id = $3 AND index = $4;`
+UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2, updated_at = $3 WHERE request_id = $4 AND index = $5;`

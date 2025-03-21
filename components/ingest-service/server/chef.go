@@ -386,7 +386,7 @@ func (s *ChefIngestServer) GetAliases(ctx context.Context, indexes map[string]ba
 			log.Info("Failed to fetch aliases for index: ", index)
 			return err
 		}
-		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID)
+		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID, time.Now())
 		if err != nil {
 			log.Info("Failed to update aliases for index: ", index)
 			return err

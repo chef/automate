@@ -340,9 +340,9 @@ func TestUpdateAliasesForIndex(t *testing.T) {
 	}
 
 	query := `UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE request_id = $3 AND index = $4;`
-	mock.ExpectExec(query).WithArgs(true, "test,test2", 1, "reindexing").WillReturnError(fmt.Errorf("update error"))
+	mock.ExpectExec(query).WithArgs(true, "test,test2", time.Now(), 1, "reindexing").WillReturnError(fmt.Errorf("update error"))
 
-	err = db.UpdateAliasesForIndex("reindexing", true, []string{"test", "test2"}, 1)
+	err = db.UpdateAliasesForIndex("reindexing", true, []string{"test", "test2"}, 1, time.Now())
 	assert.EqualError(t, err, "update error")
 }
 
@@ -356,8 +356,24 @@ func TestUpdateAliasesForIndexSuccess(t *testing.T) {
 	}
 
 	query := `UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE request_id = $3 AND index = $4;`
-	mock.ExpectExec(query).WithArgs(true, "test,test2", 1, "reindexing").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(query).WithArgs(true, "test,test2", 1, time.Now(), "reindexing").WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = db.UpdateAliasesForIndex("reindexing", true, []string{"test", "test2"}, 1)
+	err = db.UpdateAliasesForIndex("reindexing", true, []string{"test", "test2"}, 1, time.Now())
+	assert.NoError(t, err)
+}
+
+func TestUpdateAliasesForIndexNoAliases(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	query := `UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2 WHERE request_id = $3 AND index = $4;`
+	mock.ExpectExec(query).WithArgs(false, "", 1, time.Now(), "reindexing").WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = db.UpdateAliasesForIndex("reindexing", false, []string{""}, 1, time.Now())
 	assert.NoError(t, err)
 }
