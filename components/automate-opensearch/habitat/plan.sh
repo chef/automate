@@ -22,7 +22,8 @@ pkg_deps=(
   core/zlib/1.3/20240105173710
   core/bash/5.1/20240105214248 # hooks
   chef/mlsa/1.0.1/20240125084021
-  core/curl/8.7.1/20240614090648 #healthcheck
+  #core/curl/8.7.1/20240614090648 #healthcheck
+  core/curl/8.12.1/20250306073901
   chef/automate-openjdk
   chef/automate-platform-tools/0.1.0/20241212061203
 )
