@@ -247,45 +247,44 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
-func (s *ChefIngestServer) GetIndicesEligableForReindexing(ctx context.Context) (map[string]backend.IndexSettingsVersion, error) {
-	var eligableIndices = make(map[string]backend.IndexSettingsVersion)
+func (s *ChefIngestServer) GetIndicesEligibleForReindexing(ctx context.Context) (map[string]backend.IndexSettingsVersion, error) {
+	eligibleIndices := make(map[string]backend.IndexSettingsVersion)
 	indices, err := s.client.GetIndices(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+		log.WithError(err).Error("Failed to fetch indices from OpenSearch")
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %v", err)
 	}
 
 OuterLoop:
 	for _, index := range indices {
 		for prefix := range skipIndices {
 			if strings.HasPrefix(index.Index, prefix) {
-				log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index")
+				log.WithField("index", index.Index).Info("Skipping index due to prefix match")
 				continue OuterLoop
 			}
 		}
 
 		versionSettings, err := s.client.GetIndexVersionSettings(index.Index)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
+			log.WithError(err).Errorf("Failed to fetch settings for index %s", index.Index)
+			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %v", index.Index, err)
 		}
 
-		// Is reindexing needed?
 		if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
-			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
+			log.WithField("index", index.Index).Info("Skipping index as it is already up to date")
 			continue
 		}
 
-		eligableIndices[index.Index] = *versionSettings
+		eligibleIndices[index.Index] = *versionSettings
 	}
-
-	return eligableIndices, nil
+	return eligibleIndices, nil
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
-
-	indices, err := s.GetIndicesEligableForReindexing(ctx)
+	indices, err := s.GetIndicesEligibleForReindexing(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %v", err)
 	}
 
 	if len(indices) == 0 {
@@ -295,31 +294,56 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}, nil
 	}
 
-	// Add to the database that indexing request is running
+	// Preallocate index list for efficiency
+	indexList := make([]string, 0, len(indices))
+	for index := range indices {
+		indexList = append(indexList, index)
+	}
 	requestID, err := s.db.InsertReindexRequest("running", time.Now())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %v", err)
 	}
 
 	for key, value := range indices {
-		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
+		err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
 			Index:       key,
 			FromVersion: value.Settings.Index.Version.CreatedString,
 			ToVersion:   value.Settings.Index.Version.UpgradedString,
-			OsTaskID:    "",
 			Heartbeat:   time.Now(),
-			HavingAlias: false,
-			AliasList:   "",
-		}, time.Now()); err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+		}, time.Now())
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %v", err)
 		}
 	}
 
-	log.Info("Reindexing started successfully")
+	// Run reindexing asynchronously
+	s.processReindexing(ctx, requestID, indexList)
+
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
+}
+
+func (s *ChefIngestServer) processReindexing(reindexctx context.Context, requestID int, indexList []string) {
+	for _, index := range indexList {
+		srcIndex, dstIndex := index, index+"_temp"
+
+		taskID, err := s.client.ReindexIndices(reindexctx, srcIndex, dstIndex)
+		if err != nil {
+			log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
+			continue
+		}
+
+		if err := s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now()); err != nil {
+			log.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
+		} else {
+			log.WithFields(log.Fields{
+				"srcIndex": srcIndex,
+				"taskID":   taskID,
+			}).Info("Task ID updated in the database")
+		}
+	}
 }
 
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
