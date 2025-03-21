@@ -316,19 +316,20 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %v", err)
 		}
 	}
+	reindexctx := context.Background()
 	// Run reindexing asynchronously
-	go s.processReindexing(ctx, requestID, indexList)
+	go s.processReindexing(reindexctx, requestID, indexList)
 
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
 }
 
-func (s *ChefIngestServer) processReindexing(ctx context.Context, requestID int, indexList []string) {
+func (s *ChefIngestServer) processReindexing(reindexctx context.Context, requestID int, indexList []string) {
 	for _, index := range indexList {
 		srcIndex, dstIndex := index, index+"_temp"
 
-		taskID, err := s.client.ReindexIndices(ctx, srcIndex, dstIndex)
+		taskID, err := s.client.ReindexIndices(reindexctx, srcIndex, dstIndex)
 		if err != nil {
 			log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
 			continue
