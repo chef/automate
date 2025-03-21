@@ -316,9 +316,9 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %v", err)
 		}
 	}
-	reindexctx := context.Background()
+
 	// Run reindexing asynchronously
-	go s.processReindexing(reindexctx, requestID, indexList)
+	s.processReindexing(ctx, requestID, indexList)
 
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
