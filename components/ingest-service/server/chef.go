@@ -340,7 +340,6 @@ func (s *ChefIngestServer) processReindexing(reindexctx context.Context, request
 			log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
 			continue
 		}
-
 		if err := s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now()); err != nil {
 			log.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
 		} else {
