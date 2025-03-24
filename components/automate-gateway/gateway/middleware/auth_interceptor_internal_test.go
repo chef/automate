@@ -58,7 +58,7 @@ func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
 	albCert, _ := devCertToEncodedAndPeer(t, "automate-load-balancer")
 	_, agPeer := devCertToEncodedAndPeer(t, "automate-gateway")
 	otherServiceCert, otherServicePeer := devCertToEncodedAndPeer(t, "deployment-service")
-	hash := "5fa1b62dea3204dcf87e57627c3742dc81d96a3603665a27afc7b1b122eec6fa"
+	hash := "8098fabbf86aacd4d213fc57b773bfb23235af1db530e4b4756ff1eee513eea0"
 
 	// "5fa1b62dea3204dcf87e57627c3742dc81d96a3603665a27afc7b1b122eec6fa"
 	cases := map[string]struct {
@@ -184,7 +184,7 @@ func TestComboAuth(t *testing.T) {
 
 		authInfo := auth_context.FromContext(returnedCtx)
 
-		expectedSubj := []string{"tls:service:deployment-service:5fa1b62dea3204dcf87e57627c3742dc81d96a3603665a27afc7b1b122eec6fa"}
+		expectedSubj := []string{"tls:service:deployment-service:8098fabbf86aacd4d213fc57b773bfb23235af1db530e4b4756ff1eee513eea0"}
 		expectedProjects := []string{"project1", "project2"}
 
 		assert.Equal(t, expectedSubj, authInfo.Subjects)
