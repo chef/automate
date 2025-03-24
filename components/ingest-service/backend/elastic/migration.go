@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	"github.com/chef/automate/components/ingest-service/storage"
 )
 
 // DoesAliasExists - does the alias 'aliasName' exists in elasticsearch
@@ -556,4 +557,90 @@ func (es *Backend) GetAliases(ctx context.Context, index string) ([]string, bool
 
 	hasAliases := len(aliases) > 0
 	return aliases, hasAliases, nil
+}
+
+// DeleteIndexAndUpdateStatus deletes the given index from OpenSearch and updates the status in the database.
+func (es *Backend) DeleteIndexAndUpdateStatus(ctx context.Context, db *storage.DB, requestID int, indexName string) error {
+	// Update the status in the database to "running"
+	err := db.UpdateReindexRequest(requestID, "running", time.Now())
+	if err != nil {
+		log.WithFields(log.Fields{
+			"index":      indexName,
+			"request_id": requestID,
+			"error":      err,
+		}).Error("Failed to update reindex request status to running")
+		return fmt.Errorf("failed to update reindex request status to running: %w", err)
+	}
+
+	// Check if the index exists before attempting to delete it
+	exists, err := es.DoesIndexExists(ctx, indexName)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"index": indexName,
+			"error": err,
+		}).Error("Failed to check if index exists")
+		return fmt.Errorf("failed to check if index exists: %w", err)
+	}
+	if !exists {
+		log.WithFields(log.Fields{"index": indexName}).Warn("Index does not exist, skipping deletion")
+		// Update the status to "completed" since there's nothing to delete
+		err = db.UpdateReindexRequest(requestID, "completed", time.Now())
+		if err != nil {
+			log.WithFields(log.Fields{
+				"index":      indexName,
+				"request_id": requestID,
+				"error":      err,
+			}).Error("Failed to update reindex request status to completed")
+			return fmt.Errorf("failed to update reindex request status to completed: %w", err)
+		}
+		return nil
+	}
+
+	// Retry mechanism for deleting the index
+	maxRetries := 3
+	retryInterval := time.Second * 2
+	for i := 0; i < maxRetries; i++ {
+		log.WithFields(log.Fields{"index": indexName, "attempt": i + 1}).Info("Attempting to delete index")
+		err = es.DeleteIndex(ctx, indexName)
+		if err == nil {
+			break
+		}
+		log.WithFields(log.Fields{
+			"index": indexName,
+			"error": err,
+		}).Warn("Failed to delete index, retrying...")
+		time.Sleep(retryInterval)
+	}
+
+	if err != nil {
+		// Update the status in the database to "failed"
+		dbErr := db.UpdateReindexRequest(requestID, "failed", time.Now())
+		if dbErr != nil {
+			log.WithFields(log.Fields{
+				"index":      indexName,
+				"request_id": requestID,
+				"error":      dbErr,
+			}).Error("Failed to update reindex request status to failed")
+		}
+
+		log.WithFields(log.Fields{
+			"index": indexName,
+			"error": err,
+		}).Error("Failed to delete index after retries")
+		return fmt.Errorf("failed to delete index after retries: %w", err)
+	}
+
+	// Update the status in the database to "completed"
+	err = db.UpdateReindexRequest(requestID, "completed", time.Now())
+	if err != nil {
+		log.WithFields(log.Fields{
+			"index":      indexName,
+			"request_id": requestID,
+			"error":      err,
+		}).Error("Failed to update reindex request status to completed")
+		return fmt.Errorf("failed to update reindex request status to completed: %w", err)
+	}
+
+	log.WithFields(log.Fields{"index": indexName}).Info("Index deleted successfully")
+	return nil
 }

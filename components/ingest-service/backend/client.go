@@ -7,6 +7,7 @@ import (
 	elastic "github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/ingest-service/storage"
 	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
@@ -99,4 +100,5 @@ type Client interface {
 
 	TriggerReindex(index string) error
 	GetAliases(context.Context, string) ([]string, bool, error)
+	DeleteIndexAndUpdateStatus(ctx context.Context, db *storage.DB, requestID int, indexName string) error
 }
