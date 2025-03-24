@@ -557,3 +557,165 @@ func (es *Backend) GetAliases(ctx context.Context, index string) ([]string, bool
 	hasAliases := len(aliases) > 0
 	return aliases, hasAliases, nil
 }
+
+// Example settings: map[analysis:map[analyzer:map[autocomplete:map[filter:[lowercase] tokenizer:autocomplete_tokenizer]] normalizer:map[case_insensitive:map[char_filter:[] filter:[lowercase asciifolding] type:custom]] tokenizer:map[autocomplete_tokenizer:map[max_gram:20 min_gram:2 token_chars:[letter digit] type:edge_ngram]]] creation_date:1742381505210 number_of_replicas:1 number_of_shards:5 provided_name:comp-3-profiles refresh_interval:1s uuid:LxDd9TZUQtqL-DSLrdR_FQ version:map[created:6082399 upgraded:135249827]]
+func (es *Backend) FetchIndexSettings(index string) (map[string]any, error) {
+	fmt.Println("Fetching settings for index:", index)
+	resp, err := es.client.IndexGetSettings(index).Do(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
+	}
+
+	settings, exists := resp[index]
+	if !exists {
+		return nil, errors.New("index settings not found in response")
+	}
+
+	settingsMap, ok := settings.Settings["index"].(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("invalid settings format for index %s", index)
+	}
+
+	// "creation_date", "creation_date_string", "uuid", "version", "provided_name", "resize", "routing", "store", "warmer", "flush", "merge", "sync", "translog", "query_string", "verified_before_close"
+	delete(settingsMap, "creation_date")
+	delete(settingsMap, "provided_name")
+	delete(settingsMap, "creation_date_string")
+	delete(settingsMap, "uuid")
+	delete(settingsMap, "version")
+	delete(settingsMap, "resize")
+	delete(settingsMap, "routing")
+	delete(settingsMap, "store")
+	delete(settingsMap, "warmer")
+	delete(settingsMap, "flush")
+	delete(settingsMap, "merge")
+	delete(settingsMap, "sync")
+	delete(settingsMap, "translog")
+	delete(settingsMap, "query_string")
+	delete(settingsMap, "verified_before_close")
+
+	fmt.Printf("settingsMap: %+v\n", settingsMap)
+	return settingsMap, nil
+}
+
+func (es *Backend) FetchIndexMappings(index string) (map[string]interface{}, error) {
+	fmt.Println("Fetching mappings for index:", index)
+	resp, err := es.client.GetMapping().Index(index).Do(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
+	}
+
+	mappings, exists := resp[index]
+	if !exists {
+		return nil, errors.New("mappings not found for index")
+	}
+
+	mappingsMap, ok := mappings.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("invalid mappings format for index")
+	}
+
+	// Ensure that the mappings are in the correct format
+	if root, ok := mappingsMap["mappings"].(map[string]interface{}); ok {
+		if properties, ok := root["properties"].(map[string]interface{}); ok {
+			// Remove unsupported parameters from the mappings
+			for _, value := range properties {
+				if _, ok := value.(map[string]interface{}); ok {
+					// Check for unsupported parameters and remove them
+					delete(value.(map[string]interface{}), "unsupported_parameter")
+				}
+			}
+		}
+	}
+
+	// Remove unsupported root parameters
+	delete(mappingsMap, "mappings")
+
+	fmt.Printf("mappingsMap: %+v\n", mappingsMap)
+
+	return mappingsMap, nil
+}
+
+// // Example settings: map[analysis:map[analyzer:map[autocomplete:map[filter:[lowercase] tokenizer:autocomplete_tokenizer]] normalizer:map[case_insensitive:map[char_filter:[] filter:[lowercase asciifolding] type:custom]] tokenizer:map[autocomplete_tokenizer:map[max_gram:20 min_gram:2 token_chars:[letter digit] type:edge_ngram]]] creation_date:1742381505210 number_of_replicas:1 number_of_shards:5 provided_name:comp-3-profiles refresh_interval:1s uuid:LxDd9TZUQtqL-DSLrdR_FQ version:map[created:6082399 upgraded:135249827]]
+// func (es *Backend) SanitizeSettings(settings map[string]interface{}, indexName string) (map[string]interface{}, error) {
+// 	fmt.Printf("Sanitizing settings for index: %s\n", indexName)
+// 	fmt.Printf("Source index settings: %v\n", settings)
+
+// 	indexData, ok := settings[indexName]
+// 	if !ok {
+// 		return nil, fmt.Errorf("settings for index %s not found", indexName)
+// 	}
+
+// 	fmt.Println("Debug 1")
+
+// 	indexDataMap, ok := indexData.(map[string]interface{})
+// 	if !ok {
+// 		return nil, fmt.Errorf("invalid format for settings of index %s", indexName)
+// 	}
+
+// 	fmt.Println("Debug 2")
+
+// 	settingsMap, ok := indexDataMap["settings"].(map[string]interface{})
+// 	if !ok {
+// 		return nil, fmt.Errorf("settings key not found in index data for %s", indexName)
+// 	}
+
+// 	fmt.Println("Debug 3")
+
+// 	indexSettings, ok := settingsMap["index"].(map[string]interface{})
+// 	if !ok {
+// 		return nil, fmt.Errorf("index key not found in settings for index %s", indexName)
+// 	}
+
+// 	fmt.Println("Debug 4")
+
+// 	sanitizedIndexSettings := make(map[string]interface{})
+
+// 	for key, value := range indexSettings {
+// 		// Remove only settings that are not allowed during index creation
+// 		switch key {
+// 		case "creation_date", "creation_date_string", "uuid", "version", "provided_name", "resize", "routing", "store", "warmer", "flush", "merge", "sync", "translog", "query_string", "verified_before_close":
+// 			// Skip these keys
+// 			fmt.Println("Skipping key:", key)
+// 			continue
+// 		default:
+// 			fmt.Println("Adding key:", key)
+// 			sanitizedIndexSettings[key] = value
+// 		}
+// 	}
+
+// 	fmt.Println("Debug 5")
+
+// 	settingsMap["index"] = sanitizedIndexSettings
+// 	indexDataMap["settings"] = settingsMap
+// 	settings[indexName] = indexDataMap
+
+// 	fmt.Printf("sanitizedIndexSettings: %+v\n", sanitizedIndexSettings)
+
+// 	return sanitizedIndexSettings, nil
+// }
+
+func (es *Backend) CreateIndex(destIndex string, sourceIndex string, sourceIndexSettings map[string]any, sourceIndexMappings map[string]any) error {
+	fmt.Printf("Creating index %s from index %s\n", destIndex, sourceIndex)
+	fmt.Printf("Source index settings: %+v\n", sourceIndexSettings)
+	fmt.Printf("Source index mappings: %+v\n", sourceIndexMappings)
+
+	// // Sanitize settings before creating the index
+	// sanitizedSettings, err := es.SanitizeSettings(sourceIndexSettings, sourceIndex)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to sanitize settings for index %s: %w", sourceIndex, err)
+	// }
+
+	createIndexService := es.client.CreateIndex(destIndex).
+		BodyJson(map[string]any{
+			"settings": sourceIndexSettings,
+			"mappings": sourceIndexMappings,
+		})
+
+	_, err := createIndexService.Do(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to create index %s: %w", destIndex, err)
+	}
+
+	fmt.Printf("Index %s created successfully.\n", destIndex)
+	return nil
+}

@@ -27,6 +27,7 @@ var skipIndices = map[string]bool{
 	".opendistro":               true,
 	".plugins-ml-config":        true,
 	".opensearch-observability": true,
+	".tasks":                    true,
 }
 
 type ChefIngestServer struct {
@@ -317,6 +318,21 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			AliasList:   "",
 		}, time.Now()); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
+		}
+
+		mappings, err := s.client.FetchIndexMappings(key)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch mappings for index %s: %s", key, err)
+		}
+
+		settings, err := s.client.FetchIndexSettings(key)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", key, err)
+		}
+
+		err = s.client.CreateIndex(key+"_temp", key, settings, mappings)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to create index %s: %s", key+"_temp", err)
 		}
 	}
 	err = s.GetAliases(ctx, indices, requestID)
