@@ -251,7 +251,6 @@ func (s *ChefIngestServer) GetIndicesEligibleForReindexing(ctx context.Context) 
 	eligibleIndices := make(map[string]backend.IndexSettingsVersion)
 	indices, err := s.client.GetIndices(ctx)
 	if err != nil {
-		log.WithError(err).Error("Failed to fetch indices from OpenSearch")
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %v", err)
 	}
 
@@ -259,22 +258,20 @@ OuterLoop:
 	for _, index := range indices {
 		for prefix := range skipIndices {
 			if strings.HasPrefix(index.Index, prefix) {
-				log.WithField("index", index.Index).Info("Skipping index due to prefix match")
+				log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index")
 				continue OuterLoop
 			}
 		}
 
 		versionSettings, err := s.client.GetIndexVersionSettings(index.Index)
 		if err != nil {
-			log.WithError(err).Errorf("Failed to fetch settings for index %s", index.Index)
 			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %v", index.Index, err)
 		}
 
 		if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
-			log.WithField("index", index.Index).Info("Skipping index as it is already up to date")
+			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
 			continue
 		}
-
 		eligibleIndices[index.Index] = *versionSettings
 	}
 	return eligibleIndices, nil
@@ -310,7 +307,10 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			Index:       key,
 			FromVersion: value.Settings.Index.Version.CreatedString,
 			ToVersion:   value.Settings.Index.Version.UpgradedString,
+			OsTaskID:    "",
 			Heartbeat:   time.Now(),
+			HavingAlias: false,
+			AliasList:   "",
 		}, time.Now())
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %v", err)
