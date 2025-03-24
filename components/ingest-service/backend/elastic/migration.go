@@ -597,9 +597,8 @@ func (es *Backend) DeleteIndexAndUpdateStatus(ctx context.Context, db *storage.D
 	}
 
 	// Retry mechanism for deleting the index
-	maxRetries := 3
 	retryInterval := time.Second * 2
-	for i := 0; i < maxRetries; i++ {
+	for i := range [3]int{} { // Use integer range syntax
 		log.WithFields(log.Fields{"index": indexName, "attempt": i + 1}).Info("Attempting to delete index")
 		err = es.DeleteIndex(ctx, indexName)
 		if err == nil {
