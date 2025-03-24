@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/ingest-service/config"
@@ -256,6 +257,16 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 	return requestID, nil
 }
 
+func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int, currentTime time.Time) error {
+	if hasAlias {
+		aliasString := strings.Join(alias, ",")
+		_, err := db.Exec(updateReindexRequestDetailed, hasAlias, aliasString, currentTime, requestID, index)
+		return err
+	}
+
+	return nil
+}
+
 // SQL Queries
 const insertReindexRequest = `
 INSERT INTO reindex_requests(status, created_at, last_updated)
@@ -287,3 +298,6 @@ DELETE FROM reindex_requests WHERE id = $1;`
 
 const deleteReindexRequestDetail = `
 DELETE FROM reindex_request_detailed WHERE id = $1;`
+
+const updateReindexRequestDetailed = `
+UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2, updated_at = $3 WHERE request_id = $4 AND index = $5;`

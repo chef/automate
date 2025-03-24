@@ -282,7 +282,6 @@ OuterLoop:
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
-
 	indices, err := s.GetIndicesEligableForReindexing(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
@@ -315,8 +314,10 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
 	}
-
-	log.Info("Reindexing started successfully")
+	err = s.GetAliases(ctx, indices, requestID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get aliases for indices: %s", err)
+	}
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
@@ -373,4 +374,23 @@ func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.Version
 		Name:    SERVICE_NAME,
 		Sha:     version.GitSHA,
 	}, nil
+}
+
+// Get aliases for indexes
+func (s *ChefIngestServer) GetAliases(ctx context.Context, indexes map[string]backend.IndexSettingsVersion, requestID int) error {
+	log.Info("Fetching aliases for indexes")
+	for index := range indexes {
+		log.Info("Fetching aliases for index: ", index)
+		alias, hasAlias, err := s.client.GetAliases(ctx, index)
+		if err != nil {
+			log.Info("Failed to fetch aliases for index: ", index)
+			return err
+		}
+		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID, time.Now())
+		if err != nil {
+			log.Info("Failed to update aliases for index: ", index)
+			return err
+		}
+	}
+	return nil
 }

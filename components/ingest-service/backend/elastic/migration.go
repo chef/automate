@@ -537,3 +537,23 @@ func (es *Backend) GetIndexVersionSettings(index string) (*backend.IndexSettings
 func (es *Backend) TriggerReindex(index string) error {
 	return nil
 }
+
+func (es *Backend) GetAliases(ctx context.Context, index string) ([]string, bool, error) {
+
+	aliasesResult, err := es.client.Aliases().Index(index).Do(ctx)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// Extract aliases from the result
+	var aliases []string
+
+	if indexAliases, ok := aliasesResult.Indices[index]; ok {
+		for _, alias := range indexAliases.Aliases {
+			aliases = append(aliases, alias.AliasName)
+		}
+	}
+
+	hasAliases := len(aliases) > 0
+	return aliases, hasAliases, nil
+}
