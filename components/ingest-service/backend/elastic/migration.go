@@ -610,30 +610,16 @@ func (es *Backend) FetchIndexMappings(index string) (map[string]interface{}, err
 		return nil, errors.New("invalid mappings format for index")
 	}
 
-	// Ensure that the mappings are in the correct format
 	if root, ok := mappingsMap["mappings"].(map[string]interface{}); ok {
-		if properties, ok := root["properties"].(map[string]interface{}); ok {
-			// Remove unsupported parameters from the mappings
-			for _, value := range properties {
-				if _, ok := value.(map[string]interface{}); ok {
-					// Check for unsupported parameters and remove them
-					delete(value.(map[string]interface{}), "unsupported_parameter")
-				}
-			}
-		}
+		// Remove unsupported root parameters
+		delete(mappingsMap, "mappings")
+		mappingsMap = root
 	}
-
-	// Remove unsupported root parameters
-	delete(mappingsMap, "mappings")
 
 	return mappingsMap, nil
 }
 
 func (es *Backend) CreateIndex(destIndex string, sourceIndex string, sourceIndexSettings map[string]any, sourceIndexMappings map[string]any) error {
-	fmt.Printf("Creating index %s from index %s\n", destIndex, sourceIndex)
-	fmt.Printf("Source index settings: %+v\n", sourceIndexSettings)
-	fmt.Printf("Source index mappings: %+v\n", sourceIndexMappings)
-
 	createIndexService := es.client.CreateIndex(destIndex).
 		BodyJson(map[string]any{
 			"settings": sourceIndexSettings,
