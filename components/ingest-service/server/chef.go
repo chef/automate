@@ -320,17 +320,8 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
 
-		mappings, err := s.client.FetchIndexMappings(key)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to fetch mappings for index %s: %s", key, err)
-		}
-
-		settings, err := s.client.FetchIndexSettings(key)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", key, err)
-		}
-
-		err = s.client.CreateIndex(key+"_temp", key, settings, mappings)
+		tempIndex := key + "_temp"
+		err = s.client.CreateIndex(tempIndex, key)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to create index %s: %s", key+"_temp", err)
 		}

@@ -106,5 +106,5 @@ type Client interface {
 	GetAliases(context.Context, string) ([]string, bool, error)
 	FetchIndexSettings(index string) (map[string]interface{}, error)
 	FetchIndexMappings(index string) (map[string]interface{}, error)
-	CreateIndex(destIndex string, sourceIndex string, sourceIndexSettings map[string]interface{}, sourceIndexMappings map[string]interface{}) error
+	CreateIndex(destIndex string, sourceIndex string) error
 }
