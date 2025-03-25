@@ -267,6 +267,29 @@ func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string,
 	return nil
 }
 
+func (db *DB) UpdateTaskIDForReindexRequest(requestID int, indexName string, taskID string, currentTime time.Time) error {
+	query := `
+        UPDATE reindex_request_detailed
+        SET os_task_id = $1, updated_at = $2
+        WHERE request_id = $3 AND "index" = $4
+    `
+	result, err := db.Exec(query, taskID, currentTime, requestID, indexName)
+	if err != nil {
+		return errors.Wrapf(err, "failed to update task ID for request_id: %d, index: %s", requestID, indexName)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errors.Wrap(err, "failed to get rows affected count")
+	}
+
+	if rowsAffected == 0 {
+		return errors.Errorf("no matching record found for request_id: %d, index: %s", requestID, indexName)
+	}
+
+	return nil
+}
+
 // SQL Queries
 const insertReindexRequest = `
 INSERT INTO reindex_requests(status, created_at, last_updated)

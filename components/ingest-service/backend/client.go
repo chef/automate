@@ -92,6 +92,10 @@ type Client interface {
 	// @param (context, previousIndex)
 	// @return (taskID, error)
 	ReindexNodeStateToLatest(context.Context, string) (string, error)
+	// New method for reindexing indices
+	// @param (context, sourceIndex, destinationIndex)
+	// @return (taskID, error)
+	ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error)
 	GetActions(string, int, time.Time, string, bool) ([]InternalChefAction, int64, error)
 	DeleteAllIndexesWithPrefix(string, context.Context) error
 	GetIndices(ctx context.Context) ([]Index, error)
