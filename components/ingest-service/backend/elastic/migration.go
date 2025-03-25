@@ -604,13 +604,7 @@ func (es *Backend) FetchIndexMappings(index string) (map[string]interface{}, err
 		return nil, errors.New("invalid mappings format for index")
 	}
 
-	if root, ok := mappingsMap["mappings"].(map[string]interface{}); ok {
-		// Remove unsupported root parameters
-		delete(mappingsMap, "mappings")
-		mappingsMap = root
-	}
-
-	return mappingsMap, nil
+	return mappingsMap["mappings"].(map[string]interface{}), nil
 }
 
 func (es *Backend) CreateIndex(destIndex string, sourceIndex string) error {
