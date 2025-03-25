@@ -273,7 +273,6 @@ OuterLoop:
 			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
 			continue
 		}
-
 		eligableIndices[index.Index] = *versionSettings
 	}
 	return eligableIndices, nil
