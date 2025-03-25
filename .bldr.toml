@@ -255,6 +255,7 @@ paths = [
   "lib/authz/*",
   "lib/cereal/*",
   "lib/config/*",
+  "lib/db/*",
   "lib/grpc/*",
   "lib/httputils/*",
   "lib/io/*",

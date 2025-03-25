@@ -282,6 +282,7 @@ OuterLoop:
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
+
 	indices, err := s.GetIndicesEligableForReindexing(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
@@ -294,13 +295,23 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}, nil
 	}
 
-	// Add to the database that indexing request is running
 	requestID, err := s.db.InsertReindexRequest("running", time.Now())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 	}
 
 	for key, value := range indices {
+		// Check if the index exists before proceeding
+		exists, err := s.client.DoesIndexExists(ctx, key)
+		if err != nil {
+			log.WithFields(log.Fields{"index": key, "error": err}).Error("Failed to check if index exists")
+			return nil, status.Errorf(codes.Internal, "failed to check if index exists: %s", err)
+		}
+		if !exists {
+			log.WithFields(log.Fields{"index": key}).Warn("Index does not exist, skipping")
+			continue
+		}
+
 		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
 			Index:       key,
@@ -313,11 +324,22 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}, time.Now()); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
+
+		err = s.GetAliases(ctx, map[string]backend.IndexSettingsVersion{key: value}, requestID)
+		if err != nil {
+			log.WithFields(log.Fields{"index": key, "error": err}).Error("Failed to get aliases for index")
+			return nil, status.Errorf(codes.Internal, "failed to get aliases for index %s: %s", key, err)
+		}
+
+		// Delete the index and update its status
+		err = s.client.DeleteIndexAndUpdateStatus(ctx, s.db, requestID, key)
+		if err != nil {
+			log.WithFields(log.Fields{"index": key, "error": err}).Error("Failed to delete index")
+			return nil, status.Errorf(codes.Internal, "failed to delete index %s: %s", key, err)
+		}
 	}
-	err = s.GetAliases(ctx, indices, requestID)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get aliases for indices: %s", err)
-	}
+
+	log.Info("Reindexing started successfully")
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
