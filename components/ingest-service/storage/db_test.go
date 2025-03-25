@@ -1,7 +1,6 @@
 package storage_test
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -399,11 +398,10 @@ func TestUpdateTaskIDForReindexRequestSuccess(t *testing.T) {
         UPDATE reindex_request_detailed
         SET os_task_id = $1, updated_at = $2
         WHERE request_id = $3 AND "index" = $4
-        RETURNING request_id
     `
-	mock.ExpectQuery(query).
+	mock.ExpectExec(query).
 		WithArgs(taskID, currentTime, requestID, indexName).
-		WillReturnRows(sqlmock.NewRows([]string{"request_id"}).AddRow(requestID))
+		WillReturnResult(sqlmock.NewResult(1, 1)) // Simulates 1 row affected
 
 	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
 	assert.NoError(t, err)
@@ -427,11 +425,10 @@ func TestUpdateTaskIDForReindexRequestNoRowsFound(t *testing.T) {
         UPDATE reindex_request_detailed
         SET os_task_id = $1, updated_at = $2
         WHERE request_id = $3 AND "index" = $4
-        RETURNING request_id
     `
-	mock.ExpectQuery(query).
+	mock.ExpectExec(query).
 		WithArgs(taskID, currentTime, requestID, indexName).
-		WillReturnError(sql.ErrNoRows)
+		WillReturnResult(sqlmock.NewResult(0, 0)) // Simulates no rows affected
 
 	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
 	assert.Error(t, err)
@@ -456,11 +453,10 @@ func TestUpdateTaskIDForReindexRequestQueryFailure(t *testing.T) {
         UPDATE reindex_request_detailed
         SET os_task_id = $1, updated_at = $2
         WHERE request_id = $3 AND "index" = $4
-        RETURNING request_id
     `
-	mock.ExpectQuery(query).
+	mock.ExpectExec(query).
 		WithArgs(taskID, currentTime, requestID, indexName).
-		WillReturnError(fmt.Errorf("database error"))
+		WillReturnError(fmt.Errorf("database error")) // Simulates a DB failure
 
 	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
 	assert.Error(t, err)
