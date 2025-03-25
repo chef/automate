@@ -294,6 +294,11 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}, nil
 	}
 
+	indexList := make([]string, 0, len(indices))
+	for index := range indices {
+		indexList = append(indexList, index)
+	}
+
 	// Add to the database that indexing request is running
 	requestID, err := s.db.InsertReindexRequest("running", time.Now())
 	if err != nil {
@@ -318,9 +323,32 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get aliases for indices: %s", err)
 	}
+
+	s.processReindexing(ctx, requestID, indexList)
+
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
+}
+
+func (s *ChefIngestServer) processReindexing(reindexctx context.Context, requestID int, indexList []string) {
+	for _, index := range indexList {
+		srcIndex, dstIndex := index, index+"_temp"
+
+		taskID, err := s.client.ReindexIndices(reindexctx, srcIndex, dstIndex)
+		if err != nil {
+			log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
+			continue
+		}
+		if err := s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now()); err != nil {
+			log.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
+		} else {
+			log.WithFields(log.Fields{
+				"srcIndex": srcIndex,
+				"taskID":   taskID,
+			}).Info("Task ID updated in the database")
+		}
+	}
 }
 
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
