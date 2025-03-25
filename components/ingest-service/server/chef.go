@@ -276,7 +276,6 @@ OuterLoop:
 
 		eligableIndices[index.Index] = *versionSettings
 	}
-
 	return eligableIndices, nil
 }
 
