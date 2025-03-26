@@ -557,3 +557,77 @@ func (es *Backend) GetAliases(ctx context.Context, index string) ([]string, bool
 	hasAliases := len(aliases) > 0
 	return aliases, hasAliases, nil
 }
+
+func (es *Backend) FetchIndexSettings(index string) (map[string]any, error) {
+	resp, err := es.client.IndexGetSettings(index).Do(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch settings for index %s: %w", index, err)
+	}
+
+	settings, exists := resp[index]
+	if !exists {
+		return nil, errors.New("index settings not found in response")
+	}
+
+	settingsMap, ok := settings.Settings["index"].(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("invalid settings format for index %s", index)
+	}
+
+	// List of keys to delete from settingsMap
+	keysToDelete := []string{
+		"creation_date", "provided_name", "creation_date_string", "uuid", "version",
+		"resize", "routing", "store", "warmer", "flush", "merge", "sync", "translog",
+		"query_string", "verified_before_close",
+	}
+
+	for _, key := range keysToDelete {
+		delete(settingsMap, key)
+	}
+
+	return settingsMap, nil
+}
+
+func (es *Backend) FetchIndexMappings(index string) (map[string]interface{}, error) {
+	resp, err := es.client.GetMapping().Index(index).Do(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch mappings for index %s: %w", index, err)
+	}
+
+	mappings, exists := resp[index]
+	if !exists {
+		return nil, errors.New("mappings not found for index")
+	}
+
+	mappingsMap, ok := mappings.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("invalid mappings format for index")
+	}
+
+	return mappingsMap["mappings"].(map[string]interface{}), nil
+}
+
+func (es *Backend) CreateIndex(destIndex string, sourceIndex string) error {
+	sourceIndexMappings, err := es.FetchIndexMappings(sourceIndex)
+	if err != nil {
+		return fmt.Errorf("failed to fetch mappings for index %s: %w", sourceIndex, err)
+	}
+
+	sourceIndexSettings, err := es.FetchIndexSettings(sourceIndex)
+	if err != nil {
+		return fmt.Errorf("failed to fetch settings for index %s: %w", sourceIndex, err)
+	}
+
+	createIndexService := es.client.CreateIndex(destIndex).
+		BodyJson(map[string]any{
+			"settings": sourceIndexSettings,
+			"mappings": sourceIndexMappings,
+		})
+
+	_, err = createIndexService.Do(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to create index %s: %w", destIndex, err)
+	}
+
+	return nil
+}
