@@ -298,6 +298,7 @@ type MockPullConfigs struct {
 	setExceptionIpsFunc       func(ips []string)
 	getOsCertsByIpFunc        func(map[string]*ConfigKeys) []CertByIP
 	setInfraAndSSHUtilFunc    func(*AutomateHAInfraDetails, SSHUtil)
+	getOpensearchPathRepoFunc func() (string, error)
 }
 
 func (m *MockPullConfigs) setInfraAndSSHUtil(*AutomateHAInfraDetails, SSHUtil) {
@@ -345,6 +346,10 @@ func (m *MockPullConfigs) setExceptionIps(ips []string) {
 
 func (m *MockPullConfigs) getOsCertsByIp(configKeysMap map[string]*ConfigKeys) []CertByIP {
 	return m.getOsCertsByIpFunc(configKeysMap)
+}
+
+func (m *MockPullConfigs) getOpensearchPathRepo() (string, error) {
+	return m.getOpensearchPathRepoFunc()
 }
 
 func TestPopulateHaCommonConfig(t *testing.T) {
