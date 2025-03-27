@@ -44,6 +44,13 @@ You can also view the [Sample Config](#sample-config-to-setup-on-premise-deploym
 
 ## Verify Configuration file
 
+### Prerequisites
+
+- Create another user under the home directory with sudo privileges, `eg: /home/<user>`
+- The username should be set in the `ssh_user' field of the config before proceeding with the deployment. The config will have value like 'ssh-user = "<ssh_user>"'.
+- The SSH username should have read, write and execute permissions.
+- The verification service expects the '/home/<ssh_user>' directory to be present on all remote nodes.
+
 1. We verify the above config using the below command:
 
     ```bash

@@ -88,6 +88,13 @@ Once the provisioning is successful, **if you have added custom DNS to your conf
 
 ## Config Verify
 
+### Prerequisites
+
+- Create another user under the home directory with sudo privileges, `eg: /home/<user>`.
+- The username should be set in the `ssh_user' field of the config before proceeding with the deployment. The config will have value like 'ssh-user = "<ssh_user>"'.
+- The SSH username should have read, write and execute permissions.
+- The '/home/<ssh_user>' directory should be present on all remote nodes.
+
 1. After successful provision, run verify config command:
 
     ```bash

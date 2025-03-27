@@ -129,8 +129,8 @@ Configure backups for both clusters using either [file system](/automate/ha_back
         - Stop all the services on all Automate and Chef Infra frontend nodes using the following command, use the below command from the bastion.
 
         ```sh
-            chef-automate systemctl --a2
-            chef-automate systemctl --cs
+            chef-automate start --a2
+            chef-automate start --cs
         ```
 
         - In the disaster recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
