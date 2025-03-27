@@ -283,6 +283,11 @@ OuterLoop:
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
+
+	// check if reindexing is already running
+	//  ***** //
+
+	// Fetch indices that need reindexing
 	indices, err := s.GetIndicesEligableForReindexing(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
@@ -300,12 +305,13 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		indexList = append(indexList, index)
 	}
 
-	// Add to the database that indexing request is running
+	// Add the request to the database with status 'running'
 	requestID, err := s.db.InsertReindexRequest("running", time.Now())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 	}
 
+	// Add the indices to reindex request detailed table
 	for key, value := range indices {
 		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
@@ -319,12 +325,28 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}, time.Now()); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
+	}
 
-		tempIndex := key + "_temp"
-		err = s.client.CreateIndex(tempIndex, key)
+	// start the reindex process for each and every index available in the DB and which needs reindexing
+	// loop through the indices
+	for _, index := range indexList {
+		// 1. Check if the index needs reindexing
+		// 2. Get the aliases and update the database
+		// 3. Create a temp index with mappings and settings
+		tempIndex := index + "_temp"
+		err = s.client.CreateIndex(tempIndex, index)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to create index %s: %s", key+"_temp", err)
+			return nil, status.Errorf(codes.Internal, "failed to create index %s: %s", tempIndex, err)
 		}
+
+		// 4. Do reindex from source to temp and get the task id
+		// 5. Wait till the reindexing completed
+		// 6. Delete the source index
+		// 7. create the source index with mappings and settings from temp index
+		// 8. Do reindex from temp to source and get the task id
+		// 9. Wait till the reindexing completed
+		// 10. Create the alias for the new source index
+		// 11. Delete the temp index
 	}
 	err = s.GetAliases(ctx, indices, requestID)
 	if err != nil {
@@ -411,7 +433,7 @@ func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.Version
 	}, nil
 }
 
-// Get aliases for indexes
+// GetAliases fetches the aliases for index and update the database
 func (s *ChefIngestServer) GetAliases(ctx context.Context, indexes map[string]backend.IndexSettingsVersion, requestID int) error {
 	log.Info("Fetching aliases for indexes")
 	for index := range indexes {
