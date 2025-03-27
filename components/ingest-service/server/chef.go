@@ -264,14 +264,12 @@ OuterLoop:
 			}
 		}
 
-		versionSettings, err := s.client.GetIndexVersionSettings(index.Index)
+		isEligible, versionSettings, err := s.VersionComparision(index.Index)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
 		}
 
-		// Is reindexing needed?
-		if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
-			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
+		if !isEligible {
 			continue
 		}
 
@@ -279,6 +277,20 @@ OuterLoop:
 	}
 
 	return eligableIndices, nil
+}
+
+func (s *ChefIngestServer) VersionComparision(index string) (bool, *backend.IndexSettingsVersion, error) {
+	versionSettings, err := s.client.GetIndexVersionSettings(index)
+	if err != nil {
+		return false, nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index, err)
+	}
+
+	// Is reindexing needed?
+	if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
+		return false, nil, nil
+	}
+
+	return true, versionSettings, nil
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
