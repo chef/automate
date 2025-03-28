@@ -492,7 +492,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	}
 
 	// update the config if already set
-	if existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
+	if req.Config.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
 		mergedConfig, err := UpdateByMergingStructs(req, existingCopy)
 		if err != nil {
 			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
