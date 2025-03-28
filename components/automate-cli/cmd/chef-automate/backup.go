@@ -44,9 +44,19 @@ or all services are down (chef-automate stop) before retrying the restore.`
 var allPassedFlags string = ""
 
 const (
-	AUTOMATE_CMD_STOP  = "sudo systemctl stop chef-automate"
-	AUTOMATE_CMD_START = "sudo systemctl start chef-automate"
-	BACKUP_CONFIG      = "file_system"
+	AUTOMATE_CMD_STOP                    = "sudo systemctl stop chef-automate"
+	AUTOMATE_CMD_START                   = "sudo systemctl start chef-automate"
+	BACKUP_CONFIG                        = "file_system"
+	CREATE_SKIP_MIGRATION_FILE           = "sudo touch /hab/.skip_migration"
+	DELETE_SKIP_MIGRATION_FILE_IF_EXISTS = `
+	    file="/hab/.skip_migration"
+		if [ -f $file ]; then
+			echo ".skip_migration file exists, so deleting the file"
+			sudo rm -rf $file
+		else
+			echo ".skip_migration file does not exist"
+		fi
+		`
 )
 
 type BackupFromBashtion interface {
@@ -329,7 +339,7 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 		if err != nil {
 			return err
 		}
-		os.Exit(1)
+		os.Exit(0)
 	}
 	if strings.Contains(cmd.CommandPath(), "restore") {
 		if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
@@ -342,11 +352,17 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			}
 			commandString = commandString + " --yes"
 		}
+		isSkipMigrationFileExist, er := deleteSkipMigrationFileIfExists(infra)
+		if er != nil {
+			writer.Errorf("error in deleting .skip_migration file if the file exists: %s", er.Error())
+			return er
+		}
 		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
+		cleanUpRestoreTask(isSkipMigrationFileExist)
 		if err != nil {
 			return err
 		}
-		os.Exit(1)
+		os.Exit(0)
 	}
 	if strings.Contains(cmd.CommandPath(), "delete") {
 		affirmation, err := takeDeleteAffirmation(args)
@@ -1386,4 +1402,65 @@ func getBackupStatusAsCompletedOrFailed(backup *api.BackupTask) bool {
 
 	return false
 
+}
+
+func deleteSkipMigrationFileIfExists(infra *AutomateHAInfraDetails) (bool, error) {
+	isSkipMigrationFileExist := false
+	sshUtil, err := getSshUtilConfig(infra)
+	if err != nil {
+		return false, err
+	}
+	result, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(DELETE_SKIP_MIGRATION_FILE_IF_EXISTS)
+	if err != nil {
+		writer.Error(err.Error())
+		return false, err
+	}
+	if strings.Contains(result, ".skip_migration file exists") {
+		isSkipMigrationFileExist = true
+	} else {
+		isSkipMigrationFileExist = false
+	}
+	return isSkipMigrationFileExist, nil
+}
+
+func createSkipMigrationFile() error {
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	sshUtil, err := getSshUtilConfig(infra)
+	if err != nil {
+		return err
+	}
+	_, err = sshUtil.connectAndExecuteCommandOnRemote(CREATE_SKIP_MIGRATION_FILE, true)
+	if err != nil {
+		writer.Errorf("error in creating .skip_migration file: %s", err.Error())
+		return err
+	}
+	writer.Println("Created .skip_migration file")
+	return nil
+}
+
+func getSshUtilConfig(infra *AutomateHAInfraDetails) (SSHUtil, error) {
+	sshconfig := &SSHConfig{}
+	sshconfig.sshUser = infra.Outputs.SSHUser.Value
+	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+	sshconfig.sshPort = infra.Outputs.SSHPort.Value
+	sshUtil := NewSSHUtil(sshconfig)
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	if automateIps == nil || len(automateIps) < 1 {
+		return nil, status.Errorf(status.ConfigError, "Invalid deployment config")
+	}
+	sshUtil.getSSHConfig().hostIP = automateIps[0]
+	return sshUtil, nil
+}
+
+func cleanUpRestoreTask(isSkipMigrationFileExist bool) {
+	if isSkipMigrationFileExist {
+		err := createSkipMigrationFile()
+		if err != nil {
+			writer.Errorf("error in creating .skip_migration file: %s", err.Error())
+			return
+		}
+	}
 }
