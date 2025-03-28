@@ -50,20 +50,31 @@ This section will discuss deploying Chef Automate HA on-premises machines with a
 
 ### Prerequisites
 
-- Create another user under the home directory with sudo privileges, `eg: /home/<user>`.
-- The username should be set in the `ssh_user' field of the config before proceeding with the deployment. The config will have value like 'ssh-user = "<ssh_user>"'.
-- The SSH username should have read, write and execute permissions.
-- The '/home/<ssh_user>' directory should be present on all remote nodes.
+#### * Directory Structure
 
-1. Verify the configuration file.
+- A directory must exist on all cluster nodes at `/home/<ssh_user name>/`.
+- The should be specified in the 'config.toml' configuration file under the `ssh_user` key.
 
-    ```bash
-    sudo chef-automate verify -c config.toml
-    ```
+#### * Permission Requirements
 
-    To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
+- The specified SSH user must have:
+  - Read (r), write (w), and execute (x) permissions.
+  - Ownership of the directory.
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
+#### * Example
+
+If `config.toml` contains `ssh_user = "user1"`, then every node must have the `/home/user1/` directory structure with permissions `drwx------ user1 user1 /home/user1`.
+
+
+Verify the configuration file.
+
+```bash
+sudo chef-automate verify -c config.toml
+```
+
+To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
+
+Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
 
 ## Steps to Deploy
 
