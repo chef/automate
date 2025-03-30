@@ -1661,6 +1661,8 @@ exceptions:
     reason: Ruby license (previously shipped in Automate 1)
   - name : core/libmpc   
     reason: Exception made by Chef Legal    
+  - name: core/tzdata
+    reason: Added to supress license_scout error in verify_private
 
   ruby:
   - name: highline
