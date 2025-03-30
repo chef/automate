@@ -87,7 +87,7 @@ steps:
 
   - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
     commands:
-      - gem install bundler:2.3.27
+      - gem install bundler:2.6.5
       - cd components/automate-cluster-ctl/; bundle install --jobs=3 --retry=3
       - bundle exec rspec
     expeditor:

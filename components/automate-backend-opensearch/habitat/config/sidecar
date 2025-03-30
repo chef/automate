@@ -1,4 +1,4 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 echo "------------- starting opensearch sidecar -------------------"
-HAB_LICENSE=accept-no-persist GEM_PATH={{pkg.path}}/lib/gems {{pkgPathFor "core/ruby31"}}/bin/ruby {{pkg.path}}/bin/opensearch_sidecar.rb
+HAB_LICENSE=accept-no-persist GEM_PATH={{pkg.path}}/lib/gems {{pkgPathFor "core/ruby3_4"}}/bin/ruby {{pkg.path}}/bin/opensearch_sidecar.rb
 echo "-------------------------------------------------------------"
