@@ -13,7 +13,7 @@ const (
 	initMsg = `This is a Major upgrade. 
 ========================
 
-  1) In this release Embedded PostgreSQL is upgraded to version 13.5 
+  1) In this release Embedded PostgreSQL is upgraded to version %v 
   2) This will need special care if you use Embedded PostgreSQL. 
 
 ===== Your installation is using %s PostgreSQL =====
@@ -35,7 +35,7 @@ const (
      $ ` + run_chef_automate_upgrade_status_cmd + `
    This should return: Automate is up-to-date`
 
-	run_pg_data_migrate = `Migrate Data from PG 9.6 to PG 13.5 using this command:
+	run_pg_data_migrate = `Migrate Data from PG %v to PG %v using this command:
      $ ` + run_pg_data_migrate_cmd
 
 	run_pg_data_migrate_cmd = `chef-automate post-major-upgrade migrate --data=pg`
@@ -44,7 +44,7 @@ const (
 	run_chef_automate_status     = `Check all services are running using: 
      $ chef-automate status`
 
-	run_pg_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running: 
+	run_pg_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL %v Data by running: 
      $ ` + run_pg_data_cleanup_cmd
 
 	run_pg_data_cleanup_cmd        = `chef-automate post-major-upgrade clear-data --data=PG`
@@ -70,7 +70,7 @@ var postChecklistEmbedded = []PostCheckListItem{
 		IsExecuted: false,
 	}, {
 		Id:         "migrate_pg",
-		Msg:        run_pg_data_migrate,
+		Msg:        fmt.Sprintf(run_pg_data_migrate, 9.6, 13.5),
 		Cmd:        run_pg_data_migrate_cmd,
 		IsExecuted: false,
 	}, {
@@ -81,7 +81,7 @@ var postChecklistEmbedded = []PostCheckListItem{
 		IsExecuted: false,
 	}, {
 		Id:         "clean_up",
-		Msg:        run_pg_data_cleanup,
+		Msg:        fmt.Sprintf(run_pg_data_cleanup, 9.6),
 		Cmd:        run_pg_data_cleanup_cmd,
 		Optional:   true,
 		IsExecuted: false,
@@ -158,7 +158,7 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	if ci.isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
-		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), externalPGUpgradeCheck(), postChecklistIntimationCheck()}...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), externalPGUpgradeCheck(9.6, 13.5), postChecklistIntimationCheck()}...)
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
@@ -170,7 +170,7 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 		Writer: ci.writer,
 	}
 
-	ci.writer.Println(fmt.Sprintf(initMsg, dbType, ci.version)) //display the init message
+	ci.writer.Println(fmt.Sprintf(initMsg, 13.5, dbType, ci.version)) //display the init message
 
 	for _, item := range checklists {
 		if item.TestFunc == nil {
@@ -272,12 +272,12 @@ func postChecklistIntimationCheck() Checklist {
 	}
 }
 
-func externalPGUpgradeCheck() Checklist {
+func externalPGUpgradeCheck(current_version, target_version float64) Checklist {
 	return Checklist{
 		Name:        "external_pg_upgrade_acceptance",
 		Description: "confirmation check for external PG upgrade",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Upgrade your PostgreSQL 9.6 to 13.5 with the help of your Database Administrator")
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Upgrade your PostgreSQL %v to %v with the help of your Database Administrator", current_version, target_version))
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
