@@ -17,6 +17,7 @@ message ConfigRequest {
   message V1 {
     System sys = 1;
     Service svc = 2;
+    Log log = 3;
 
     message System {
       chef.automate.infra.config.Mlsa mlsa = 1;
@@ -31,6 +32,15 @@ message ConfigRequest {
         google.protobuf.StringValue message = 2;   
       }
     }
+
+    message Log {
+      google.protobuf.StringValue level = 1;
+      google.protobuf.StringValue format = 2;
+    }
+    
     message Service {}
+    
   }
+
+
 }
