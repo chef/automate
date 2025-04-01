@@ -16,6 +16,41 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// SQL Queries
+const insertReindexRequest = `
+INSERT INTO reindex_requests(status, created_at, last_updated)
+VALUES ($1, $2, $3)
+RETURNING id;`
+
+const updateReindexRequest = `
+UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE id = $3;`
+
+const getLatestReindexRequest = `
+SELECT id, status, created_at, last_updated 
+FROM reindex_requests 
+WHERE id = $1 
+ORDER BY last_updated DESC 
+LIMIT 1;`
+
+const insertReindexRequestDetailed = `
+INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
+
+const getLatestReindexRequestDetails = `
+SELECT id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at 
+FROM reindex_request_detailed 
+WHERE request_id = $1 
+ORDER BY updated_at DESC;`
+
+const deleteReindexRequest = `
+DELETE FROM reindex_requests WHERE id = $1;`
+
+const deleteReindexRequestDetail = `
+DELETE FROM reindex_request_detailed WHERE id = $1;`
+
+const updateReindexRequestDetailed = `
+UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2, updated_at = $3 WHERE request_id = $4 AND index = $5;`
+
 type DB struct {
 	*gorp.DbMap
 }
@@ -290,37 +325,85 @@ func (db *DB) UpdateTaskIDForReindexRequest(requestID int, indexName string, tas
 	return nil
 }
 
-// SQL Queries
-const insertReindexRequest = `
-INSERT INTO reindex_requests(status, created_at, last_updated)
-VALUES ($1, $2, $3)
-RETURNING id;`
+func (db *DB) CreateOrUpdateStageAndStatusForIndex(requestId int, index string, stage string, status string, updateTime time.Time) error {
 
-const updateReindexRequest = `
-UPDATE reindex_requests SET status = $1, last_updated = $2 WHERE id = $3;`
+	stageDetails, err := db.GetStageForIndex(requestId, index)
+	if err != nil {
+		return errors.Errorf("Unable to get the stage for requestId %d and index %s with error %v", requestId, index, err)
+	}
 
-const getLatestReindexRequest = `
-SELECT id, status, created_at, last_updated 
-FROM reindex_requests 
-WHERE id = $1 
-ORDER BY last_updated DESC 
-LIMIT 1;`
+	stageDetailsNew := getUpdatedStageDetails(stageDetails, stage, status, updateTime)
 
-const insertReindexRequestDetailed = `
-INSERT INTO reindex_request_detailed(request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
+	return db.UpdateStageDetailsForIndex(requestId, index, stageDetailsNew)
+}
 
-const getLatestReindexRequestDetails = `
-SELECT id, request_id, index, from_version, to_version, stage, os_task_id, heartbeat, having_alias, alias_list, created_at, updated_at 
-FROM reindex_request_detailed 
-WHERE request_id = $1 
-ORDER BY updated_at DESC;`
+func (db *DB) GetStageForIndex(requestId int, index string) ([]*StageDetail, error) {
+	var stageDetails []*StageDetail
 
-const deleteReindexRequest = `
-DELETE FROM reindex_requests WHERE id = $1;`
+	query := `Select stage from reindex_request_detailed where request_id = $1 and index = $2`
 
-const deleteReindexRequestDetail = `
-DELETE FROM reindex_request_detailed WHERE id = $1;`
+	var stageData []byte
+	err := db.QueryRow(query, requestId, index).Scan(&stageData)
+	if err != nil {
+		return nil, err
+	}
 
-const updateReindexRequestDetailed = `
-UPDATE reindex_request_detailed SET having_alias = $1, alias_list = $2, updated_at = $3 WHERE request_id = $4 AND index = $5;`
+	if stageData == nil {
+		return stageDetails, nil
+	}
+
+	err = json.Unmarshal(stageData, &stageDetails)
+	if err != nil {
+		return nil, err
+	}
+
+	return stageDetails, nil
+
+}
+
+func (db *DB) UpdateStageDetailsForIndex(requestId int, index string, stageDetails []*StageDetail) error {
+	updateQuery := `update reindex_request_detailed set stage = $1 where request_id = $2 and index = $3`
+	stageDetailsBytes, err := json.Marshal(stageDetails)
+	if err != nil {
+		return errors.Errorf("Unable to convert json into bytes for stage details with requestId %d and index %s and error %v", requestId, index, err)
+	}
+
+	result, err := db.Exec(updateQuery, stageDetailsBytes, requestId, index)
+	if err != nil {
+		return errors.Errorf("Unable to executed update query the stage for requestId %d and index %s and error %v", requestId, index, err)
+	}
+
+	rows, err := result.RowsAffected()
+	if rows == 0 {
+		return errors.Errorf("Unable to update the stage for requestId %d and index %s", requestId, index)
+	}
+
+	if err != nil {
+		return errors.Errorf("Unable to executed update query the stage for requestId %d and index %s and error %v", requestId, index, err)
+	}
+
+	return err
+}
+
+func getUpdatedStageDetails(stageDetails []*StageDetail, stage string, status string, updateTime time.Time) []*StageDetail {
+	var stageFound bool
+	for _, stageDetail := range stageDetails {
+		//If Stage already present updating it
+		if stageDetail.Stage == stage {
+			stageDetail.Status = status
+			stageDetail.UpdatedAt = updateTime
+			stageFound = true
+		}
+	}
+
+	//Stage not found or if the stage we are adding is first one
+	if !stageFound || len(stageDetails) == 0 {
+		stageDetails = append(stageDetails, &StageDetail{
+			Stage:     stage,
+			Status:    status,
+			UpdatedAt: updateTime,
+		})
+	}
+
+	return stageDetails
+}
