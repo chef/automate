@@ -418,22 +418,23 @@ func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceI
 	return nil
 }
 
+// TODO: Uncomment and implement the createAliases function
 func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, aliases []string, requestID int) error {
-	if len(aliases) == 0 {
-		log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
-		return nil
-	}
+	// if len(aliases) == 0 {
+	// 	log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
+	// 	return nil
+	// }
 
-	for _, aliasName := range aliases {
-		log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
-		err := s.client.CreateAlias(ctx, aliasName, srcIndex)
-		if err != nil {
-			log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
-			// TODO: Update the database with the error
-			continue
-		}
-		// TODO: Update the database with the success
-	}
+	// for _, aliasName := range aliases {
+	// 	log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
+	// 	err := s.client.CreateAlias(ctx, aliasName, srcIndex)
+	// 	if err != nil {
+	// 		log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
+	// 		// TODO: Update the database with the error
+	// 		continue
+	// 	}
+	// 	// TODO: Update the database with the success
+	// }
 	return nil
 }
 
