@@ -264,14 +264,12 @@ OuterLoop:
 			}
 		}
 
-		versionSettings, err := s.client.GetIndexVersionSettings(index.Index)
+		isEligible, versionSettings, err := s.VersionComparision(index.Index)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index.Index, err)
 		}
 
-		// Is reindexing needed?
-		if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
-			log.WithFields(log.Fields{"index": index.Index}).Info("Skipping index as it is already up to date")
+		if !isEligible {
 			continue
 		}
 
@@ -281,8 +279,27 @@ OuterLoop:
 	return eligableIndices, nil
 }
 
+func (s *ChefIngestServer) VersionComparision(index string) (bool, *backend.IndexSettingsVersion, error) {
+	versionSettings, err := s.client.GetIndexVersionSettings(index)
+	if err != nil {
+		return false, nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index, err)
+	}
+
+	// Is reindexing needed?
+	if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
+		return false, nil, nil
+	}
+
+	return true, versionSettings, nil
+}
+
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
 	log.Info("Received request to start reindexing")
+
+	// check if reindexing is already running
+	//  ***** //
+
+	// Fetch indices that need reindexing
 	indices, err := s.GetIndicesEligableForReindexing(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
@@ -300,18 +317,20 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		indexList = append(indexList, index)
 	}
 
-	// Add to the database that indexing request is running
+	// Add the request to the database with status 'running'
 	requestID, err := s.db.InsertReindexRequest("running", time.Now())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 	}
 
+	// Add the indices to reindex request detailed table
 	for key, value := range indices {
 		if err := s.db.InsertReindexRequestDetailed(storage.ReindexRequestDetailed{
 			RequestID:   requestID,
 			Index:       key,
 			FromVersion: value.Settings.Index.Version.CreatedString,
 			ToVersion:   value.Settings.Index.Version.UpgradedString,
+			Stage:       []storage.StageDetail{},
 			OsTaskID:    "",
 			Heartbeat:   time.Now(),
 			HavingAlias: false,
@@ -319,43 +338,139 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}, time.Now()); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add reindex request: %s", err)
 		}
+	}
 
-		tempIndex := key + "_temp"
-		err = s.client.CreateIndex(tempIndex, key)
+	// start the reindex process for each and every index available in the DB and which needs reindexing
+	// loop through the indices
+	for _, index := range indexList {
+		// 1. Check if the index needs reindexing
+		isEligible, _, _ := s.VersionComparision(index)
+		if !isEligible {
+			log.WithFields(log.Fields{"index": index}).Info("Index does not need reindexing")
+			continue
+		}
+
+		// 2. Get the aliases and update the database
+		alias, err := s.getAliases(ctx, index, requestID)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to create index %s: %s", key+"_temp", err)
+			log.WithFields(log.Fields{"index": index}).Info("Failed to fetch aliases for index: ", index)
+			continue
+		}
+		tempIndex := index + "_temp"
+
+		// Step 3: Create Temporary Index
+		if err := s.createIndex(ctx, tempIndex, index, requestID); err != nil {
+			continue
+		}
+
+		// Step 4: Reindex from Source to Temporary Index
+		if err := s.processReindexing(ctx, tempIndex, index, requestID); err != nil {
+			log.WithFields(log.Fields{"index": index}).Info("Failed to reindex from source to temporary index: ", index)
+			continue
+		}
+
+		// Step 6: Delete Source Index
+		if err := s.deleteIndex(ctx, index, requestID); err != nil {
+			log.WithFields(log.Fields{"index": index}).Info("Failed to delete source index: ", index)
+			continue
+		}
+
+		// Step 7: Recreate Source Index from Temporary Index
+		if err := s.createIndex(ctx, index, tempIndex, requestID); err != nil {
+			log.WithFields(log.Fields{"index": index}).Info("Failed to recreate source index from temporary index: ", index)
+			continue
+		}
+
+		// Step 8: Reindex from Temporary to Source Index
+		if err := s.processReindexing(ctx, index, tempIndex, requestID); err != nil {
+			log.WithFields(log.Fields{"index": index}).Info("Failed to reindex from temporary to source index: ", index)
+			continue
+		}
+
+		// Step 10: Create Aliases for Source Index
+		if err := s.createAliases(ctx, index, alias, requestID); err != nil {
+			log.WithFields(log.Fields{"index": index}).Info("Failed to create aliases for source index: ", index)
+			continue
+		}
+
+		// Step 11: Delete Temporary Index
+		if err := s.deleteIndex(ctx, tempIndex, requestID); err != nil {
+			log.WithFields(log.Fields{"index": index}).Info("Failed to delete temporary index: ", tempIndex)
+			continue
 		}
 	}
-	err = s.GetAliases(ctx, indices, requestID)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get aliases for indices: %s", err)
-	}
-
-	s.processReindexing(ctx, requestID, indexList)
 
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
 }
 
-func (s *ChefIngestServer) processReindexing(reindexctx context.Context, requestID int, indexList []string) {
-	for _, index := range indexList {
-		srcIndex, dstIndex := index, index+"_temp"
-
-		taskID, err := s.client.ReindexIndices(reindexctx, srcIndex, dstIndex)
-		if err != nil {
-			log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
-			continue
-		}
-		if err := s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now()); err != nil {
-			log.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
-		} else {
-			log.WithFields(log.Fields{
-				"srcIndex": srcIndex,
-				"taskID":   taskID,
-			}).Info("Task ID updated in the database")
-		}
+func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceIndex string, requestID int) error {
+	log.WithFields(log.Fields{"targetIndex": targetIndex, "sourceIndex": sourceIndex}).Info("Creating index")
+	err := s.client.CreateIndex(targetIndex, sourceIndex)
+	if err != nil {
+		log.WithError(err).Errorf("Failed to create index: %s", targetIndex)
+		// TODO: Update the database with the error
+		return status.Errorf(codes.Internal, "failed to create index %s: %s", targetIndex, err)
 	}
+	// TODO: Update the database with the success
+
+	return nil
+}
+
+// TODO: Uncomment and implement the createAliases function
+func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, aliases []string, requestID int) error {
+	// if len(aliases) == 0 {
+	// 	log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
+	// 	return nil
+	// }
+
+	// for _, aliasName := range aliases {
+	// 	log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
+	// 	err := s.client.CreateAlias(ctx, aliasName, srcIndex)
+	// 	if err != nil {
+	// 		log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
+	// 		// TODO: Update the database with the error
+	// 		continue
+	// 	}
+	// 	// TODO: Update the database with the success
+	// }
+	return nil
+}
+
+func (s *ChefIngestServer) deleteIndex(ctx context.Context, index string, requestID int) error {
+	log.WithFields(log.Fields{"index": index}).Info("Deleting index")
+	err := s.client.DeleteIndex(ctx, index)
+	if err != nil {
+		log.WithError(err).Errorf("Failed to delete index %s", index)
+
+		// TODO: Update the database with the error
+		return err
+	}
+	// TODO: Update the database with the success
+	return nil
+}
+
+func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, srcIndex string, requestID int) error {
+	log.WithFields(log.Fields{"destIndex": destIndex, "srcIndex": srcIndex}).Info("Reindexing from source to destination index")
+
+	taskID, err := s.client.ReindexIndices(ctx, srcIndex, destIndex)
+	if err != nil {
+		log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
+		return status.Errorf(codes.Internal, "failed to start reindexing for index %s: %s", srcIndex, err)
+	}
+	if err := s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now()); err != nil {
+		log.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
+		return status.Errorf(codes.Internal, "failed to update task ID for index %s: %s", srcIndex, err)
+	} else {
+		log.WithFields(log.Fields{
+			"srcIndex": srcIndex,
+			"taskID":   taskID,
+		}).Info("Task ID updated in the database")
+	}
+
+	// Wait for the reindexing to complete
+	return nil
 }
 
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {
@@ -411,21 +526,19 @@ func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.Version
 	}, nil
 }
 
-// Get aliases for indexes
-func (s *ChefIngestServer) GetAliases(ctx context.Context, indexes map[string]backend.IndexSettingsVersion, requestID int) error {
-	log.Info("Fetching aliases for indexes")
-	for index := range indexes {
-		log.Info("Fetching aliases for index: ", index)
-		alias, hasAlias, err := s.client.GetAliases(ctx, index)
-		if err != nil {
-			log.Info("Failed to fetch aliases for index: ", index)
-			return err
-		}
-		err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID, time.Now())
-		if err != nil {
-			log.Info("Failed to update aliases for index: ", index)
-			return err
-		}
+// GetAliases fetches the aliases for index and update the database
+func (s *ChefIngestServer) getAliases(ctx context.Context, index string, requestID int) ([]string, error) {
+	log.Info("Fetching aliases for index: ", index)
+	alias, hasAlias, err := s.client.GetAliases(ctx, index)
+	if err != nil {
+		log.Info("Failed to fetch aliases for index: ", index)
+		return nil, err
 	}
-	return nil
+	err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID, time.Now())
+	if err != nil {
+		log.Info("Failed to update aliases for index: ", index)
+		return nil, err
+	}
+
+	return alias, nil
 }
