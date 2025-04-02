@@ -353,49 +353,49 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		// 2. Get the aliases and update the database
 		alias, err := s.getAliases(ctx, index, requestID)
 		if err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to fetch aliases for index: ", index)
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to fetch aliases for index: ", index)
 			continue
 		}
 		tempIndex := index + "_temp"
 
 		// Step 3: Create Temporary Index
-		if err := s.createIndex(ctx, tempIndex, index, requestID); err != nil {
+		if err := s.createIndex(ctx, tempIndex, index, requestID, SRC_TO_TEMP, index); err != nil {
 			continue
 		}
 
 		// Step 4: Reindex from Source to Temporary Index
-		if err := s.processReindexing(ctx, tempIndex, index, requestID); err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to reindex from source to temporary index: ", index)
+		if err := s.processReindexing(ctx, tempIndex, index, requestID, REINDEX_SRC_TEMP, index); err != nil {
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from source to temporary index: ", index)
 			continue
 		}
 
 		// Step 6: Delete Source Index
-		if err := s.deleteIndex(ctx, index, requestID); err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to delete source index: ", index)
+		if err := s.deleteIndex(ctx, index, requestID, index, DELETE_SRC); err != nil {
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete source index: ", index)
 			continue
 		}
 
 		// Step 7: Recreate Source Index from Temporary Index
-		if err := s.createIndex(ctx, index, tempIndex, requestID); err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to recreate source index from temporary index: ", index)
+		if err := s.createIndex(ctx, index, tempIndex, requestID, TEMP_TO_SRC, index); err != nil {
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to recreate source index from temporary index: ", index)
 			continue
 		}
 
 		// Step 8: Reindex from Temporary to Source Index
-		if err := s.processReindexing(ctx, index, tempIndex, requestID); err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to reindex from temporary to source index: ", index)
+		if err := s.processReindexing(ctx, index, tempIndex, requestID, REINDEX_TEMP_SRC, index); err != nil {
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from temporary to source index: ", index)
 			continue
 		}
 
 		// Step 10: Create Aliases for Source Index
 		if err := s.createAliases(ctx, index, alias, requestID); err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to create aliases for source index: ", index)
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create aliases for source index: ", index)
 			continue
 		}
 
 		// Step 11: Delete Temporary Index
-		if err := s.deleteIndex(ctx, tempIndex, requestID); err != nil {
-			log.WithFields(log.Fields{"index": index}).Info("Failed to delete temporary index: ", tempIndex)
+		if err := s.deleteIndex(ctx, tempIndex, requestID, index, DELETE_TEMP); err != nil {
+			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete temporary index: ", tempIndex)
 			continue
 		}
 	}
@@ -405,21 +405,40 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	}, nil
 }
 
-func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceIndex string, requestID int) error {
+func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceIndex string, requestID int, stage string, originalIndex string) error {
 	log.WithFields(log.Fields{"targetIndex": targetIndex, "sourceIndex": sourceIndex}).Info("Creating index")
-	err := s.client.CreateIndex(targetIndex, sourceIndex)
+
+	err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_RUNNING, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_RUNNING, err)
+		return err
+	}
+	err = s.client.CreateIndex(targetIndex, sourceIndex)
 	if err != nil {
 		log.WithError(err).Errorf("Failed to create index: %s", targetIndex)
-		// TODO: Update the database with the error
+		err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_FAILED, err)
+		}
 		return status.Errorf(codes.Internal, "failed to create index %s: %s", targetIndex, err)
 	}
-	// TODO: Update the database with the success
+	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_COMPLETED, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_COMPLETED, err)
+		return err
+	}
 
 	return nil
 }
 
 // TODO: Uncomment and implement the createAliases function
 func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, aliases []string, requestID int) error {
+
+	err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_RUNNING, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_RUNNING, err)
+		return err
+	}
 	// if len(aliases) == 0 {
 	// 	log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
 	// 	return nil
@@ -431,36 +450,74 @@ func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, a
 	// 	if err != nil {
 	// 		log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
 	// 		// TODO: Update the database with the error
+	// err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_FAILED, time.Now())
+	// if err != nil {
+	// 	log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_FAILED, err)
+	// 	return err
+	// }
 	// 		continue
 	// 	}
-	// 	// TODO: Update the database with the success
+	//
 	// }
-	return nil
-}
 
-func (s *ChefIngestServer) deleteIndex(ctx context.Context, index string, requestID int) error {
-	log.WithFields(log.Fields{"index": index}).Info("Deleting index")
-	err := s.client.DeleteIndex(ctx, index)
+	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_COMPLETED, time.Now())
 	if err != nil {
-		log.WithError(err).Errorf("Failed to delete index %s", index)
-
-		// TODO: Update the database with the error
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_COMPLETED, err)
 		return err
 	}
-	// TODO: Update the database with the success
 	return nil
 }
 
-func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, srcIndex string, requestID int) error {
+func (s *ChefIngestServer) deleteIndex(ctx context.Context, index string, requestID int, originalIndex, stage string) error {
+
+	log.WithFields(log.Fields{"index": index}).Info("Deleting index")
+
+	err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_RUNNING, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_RUNNING, err)
+		return err
+	}
+
+	err = s.client.DeleteIndex(ctx, index)
+	if err != nil {
+		log.WithError(err).Errorf("Failed to delete index %s", index)
+		err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_FAILED, err)
+		}
+		return err
+	}
+	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_COMPLETED, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_COMPLETED, err)
+		return err
+	}
+	return nil
+}
+
+func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, srcIndex string, requestID int, stage, originalIndex string) error {
 	log.WithFields(log.Fields{"destIndex": destIndex, "srcIndex": srcIndex}).Info("Reindexing from source to destination index")
+
+	err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_RUNNING, time.Now())
+	if err != nil {
+		return err
+	}
 
 	taskID, err := s.client.ReindexIndices(ctx, srcIndex, destIndex)
 	if err != nil {
 		log.WithError(err).Errorf("Failed to start reindexing for index %s", srcIndex)
+		err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_FAILED, err)
+		}
 		return status.Errorf(codes.Internal, "failed to start reindexing for index %s: %s", srcIndex, err)
 	}
-	if err := s.db.UpdateTaskIDForReindexRequest(requestID, srcIndex, taskID, time.Now()); err != nil {
+	if err := s.db.UpdateTaskIDForReindexRequest(requestID, originalIndex, taskID, time.Now()); err != nil {
 		log.WithError(err).Errorf("Failed to update task ID for index %s", srcIndex)
+		err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_FAILED, err)
+		}
 		return status.Errorf(codes.Internal, "failed to update task ID for index %s: %s", srcIndex, err)
 	} else {
 		log.WithFields(log.Fields{
@@ -470,6 +527,12 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, src
 	}
 
 	// Wait for the reindexing to complete
+
+	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_COMPLETED, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_COMPLETED, err)
+		return err
+	}
 	return nil
 }
 
@@ -529,14 +592,34 @@ func (s *ChefIngestServer) GetVersion(ctx context.Context, empty *ingest.Version
 // GetAliases fetches the aliases for index and update the database
 func (s *ChefIngestServer) getAliases(ctx context.Context, index string, requestID int) ([]string, error) {
 	log.Info("Fetching aliases for index: ", index)
+	err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, index, GET_ALIASES, STATUS_RUNNING, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", GET_ALIASES, STATUS_RUNNING, err)
+		return nil, err
+	}
 	alias, hasAlias, err := s.client.GetAliases(ctx, index)
 	if err != nil {
-		log.Info("Failed to fetch aliases for index: ", index)
+		log.Errorf("Failed to fetch aliases for index: %s for error %v ", index, err)
+		err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, index, GET_ALIASES, STATUS_FAILED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s with status %s with error %v", GET_ALIASES, STATUS_FAILED, err)
+		}
+
 		return nil, err
 	}
 	err = s.db.UpdateAliasesForIndex(index, hasAlias, alias, requestID, time.Now())
 	if err != nil {
-		log.Info("Failed to update aliases for index: ", index)
+		log.Errorf("Failed to fetch aliases for index: %s for error %v ", index, err)
+		err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, index, GET_ALIASES, STATUS_FAILED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s with status %s with error %v", GET_ALIASES, STATUS_FAILED, err)
+		}
+		return nil, err
+	}
+
+	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, index, GET_ALIASES, STATUS_COMPLETED, time.Now())
+	if err != nil {
+		log.Errorf("Failed to update the status for stage %s with status %s with error %v", GET_ALIASES, STATUS_COMPLETED, err)
 		return nil, err
 	}
 

@@ -1,4 +1,4 @@
-package storage_test
+package storage
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/chef/automate/components/ingest-service/storage"
 	"github.com/go-gorp/gorp"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +17,7 @@ func TestInsertReindexRequestSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -36,7 +36,7 @@ func TestInsertReindexRequestFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -54,7 +54,7 @@ func TestUpdateReindexRequestSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -72,7 +72,7 @@ func TestUpdateReindexRequestFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -90,16 +90,16 @@ func TestInsertReindexRequestDetailedSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
-	detail := storage.ReindexRequestDetailed{
+	detail := ReindexRequestDetailed{
 		RequestID:   1,
 		Index:       "index1",
 		FromVersion: "1.0",
 		ToVersion:   "2.0",
-		Stage:       []storage.StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
+		Stage:       []StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
 		OsTaskID:    "task1",
 		Heartbeat:   time.Now(),
 		HavingAlias: true,
@@ -129,16 +129,16 @@ func TestInsertReindexRequestDetailedFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
-	detail := storage.ReindexRequestDetailed{
+	detail := ReindexRequestDetailed{
 		RequestID:   1,
 		Index:       "index1",
 		FromVersion: "1.0",
 		ToVersion:   "2.0",
-		Stage:       []storage.StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
+		Stage:       []StageDetail{{Stage: "stage1", Status: "running", UpdatedAt: time.Now()}},
 		OsTaskID:    "task1",
 		Heartbeat:   time.Now(),
 		HavingAlias: true,
@@ -168,7 +168,7 @@ func TestDeleteReindexRequestSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -184,7 +184,7 @@ func TestDeleteReindexRequestFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -200,7 +200,7 @@ func TestDeleteReindexRequestDetailSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -216,7 +216,7 @@ func TestDeleteReindexRequestDetailFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -232,7 +232,7 @@ func TestGetReindexStatusSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -274,7 +274,7 @@ func TestGetReindexStatusFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -297,7 +297,7 @@ func TestGetReindexStatusNoDetails(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -335,7 +335,7 @@ func TestUpdateAliasesForIndex(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 	time := time.Now()
@@ -351,7 +351,7 @@ func TestUpdateAliasesForIndexSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 	time := time.Now()
@@ -368,7 +368,7 @@ func TestUpdateAliasesForIndexNoAliases(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 	time := time.Now()
@@ -385,7 +385,7 @@ func TestUpdateTaskIDForReindexRequestSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -412,7 +412,7 @@ func TestUpdateTaskIDForReindexRequestNoRowsFound(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -440,7 +440,7 @@ func TestUpdateTaskIDForReindexRequestQueryFailure(t *testing.T) {
 	assert.NoError(t, err)
 	defer dbConn.Close()
 
-	db := &storage.DB{
+	db := DB{
 		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
 	}
 
@@ -461,4 +461,178 @@ func TestUpdateTaskIDForReindexRequestQueryFailure(t *testing.T) {
 	err = db.UpdateTaskIDForReindexRequest(requestID, indexName, taskID, currentTime)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to update task ID")
+}
+
+func TestDB_CreateOrUpdateStageAndStatusForIndex(t *testing.T) {
+
+	t.Run("Sucessful update", func(t *testing.T) {
+		dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		assert.NoError(t, err)
+		defer dbConn.Close()
+
+		db := DB{
+			DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+		}
+
+		requestID := 1
+		index := "test_index"
+		stage := "stage1"
+		status := "completed"
+		updateTime := time.Now()
+
+		// Mock the query to fetch existing stages
+		stageJSON := `[{"stage":"stage1","status":"running","updated_at":"2025-03-28T12:00:00Z"}]`
+		mock.ExpectQuery(`Select stage from reindex_request_detailed where request_id = $1 and index = $2`).
+			WithArgs(requestID, index).
+			WillReturnRows(sqlmock.NewRows([]string{"stage"}).AddRow(stageJSON))
+
+		// Mock the update query
+		mock.ExpectExec(`update reindex_request_detailed set stage = $1 where request_id = $2 and index = $3`).
+			WithArgs(sqlmock.AnyArg(), requestID, index).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = db.CreateOrUpdateStageAndStatusForIndex(requestID, index, stage, status, updateTime)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Error in getting data already presnet", func(t *testing.T) {
+		dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		assert.NoError(t, err)
+		defer dbConn.Close()
+
+		db := DB{
+			DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+		}
+
+		requestID := 1
+		index := "test_index"
+		stage := "stage1"
+		status := "completed"
+		updateTime := time.Now()
+
+		// Mock the query to fetch existing stages (simulate query failure)
+		mock.ExpectQuery(`Select stage from reindex_request_detailed where request_id = $1 and index = $2`).
+			WithArgs(requestID, index).
+			WillReturnError(assert.AnError)
+
+		err = db.CreateOrUpdateStageAndStatusForIndex(requestID, index, stage, status, updateTime)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Unable to get the stage for requestId")
+	})
+
+	t.Run("Error in Updating the data", func(t *testing.T) {
+		dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		assert.NoError(t, err)
+		defer dbConn.Close()
+
+		db := DB{
+			DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+		}
+
+		requestID := 1
+		index := "test_index"
+		stage := "stage1"
+		status := "completed"
+		updateTime := time.Now()
+
+		// Mock the query to fetch existing stages
+		stageJSON := `[{"stage":"stage1","status":"running","updated_at":"2025-03-28T12:00:00Z"}]`
+		mock.ExpectQuery(`Select stage from reindex_request_detailed where request_id = $1 and index = $2`).
+			WithArgs(requestID, index).
+			WillReturnRows(sqlmock.NewRows([]string{"stage"}).AddRow(stageJSON))
+
+		// Mock the update query (simulate update failure)
+		mock.ExpectExec(`update reindex_request_detailed set stage = $1 where request_id = $2 and index = $3`).
+			WithArgs(sqlmock.AnyArg(), requestID, index).
+			WillReturnError(assert.AnError)
+
+		err = db.CreateOrUpdateStageAndStatusForIndex(requestID, index, stage, status, updateTime)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Unable to executed update query")
+	})
+
+}
+
+func Test_getUpdatedStageDetails(t *testing.T) {
+	updateTime := time.Now()
+	type args struct {
+		stageDetails []*StageDetail
+		stage        string
+		status       string
+		updateTime   time.Time
+	}
+	tests := []struct {
+		name               string
+		args               args
+		resultStageDetails []*StageDetail
+	}{
+		{
+			name: "Adding new stage if empty",
+			args: args{
+				stageDetails: []*StageDetail{},
+				stage:        "stage1",
+				status:       "running",
+				updateTime:   updateTime,
+			},
+			resultStageDetails: []*StageDetail{
+				{
+					Stage:     "stage1",
+					Status:    "running",
+					UpdatedAt: updateTime,
+				},
+			},
+		},
+		{
+			name: "Update a stage if present in the stage details",
+			args: args{
+				stageDetails: []*StageDetail{{
+					Stage:     "stage1",
+					Status:    "running",
+					UpdatedAt: updateTime,
+				}},
+				stage:      "stage1",
+				status:     "completed",
+				updateTime: updateTime,
+			},
+			resultStageDetails: []*StageDetail{
+				{
+					Stage:     "stage1",
+					Status:    "completed",
+					UpdatedAt: updateTime,
+				},
+			},
+		},
+		{
+			name: "Add a stage if not present",
+			args: args{
+				stageDetails: []*StageDetail{{
+					Stage:     "stage1",
+					Status:    "running",
+					UpdatedAt: updateTime,
+				}},
+				stage:      "stage2",
+				status:     "completed",
+				updateTime: updateTime,
+			},
+			resultStageDetails: []*StageDetail{
+				{
+					Stage:     "stage1",
+					Status:    "running",
+					UpdatedAt: updateTime,
+				},
+				{
+					Stage:     "stage2",
+					Status:    "completed",
+					UpdatedAt: updateTime,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stageDetails := getUpdatedStageDetails(tt.args.stageDetails, tt.args.stage, tt.args.status, tt.args.updateTime)
+			assert.Equal(t, tt.resultStageDetails, stageDetails)
+
+		})
+	}
 }
