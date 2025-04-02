@@ -393,6 +393,7 @@ func getUpdatedStageDetails(stageDetails []*StageDetail, stage string, status st
 			stageDetail.Status = status
 			stageDetail.UpdatedAt = updateTime
 			stageFound = true
+			break
 		}
 	}
 
