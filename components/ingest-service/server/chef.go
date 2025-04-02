@@ -527,13 +527,57 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, src
 	}
 
 	// Wait for the reindexing to complete
+	taskCompleted := s.monitorReindexing(ctx, requestID, srcIndex, taskID) // Ensure monitoring is finished
 
-	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_COMPLETED, time.Now())
-	if err != nil {
-		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_COMPLETED, err)
-		return err
+	// Only update status to COMPLETED if the task was successful
+	if taskCompleted {
+		err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_COMPLETED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update status for stage %s to COMPLETED: %v", stage, err)
+			return err
+		}
+	} else {
+		log.Warnf("Reindexing task %s for index %s did not complete successfully. Updating status to FAILED.", taskID, srcIndex)
+		if err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now()); err != nil {
+			log.Errorf("Failed to update status for stage %s to FAILED: %v", stage, err)
+		}
 	}
 	return nil
+}
+
+func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int, index, taskID string) bool {
+	// Set a timeout for how long to wait for the task to complete
+	timeout := time.Now().Add(6 * time.Hour)
+
+	for {
+		// Check if we've exceeded the timeout
+		if time.Now().After(timeout) {
+			log.Warnf("Task %s for index %s timed out.", taskID, index)
+			return false // Task timed out
+		}
+
+		// Check the task status
+		jobStatus, err := s.client.JobStatus(ctx, taskID)
+		if err != nil {
+			log.WithError(err).Errorf("Error checking status for task %s", taskID)
+		}
+
+		// Update heartbeat only if the task is still running
+		if !jobStatus.Completed {
+			if err := s.db.UpdateReindexStatus(requestID, index, "heartbeat", time.Now()); err != nil {
+				log.WithError(err).Errorf("Failed to update heartbeat for index %s", index)
+			}
+		}
+
+		// If the job is completed, exit the loop
+		if jobStatus.Completed {
+			log.Infof("Reindexing task %s for index %s completed successfully.", taskID, index)
+			return true // Task completed successfully
+		}
+
+		// Wait for 15 seconds before checking again
+		time.Sleep(15 * time.Second)
+	}
 }
 
 func (s *ChefIngestServer) GetReindexStatus(ctx context.Context, req *ingest.GetReindexStatusRequest) (*ingest.GetReindexStatusResponse, error) {

@@ -636,3 +636,54 @@ func Test_getUpdatedStageDetails(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateReindexStatusSuccess(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	requestID := 1
+	index := "index1"
+	timestamp := time.Now()
+
+	query := `UPDATE reindex_request_detailed 
+              SET heartbeat = $1,
+                  updated_at = $2
+              WHERE request_id = $3 AND index = $4`
+
+	mock.ExpectExec(query).WithArgs(timestamp, timestamp, requestID, index).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = db.UpdateReindexStatus(requestID, index, "heartbeat", timestamp)
+	assert.NoError(t, err)
+}
+
+func TestUpdateReindexStatusFailure(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	requestID := 1
+	index := "index1"
+	timestamp := time.Now()
+
+	query := `UPDATE reindex_request_detailed 
+              SET heartbeat = $1,
+                  updated_at = $2
+              WHERE request_id = $3 AND index = $4`
+
+	mock.ExpectExec(query).WithArgs(timestamp, timestamp, requestID, index).
+		WillReturnError(fmt.Errorf("update error"))
+
+	err = db.UpdateReindexStatus(requestID, index, "heartbeat", timestamp)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Failed to update reindex status")
+}
