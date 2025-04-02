@@ -408,3 +408,17 @@ func getUpdatedStageDetails(stageDetails []*StageDetail, stage string, status st
 
 	return stageDetails
 }
+
+func (db *DB) UpdateReindexStatus(requestID int, index, status string, timestamp time.Time) error {
+	query := `UPDATE reindex_request_detailed 
+              SET heartbeat = $1,
+                  updated_at = $2
+              WHERE request_id = $3 AND index = $4`
+
+	_, err := db.Exec(query, timestamp, timestamp, requestID, index)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to update reindex status for requestID: %d, index: %s", requestID, index)
+	}
+
+	return nil
+}
