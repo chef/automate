@@ -546,8 +546,8 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, src
 }
 
 func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int, index, taskID string) bool {
-	// Set a timeout for how long to wait for the task to complete (e.g., 30 minutes).
-	timeout := time.Now().Add(30 * time.Minute)
+	// Set a timeout for how long to wait for the task to complete
+	timeout := time.Now().Add(6 * time.Hour)
 
 	for {
 		// Check if we've exceeded the timeout
