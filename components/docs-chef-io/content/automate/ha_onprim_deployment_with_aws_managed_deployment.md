@@ -44,15 +44,32 @@ You can also view the [Sample Config](#sample-config-to-setup-on-premise-deploym
 
 ## Verify Configuration file
 
-1. We verify the above config using the below command:
+### Prerequisites
 
-    ```bash
-    sudo chef-automate verify -c config.toml
-    ```
+#### * Directory Structure
 
-    To know more about config verify, you can check [Config Verify Doc page](/automate/ha_verification_check/).
+- A directory must exist on all cluster nodes at `/home/<ssh_user name>/`.
+- This should be specified in the 'config.toml' configuration file under the `ssh_user` key.
 
-    Once the verification is successfully completed, then proceed with deployment, In case of failure, please fix the issue and re-run the verify command.
+#### * Permission Requirements
+
+- The specified SSH user must have:
+  - Read (r), write (w), and execute (x) permissions.
+  - Ownership of the directory.
+
+#### * Example
+
+If `config.toml` contains `ssh_user = "user1"`, then every node must have the `/home/user1/` directory structure with permissions `drwx------ user1 user1 /home/user1`.
+
+We verify the above config using the below command:
+
+```bash
+sudo chef-automate verify -c config.toml
+```
+
+To learn more about Config Verify, check the [Config Verify Doc page](/automate/ha_verification_check/).
+
+Once the verification is completed, proceed with deployment. In case of failure, fix the issue and re-run the verify command.
 
 ## Steps to Deploy
 

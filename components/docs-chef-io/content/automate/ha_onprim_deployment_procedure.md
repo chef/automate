@@ -101,15 +101,32 @@ You can also generate a configuration file using the `init-config` subcommand.
 
 ## Config Verify
 
-1. Verify the above config using the `verify` subcommand.
+### Prerequisites
 
-    ```bash
-    sudo chef-automate verify -c config.toml
-    ```
+#### * Directory Structure
 
-    To know more about config verify, check [Config Verify Documentation](/automate/ha_verification_check/).
+- A directory must exist on all cluster nodes at `/home/<ssh_user name>/`.
+- This should be specified in the 'config.toml' configuration file under the `ssh_user` key.
 
-    Once the verification completed successfully, proceed with the deployment. In case of failure, fix the issue and verify it by re-running the verify command.
+#### * Permission Requirements
+
+- The specified SSH user must have:
+  - Read (r), write (w), and execute (x) permissions.
+  - Ownership of the directory.
+
+#### * Example
+
+If `config.toml` contains `ssh_user = "user1"`, then every node must have the `/home/user1/` directory structure with permissions `drwx------ user1 user1 /home/user1`.
+
+Verify the above config using the `verify` subcommand.
+
+```bash
+sudo chef-automate verify -c config.toml
+```
+
+To learn more about Config Verify, check the [Config Verify Documentation](/automate/ha_verification_check/).
+
+Once the verification completed successfully, proceed with the deployment. In case of failure, fix the issue and verify it by re-running the verify command.
 
 ## Steps to Deploy
 
