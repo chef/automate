@@ -431,7 +431,6 @@ func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceI
 	return nil
 }
 
-// TODO: Uncomment and implement the createAliases function
 func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, aliases []string, requestID int) error {
 	log.WithFields(log.Fields{"srcIndex": srcIndex, "aliases": aliases}).Info("Creating/updating aliases for source index")
 
@@ -459,9 +458,8 @@ func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, a
 			dbErr := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_FAILED, time.Now())
 			if dbErr != nil {
 				log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_FAILED, dbErr)
-				return dbErr
 			}
-			continue
+			return err
 		}
 	}
 
