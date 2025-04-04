@@ -431,35 +431,39 @@ func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceI
 	return nil
 }
 
-// TODO: Uncomment and implement the createAliases function
 func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, aliases []string, requestID int) error {
+	log.WithFields(log.Fields{"srcIndex": srcIndex, "aliases": aliases}).Info("Creating/updating aliases for source index")
 
+	// Update the status to indicate the alias creation process has started
 	err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_RUNNING, time.Now())
 	if err != nil {
 		log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_RUNNING, err)
 		return err
 	}
-	// if len(aliases) == 0 {
-	// 	log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
-	// 	return nil
-	// }
 
-	// for _, aliasName := range aliases {
-	// 	log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
-	// 	err := s.client.CreateAlias(ctx, aliasName, srcIndex)
-	// 	if err != nil {
-	// 		log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
-	// 		// TODO: Update the database with the error
-	// err := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_FAILED, time.Now())
-	// if err != nil {
-	// 	log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_FAILED, err)
-	// 	return err
-	// }
-	// 		continue
-	// 	}
-	//
-	// }
+	// If no aliases are provided, log and return
+	if len(aliases) == 0 {
+		log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
+		return nil
+	}
 
+	// Iterate over the aliases and create/update them in OpenSearch
+	for _, aliasName := range aliases {
+		log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
+		err := s.client.CreateAlias(ctx, aliasName, srcIndex)
+		if err != nil {
+			log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
+
+			// Update the database with the failure status
+			dbErr := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_FAILED, time.Now())
+			if dbErr != nil {
+				log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_FAILED, dbErr)
+			}
+			return err
+		}
+	}
+
+	// Update the status to indicate the alias creation process has completed
 	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_COMPLETED, time.Now())
 	if err != nil {
 		log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_COMPLETED, err)
