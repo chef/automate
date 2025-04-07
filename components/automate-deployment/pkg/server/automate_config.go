@@ -13,7 +13,6 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
-	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -415,8 +414,8 @@ func removeOrUpdateRateLimit(req *api.SetAutomateConfigRequest) error {
 	return nil
 }
 
-func createRedirectLogs(req *api.PatchAutomateConfigRequest, rateLimitBurstAutomateSyslog int32, rateLimitIntervalAutomateSyslog int32) error {
-	err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+func createRedirectLogs(req *deployment.AutomateConfig, rateLimitBurstAutomateSyslog int32, rateLimitIntervalAutomateSyslog int32) error {
+	err := createConfigFileForAutomateSysLog(req.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
@@ -443,7 +442,7 @@ func updateRedirectLogs(req *api.SetAutomateConfigRequest) error {
 	}
 	rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog := getRateLimitValues(patchReq, nil, defaultRateLimitBurstAutomateSyslog, defaultRateLimitIntervalAutomateSyslog)
 
-	return createRedirectLogs(patchReq, rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+	return createRedirectLogs(patchReq.GetConfig(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
 }
 
 func removeRedirectLogs() error {
@@ -482,7 +481,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	// set the config if already not set
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() &&
 		!existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
-		return createRedirectLogs(req, rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+		return createRedirectLogs(req.GetConfig(), rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
 	}
 
 	// rollback the config if requested
@@ -492,17 +491,18 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	}
 
 	// update the config if already set
-	if existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() {
-		mergedConfig, err := UpdateByMergingStructs(req, existingCopy)
+	if existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() && req.GetConfig().GetGlobal().GetV1().GetLog() != nil {
+		mergeConfig := deployment.NewUserOverrideConfig()
+		err := config.Merge(existingCopy, req.Config, mergeConfig) // UpdateByMergingStructs(req, existingCopy)
 		if err != nil {
 			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
 		}
 
-		if IfEqual(mergedConfig, existingCopy) {
+		if IfEqual(mergeConfig, existingCopy) {
 			return nil
 		}
 
-		return createRedirectLogs(mergedConfig, rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
+		return createRedirectLogs(mergeConfig, rateLimitBurstAutomateSyslog, rateLimitIntervalAutomateSyslog)
 	}
 
 	return nil
@@ -558,12 +558,12 @@ func removeConfigFileForAutomateSyslog() error {
 }
 
 // runLogrotateConfig() to initiate logrotate setup
-func runLogrotateConfig(req *api.PatchAutomateConfigRequest) error {
+func runLogrotateConfig(req *deployment.AutomateConfig) error {
 	if err := logrotateConfChecks(); err != nil {
 		logrus.Error("Logrotate isn't setup!")
 	}
 
-	if err := configLogrotate(req.GetConfig().GetGlobal().GetV1().GetLog()); err != nil {
+	if err := configLogrotate(req.GetGlobal().GetV1().GetLog()); err != nil {
 		logrus.Errorf("Error while configuring logrotate: %v", err)
 		return err
 	}
@@ -631,23 +631,13 @@ func rollbackLogrotate() error {
 
 }
 
-// UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
-func UpdateByMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
-	if err := mergo.Merge(req.Config, existingCopy); err != nil {
-		logrus.Errorf("cannot merge the requested and existing structs: %v", err)
-		return nil, err
-	}
-
-	return req, nil
-}
-
-func IfEqual(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) bool {
-	if req.Config.Global.V1.Log.MaxNumberRotatedLogs == existingCopy.Global.V1.Log.MaxNumberRotatedLogs &&
-		req.Config.Global.V1.Log.RedirectLogFilePath == existingCopy.Global.V1.Log.RedirectLogFilePath &&
-		req.Config.Global.V1.Log.CompressRotatedLogs == existingCopy.Global.V1.Log.CompressRotatedLogs &&
-		req.Config.Global.V1.Log.MaxSizeRotateLogs == existingCopy.Global.V1.Log.MaxSizeRotateLogs &&
-		req.Config.Global.V1.Log.RateLimitBurst == existingCopy.Global.V1.Log.RateLimitBurst &&
-		req.Config.Global.V1.Log.RateLimitInterval == existingCopy.Global.V1.Log.RateLimitInterval {
+func IfEqual(req *deployment.AutomateConfig, existingCopy *deployment.AutomateConfig) bool {
+	if req.Global.V1.Log.MaxNumberRotatedLogs == existingCopy.Global.V1.Log.MaxNumberRotatedLogs &&
+		req.Global.V1.Log.RedirectLogFilePath == existingCopy.Global.V1.Log.RedirectLogFilePath &&
+		req.Global.V1.Log.CompressRotatedLogs == existingCopy.Global.V1.Log.CompressRotatedLogs &&
+		req.Global.V1.Log.MaxSizeRotateLogs == existingCopy.Global.V1.Log.MaxSizeRotateLogs &&
+		req.Global.V1.Log.RateLimitBurst == existingCopy.Global.V1.Log.RateLimitBurst &&
+		req.Global.V1.Log.RateLimitInterval == existingCopy.Global.V1.Log.RateLimitInterval {
 		return true
 	}
 

@@ -95,10 +95,9 @@ func TestUpdateByMergingStructs(t *testing.T) {
 					Global: &shared.GlobalConfig{
 						V1: &shared.V1{
 							Log: &shared.Log{
-								RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath: &wrapperspb.StringValue{Value: filePath2},
-								CompressRotatedLogs: &wrapperspb.BoolValue{Value: true},
-
+								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath2},
+								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 10},
 							},
 						},
@@ -112,7 +111,7 @@ func TestUpdateByMergingStructs(t *testing.T) {
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
 								RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath1},
-								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
+								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: false},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
 							},
@@ -172,14 +171,16 @@ func TestUpdateByMergingStructs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := UpdateByMergingStructs(tt.args.req, tt.args.existingCopy)
+			got := deployment.NewUserOverrideConfig()
+			err := shared.Merge(tt.args.existingCopy, tt.args.req.Config, got)
+			//got, err := UpdateByMergingStructs(tt.args.req, tt.args.existingCopy)
 			require.NoError(t, err)
 			require.False(t, tt.wantErr)
 
-			require.Equal(t, got.Config.Global.V1.Log.RedirectLogFilePath.Value, tt.want.Config.Global.V1.Log.RedirectLogFilePath.Value)
-			require.Equal(t, got.Config.Global.V1.Log.CompressRotatedLogs.Value, tt.want.Config.Global.V1.Log.CompressRotatedLogs.Value)
-			require.Equal(t, got.Config.Global.V1.Log.MaxSizeRotateLogs.Value, tt.want.Config.Global.V1.Log.MaxSizeRotateLogs.Value)
-			require.Equal(t, got.Config.Global.V1.Log.MaxNumberRotatedLogs.Value, tt.want.Config.Global.V1.Log.MaxNumberRotatedLogs.Value)
+			require.Equal(t, got.Global.V1.Log.RedirectLogFilePath.Value, tt.want.Config.Global.V1.Log.RedirectLogFilePath.Value)
+			require.Equal(t, got.Global.V1.Log.CompressRotatedLogs.Value, tt.want.Config.Global.V1.Log.CompressRotatedLogs.Value)
+			require.Equal(t, got.Global.V1.Log.MaxSizeRotateLogs.Value, tt.want.Config.Global.V1.Log.MaxSizeRotateLogs.Value)
+			require.Equal(t, got.Global.V1.Log.MaxNumberRotatedLogs.Value, tt.want.Config.Global.V1.Log.MaxNumberRotatedLogs.Value)
 		})
 	}
 }

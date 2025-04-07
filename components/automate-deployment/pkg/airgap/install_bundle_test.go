@@ -19,17 +19,17 @@ import (
 
 const sampleManifest = `
 {
-	"schema_version": "1",
+	"schema_version": "2",
 	"build": "20180611145755",
 	"hab": [
-	  "core/hab/0.55.0/20180321220925",
-	  "core/hab-sup/0.55.0/20180321222338",
-	  "core/hab-launcher/7241/20180321162126"
+		"core/hab/1.6.1205/20241107140309",
+		"core/hab-sup/1.6.1205/20241107150331",
+		"core/hab-launcher/16260/20220603161305"
 	],
-	"hab_build": "core/hab/0.54.0/20180221022026",
-	"git_sha": "c6e9e90b46b03ca9ea27cfd87125b26ea2cfafbb",
+	"hab_build": "core/hab/1.6.1243/20241227194506",
+	"git_sha": "095673404808228c12df1ee71b2494a67a1368e0",
 	"packages": [
-	  "core/tar/1.29/20170513213607"
+	  "core/rsync/3.2.3/20240107034222"
 	]
   }
   `
@@ -96,27 +96,22 @@ func TestRoundTrip(t *testing.T) {
 
 	_, err = creator.Create(progress)
 	require.NoError(t, err)
-
 	downloaded := []string{
-		"core/hab/0.55.0/20180321220925",
-		"core/acl/2.2.52/20170513213108",
-		"core/attr/2.4.47/20170513213059",
-		"core/glibc/2.22/20170513201042",
-		"core/linux-headers/4.3/20170513200956",
-		"core/tar/1.29/20170513213607",
-		"core/hab/0.55.0/20180321220925",
-		"core/busybox-static/1.24.2/20170513215502",
-		"core/bzip2/1.0.6/20170513212938",
-		"core/cacerts/2017.09.20/20171014212239",
-		"core/gcc-libs/5.2.0/20170513212920",
-		"core/libarchive/3.3.2/20171018164107",
-		"core/libsodium/1.0.13/20170905223149",
-		"core/openssl/1.0.2l/20171014213633",
-		"core/xz/5.2.2/20170513214327",
-		"core/zeromq/4.2.2/20171018132502",
-		"core/zlib/1.2.8/20170513201911",
-		"core/hab-sup/0.55.0/20180321222338",
-		"core/hab-launcher/7241/20180321162126",
+		"core/hab/1.6.1205/20241107140309",
+		"core/acl/2.3.1/20240105212642",
+		"core/attr/2.5.1/20240105212555",
+		"core/glibc/2.34/20220311081742",
+		"core/linux-headers/5.19.8/20241017082755",
+		"core/perl/5.34.0/20240105215658",
+		"core/busybox-static/1.36.1/20241017124523",
+		"core/bzip2/1.0.8/20240105212113",
+		"core/cacerts/2021.10.26/20240105224256",
+		"core/gcc-libs/9.4.0/20220311083308",
+		"core/openssl/1.0.2zi/20240105224424",
+		"core/zeromq/4.3.4/20241017163014",
+		"core/zlib/1.2.11/20220311082914",
+		"core/hab-sup/1.6.1205/20241107150331",
+		"core/hab-launcher/16260/20220603161305",
 	}
 	for _, d := range downloaded {
 		assert.Contains(t, progress.downloading, d, "Expected %s to report downloading", d)
@@ -135,31 +130,27 @@ func TestRoundTrip(t *testing.T) {
 	assert.Equal(t, "", metadataHartsOnly.HabBinPath)
 
 	shasumsAutomate := map[string]string{
-		"92510240c6d0947519b4695b07e6845d7c8376f6737c0b9a65f53e0ce97fdf9c": "hab/svc/deployment-service/data/airgap/manifest.json",
-		"7d73666fd246819bd6925e7c50afeac6a6f27e2b3e970ea0e045855b7357536d": "hab/tmp/hab",
+		"1b97f9a0ce48df2aa96686eb833c4e183dd12cf6767d95d7cffd5f3511577558": "hab/svc/deployment-service/data/airgap/manifest.json",
+		"2f423768274257ed2f3b4aa0d5426289f98ffedf10a307c5e6f0376cbfa40916": "hab/tmp/hab",
 	}
 
 	shasumsHarts := map[string]string{
 		"ecbf088a7a77e0e09e9d3ebf79eb6820f92c5cd455598efea501ba62ad3fdaa9": "hab/cache/keys/core-20180119235000.pub",
-		"310fb32158a62d15d13957462336a991f27b3e35da7c600cfa2c01ad7f500139": "hab/cache/keys/core-20160810182414.pub",
-		"33099486b1381a804aa8b0a491253e3b77a77cf0ef09585def7a65ba6a5cd614": "hab/cache/artifacts/core-zlib-1.2.8-20170513201911-x86_64-linux.hart",
-		"568d5e5711bd68351611b3bccfb31b9fdd7b13bec27a4f27ba0f7a49a8b0d20c": "hab/cache/artifacts/core-zeromq-4.2.2-20171018132502-x86_64-linux.hart",
-		"ef0f0dc5f22138393e3603643b325017bca5a81ea9d190311e0c434fae012d6f": "hab/cache/artifacts/core-xz-5.2.2-20170513214327-x86_64-linux.hart",
-		"f54fc047afe92b3b9c716abee26107f7345e7fdf0884169bb5b4f092349d16c8": "hab/cache/artifacts/core-tar-1.29-20170513213607-x86_64-linux.hart",
-		"a29837662df3fff87131e013dca72a43e4c46ce2971b859a9695401f9f351407": "hab/cache/artifacts/core-openssl-1.0.2l-20171014213633-x86_64-linux.hart",
-		"9fc7445f8fc86d712b59c7ffabe0b1b832e0deb4ed0c61715349f0d2aee87b50": "hab/cache/artifacts/core-linux-headers-4.3-20170513200956-x86_64-linux.hart",
-		"17eef07687e0e0b57a813e3a49fcf9a774b7613a23cecf70ad34cf927064507e": "hab/cache/artifacts/core-libsodium-1.0.13-20170905223149-x86_64-linux.hart",
-		"c2b4f00a9c11b53d4dc5fbe13a82c39f9978661468c9319cda6dd6d2118baf1f": "hab/cache/artifacts/core-libarchive-3.3.2-20171018164107-x86_64-linux.hart",
-		"542626d97f85dd19359f7959dc51248d1242b131ac473a491b5d65a9aaf190d1": "hab/cache/artifacts/core-hab-sup-0.55.0-20180321222338-x86_64-linux.hart",
-		"f8bb3b00e69855dccd738ea7d5cd2df4bc887400972f903be283792dea7b65e9": "hab/cache/artifacts/core-hab-launcher-7241-20180321162126-x86_64-linux.hart",
-		"0b2678b232c4b42b40a68672aaa14dc8668b6e78244958abc86ff7568f58cee1": "hab/cache/artifacts/core-hab-0.55.0-20180321220925-x86_64-linux.hart",
-		"7d579a9e762f6094a6ea79c76397fbfbb97f1baf2b34e7ddece5f3dcb23162ff": "hab/cache/artifacts/core-glibc-2.22-20170513201042-x86_64-linux.hart",
-		"8045cfd3653ae07dcb2c1caa0c92e831bd129b5954c3e36c4f112d805a6473d9": "hab/cache/artifacts/core-gcc-libs-5.2.0-20170513212920-x86_64-linux.hart",
-		"7f948a24b991eabe537797b9e153dbac9d9b5a95a0242b4c289402bc9d03b46e": "hab/cache/artifacts/core-cacerts-2017.09.20-20171014212239-x86_64-linux.hart",
-		"7c669e5c1d8f8ddb8fdc9d158c51d59bef8d351b205aa6cd711fc7bd442fbd6d": "hab/cache/artifacts/core-bzip2-1.0.6-20170513212938-x86_64-linux.hart",
-		"8b86241397d520d0376920a32c2e0c3b49164b798100e606c0f4a82a0070ac50": "hab/cache/artifacts/core-busybox-static-1.24.2-20170513215502-x86_64-linux.hart",
-		"3d7554c8a9e3913d13716d7175c5897bec2a583fc9089e0ade4129804a8f6b7a": "hab/cache/artifacts/core-attr-2.4.47-20170513213059-x86_64-linux.hart",
-		"44e7d0a8dbc8c398bb339c6c66b88f1f196024f55e13070faed3f783fa961f7a": "hab/cache/artifacts/core-acl-2.2.52-20170513213108-x86_64-linux.hart",
+		"a12c5aecfb1084f9c844e3d17c56afb9be9a54745fd2cec63eb65add81be38f4": "hab/cache/keys/core-20220215190604.pub",
+		"0f4a23881adf1f51726891b694e704615c4767b12e566c3f774d93a7609842f1": "hab/cache/artifacts/core-zlib-1.2.11-20220311082914-x86_64-linux.hart",
+		"a127399491b5f58f8bbb13f2054a21ce5984d5a3c4a86dc644ca589c8db787ec": "hab/cache/artifacts/core-zeromq-4.3.4-20241017163014-x86_64-linux.hart",
+		"5e522f97a89fab69ece7c9c7a7188697889638a99392ef959c8560cb23d1da15": "hab/cache/artifacts/core-openssl-1.0.2zi-20240105224424-x86_64-linux.hart",
+		"30cf437bb1fd58850e280e195e22fa1a928e389ffc7af13d514988936657d13f": "hab/cache/artifacts/core-linux-headers-5.19.8-20241017082755-x86_64-linux.hart",
+		"b36f26e2dfe501210b917bd18270770ef9d25de7621f6407d18176955c447d75": "hab/cache/artifacts/core-hab-sup-1.6.1205-20241107150331-x86_64-linux.hart",
+		"621f1c8929e9fc89c348f7e855a3651705de86101501ad66fcbe8e87c2936db5": "hab/cache/artifacts/core-hab-launcher-16260-20220603161305-x86_64-linux.hart",
+		"f9da0b07a5dc33f6187d38180348e21e53e5589b0ba0829724320a0b78b667e5": "hab/cache/artifacts/core-hab-1.6.1205-20241107140309-x86_64-linux.hart",
+		"2edb50c3e11aa8820afaf587615fdfbb68a4576661b134a505ac665339f4c12a": "hab/cache/artifacts/core-glibc-2.34-20220311081742-x86_64-linux.hart",
+		"e922b9be9a234ef35c3feca9fdd0ad6402440a74991f8f2acc4d16dac92a6ce9": "hab/cache/artifacts/core-gcc-libs-9.4.0-20220311083308-x86_64-linux.hart",
+		"c670af129e8d72e4ec973887a3ace0d17e0c9db5e1b53f32a37477dd3caeb819": "hab/cache/artifacts/core-cacerts-2021.10.26-20240105224256-x86_64-linux.hart",
+		"816385d36e894e8f4a613f836342dbe886ae4311a235adbf038a9d05941d5dad": "hab/cache/artifacts/core-bzip2-1.0.8-20240105212113-x86_64-linux.hart",
+		"4e5e4a1e638f43774260bf564d7d70eb5f12a98d7317601d2d5f5093c26b4601": "hab/cache/artifacts/core-busybox-static-1.36.1-20241017124523-x86_64-linux.hart",
+		"cf6393d85fcc6032a047bc307f73482813d9ea7cf23c9bdb91370aba657d090f": "hab/cache/artifacts/core-attr-2.5.1-20240105212555-x86_64-linux.hart",
+		"d4ba3398421da3d97e0323141096a92db43d21c1df238327bf721283bc96ccd6": "hab/cache/artifacts/core-acl-2.3.1-20240105212642-x86_64-linux.hart",
 	}
 
 	for shasum, filename := range shasumsAutomate {
