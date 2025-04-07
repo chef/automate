@@ -398,6 +398,11 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete temporary index: ", tempIndex)
 			continue
 		}
+
+	}
+
+	if err := s.db.UpdateReindexRequest(requestID, STATUS_COMPLETED, time.Now()); err != nil {
+		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
 	}
 
 	return &ingest.StartReindexResponse{
