@@ -13,7 +13,6 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
-	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -630,16 +629,6 @@ func rollbackLogrotate() error {
 
 	return nil
 
-}
-
-// UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
-func UpdateByMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
-	if err := mergo.Merge(req.Config, existingCopy); err != nil {
-		logrus.Errorf("cannot merge the requested and existing structs: %v", err)
-		return nil, err
-	}
-
-	return req, nil
 }
 
 func IfEqual(req *deployment.AutomateConfig, existingCopy *deployment.AutomateConfig) bool {
