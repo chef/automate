@@ -341,8 +341,25 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}
 	}
 
+	// Start the reindexing process in a background goroutine
+	go func() {
+		backgroundCtx := context.WithValue(ctx, "requestID", requestID)
+
+		// Run the reindexing process
+		err := s.runReindexingProcess(backgroundCtx, indexList, requestID)
+		if err != nil {
+			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Reindexing process failed")
+		}
+	}()
+
+	return &ingest.StartReindexResponse{
+		Message: "Reindexing started successfully",
+	}, nil
+}
+
+func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList []string, requestID int) error {
 	var isFailed bool
-	// start the reindex process for each and every index available in the DB and which needs reindexing
+
 	// loop through the indices
 	for _, index := range indexList {
 		// 1. Check if the index needs reindexing
@@ -415,15 +432,16 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		if err := s.db.UpdateReindexRequest(requestID, STATUS_FAILED, time.Now()); err != nil {
 			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
 		}
+
+		return status.Errorf(codes.Internal, "failed to reindex indices")
 	} else {
 		if err := s.db.UpdateReindexRequest(requestID, STATUS_COMPLETED, time.Now()); err != nil {
 			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
 		}
-	}
 
-	return &ingest.StartReindexResponse{
-		Message: "Reindexing started successfully",
-	}, nil
+		log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
+		return nil
+	}
 }
 
 func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceIndex string, requestID int, stage string, originalIndex string) error {
