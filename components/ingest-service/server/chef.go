@@ -294,7 +294,6 @@ func (s *ChefIngestServer) VersionComparision(index string) (bool, *backend.Inde
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
-
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
@@ -341,14 +340,23 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}
 	}
 
+	// Create a detached background context that won't be canceled when the RPC call returns
+	backgroundCtx, cancel := context.WithTimeout(context.Background(), 12*time.Hour)
+
+	// Create channels for communication
+	done := make(chan struct{})
+	errChan := make(chan error, 1)
+
 	// Start the reindexing process in a background goroutine
 	go func() {
-		backgroundCtx := context.WithValue(ctx, "requestID", requestID)
+		defer cancel()    // Ensure context is canceled when goroutine completes
+		defer close(done) // Signal that the reindexing process is complete
 
-		// Run the reindexing process
-		err := s.runReindexingProcess(backgroundCtx, indexList, requestID)
+		// Run the reindexing process with the detached context
+		err := s.runReindexingProcess(backgroundCtx, indexList, requestID, done, errChan)
 		if err != nil {
 			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Reindexing process failed")
+			errChan <- err
 		}
 	}()
 
@@ -357,16 +365,62 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	}, nil
 }
 
-func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList []string, requestID int) error {
+func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList []string, requestID int, done chan struct{}, errChan chan error) error {
+	// Start a goroutine for heartbeat updates
+	heartbeatDone := make(chan struct{})
+	defer close(heartbeatDone)
+
+	// Create a ticker for heartbeat updates - every 2 minutes
+	go func() {
+		ticker := time.NewTicker(2 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped due to context cancellation")
+				return
+			case <-heartbeatDone:
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped as process completed")
+				return
+			case <-ticker.C:
+				// Update heartbeat for all indices in this request
+				for _, index := range indexList {
+					if err := s.db.UpdateReindexStatus(requestID, index, "heartbeat", time.Now()); err != nil {
+						log.WithFields(log.Fields{
+							"requestId": requestID,
+							"index":     index,
+						}).WithError(err).Error("Failed to update heartbeat")
+					}
+				}
+
+			}
+		}
+	}()
+
 	var isFailed bool
 
-	// loop through the indices
+	// Loop through the indices
 	for _, index := range indexList {
+		// Check if context is canceled
+		select {
+		case <-ctx.Done():
+			log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process canceled")
+			return ctx.Err()
+		default:
+			// Continue processing
+		}
+
 		// 1. Check if the index needs reindexing
 		isEligible, _, _ := s.VersionComparision(index)
 		if !isEligible {
 			log.WithFields(log.Fields{"index": index}).Info("Index does not need reindexing")
 			continue
+		}
+
+		// Update heartbeat at the beginning of each index processing
+		if err := s.db.UpdateReindexStatus(requestID, index, "processing_started", time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID, "index": index}).WithError(err).Error("Failed to update index status")
 		}
 
 		// 2. Get the aliases and update the database
@@ -384,11 +438,21 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 			continue
 		}
 
+		// Update heartbeat after creating temporary index
+		if err := s.db.UpdateReindexStatus(requestID, index, "temp_index_created", time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID, "index": index}).WithError(err).Error("Failed to update index status")
+		}
+
 		// Step 4: Reindex from Source to Temporary Index
 		if err := s.processReindexing(ctx, tempIndex, index, requestID, REINDEX_SRC_TEMP, index); err != nil {
 			isFailed = true
 			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from source to temporary index: ", index)
 			continue
+		}
+
+		// Update heartbeat after reindexing to temporary
+		if err := s.db.UpdateReindexStatus(requestID, index, "reindexed_to_temp", time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID, "index": index}).WithError(err).Error("Failed to update index status")
 		}
 
 		// Step 6: Delete Source Index
@@ -412,6 +476,11 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 			continue
 		}
 
+		// Update heartbeat after reindexing back to source
+		if err := s.db.UpdateReindexStatus(requestID, index, "reindexed_back_to_source", time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID, "index": index}).WithError(err).Error("Failed to update index status")
+		}
+
 		// Step 10: Create Aliases for Source Index
 		if err := s.createAliases(ctx, index, alias, requestID); err != nil {
 			isFailed = true
@@ -426,19 +495,27 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 			continue
 		}
 
+		// Update heartbeat after completing all steps for this index
+		if err := s.db.UpdateReindexStatus(requestID, index, "completed", time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID, "index": index}).WithError(err).Error("Failed to update index status")
+		}
+
+		log.WithFields(log.Fields{"index": index}).Info("Reindexing completed for index")
+	}
+
+	finalStatus := STATUS_COMPLETED
+	if isFailed {
+		finalStatus = STATUS_FAILED
+		errChan <- status.Errorf(codes.Internal, "failed to reindex indices")
+	}
+
+	if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
+		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
 	}
 
 	if isFailed {
-		if err := s.db.UpdateReindexRequest(requestID, STATUS_FAILED, time.Now()); err != nil {
-			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
-		}
-
 		return status.Errorf(codes.Internal, "failed to reindex indices")
 	} else {
-		if err := s.db.UpdateReindexRequest(requestID, STATUS_COMPLETED, time.Now()); err != nil {
-			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
-		}
-
 		log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
 		return nil
 	}
@@ -592,34 +669,46 @@ func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int,
 	// Set a timeout for how long to wait for the task to complete
 	timeout := time.Now().Add(6 * time.Hour)
 
+	// Create a ticker for status checks - check every 15 seconds
+	statusTicker := time.NewTicker(15 * time.Second)
+	defer statusTicker.Stop()
+
+	// Create a ticker for heartbeat updates - update every 2 minutes
+	heartbeatTicker := time.NewTicker(2 * time.Minute)
+	defer heartbeatTicker.Stop()
+
 	for {
-		// Check if we've exceeded the timeout
-		if time.Now().After(timeout) {
-			log.Warnf("Task %s for index %s timed out.", taskID, index)
-			return false // Task timed out
-		}
+		select {
+		case <-ctx.Done():
+			log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).Warn("Monitoring stopped due to context cancellation")
+			return false
 
-		// Check the task status
-		jobStatus, err := s.client.JobStatus(ctx, taskID)
-		if err != nil {
-			log.WithError(err).Errorf("Error checking status for task %s", taskID)
-		}
+		case <-heartbeatTicker.C:
+			// Update heartbeat during long-running task monitoring
+			if err := s.db.UpdateReindexStatus(requestID, index, "monitoring_task", time.Now()); err != nil {
+				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).WithError(err).Error("Failed to update heartbeat during task monitoring")
+			}
 
-		// Update heartbeat only if the task is still running
-		if !jobStatus.Completed {
-			if err := s.db.UpdateReindexStatus(requestID, index, "heartbeat", time.Now()); err != nil {
-				log.WithError(err).Errorf("Failed to update heartbeat for index %s", index)
+		case <-statusTicker.C:
+			// Check if we've exceeded the timeout
+			if time.Now().After(timeout) {
+				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).Warn("Task timed out")
+				return false // Task timed out
+			}
+
+			// Check the task status
+			jobStatus, err := s.client.JobStatus(ctx, taskID)
+			if err != nil {
+				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).WithError(err).Error("Error checking status for task")
+				continue
+			}
+
+			// If the job is completed, exit the loop
+			if jobStatus.Completed {
+				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).Info("Reindexing task completed successfully")
+				return true // Task completed successfully
 			}
 		}
-
-		// If the job is completed, exit the loop
-		if jobStatus.Completed {
-			log.Infof("Reindexing task %s for index %s completed successfully.", taskID, index)
-			return true // Task completed successfully
-		}
-
-		// Wait for 15 seconds before checking again
-		time.Sleep(15 * time.Second)
 	}
 }
 
