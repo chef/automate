@@ -642,46 +642,34 @@ func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int,
 	// Set a timeout for how long to wait for the task to complete
 	timeout := time.Now().Add(6 * time.Hour)
 
-	// Create a ticker for status checks - check every 15 seconds
-	statusTicker := time.NewTicker(15 * time.Second)
-	defer statusTicker.Stop()
-
-	// Create a ticker for heartbeat updates - update every 2 minutes
-	heartbeatTicker := time.NewTicker(2 * time.Minute)
-	defer heartbeatTicker.Stop()
-
 	for {
-		select {
-		case <-ctx.Done():
-			log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).Warn("Monitoring stopped due to context cancellation")
-			return false
+		// Check if we've exceeded the timeout
+		if time.Now().After(timeout) {
+			log.Warnf("Task %s for index %s timed out.", taskID, index)
+			return false // Task timed out
+		}
 
-		case <-heartbeatTicker.C:
-			// Update heartbeat during long-running task monitoring
+		// Check the task status
+		jobStatus, err := s.client.JobStatus(ctx, taskID)
+		if err != nil {
+			log.WithError(err).Errorf("Error checking status for task %s", taskID)
+		}
+
+		// Update heartbeat only if the task is still running
+		if !jobStatus.Completed {
 			if err := s.db.UpdateReindexStatus(requestID, index, "heartbeat", time.Now()); err != nil {
-				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).WithError(err).Error("Failed to update heartbeat during task monitoring")
-			}
-
-		case <-statusTicker.C:
-			// Check if we've exceeded the timeout
-			if time.Now().After(timeout) {
-				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).Warn("Task timed out")
-				return false // Task timed out
-			}
-
-			// Check the task status
-			jobStatus, err := s.client.JobStatus(ctx, taskID)
-			if err != nil {
-				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).WithError(err).Error("Error checking status for task")
-				continue
-			}
-
-			// If the job is completed, exit the loop
-			if jobStatus.Completed {
-				log.WithFields(log.Fields{"taskID": taskID, "index": index, "requestId": requestID}).Info("Reindexing task completed successfully")
-				return true // Task completed successfully
+				log.WithError(err).Errorf("Failed to update heartbeat for index %s", index)
 			}
 		}
+
+		// If the job is completed, exit the loop
+		if jobStatus.Completed {
+			log.Infof("Reindexing task %s for index %s completed successfully.", taskID, index)
+			return true // Task completed successfully
+		}
+
+		// Wait for 15 seconds before checking again
+		time.Sleep(15 * time.Second)
 	}
 }
 
