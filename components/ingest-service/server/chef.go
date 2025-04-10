@@ -340,20 +340,16 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}
 	}
 
-	// Create a detached background context that won't be canceled when the RPC call returns
-	backgroundCtx, cancel := context.WithTimeout(context.Background(), 12*time.Hour)
+	backgroundCtx, cancel := context.WithTimeout(context.Background(), 24*time.Hour)
 
-	// Create channels for communication
-	done := make(chan struct{})
 	errChan := make(chan error, 1)
 
 	// Start the reindexing process in a background goroutine
 	go func() {
-		defer cancel()    // Ensure context is canceled when goroutine completes
-		defer close(done) // Signal that the reindexing process is complete
+		defer cancel() // Ensure context is canceled when goroutine completes
 
 		// Run the reindexing process with the detached context
-		err := s.runReindexingProcess(backgroundCtx, indexList, requestID, done, errChan)
+		err := s.runReindexingProcess(backgroundCtx, indexList, requestID, errChan)
 		if err != nil {
 			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Reindexing process failed")
 			errChan <- err
@@ -365,7 +361,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	}, nil
 }
 
-func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList []string, requestID int, done chan struct{}, errChan chan error) error {
+func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList []string, requestID int, errChan chan error) error {
 	// Start a goroutine for heartbeat updates
 	heartbeatDone := make(chan struct{})
 	defer close(heartbeatDone)
