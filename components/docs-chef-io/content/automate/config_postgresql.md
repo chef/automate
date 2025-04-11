@@ -79,6 +79,8 @@ In the above snippet, `max_connections` determines the maximum number of concurr
 
 When running a standby server, you must set this parameter to the same or higher value than on the master server. Otherwise, queries will not be allowed on the standby server.
 
+**Note:** Modifications to the 'max_connections' require a reboot of the  leader, during which a new leader will be elected. The updated value for 'max_connections' will be reflected in the configuration only after the reboot, in accordance with [PostgresSQL documentation](https://www.postgresql.org/docs/current/runtime-config-connection.html#GUC-MAX-CONNECTIONS).
+
 ### Pg Dump
 
 ```bash
