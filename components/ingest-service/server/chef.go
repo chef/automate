@@ -294,7 +294,6 @@ func (s *ChefIngestServer) VersionComparision(index string) (bool, *backend.Inde
 }
 
 func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartReindexRequest) (*ingest.StartReindexResponse, error) {
-
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
@@ -341,89 +340,152 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}
 	}
 
-	var isFailed bool
-	// start the reindex process for each and every index available in the DB and which needs reindexing
-	// loop through the indices
-	for _, index := range indexList {
-		// 1. Check if the index needs reindexing
-		isEligible, _, _ := s.VersionComparision(index)
-		if !isEligible {
-			log.WithFields(log.Fields{"index": index}).Info("Index does not need reindexing")
-			continue
-		}
+	backgroundCtx, cancel := context.WithTimeout(context.Background(), 24*time.Hour)
 
-		// 2. Get the aliases and update the database
-		alias, err := s.getAliases(ctx, index, requestID)
+	errChan := make(chan error, 1)
+
+	// Start the reindexing process in a background goroutine
+	go func() {
+		defer cancel() // Ensure context is canceled when goroutine completes
+
+		// Run the reindexing process with the detached context
+		err := s.runReindexingProcess(backgroundCtx, indexList, requestID, errChan)
 		if err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to fetch aliases for index: ", index)
-			continue
+			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Reindexing process failed")
+			errChan <- err
 		}
-		tempIndex := index + "_temp"
-
-		// Step 3: Create Temporary Index
-		if err := s.createIndex(ctx, tempIndex, index, requestID, SRC_TO_TEMP, index); err != nil {
-			isFailed = true
-			continue
-		}
-
-		// Step 4: Reindex from Source to Temporary Index
-		if err := s.processReindexing(ctx, tempIndex, index, requestID, REINDEX_SRC_TEMP, index); err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from source to temporary index: ", index)
-			continue
-		}
-
-		// Step 6: Delete Source Index
-		if err := s.deleteIndex(ctx, index, requestID, index, DELETE_SRC); err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete source index: ", index)
-			continue
-		}
-
-		// Step 7: Recreate Source Index from Temporary Index
-		if err := s.createIndex(ctx, index, tempIndex, requestID, TEMP_TO_SRC, index); err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to recreate source index from temporary index: ", index)
-			continue
-		}
-
-		// Step 8: Reindex from Temporary to Source Index
-		if err := s.processReindexing(ctx, index, tempIndex, requestID, REINDEX_TEMP_SRC, index); err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from temporary to source index: ", index)
-			continue
-		}
-
-		// Step 10: Create Aliases for Source Index
-		if err := s.createAliases(ctx, index, alias, requestID); err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create aliases for source index: ", index)
-			continue
-		}
-
-		// Step 11: Delete Temporary Index
-		if err := s.deleteIndex(ctx, tempIndex, requestID, index, DELETE_TEMP); err != nil {
-			isFailed = true
-			log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete temporary index: ", tempIndex)
-			continue
-		}
-
-	}
-
-	if isFailed {
-		if err := s.db.UpdateReindexRequest(requestID, STATUS_FAILED, time.Now()); err != nil {
-			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
-		}
-	} else {
-		if err := s.db.UpdateReindexRequest(requestID, STATUS_COMPLETED, time.Now()); err != nil {
-			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
-		}
-	}
+	}()
 
 	return &ingest.StartReindexResponse{
 		Message: "Reindexing started successfully",
 	}, nil
+}
+
+func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList []string, requestID int, errChan chan error) error {
+	// Start a goroutine for heartbeat updates
+	heartbeatDone := make(chan struct{})
+	defer close(heartbeatDone)
+
+	// Create a ticker for heartbeat updates - every 2 minutes
+	go func() {
+		ticker := time.NewTicker(2 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped due to context cancellation")
+				return
+			case <-heartbeatDone:
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped as process completed")
+				return
+			case <-ticker.C:
+				// Log heartbeat for all indices in this request
+				for _, index := range indexList {
+					log.WithFields(log.Fields{
+						"requestId": requestID,
+						"index":     index,
+					}).Info("Heartbeat tick")
+				}
+			}
+		}
+	}()
+
+	var isFailed bool
+
+	// Loop through the indices
+	for _, index := range indexList {
+		// Check if context is canceled
+		select {
+		case <-ctx.Done():
+			log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process canceled")
+			return ctx.Err()
+		default:
+			// 1. Check if the index needs reindexing
+			isEligible, _, _ := s.VersionComparision(index)
+			if !isEligible {
+				log.WithFields(log.Fields{"index": index}).Info("Index does not need reindexing")
+				continue
+			}
+
+			// 2. Get the aliases and update the database
+			alias, err := s.getAliases(ctx, index, requestID)
+			if err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to fetch aliases for index: ", index)
+				continue
+			}
+			tempIndex := index + "_temp"
+
+			// Step 3: Create Temporary Index
+			if err := s.createIndex(ctx, tempIndex, index, requestID, SRC_TO_TEMP, index); err != nil {
+				isFailed = true
+				continue
+			}
+
+			// Step 4: Reindex from Source to Temporary Index
+			if err := s.processReindexing(ctx, tempIndex, index, requestID, REINDEX_SRC_TEMP, index); err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from source to temporary index: ", index)
+				continue
+			}
+
+			// Step 6: Delete Source Index
+			if err := s.deleteIndex(ctx, index, requestID, index, DELETE_SRC); err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete source index: ", index)
+				continue
+			}
+
+			// Step 7: Recreate Source Index from Temporary Index
+			if err := s.createIndex(ctx, index, tempIndex, requestID, TEMP_TO_SRC, index); err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to recreate source index from temporary index: ", index)
+				continue
+			}
+
+			// Step 8: Reindex from Temporary to Source Index
+			if err := s.processReindexing(ctx, index, tempIndex, requestID, REINDEX_TEMP_SRC, index); err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from temporary to source index: ", index)
+				continue
+			}
+
+			// Step 10: Create Aliases for Source Index
+			if err := s.createAliases(ctx, index, alias, requestID); err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create aliases for source index: ", index)
+				continue
+			}
+
+			// Step 11: Delete Temporary Index
+			if err := s.deleteIndex(ctx, tempIndex, requestID, index, DELETE_TEMP); err != nil {
+				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete temporary index: ", tempIndex)
+				continue
+			}
+
+			log.WithFields(log.Fields{"index": index}).Info("Reindexing completed for index")
+		}
+	}
+
+	if isFailed {
+		finalStatus := STATUS_FAILED
+		errChan <- status.Errorf(codes.Internal, "failed to reindex indices")
+		if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		}
+		return status.Errorf(codes.Internal, "failed to reindex indices")
+	}
+
+	finalStatus := STATUS_COMPLETED
+	if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
+		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		return status.Errorf(codes.Internal, "failed to update overall status of the request")
+	}
+
+	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
+	return nil
 }
 
 func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceIndex string, requestID int, stage string, originalIndex string) error {
