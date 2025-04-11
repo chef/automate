@@ -380,16 +380,13 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped as process completed")
 				return
 			case <-ticker.C:
-				// Update heartbeat for all indices in this request
+				// Log heartbeat for all indices in this request
 				for _, index := range indexList {
-					if err := s.db.UpdateReindexStatus(requestID, index, "heartbeat", time.Now()); err != nil {
-						log.WithFields(log.Fields{
-							"requestId": requestID,
-							"index":     index,
-						}).WithError(err).Error("Failed to update heartbeat")
-					}
+					log.WithFields(log.Fields{
+						"requestId": requestID,
+						"index":     index,
+					}).Info("Heartbeat tick")
 				}
-
 			}
 		}
 	}()
@@ -472,22 +469,23 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 		}
 	}
 
-	finalStatus := STATUS_COMPLETED
 	if isFailed {
-		finalStatus = STATUS_FAILED
+		finalStatus := STATUS_FAILED
 		errChan <- status.Errorf(codes.Internal, "failed to reindex indices")
+		if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		}
+		return status.Errorf(codes.Internal, "failed to reindex indices")
 	}
 
+	finalStatus := STATUS_COMPLETED
 	if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
 		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		return status.Errorf(codes.Internal, "failed to update overall status of the request")
 	}
 
-	if isFailed {
-		return status.Errorf(codes.Internal, "failed to reindex indices")
-	} else {
-		log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
-		return nil
-	}
+	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
+	return nil
 }
 
 func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceIndex string, requestID int, stage string, originalIndex string) error {
