@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
@@ -14,6 +16,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+)
+
+const (
+	enable_maintenance_mode_cmd = `chef-automate maintenance on`
+	maintenanceModeMsg          = "This reindex put the system in maintenance mode. During that period no new ingestion of data can happen. \n The maintenance mode will be switched off automatically at the end of a successful reindexing. But in case of an unsuccessful upgrade, you have to set it ‘Off’ manually.\nAre you ready to proceed?"
+	downTimeError               = "There will be a downtime while reindexing. Please prepare for down time and run the reindex"
 )
 
 var reindexCmd = &cobra.Command{
@@ -51,6 +59,7 @@ var reindexStatusCmd = &cobra.Command{
 type ReindexDSClient interface {
 	GetReindexStatus(ctx context.Context, in *api.GetReindexStatusRequest, opts ...grpc.CallOption) (*api.GetReindexStatusResponse, error)
 	StartReindex(ctx context.Context, in *api.StartReindexRequest, opts ...grpc.CallOption) (*api.StartReindexResponse, error)
+	GetEligilbeIndexes(ctx context.Context, re *api.GetEligilbeIndexesRequest, opts ...grpc.CallOption) (*api.GetEligilbeIndexesResponse, error)
 	Close() error
 }
 
@@ -158,7 +167,35 @@ func (rf *ReindexFlow) StartReindex() error {
 
 	req := &api.StartReindexRequest{} // Modify if additional params are needed
 
-	_, err := rf.DsClient.StartReindex(context.Background(), req)
+	//Check if indexes are there to reindex
+	indexes, err := rf.DsClient.GetEligilbeIndexes(context.Background(), &api.GetEligilbeIndexesRequest{})
+	if err != nil {
+		return status.Wrap(err, status.DeploymentServiceCallError, "Failed to get the indexes for reindexing")
+	}
+
+	if indexes == nil || len(indexes.Indexes) == 0 {
+		rf.Writer.Println("No indexes available for reindexing.")
+		return nil
+	}
+
+	//Ask for the confirmation for maintenance mode
+	resp, err := rf.Writer.Confirm(maintenanceModeMsg)
+	if err != nil {
+		rf.Writer.Error(err.Error())
+		return status.Errorf(status.InvalidCommandArgsError, err.Error())
+	}
+	if !resp {
+		rf.Writer.Error(downTimeError)
+		return status.New(status.InvalidCommandArgsError, downTimeError)
+	}
+
+	out, err := exec.Command("/bin/sh", "-c", enable_maintenance_mode_cmd).Output()
+	if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
+		rf.Writer.Errorln("error in enabling the maintenance mode")
+		return nil
+	}
+
+	_, err = rf.DsClient.StartReindex(context.Background(), req)
 	if err != nil {
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed to start reindexing")
 	}

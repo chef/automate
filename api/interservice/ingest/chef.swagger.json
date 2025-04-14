@@ -581,6 +581,17 @@
     "chef.automate.api.ingest.response.ProcessNodeDeleteResponse": {
       "type": "object"
     },
+    "chef.automate.domain.ingest.GetEligilbeIndexesResponse": {
+      "type": "object",
+      "properties": {
+        "indexes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "chef.automate.domain.ingest.GetReindexStatusResponse": {
       "type": "object",
       "properties": {

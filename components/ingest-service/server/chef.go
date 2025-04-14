@@ -756,3 +756,27 @@ func (s *ChefIngestServer) getAliases(ctx context.Context, index string, request
 
 	return alias, nil
 }
+
+func (s *ChefIngestServer) GetEligilbeIndexes(ctx context.Context, re *ingest.GetEligilbeIndexesRequest) (*ingest.GetEligilbeIndexesResponse, error) {
+
+	indices, err := s.GetIndicesEligableForReindexing(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch indices: %s", err)
+	}
+
+	if len(indices) == 0 {
+		log.Info("No indices found that need reindexing")
+		return &ingest.GetEligilbeIndexesResponse{
+			Indexes: []string{},
+		}, nil
+	}
+
+	indexList := make([]string, 0, len(indices))
+	for index := range indices {
+		indexList = append(indexList, index)
+	}
+
+	return &ingest.GetEligilbeIndexesResponse{
+		Indexes: indexList,
+	}, nil
+}
