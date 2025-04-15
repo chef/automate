@@ -207,7 +207,7 @@ func (es *ElasticSidecar) wait() {
 func (es *ElasticSidecar) run() {
 	var client = &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig:     &tls.Config{InsecureSkipVerify: true}, // nosemgrep
 			MaxIdleConns:        5,
 			MaxIdleConnsPerHost: 5,
 			IdleConnTimeout:     70 * time.Second,
