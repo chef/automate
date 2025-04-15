@@ -167,16 +167,16 @@ func (l *licenseInterceptor) isValidLicense() bool {
 }
 
 func (l *licenseInterceptor) refreshLicenseDetails(ctx context.Context) error {
-	//if the global variable license status containing details is nil or If its not nil checking the details validity.
-	//If the details validity is before the current time refersh the license details
-	if (l.licenseStatus != nil && l.licenseStatus.DetailsValidity.Before(time.Now())) ||
-		(l.licenseStatus != nil && l.licenseStatus.LicenseDetailsRefresh) || l.licenseStatus == nil {
+	// Always refresh license details if the cache is invalid or expired
+	if l.licenseStatus == nil ||
+		l.licenseStatus.DetailsValidity.Before(time.Now()) ||
+		l.licenseStatus.LicenseDetailsRefresh ||
+		!l.isValidLicense() {
 		err := l.getLicenseDetails(ctx)
 		if err != nil {
 			return errors.Wrap(err, "Unable to fetch license details")
 		}
 	}
-
 	return nil
 }
 
