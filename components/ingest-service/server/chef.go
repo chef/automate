@@ -297,7 +297,30 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
-	//  ***** //
+	reindexStatus, err := s.db.GetLatestReindexStatus()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %s", err)
+	}
+
+	if reindexStatus == STATUS_RUNNING {
+		log.Info("Reindexing is already in progress")
+		return nil, status.Errorf(codes.AlreadyExists, "reindexing is already in progress")
+	}
+
+	if reindexStatus == STATUS_FAILED {
+		// Trigger the workflow for the failed indices
+		log.Info("Reindexing failed previously, starting the process for the failed indices")
+		reqID, err := s.db.GetLatestReindexRequestID()
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
+		}
+
+		err = s.reindexTheFailedIndices(ctx, reqID)
+		if err != nil {
+			log.WithError(err).Error("Failed to reindex the failed indices")
+			return nil, status.Errorf(codes.Internal, "failed to reindex the failed indices: %s", err)
+		}
+	}
 
 	// Fetch indices that need reindexing
 	indices, err := s.GetIndicesEligableForReindexing(ctx)
@@ -755,4 +778,8 @@ func (s *ChefIngestServer) getAliases(ctx context.Context, index string, request
 	}
 
 	return alias, nil
+}
+
+func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestID int) error {
+	panic("not implemented") // TODO: Implement
 }
