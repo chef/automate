@@ -292,6 +292,28 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 	return requestID, nil
 }
 
+func (db *DB) GetLatestReindexStatus() (string, error) {
+	if db == nil || db.DbMap == nil {
+		logrus.Error("DB connection is not initialized")
+		return "", errors.New("database connection is not initialized")
+	}
+	var status string
+	err := db.QueryRow("SELECT status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logrus.Error("No reindex requests found in the database")
+			return "", errors.New("no reindex requests found")
+		}
+		return "", errors.Wrap(err, "error fetching latest request ID")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"latestRequestID": status,
+	}).Info("Fetched latest reindex request ID")
+
+	return status, nil
+}
+
 func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int, currentTime time.Time) error {
 	if hasAlias {
 		aliasString := strings.Join(alias, ",")
