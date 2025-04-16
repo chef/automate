@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"os/exec"
 	"strings"
 	"time"
@@ -490,7 +489,6 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 	}
 
 	out, err := exec.Command("/bin/sh", "-c", disable_maintenance_mode_cmd).CombinedOutput()
-	fmt.Println(string(out))
 	if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
 		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Error in disabling the maintenance mode")
 		return status.Errorf(codes.Internal, "failed to switch off the maintenance mode")

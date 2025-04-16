@@ -192,7 +192,6 @@ func (rf *ReindexFlow) StartReindex() error {
 	}
 
 	out, err := exec.Command("/bin/sh", "-c", enable_maintenance_mode_cmd).Output()
-	fmt.Println(out)
 	if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
 		rf.Writer.Errorln("error in enabling the maintenance mode")
 		return nil
