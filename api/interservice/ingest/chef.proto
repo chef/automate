@@ -45,6 +45,13 @@ message GetReindexStatusRequest {
 	int32 request_id = 1;
 }
 
+message GetEligilbeIndexesRequest {
+}
+message GetEligilbeIndexesResponse {
+  repeated string indexes = 1;
+}
+
+
 service ChefIngesterService {
 	rpc ProcessChefRun (api.ingest.request.Run) returns (api.ingest.response.ProcessChefRunResponse) {
 		option (google.api.http) = {
@@ -80,4 +87,10 @@ service ChefIngesterService {
 	rpc GetReindexStatus (GetReindexStatusRequest) returns (GetReindexStatusResponse) {
         option (google.api.http).get =  "/api/v0/ingest/reindex/status";
     };
+
+	rpc GetEligilbeIndexes (GetEligilbeIndexesRequest) returns (GetEligilbeIndexesResponse) {
+
+	};
+
+
 }

@@ -34,6 +34,7 @@ pkg_deps=(
   chef/automate-platform-tools
   chef/mlsa
 )
+pkg_svc_user=root
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef

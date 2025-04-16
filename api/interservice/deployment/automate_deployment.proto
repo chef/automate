@@ -61,6 +61,15 @@ service Deployment {
 	rpc ControlIndexUpgradeStatus(google.protobuf.Empty) returns (ControlIndexUpgradeStatusResponse);
 	rpc StartReindex(StartReindexRequest) returns (StartReindexResponse);
 	rpc GetReindexStatus (GetReindexStatusRequest) returns (GetReindexStatusResponse);
+	rpc GetEligilbeIndexes (GetEligilbeIndexesRequest) returns (GetEligilbeIndexesResponse);
+	
+}
+
+
+message GetEligilbeIndexesRequest {
+}
+message GetEligilbeIndexesResponse {
+  repeated string indexes = 1;
 }
 
 message GetReindexStatusResponse {

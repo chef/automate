@@ -37,6 +37,26 @@ func (m *MockChefIngesterServiceClient) EXPECT() *MockChefIngesterServiceClientM
 	return m.recorder
 }
 
+// GetEligilbeIndexes mocks base method.
+func (m *MockChefIngesterServiceClient) GetEligilbeIndexes(ctx context.Context, in *GetEligilbeIndexesRequest, opts ...grpc.CallOption) (*GetEligilbeIndexesResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetEligilbeIndexes", varargs...)
+	ret0, _ := ret[0].(*GetEligilbeIndexesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEligilbeIndexes indicates an expected call of GetEligilbeIndexes.
+func (mr *MockChefIngesterServiceClientMockRecorder) GetEligilbeIndexes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEligilbeIndexes", reflect.TypeOf((*MockChefIngesterServiceClient)(nil).GetEligilbeIndexes), varargs...)
+}
+
 // GetReindexStatus mocks base method.
 func (m *MockChefIngesterServiceClient) GetReindexStatus(ctx context.Context, in *GetReindexStatusRequest, opts ...grpc.CallOption) (*GetReindexStatusResponse, error) {
 	m.ctrl.T.Helper()
@@ -218,6 +238,21 @@ func NewMockChefIngesterServiceServer(ctrl *gomock.Controller) *MockChefIngester
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockChefIngesterServiceServer) EXPECT() *MockChefIngesterServiceServerMockRecorder {
 	return m.recorder
+}
+
+// GetEligilbeIndexes mocks base method.
+func (m *MockChefIngesterServiceServer) GetEligilbeIndexes(arg0 context.Context, arg1 *GetEligilbeIndexesRequest) (*GetEligilbeIndexesResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEligilbeIndexes", arg0, arg1)
+	ret0, _ := ret[0].(*GetEligilbeIndexesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEligilbeIndexes indicates an expected call of GetEligilbeIndexes.
+func (mr *MockChefIngesterServiceServerMockRecorder) GetEligilbeIndexes(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEligilbeIndexes", reflect.TypeOf((*MockChefIngesterServiceServer)(nil).GetEligilbeIndexes), arg0, arg1)
 }
 
 // GetReindexStatus mocks base method.
