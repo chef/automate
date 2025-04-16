@@ -1,10 +1,11 @@
 package sshutils
 
 type MockSSHUtilsImpl struct {
-	Executefunc                      func(sshConfig SSHConfig, cmd string) (string, error)
-	ExecuteConcurrentlyFunc          func(sshConfig SSHConfig, cmd string, hostIPs []string) []Result
-	CopyFileToRemoteFunc             func(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool) error
-	CopyFileToRemoteConcurrentlyFunc func(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result
+	Executefunc                               func(sshConfig SSHConfig, cmd string) (string, error)
+	ExecuteConcurrentlyFunc                   func(sshConfig SSHConfig, cmd string, hostIPs []string) []Result
+	CopyFileToRemoteFunc                      func(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool) error
+	CopyFileToRemoteConcurrentlyFunc          func(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result
+	CopyFileToRemoteConcurrentlyInHomeDirFunc func(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result
 }
 
 func (mssh *MockSSHUtilsImpl) Execute(sshConfig SSHConfig, cmd string) (string, error) {
@@ -21,4 +22,8 @@ func (mssh *MockSSHUtilsImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath 
 
 func (mssh *MockSSHUtilsImpl) CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result {
 	return mssh.CopyFileToRemoteConcurrentlyFunc(sshConfig, srcFilePath, destFileName, destDir, removeFile, hostIPs)
+}
+
+func (mssh *MockSSHUtilsImpl) CopyFileToRemoteConcurrentlyInHomeDir(sshConfig SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []Result {
+	return mssh.CopyFileToRemoteConcurrentlyInHomeDirFunc(sshConfig, srcFilePath, destFileName, destDir, removeFile, hostIPs)
 }
