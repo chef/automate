@@ -20,7 +20,7 @@ import (
 
 const (
 	enable_maintenance_mode_cmd = `chef-automate maintenance on`
-	maintenanceModeMsg          = "This reindex put the system in maintenance mode. During that period no new ingestion of data can happen. \n The maintenance mode will be switched off automatically at the end of a successful reindexing. But in case of an unsuccessful upgrade, you have to set it ‘Off’ manually.\nAre you ready to proceed?"
+	maintenanceModeMsg          = "This reindex put the system in maintenance mode. During that period no new ingestion of data can happen. \n The maintenance mode will be switched off automatically at the end of a successful reindexing.\nAre you ready to proceed?"
 	downTimeError               = "There will be a downtime while reindexing. Please prepare for down time and run the reindex"
 )
 
@@ -175,6 +175,7 @@ func (rf *ReindexFlow) StartReindex() error {
 
 	if indexes == nil || len(indexes.Indexes) == 0 {
 		rf.Writer.Println("No indexes available for reindexing.")
+		fmt.Println("Inside iff statements")
 		return nil
 	}
 
@@ -182,6 +183,7 @@ func (rf *ReindexFlow) StartReindex() error {
 	resp, err := rf.Writer.Confirm(maintenanceModeMsg)
 	if err != nil {
 		rf.Writer.Error(err.Error())
+		fmt.Println("Inside iff error of resoponse statements")
 		return status.Errorf(status.InvalidCommandArgsError, err.Error())
 	}
 	if !resp {
@@ -190,6 +192,7 @@ func (rf *ReindexFlow) StartReindex() error {
 	}
 
 	out, err := exec.Command("/bin/sh", "-c", enable_maintenance_mode_cmd).Output()
+	fmt.Println(out)
 	if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
 		rf.Writer.Errorln("error in enabling the maintenance mode")
 		return nil

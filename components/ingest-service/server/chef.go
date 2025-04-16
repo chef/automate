@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -29,6 +31,8 @@ var skipIndices = map[string]bool{
 	".opensearch-observability": true,
 	".tasks":                    true,
 }
+
+const disable_maintenance_mode_cmd = `chef-automate maintenance off`
 
 type ChefIngestServer struct {
 	chefRunPipeline    pipeline.ChefRunPipeline
@@ -354,6 +358,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Reindexing process failed")
 			errChan <- err
 		}
+
 	}()
 
 	return &ingest.StartReindexResponse{
@@ -482,6 +487,13 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 	if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
 		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
 		return status.Errorf(codes.Internal, "failed to update overall status of the request")
+	}
+
+	out, err := exec.Command("/bin/sh", "-c", disable_maintenance_mode_cmd).CombinedOutput()
+	fmt.Println(string(out))
+	if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
+		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Error in disabling the maintenance mode")
+		return status.Errorf(codes.Internal, "failed to switch off the maintenance mode")
 	}
 
 	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
