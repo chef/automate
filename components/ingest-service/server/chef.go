@@ -838,6 +838,7 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 	return nil
 }
 
+// runFromReindexFromSourceToTemp is a helper function to run the reindexing process from source to temporary index
 func (s *ChefIngestServer) runFromReindexFromSourceToTemp(ctx context.Context, requestID int, index, stage string) error {
 	log.WithFields(log.Fields{
 		"requestId": requestID,
