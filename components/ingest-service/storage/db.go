@@ -89,6 +89,11 @@ type StageDetail struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type IndexWorkflow struct {
+	Index string        `json:"index"`
+	Stage []StageDetail `json:"stage"`
+}
+
 // StatusResponse represents the response structure for reindex status
 type StatusResponse struct {
 	RequestID int                 `json:"request_id"`
@@ -443,4 +448,43 @@ func (db *DB) UpdateReindexStatus(requestID int, index, status string, timestamp
 	}
 
 	return nil
+}
+
+func (db *DB) GetReindexRequestDetailed(requestID int) ([]IndexWorkflow, error) {
+	var indexWorkflows []IndexWorkflow
+	var stageJSON string
+
+	query := `
+		SELECT index, stage
+		FROM reindex_request_detailed
+		WHERE request_id = $1
+	`
+
+	rows, err := db.Query(query, requestID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to fetch reindex request details")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var index string
+		var stages []StageDetail
+
+		err := rows.Scan(&index, &stageJSON)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to scan reindex request detail row")
+		}
+
+		err = json.Unmarshal([]byte(stageJSON), &stages)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal stage JSON")
+		}
+
+		indexWorkflows = append(indexWorkflows, IndexWorkflow{
+			Index: index,
+			Stage: stages,
+		})
+	}
+
+	return indexWorkflows, nil
 }
