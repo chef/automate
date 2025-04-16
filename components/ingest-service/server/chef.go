@@ -781,5 +781,61 @@ func (s *ChefIngestServer) getAliases(ctx context.Context, index string, request
 }
 
 func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestID int) error {
+	// Get all the indices with requestID
+	indexWorkflows, err := s.db.GetReindexRequestDetailed(requestID)
+	if err != nil {
+		log.WithError(err).Error("Failed to fetch reindex request details")
+		return status.Errorf(codes.Internal, "failed to fetch reindex request details: %s", err)
+	}
+
+	// parse indices and their stage into []struct
+	for _, iWorkflow := range indexWorkflows {
+		if len(iWorkflow.Stage) == 8 {
+			log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Index is not fully reindexed")
+			continue
+		}
+
+		lastState := iWorkflow.Stage[len(iWorkflow.Stage)-1]
+		if lastState.Status == STATUS_FAILED {
+			log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Index is not fully reindexed")
+
+			switch lastState.Stage {
+			case GET_ALIASES:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Getting aliases for index")
+				continue
+			case SRC_TO_TEMP:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Creating temporary index")
+				continue
+			case REINDEX_SRC_TEMP:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Reindexing from source to temporary index")
+				continue
+			case DELETE_SRC:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Deleting source index")
+				continue
+			case TEMP_TO_SRC:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Creating source index from temporary index")
+				continue
+			case REINDEX_TEMP_SRC:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Reindexing from temporary to source index")
+				continue
+			case CREATE_ALIASES:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Creating aliases for source index")
+				continue
+			case DELETE_TEMP:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Deleting temporary index")
+				continue
+			default:
+				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("We don't support this stage")
+				continue
+			}
+		} else {
+			log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Index is not fully reindexed")
+		}
+	}
+	return nil
+}
+
+func (s *ChefIngestServer) runFromReindexFromSourceToTemp(ctx context.Context, requestID int, index, stage string) error {
 	panic("not implemented") // TODO: Implement
+
 }
