@@ -307,6 +307,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		return nil, status.Errorf(codes.AlreadyExists, "reindexing is already in progress")
 	}
 
+	// tODO: Null check and hearbeat > 5 mins
 	if reindexStatus == STATUS_FAILED {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
@@ -790,7 +791,7 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 
 	// parse indices and their stage into []struct
 	for _, iWorkflow := range indexWorkflows {
-		if len(iWorkflow.Stage) == 8 {
+		if len(iWorkflow.Stage) == 8 && iWorkflow.Stage[7].Status == STATUS_COMPLETED {
 			log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Index is not fully reindexed")
 			continue
 		}
