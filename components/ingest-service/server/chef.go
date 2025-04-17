@@ -297,7 +297,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
-	reindexStatus, _, err := s.db.GetLatestReindexStatus()
+	reindexStatus, heartbeat, err := s.db.GetLatestReindexStatus()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %s", err)
 	}
@@ -307,8 +307,9 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		return nil, status.Errorf(codes.AlreadyExists, "reindexing is already in progress")
 	}
 
-	// tODO: hearbeat > 5 mins
-	if reindexStatus == STATUS_FAILED {
+	heartbeatThreshold := 5 * time.Minute
+	h := time.Since(heartbeat) > heartbeatThreshold
+	if reindexStatus == STATUS_FAILED && h {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
 		reqID, err := s.db.GetLatestReindexRequestID()
@@ -316,18 +317,24 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
 		}
 
-		// Update the request status to 'running'
-		err = s.db.UpdateReindexRequestStatus(reqID, STATUS_RUNNING, time.Now())
-		if err != nil {
-			log.WithError(err).Error("Failed to update reindex request status to running")
-			return nil, status.Errorf(codes.Internal, "failed to update reindex request status: %s", err)
-		}
+		backgroundCtx, cancel := context.WithTimeout(context.Background(), 24*time.Hour)
 
-		err = s.reindexTheFailedIndices(ctx, reqID)
-		if err != nil {
-			log.WithError(err).Error("Failed to reindex the failed indices")
-			return nil, status.Errorf(codes.Internal, "failed to reindex the failed indices: %s", err)
-		}
+		errChan := make(chan error, 1)
+
+		// Start the reindexing process in a background goroutine
+		go func() {
+			defer cancel() // Ensure context is canceled when goroutine completes
+
+			err = s.reindexTheFailedIndices(backgroundCtx, reqID)
+			if err != nil {
+				log.WithError(err).Error("Failed to reindex the failed indices")
+				errChan <- err
+			}
+		}()
+
+		return &ingest.StartReindexResponse{
+			Message: "Reindexing started for failed indices",
+		}, nil
 	}
 
 	// Fetch indices that need reindexing
@@ -833,6 +840,35 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		log.WithError(err).Error("Failed to fetch reindex request details")
 		return status.Errorf(codes.Internal, "failed to fetch reindex request details: %s", err)
 	}
+
+	// Start a goroutine for heartbeat updates
+	heartbeatDone := make(chan struct{})
+	defer close(heartbeatDone)
+
+	// Create a ticker for heartbeat updates - every 2 minutes
+	go func() {
+		ticker := time.NewTicker(2 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped due to context cancellation")
+				return
+			case <-heartbeatDone:
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped as process completed")
+				return
+			case <-ticker.C:
+				// Log heartbeat for all indices in this request
+				for _, index := range indexWorkflows {
+					log.WithFields(log.Fields{
+						"requestId": requestID,
+						"index":     index,
+					}).Info("Heartbeat tick")
+				}
+			}
+		}
+	}()
 
 	// parse indices and their stage into []struct
 	for _, iWorkflow := range indexWorkflows {

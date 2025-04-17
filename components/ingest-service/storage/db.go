@@ -302,6 +302,7 @@ func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
 		logrus.Error("DB connection is not initialized")
 		return "", time.Time{}, errors.New("database connection is not initialized")
 	}
+
 	var status string
 	var requestID int
 	err := db.QueryRow("SELECT id, status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID, &status)
@@ -329,6 +330,7 @@ func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
 		"status":          status,
 		"heartbeat":       heartbeat,
 	}).Info("Fetched latest reindex request status and heartbeat")
+
 	return status, heartbeat, nil
 }
 
