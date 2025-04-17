@@ -867,21 +867,18 @@ func (s *ChefIngestServer) runFromGetAliasesOnwards(ctx context.Context, request
 		"stage":     stage,
 	}).Info("Resuming reindexing from Step 1: Get Aliases")
 
-	// Fetch aliases for the index
 	_, err := s.getAliases(ctx, index, requestID)
 	if err != nil {
 		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to fetch aliases for index")
-		// Return the error to allow retry logic or proper failure handling
 		return err
 	}
 
 	log.WithFields(log.Fields{"index": index}).Info("Alias fetch completed, continuing to next stage")
 
-	// If the next stage is creating a temporary index, continue with that
 	err = s.runFromCreateTempIndexOnwards(ctx, requestID, index, SRC_TO_TEMP)
 	if err != nil {
 		log.WithError(err).WithField("index", index).Error("Failed while continuing from alias fetch")
-		// Return the error to be handled by the calling function
+
 		return err
 	}
 
@@ -895,21 +892,16 @@ func (s *ChefIngestServer) runFromCreateTempIndexOnwards(ctx context.Context, re
 		"stage":     stage,
 	}).Info("Resuming reindexing from Step 3: Create Temporary Index")
 
-	// Generate the name for the temporary index
 	tempIndex := index + "_temp"
 
-	// Step 3: Create Temporary Index from Source Index
 	if err := s.createIndex(ctx, tempIndex, index, requestID, SRC_TO_TEMP, index); err != nil {
 		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create temporary index from source")
-		// Return the error to allow retry logic or proper failure handling
 		return err
 	}
 
-	// Continue with reindexing from source to temporary index
 	err := s.runFromReindexFromSourceToTemp(ctx, requestID, index, REINDEX_SRC_TEMP)
 	if err != nil {
 		log.WithError(err).WithField("index", index).Error("Failed while continuing after creating temporary index")
-		// Return the error to be handled by the calling function
 		return err
 	}
 
