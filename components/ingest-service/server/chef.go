@@ -308,7 +308,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	}
 
 	// tODO: hearbeat > 5 mins
-	if reindexStatus == "" || reindexStatus != STATUS_COMPLETED {
+	if reindexStatus == STATUS_FAILED {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
 		reqID, err := s.db.GetLatestReindexRequestID()
@@ -797,7 +797,7 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		}
 
 		lastState := iWorkflow.Stage[len(iWorkflow.Stage)-1]
-		if lastState.Status == "" || lastState.Status != STATUS_COMPLETED {
+		if lastState.Status != STATUS_COMPLETED {
 			log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Index is not fully reindexed")
 
 			switch lastState.Stage {
