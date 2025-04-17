@@ -343,7 +343,8 @@ func Test_getOpensearchVersion(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
-		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1])
+		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1].ShortVersion)
+		assert.Equal(t, "chef/automate-ha-opensearch/1.3.7/20230223065900", versionMap[TEST_IP_1].LongVersion)
 	})
 	t.Run("Error Chef Managed", func(t *testing.T) {
 		mockCmdExecutor := &MockRemoteCmdExecutor{
@@ -403,7 +404,8 @@ func Test_getOpensearchVersion(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
-		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1])
+		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1].ShortVersion)
+		assert.Equal(t, "NA", versionMap[TEST_IP_1].LongVersion)
 	})
 	t.Run("Error Self Managed", func(t *testing.T) {
 		mockCmdExecutor := &MockRemoteCmdExecutor{
@@ -470,7 +472,7 @@ func Test_getPostgresqlVersion(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
-		assert.Equal(t, "13.5.0", versionMap[TEST_IP_1])
+		assert.Equal(t, "13.5.0", versionMap[TEST_IP_1].ShortVersion)
 	})
 	t.Run("Error Chef Managed", func(t *testing.T) {
 		mockCmdExecutor := &MockRemoteCmdExecutor{

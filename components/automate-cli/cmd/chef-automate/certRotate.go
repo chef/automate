@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
 	"net"
@@ -9,7 +8,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
@@ -113,8 +111,8 @@ const (
 	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip during root-ca and common name patching as the following %s have same root-ca and common name as currently provided OpenSearch root-ca and common name.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip during common name patching as the following %s have same common name as currently provided OpenSearch common name.\n\t %s"
 	DEFAULT_TIMEOUT                   = 600
-
-	MAINTENANICE_ON_LAG = `
+	ERROR_REQUIRED_FLAG_CC            = `Flag certificate-config is mandatory for certificate rotation. Make sure to pass the certificate template with this flag`
+	MAINTENANICE_ON_LAG               = `
 Follower nodes are behind leader node by %d bytes, to avoid data loss we will put cluster on maintenance mode, do you want to continue :
 `
 )
@@ -134,7 +132,7 @@ type certRotateFlags struct {
 	postgres   bool
 	opensearch bool
 
-	// Certificates Path
+	// // Certificates Path
 	privateCertPath string
 	publicCertPath  string
 	rootCAPath      string
@@ -205,24 +203,9 @@ func init() {
 		},
 	}
 
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, AUTOMATE, "a", false, "Automate Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Automate Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CHEF_SERVER, "c", false, "Chef Infra Server Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Chef Infra Server Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, POSTGRESQL, "p", false, "Postgres Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.postgres, "pg", false, "Postgres Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, OPENSEARCH, "o", false, "OS Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "OS Certificate Rotation")
-
-	certRotateCmd.PersistentFlags().StringVar(&flagsObj.privateCertPath, "private-cert", "", "Private certificate")
-	certRotateCmd.PersistentFlags().StringVar(&flagsObj.publicCertPath, "public-cert", "", "Public certificate")
-	certRotateCmd.PersistentFlags().StringVar(&flagsObj.rootCAPath, "root-ca", "", "RootCA certificate")
-	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminCertPath, "admin-cert", "", "Admin certificate")
-	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminKeyPath, "admin-key", "", "Admin Private certificate")
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.cluster, "certificate-config", "", "Cluster certificate file")
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.cluster, "cc", "", "Cluster certificate file")
 
-	certRotateCmd.PersistentFlags().StringVar(&flagsObj.node, "node", "", "Node Ip address")
 	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process")
 
 	RootCmd.AddCommand(certRotateCmd)
@@ -248,194 +231,40 @@ func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args 
 // certRotate will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj *certRotateFlags) error {
 	if isA2HARBFileExist() {
-		infra, err := getAutomateHAInfraDetails()
-		if err != nil {
-			return err
-		}
-
-		sshConfig := c.getSshDetails(infra)
-		sshUtil := NewSSHUtil(sshConfig)
-		sshConfig.timeout = flagsObj.timeout
-		sshUtil.setSSHConfig(sshConfig)
-		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), sshUtil, writer)
-		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		infra, err = getAutomateHAInfraDetails()
-		if err != nil {
-			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
-			return err
-		}
-		statusSummary, err := getStatusSummary(infra)
-		if err != nil {
-			return err
-		}
-
 		if len(flagsObj.cluster) > 0 {
+			infra, err := getAutomateHAInfraDetails()
+			if err != nil {
+				return err
+			}
+			sshConfig := c.getSshDetails(infra)
+			sshUtil := NewSSHUtil(sshConfig)
+			sshConfig.timeout = flagsObj.timeout
+			sshUtil.setSSHConfig(sshConfig)
+			certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), sshUtil, writer)
+			currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			infra, err = getAutomateHAInfraDetails()
+			if err != nil {
+				writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
+				return err
+			}
+			statusSummary, err := getStatusSummary(infra)
+			if err != nil {
+				return err
+			}
 			err = c.certRotateFromTemplate(flagsObj.cluster, sshUtil, infra, currentCertsInfo, statusSummary, true, 10, flagsObj)
 			if err != nil {
 				return err
 			}
 		} else {
-			certs, err := c.getCerts(infra, flagsObj)
-			if err != nil {
-				return err
-			}
-			// we need to ignore root-ca, adminCert and adminKey in the case of each node
-			if certs.rootCA != "" && flagsObj.node != "" {
-				writer.Warn("root-ca flag will be ignored when node flag is provided")
-			}
-			if (certs.adminCert != "" || certs.adminKey != "") && flagsObj.node != "" {
-				writer.Warn("admin-cert and admin-key flag will be ignored when node flag is provided")
-			}
-
-			if flagsObj.timeout < DEFAULT_TIMEOUT {
-				return errors.Errorf("The operation timeout duration for each individual node during the certificate rotation process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
-			}
-
-			if flagsObj.automate || flagsObj.chefserver {
-				err := c.certRotateFrontend(sshUtil, certs, infra, flagsObj, currentCertsInfo)
-				if err != nil {
-					return err
-				}
-			} else if flagsObj.postgres {
-				err := c.certRotatePG(sshUtil, certs, infra, flagsObj, currentCertsInfo, false)
-				if err != nil {
-					return err
-				}
-			} else if flagsObj.opensearch {
-				err := c.certRotateOS(sshUtil, certs, infra, flagsObj, currentCertsInfo, false)
-				if err != nil {
-					return err
-				}
-			} else {
-				return errors.New("Please Provide service flag")
-			}
+			return status.Errorf(status.InvalidCommandArgsError, ERROR_REQUIRED_FLAG_CC)
 		}
 	} else {
 		return fmt.Errorf("cert-rotate command should be executed from Automate HA Bastion Node")
 	}
 
-	return nil
-}
-
-// certRotateFrontend will rotate the certificates of Automate and Chef Infra Server.
-func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
-	fileName := "cert-rotate-fe.toml"
-	timestamp := time.Now().Format("20060102150405")
-	var remoteService string
-
-	if flagsObj.automate {
-		remoteService = AUTOMATE
-	} else if flagsObj.chefserver {
-		remoteService = CHEF_SERVER
-	}
-	//get ips to exclude
-	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
-	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
-
-	// Creating and patching the required configurations.
-	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
-	concurrent := true
-	patchFnParam := &patchFnParameters{
-		sshUtil:       sshUtil,
-		config:        config,
-		fileName:      fileName,
-		timestamp:     timestamp,
-		remoteService: remoteService,
-		concurrent:    concurrent,
-		infra:         infra,
-		flagsObj:      flagsObj,
-		skipIpsList:   skipIpsList,
-	}
-
-	err := c.patchConfig(patchFnParam, true)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// certRotatePG will rotate the certificates of Postgres.
-func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates, skipFrontend bool) error {
-	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, POSTGRESQL)
-	}
-	fileName := "cert-rotate-pg.toml"
-	timestamp := time.Now().Format("20060102150405")
-	remoteService := POSTGRESQL
-
-	// Creating and patching the required configurations.
-	var config string
-	if flagsObj.node != "" {
-		config = fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, certs.privateCert, certs.publicCert)
-	} else {
-		config = fmt.Sprintf(POSTGRES_CONFIG, certs.privateCert, certs.publicCert, certs.rootCA)
-	}
-
-	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
-	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
-	concurrent := false
-	patchFnParam := &patchFnParameters{
-		sshUtil:       sshUtil,
-		config:        config,
-		fileName:      fileName,
-		timestamp:     timestamp,
-		remoteService: remoteService,
-		concurrent:    concurrent,
-		infra:         infra,
-		flagsObj:      flagsObj,
-		skipIpsList:   skipIpsList,
-	}
-
-	// patching on PG
-	err := c.patchConfig(patchFnParam, true)
-	if err != nil {
-		return err
-	}
-	// ignore patching of root-ca when node flag is provided
-	if flagsObj.node != "" {
-		return nil
-	}
-	if skipFrontend {
-		//Skiping frontend nodes
-		return nil
-	}
-	return c.certRotateFrontendForPG(sshUtil, certs, infra, flagsObj, timestamp)
-}
-
-func (c *certRotateFlow) certRotateFrontendForPG(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, timestamp string) error {
-	skipIpsList, err := c.getSkipIpsListForPgRootCAPatching(infra, sshUtil, certs)
-	if err != nil {
-		return err
-	}
-	c.skipMessagePrinter("frontend", SKIP_FRONT_END_IPS_MSG_PG, "", skipIpsList)
-
-	//Patching root-ca to frontend-nodes for maintaining the connection.
-	filenameFe := "pg_fe.toml"
-	remoteService := "frontend"
-	// Creating and patching the required configurations.
-	configFe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, certs.rootCA)
-
-	patchFnParam := &patchFnParameters{
-		sshUtil:       sshUtil,
-		config:        configFe,
-		fileName:      filenameFe,
-		timestamp:     timestamp,
-		remoteService: remoteService,
-		concurrent:    true,
-		infra:         infra,
-		flagsObj:      flagsObj,
-		skipIpsList:   skipIpsList,
-	}
-
-	// patching frontend
-	err = c.patchConfig(patchFnParam, true)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -461,128 +290,6 @@ func (c *certRotateFlow) getSkipIpsListForPgRootCAPatching(infra *AutomateHAInfr
 	skipIpsList = append(skipIpsList, newskipIpsList...)
 
 	return skipIpsList, nil
-}
-
-// certRotateOS will rotate the certificates of OpenSearch.
-func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates, skipFrontend bool) error {
-	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, OPENSEARCH)
-	}
-	fileName := "cert-rotate-os.toml"
-	timestamp := time.Now().Format("20060102150405")
-	remoteService := OPENSEARCH
-
-	var adminDn pkix.Name
-	var err error
-	if flagsObj.node == "" {
-		adminDn, err = getDistinguishedNameFromKey(certs.adminCert)
-		if err != nil {
-			return err
-		}
-	}
-	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
-	if err != nil {
-		return err
-	}
-
-	existingNodesDN := currentCertsInfo.OpensearchCertsByIP[0].NodesDn
-	nodesDn := ""
-	nodesCn := ""
-
-	if flagsObj.node != "" {
-		nodesDn = nodesDn + fmt.Sprintf("%v", existingNodesDN) + "\n  - " + fmt.Sprintf("%v", nodeDn) + "\n"
-	} else {
-		nodesDn = fmt.Sprintf("%v", nodeDn) + nodesDn
-		nodesCn = nodeDn.CommonName
-	}
-
-	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
-	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
-
-	// Creating and patching the required configurations.
-	var config string
-	if flagsObj.node != "" {
-		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", nodesDn))
-	} else {
-		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
-	}
-	concurrent := false
-	patchFnParam := &patchFnParameters{
-		sshUtil:       sshUtil,
-		config:        config,
-		fileName:      fileName,
-		timestamp:     timestamp,
-		remoteService: remoteService,
-		concurrent:    concurrent,
-		infra:         infra,
-		flagsObj:      flagsObj,
-		skipIpsList:   skipIpsList,
-	}
-
-	err = c.patchConfig(patchFnParam, true)
-	if err != nil {
-		return err
-	}
-
-	if flagsObj.node != "" && stringutils.SliceContains(skipIpsList, flagsObj.node) {
-		return nil
-	}
-
-	if flagsObj.node != "" {
-
-		err := patchOSNodeDN(flagsObj, patchFnParam, c, nodesDn)
-		if err != nil {
-			return err
-		}
-
-	}
-
-	if skipFrontend {
-		//Skiping frontend nodes
-		return nil
-	}
-	return c.certRotateFrontendForOS(sshUtil, certs, infra, flagsObj, nodesCn, timestamp)
-}
-
-func (c *certRotateFlow) certRotateFrontendForOS(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, nodesCn string, timestamp string) error {
-	// Patching root-ca to frontend-nodes for maintaining the connection.
-	filenameFe := "os_fe.toml"
-	remoteService := "frontend"
-
-	skipIpsList, err := c.getSkipIpsListForOsRootCACNPatching(infra, sshUtil, certs, nodesCn, flagsObj)
-	if err != nil {
-		return err
-	}
-	skipMessage := ""
-
-	// Creating and patching the required configurations.
-	var configFe string
-	if flagsObj.node != "" {
-		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, nodesCn)
-		skipMessage = SKIP_FRONT_END_IPS_MSG_CN
-	} else {
-		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, nodesCn)
-		skipMessage = SKIP_FRONT_END_IPS_MSG_OS
-	}
-	c.skipMessagePrinter(remoteService, skipMessage, "", skipIpsList)
-
-	patchFnParam := &patchFnParameters{
-		sshUtil:       sshUtil,
-		config:        configFe,
-		fileName:      filenameFe,
-		timestamp:     timestamp,
-		remoteService: remoteService,
-		concurrent:    true,
-		infra:         infra,
-		flagsObj:      flagsObj,
-		skipIpsList:   skipIpsList,
-	}
-
-	err = c.patchConfig(patchFnParam, true)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (c *certRotateFlow) getSkipIpsListForOsRootCACNPatching(infra *AutomateHAInfraDetails, sshUtil SSHUtil, certs *certificates, nodesCn string, flagsObj *certRotateFlags) ([]string, error) {

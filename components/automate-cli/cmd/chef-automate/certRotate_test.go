@@ -2280,9 +2280,10 @@ func TestPatchConfig(t *testing.T) {
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
-							HostIP: "",
-							Error:  nil,
-							Output: "",
+							HostIP:  "",
+							Error:   nil,
+							Output:  "",
+							DestDir: "",
 						},
 					}
 				},

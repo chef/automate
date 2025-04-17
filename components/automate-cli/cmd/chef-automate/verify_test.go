@@ -93,6 +93,15 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
 			},
 			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
 			wantErr:    nil,
@@ -138,6 +147,15 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -198,6 +216,15 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
 			},
 			mockVerifyCmdDeps: &verifyCmdDeps{
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
@@ -244,6 +271,15 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -309,6 +345,15 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
 			},
 			mockVerifyCmdDeps: &verifyCmdDeps{
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
@@ -358,6 +403,15 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",
@@ -424,6 +478,15 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
 			},
 			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
 			wantErr:    nil,
@@ -477,6 +540,15 @@ func TestRunVerifyCmd(t *testing.T) {
 						},
 					}
 				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
 			},
 			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
 			wantErr:    nil,
@@ -522,6 +594,15 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyInHomeDirFunc: func(sshConfig sshutils.SSHConfig, srcFilePath, destFileName, destDir string, removeFile bool, hostIPs []string) []sshutils.Result {
 					return []sshutils.Result{
 						{
 							HostIP: "",

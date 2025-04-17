@@ -598,7 +598,7 @@ func (v *verifyCmdFlow) copyCLIOnRemoteNodes(destFileName string, sshConfig sshu
 	if err != nil {
 		return err
 	}
-	copyResults := v.SSHUtil.CopyFileToRemoteConcurrently(sshConfig, currentBinaryPath, destFileName, destDir, false, hostIPs)
+	copyResults := v.SSHUtil.CopyFileToRemoteConcurrentlyInHomeDir(sshConfig, currentBinaryPath, destFileName, destDir, false, hostIPs)
 	isError := false
 	for _, result := range copyResults {
 		if result.Error != nil {

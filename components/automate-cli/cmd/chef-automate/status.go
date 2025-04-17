@@ -48,6 +48,7 @@ type FeStatusValue struct {
 	ipAddress   string
 	status      string
 	Opensearch  string
+	MaintStatus string
 }
 
 type BeStatusValue struct {

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"container/list"
 	"context"
 	"errors"
@@ -282,6 +283,15 @@ func runCommandOnBastion(args []string) error {
 
 	isManaged := isManagedServicesOn()
 
+	var aibValue string
+	if !isManaged {
+		aibValue, err = extractValueFromFile(AIB_BE_AUTO_TFVARS, "backend_aib_local_file")
+		if err != nil {
+			fmt.Println("Error reading AIB file:", err)
+			return err
+		}
+	}
+
 	if len(opensearchIps) != 0 {
 		versions, err := getOpensearchVersion(opensearchIps, infra, isManaged, cmdExecutor)
 		if err != nil {
@@ -293,7 +303,23 @@ func runCommandOnBastion(args []string) error {
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
 
-			writer.Printf("Version : %s\n\n", version)
+			writer.Printf("Version : %s\n", version.ShortVersion)
+
+			if !isManaged {
+
+				localAIBVal := aibValue
+				match, err := checkSvcVersion(MANIFEST_AUTO_TFVARS, OS_IDENT, version.LongVersion)
+				if err != nil {
+					fmt.Println("Error reading manifest file:", err)
+					return err
+				}
+
+				if !match {
+					localAIBVal = VERSION_ERR
+				}
+
+				writer.Printf("Airgap-Bundle : %s\n\n", localAIBVal)
+			}
 		}
 		writer.Println("-----------------------------------------")
 
@@ -311,7 +337,24 @@ func runCommandOnBastion(args []string) error {
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
 
-			writer.Printf("Version : %s\n\n", version)
+			writer.Printf("Version : %s\n", version.ShortVersion)
+
+			if !isManaged {
+
+				localAIBVal := aibValue
+				match, err := checkSvcVersion(MANIFEST_AUTO_TFVARS, PG_IDENT, version.LongVersion)
+				if err != nil {
+					fmt.Println("Error reading manifest file:", err)
+					return err
+				}
+
+				if !match {
+					localAIBVal = VERSION_ERR
+				}
+
+				writer.Printf("Airgap-Bundle : %s\n\n", localAIBVal)
+			}
+
 		}
 
 		writer.Println("-----------------------------------------")
@@ -319,6 +362,51 @@ func runCommandOnBastion(args []string) error {
 	}
 
 	return nil
+}
+
+func checkSvcVersion(filePath, pkgName, expected string) (bool, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, pkgName) {
+			parts := strings.Split(line, "=")
+			if len(parts) != 2 {
+				return false, fmt.Errorf("invalid format in manifest file")
+			}
+			val := strings.Trim(parts[1], " \"")
+			return val == expected, nil
+		}
+	}
+
+	return false, fmt.Errorf("%s not found in %s", pkgName, filePath)
+}
+
+func extractValueFromFile(filePath, key string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	re := regexp.MustCompile(`backend-(\d+\.\d+\.\d+)\.aib`)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "backend_aib_local_file") {
+			matches := re.FindStringSubmatch(line)
+			if len(matches) == 2 {
+				return matches[1], nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("%s not found in %s", key, filePath)
 }
 
 func getVersionBasedOnFlag() error {
@@ -458,8 +546,8 @@ func getInfraServerVersion(chefServerIps []string, infra *AutomateHAInfraDetails
 	return versionMap, nil
 }
 
-func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
-	versionMap := make(map[string]string)
+func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool, cmdExecuter RemoteCmdExecutor) (map[string]SvcVersions, error) {
+	versionMap := make(map[string]SvcVersions)
 	if isManagedServicesOn {
 		automateIps := infra.Outputs.AutomatePrivateIps.Value
 		nodeMap := &NodeTypeAndCmd{
@@ -493,7 +581,10 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails,
 			}
 		}
 		for _, ip := range opensearchIps {
-			versionMap[ip] = v
+			versionMap[ip] = SvcVersions{
+				ShortVersion: v,
+				LongVersion:  "NA",
+			}
 
 		}
 
@@ -537,7 +628,10 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails,
 				logrus.Error("ERROR", err)
 				return nil, err
 			}
-			versionMap[ip] = v
+			versionMap[ip] = SvcVersions{
+				ShortVersion: v,
+				LongVersion:  osPkg.Version,
+			}
 
 		}
 
@@ -546,8 +640,13 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails,
 	}
 }
 
-func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
-	versionMap := make(map[string]string)
+type SvcVersions struct {
+	ShortVersion string
+	LongVersion  string
+}
+
+func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool, cmdExecuter RemoteCmdExecutor) (map[string]SvcVersions, error) {
+	versionMap := make(map[string]SvcVersions)
 
 	if isManagedServicesOn {
 		sshconfig := &SSHConfig{}
@@ -594,7 +693,10 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 		}
 
 		for _, ip := range postgresqlIps {
-			versionMap[ip] = v
+			versionMap[ip] = SvcVersions{
+				ShortVersion: v,
+				LongVersion:  "NA",
+			}
 		}
 
 		return versionMap, nil
@@ -636,7 +738,10 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 				logrus.Error("ERROR", err)
 				return nil, err
 			}
-			versionMap[ip] = v
+			versionMap[ip] = SvcVersions{
+				ShortVersion: v,
+				LongVersion:  pgPkg.Version,
+			}
 
 		}
 
