@@ -21,8 +21,10 @@ const DATE_FORMAT = "%Y%m%d%H%M%S"
 
 const PG_IDENT = "postgresql_pkg_ident"
 const PG_LEADER_IDENT = "pgleaderchk_pkg_ident"
+const OS_IDENT = "opensearch_pkg_ident"
 const HA_PROXY_IDENT = "proxy_pkg_ident"
 const MANIFEST_AUTO_TFVARS = "/hab/a2_deploy_workspace/terraform/a2ha_manifest.auto.tfvars"
+const AIB_BE_AUTO_TFVARS = "/hab/a2_deploy_workspace/terraform/a2ha_aib_be.auto.tfvars"
 const PG_SCRIPT_NAME = "pg-restart-script.sh"
 const PG_SCRIPT_PATH = "/hab/var/automate-ha"
 
@@ -102,4 +104,5 @@ const (
 	GET_OPENSEARCH_CLUSTER_SETTINGS = `curl --location --request GET 'http://localhost:10144/_cluster/settings'`
 
 	DEFAULT_BACKEND_CERTS = "/hab/a2_deploy_workspace/default_backend_certificates.toml"
+	VERSION_ERR           = "Version Undetermined. Please contact support."
 )
