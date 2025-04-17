@@ -802,10 +802,16 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 
 			switch lastState.Stage {
 			case GET_ALIASES:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Getting aliases for index")
+				err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: GET_ALIASES")
+				}
 				continue
 			case SRC_TO_TEMP:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Creating temporary index")
+				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: SRC_TO_TEMP")
+				}
 				continue
 			case REINDEX_SRC_TEMP:
 				err := s.runFromReindexFromSourceToTemp(ctx, requestID, iWorkflow.Index, lastState.Stage)
@@ -814,19 +820,34 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case DELETE_SRC:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Deleting source index")
+				err := s.runFromDeleteSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: DELETE_SRC")
+				}
 				continue
 			case TEMP_TO_SRC:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Creating source index from temporary index")
+				err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: TEMP_TO_SRC")
+				}
 				continue
 			case REINDEX_TEMP_SRC:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Reindexing from temporary to source index")
+				err := s.runFromReindexTempToSourceOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC")
+				}
 				continue
 			case CREATE_ALIASES:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Creating aliases for source index")
+				err := s.runFromCreateAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: CREATE_ALIASES")
+				}
 				continue
 			case DELETE_TEMP:
-				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Deleting temporary index")
+				err := s.runFromDeleteTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				if err != nil {
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: DELETE_TEMP")
+				}
 				continue
 			default:
 				log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("We don't support this stage")
@@ -839,67 +860,168 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 	return nil
 }
 
+func (s *ChefIngestServer) runFromGetAliasesOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming reindexing from Step 1: Get Aliases")
+
+	// Fetch aliases for the index
+	_, err := s.getAliases(ctx, index, requestID)
+	if err != nil {
+		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to fetch aliases for index")
+		// Return the error to allow retry logic or proper failure handling
+		return err
+	}
+
+	log.WithFields(log.Fields{"index": index}).Info("Alias fetch completed, continuing to next stage")
+
+	// If the next stage is creating a temporary index, continue with that
+	err = s.runFromCreateTempIndexOnwards(ctx, requestID, index, SRC_TO_TEMP)
+	if err != nil {
+		log.WithError(err).WithField("index", index).Error("Failed while continuing from alias fetch")
+		// Return the error to be handled by the calling function
+		return err
+	}
+
+	return nil
+}
+
+func (s *ChefIngestServer) runFromCreateTempIndexOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming reindexing from Step 3: Create Temporary Index")
+
+	// Generate the name for the temporary index
+	tempIndex := index + "_temp"
+
+	// Step 3: Create Temporary Index from Source Index
+	if err := s.createIndex(ctx, tempIndex, index, requestID, SRC_TO_TEMP, index); err != nil {
+		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create temporary index from source")
+		// Return the error to allow retry logic or proper failure handling
+		return err
+	}
+
+	// Continue with reindexing from source to temporary index
+	err := s.runFromReindexFromSourceToTemp(ctx, requestID, index, REINDEX_SRC_TEMP)
+	if err != nil {
+		log.WithError(err).WithField("index", index).Error("Failed while continuing after creating temporary index")
+		// Return the error to be handled by the calling function
+		return err
+	}
+
+	return nil
+}
+
 func (s *ChefIngestServer) runFromReindexFromSourceToTemp(ctx context.Context, requestID int, index, stage string) error {
 	log.WithFields(log.Fields{
 		"requestId": requestID,
 		"index":     index,
 		"stage":     stage,
-	}).Info("Resuming reindexing from Step 4: Reindex from Source to Temporary Index")
-
-	// Step 1: Fetch aliases for the index
-	alias, err := s.getAliases(ctx, index, requestID)
-	if err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to fetch aliases for index")
-		return err
-	}
+	}).Info("Resuming from Step 4: Reindex from Source to Temporary Index")
 
 	tempIndex := index + "_temp"
 
-	// Step 4: Reindex from Source to Temporary Index
 	if err := s.processReindexing(ctx, tempIndex, index, requestID, REINDEX_SRC_TEMP, index); err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from source to temporary index")
 		return err
 	}
 
-	// Step 6: Delete Source Index
+	return s.runFromDeleteSourceIndexOnwards(ctx, requestID, index, stage)
+}
+
+func (s *ChefIngestServer) runFromDeleteSourceIndexOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming from Step 6: Delete Source Index")
+
 	if err := s.deleteIndex(ctx, index, requestID, index, DELETE_SRC); err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete source index")
 		return err
 	}
 
-	// Step 7: Recreate Source Index from Temporary Index
+	return s.runFromTempToSourceIndexOnwards(ctx, requestID, index, stage)
+}
+
+func (s *ChefIngestServer) runFromTempToSourceIndexOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming from Step 7: Create Source Index from Temporary Index")
+
+	tempIndex := index + "_temp"
+
 	if err := s.createIndex(ctx, index, tempIndex, requestID, TEMP_TO_SRC, index); err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to recreate source index from temporary index")
 		return err
 	}
 
-	// Step 8: Reindex from Temporary to Source Index
+	return s.runFromReindexTempToSourceOnwards(ctx, requestID, index, stage)
+}
+
+func (s *ChefIngestServer) runFromReindexTempToSourceOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming from Step 8: Reindex from Temporary to Source Index")
+
+	tempIndex := index + "_temp"
+
 	if err := s.processReindexing(ctx, index, tempIndex, requestID, REINDEX_TEMP_SRC, index); err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to reindex from temporary to source index")
 		return err
 	}
 
-	// Step 10: Create Aliases for Source Index
+	return s.runFromCreateAliasesOnwards(ctx, requestID, index, stage)
+}
+
+func (s *ChefIngestServer) runFromCreateAliasesOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming from Step 10: Create Aliases")
+
+	alias, err := s.getAliases(ctx, index, requestID)
+	if err != nil {
+		log.WithError(err).WithField("index", index).Error("Failed to get aliases")
+		return err
+	}
+
 	if err := s.createAliases(ctx, index, alias, requestID); err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create aliases for source index")
+		log.WithError(err).WithField("index", index).Error("Failed to create aliases")
 		return err
 	}
 
-	// Step 11: Delete Temporary Index
+	// Continue to the next step (delete temporary index)
+	return s.runFromDeleteTempIndexOnwards(ctx, requestID, index, stage)
+}
+
+func (s *ChefIngestServer) runFromDeleteTempIndexOnwards(ctx context.Context, requestID int, index, stage string) error {
+	log.WithFields(log.Fields{
+		"requestId": requestID,
+		"index":     index,
+		"stage":     stage,
+	}).Info("Resuming from Step 11: Delete Temporary Index")
+
+	tempIndex := index + "_temp"
+
 	if err := s.deleteIndex(ctx, tempIndex, requestID, index, DELETE_TEMP); err != nil {
-		log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to delete temporary index")
+		log.WithError(err).WithField("index", index).Error("Failed to delete temporary index")
 		return err
 	}
 
 	log.WithFields(log.Fields{"index": index}).Info("Reindexing completed for index")
 
-	// Final status update based on result
 	finalStatus := STATUS_COMPLETED
 	if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
-		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		log.WithError(err).WithField("requestId", requestID).Error("Failed to update reindex request status")
 		return err
 	}
 
-	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully for index")
+	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
 	return nil
 }
