@@ -178,7 +178,6 @@ func (l *licenseInterceptor) refreshLicenseDetails(ctx context.Context) error {
 			return errors.Wrap(err, "Unable to fetch license details")
 		}
 	}
-
 	return nil
 }
 
