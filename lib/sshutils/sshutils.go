@@ -297,7 +297,7 @@ func (s *SSHUtilImpl) CopyFileToRemoteConcurrentlyInHomeDir(sshConfig SSHConfig,
 		go func(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, resultChan chan Result) {
 			rc := Result{sshConfig.HostIP, "", nil, destDir}
 
-			cmd := "sudo echo $HOME"
+			cmd := "sudo echo -n $HOME"
 			output, err := s.Execute(sshConfig, cmd)
 			if err != nil {
 				rc.Error = err
