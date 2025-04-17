@@ -321,6 +321,8 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 
 		errChan := make(chan error, 1)
 
+		// tODO: Updates the status of the reindex request to 'running' / previous req Id
+
 		// Start the reindexing process in a background goroutine
 		go func() {
 			defer cancel() // Ensure context is canceled when goroutine completes
