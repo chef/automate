@@ -505,6 +505,6 @@ func (db *DB) GetReindexRequestDetailed(requestID int) ([]IndexWorkflow, error) 
 }
 
 func (db *DB) UpdateReindexRequestStatus(requestID int, status string, timestamp time.Time) error {
-	_, err := db.Exec(`UPDATE reindex_requests SET status=$1, updated_at=$2 WHERE id=$3`, status, timestamp, requestID)
+	_, err := db.Exec(`UPDATE reindex_requests SET status=$1, last_updated=$2 WHERE id=$3`, status, timestamp, requestID)
 	return err
 }

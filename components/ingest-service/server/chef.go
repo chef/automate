@@ -321,7 +321,13 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 
 		errChan := make(chan error, 1)
 
-		// tODO: Updates the status of the reindex request to 'running' / previous req Id
+		// Update the request status to 'running'
+		err = s.db.UpdateReindexRequestStatus(reqID, STATUS_RUNNING, time.Now())
+		if err != nil {
+			log.WithError(err).Error("Failed to update reindex request status to running")
+			cancel() // Ensure the context is canceled before returning
+			return nil, status.Errorf(codes.Internal, "failed to update reindex request status: %s", err)
+		}
 
 		// Start the reindexing process in a background goroutine
 		go func() {
