@@ -297,26 +297,39 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 	return requestID, nil
 }
 
-func (db *DB) GetLatestReindexStatus() (string, error) {
+func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
 	if db == nil || db.DbMap == nil {
 		logrus.Error("DB connection is not initialized")
-		return "", errors.New("database connection is not initialized")
+		return "", time.Time{}, errors.New("database connection is not initialized")
 	}
 	var status string
-	err := db.QueryRow("SELECT status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&status)
+	var requestID int
+	err := db.QueryRow("SELECT id, status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID, &status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logrus.Error("No reindex requests found in the database")
-			return "", errors.New("no reindex requests found")
+			return "", time.Time{}, nil
 		}
-		return "", errors.Wrap(err, "error fetching latest request ID")
+		return "", time.Time{}, errors.Wrap(err, "error fetching latest request ID")
+	}
+
+	var heartbeatStr string
+	err = db.QueryRow("SELECT MAX(heartbeat) FROM reindex_request_detailed WHERE request_id = $1", requestID).Scan(&heartbeatStr)
+	if err != nil && err != sql.ErrNoRows {
+		return "", time.Time{}, errors.Wrap(err, "error fetching heartbeat for latest reindex request")
+	}
+
+	heartbeat, err := time.Parse(time.RFC3339Nano, heartbeatStr)
+	if err != nil {
+		return "", time.Time{}, errors.Wrap(err, "error parsing heartbeat time")
 	}
 
 	logrus.WithFields(logrus.Fields{
-		"latestRequestID": status,
-	}).Info("Fetched latest reindex request ID")
-
-	return status, nil
+		"latestRequestID": requestID,
+		"status":          status,
+		"heartbeat":       heartbeat,
+	}).Info("Fetched latest reindex request status and heartbeat")
+	return status, heartbeat, nil
 }
 
 func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int, currentTime time.Time) error {
@@ -487,4 +500,9 @@ func (db *DB) GetReindexRequestDetailed(requestID int) ([]IndexWorkflow, error) 
 	}
 
 	return indexWorkflows, nil
+}
+
+func (db *DB) UpdateReindexRequestStatus(requestID int, status string, timestamp time.Time) error {
+	_, err := db.Exec(`UPDATE reindex_requests SET status=$1, updated_at=$2 WHERE id=$3`, status, timestamp, requestID)
+	return err
 }

@@ -297,7 +297,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
-	reindexStatus, err := s.db.GetLatestReindexStatus()
+	reindexStatus, _, err := s.db.GetLatestReindexStatus()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %s", err)
 	}
@@ -314,6 +314,13 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		reqID, err := s.db.GetLatestReindexRequestID()
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
+		}
+
+		// Update the request status to 'running'
+		err = s.db.UpdateReindexRequestStatus(reqID, STATUS_RUNNING, time.Now())
+		if err != nil {
+			log.WithError(err).Error("Failed to update reindex request status to running")
+			return nil, status.Errorf(codes.Internal, "failed to update reindex request status: %s", err)
 		}
 
 		err = s.reindexTheFailedIndices(ctx, reqID)
@@ -520,6 +527,17 @@ func (s *ChefIngestServer) createIndex(ctx context.Context, targetIndex, sourceI
 		log.Errorf("Failed to update the status for stage %s with status %s with error %v", stage, STATUS_RUNNING, err)
 		return err
 	}
+
+	// // eventfeed-2-feeds: simulate full failure, but still mark STATUS_FAILED
+	// if originalIndex == "eventfeed-2-feeds" {
+	// 	log.Errorf("Simulated failure to create index for %s", originalIndex)
+	// 	dbErr := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+	// 	if dbErr != nil {
+	// 		log.Errorf("Failed to mark STATUS_FAILED for %s: %v", originalIndex, dbErr)
+	// 	}
+	// 	return status.Errorf(codes.Internal, "failed to create index %s", originalIndex)
+	// }
+
 	err = s.client.CreateIndex(targetIndex, sourceIndex)
 	if err != nil {
 		log.WithError(err).Errorf("Failed to create index: %s", targetIndex)
@@ -557,6 +575,16 @@ func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, a
 	// Iterate over the aliases and create/update them in OpenSearch
 	for _, aliasName := range aliases {
 		log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
+		// //Simulate alias creation failure (but allow DB update to succeed)
+		// if srcIndex == "node-state-7" {
+		// 	log.Errorf("Simulated failure while creating alias %s for index %s", aliasName, srcIndex)
+		// 	dbErr := s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_FAILED, time.Now())
+		// 	if dbErr != nil {
+		// 		log.Errorf("Failed to update the status for stage %s with status %s with error %v", CREATE_ALIASES, STATUS_FAILED, dbErr)
+		// 	}
+		// 	return status.Errorf(codes.Internal, "simulated alias creation failure for %s", srcIndex)
+		// }
+
 		err := s.client.CreateAlias(ctx, aliasName, srcIndex)
 		if err != nil {
 			log.WithError(err).Errorf("Failed to create alias %s for index %s", aliasName, srcIndex)
@@ -589,6 +617,16 @@ func (s *ChefIngestServer) deleteIndex(ctx context.Context, index string, reques
 		return err
 	}
 
+	// //Delete fails, DB update to FAILED succeeds --------
+	// if originalIndex == "comp-3-profiles" && stage == DELETE_TEMP {
+	// 	log.Errorf("Simulated delete failure for index %s", originalIndex)
+	// 	err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+	// 	if err != nil {
+	// 		log.Errorf("Simulated failure: couldn't mark comp-3-profiles as failed")
+	// 	}
+	// 	return errors.New("Simulated OpenSearch delete failure")
+	// }
+
 	err = s.client.DeleteIndex(ctx, index)
 	if err != nil {
 		log.WithError(err).Errorf("Failed to delete index %s", index)
@@ -613,6 +651,13 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, src
 	if err != nil {
 		return err
 	}
+
+	// //Simulated failure in reindexing for comp-3-profiles
+	// if originalIndex == "node-attribute" {
+	// 	log.Errorf("Simulated reindexing failure for index %s", originalIndex)
+	// 	_ = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, originalIndex, stage, STATUS_FAILED, time.Now())
+	// 	return status.Errorf(codes.Internal, "simulated reindexing failure for %s", originalIndex)
+	// }
 
 	taskID, err := s.client.ReindexIndices(ctx, srcIndex, destIndex)
 	if err != nil {
