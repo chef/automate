@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -298,10 +297,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
-	reindexStatus, heartbeat, err := s.db.GetLatestReindexStatus()
-	fmt.Printf("err: %v\n", err)
-	fmt.Printf("reindexStatus: %v\n", reindexStatus)
-	fmt.Printf("heartbeat: %v\n", heartbeat)
+	reindexStatus, _, err := s.db.GetLatestReindexStatus()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %s", err)
 	}
@@ -312,10 +308,10 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
 		}
-		return &ingest.StartReindexResponse{
-			Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
-		}, nil
-		//return nil, fmt.Errorf("reindexing already in progress with request id: %v", reqID)
+		// return &ingest.StartReindexResponse{
+		// 	Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
+		// }, nil
+		return nil, status.Errorf(codes.AlreadyExists, "reindexing already in progress with request id: %v", reqID)
 	}
 
 	//heartbeatThreshold := 5 * time.Minute
@@ -340,7 +336,6 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to update reindex request status: %s", err)
 		}
 
-		// Start the reindexing process in a background goroutine
 		go func() {
 			defer cancel() // Ensure context is canceled when goroutine completes
 
@@ -350,11 +345,12 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 				errChan <- err
 			}
 		}()
-		log.Info("Succesfully reindexing routinue for the failed indicies")
-		return &ingest.StartReindexResponse{
-			Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
-		}, nil
-		//return nil, fmt.Errorf("reindexing started for failed indices for request id: %v", reqID)
+		log.Info("Successfully reindexing routine for the failed indices")
+
+		// return &ingest.StartReindexResponse{
+		// 	Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
+		// }, nil
+		return nil, status.Errorf(codes.Unknown, "reindexing started for failed indices for request id: %v", reqID)
 	}
 
 	// Fetch indices that need reindexing
@@ -924,7 +920,6 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				tempIndex := getTempIndexName(iWorkflow.Index)
 				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, tempIndex, DELETE_TEMP); err != nil {
 					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete temp index during REINDEX_SRC_TEMP retry")
-					continue
 				}
 				// Recreate the temp index and continue the flow
 				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
@@ -948,7 +943,6 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				// Step 1: Remove the source index
 				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, iWorkflow.Index, DELETE_SRC); err != nil {
 					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete source index during REINDEX_TEMP_SRC retry")
-					continue
 				}
 				// Step 2: Recreate the source index from temp
 				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
