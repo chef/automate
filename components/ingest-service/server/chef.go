@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -309,7 +310,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 
 	heartbeatThreshold := 5 * time.Minute
 	h := time.Since(heartbeat) > heartbeatThreshold
-	if reindexStatus == STATUS_FAILED && h {
+	if reindexStatus == STATUS_FAILED || h {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
 		reqID, err := s.db.GetLatestReindexRequestID()
@@ -341,7 +342,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}()
 
 		return &ingest.StartReindexResponse{
-			Message: "Reindexing started for failed indices",
+			Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
 		}, nil
 	}
 
