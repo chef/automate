@@ -854,6 +854,10 @@ func (s *ChefIngestServer) getAliases(ctx context.Context, index string, request
 	return alias, nil
 }
 
+func getTempIndexName(index string) string {
+	return index + "_temp"
+}
+
 func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestID int) error {
 	// Get all the indices with requestID
 	indexWorkflows, err := s.db.GetReindexRequestDetailed(requestID)
@@ -916,11 +920,16 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_SRC_TEMP:
-				//remove temp index
-				//create temp index onec again
-				err := s.runFromReindexFromSourceToTemp(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				// Remove the temp index
+				tempIndex := getTempIndexName(iWorkflow.Index)
+				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, tempIndex, DELETE_TEMP); err != nil {
+					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete temp index during REINDEX_SRC_TEMP retry")
+					continue
+				}
+				// Recreate the temp index and continue the flow
+				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP after recreating temp index")
 				}
 				continue
 			case DELETE_SRC:
@@ -936,11 +945,15 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_TEMP_SRC:
-				//remove source index
-				//re-create sounce index once again
-				err := s.runFromReindexTempToSourceOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				// Step 1: Remove the source index
+				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, iWorkflow.Index, DELETE_SRC); err != nil {
+					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete source index during REINDEX_TEMP_SRC retry")
+					continue
+				}
+				// Step 2: Recreate the source index from temp
+				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC after recreating source index")
 				}
 				continue
 			case CREATE_ALIASES:
