@@ -299,18 +299,28 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 
 	// check if reindexing is already running
 	reindexStatus, heartbeat, err := s.db.GetLatestReindexStatus()
+	fmt.Printf("err: %v\n", err)
+	fmt.Printf("reindexStatus: %v\n", reindexStatus)
+	fmt.Printf("heartbeat: %v\n", heartbeat)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %s", err)
 	}
 
 	if reindexStatus == STATUS_RUNNING {
 		log.Info("Reindexing is already in progress")
-		return nil, status.Errorf(codes.AlreadyExists, "reindexing is already in progress")
+		reqID, err := s.db.GetLatestReindexRequestID()
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
+		}
+		// return &ingest.StartReindexResponse{
+		// 	Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
+		// }, nil
+		return nil, fmt.Errorf("reindexing already in progress with request id: %v", reqID)
 	}
 
-	heartbeatThreshold := 5 * time.Minute
-	h := time.Since(heartbeat) > heartbeatThreshold
-	if reindexStatus == STATUS_FAILED || h {
+	//heartbeatThreshold := 5 * time.Minute
+	//h := time.Since(heartbeat) > heartbeatThreshold
+	if reindexStatus == STATUS_FAILED {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
 		reqID, err := s.db.GetLatestReindexRequestID()
@@ -340,10 +350,11 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 				errChan <- err
 			}
 		}()
-
-		return &ingest.StartReindexResponse{
-			Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
-		}, nil
+		log.Info("Succesfully reindexing routinue for the failed indicies")
+		// return &ingest.StartReindexResponse{
+		// 	Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
+		// }, nil
+		return nil, fmt.Errorf("reindexing started for failed indices for request id: %v", reqID)
 	}
 
 	// Fetch indices that need reindexing
@@ -591,6 +602,7 @@ func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, a
 	// Iterate over the aliases and create/update them in OpenSearch
 	for _, aliasName := range aliases {
 		log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
+
 		// //Simulate alias creation failure (but allow DB update to succeed)
 		// if srcIndex == "node-state-7" {
 		// 	log.Errorf("Simulated failure while creating alias %s for index %s", aliasName, srcIndex)

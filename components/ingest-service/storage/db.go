@@ -306,11 +306,12 @@ func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
 	var status string
 	var requestID int
 	err := db.QueryRow("SELECT id, status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID, &status)
+	if err == sql.ErrNoRows {
+		logrus.Error("No reindex requests found in the database")
+		return "", time.Time{}, nil
+	}
 	if err != nil {
-		if err == sql.ErrNoRows {
-			logrus.Error("No reindex requests found in the database")
-			return "", time.Time{}, nil
-		}
+		logrus.Error("internal server error")
 		return "", time.Time{}, errors.Wrap(err, "error fetching latest request ID")
 	}
 
