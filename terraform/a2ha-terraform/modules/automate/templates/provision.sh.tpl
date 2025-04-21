@@ -352,6 +352,9 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
   version_check_for_addnode
   # If isSkipRequired is true then we are exiting from here  
   if $isSkipRequired ; then
+     chef-automate decode-password $config
+     echo "Applying $config"
+     chef-automate config patch $config 
      create_bootstrap_bundle 
      echo "Skipping the below flow, not required for the add-node case"
      exit
