@@ -302,14 +302,16 @@ func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
 		logrus.Error("DB connection is not initialized")
 		return "", time.Time{}, errors.New("database connection is not initialized")
 	}
+
 	var status string
 	var requestID int
 	err := db.QueryRow("SELECT id, status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID, &status)
+	if err == sql.ErrNoRows {
+		logrus.Error("No reindex requests found in the database")
+		return "", time.Time{}, nil
+	}
 	if err != nil {
-		if err == sql.ErrNoRows {
-			logrus.Error("No reindex requests found in the database")
-			return "", time.Time{}, nil
-		}
+		logrus.Error("internal server error")
 		return "", time.Time{}, errors.Wrap(err, "error fetching latest request ID")
 	}
 
@@ -329,6 +331,7 @@ func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
 		"status":          status,
 		"heartbeat":       heartbeat,
 	}).Info("Fetched latest reindex request status and heartbeat")
+
 	return status, heartbeat, nil
 }
 
@@ -503,6 +506,6 @@ func (db *DB) GetReindexRequestDetailed(requestID int) ([]IndexWorkflow, error) 
 }
 
 func (db *DB) UpdateReindexRequestStatus(requestID int, status string, timestamp time.Time) error {
-	_, err := db.Exec(`UPDATE reindex_requests SET status=$1, updated_at=$2 WHERE id=$3`, status, timestamp, requestID)
+	_, err := db.Exec(`UPDATE reindex_requests SET status=$1, last_updated=$2 WHERE id=$3`, status, timestamp, requestID)
 	return err
 }

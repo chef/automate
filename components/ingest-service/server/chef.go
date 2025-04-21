@@ -304,10 +304,18 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 
 	if reindexStatus == STATUS_RUNNING {
 		log.Info("Reindexing is already in progress")
-		return nil, status.Errorf(codes.AlreadyExists, "reindexing is already in progress")
+		reqID, err := s.db.GetLatestReindexRequestID()
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
+		}
+		// return &ingest.StartReindexResponse{
+		// 	Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
+		// }, nil
+		return nil, status.Errorf(codes.AlreadyExists, "reindexing already in progress with request id: %v", reqID)
 	}
 
-	// tODO: hearbeat > 5 mins
+	//heartbeatThreshold := 5 * time.Minute
+	//h := time.Since(heartbeat) > heartbeatThreshold
 	if reindexStatus == STATUS_FAILED {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
@@ -316,18 +324,33 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
 		}
 
+		backgroundCtx, cancel := context.WithTimeout(context.Background(), 24*time.Hour)
+
+		errChan := make(chan error, 1)
+
 		// Update the request status to 'running'
 		err = s.db.UpdateReindexRequestStatus(reqID, STATUS_RUNNING, time.Now())
 		if err != nil {
 			log.WithError(err).Error("Failed to update reindex request status to running")
+			cancel() // Ensure the context is canceled before returning
 			return nil, status.Errorf(codes.Internal, "failed to update reindex request status: %s", err)
 		}
 
-		err = s.reindexTheFailedIndices(ctx, reqID)
-		if err != nil {
-			log.WithError(err).Error("Failed to reindex the failed indices")
-			return nil, status.Errorf(codes.Internal, "failed to reindex the failed indices: %s", err)
-		}
+		go func() {
+			defer cancel() // Ensure context is canceled when goroutine completes
+
+			err = s.reindexTheFailedIndices(backgroundCtx, reqID)
+			if err != nil {
+				log.WithError(err).Error("Failed to reindex the failed indices")
+				errChan <- err
+			}
+		}()
+		log.Info("Successfully reindexing routine for the failed indices")
+
+		// return &ingest.StartReindexResponse{
+		// 	Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
+		// }, nil
+		return nil, status.Errorf(codes.Unknown, "reindexing started for failed indices for request id: %v", reqID)
 	}
 
 	// Fetch indices that need reindexing
@@ -575,6 +598,7 @@ func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, a
 	// Iterate over the aliases and create/update them in OpenSearch
 	for _, aliasName := range aliases {
 		log.WithFields(log.Fields{"srcIndex": srcIndex, "alias": aliasName}).Info("Creating alias for source index")
+
 		// //Simulate alias creation failure (but allow DB update to succeed)
 		// if srcIndex == "node-state-7" {
 		// 	log.Errorf("Simulated failure while creating alias %s for index %s", aliasName, srcIndex)
@@ -826,6 +850,10 @@ func (s *ChefIngestServer) getAliases(ctx context.Context, index string, request
 	return alias, nil
 }
 
+func getTempIndexName(index string) string {
+	return index + "_temp"
+}
+
 func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestID int) error {
 	// Get all the indices with requestID
 	indexWorkflows, err := s.db.GetReindexRequestDetailed(requestID)
@@ -833,6 +861,35 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		log.WithError(err).Error("Failed to fetch reindex request details")
 		return status.Errorf(codes.Internal, "failed to fetch reindex request details: %s", err)
 	}
+
+	// Start a goroutine for heartbeat updates
+	heartbeatDone := make(chan struct{})
+	defer close(heartbeatDone)
+
+	// Create a ticker for heartbeat updates - every 2 minutes
+	go func() {
+		ticker := time.NewTicker(2 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped due to context cancellation")
+				return
+			case <-heartbeatDone:
+				log.WithFields(log.Fields{"requestId": requestID}).Info("Heartbeat stopped as process completed")
+				return
+			case <-ticker.C:
+				// Log heartbeat for all indices in this request
+				for _, index := range indexWorkflows {
+					log.WithFields(log.Fields{
+						"requestId": requestID,
+						"index":     index,
+					}).Info("Heartbeat tick")
+				}
+			}
+		}
+	}()
 
 	// parse indices and their stage into []struct
 	for _, iWorkflow := range indexWorkflows {
@@ -859,9 +916,15 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_SRC_TEMP:
-				err := s.runFromReindexFromSourceToTemp(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				// Remove the temp index
+				tempIndex := getTempIndexName(iWorkflow.Index)
+				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, tempIndex, DELETE_TEMP); err != nil {
+					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete temp index during REINDEX_SRC_TEMP retry")
+				}
+				// Recreate the temp index and continue the flow
+				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP after recreating temp index")
 				}
 				continue
 			case DELETE_SRC:
@@ -877,9 +940,14 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_TEMP_SRC:
-				err := s.runFromReindexTempToSourceOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				// Step 1: Remove the source index
+				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, iWorkflow.Index, DELETE_SRC); err != nil {
+					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete source index during REINDEX_TEMP_SRC retry")
+				}
+				// Step 2: Recreate the source index from temp
+				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC after recreating source index")
 				}
 				continue
 			case CREATE_ALIASES:
