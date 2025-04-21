@@ -916,6 +916,8 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_SRC_TEMP:
+				//remove temp index
+				//create temp index onec again
 				err := s.runFromReindexFromSourceToTemp(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
 					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
@@ -934,6 +936,8 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_TEMP_SRC:
+				//remove source index
+				//re-create sounce index once again
 				err := s.runFromReindexTempToSourceOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
 					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC")
