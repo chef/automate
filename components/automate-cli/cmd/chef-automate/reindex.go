@@ -156,14 +156,14 @@ func NewReindexFlow(writer *cli.Writer) (*ReindexFlow, error) {
 func (rf *ReindexFlow) StartReindex() error {
 	defer rf.DsClient.Close()
 
-	req := &api.StartReindexRequest{} // Modify if additional params are needed
+	req := &api.StartReindexRequest{}
 
-	_, err := rf.DsClient.StartReindex(context.Background(), req)
+	resp, err := rf.DsClient.StartReindex(context.Background(), req)
 	if err != nil {
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed to start reindexing")
 	}
 
-	rf.Writer.Println("Reindexing started successfully.")
+	rf.Writer.Println(resp.Message)
 	return nil
 }
 

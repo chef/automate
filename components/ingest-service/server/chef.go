@@ -312,10 +312,10 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
 		}
-		// return &ingest.StartReindexResponse{
-		// 	Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
-		// }, nil
-		return nil, fmt.Errorf("reindexing already in progress with request id: %v", reqID)
+		return &ingest.StartReindexResponse{
+			Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
+		}, nil
+		//return nil, fmt.Errorf("reindexing already in progress with request id: %v", reqID)
 	}
 
 	//heartbeatThreshold := 5 * time.Minute
@@ -351,10 +351,10 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 			}
 		}()
 		log.Info("Succesfully reindexing routinue for the failed indicies")
-		// return &ingest.StartReindexResponse{
-		// 	Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
-		// }, nil
-		return nil, fmt.Errorf("reindexing started for failed indices for request id: %v", reqID)
+		return &ingest.StartReindexResponse{
+			Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
+		}, nil
+		//return nil, fmt.Errorf("reindexing started for failed indices for request id: %v", reqID)
 	}
 
 	// Fetch indices that need reindexing
