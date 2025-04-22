@@ -893,8 +893,24 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 
 	// parse indices and their stage into []struct
 	for _, iWorkflow := range indexWorkflows {
+
+		log.WithFields(log.Fields{
+			"index": iWorkflow.Index,
+			"stage": func() string {
+				if len(iWorkflow.Stage) > 0 {
+					return iWorkflow.Stage[len(iWorkflow.Stage)-1].Stage
+				}
+				return "unknown"
+			}(),
+		}).Info("Processing index for reindexing")
+
 		if len(iWorkflow.Stage) == 8 && iWorkflow.Stage[7].Status == STATUS_COMPLETED {
 			log.WithFields(log.Fields{"index": iWorkflow.Index}).Info("Index is not fully reindexed")
+			continue
+		}
+
+		if len(iWorkflow.Stage) == 0 {
+			log.WithFields(log.Fields{"index": iWorkflow.Index}).Error("Stage is empty for index")
 			continue
 		}
 
@@ -910,13 +926,17 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case SRC_TO_TEMP:
-				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
+				err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
 					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: SRC_TO_TEMP")
 				}
 				continue
 			case REINDEX_SRC_TEMP:
-				err := s.runFromReindexFromSourceToTemp(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				// 1. Remove the temp index from opensearch
+				s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
+				// 2. Change database stage appropriately
+				err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
 					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
 				}
@@ -928,15 +948,19 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case TEMP_TO_SRC:
+				s.client.DeleteIndex(ctx, iWorkflow.Index)
 				err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
 					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: TEMP_TO_SRC")
 				}
 				continue
 			case REINDEX_TEMP_SRC:
-				err := s.runFromReindexTempToSourceOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				// 1. Remove the temp index from opensearch
+				s.client.DeleteIndex(ctx, iWorkflow.Index)
+				// 2. Change database stage appropriately
+				err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
 				}
 				continue
 			case CREATE_ALIASES:
