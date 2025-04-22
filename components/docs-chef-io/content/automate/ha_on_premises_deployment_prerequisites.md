@@ -80,9 +80,9 @@ Current Automate HA integrates with the following non-Chef tools:
 - **NoSQL Database:** OpenSearch: 1.3.7
 - **Load Balancer:** 
   - [Kemp LoadMaster](https://kemptechnologies.com/?_gl=1*jfw3dz*_gcl_au*MTIzMDA0NzAwNC4xNzM4NjA3NTQ3*_ga*MTk4NzcyMzc0My4xNzM4NjA3NTQ3*_ga_9JSNBCSF54*MTc0NDYxNTI1MS4xNC4xLjE3NDQ2MzQ4NTcuMzUuMC4w) (Preferred)
-  - or NGINX: 1.21.3
-  - or HA Proxy: 2.2.18
-  - or AWS Application Load Balancer
+  - NGINX: 1.21.3
+  - HA Proxy: 2.2.18
+  - AWS Application Load Balancer
 
 ## Hardware Requirements
 
