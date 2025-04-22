@@ -89,6 +89,11 @@ type StageDetail struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type IndexWorkflow struct {
+	Index string        `json:"index"`
+	Stage []StageDetail `json:"stage"`
+}
+
 // StatusResponse represents the response structure for reindex status
 type StatusResponse struct {
 	RequestID int                 `json:"request_id"`
@@ -292,6 +297,44 @@ func (db *DB) GetLatestReindexRequestID() (int, error) {
 	return requestID, nil
 }
 
+func (db *DB) GetLatestReindexStatus() (string, time.Time, error) {
+	if db == nil || db.DbMap == nil {
+		logrus.Error("DB connection is not initialized")
+		return "", time.Time{}, errors.New("database connection is not initialized")
+	}
+
+	var status string
+	var requestID int
+	err := db.QueryRow("SELECT id, status FROM reindex_requests ORDER BY created_at DESC LIMIT 1").Scan(&requestID, &status)
+	if err == sql.ErrNoRows {
+		logrus.Error("No reindex requests found in the database")
+		return "", time.Time{}, nil
+	}
+	if err != nil {
+		logrus.Error("internal server error")
+		return "", time.Time{}, errors.Wrap(err, "error fetching latest request ID")
+	}
+
+	var heartbeatStr string
+	err = db.QueryRow("SELECT MAX(heartbeat) FROM reindex_request_detailed WHERE request_id = $1", requestID).Scan(&heartbeatStr)
+	if err != nil && err != sql.ErrNoRows {
+		return "", time.Time{}, errors.Wrap(err, "error fetching heartbeat for latest reindex request")
+	}
+
+	heartbeat, err := time.Parse(time.RFC3339Nano, heartbeatStr)
+	if err != nil {
+		return "", time.Time{}, errors.Wrap(err, "error parsing heartbeat time")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"latestRequestID": requestID,
+		"status":          status,
+		"heartbeat":       heartbeat,
+	}).Info("Fetched latest reindex request status and heartbeat")
+
+	return status, heartbeat, nil
+}
+
 func (db *DB) UpdateAliasesForIndex(index string, hasAlias bool, alias []string, requestID int, currentTime time.Time) error {
 	if hasAlias {
 		aliasString := strings.Join(alias, ",")
@@ -421,4 +464,48 @@ func (db *DB) UpdateReindexStatus(requestID int, index, status string, timestamp
 	}
 
 	return nil
+}
+
+func (db *DB) GetReindexRequestDetailed(requestID int) ([]IndexWorkflow, error) {
+	var indexWorkflows []IndexWorkflow
+	var stageJSON string
+
+	query := `
+		SELECT index, stage
+		FROM reindex_request_detailed
+		WHERE request_id = $1
+	`
+
+	rows, err := db.Query(query, requestID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to fetch reindex request details")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var index string
+		var stages []StageDetail
+
+		err := rows.Scan(&index, &stageJSON)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to scan reindex request detail row")
+		}
+
+		err = json.Unmarshal([]byte(stageJSON), &stages)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal stage JSON")
+		}
+
+		indexWorkflows = append(indexWorkflows, IndexWorkflow{
+			Index: index,
+			Stage: stages,
+		})
+	}
+
+	return indexWorkflows, nil
+}
+
+func (db *DB) UpdateReindexRequestStatus(requestID int, status string, timestamp time.Time) error {
+	_, err := db.Exec(`UPDATE reindex_requests SET status=$1, last_updated=$2 WHERE id=$3`, status, timestamp, requestID)
+	return err
 }
