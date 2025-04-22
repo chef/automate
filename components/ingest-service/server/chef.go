@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -297,7 +298,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	log.Info("Received request to start reindexing")
 
 	// check if reindexing is already running
-	reindexStatus, _, err := s.db.GetLatestReindexStatus()
+	reindexStatus, heartbeat, err := s.db.GetLatestReindexStatus()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to fetch reindex status: %s", err)
 	}
@@ -308,15 +309,15 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to fetch latest reindex request ID: %s", err)
 		}
-		// return &ingest.StartReindexResponse{
-		// 	Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
-		// }, nil
-		return nil, status.Errorf(codes.AlreadyExists, "reindexing already in progress with request id: %v", reqID)
+		return &ingest.StartReindexResponse{
+			Message: fmt.Sprintf("Reindexing already in progress with request id: %v", reqID),
+		}, nil
 	}
 
-	//heartbeatThreshold := 5 * time.Minute
-	//h := time.Since(heartbeat) > heartbeatThreshold
-	if reindexStatus == STATUS_FAILED {
+	heartbeatThreshold := 5 * time.Minute
+	h := time.Since(heartbeat) > heartbeatThreshold
+
+	if reindexStatus == STATUS_FAILED || (!heartbeat.IsZero() && h) {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
 		reqID, err := s.db.GetLatestReindexRequestID()
@@ -347,10 +348,9 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		}()
 		log.Info("Successfully reindexing routine for the failed indices")
 
-		// return &ingest.StartReindexResponse{
-		// 	Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
-		// }, nil
-		return nil, status.Errorf(codes.Unknown, "reindexing started for failed indices for request id: %v", reqID)
+		return &ingest.StartReindexResponse{
+			Message: fmt.Sprintf("Reindexing started for failed indices for request id: %v", reqID),
+		}, nil
 	}
 
 	// Fetch indices that need reindexing
@@ -916,15 +916,9 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_SRC_TEMP:
-				// Remove the temp index
-				tempIndex := getTempIndexName(iWorkflow.Index)
-				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, tempIndex, DELETE_TEMP); err != nil {
-					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete temp index during REINDEX_SRC_TEMP retry")
-				}
-				// Recreate the temp index and continue the flow
-				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				err := s.runFromReindexFromSourceToTemp(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP after recreating temp index")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
 				}
 				continue
 			case DELETE_SRC:
@@ -940,14 +934,9 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 				}
 				continue
 			case REINDEX_TEMP_SRC:
-				// Step 1: Remove the source index
-				if err := s.deleteIndex(ctx, iWorkflow.Index, requestID, iWorkflow.Index, DELETE_SRC); err != nil {
-					log.WithFields(log.Fields{"index": iWorkflow.Index}).WithError(err).Error("Failed to delete source index during REINDEX_TEMP_SRC retry")
-				}
-				// Step 2: Recreate the source index from temp
-				err := s.runFromCreateTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
+				err := s.runFromReindexTempToSourceOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 				if err != nil {
-					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC after recreating source index")
+					log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_TEMP_SRC")
 				}
 				continue
 			case CREATE_ALIASES:
