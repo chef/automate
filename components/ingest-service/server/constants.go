@@ -2,6 +2,7 @@ package server
 
 const (
 	//Stages
+	INITIALIZATION   string = "initialization"
 	GET_ALIASES      string = "get_aliases"
 	SRC_TO_TEMP      string = "create_src_to_temp"
 	REINDEX_SRC_TEMP string = "reindex_src_temp"
