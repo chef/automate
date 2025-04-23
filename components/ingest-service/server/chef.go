@@ -991,7 +991,6 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 			s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
 			err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
-				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: SRC_TO_TEMP")
 			}
 			continue
@@ -999,7 +998,6 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 			// 1. Remove the temp index from opensearch
 			err = s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
 			if err != nil {
-				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Failed to delete index")
 			}
 			err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
@@ -1018,7 +1016,6 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		case TEMP_TO_SRC:
 			err = s.client.DeleteIndex(ctx, iWorkflow.Index)
 			if err != nil {
-				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Failed to delete index")
 			}
 			err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
@@ -1031,7 +1028,6 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 			// 1. Remove the temp index from opensearch
 			err = s.client.DeleteIndex(ctx, iWorkflow.Index)
 			if err != nil {
-				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Failed to delete index")
 			}
 			err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
