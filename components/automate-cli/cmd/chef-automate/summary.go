@@ -383,9 +383,21 @@ func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 			clusterOSHealth,
 		})
 
+	maintStatus := GenerateOriginalAutomateCLICommand(
+		&cobra.Command{
+			Use: "chef-automate",
+		}, []string{
+			"config",
+			"show",
+			"|",
+			"grep",
+			"maintenance_mode",
+		})
+
 	script := map[string]string{
-		"Status":   status,
-		"OsStatus": osStatus,
+		"Status":      status,
+		"OsStatus":    osStatus,
+		"MaintStatus": maintStatus,
 	}
 
 	if serviceName == automateName {
@@ -557,7 +569,7 @@ func (ss *Summary) getFollowerLag(output, service, role string) (string, error) 
 }
 
 func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
-	var osStatus, status string
+	var osStatus, status, ms string
 
 	for _, output := range outputs {
 		switch output.ScriptName {
@@ -572,6 +584,15 @@ func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType stri
 					status = "ERROR"
 				}
 			}
+		case "MaintStatus":
+			ms = "false"
+			parts := strings.Split(output.Output, "=")
+			if len(parts) == 2 {
+				val := strings.TrimSpace(parts[1])
+				if val == "true" {
+					ms = val
+				}
+			}
 		}
 	}
 
@@ -580,6 +601,7 @@ func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType stri
 		ipAddress:   ip,
 		status:      status,
 		Opensearch:  osStatus,
+		MaintStatus: ms,
 	}
 	return feStatusValue
 }
@@ -655,9 +677,9 @@ func (ss *Summary) ShowFEStatus() string {
 		tTemp := table.Table{}
 		tTemp.Render()
 		for _, status := range ss.feStatus {
-			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.status, status.Opensearch})
+			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.status, status.Opensearch, status.MaintStatus})
 		}
-		t.AppendHeader(table.Row{"Name", "IP Address", "Status", "Opensearch"})
+		t.AppendHeader(table.Row{"Name", "IP Address", "Status", "Opensearch", "Maintenance Mode"})
 		return t.Render()
 	}
 	return ""
