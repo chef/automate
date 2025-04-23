@@ -147,8 +147,8 @@ func (l *licenseInterceptor) getLicenseDetails(ctx context.Context) error {
 }
 
 func (l *licenseInterceptor) isValidLicense() bool {
-
-	if l.licenseStatus.LicenseDetails == nil {
+	//Added a check to ensure l.licenseStatus is not nil before accessing LicenseDetails.
+	if l.licenseStatus == nil || l.licenseStatus.LicenseDetails == nil {
 		return false
 	}
 	licenseValidDate := l.licenseStatus.LicenseDetails.ExpiryDate
@@ -167,17 +167,25 @@ func (l *licenseInterceptor) isValidLicense() bool {
 }
 
 func (l *licenseInterceptor) refreshLicenseDetails(ctx context.Context) error {
-	//if the global variable license status containing details is nil or If its not nil checking the details validity.
-	//If the details validity is before the current time refersh the license details
-	if (l.licenseStatus != nil && l.licenseStatus.DetailsValidity.Before(time.Now())) ||
-		(l.licenseStatus != nil && l.licenseStatus.LicenseDetailsRefresh) ||
-		l.licenseStatus == nil ||
+	//Added multiple conditions to determine when to refresh license details.
+	//If l.licenseStatus is nil, it means the license details are not initialized.
+	//If DetailsValidity has expired, the license details need to be refreshed.
+	//If LicenseDetailsRefresh is true, a hard refresh is triggered.
+	//If the license is invalid (checked via isValidLicense), the details are refreshed.
+	if l.licenseStatus == nil ||
+		l.licenseStatus.DetailsValidity.Before(time.Now()) ||
+		l.licenseStatus.LicenseDetailsRefresh ||
 		!l.isValidLicense() {
 		err := l.getLicenseDetails(ctx)
 		if err != nil {
 			return errors.Wrap(err, "Unable to fetch license details")
 		}
+
+		// Reset the LicenseDetailsRefresh flag after refreshing the details.
+		l.licenseStatus.LicenseDetailsRefresh = false
+
 	}
+
 	return nil
 }
 
