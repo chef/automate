@@ -340,7 +340,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 		go func() {
 			defer cancel() // Ensure context is canceled when goroutine completes
 
-			err = s.reindexTheFailedIndices(backgroundCtx, reqID)
+			err = s.reindexTheFailedIndices(backgroundCtx, reqID, errChan)
 			if err != nil {
 				log.WithError(err).Error("Failed to reindex the failed indices")
 				errChan <- err
@@ -477,6 +477,7 @@ func (s *ChefIngestServer) runReindexingProcess(ctx context.Context, indexList [
 			// Step 3: Create Temporary Index
 			if err := s.createIndex(ctx, tempIndex, index, requestID, SRC_TO_TEMP, index); err != nil {
 				isFailed = true
+				log.WithFields(log.Fields{"index": index}).WithError(err).Error("Failed to create temporary index: ", tempIndex)
 				continue
 			}
 
@@ -910,7 +911,7 @@ func getTempIndexName(index string) string {
 	return index + "_temp"
 }
 
-func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestID int) error {
+func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestID int, errChan chan error) error {
 	// Get all the indices with requestID
 	indexWorkflows, err := s.db.GetReindexRequestDetailed(requestID)
 	if err != nil {
@@ -947,6 +948,8 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		}
 	}()
 
+	var isFailed bool
+
 	// parse indices and their stage into []struct
 	for _, iWorkflow := range indexWorkflows {
 
@@ -973,12 +976,14 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		case INITIALIZATION:
 			err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: GET_ALIASES")
 			}
 			continue
 		case GET_ALIASES:
 			err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: GET_ALIASES")
 			}
 			continue
@@ -986,49 +991,66 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 			s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
 			err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: SRC_TO_TEMP")
 			}
 			continue
 		case REINDEX_SRC_TEMP:
 			// 1. Remove the temp index from opensearch
-			s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
-			// 2. Change database stage appropriately
+			err = s.client.DeleteIndex(ctx, iWorkflow.Index+"_temp")
+			if err != nil {
+				isFailed = true
+				log.WithError(err).WithField("index", iWorkflow.Index).Error("Failed to delete index")
+			}
 			err := s.runFromGetAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
 			}
 			continue
 		case DELETE_SRC:
 			err := s.runFromDeleteSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: DELETE_SRC")
 			}
 			continue
 		case TEMP_TO_SRC:
-			s.client.DeleteIndex(ctx, iWorkflow.Index)
+			err = s.client.DeleteIndex(ctx, iWorkflow.Index)
+			if err != nil {
+				isFailed = true
+				log.WithError(err).WithField("index", iWorkflow.Index).Error("Failed to delete index")
+			}
 			err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: TEMP_TO_SRC")
 			}
 			continue
 		case REINDEX_TEMP_SRC:
 			// 1. Remove the temp index from opensearch
-			s.client.DeleteIndex(ctx, iWorkflow.Index)
-			// 2. Change database stage appropriately
+			err = s.client.DeleteIndex(ctx, iWorkflow.Index)
+			if err != nil {
+				isFailed = true
+				log.WithError(err).WithField("index", iWorkflow.Index).Error("Failed to delete index")
+			}
 			err := s.runFromTempToSourceIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: REINDEX_SRC_TEMP")
 			}
 			continue
 		case CREATE_ALIASES:
 			err := s.runFromCreateAliasesOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: CREATE_ALIASES")
 			}
 			continue
 		case DELETE_TEMP:
 			err := s.runFromDeleteTempIndexOnwards(ctx, requestID, iWorkflow.Index, lastState.Stage)
 			if err != nil {
+				isFailed = true
 				log.WithError(err).WithField("index", iWorkflow.Index).Error("Retry failed for stage: DELETE_TEMP")
 			}
 			continue
@@ -1038,6 +1060,23 @@ func (s *ChefIngestServer) reindexTheFailedIndices(ctx context.Context, requestI
 		}
 
 	}
+
+	if isFailed {
+		finalStatus := STATUS_FAILED
+		errChan <- status.Errorf(codes.Internal, "failed to reindex indices")
+		if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
+			log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		}
+		return status.Errorf(codes.Internal, "failed to reindex indices")
+	}
+
+	finalStatus := STATUS_COMPLETED
+	if err := s.db.UpdateReindexRequest(requestID, finalStatus, time.Now()); err != nil {
+		log.WithFields(log.Fields{"requestId": requestID}).WithError(err).Error("Failed to update overall status of the request")
+		return status.Errorf(codes.Internal, "failed to update overall status of the request")
+	}
+
+	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
 	return nil
 }
 
@@ -1198,3 +1237,5 @@ func (s *ChefIngestServer) runFromDeleteTempIndexOnwards(ctx context.Context, re
 	log.WithFields(log.Fields{"requestId": requestID}).Info("Reindexing process completed successfully")
 	return nil
 }
+
+// 1. UpdateReindexRequest add this in every stage
