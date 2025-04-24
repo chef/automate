@@ -48,18 +48,16 @@ You can also view the [Sample Config](#sample-config-to-setup-on-premise-deploym
 
 #### * Directory Structure
 
-- A directory must exist on all cluster nodes at `/home/<ssh_user name>/`.
-- This should be specified in the 'config.toml' configuration file under the `ssh_user` key.
+- The verification cli needs `$HOME` environment variable to be available on all nodes. 
+- If in some case its not available then as a fallback the cli will be copied over to `/home/<ssh_user name>/`.
+  - `ssh_user name` is read from `ssh_user` property in `config.toml`
+- Every node must have the `$HOME` directory with minimum permissions `drwx------`.
 
 #### * Permission Requirements
 
 - The specified SSH user must have:
   - Read (r), write (w), and execute (x) permissions.
   - Ownership of the directory.
-
-#### * Example
-
-If `config.toml` contains `ssh_user = "user1"`, then every node must have the `/home/user1/` directory structure with permissions `drwx------ user1 user1 /home/user1`.
 
 We verify the above config using the below command:
 
