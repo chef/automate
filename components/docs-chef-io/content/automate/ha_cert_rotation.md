@@ -62,6 +62,12 @@ To rotate the certificate for a node (automate,chef-server,postgres,opensearch) 
     chef-automate cert-rotate --certificate-config certificate-config.toml
     ```
 
+{{< warning >}}
+It is critical to generate the certificate template using the following command:
+`chef-automate cert-rotate generate-certificate-config certificate-config.toml`
+This ensures that specific certificate metadata such as `nodes_dn` is generated in the exact same order as during processes like `upgrade`, `node add`, or `node remove`. Maintaining this order is essential; failure to do so may lead to unexpected cluster reboots or instability.
+{{< /warning >}}
+
 #### Sample Certificate Template
 
 ```toml
