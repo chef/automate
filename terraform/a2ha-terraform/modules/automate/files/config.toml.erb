@@ -2715,15 +2715,22 @@ rM2p0kk=
     enable = true
     node = "https://<%= overrides[:automate_fqdn] %>"
   
-  [cs_nginx.v1.sys.ngx.main]
-    worker_processes = 2  
+  # Default values should be set only in case of fresh deployment. User.toml file will not exist in case of fresh deployment.
+  # In case of upgrade or add node scenario, user.toml file will be present and default values should not be set.
+  <% if !File.exist?('/hab/user/deployment-service/config/user.toml') %>
+    [cs_nginx.v1.sys.ngx.main]
+      worker_processes = 2  
+  <% end %>
 
   [global.v1.external.automate.auth]
     token = "<%= overrides[:automate_dc_token] %>"
 
   <% if overrides[:automate_root_ca] -%>
-    [cs_nginx.v1.sys.ngx.http]
-      ssl_verify_depth = 6
+    <% if !File.exist?('/hab/user/deployment-service/config/user.toml') %>
+      [cs_nginx.v1.sys.ngx.http]
+        ssl_verify_depth = 6
+    <% end %>
+      
     [global.v1.external.automate.ssl]
       server_name = "<%= overrides[:automate_fqdn] %>"
       root_cert = """<%= overrides[:automate_root_ca] %>"""
@@ -2857,20 +2864,23 @@ rM2p0kk=
   <% end %>
 <% end %>
 
+# Default values should be set only in case of fresh deployment. User.toml file will not exist in case of fresh deployment.
+# In case of upgrade or add node scenario, user.toml file will be present and default values should not be set.
+<% if !File.exist?('/hab/user/deployment-service/config/user.toml') %>
+  [erchef.v1.sys.api]
+    s3_url_ttl = 28800
 
-[erchef.v1.sys.api]
-  s3_url_ttl = 28800
+  [erchef.v1.sys.depsolver]
+    pool_queue_timeout= 0
+    pool_queue_max= 50
 
-[erchef.v1.sys.depsolver]
-  pool_queue_timeout= 0
-  pool_queue_max= 50
+  [erchef.v1.sys.sql]
+    pool_max_size= 20
+    pool_queue_max= 20  
 
-[erchef.v1.sys.sql]
-  pool_max_size= 20
-  pool_queue_max= 20  
-
-[erchef.v1.sys.keygen]
-  cache_size=10
+  [erchef.v1.sys.keygen]
+    cache_size=10
+<% end %>
   
 ##### GCP 
 ### Below is only for GCP 
