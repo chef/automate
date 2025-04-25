@@ -3007,7 +3007,7 @@ func TestRotateOSNodeCerts(t *testing.T) {
 			c := certRotateFlow{fileUtils: mockFS(),
 				sshUtil: testCase.MockSSHUtil,
 				writer:  getMockWriterImpl(), log: log}
-			output := c.rotateOSNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, &testCase.certToml.OpenSearch, &testCase.certToml.OpenSearch.IPS[0], false)
+			output := c.rotateOSNodeCerts(testCase.inf, testCase.sshutil, testCase.currentCertsInfo, &testCase.certToml.OpenSearch, &testCase.certToml.OpenSearch.IPS[0], false, "test_node_dn")
 			fmt.Println(output)
 			if testCase.isError {
 				assert.Error(t, output, testCase.ExpectedError)
@@ -3550,6 +3550,43 @@ func TestRotateClusterPGOSRootFrontendCertificates(t *testing.T) {
 			} else {
 				assert.NoError(t, output)
 				assert.EqualValues(t, testCase.ExpectedPatch, filteredIps)
+			}
+		})
+	}
+}
+
+func TestConvertToMultilineIndented(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		key      string
+		expected string
+	}{
+		{
+			name:  "Single line input",
+			input: `nodes_dn = "- CN=chefnode3,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US\n"`,
+			key:   "nodes_dn",
+			expected: `nodes_dn = """
+- CN=chefnode3,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US
+"""`,
+		},
+		{
+			name:  "Multiline input",
+			input: `nodes_dn = "- CN=chefnode3,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US\n  - CN=chefnode4,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US\n  - CN=chefclient2,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US\n  "`,
+			key:   "nodes_dn",
+			expected: `nodes_dn = """
+- CN=chefnode3,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US
+  - CN=chefnode4,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US
+  - CN=chefclient2,O=Chef Softwar\\, Inc,L=Seattle,ST=Washington,C=US
+"""`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := convertToMultilineIndented(tt.input, tt.key)
+			if result != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, result)
 			}
 		})
 	}

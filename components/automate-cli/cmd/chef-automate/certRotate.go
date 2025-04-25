@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/pem"
 	"fmt"
 	"net"
@@ -62,7 +63,7 @@ const (
 		ssl_cert = """%v"""
 		ssl_key = """%v"""
 	[plugins.security.authcz]
-		admin_dn = '- %v'
+		admin_dn = "- %v"
 	[plugins.security.ssl.transport]
 		enforce_hostname_verification = false
 		resolve_hostname = false
@@ -852,16 +853,55 @@ func (c *certRotateFlow) getMerger(fileName string, timestamp string, remoteType
 		writer.Bodyf("Failed to create/open the file, \n%v", err)
 		return "", err
 	}
-	if err := toml.NewEncoder(f).Encode(dest); err != nil {
-		// failed to encode
+	var buf bytes.Buffer
+	if err := toml.NewEncoder(&buf).Encode(dest); err != nil {
 		writer.Bodyf("Failed to encode\n%v", err)
 		return "", err
 	}
+	processed := convertToMultilineIndented(buf.String(), "nodes_dn")
+	if _, err := f.WriteString(processed); err != nil {
+		writer.Bodyf("Failed to write to file\n%v", err)
+		return "", err
+	}
 	if err := f.Close(); err != nil {
-		// failed to close the file
 		writer.Bodyf("Failed to close the file\n%v", err)
 		return "", err
 	}
 
 	return tomlFile, nil
+}
+
+func convertToMultilineIndented(tomlStr string, key string) string {
+	pattern := fmt.Sprintf(`(?m)^([ \t]*)%s\s*=\s*"((?:[^"\\]|\\.)*)"$`, regexp.QuoteMeta(key))
+	re := regexp.MustCompile(pattern)
+	return re.ReplaceAllStringFunc(tomlStr, func(line string) string {
+		matches := re.FindStringSubmatch(line)
+		if len(matches) < 3 {
+			return line
+		}
+		indent := matches[1]
+		escaped := matches[2]
+		unescaped := strings.ReplaceAll(escaped, `\\`, `\`)
+		unescaped = strings.ReplaceAll(unescaped, `\n`, "\n")
+		unescaped = strings.ReplaceAll(unescaped, `\`, `\\`)
+		lines := strings.Split(unescaped, "\n")
+		for i, line := range lines {
+			if i == 0 {
+				continue
+			}
+			lines[i] = line
+		}
+		final := trimFirstAndLastLineSpaces(strings.Join(lines, "\n"))
+		return fmt.Sprintf(`%s%s = """%s%s"""`, indent, key, "\n", final)
+	})
+}
+
+func trimFirstAndLastLineSpaces(s string) string {
+	lines := strings.Split(s, "\n")
+	if len(lines) == 0 {
+		return s
+	}
+	lines[0] = strings.TrimLeft(lines[0], " ")
+	lines[len(lines)-1] = strings.TrimRight(lines[len(lines)-1], " ")
+	return strings.Join(lines, "\n")
 }

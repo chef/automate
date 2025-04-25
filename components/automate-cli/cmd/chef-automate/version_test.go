@@ -150,7 +150,7 @@ func Test_getChefAutomateVersion(t *testing.T) {
 		automateIps := []string{TEST_IP_1}
 		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
 
-		versionMap, err := getChefAutomateVersion(automateIps, infra, mockCmdExecutor)
+		versionMap, err := getChefAutomateVersion(automateIps, infra, mockCmdExecutor, false)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
@@ -175,7 +175,7 @@ func Test_getChefAutomateVersion(t *testing.T) {
 		automateIps := []string{TEST_IP_1}
 		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
 
-		versionMap, err := getChefAutomateVersion(automateIps, infra, mockCmdExecutor)
+		versionMap, err := getChefAutomateVersion(automateIps, infra, mockCmdExecutor, false)
 		assert.Error(t, err)
 		assert.Empty(t, versionMap)
 	})

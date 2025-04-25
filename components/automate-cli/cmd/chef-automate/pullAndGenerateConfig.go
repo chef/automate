@@ -510,7 +510,7 @@ func (p *PullConfigsImpl) fetchInfraConfig(removeUnreachableNodes bool) (*Existi
 		if err != nil {
 			writer.Fail(err.Error())
 		}
-		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
+		sharedConfigToml.Opensearch.Config.AdminDn = strings.ReplaceAll(fmt.Sprintf("%v", adminDn), `\`, `\\\\\\\\`)
 		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
 
 		// Build CertsByIP for Postgresql
@@ -734,16 +734,16 @@ func (p *PullConfigsImpl) getExternalOpensearchDetails(a2ConfigMap map[string]*d
 			if ele.Global.V1.External.Opensearch != nil &&
 				ele.Global.V1.External.Opensearch.Auth != nil &&
 				ele.Global.V1.External.Opensearch.Auth.AwsOs != nil {
-					var osPwd string
-					if ele.Global.V1.External.Opensearch.Auth.AwsOs.Password != nil && ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value != "" {
-						osPwd = ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value
-					} else {
-						osPass, err := p.getPasswordFromSecretHelper(GET_AWS_OS_PASSWORD)
-						if err != nil {
-							return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch password")
-						}
-						osPwd = osPass
+				var osPwd string
+				if ele.Global.V1.External.Opensearch.Auth.AwsOs.Password != nil && ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value != "" {
+					osPwd = ele.Global.V1.External.Opensearch.Auth.AwsOs.Password.Value
+				} else {
+					osPass, err := p.getPasswordFromSecretHelper(GET_AWS_OS_PASSWORD)
+					if err != nil {
+						return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch password")
 					}
+					osPwd = osPass
+				}
 				return setExternalOpensearchDetails(ele.Global.V1.External.Opensearch.Nodes[0].Value,
 					ele.Global.V1.External.Opensearch.Auth.AwsOs.Username.Value,
 					base64.StdEncoding.EncodeToString([]byte(osPwd)),
@@ -801,25 +801,25 @@ func (p *PullConfigsImpl) getExternalPGDetails(a2ConfigMap map[string]*dc.Automa
 		if ele.Global.V1.External.Postgresql.Nodes != nil &&
 			ele.Global.V1.External.Postgresql.Auth.Password.Superuser != nil &&
 			ele.Global.V1.External.Postgresql.Auth.Password.Dbuser != nil {
-				var spwd, dpwd string
-				if ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password != nil && ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value != "" {
-					spwd = ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value
-				} else {
-					supwd, err := p.getPasswordFromSecretHelper(GET_PG_SUPERUSER_PASSWORD)
-					if err != nil {
-						return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgres superuser password")
-					}
-					spwd = supwd
+			var spwd, dpwd string
+			if ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password != nil && ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value != "" {
+				spwd = ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Password.Value
+			} else {
+				supwd, err := p.getPasswordFromSecretHelper(GET_PG_SUPERUSER_PASSWORD)
+				if err != nil {
+					return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgres superuser password")
 				}
-				if ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password != nil && ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value != "" {
-					dpwd = ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value
-				} else {
-					dbpwd, err := p.getPasswordFromSecretHelper(GET_PG_DBUSER_PASSWORD)
-					if err != nil {
-						return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgres Dbuser password")
-					}
-					dpwd = dbpwd
+				spwd = supwd
+			}
+			if ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password != nil && ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value != "" {
+				dpwd = ele.Global.V1.External.Postgresql.Auth.Password.Dbuser.Password.Value
+			} else {
+				dbpwd, err := p.getPasswordFromSecretHelper(GET_PG_DBUSER_PASSWORD)
+				if err != nil {
+					return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgres Dbuser password")
 				}
+				dpwd = dbpwd
+			}
 			return setExternalPGDetails(
 				ele.Global.V1.External.Postgresql.Nodes[0].Value,
 				ele.Global.V1.External.Postgresql.Auth.Password.Superuser.Username.Value,
@@ -882,11 +882,13 @@ func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []C
 		nodeDnStr := fmt.Sprintf("%v", nodeDn)
 		_, isPresent := nodesDnMap[nodeDnStr]
 
+		nodeDnStrReplaced := strings.ReplaceAll(nodeDnStr, `\`, `\\\\`)
+
 		if !isPresent {
 			if len(allNodesDn) == 0 {
-				allNodesDn = allNodesDn + fmt.Sprintf("%v", nodeDnStr) + "\\n  "
+				allNodesDn = allNodesDn + fmt.Sprintf("%v", nodeDnStrReplaced) + "\\n  "
 			} else {
-				allNodesDn = allNodesDn + fmt.Sprintf("- %v", nodeDnStr) + "\\n  "
+				allNodesDn = allNodesDn + fmt.Sprintf("- %v", nodeDnStrReplaced) + "\\n  "
 			}
 		}
 
@@ -993,8 +995,8 @@ func (p *PullConfigsImpl) fetchAwsConfig(removeUnreachableNodes bool) (*AwsConfi
 		if err != nil {
 			writer.Fail(err.Error())
 		}
-		sharedConfigToml.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodeDn)
-		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
+		sharedConfigToml.Opensearch.Config.NodesDn = strings.ReplaceAll(fmt.Sprintf("%v", nodeDn), `\`, `\\\\`)
+		sharedConfigToml.Opensearch.Config.AdminDn = strings.ReplaceAll(fmt.Sprintf("%v", adminDn), `\`, `\\\\\\\\`)
 		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
 
 		// Build CertsByIP for Postgresql

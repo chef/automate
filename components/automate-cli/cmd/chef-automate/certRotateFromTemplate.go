@@ -99,9 +99,15 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	c.log.Debug("Time elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
 	// rotating OS certs
 	c.writer.Println("rotating opensearch node certificates")
+
+	allNodesDn, err := c.getAllNodeDn(infra, templateCerts)
+	if err != nil {
+		return err
+	}
+
 	for i, osIp := range templateCerts.OpenSearch.IPS {
 		c.writer.Printf("Rotating OpenSearch node %d certificates \n", i)
-		err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false)
+		err = c.rotateOSNodeCerts(infra, sshUtil, currentCertsInfo, &templateCerts.OpenSearch, &osIp, false, allNodesDn)
 		if err != nil {
 			return err
 		}
@@ -167,6 +173,49 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	c.log.Debug("==========================================================")
 
 	return nil
+}
+
+func (c *certRotateFlow) getAllNodeDn(infra *AutomateHAInfraDetails, ct *CertificateToml) (string, error) {
+	nodesDnMap := make(map[string]bool)
+	allNodesDn := ""
+	for i := 0; i < len(ct.OpenSearch.IPS); i++ {
+
+		currentIP := ct.OpenSearch.IPS[i]
+		flagsObj := certRotateFlags{
+			opensearch:      true,
+			rootCAPath:      ct.OpenSearch.RootCA,
+			adminKeyPath:    ct.OpenSearch.AdminPrivateKey,
+			adminCertPath:   ct.OpenSearch.AdminPublickey,
+			privateCertPath: currentIP.PrivateKey,
+			publicCertPath:  currentIP.Publickey,
+			node:            currentIP.IP,
+			timeout:         1000,
+		}
+		certs, err := c.getCerts(infra, &flagsObj)
+		if err != nil {
+			return "", err
+		}
+
+		nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
+		if err != nil {
+			c.writer.Printf("Error in decoding node cert, not able to get nodeDn for ip %s \n", currentIP.IP)
+			c.writer.Printf("Error: %v for public key: %s \n", err, currentIP.Publickey)
+			return "", err
+		}
+		nodeDnStr := strings.ReplaceAll(fmt.Sprintf("%v", nodeDn), `\`, `\\`)
+		_, isPresent := nodesDnMap[nodeDnStr]
+
+		if !isPresent {
+			if len(allNodesDn) == 0 {
+				allNodesDn = allNodesDn + fmt.Sprintf("%v", nodeDnStr) + "\\n  "
+			} else {
+				allNodesDn = allNodesDn + fmt.Sprintf("- %v", nodeDnStr) + "\\n  "
+			}
+		}
+
+		nodesDnMap[nodeDnStr] = true
+	}
+	return allNodesDn, nil
 }
 
 // patchExternalA2RootCaInCS patches the external automate root ca in chef server
@@ -290,7 +339,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 	return nil
 }
 
-func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool) error {
+func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool, nodeDnStr string) error {
 	start := time.Now()
 	c.log.Debug("Roating opensearch node %s certificate at %s \n", osIp.IP, start.Format(time.ANSIC))
 	if len(osIp.PrivateKey) == 0 || len(osIp.Publickey) == 0 {
@@ -335,29 +384,15 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 		c.writer.Printf("Error in decoding admin cert, not able to get adminDn \n")
 		return err
 	}
-	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
-	if err != nil {
-		c.writer.Printf("Error in decoding node cert, not able to get nodeDn \n")
-		return err
-	}
-	existingNodesDN := strings.TrimSpace(currentCertsInfo.OpensearchCertsByIP[0].NodesDn)
-	if strings.HasSuffix(existingNodesDN, `\n`) {
-		i := strings.LastIndex(existingNodesDN, `\n`)
-		existingNodesDN = existingNodesDN[:i] + strings.Replace(existingNodesDN[i:], `\n`, "", 1)
-	}
-	nodesDn := ""
-	if strings.EqualFold(existingNodesDN, fmt.Sprintf("%v", nodeDn)) {
-		nodesDn = fmt.Sprintf("%v", nodeDn)
-	} else {
-		nodesDn = fmt.Sprintf("%v\n", existingNodesDN) + "  - " + fmt.Sprintf("%v\n", nodeDn)
-	}
+
+	adminDnStr := strings.ReplaceAll(fmt.Sprintf("%v", adminDn), `\`, `\\`)
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, &flagsObj, currentCertsInfo)
 	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
 
 	// Creating and patching the required configurations.
 
-	config := fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, adminPublicCertString, strings.TrimSpace(string(adminPrivateCert)), certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
+	config := fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, adminPublicCertString, strings.TrimSpace(string(adminPrivateCert)), certs.publicCert, certs.privateCert, adminDnStr, nodeDnStr)
 
 	patchFnParam := &patchFnParameters{
 		sshUtil:       sshUtil,
@@ -382,7 +417,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 	if flagsObj.node != "" {
 
-		err := patchOSNodeDN(&flagsObj, patchFnParam, c, nodesDn)
+		err := patchOSNodeDN(&flagsObj, patchFnParam, c, nodeDnStr)
 		if err != nil {
 			return err
 		}

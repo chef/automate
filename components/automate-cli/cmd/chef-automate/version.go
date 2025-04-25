@@ -250,9 +250,9 @@ func runCommandOnBastion(args []string) error {
 
 	if len(automateIps) != 0 {
 
-		versions, err := getChefAutomateVersion(automateIps, infra, cmdExecutor)
+		versions, err := getChefAutomateVersion(automateIps, infra, cmdExecutor, false)
 		if err != nil {
-			logrus.Errorf("Error while getting Automate Version :: %s", err)
+			logrus.Errorf("Error while getting Automate Version on automate nodes:: %s", err)
 			return err
 		}
 		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(AUTOMATE_NAME))
@@ -271,12 +271,17 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Infra server Version :: %s", err)
 			return err
 		}
+		automateVersions, err := getChefAutomateVersion(chefServerIps, infra, cmdExecutor, true)
+		if err != nil {
+			logrus.Errorf("Error while getting Automate Version on chef server nodes:: %s", err)
+			return err
+		}
 		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(CHEF_SERVER_NAME))
 		writer.Println("\n")
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
-
-			writer.Printf("Version : %s\n\n", version)
+			writer.Printf("Infra Server Version : %s\n", version)
+			writer.Println(automateVersions[ip])
 		}
 		writer.Println("-----------------------------------------")
 	}
@@ -479,23 +484,40 @@ func getFrontEndVersion(automateIps []string, infra *AutomateHAInfraDetails, cmd
 	return versionMap, nil
 }
 
-func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
+func getChefAutomateVersion(nodeIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor, cs bool) (map[string]string, error) {
 	automateCmd := A2VERSIONCMD
 	if VersionCommandFlags.verbose {
 		automateCmd = A2VERSIONVERBOSE
 	}
-	nodeMap := &NodeTypeAndCmd{
-		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-		Automate: &Cmd{CmdInputs: &CmdInputs{
-			Cmd:                      automateCmd,
-			NodeIps:                  automateIps,
-			NodeType:                 true,
-			SkipPrintOutput:          true,
-			HideSSHConnectionMessage: true}},
-		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-		Infra:      infra,
+	var nodeMap *NodeTypeAndCmd
+	if cs {
+		nodeMap = &NodeTypeAndCmd{
+			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Automate: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			ChefServer: &Cmd{CmdInputs: &CmdInputs{
+				Cmd:                      automateCmd,
+				NodeIps:                  nodeIps,
+				NodeType:                 true,
+				SkipPrintOutput:          true,
+				HideSSHConnectionMessage: true}},
+			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Infra:      infra,
+		}
+	} else {
+		nodeMap = &NodeTypeAndCmd{
+			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Automate: &Cmd{CmdInputs: &CmdInputs{
+				Cmd:                      automateCmd,
+				NodeIps:                  nodeIps,
+				NodeType:                 true,
+				SkipPrintOutput:          true,
+				HideSSHConnectionMessage: true}},
+			ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Infra:      infra,
+		}
 	}
 
 	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
