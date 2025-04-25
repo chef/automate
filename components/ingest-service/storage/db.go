@@ -219,6 +219,15 @@ func (db *DB) GetReindexStatus(requestID int) (*StatusResponse, error) {
 			return nil, errors.Wrap(err, "error unmarshalling stage JSON")
 		}
 
+		if len(detail.Stage) < 9 {
+			logrus.WithFields(logrus.Fields{
+				"requestID": detail.RequestID,
+				"index":     detail.Index,
+			}).Warn("Stage details are incomplete")
+
+			return nil, errors.Wrap(errors.Errorf("all the stages for the index %s are not completed", detail.Index), "error processing reindex request details")
+		}
+
 		details = append(details, detail)
 	}
 
