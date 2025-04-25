@@ -644,6 +644,11 @@ func (s *ChefIngestServer) createAliases(ctx context.Context, srcIndex string, a
 	// If no aliases are provided, log and return
 	if len(aliases) == 0 {
 		log.WithFields(log.Fields{"srcIndex": srcIndex}).Info("No aliases found for source index")
+		err = s.db.CreateOrUpdateStageAndStatusForIndex(requestID, srcIndex, CREATE_ALIASES, STATUS_COMPLETED, time.Now())
+		if err != nil {
+			log.Errorf("Failed to update the status for stage %s to %s: %v", CREATE_ALIASES, STATUS_COMPLETED, err)
+			return err
+		}
 		return nil
 	}
 
