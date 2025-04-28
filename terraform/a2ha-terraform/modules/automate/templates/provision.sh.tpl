@@ -355,6 +355,7 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
      chef-automate decode-password $config
      echo "Applying $config"
      chef-automate config patch $config 
+     chef-automate encode-password $config
      create_bootstrap_bundle 
      echo "Skipping the below flow, not required for the add-node case"
      exit
