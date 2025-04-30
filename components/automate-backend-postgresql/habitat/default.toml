@@ -23,11 +23,16 @@ password = 'admin'
 [replication]
 name = 'replication'
 password = 'replication'
-# note: lag_health_threshold is in bytes - default to 20MB
+# note: lag_health_threshold is in bytes - default to 300KB
 # this is just greater than 1 WAL segment
-lag_health_threshold = 20480
+lag_health_threshold = 307200
 # maximum lag time in seconds since log was last replayed before replica is eligible for a restart
 max_replay_lag_before_restart_s = 180
+max_wal_senders = 10
+max_replication_slots = 5
+wal_sender_timeout = 60
+wal_receiver_timeout = 60
+wal_compression = "off"
 
 [wal_archive]
 enable = false
