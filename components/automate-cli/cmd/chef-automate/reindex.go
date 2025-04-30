@@ -21,6 +21,7 @@ var reindexCmd = &cobra.Command{
 	Short:             "Manage OpenSearch reindexing",
 	Long:              "Commands for managing OpenSearch reindexing within Chef Automate.",
 	PersistentPreRunE: preReindexCmd,
+	Hidden:            true,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
@@ -32,6 +33,7 @@ var reindexStartCmd = &cobra.Command{
 	PersistentPreRunE: checkLicenseStatusForExpiry, // Enforce license check before execution
 	RunE:              runReindexStartCmd,
 	Args:              cobra.NoArgs,
+	Hidden:            true,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
 	},
