@@ -95,13 +95,30 @@ This section configures pg_dump, a PostgreSQL utility for performing database ba
 
 ```bash
 [replication]
-lag_health_threshold = 20480
+name = 'replication'
+password = 'replication'
+# note: lag_health_threshold is in bytes - default to 300KB
+# this is just greater than 1 WAL segment
+lag_health_threshold = 307200
+# maximum lag time in seconds since log was last replayed before replica is eligible for a restart
 max_replay_lag_before_restart_s = 180
-name = "replication"
-password = "replication"
+max_wal_senders = 10
+max_replication_slots = 5
+wal_sender_timeout = 60
+wal_receiver_timeout = 60
+wal_compression = "off"
 ```
 
-This section configures replication settings. It sets the lag health threshold to 20480 bytes, the maximum allowed replication lag. It also specifies the maximum replay lag before restarting replication and provides the replication name and password.
+This section configures replication settings. 
+`name`: replication name
+`password`: replication password. 
+`lag_health_threshold`: it sets the lag health threshold to 307200 bytes(300 kb), the maximum allowed replication lag.
+`max_replay_lag_before_restart_s`: Custom setting; maximum lag time in seconds since log was last replayed before replica is eligible for a restart.
+`max_wal_senders`: Limits how many standbys can connect for replication (default: 10).
+`max_replication_slots`: Sets how many replication slots are allowed (default: 5).
+`wal_sender_timeout`: Primary waits 60 seconds for standby response before disconnecting.
+`wal_receiver_timeout`: Standby waits 60 seconds for data from primary before timing out.
+`wal_compression`: Controls compression of WAL data; "off" disables it, "on" enables it.
 
 ### SSL
 

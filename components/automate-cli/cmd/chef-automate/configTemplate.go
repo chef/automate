@@ -176,6 +176,11 @@ type PostgresqlConfig struct {
 		MaxReplayLagBeforeRestartS int    `protobuf:"bytes,,opt,name=max_replay_lag_before_restart_s,proto3" toml:"max_replay_lag_before_restart_s,omitzero" json:"max_replay_lag_before_restart_s,omitzero" mapstructure:"max_replay_lag_before_restart_s,omitzero"`
 		Name                       string `protobuf:"bytes,,opt,name=name,proto3" toml:"name,omitempty" json:"name,omitempty" mapstructure:"name,omitempty"`
 		Password                   string `protobuf:"bytes,,opt,name=password,proto3" toml:"password,omitempty" json:"password,omitempty" mapstructure:"password,omitempty"`
+		MaxWalSenders              int    `protobuf:"bytes,,opt,name=max_wal_senders,proto3" toml:"max_wal_senders,omitzero" json:"max_wal_senders,omitzero" mapstructure:"max_wal_senders,omitzero"`
+		MaxReplicationSlots        int    `protobuf:"bytes,,opt,name=max_replication_slots,proto3" toml:"max_replication_slots,omitzero" json:"max_replication_slots,omitzero" mapstructure:"max_replication_slots,omitzero"`
+		WalSenderTimeout           int    `protobuf:"bytes,,opt,name=wal_sender_timeout,proto3" toml:"wal_sender_timeout,omitzero" json:"wal_sender_timeout,omitzero" mapstructure:"wal_sender_timeout,omitzero"`
+		WalReceiverTimeout         int    `protobuf:"bytes,,opt,name=wal_receiver_timeout,proto3" toml:"wal_receiver_timeout,omitzero" json:"wal_receiver_timeout,omitzero" mapstructure:"wal_receiver_timeout,omitzero"`
+		WalCompression             string `protobuf:"bytes,,opt,name=wal_compression,proto3" toml:"wal_compression,omitzero" json:"wal_compression,omitzero" mapstructure:"wal_compression,omitzero"`
 	} `protobuf:"bytes,,opt,name=replication,proto3" toml:"replication,omitempty" json:"replication,omitempty" mapstructure:"replication,omitempty"`
 	S3 *struct {
 		Client struct {

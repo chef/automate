@@ -23,11 +23,16 @@ password = 'admin'
 [replication]
 name = 'replication'
 password = 'replication'
-# note: lag_health_threshold is in bytes - default to 20MB
+# note: lag_health_threshold is in bytes - default to 300KB
 # this is just greater than 1 WAL segment
-lag_health_threshold = 20480
+lag_health_threshold = 307200
 # maximum lag time in seconds since log was last replayed before replica is eligible for a restart
 max_replay_lag_before_restart_s = 180
+max_wal_senders = 10
+max_replication_slots = 5
+wal_sender_timeout = 60
+wal_receiver_timeout = 60
+wal_compression = "off"
 
 [wal_archive]
 enable = false
@@ -41,3 +46,9 @@ path = "/hab/svc/automate-ha-postgresql/data/pg_dump"
 enable = true
 # tls 1.2 ciphersuite (to exclude tlsv1 and tlsv1.1)
 tls_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"
+# server public cert used for ssl listener
+ssl_cert = """"""
+# server private key
+ssl_key = """"""
+# issuer public cert that signed the above server public cert
+issuer_cert = """"""
