@@ -28,9 +28,19 @@ The Chef Automate HA equates to reliability, efficiency, and productivity, built
 
 HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *PostgreSQL*, and *OpenSearch*.
 
-### Chef Automate HA Architecture for On Premises / Cloud Non-Managed
+{{< note >}}
+Port **7799** must be accessible from the bastion host to all nodes in the Chef Automate cluster.
+While this is not explicitly shown in the diagram (for clarity), it is a required configuration. The `chef-automate verify` command relies on connectivity to port **7799** on all nodes to function correctly.
+{{< /note >}}
+
+### Chef Automate HA Architecture for OnPremise / Cloud Non-Managed
 
 ![High Availability Architecture](/images/automate/ha_arch_onprem.png)
+
+{{< note >}}
+In the Chef Automate HA architecture for On-Premise or Cloud (Non-Managed) deployments, frontend nodes now connect to PostgreSQL over port 5432 and uses 6432 for leader check.
+The previously required configuration where frontend nodes used port 7432 for PostgreSQL connectivity has been deprecated.
+{{< /note >}}
 
 ### Chef Automate HA Architecture for AWS Managed
 
@@ -45,6 +55,11 @@ Chef Automate HA for Managed Services has default port 5432 for Managed PostgreS
 The following shows a five-node cluster, which is a supported deployment pattern. Work with your Progress technical teams to determine the appropriate cluster configuration for optimal performance based on parameters such as node count and data size.
 
 ![High Availability Architecture](/images/automate/ha_arch_minnode_cluster.png)
+
+{{< note >}}
+In the Chef Automate HA architecture for On-Premise or Cloud (Non-Managed) deployments, frontend nodes now connect to PostgreSQL over port 5432 and uses 6432 for leader check.
+The previously required configuration where frontend nodes used port 7432 for PostgreSQL connectivity has been deprecated.
+{{< /note >}}
 
 {{< warning >}}
 
