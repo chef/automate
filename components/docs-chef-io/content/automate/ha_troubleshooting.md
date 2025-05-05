@@ -39,7 +39,8 @@ To make the service healthy, ensure the chef server can curl the data collector 
 ### Rate limiter ingestion issues on data collector endpoint
 
 ```bash
-Sep 24 22:33:20 rp000134186 hab: automate-gateway.default(O): time="2024-09-24T22:33:20-05:00" level=error msg="resource=collector-requests cur=960 max=960: Resource limit exceeded" grpc_port=2001 hostname=127.0.0.1 https_port=2000 null_backend_socket=/hab/svc/automate-gateway/var/null_backend.sock
+Sep 24 22:33:20 rp000134186 hab: automate-gateway.default(O): time="2024-09-24T22:33:20-05:00" level=error 
+msg="resource=collector-requests cur=960 max=960: Resource limit exceeded" grpc_port=2001 hostname=127.0.0.1 https_port=2000 null_backend_socket=/hab/svc/automate-gateway/var/null_backend.sock
 ```
 
 The rate limiter controls how many data collector requests are processed concurrently. If you experience "Resource limit exceeded" errors, you can increase the number of concurrent requests to handle more load — but be aware that this will increase CPU and memory consumption.
@@ -69,6 +70,11 @@ max_inflight_requests = 1200
 📎 Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
 
 ### Queue is full errors on data collector endpoint
+
+```bash
+Sep 30 00:04:43 rp000134186 hab: ingest-service.default(O): time="2024-09-30T00:04:43-05:00" level=error msg="Chef run ingestion failure" 
+error="Message rejected because queue is full"
+```
 
 The ingest/compliance service uses a message buffer to queue incoming data. If you encounter "Message rejected because queue is full" errors, you can increase the queue size — but this will increase CPU and memory usage.
 
