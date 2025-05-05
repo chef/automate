@@ -61,13 +61,13 @@ disable = false
 max_inflight_requests = 1200
 ```
 
-📌 Guidance:
+Guidance:
 
 - The default value for max_inflight_requests is 60 * number of CPUs.
 - If you encounter `Resource limit exceeded` errors, increase this value gradually by 10% to 30% based on performance improvements.
 - Monitor CPU and memory usage after each adjustment.
 
-📎 Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
+Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
 
 ### Queue is full errors on data collector endpoint
 
@@ -92,7 +92,7 @@ message_buffer_size = 300
 message_buffer_size = 300
 ```
 
-📌 Guidance:
+Guidance:
 
 - The default value for message_buffer_size is 100.
 - If you see queue overflow errors, increase the value to 300.
@@ -100,7 +100,7 @@ message_buffer_size = 300
 
 Avoid setting this value too high, as it may cause backpressure and increase latency if downstream processing slows down or fails.
 
-📎 Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
+Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
 
 ### Still getting 5XX on data collector endpoint
 
