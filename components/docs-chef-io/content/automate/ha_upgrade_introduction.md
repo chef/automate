@@ -58,6 +58,7 @@ Steps to upgrade the Chef Automate HA are as shown below:
   - Backend upgrades will restart the backend service, which take time for cluster to be in health state.
   - Backend upgrades should be performed in maintenance window.
   - Upgrade command, currently only supports minor upgrade.  
+  - We recommend always performing a chef-automate backup before initiating any upgrade.
 {{< /note >}}
 
 - To skip user confirmation prompt in upgrade, you can pass a flag

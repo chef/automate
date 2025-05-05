@@ -246,6 +246,7 @@ The bastion server can patch new configurations in all nodes. To know more see [
 - For the Frontend nodes you can use the same IP in Chef Automate and Chef Server.
 - For the Backend nodes you can use the same IP in PostgreSQL and OpenSearch.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
+- We do not recommend using a 5-node cluster for production environments, as running both PostgreSQL and OpenSearch on the same nodes can create performance bottlenecks.
 
 {{< /note >}}
 
