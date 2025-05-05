@@ -36,6 +36,75 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 To make the service healthy, ensure the chef server can curl the data collector endpoint from the chef server node.
 
+### Rate limiter ingestion issues on data collector endpoint
+
+```bash
+Sep 24 22:33:20 rp000134186 hab: automate-gateway.default(O): time="2024-09-24T22:33:20-05:00" level=error msg="resource=collector-requests cur=960 max=960: Resource limit exceeded" grpc_port=2001 hostname=127.0.0.1 https_port=2000 null_backend_socket=/hab/svc/automate-gateway/var/null_backend.sock
+```
+
+The rate limiter controls how many data collector requests are processed concurrently. If you experience "Resource limit exceeded" errors, you can increase the number of concurrent requests to handle more load — but be aware that this will increase CPU and memory consumption.
+
+Example Configuration:
+
+Use the following TOML template to update the gateway settings on the Automate nodes:
+
+`chef-automate config patch config.toml --a2`
+
+```toml
+[gateway.v1.sys.data_collector.limiter]
+# Setting disable to true will allow an unbounded number of
+# concurrent data collector requests (not recommended).
+disable = false
+# Sets the maximum number of concurrent inflight requests.
+# Default value = 60 * number of CPUs.
+max_inflight_requests = 1200
+```
+
+📌 Guidance:
+
+- The default value for max_inflight_requests is 60 * number of CPUs.
+- If you encounter `Resource limit exceeded` errors, increase this value gradually by 10% to 30% based on performance improvements.
+- Monitor CPU and memory usage after each adjustment.
+
+📎 Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
+
+### Queue is full errors on data collector endpoint
+
+The ingest/compliance service uses a message buffer to queue incoming data. If you encounter "Message rejected because queue is full" errors, you can increase the queue size — but this will increase CPU and memory usage.
+
+Example Configuration:
+
+Use the following TOML template to increase the queue size on the Automate nodes:
+
+`chef-automate config patch config.toml --a2`
+
+```toml
+[compliance.v1.sys.service]
+message_buffer_size = 300
+
+[ingest.v1.sys.service]
+message_buffer_size = 300
+```
+
+📌 Guidance:
+
+- The default value for message_buffer_size is 100.
+- If you see queue overflow errors, increase the value to 300.
+- If the issue persists, increase it gradually by 100 until the problem is resolved.
+
+Avoid setting this value too high, as it may cause backpressure and increase latency if downstream processing slows down or fails.
+
+📎 Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configuration/)
+
+### Still getting 5XX on data collector endpoint
+
+Along with the above configuration changes related to rate-limiter and queue configuration, it is crucial to implement proper splay on the client nodes sending data to Automate. Configuration changes can help mitigate the issue to a certain extent, but sudden bursts of traffic from multiple clients can still overwhelm the system and cause request rejections.
+
+Splay introduces a random delay between client runs, which helps:
+- Prevent traffic spikes.
+- Distribute load more evenly across the system.
+- Reduce the chances of exceeding rate limits or overloading the queue.
+
 ### Issue: Database Accessed by Other Users
 
 ```bash
