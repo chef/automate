@@ -399,6 +399,16 @@ func (es *Backend) ReindexIndices(reindexctx context.Context, srcIndex, dstIndex
 	return startTaskResult.TaskId, nil
 }
 
+// Count returns the document count for the given index
+func (es *Backend) Count(ctx context.Context, index string) (int64, error) {
+	countResult, err := es.client.Count(index).Do(ctx)
+	if err != nil {
+		log.WithError(err).Errorf("Failed to count documents in index: %s", index)
+		return 0, err
+	}
+	return countResult, nil
+}
+
 func (es *Backend) storeExists(ctx context.Context, indexName string) bool {
 	exists, err := es.client.IndexExists().Index([]string{indexName}).Do(ctx)
 

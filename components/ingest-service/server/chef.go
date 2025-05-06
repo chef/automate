@@ -317,7 +317,7 @@ func (s *ChefIngestServer) StartReindex(ctx context.Context, req *ingest.StartRe
 	heartbeatThreshold := 5 * time.Minute
 	h := time.Since(heartbeat) > heartbeatThreshold
 
-	if reindexStatus == STATUS_FAILED || (!heartbeat.IsZero() && h) {
+	if reindexStatus == STATUS_FAILED || (reindexStatus != STATUS_COMPLETED && !heartbeat.IsZero() && h) {
 		// Trigger the workflow for the failed indices
 		log.Info("Reindexing failed previously, starting the process for the failed indices")
 		reqID, err := s.db.GetLatestReindexRequestID()
@@ -764,7 +764,7 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, src
 	}
 
 	// Wait for the reindexing to complete
-	taskCompleted := s.monitorReindexing(ctx, requestID, srcIndex, taskID) // Ensure monitoring is finished
+	taskCompleted := s.monitorReindexing(ctx, requestID, srcIndex, taskID, srcIndex, destIndex) // Ensure monitoring is finished
 
 	// Only update status to COMPLETED if the task was successful
 	if taskCompleted {
@@ -782,7 +782,7 @@ func (s *ChefIngestServer) processReindexing(ctx context.Context, destIndex, src
 	return nil
 }
 
-func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int, index, taskID string) bool {
+func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int, index, taskID string, srcIndex, dstIndex string) bool {
 	// Set a timeout for how long to wait for the task to complete
 	timeout := time.Now().Add(6 * time.Hour)
 
@@ -797,6 +797,7 @@ func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int,
 		jobStatus, err := s.client.JobStatus(ctx, taskID)
 		if err != nil {
 			log.WithError(err).Errorf("Error checking status for task %s", taskID)
+			return false // Return false on error
 		}
 
 		// Update heartbeat only if the task is still running
@@ -806,9 +807,39 @@ func (s *ChefIngestServer) monitorReindexing(ctx context.Context, requestID int,
 			}
 		}
 
-		// If the job is completed, exit the loop
+		// If the job is completed, validate document counts
 		if jobStatus.Completed {
 			log.Infof("Reindexing task %s for index %s completed successfully.", taskID, index)
+
+			// Validate document counts
+			srcCount, err := s.client.Count(ctx, srcIndex) // Pass context as the first argument
+			if err != nil {
+				log.WithError(err).Errorf("Failed to count documents in source index: %s", srcIndex)
+				return false
+			}
+
+			dstCount, err := s.client.Count(ctx, dstIndex) // Pass context as the first argument
+			if err != nil {
+				log.WithError(err).Errorf("Failed to count documents in destination index: %s", dstIndex)
+				return false
+			}
+
+			if srcCount != dstCount {
+				log.WithFields(log.Fields{
+					"srcIndex": srcIndex,
+					"dstIndex": dstIndex,
+					"srcCount": srcCount,
+					"dstCount": dstCount,
+				}).Error("Data mismatch after reindexing")
+				return false // Document counts do not match
+			}
+
+			log.WithFields(log.Fields{
+				"srcIndex": srcIndex,
+				"dstIndex": dstIndex,
+				"srcCount": srcCount,
+				"dstCount": dstCount,
+			}).Info("Reindexing completed successfully with matching document counts")
 			return true // Task completed successfully
 		}
 

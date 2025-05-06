@@ -98,6 +98,8 @@ type Client interface {
 	// @param (context, sourceIndex, destinationIndex)
 	// @return (taskID, error)
 	ReindexIndices(ctx context.Context, srcIndex, dstIndex string) (string, error)
+	// Count returns the document count for the given index
+	Count(ctx context.Context, index string) (int64, error)
 	GetActions(string, int, time.Time, string, bool) ([]InternalChefAction, int64, error)
 	DeleteAllIndexesWithPrefix(string, context.Context) error
 	GetIndices(ctx context.Context) ([]Index, error)
