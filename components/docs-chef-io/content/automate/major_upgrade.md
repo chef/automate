@@ -28,6 +28,8 @@ For example, if today you are on version 2021201164433, then your upgrade journe
 1. Manual upgrade to 20220329091442.
 1. Manual upgrade to 3.0.x.
 
+{{% warning %}} A2HA installs should not be upgraded with the semver 3.x and 4.x releases of Automate. Chef will have other instructions available at a later data for A2HA installs {{% /warning %}}
+
 ## Prerequisites
 
 - **Plan your downtime**: This upgrade requires downtime. Before upgrading, set the environment to handle the downtime.
