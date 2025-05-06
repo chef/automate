@@ -104,7 +104,7 @@ You can generate the required certificates on your own or you can use the existi
 Follow these steps to rotate your certificates that are to be used in Chef Automate High Availability (HA):
 
 1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
-1. Type the command, `./scripts/credentials set ssl --rotate all` and press **Enter**. This command rotates all the certificates of your organization.
+1. Type the command, `./scripts/credentials set ssl --rotate-all` and press **Enter**. This command rotates all the certificates of your organization.
 
     {{< note >}}
 
