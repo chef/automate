@@ -68,8 +68,12 @@ func (es *ElasticSidecar) testAuthentication(user, pass string) (int, string) {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // nosemgrep
 		},
 	}
+	req, err := http.NewRequest("GET", "https://localhost:9200", nil)
+	if err != nil {
+		es.logger.Println(err)
+		return 0, "error"
+	}
 	req.SetBasicAuth(user, pass)
-
 	resp, err := client.Do(req)
 	if err != nil {
 		es.logger.Println(err)
@@ -77,7 +81,6 @@ func (es *ElasticSidecar) testAuthentication(user, pass string) (int, string) {
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-
 	return resp.StatusCode, string(body)
 }
 
