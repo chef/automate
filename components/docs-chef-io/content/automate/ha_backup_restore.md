@@ -52,10 +52,6 @@ An Amazon S3 bucket is a public cloud storage resource available in Amazon Web S
 
 With the AWS Free Usage Tier*, you can get started with Amazon S3 for free in all regions except the AWS GovCloud Regions. [See](https://aws.amazon.com/s3/) for more information.
 
-## Taking Backup with Amazon S3 Bucket
-
-This section explains how to take backup for External Elasticsearch (ES) and PostgreSQL to the Amazon S3 bucket.
-
 {{< note >}}
 
 Ensure you perform the backup configuration before deploying the Chef Automate High Availability (HA) cluster.
