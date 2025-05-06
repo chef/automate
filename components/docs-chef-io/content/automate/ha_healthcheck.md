@@ -175,3 +175,80 @@ automate-backend-ctl show --svc=automate-ha-postgresql
   cd /hab/a2_deploy_workspace/
   ./scripts/credentials set opensearch --no-auto
 ```
+
+## Precaution During Backend Node Reboot
+
+To prevent data loss, do not restart all nodes in a PostgreSQL cluster in quick succession.
+
+When a follower node (e.g., f1) is restarted, it begins synchronizing data from the current leader. If the leader node is also restarted during this synchronization process, a leader election may occur. If f1 is elected as the new leader before completing its sync, it may not have the most recent data, which can lead to inconsistencies or data loss.
+
+## Precaution during opensearch Reboot
+
+- Check cluster health
+Execute the following commands to verify the health of the cluster:
+
+```sh
+curl -X GET "https://localhost:9200/_cat/health?v" -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+```
+
+```sh
+curl -X GET "https://localhost:9200/_cat/recovery?v" -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+```
+
+- Disable shard allocation
+Before restarting the node, disable shard allocation to prevent unnecessary rebalancing during the process:
+
+```sh
+curl -X PUT "https://localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
+{
+  "persistent": {
+    "cluster.routing.allocation.enable": "primaries"
+  }
+}' -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+```
+
+- Stop indexing and flush the data to disk:
+
+```sh
+curl -X POST "https://localhost:9200/_flush" -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+```
+
+- Enable shard allocation once the node is back online to resume normal data distribution.
+
+```sh
+curl -X PUT "https://localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
+{
+  "persistent": {
+    "cluster.routing.allocation.enable": null
+  }
+}' -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+```
+
+- Monitor the cluster state, and verify its health and recovery status to ensure overall stability.
+
+```sh
+curl -X GET "https://localhost:9200/_cat/health?v" -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+
+curl -X GET "https://localhost:9200/_cat/recovery?v" -k 
+--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem 
+--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem  
+--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+```

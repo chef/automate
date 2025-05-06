@@ -28,9 +28,20 @@ The Chef Automate HA equates to reliability, efficiency, and productivity, built
 
 HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *PostgreSQL*, and *OpenSearch*.
 
-### Chef Automate HA Architecture for On Premises / Cloud Non-Managed
+{{< note >}}
+Port **7799** must be accessible from the bastion host to all nodes within the Chef Automate cluster.
+Although this requirement is not explicitly illustrated in the network architecture diagram for the sake of visual clarity, it is essential for proper cluster operation. The `chef-automate verify` command depends on successful connectivity to port **7799** on each node to perform its validations correctly.
+{{< /note >}}
+
+### Chef Automate HA Architecture for OnPremise / Cloud Non-Managed
 
 ![High Availability Architecture](/images/automate/ha_arch_onprem.png)
+
+{{< note >}}
+In Chef Automate HA architecture for On-Premise or non-managed Cloud deployments, frontend nodes connect to PostgreSQL over port **5432** and use port **6432** to perform leader checks.
+
+Chef has deprecated the earlier configuration that required frontend nodes to use port **7432** for PostgreSQL connectivity.
+{{< /note >}}
 
 ### Chef Automate HA Architecture for AWS Managed
 
@@ -45,6 +56,12 @@ Chef Automate HA for Managed Services has default port 5432 for Managed PostgreS
 The following shows a five-node cluster, which is a supported deployment pattern. Work with your Progress technical teams to determine the appropriate cluster configuration for optimal performance based on parameters such as node count and data size.
 
 ![High Availability Architecture](/images/automate/ha_arch_minnode_cluster.png)
+
+{{< note >}}
+In Chef Automate HA architecture for On-Premise or non-managed Cloud deployments, frontend nodes connect to PostgreSQL over port **5432** and use port **6432** to perform leader checks.
+
+Chef has deprecated the earlier configuration that required frontend nodes to use port **7432** for PostgreSQL connectivity.
+{{< /note >}}
 
 {{< warning >}}
 

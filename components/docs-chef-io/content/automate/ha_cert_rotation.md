@@ -42,6 +42,8 @@ To understand how to generate certificates, refer to the [Certificate Generation
 - `--wait-timeout` This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process.
 - Certificate rotation should be done in down-time window as service will restart.
 - CN (Common Name) should be the same for all certificates in Opensearch nodes.
+-Use the CLI command to generate the certificate template, ensuring that the node order in the TOML file remains unchanged. Modifying the node sequence may lead to issues when issuing unique certificates for individual nodes.
+- When specifying the subject during certificate generation, avoid using special characters. Due to the involvement of multiple processing layers, special character handling becomes complex and may necessitate manual intervention or patching.
 {{< /note >}}
 
 ### Rotate Cluster Certificates

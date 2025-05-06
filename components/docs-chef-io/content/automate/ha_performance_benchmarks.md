@@ -127,4 +127,6 @@ If a large number of Chef Infra client converges happen in a small window, it wi
 
 When expanding the Automate HA cluster to handle additional nodes or loads from users, it's preferable to scale the front-end nodes horizontally by adding more nodes rather than increasing the amount of server resources on the nodes. This makes it easier to scale as new nodes are added to Chef Infra and reduces the amount of configuration tuning required on each front-end node.
 
+For PostgreSQL, we prefer vertical scaling to horizontal scaling for high-availability deployments. All frontend nodes in this architecture directly talk to the leader node, hence it is the sole point of interaction. Increasing the number of follower nodes does not share the load but adds to the load on the leader since it has to replicate data to all followers. It adds extra replication lag and worsens performance overall.
+
 Tuning the configs to handle additional CPU cores can be time-consuming. It often can lead to bottlenecks or other issues in different parts of the Automate HA cluster.
