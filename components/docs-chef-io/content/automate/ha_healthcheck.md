@@ -178,15 +178,14 @@ automate-backend-ctl show --svc=automate-ha-postgresql
 
 ## Precaution During Backend Node Reboot
 
-For a PostgreSQL cluster, avoid restarting all nodes in quick succession, as this can lead to data loss.
-For example, when a follower node (e.g., f1) is rebooted, it begins syncing data from the leader.
-If, during this syncing process, the leader node is also restarted, a leader election may occur.
-If f1 becomes the new leader before completing its data sync, it may not have the latest data, leading to potential data loss.
+To prevent data loss, do not restart all nodes in a PostgreSQL cluster in quick succession.
+
+When a follower node (e.g., f1) is restarted, it begins synchronizing data from the current leader. If the leader node is also restarted during this synchronization process, a leader election may occur. If f1 is elected as the new leader before completing its sync, it may not have the most recent data, which can lead to inconsistencies or data loss.
 
 ## Precaution during opensearch Reboot
 
 - Check cluster health
-Run the following commands to ensure the cluster is in a healthy state:
+Execute the following commands to verify the health of the cluster:
 
 ```sh
 curl -X GET "https://localhost:9200/_cat/health?v" -k 
@@ -203,7 +202,7 @@ curl -X GET "https://localhost:9200/_cat/recovery?v" -k
 ```
 
 - Disable shard allocation
-Before restarting the node, disable shard allocation to avoid unnecessary rebalancing during the restart:
+Before restarting the node, disable shard allocation to prevent unnecessary rebalancing during the process:
 
 ```sh
 curl -X PUT "https://localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
@@ -226,7 +225,7 @@ curl -X POST "https://localhost:9200/_flush" -k
 --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
 ```
 
-- Enable shard allocation, Once the node is back up, enable shard allocation:
+- Enable shard allocation once the node is back online to resume normal data distribution.
 
 ```sh
 curl -X PUT "https://localhost:9200/_cluster/settings" -H 'Content-Type: application/json' -d'
@@ -240,7 +239,7 @@ curl -X PUT "https://localhost:9200/_cluster/settings" -H 'Content-Type: applica
 --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
 ```
 
-- Monitor cluster state, Check the cluster health and recovery status to ensure the cluster is stable:
+- Monitor the cluster state, and verify its health and recovery status to ensure overall stability.
 
 ```sh
 curl -X GET "https://localhost:9200/_cat/health?v" -k 
