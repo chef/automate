@@ -27,12 +27,14 @@ pkg_deps=(
   core/certstrap/v1.2.0/20240107042707
   core/coreutils/8.32/20240105213308
   core/findutils/4.9.0/20240105220908
-  core/rsync/3.2.3/20240107034222
+  #core/rsync/3.2.3/20240107034222
+  core/rsync/3.2.3/20250307034807
   core/tar/1.35/20240105214549
   chef/mlsa/1.0.1/20240125084021
   # deployment-service uses the postgres11 client to backup/restore postgresql.
   # we need pg11 because the ha backend uses postgres 11
-  core/postgresql13-client/13.18/20241203070721
+  #core/postgresql13-client/13.18/20241203070721
+  core/postgresql13-client/13.18/20250306153717
 )
 
 pkg_bin_dirs=(bin)
