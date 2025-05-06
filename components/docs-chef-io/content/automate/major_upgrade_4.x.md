@@ -50,6 +50,23 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
     curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     ```
 
+{{< note >}}
+
+If the package you have downloaded is not at the _CLI Build:_ version or higher as shown when you check the version, then stop now
+
+```sh
+./chef-automate.new version
+Version: 2
+  CLI Build: 20221006204445
+```
+
+To attempt another download to retrieve the latest, add a query parameter to the URL and run the same command again, like this. This will force download the latest by ignoring the cache.
+
+```sh
+curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip?x=1 | gunzip - > chef-automate && chmod +x chef-automate
+```
+{{< /note >}}
+
 ## Upgrade to Version 3.0.49
 
 Check your current version:
