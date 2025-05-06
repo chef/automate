@@ -406,7 +406,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 		skipIpsList:   skipIpsList,
 	}
 
-	err = c.patchConfig(patchFnParam, true)
+	err = c.patchConfig(patchFnParam, false)
 	if err != nil {
 		return err
 	}
