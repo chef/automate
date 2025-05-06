@@ -47,11 +47,11 @@ source {{pkg.svc_config_path}}/init_ca
 echo "JDK PATH"
 echo $JDK_PKG_PATH
 
-hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
+hab pkg exec rensycthomas/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
 
-hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore {{pkg.svc_var_path}}/ca.jks -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
+hab pkg exec rensycthomas/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore {{pkg.svc_var_path}}/ca.jks -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
 
-hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore $JDK_PKG_PATH/lib/security/cacerts -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
+hab pkg exec rensycthomas/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore $JDK_PKG_PATH/lib/security/cacerts -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
 exec opensearch
 
 
