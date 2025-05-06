@@ -155,8 +155,9 @@ DOC
         echo "Testing odfe connectivity (attempt ${try})"
 
         errcode=0
-        curl --connect-timeout 15 --max-time 15 -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container1_ip}" "https://chefnode:9200" &&
-        curl --connect-timeout 15 --max-time 15 -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container2_ip}" "https://chefnode:9200" || errcode=${?}
+        cp "${certdir}/odfe-admin.key" "${certdir}/odfe-admin_rename.key" 
+        curl --connect-timeout 15 --max-time 15 -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin_rename.key"  --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container1_ip}" "https://chefnode:9200" &&
+        curl --connect-timeout 15 --max-time 15 -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin_rename.key"  --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container2_ip}" "https://chefnode:9200" || errcode=${?}
         if [ ${errcode} -eq 0 ]; then
             break
         else
