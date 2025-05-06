@@ -1,16 +1,15 @@
 package commands
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"time"
 
+	"crypto/tls"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -63,11 +62,11 @@ func (es *ElasticSidecar) validJSON(jsonStr string) bool {
 	return json.Unmarshal([]byte(jsonStr), &js) == nil
 }
 
-func (es *ElasticSidecar) testAuthentication(user, pass string, client http.Client) (int, string) {
-	req, err := http.NewRequest("GET", "https://localhost:9200", nil)
-	if err != nil {
-		es.logger.Println(err)
-		return 0, "error"
+func (es *ElasticSidecar) testAuthentication(user, pass string) (int, string) {
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // nosemgrep
+		},
 	}
 	req.SetBasicAuth(user, pass)
 
@@ -77,8 +76,8 @@ func (es *ElasticSidecar) testAuthentication(user, pass string, client http.Clie
 		return 0, "error"
 	}
 	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
 
-	body, _ := io.ReadAll(resp.Body)
 	return resp.StatusCode, string(body)
 }
 
@@ -205,21 +204,13 @@ func (es *ElasticSidecar) wait() {
 }
 
 func (es *ElasticSidecar) run() {
-	var client = &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig:     &tls.Config{InsecureSkipVerify: true}, // nosemgrep
-			MaxIdleConns:        5,
-			MaxIdleConnsPerHost: 5,
-			IdleConnTimeout:     70 * time.Second,
-		},
-	}
 	for {
-		code, response := es.testAuthentication(es.config.AdminUsername, es.config.AdminPassword, *client)
+		code, response := es.testAuthentication(es.config.AdminUsername, es.config.AdminPassword)
 		if response == "error" {
 			es.wait()
 			continue
 		} else if code == 200 {
-			es.logger.Println("auth successful for user:", es.config.AdminUsername)
+			es.logger.Println("auth successful for", es.config.AdminUsername)
 		}
 
 		switch code {
