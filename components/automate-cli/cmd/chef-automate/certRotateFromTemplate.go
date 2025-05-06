@@ -94,7 +94,7 @@ func (c *certRotateFlow) handleTemplateCertificateRotation(templateCerts *Certif
 	if err != nil {
 		return err
 	}
-	c.writer.Println("PG certificate rotated and node restarted")
+	c.writer.Println("PG certificate rotated")
 	timeElapsed := time.Since(start)
 	c.log.Debug("Time elapsed to execute Postgresql certificate rotation since start %f \n", timeElapsed.Seconds())
 	// rotating OS certs
@@ -284,10 +284,10 @@ func (c *certRotateFlow) rotatePGFollowerNodeCert(pgIps []IP, pgLeaderIpAndHealt
 
 func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, pgRootCA string, pgIps *IP, concurrent bool) error {
 	start := time.Now()
-	c.log.Debug("Roating PostgreSQL node %s certificate at %s \n", pgIps.IP, start.Format(time.ANSIC))
+	c.log.Debug("Rotating PostgreSQL node %s certificate at %s \n", pgIps.IP, start.Format(time.ANSIC))
 	if len(pgIps.PrivateKey) == 0 || len(pgIps.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for PostgerSQL node %s \n", pgIps.IP)
-		err := errors.New(fmt.Sprintf("Empty certificate for PostgerSQL node %s \n", pgIps.IP))
+		err := errors.New(fmt.Sprintf("Empty certificate for PostgreSQL node %s \n", pgIps.IP))
 		return err
 	}
 	flagsObj := certRotateFlags{
@@ -341,7 +341,7 @@ func (c *certRotateFlow) rotatePGNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUtil SSHUtil, currentCertsInfo *certShowCertificates, oss *NodeCertficate, osIp *IP, concurrent bool, nodeDnStr string) error {
 	start := time.Now()
-	c.log.Debug("Roating opensearch node %s certificate at %s \n", osIp.IP, start.Format(time.ANSIC))
+	c.log.Debug("Rotating opensearch node %s certificate at %s \n", osIp.IP, start.Format(time.ANSIC))
 	if len(osIp.PrivateKey) == 0 || len(osIp.Publickey) == 0 {
 		c.writer.Printf("Empty certificate for OpenSearch node %s \n", osIp.IP)
 		err := errors.New(fmt.Sprintf("Empty certificate for OpenSearch node %s \n", osIp.IP))
@@ -424,7 +424,7 @@ func (c *certRotateFlow) rotateOSNodeCerts(infra *AutomateHAInfraDetails, sshUti
 
 	}
 	timeElapsed := time.Since(start)
-	c.log.Debug("Time taken to roate opensearch node %s certificate at %f \n", osIp.IP, timeElapsed.Seconds())
+	c.log.Debug("Time taken to rotate opensearch node %s certificate at %f \n", osIp.IP, timeElapsed.Seconds())
 	return nil
 }
 
@@ -630,7 +630,7 @@ func (c *certRotateFlow) validateCertificateTemplate(template *CertificateToml, 
 	if len(template.PostgreSQL.RootCA) != 0 {
 		RootCA, err := c.getCertFromFile(template.PostgreSQL.RootCA, infra)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "PostgreSQL RootCA file not exist."))
+			errs = append(errs, errors.Wrap(err, "PostgreSQL RootCA file does not exist."))
 		}
 		errsNodes := c.validateNodeCerts(template.PostgreSQL.IPS, infra, RootCA)
 		errs = append(errs, errsNodes...)
@@ -638,12 +638,12 @@ func (c *certRotateFlow) validateCertificateTemplate(template *CertificateToml, 
 	if len(template.OpenSearch.RootCA) != 0 {
 		rootCA, err := c.getCertFromFile(template.OpenSearch.RootCA, infra)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "OpenSearch RootCA file not exist."))
+			errs = append(errs, errors.Wrap(err, "OpenSearch RootCA file does not exist."))
 		}
 		if len(template.OpenSearch.AdminPrivateKey) != 0 {
 			adminPrivateKey, err := c.getCertFromFile(template.OpenSearch.AdminPrivateKey, infra)
 			if err != nil {
-				errs = append(errs, errors.Wrap(err, "OpenSearch Admin Private key file not exist."))
+				errs = append(errs, errors.Wrap(err, "OpenSearch Admin Private key file does not exist."))
 			}
 			err = c.validatePrivateKey(adminPrivateKey)
 			if err != nil {
@@ -653,7 +653,7 @@ func (c *certRotateFlow) validateCertificateTemplate(template *CertificateToml, 
 		if len(template.OpenSearch.AdminPublickey) != 0 {
 			_, err := c.getCertFromFile(template.OpenSearch.AdminPublickey, infra)
 			if err != nil {
-				errs = append(errs, errors.Wrap(err, "OpenSearch Admin Public key file not exist."))
+				errs = append(errs, errors.Wrap(err, "OpenSearch Admin Public key file does not exist."))
 			}
 		}
 		errsNodes := c.validateNodeCerts(template.OpenSearch.IPS, infra, rootCA)
@@ -669,7 +669,7 @@ func (c *certRotateFlow) validateNodeCerts(ips []IP, infra *AutomateHAInfraDetai
 		if len(ip.PrivateKey) != 0 {
 			private, err := c.getCertFromFile(ip.PrivateKey, infra)
 			if err != nil {
-				errs = append(errs, errors.Wrapf(err, "Node %s Private key file not exist.", ip.IP))
+				errs = append(errs, errors.Wrapf(err, "Node %s Private key file does not exist.", ip.IP))
 			}
 			err = c.validatePrivateKey(private)
 			if err != nil {
@@ -680,7 +680,7 @@ func (c *certRotateFlow) validateNodeCerts(ips []IP, infra *AutomateHAInfraDetai
 		if len(ip.Publickey) != 0 {
 			public, err := c.getCertFromFile(ip.Publickey, infra)
 			if err != nil {
-				errs = append(errs, errors.Wrapf(err, "Node %s Public key file not exist.", ip.IP))
+				errs = append(errs, errors.Wrapf(err, "Node %s Public key file does not exist.", ip.IP))
 			}
 			err = c.validatePublicCertsWithRootCA(rootCA, public)
 			if err != nil {
@@ -706,7 +706,7 @@ func (c *certRotateFlow) validatePublicCertsWithRootCA(rootCert []byte, publicCe
 	roots := x509.NewCertPool()
 	ok := roots.AppendCertsFromPEM(rootCert)
 	if !ok {
-		return errors.New("Fialed to pasrse root certificate")
+		return errors.New("Failed to parse root certificate")
 	}
 	publicBlock, _ := pem.Decode(publicCert)
 	if publicBlock == nil {
