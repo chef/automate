@@ -71,6 +71,7 @@ type NodeOpUtils interface {
 	moveAWSAutoTfvarsFile(string) error
 	modifyTfArchFile(string) error
 	getAWSConfigIp() (*AWSConfigIp, error)
+	getAWSConfigIpFromAwsDestroyModule() (*AWSConfigIp, error)
 	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
@@ -98,6 +99,19 @@ func NewNodeUtils(cmdUtil RemoteCmdExecutor, exec command.Executor, writer *cli.
 
 func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	outputDetails, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return nil, err
+	}
+	return &AWSConfigIp{
+		configAutomateIpList:   outputDetails.Outputs.AutomatePrivateIps.Value,
+		configChefServerIpList: outputDetails.Outputs.ChefServerPrivateIps.Value,
+		configOpensearchIpList: outputDetails.Outputs.OpensearchPrivateIps.Value,
+		configPostgresqlIpList: outputDetails.Outputs.PostgresqlPrivateIps.Value,
+	}, nil
+}
+
+func (nu *NodeUtilsImpl) getAWSConfigIpFromAwsDestroyModule() (*AWSConfigIp, error) {
+	outputDetails, err := getAutomateHAInfraDetailsAwsDestroyModule()
 	if err != nil {
 		return nil, err
 	}

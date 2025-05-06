@@ -19,6 +19,7 @@ type MockNodeUtilsImpl struct {
 	moveAWSAutoTfvarsFileFunc                    func(path string) error
 	modifyTfArchFileFunc                         func(path string) error
 	getAWSConfigIpFunc                           func() (*AWSConfigIp, error)
+	getAWSConfigIpFromAwsDestroyModuleFunc       func() (*AWSConfigIp, error)
 	stopServicesOnNodeFunc                       func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNodeFunc                    func(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodesFunc             func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
@@ -36,6 +37,9 @@ func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command stri
 }
 func (mnu *MockNodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	return mnu.getAWSConfigIpFunc()
+}
+func (mnu *MockNodeUtilsImpl) getAWSConfigIpFromAwsDestroyModule() (*AWSConfigIp, error) {
+	return mnu.getAWSConfigIpFromAwsDestroyModuleFunc()
 }
 func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()

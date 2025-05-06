@@ -305,7 +305,7 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 	patchFnParam.timestamp = time.Now().Format("20060102150405")
 	patchFnParam.skipIpsList = []string{flagsObj.node}
 	patchFnParam.concurrent = false
-	err := c.patchConfig(patchFnParam, true)
+	err := c.patchConfig(patchFnParam, false)
 	if err != nil {
 		return err
 	}

@@ -251,6 +251,16 @@ func getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
 	return getAutomateHAInfraDetailHelper(infraConfigFile)
 }
 
+func getAutomateHAInfraDetailsAwsDestroyModule() (*AutomateHAInfraDetails, error) {
+
+	infraConfigFile, err := AwsDestroyModuleAutomateHAInfraDetails()
+	if err != nil {
+		return nil, err
+	}
+
+	return getAutomateHAInfraDetailHelper(infraConfigFile)
+}
+
 func getAutomateHAInfraDetailHelper(infraConfigFilePath string) (*AutomateHAInfraDetails, error) {
 	automateHAInfraDetails := &AutomateHAInfraDetails{}
 
@@ -290,6 +300,14 @@ func FileContainingAutomateHAInfraDetails() (string, error) {
 	}
 
 	return "", errors.New("Automate Ha infra confile file not exist")
+}
+
+func AwsDestroyModuleAutomateHAInfraDetails() (string, error) {
+	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
+		return automateHATerraformDestroyOutputFile, nil
+	}
+
+	return "", errors.New("Automate Ha infra destroy config file not exist")
 }
 
 func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {

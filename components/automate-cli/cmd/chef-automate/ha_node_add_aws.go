@@ -196,7 +196,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 }
 
 func (ani *AddNodeAWSImpl) getAwsHAIp() error {
-	ConfigIp, err := ani.nodeUtils.getAWSConfigIp()
+	ConfigIp, err := ani.nodeUtils.getAWSConfigIpFromAwsDestroyModule()
 	if err != nil {
 		return err
 	}

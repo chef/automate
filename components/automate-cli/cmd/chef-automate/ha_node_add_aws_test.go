@@ -200,7 +200,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return nil
 		},
-		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+		getAWSConfigIpFromAwsDestroyModuleFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
 				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
 				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
@@ -447,7 +447,7 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("random")
 		},
-		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+		getAWSConfigIpFromAwsDestroyModuleFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
 				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
 				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
@@ -523,7 +523,7 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		syncConfigToAllNodesFunc: func(unreachableNodes map[string][]string) error {
 			return errors.New("random")
 		},
-		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+		getAWSConfigIpFromAwsDestroyModuleFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
 				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
 				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
@@ -599,7 +599,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		saveConfigToBastionFunc: func() error {
 			return nil
 		},
-		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+		getAWSConfigIpFromAwsDestroyModuleFunc: func() (*AWSConfigIp, error) {
 			return &AWSConfigIp{
 				configAutomateIpList:   []string{"127.0.0.1", "127.0.1.1", "127.0.2.1"},
 				configChefServerIpList: []string{"127.0.0.2", "127.0.1.2", "127.0.2.2"},
