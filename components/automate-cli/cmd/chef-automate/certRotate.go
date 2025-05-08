@@ -765,9 +765,14 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomateHAInfra
 		if err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("Unable to read file from remote path: %v", certPath))
 		}
-		return []byte(out), nil
+		return []byte(strings.TrimSpace(out)), nil
 	}
-	return c.fileUtils.ReadFile(certPath)
+	cp, err := c.fileUtils.ReadFile(certPath)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("Unable to read file from local path: %v", certPath))
+	}
+	cpstr := strings.TrimSpace(string(cp))
+	return []byte(cpstr), nil
 }
 
 // GetRemoteFileDetails returns the remote file details from the remotePath.
