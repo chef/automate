@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRunUpdateBackendIpCmd(t *testing.T) {
-	runUpdateBackendIpCmd(cmd, []string{CONFIG_PATH + "/config_with_only_db.toml"})
+func TestRunGetExternalDbIpCmd(t *testing.T) {
+	runGetExternalDbIpCmd(cmd, []string{CONFIG_PATH + "/config_with_only_db.toml"})
 	tomlbyte, _ := fileutils.ReadFile(CONFIG_PATH + "/config_with_only_db.toml")
 	configString := string(tomlbyte)
 	var config dc.AutomateConfig

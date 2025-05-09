@@ -353,11 +353,12 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
   # If isSkipRequired is true then we are exiting from here  
   if $isSkipRequired ; then
      chef-automate decode-password $config
-     backend_ip_config="/hab/backendIpPatch.toml"
-     if [ -e $backend_ip_config ]; then
-        echo "Applying $backend_ip_config"
-        chef-automate config patch $backend_ip_config
-        rm -f $backend_ip_config
+     chef-automate get-external-db-ips $config
+     external_db_ips_config="/hab/externalDbIpsConfig.toml"
+     if [ -e $external_db_ips_config ]; then        
+        echo "Applying $external_db_ips_config"
+        chef-automate config patch $external_db_ips_config
+        rm -f $external_db_ips_config
      fi
      chef-automate encode-password $config
      create_bootstrap_bundle 
