@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -40,6 +42,17 @@ var getExternalDbIpCmd = &cobra.Command{
 
 func runGetExternalDbIpCmd(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
+		dirPath := "/hab"
+		fileName := "externalDbIpsConfig.toml"
+		externalDbIpsConfig := filepath.Join(dirPath, fileName)
+
+		if _,err := os.Stat(externalDbIpsConfig); err == nil {
+		err := os.Remove(externalDbIpsConfig)
+			if err != nil {
+				return err
+			}
+		}
+
 		configFile := args[0]
 		if len(configFile) > 0 {
 			if checkIfFileExist(configFile) {
@@ -95,19 +108,30 @@ func runGetExternalDbIpCmd(cmd *cobra.Command, args []string) error {
 						tomlFileContent = ""
 					}
 					if len(tomlFileContent) > 0 {
-						externalDbIpsConfig := "externalDbIpsConfig.toml"
-						extractedConfig, err := fileutils.CreateTempFile(tomlFileContent, externalDbIpsConfig, "")
+						extractedConfig, err := createExtractedContentTomlFile(tomlFileContent, externalDbIpsConfig)
 						if err != nil {
 							return err
 						}
-						er := fileutils.Move(extractedConfig, "/hab/externalDbIpsConfig.toml")
-						if er != nil {
-							return er
-						}
+						writer.Printf("Extracted external database IPs to %s\n", extractedConfig)
 					}
 				}
 			}
 		}
 	}
 	return nil
+}
+
+func createExtractedContentTomlFile(tomlContent string, file string) (string, error) {
+	
+	extractedConfig, err := os.Create(file)
+	if err != nil {
+		return "Error creating file", err
+	}
+	defer extractedConfig.Close()
+
+	_, err = extractedConfig.WriteString(tomlContent)
+	if err != nil {
+		return "Error writing to file", err
+	}
+	return extractedConfig.Name(), nil
 }
