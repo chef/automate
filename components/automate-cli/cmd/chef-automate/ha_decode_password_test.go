@@ -10,8 +10,8 @@ import (
 )
 
 func TestRunDecodePasswordCmd(t *testing.T) {
-	runDecodePasswordCmd(cmd, []string{CONFIG_PATH + "/config_externaldb.toml"})
-	tomlbyte, _ := fileutils.ReadFile(CONFIG_PATH + "/config_externaldb.toml")
+	runDecodePasswordCmd(cmd, []string{CONFIG_PATH + "/config_with_only_db.toml"})
+	tomlbyte, _ := fileutils.ReadFile(CONFIG_PATH + "/config_with_only_db.toml")
 	configString := string(tomlbyte)
 	var config dc.AutomateConfig
 	toml.Decode(configString, &config)
