@@ -246,7 +246,10 @@ The bastion server can patch new configurations in all nodes. To know more see [
 - For the Frontend nodes you can use the same IP in Chef Automate and Chef Server.
 - For the Backend nodes you can use the same IP in PostgreSQL and OpenSearch.
 - To provide multiline certificates use triple quotes like `""" multiline certificate contents"""`.
-
+- Rebooting or restarting individual nodes outside a designated maintenance window should be avoided, especially during periods of high traffic.
+- This recommendation is based on our [performance benchmarking](/automate/ha_performance_benchmarks/#5-node-cluster-deployment) and is intended for customers managing up to 10,000 nodes under typical load conditions.
+- The 5 node Automate deployment pattern does not support dynamic scaling (i.e., adding or removing nodes). A 5 node deployment will always remain a 5 node setup.
+-  Transitioning to an 11 node deployment requires decommissioning the existing 5 node cluster entirely. The new 11 node architecture must be provisioned from scratch.
 {{< /note >}}
 
 ```config
