@@ -42,7 +42,7 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
 1. `cd rotate-certs` then execute the below script.
 
     ```bash
-    
+# Run with OpenSSL version 1.0.2k-fips    
 cat <<EOF >> root-ca.cnf
 [req]
 distinguished_name = req_distinguished_name
