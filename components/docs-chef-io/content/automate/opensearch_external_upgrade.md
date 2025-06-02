@@ -63,7 +63,7 @@ Chef Automate 4.x supports external OpenSearch. Please follow the migration sect
 
 Steps To Enable External OpenSearch
 
-- Set the `external.opensearch` `enable` attribute to false.
+- Set the `external.opensearch` `enable` attribute to `true`.
 - Set the `nodes` attribute to the external OpenSearch URL array.
 - Set the auth .
 - Set the `auth` attribute `scheme` to `basic_auth`.
@@ -72,7 +72,7 @@ Steps To Enable External OpenSearch
 
 For example:
 
-```
+```toml
 [global.v1.external.opensearch]
   enable = true
   nodes = ["http://opensearch1.example:10168", "http://opensearch2.example:10168", "..." ]
