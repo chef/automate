@@ -244,7 +244,7 @@ Follow the steps below when migrating to On-Premises or Cloud HA deployment **(b
 
 ## Migration with S3
 
-For AWS managed services, map the snapshot role to the OpenSearch dashboard. It is necessary to [enable backup and restore in OpenSearch](automate/managed_services/#enabling-opensearch-backup-restore).
+For AWS managed services, map the snapshot role to the OpenSearch dashboard. It is necessary to [enable backup and restore in OpenSearch](/automate/managed_services/#enabling-opensearch-backup-restore).
 
 1. If the standalone Automate is not configured with S3 backup configurations then patch the following configuration in Standalone Chef Automate for creating the backup in the S3.
 
