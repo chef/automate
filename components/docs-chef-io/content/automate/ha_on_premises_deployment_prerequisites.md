@@ -79,7 +79,7 @@ Current Automate HA integrates with the following non-Chef tools:
 - **SQL Database:** PostgreSQL: 13.18
 - **NoSQL Database:** OpenSearch: 1.3.7
 - **Load Balancer:** 
-  - [Kemp LoadMaster](https://kemptechnologies.com/?_gl=1*jfw3dz*_gcl_au*MTIzMDA0NzAwNC4xNzM4NjA3NTQ3*_ga*MTk4NzcyMzc0My4xNzM4NjA3NTQ3*_ga_9JSNBCSF54*MTc0NDYxNTI1MS4xNC4xLjE3NDQ2MzQ4NTcuMzUuMC4w) (Preferred)
+  - [Kemp LoadMaster](https://docs.progress.com/bundle/loadmaster-deployment-guide-progress-chef-automate-and-infra-server-ga/page/Document-Purpose.html) (Preferred)
   - NGINX: 1.21.3
   - HA Proxy: 2.2.18
   - AWS Application Load Balancer
