@@ -31,9 +31,9 @@ The Integration App works by exposing the REST API endpoints for communication b
 
 - A running [Chef Automate](https://www.chef.io/automate/) instance.
 - Chef Automate has a valid SSL/TLS certificate from a trusted certificate authority (CA).
-- A running [ServiceNow](https://www.servicenow.com/) instance.* A running [ServiceNow](https://www.servicenow.com/) instance. The supported ServiceNow versions are **Vancouver**, **Washington DC** and **Xanadu**.
+- A running [ServiceNow](https://www.servicenow.com/) instance.* A running [ServiceNow](https://www.servicenow.com/) instance. The supported ServiceNow versions are **Xanadu** and **Yokohama**.
 - The ServiceNow instance is reachable on port 443.
-- The ServiceNow instance should be compatible with **Vancouver**, **Washington DC** and **Xanadu** versions.
+- The ServiceNow instance should be compatible with **Xanadu** and **Yokohama** versions.
 
 ### Required ServiceNow Plugins
 
