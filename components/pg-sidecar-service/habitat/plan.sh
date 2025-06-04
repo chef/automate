@@ -18,7 +18,7 @@ pkg_exports=(
 )
 pkg_exposes=(port)
 pkg_deps=(
-  chef/mlsa/1.0.1/20240125084021
+  chef/mlsa
   chef/automate-platform-tools
   # Pin postgresql, sqitch_pg, and postgresql client until automate-postgresql
   # is updated.
