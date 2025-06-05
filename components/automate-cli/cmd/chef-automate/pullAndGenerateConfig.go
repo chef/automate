@@ -1696,7 +1696,7 @@ func (p *PullConfigsImpl) getBackupPathFromAutomateConfig(a2ConfigMap map[string
 				if ele.Global.V1.External.Opensearch.Backup.Fs != nil &&
 					ele.Global.V1.External.Opensearch.Backup.Fs.Path != nil {
 					path = ele.Global.V1.External.Opensearch.Backup.Fs.Path.GetValue()
-					logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+					logrus.Debugf("Backup path set for opensearch settings in automate config: %s and backup location: %s", path, backupLocation)
 					return path, nil
 				}
 			case "s3":
@@ -1704,7 +1704,7 @@ func (p *PullConfigsImpl) getBackupPathFromAutomateConfig(a2ConfigMap map[string
 					ele.Global.V1.External.Opensearch.Backup.S3.Bucket != nil &&
 					ele.Global.V1.External.Opensearch.Backup.S3.BasePath != nil {
 					path = ele.Global.V1.External.Opensearch.Backup.S3.BasePath.GetValue()
-					logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+					logrus.Debugf("Backup path set for opensearch settings in automate config: %s and backup location: %s", path, backupLocation)
 					return path, nil
 				}
 			case "gcs":
@@ -1712,7 +1712,7 @@ func (p *PullConfigsImpl) getBackupPathFromAutomateConfig(a2ConfigMap map[string
 					ele.Global.V1.External.Opensearch.Backup.Gcs.Bucket != nil &&
 					ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath != nil {
 					path = ele.Global.V1.External.Opensearch.Backup.Gcs.BasePath.GetValue()
-					logrus.Debugf("backup path configured in automate nodes: %s and backup location: %s", path, backupLocation)
+					logrus.Debugf("Backup path set for opensearch settings in automate config: %s and backup location: %s", path, backupLocation)
 					return path, nil
 				}
 			}
@@ -1737,6 +1737,6 @@ func (p *PullConfigsImpl) getBackupPathFromOpensearchConfig() (string, error) {
 	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
 		return "", err
 	}
-	logrus.Debugf("backup path from opensearch config: %s", src.Path.Repo)
+	logrus.Debugf("Backup path from opensearch config: %s", src.Path.Repo)
 	return src.Path.Repo, nil
 }
