@@ -96,7 +96,7 @@ func runCertShowCmd(*cobra.Command, []string) error {
 			if tlsCred.GetServerName() == certCmdFlags.hostname {
 				// Print hostname on stderr so that we can pipe the cert with other cmds
 				writer.Errorf("Hostname: %s\n", tlsCred.GetServerName())
-				writer.Printf(tlsCred.GetCert())
+				writer.Print(tlsCred.GetCert())
 				return nil
 			}
 		}

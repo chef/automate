@@ -212,7 +212,7 @@ func downTimeCheck() Checklist {
 			resp, err := h.Writer.Confirm("You had planned for a downtime?:")
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(downTimeError)
@@ -231,7 +231,7 @@ func backupCheck() Checklist {
 			resp, err := h.Writer.Confirm("You have taken backup of your data and kept it safe, preferred on other disk or location?")
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(backupError)
@@ -261,7 +261,7 @@ func postChecklistIntimationCheck() Checklist {
 			resp, err := h.Writer.Confirm("After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use")
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(postChecklistIntimationError)
@@ -280,7 +280,7 @@ func externalPGUpgradeCheck() Checklist {
 			resp, err := h.Writer.Confirm("Upgrade your PostgreSQL 9.6 to 13.5 with the help of your Database Administrator")
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(backupError)
@@ -299,7 +299,7 @@ func promptUpgradeContinue() Checklist {
 			resp, err := h.Writer.Confirm(v3_post_checklist_confirmation)
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error("end user not ready to upgrade")

@@ -123,7 +123,7 @@ func (s *policyServer) CreatePolicy(
 		case *projectassignment.ProjectsMissingError:
 			return nil, status.Error(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
-			return nil, status.Errorf(codes.PermissionDenied, err.Error())
+			return nil, status.Error(codes.PermissionDenied, err.Error())
 		case *storage.ForeignKeyError:
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		default:
@@ -192,7 +192,7 @@ func (s *policyServer) DeletePolicy(
 
 	err := validate.RequiredID(req, "policy")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err = s.store.DeletePolicy(ctx, req.Id)
@@ -214,7 +214,7 @@ func (s *policyServer) UpdatePolicy(
 
 	err := requiredFields(req, "policy")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	statements := make([]storage.Statement, len(req.Statements))
@@ -249,9 +249,9 @@ func (s *policyServer) UpdatePolicy(
 		default:
 			switch err.(type) {
 			case *projectassignment.ProjectsMissingError:
-				return nil, status.Errorf(codes.NotFound, err.Error())
+				return nil, status.Error(codes.NotFound, err.Error())
 			case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
-				return nil, status.Errorf(codes.PermissionDenied, err.Error())
+				return nil, status.Error(codes.PermissionDenied, err.Error())
 			case *storage.ForeignKeyError:
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			default:
@@ -275,7 +275,7 @@ func (s *policyServer) ListPolicyMembers(
 
 	err := validate.RequiredID(req, "policy")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	membersInternal, err := s.store.ListPolicyMembers(ctx, req.Id)
@@ -299,7 +299,7 @@ func (s *policyServer) AddPolicyMembers(
 
 	err := validate.RequiredID(req, "policy")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	members, err := membersFromAPI(req.Members)
@@ -329,7 +329,7 @@ func (s *policyServer) ReplacePolicyMembers(
 
 	err := validate.RequiredID(req, "policy")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	members, err := membersFromAPI(req.Members)
@@ -358,7 +358,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 
 	err := validate.RequiredID(req, "policy")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	members, err := membersFromAPI(req.Members)
@@ -402,7 +402,7 @@ func (s *policyServer) CreateRole(
 	req *api.CreateRoleReq) (*api.Role, error) {
 	err := requiredFields(req, "role")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	storageRole, err := storage.NewRole(req.Id, req.Name, storage.Custom, req.Actions, req.Projects)
@@ -419,11 +419,11 @@ func (s *policyServer) CreateRole(
 	default:
 		switch err.(type) {
 		case *storage.ForeignKeyError:
-			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		case *projectassignment.ProjectsMissingError:
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
-			return nil, status.Errorf(codes.PermissionDenied, err.Error())
+			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
 	}
@@ -464,7 +464,7 @@ func (s *policyServer) GetRole(
 
 	err := validate.RequiredID(req, "role")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	roleInternal, err := s.store.GetRole(ctx, req.Id)
@@ -485,7 +485,7 @@ func (s *policyServer) DeleteRole(
 
 	err := validate.RequiredID(req, "role")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err = s.store.DeleteRole(ctx, req.Id)
@@ -507,7 +507,7 @@ func (s *policyServer) UpdateRole(
 
 	err := requiredFields(req, "role")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	storageRole, err := storage.NewUpdateRole(req.Id, req.Name, req.Actions, req.Projects)
@@ -525,9 +525,9 @@ func (s *policyServer) UpdateRole(
 	default:
 		switch err.(type) {
 		case *projectassignment.ProjectsMissingError:
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
-			return nil, status.Errorf(codes.PermissionDenied, err.Error())
+			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "updating role %q: %s, projects: %s", req.Id, req.Projects, err.Error())
 	}

@@ -166,15 +166,15 @@ func ParseAPIError(err error) error {
 	if chefError != nil {
 		switch chefError.StatusCode() {
 		case http.StatusBadRequest:
-			return status.Errorf(codes.InvalidArgument, chefError.StatusMsg())
+			return status.Error(codes.InvalidArgument, chefError.StatusMsg())
 		case http.StatusUnauthorized:
-			return status.Errorf(codes.Unauthenticated, chefError.StatusMsg())
+			return status.Error(codes.Unauthenticated, chefError.StatusMsg())
 		case http.StatusForbidden:
-			return status.Errorf(codes.PermissionDenied, chefError.StatusMsg())
+			return status.Error(codes.PermissionDenied, chefError.StatusMsg())
 		case http.StatusConflict:
-			return status.Errorf(codes.AlreadyExists, chefError.StatusMsg())
+			return status.Error(codes.AlreadyExists, chefError.StatusMsg())
 		case http.StatusNotFound:
-			return status.Errorf(codes.NotFound, chefError.StatusMsg())
+			return status.Error(codes.NotFound, chefError.StatusMsg())
 		default:
 			return status.Error(codes.InvalidArgument, chefError.StatusMsg())
 		}
@@ -199,7 +199,7 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 	return v, err
 }
 
-//createChefServerClient: Creates a client with only server details
+// createChefServerClient: Creates a client with only server details
 func (s *Server) createChefServerClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

@@ -44,7 +44,7 @@ var initCmd = &cobra.Command{
 		if os.IsNotExist(err) || len(keyContent) < 2 {
 			err = generateOrMigrateKey(keyPath)
 			if err != nil {
-				fatalf(err.Error())
+				fatalf("%s", err.Error())
 			}
 		}
 

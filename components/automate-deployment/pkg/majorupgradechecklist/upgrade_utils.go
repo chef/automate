@@ -102,11 +102,11 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, version string, sk
 	}
 	habFreeSpace, err := cm.GetFreeSpaceinGB(habRootPath)
 	if err != nil {
-		return false, status.Errorf(status.AvailableSpaceError, err.Error())
+		return false, status.New(status.AvailableSpaceError, err.Error())
 	}
 	sizeESDir, err := cm.CalDirSizeInGB(dbDataPath)
 	if err != nil {
-		return false, status.Errorf(status.CalESDirSizeError, err.Error())
+		return false, status.New(status.CalESDirSizeError, err.Error())
 	}
 	destDir := habRootPath
 	eSDirSizeWithBuffer := sizeESDir * 11 / 10
@@ -117,7 +117,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, version string, sk
 		destDir = osDestDataDir
 		sizeDestDir, err := cm.GetFreeSpaceinGB(osDestDataDir)
 		if err != nil {
-			return false, status.Errorf(status.CalDestDirSizeError, err.Error())
+			return false, status.New(status.CalDestDirSizeError, err.Error())
 		}
 		if habFreeSpace < MIN_DIRSIZE_GB {
 			message = HAB_5GB_FREE_SPACE_ERROR
@@ -134,7 +134,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, version string, sk
 		if !isMigration && isDestDirFlag {
 			message = fmt.Sprintf(DEST_FLAG_INFO, message, destDir)
 		}
-		return false, status.Errorf(status.InsufficientSpaceError, message)
+		return false, status.New(status.InsufficientSpaceError, message)
 	}
 	return true, nil
 }

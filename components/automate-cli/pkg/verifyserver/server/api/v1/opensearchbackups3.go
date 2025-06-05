@@ -15,20 +15,20 @@ func (h *Handler) CheckOSBackupS3(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(req); err != nil {
 		errString := fmt.Sprintf("%s %v", constants.INVALID_REQUEST_ERROR, err.Error())
-		h.Logger.Error(fmt.Errorf(errString))
+		h.Logger.Error(fmt.Errorf("%s", errString))
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	if !requestValidator(*req) {
 		errString := fmt.Sprintf("Invalid request body for S3 backup check")
-		h.Logger.Error(fmt.Errorf(errString))
+		h.Logger.Error(fmt.Errorf("%s", errString))
 		return fiber.NewError(fiber.StatusBadRequest, errString)
 	}
 
 	resp, err := h.OSBackupService.OSS3BackupVerify(*req, c)
 	if err != nil {
 		errString := fmt.Sprintf("S3 backup check failed : %v", err.Error())
-		h.Logger.Error(fmt.Errorf(errString))
+		h.Logger.Error(fmt.Errorf("%s", errString))
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 

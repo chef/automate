@@ -254,7 +254,7 @@ func postChecklistIntimationCheckV4(isEmbedded bool) Checklist {
 					h.Writer.Error(shardError.Error())
 				}
 
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(postChecklistIntimationError)
@@ -285,7 +285,7 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 					h.Writer.Error(shardError.Error())
 				}
 
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error("end user not ready to upgrade")
@@ -324,7 +324,7 @@ func downTimeCheckV4() Checklist {
 				resp, err := h.Writer.Confirm(maintenanceModeMsg)
 				if err != nil {
 					h.Writer.Error(err.Error())
-					return status.Errorf(status.InvalidCommandArgsError, err.Error())
+					return status.New(status.InvalidCommandArgsError, err.Error())
 				}
 				if !resp {
 					h.Writer.Error(downTimeError)
@@ -351,7 +351,7 @@ func externalESUpgradeCheck() Checklist {
 			resp, err := h.Writer.Confirm(externalESUpgradeMsg)
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(externalESUpgradeError)
@@ -492,7 +492,7 @@ func disableSharding() Checklist {
 			resp, err := h.Writer.Confirm("This will disable Sharding on your elastic search")
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(shardingError)
@@ -502,13 +502,13 @@ func disableSharding() Checklist {
 			err = disableShardAllocation()
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.DatabaseError, err.Error())
+				return status.New(status.DatabaseError, err.Error())
 			}
 
 			err = flushRequest()
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.DatabaseError, err.Error())
+				return status.New(status.DatabaseError, err.Error())
 			}
 			h.Writer.Println("Finished disabling shard allocation successfully.")
 			return nil
@@ -639,17 +639,17 @@ func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
 		resp, err := h.Writer.Confirm("Do you wish to delete the index to continue?")
 		if err != nil {
 			h.Writer.Error(err.Error())
-			return status.Errorf(status.InvalidCommandArgsError, err.Error())
+			return status.New(status.InvalidCommandArgsError, err.Error())
 		}
 		errMsg := formErrorMsg(indexInfo)
 		if !resp {
-			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+			return status.New(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
 		}
 
 		_, err = execRequest(fmt.Sprintf("%s%s?pretty", basePath, index.Name), "DELETE", nil)
 		if err != nil {
 			h.Writer.Error(err.Error())
-			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+			return status.New(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
 		}
 		indexInfo[i].IsDeleted = true //mark the deleted indices, so that those wont show in the list to end user
 	}
@@ -664,7 +664,7 @@ func formErrorMsg(IndexDetailsArray []indexData) error {
 		}
 	}
 	msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
-	return fmt.Errorf(msg)
+	return fmt.Errorf("%s", msg)
 }
 
 func getDataForOldIndices(allIndexData []byte) ([]indexData, error) {
@@ -735,7 +735,7 @@ func storeSearchEngineSettings() Checklist {
 					resp, err := h.Writer.Confirm(errorUserConcent)
 					if err != nil {
 						h.Writer.Error(err.Error())
-						return status.Errorf(status.InappropriateSettingError, err.Error())
+						return status.New(status.InappropriateSettingError, err.Error())
 					}
 					if !resp {
 						return status.New(status.InappropriateSettingError, upgradeFailed)
@@ -779,7 +779,7 @@ func deleteA1Indexes(timeout int64) Checklist {
 			resp, err := h.Writer.Confirm(fmt.Sprintf("Following Indexes are of Automate 1 and are no longer use in automate, thus we will delete these indices:%s", indexes))
 			if err != nil {
 				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.New(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.")
