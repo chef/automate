@@ -100,7 +100,7 @@ function link_component_bin() {
 }
 
 function desired_golang_ident() {
-    echo "core/go1_22/$(cat /src/GOLANG_VERSION)"
+    echo "core/go1_24/$(cat /src/GOLANG_VERSION)"
 }
 
 function verify_components_have_platform_config() {
