@@ -196,7 +196,7 @@ func TestAssembleJob(t *testing.T) {
 	assert.NotZero(t, job.TargetConfig.SecretsArr)
 }
 
-func TestnodeInfoFromManagerNodeCorrectlyAssignsName(t *testing.T) {
+func TestNodeInfoFromManagerNodeCorrectlyAssignsName(t *testing.T) {
 	nodeDetails := nodeInfoFromManagerNode(&manager.ManagerNode{
 		Name: "test-name",
 		Host: "localhost",
@@ -210,7 +210,7 @@ func TestnodeInfoFromManagerNodeCorrectlyAssignsName(t *testing.T) {
 	assert.Equal(t, "localhost", nodeDetails.Name)
 }
 
-func TestnodeInfoFromManagerNodeObservesTagValues(t *testing.T) {
+func TestNodeInfoFromManagerNodeObservesTagValues(t *testing.T) {
 	nodeDetails := nodeInfoFromManagerNode(&manager.ManagerNode{
 		Name: "test-name",
 		Host: "localhost",

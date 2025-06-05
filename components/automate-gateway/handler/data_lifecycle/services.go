@@ -32,11 +32,11 @@ var ValidServicesJobNames = []string{
 func (s *Server) GetServicesStatus(ctx context.Context, req *api.GetServicesStatusRequest) (*api.GetServicesStatusResponse, error) {
 	dsc, err := s.appsClient.GetDisconnectedServicesConfig(ctx, &a.GetDisconnectedServicesConfigReq{})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	ddsc, err := s.appsClient.GetDeleteDisconnectedServicesConfig(ctx, &a.GetDeleteDisconnectedServicesConfigReq{})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := api.GetServicesStatusResponse{
 		Jobs: []*api.JobStatus{
@@ -73,11 +73,11 @@ func (s *Server) RunServices(ctx context.Context, req *api.RunServicesRequest) (
 	var err error
 	_, err = s.appsClient.RunDisconnectedServicesJob(ctx, &a.RunDisconnectedServicesJobReq{})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	_, err = s.appsClient.RunDeleteDisconnectedServicesJob(ctx, &a.RunDeleteDisconnectedServicesJobReq{})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &api.RunServicesResponse{}, nil
 }
@@ -89,15 +89,15 @@ func (s *Server) SetServicesConfig(ctx context.Context, req *api.SetServicesConf
 		switch job.Name {
 		case DisconnectedServicesJobName:
 			if err = s.configureDisconnedServices(ctx, job); err != nil {
-				return nil, status.Errorf(codes.Internal, err.Error())
+				return nil, status.Error(codes.Internal, err.Error())
 			}
 		case DeleteDisconnectedServicesJobName:
 			if err = s.configureDeleteDisconnedServices(ctx, job); err != nil {
-				return nil, status.Errorf(codes.Internal, err.Error())
+				return nil, status.Error(codes.Internal, err.Error())
 			}
 		default:
 			errMsg := fmt.Sprintf("invalid job name %q; valid names are '%s'", job.Name, strings.Join(ValidServicesJobNames, "', '"))
-			return nil, status.Errorf(codes.InvalidArgument, errMsg)
+			return nil, status.Error(codes.InvalidArgument, errMsg)
 		}
 	}
 	return &api.SetServicesConfigResponse{}, nil

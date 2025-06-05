@@ -14,7 +14,7 @@ func (h *Handler) GetS3Config(c *fiber.Ctx) error {
 	s3ConfigRequest := new(models.S3ConfigRequest)
 	if err := c.BodyParser(&s3ConfigRequest); err != nil {
 		errString := fmt.Sprintf("s3 config request body parsing failed: %v", err.Error())
-		h.Logger.Error(fmt.Errorf(errString))
+		h.Logger.Error(fmt.Errorf("%s", errString))
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	s3Connection := h.S3ConfigService.GetS3Connection(s3ConfigRequest)

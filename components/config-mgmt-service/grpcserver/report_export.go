@@ -92,7 +92,7 @@ func getReportExportHandler(outputType string, stream service.CfgMgmtService_Rep
 	case "csv":
 		return csvReportExport(stream), nil
 	default:
-		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(outputType+" export is not supported"))
+		return nil, status.Error(codes.Unauthenticated, fmt.Sprint(outputType+" export is not supported"))
 	}
 }
 
@@ -101,12 +101,12 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 	// Date Range
 	start, err := ToTime(request.Start)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	end, err := ToTime(request.End)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
@@ -124,13 +124,13 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 	runFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeRunBackend)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	runs, err := s.client.GetRunsPageByCursor(ctx, request.NodeId, start, end,
 		runFilters, cursorEndTime, cursorID, pageSize, sortAsc)
 	if err != nil {
-		return status.Errorf(codes.Internal, err.Error())
+		return status.Error(codes.Internal, err.Error())
 	}
 
 	// Wait for check if the associated node's projects match
@@ -157,7 +157,7 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		runs, err = s.client.GetRunsPageByCursor(ctx, request.NodeId, start, end,
 			runFilters, cursorEndTime, cursorID, pageSize, sortAsc)
 		if err != nil {
-			return status.Errorf(codes.Internal, err.Error())
+			return status.Error(codes.Internal, err.Error())
 		}
 	}
 

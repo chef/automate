@@ -66,12 +66,12 @@ func (eventFeedServer *EventFeedServer) EventExport(request *event_feed.EventExp
 
 	filters, err := feed.FormatFilters(request.Filter)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	sortAsc := request.Order.String() != "desc"
@@ -81,7 +81,7 @@ func (eventFeedServer *EventFeedServer) EventExport(request *event_feed.EventExp
 	for {
 		entries, err := entryPager()
 		if err != nil {
-			return status.Errorf(codes.Internal, err.Error())
+			return status.Error(codes.Internal, err.Error())
 		}
 
 		err = sendResult(entries)

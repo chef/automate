@@ -46,7 +46,7 @@ func reportManagerPublisher(in <-chan message.Compliance, reportmanagerClient ma
 			}
 			body, err := json.Marshal(msg.Report)
 			if err != nil {
-				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, err.Error()))
+				msg.FinishProcessingCompliance(status.Error(codes.Internal, err.Error()))
 				continue
 			}
 			reader := bytes.NewReader(body)
@@ -76,7 +76,7 @@ func reportManagerPublisher(in <-chan message.Compliance, reportmanagerClient ma
 					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
-				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, err.Error()))
+				msg.FinishProcessingCompliance(status.Error(codes.Internal, err.Error()))
 				continue
 			}
 			message.Propagate(out, &msg)

@@ -132,21 +132,21 @@ func getSingleErrorFromList(errorList *list.List) error {
 				errorMsgs = append(errorMsgs, fmt.Sprintf("unknown error type: %v", value))
 			}
 		}
-		return fmt.Errorf(strings.Join(errorMsgs, "\n"))
+		return fmt.Errorf("%s", strings.Join(errorMsgs, "\n"))
 	}
 	return nil
 }
 
 func commonFqdnValidation(value string, keyName string) error {
 	if len(value) < 1 {
-		return fmt.Errorf("invalid or empty URL: " + keyName)
+		return fmt.Errorf("%s", "invalid or empty URL: "+keyName)
 	}
 	if strings.Contains(value, " ") {
-		return fmt.Errorf("domain name cannot contain spaces: " + keyName)
+		return fmt.Errorf("%s", "domain name cannot contain spaces: "+keyName)
 	}
 	// Check for "http://" or "https://" in the URL
 	if strings.HasPrefix(value, "http://") || strings.HasPrefix(value, "https://") {
-		return fmt.Errorf("url should not include the protocol (http:// or https://): " + keyName)
+		return fmt.Errorf("%s", "url should not include the protocol (http:// or https://): "+keyName)
 	}
 	return nil
 }
@@ -160,7 +160,7 @@ func validateFQDN(value string, keyName string) error {
 	regex := `^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(?::\d+)?$`
 	match, _ := regexp.MatchString(regex, value)
 	if !match {
-		return fmt.Errorf("invalid URL format: " + keyName)
+		return fmt.Errorf("%s", "invalid URL format: "+keyName)
 	}
 	return nil
 }
@@ -174,7 +174,7 @@ func validateUrlWithPort(value string, keyName string) error {
 	regex := `^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*:\d{2,5}$`
 	match, _ := regexp.MatchString(regex, value)
 	if !match {
-		return fmt.Errorf("invalid URL format: " + keyName)
+		return fmt.Errorf("%s", "invalid URL format: "+keyName)
 	}
 	return nil
 
@@ -191,11 +191,11 @@ func validateAutomateAdminPassword(automateSettings *ConfigAutomateSettings) err
 	if len(automateSettings.AdminPassword) > 0 {
 		val, err := password.NewValidator()
 		if err != nil {
-			return fmt.Errorf(err.Error())
+			return fmt.Errorf("%s", err.Error())
 		}
 		passvalErr := val.Validate(automateSettings.AdminPassword)
 		if passvalErr != nil {
-			return fmt.Errorf(passvalErr.Error())
+			return fmt.Errorf("%s", passvalErr.Error())
 		}
 	}
 	return nil
@@ -411,7 +411,7 @@ func validateCertsByIP(certsByIpList *[]CertByIP, nodeType string) error {
 		if len(strings.TrimSpace(element.IP)) < 1 ||
 			len(strings.TrimSpace(element.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(element.PublicKey)) < 1 {
-			return fmt.Errorf(nodeType + " public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false")
+			return fmt.Errorf("%s", nodeType+" public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false")
 		}
 		if checkIPAddress(element.IP) != nil {
 			errorList.PushBack(nodeType + " " + element.IP + " for certs is not valid")

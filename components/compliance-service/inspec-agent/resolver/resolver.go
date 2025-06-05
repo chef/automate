@@ -698,8 +698,8 @@ func (r *Resolver) resolveDynamicJob(ctx context.Context, job *jobs.Job) ([]*typ
 			agentJobs, err = r.handleManuallyManagedNodes(ctx, m.Manager, m.Filters, job)
 		default:
 			strErr := "resolveDynamicJob unable to resolve node manager type: " + managerType
-			logrus.Debugf(strErr)
-			return nil, fmt.Errorf(strErr)
+			logrus.Debug(strErr)
+			return nil, fmt.Errorf("%s", strErr)
 		}
 		if err != nil {
 			return nil, err

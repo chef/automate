@@ -83,7 +83,7 @@ func (a *AuthzServer) IntrospectSome(
 	ctx context.Context, gwReq *gwAuthzReq.IntrospectSomeReq) (*gwAuthzRes.IntrospectResp, error) {
 
 	log := ctxlogrus.Extract(ctx)
-	log.Debugf("Requested paths: " + strings.Join(gwReq.Paths, ", "))
+	log.Debug("Requested paths: " + strings.Join(gwReq.Paths, ", "))
 
 	methodsInfo := policy.GetInfoMap()
 
@@ -180,7 +180,7 @@ func logResult(log *logrus.Entry, endpointMap map[string]*gwAuthzRes.MethodsAllo
 		}
 		i++
 	}
-	log.Debugf("Allowed paths: " + strings.Join(paths, ", "))
+	log.Debug("Allowed paths: " + strings.Join(paths, ", "))
 }
 
 func logEndpoints(log *logrus.Entry, querySet map[string]pairs.Info) {
@@ -194,7 +194,7 @@ func logEndpoints(log *logrus.Entry, querySet map[string]pairs.Info) {
 		endpoints[i] = k
 		i++
 	}
-	log.Debugf("Endpoints to process: " + strings.Join(endpoints, ", "))
+	log.Debug("Endpoints to process: " + strings.Join(endpoints, ", "))
 }
 
 func getSelectedSubset(log *logrus.Entry, paths []string, methodsInfo map[string]pairs.Info) map[string]pairs.Info {

@@ -159,7 +159,7 @@ func (srv *Server) Read(ctx context.Context, in *jobs.Id) (*jobs.Job, error) {
 func (srv *Server) Update(ctx context.Context, in *jobs.Job) (*pb.Empty, error) {
 	logrus.Debugf("Update job with id: %+v", in)
 	if in.Recurrence == "" && in.ParentId != "" {
-		err := &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid job. Child jobs may not be updated. If you wish to update the parent job, please find job: " + in.ParentId)}
+		err := &errorutils.InvalidError{Msg: fmt.Sprint("Invalid job. Child jobs may not be updated. If you wish to update the parent job, please find job: " + in.ParentId)}
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 

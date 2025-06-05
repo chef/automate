@@ -74,7 +74,7 @@ func (em *EnableMaintenanceInspection) showTurningOn() {
 }
 
 func (em *EnableMaintenanceInspection) showSuccess() {
-	em.spinner.FinalMSG = "\n " + fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned ON successfully\n")
+	em.spinner.FinalMSG = "\n " + fmt.Sprint(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned ON successfully\n")
 	em.spinner.Stop()
 	em.writer.Println("")
 }

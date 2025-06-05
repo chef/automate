@@ -261,7 +261,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 
 func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserver.Server, migrationLabel string) error {
 	myName := fmt.Sprintf("migrate (%s)", migrationLabel)
-	logrus.Debugf(myName)
+	logrus.Debug(myName)
 	defer util.TimeTrack(time.Now(), fmt.Sprintf(" %s reindex indices", myName))
 
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post feeds migration cleanup...")
@@ -719,7 +719,7 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 					if esInSpecReports[reportId] != nil {
 						dstSum, err := convertA2v2SummaryDocToLatest(&esInSpecSummary)
 						if err != nil {
-							logrus.Errorf(err.Error())
+							logrus.Error(err.Error())
 							// Only log errors and avoid migrating incomplete reports
 							continue
 						}
@@ -729,7 +729,7 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 
 						dstRep, err := convertA2v2ReportDocToLatest(esInSpecReports[hit.Id], dstSum)
 						if err != nil {
-							logrus.Errorf(err.Error())
+							logrus.Error(err.Error())
 							// Only log errors and avoid migrating incomplete reports
 							continue
 						}
