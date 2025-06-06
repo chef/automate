@@ -68,7 +68,7 @@ func (chefAction ChefAction) FinishProcessing(err error) {
 // the message got started until 'Now()'
 //
 // Useful to check the time that messages take to go through the pipeline
-func (chefAction *ChefAction) ClockProcessingTime() int64 {
+func (chefAction ChefAction) ClockProcessingTime() int64 {
 	var (
 		t       = time.Now()
 		elapsed = t.Sub(chefAction.QueueTime)

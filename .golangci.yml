@@ -28,22 +28,17 @@ linters:
     - gocognit
     - goconst
     - godot
-    - goerr113
+    - err113
     - goimports
-    - gomnd
     - goprintffuncname
-    - maligned
     - megacheck
     - nestif
     - nolintlint
-    - interfacer
-    - golint
-    - gas
+    - gosec
     - gochecknoglobals
     - gochecknoinits
     - gocritic
     - rowserrcheck # too many false positives as of Feb 2021
-    - scopelint
     - stylecheck
     - unparam
     - lll
@@ -58,10 +53,8 @@ linters:
     - cyclop
     - errorlint
     - exhaustive
-    - exhaustivestruct
     - forcetypeassert
     - nlreturn
-    - nosnakecase
     - tagliatelle
     - varnamelen
     - wrapcheck
