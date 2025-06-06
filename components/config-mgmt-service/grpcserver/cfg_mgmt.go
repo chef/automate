@@ -74,10 +74,10 @@ func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context,
 	policyCookbooks, err := s.pg.GetPolicyCookbooks(request.GetRevisionId())
 	if err != nil {
 		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.PolicyCookbooksNotFound {
-			return &pcProto, status.Errorf(codes.NotFound, err.Error())
+			return &pcProto, status.Error(codes.NotFound, err.Error())
 		}
 
-		return &pcProto, status.Errorf(codes.Internal, err.Error())
+		return &pcProto, status.Error(codes.Internal, err.Error())
 	}
 	clProtoList := make([]*response.CookbookLock, len(policyCookbooks.CookbookLocks))
 
@@ -277,7 +277,7 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
 	if err != nil {
-		return runsCounts, status.Errorf(codes.Internal, err.Error())
+		return runsCounts, status.Error(codes.Internal, err.Error())
 	}
 
 	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
@@ -328,12 +328,12 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 			"request": request.String(),
 			"func":    nameOfFunc(),
 		}).Error("Unable to determine index of last ccr")
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	// Start the async request for the run's associated node
@@ -342,25 +342,25 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 	run, err := s.client.GetRun(request.GetRunId(), endTime)
 	if err != nil {
 		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.RunNotFound {
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	// If the requested NodeID does not match the run's associated node's ID.
 	if run.EntityUuid != request.NodeId {
-		return nil, status.Errorf(codes.NotFound, "Invalid ID")
+		return nil, status.Error(codes.NotFound, "Invalid ID")
 	}
 
 	// Wait for the request for the run's associated node
 	getNodes := <-nodesAsync
 	if getNodes.err != nil {
-		return nil, status.Errorf(codes.Internal, getNodes.err.Error())
+		return nil, status.Error(codes.Internal, getNodes.err.Error())
 	}
 
 	// Either the user does not have permissions or the node does not exist
 	if len(getNodes.nodes) == 0 {
-		return nil, status.Errorf(codes.NotFound, "Invalid ID")
+		return nil, status.Error(codes.NotFound, "Invalid ID")
 	}
 
 	return toResponseRun(run, getNodes.nodes[0])
@@ -427,12 +427,12 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 	filters, err := stringutils.FormatFiltersWithKeyConverter(adjustedFilter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
-		return nil, errors.GrpcErrorf(codes.Internal, err.Error())
+		return nil, errors.GrpcError(codes.Internal, err.Error())
 	}
 
 	suggestions, err := s.client.GetSuggestions(

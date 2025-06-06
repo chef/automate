@@ -41,14 +41,14 @@ func ChefRunDateInfo(in <-chan message.ChefRun, client backend.Client, out chan<
 		for err := range errc {
 			if err != nil {
 				if megaErr != nil {
-					megaErr = fmt.Errorf(err.Error() + " " + megaErr.Error())
+					megaErr = fmt.Errorf("%s", err.Error()+" "+megaErr.Error())
 				} else {
 					megaErr = err
 				}
 			}
 		}
 		if megaErr != nil {
-			msg.FinishProcessing(status.Errorf(codes.Internal, megaErr.Error()))
+			msg.FinishProcessing(status.Error(codes.Internal, megaErr.Error()))
 		} else {
 			out <- msg
 		}

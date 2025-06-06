@@ -414,7 +414,7 @@ func (srv *Server) GetReportListForReportManager(filters *reporting.ListFilters,
 			errString = fmt.Sprintf("%s.\n failed to retrieve report %d/%d with ID %s . Error: %s", errString, key, total, value.reportID, value.err.Error())
 		}
 		//return responseID, fmt.Errorf(errString)
-		return status.Errorf(codes.Internal, errString)
+		return status.Error(codes.Internal, errString)
 	}
 
 	for idx := total - 1; idx >= 0; idx-- {
@@ -552,7 +552,7 @@ func getExportHandler(format string, stream reporting.ReportingService_ExportSer
 	case "csv":
 		return csvExport(stream), nil
 	default:
-		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(format+" export is not supported"))
+		return nil, status.Error(codes.Unauthenticated, fmt.Sprint(format+" export is not supported"))
 	}
 }
 

@@ -89,12 +89,12 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	nodeFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	nodeFilters, err = filterByProjects(ctx, nodeFilters)
 	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	// Adding the exists = true filter to the list of filters, because nodes
@@ -109,7 +109,7 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	for {
 		nodes, err := nodePager()
 		if err != nil {
-			return status.Errorf(codes.Internal, err.Error())
+			return status.Error(codes.Internal, err.Error())
 		}
 
 		err = sendResult(nodes)

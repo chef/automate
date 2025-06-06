@@ -202,8 +202,8 @@ func (db *DB) handleIncomingLastContactData(node *manager.NodeMetadata) (lastCon
 
 	if node.GetScanData() == nil && node.GetRunData() == nil {
 		msg := "invalid request: scan_data or run_data must be provided"
-		logrus.Errorf(msg)
-		return lastContactInfo, fmt.Errorf(msg)
+		logrus.Error(msg)
+		return lastContactInfo, fmt.Errorf("%s", msg)
 	}
 
 	if node.GetScanData() != nil {

@@ -283,7 +283,7 @@ func runScriptOnRemoteNode(sshUtil SSHUtil, remoteIp []string, scriptCommands st
 		}
 		// Adding this if condition, because RateLimit Config is shared between centralized logging and systemd. Otherwise it's Printing twice
 		if print {
-			writer.Printf(output)
+			writer.Print(output)
 			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
 		}
 

@@ -297,17 +297,18 @@ func stringArrayToInterfaceArray(array []string) []interface{} {
 // the provided start time and end time.
 //
 // Example of the generated elasticsearch query:
-// {
-//     "query": {
-//         "range" : {
-//             "start_time" : {
-//                 "gte": "2017-09-01-07:58:06", // start
-//                 "lte": "2017-09-01-07:58:08", // end
-//                 "format": "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss"
-//             }
-//         }
-//     }
-// }
+//
+//	{
+//	    "query": {
+//	        "range" : {
+//	            "start_time" : {
+//	                "gte": "2017-09-01-07:58:06", // start
+//	                "lte": "2017-09-01-07:58:08", // end
+//	                "format": "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss"
+//	            }
+//	        }
+//	    }
+//	}
 func newRangeQuery(start string, end string, fieldTime string) (*olivere.RangeQuery, bool) {
 	var ok = false
 
@@ -427,7 +428,7 @@ func (efs ElasticFeedStore) getAggregationBucket(boolQuery *olivere.BoolQuery, i
 	return statusCounts.Buckets, nil
 }
 
-func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
+func (efs ElasticFeedStore) indexExists(name string) (bool, error) {
 	// if feed index doesn't exist yet, return false
 	exists, err := efs.client.IndexExists(name).Do(context.Background())
 	if err != nil {
@@ -447,52 +448,54 @@ func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
 // This can be fixed by setting the time zone. The bucket will start at the
 // beginning of the day in that timezone.
 // The Elastic Search request
-// {
-//   "aggregations": {
-//     "dateHisto": {
-//       "aggregations": {
-//         "items": {
-//           "terms": {
-//             "field": "entity_type"
-//           }
-//         }
-//       },
-//       "date_histogram": {
-//         "extended_bounds": {
-//           "max": "2018-01-26T23:59:59-08:00",
-//           "min": "2018-01-20T00:00:00-08:00"
-//         },
-//         "field": "recorded_at",
-//         "format": "yyyy-MM-dd'T'HH:mm:ssZ",
-//         "interval": "3h",
-//         "min_doc_count": 0,
-//         "time_zone": "-08:00"
-//       }
-//     }
-//   },
-//   "query": {
-//     "bool": {
-//       "must": [
-//         {
-//           "term": {
-//             "task": "delete"
-//           }
-//         },
-//         {
-//           "range": {
-//             "recorded_at": {
-//               "format": "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ",
-//               "from": "2018-01-20T00:00:00-08:00",
-//               "include_lower": true,
-//               "include_upper": true,
-//               "to": "2018-01-26T23:59:59-08:00"
-//             }
-//           }
-//         }
-//       ]
-//     }
-//   }
-// }
+//
+//	{
+//	  "aggregations": {
+//	    "dateHisto": {
+//	      "aggregations": {
+//	        "items": {
+//	          "terms": {
+//	            "field": "entity_type"
+//	          }
+//	        }
+//	      },
+//	      "date_histogram": {
+//	        "extended_bounds": {
+//	          "max": "2018-01-26T23:59:59-08:00",
+//	          "min": "2018-01-20T00:00:00-08:00"
+//	        },
+//	        "field": "recorded_at",
+//	        "format": "yyyy-MM-dd'T'HH:mm:ssZ",
+//	        "interval": "3h",
+//	        "min_doc_count": 0,
+//	        "time_zone": "-08:00"
+//	      }
+//	    }
+//	  },
+//	  "query": {
+//	    "bool": {
+//	      "must": [
+//	        {
+//	          "term": {
+//	            "task": "delete"
+//	          }
+//	        },
+//	        {
+//	          "range": {
+//	            "recorded_at": {
+//	              "format": "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ",
+//	              "from": "2018-01-20T00:00:00-08:00",
+//	              "include_lower": true,
+//	              "include_upper": true,
+//	              "to": "2018-01-26T23:59:59-08:00"
+//	            }
+//	          }
+//	        }
+//	      ]
+//	    }
+//	  }
+//	}
+//
 // interval - 24 must be divisible by this number
 // For example 1, 2, 3, 4, 6, 8, 12, and 24 are valid. Where
 // 5, 7, 9, 10, 11, and 13 are not valid values.

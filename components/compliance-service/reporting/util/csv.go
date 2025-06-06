@@ -51,7 +51,7 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 		for _, control := range profile.Controls {
 			timestamp, err := ptypes.Timestamp(report.EndTime)
 			if err != nil {
-				logrus.Errorf(err.Error())
+				logrus.Error(err.Error())
 				timestamp = time.Time{}
 			}
 			waived := false

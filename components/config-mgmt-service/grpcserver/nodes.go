@@ -35,13 +35,13 @@ func (s *CfgMgmtServer) GetRuns(
 	}).Debug("rpc call")
 
 	if request.GetNodeId() == "" {
-		return runs, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
+		return runs, status.Error(codes.InvalidArgument, "Parameter 'node_id' not provided")
 	}
 
 	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeRunBackend)
 	if err != nil {
-		return runs, status.Errorf(codes.InvalidArgument, err.Error())
+		return runs, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	// Pagination
@@ -49,12 +49,12 @@ func (s *CfgMgmtServer) GetRuns(
 
 	// Date Range
 	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) && !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
-		return runs, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
+		return runs, status.Error(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
 	if err != nil {
-		return runs, status.Errorf(codes.Internal, err.Error())
+		return runs, status.Error(codes.Internal, err.Error())
 	}
 
 	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
@@ -68,7 +68,7 @@ func (s *CfgMgmtServer) GetRuns(
 		request.GetEnd(),
 	)
 	if err != nil {
-		return runs, status.Errorf(codes.Internal, err.Error())
+		return runs, status.Error(codes.Internal, err.Error())
 	}
 
 	if len(bRuns) == 0 {
@@ -107,22 +107,22 @@ func (s *CfgMgmtServer) GetInventoryNodes(ctx context.Context,
 	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
-		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.InvalidArgument, err.Error())
+		return &interserviceResp.InventoryNodes{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	start, err := ToTime(request.Start)
 	if err != nil {
-		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.InvalidArgument, err.Error())
+		return &interserviceResp.InventoryNodes{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	end, err := ToTime(request.End)
 	if err != nil {
-		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.InvalidArgument, err.Error())
+		return &interserviceResp.InventoryNodes{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	cursorDate, err := ToTime(request.CursorDate)
 	if err != nil {
-		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.InvalidArgument, err.Error())
+		return &interserviceResp.InventoryNodes{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	// Sorting
@@ -131,7 +131,7 @@ func (s *CfgMgmtServer) GetInventoryNodes(ctx context.Context,
 	bNodes, err := s.client.GetInventoryNodes(ctx, start, end,
 		filters, cursorDate, request.CursorId, pageSize, sortField, sortAsc)
 	if err != nil {
-		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.Internal, err.Error())
+		return &interserviceResp.InventoryNodes{}, status.Error(codes.Internal, err.Error())
 	}
 
 	inventoryNodeCollection := backendNodeArrayToInventoryNodeArray(bNodes)
@@ -154,7 +154,7 @@ func (s *CfgMgmtServer) GetNodes(
 	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
-		return nodes, status.Errorf(codes.InvalidArgument, err.Error())
+		return nodes, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	// Date Range
@@ -165,7 +165,7 @@ func (s *CfgMgmtServer) GetNodes(
 
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
-		return nodes, status.Errorf(codes.Internal, err.Error())
+		return nodes, status.Error(codes.Internal, err.Error())
 	}
 
 	// Pagination
@@ -181,26 +181,26 @@ func (s *CfgMgmtServer) GetNodes(
 	)
 
 	if err != nil {
-		return nodes, status.Errorf(codes.Internal, err.Error())
+		return nodes, status.Error(codes.Internal, err.Error())
 	}
 
 	if len(bNodes) > 0 {
 		oldestConvergeIndexDate, indicesExists, err := s.client.GetDateOfOldestConvergeIndices()
 		if err != nil {
-			return nodes, status.Errorf(codes.Internal, err.Error())
+			return nodes, status.Error(codes.Internal, err.Error())
 		}
 
 		msgArray := backendNodeArrayToMessageArray(bNodes, oldestConvergeIndexDate, indicesExists)
 		err = messageArrayToListValue(msgArray, nodes)
 		if err != nil {
-			return nodes, status.Errorf(codes.Internal, err.Error())
+			return nodes, status.Error(codes.Internal, err.Error())
 		}
 	}
 
 	return nodes, nil
 }
 
-//GetAttributes get node attributes
+// GetAttributes get node attributes
 func (s *CfgMgmtServer) GetAttributes(
 	ctx context.Context,
 	request *pRequest.Node) (*interserviceResp.NodeAttribute, error) {
@@ -217,7 +217,7 @@ func (s *CfgMgmtServer) GetAttributes(
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
 	if err != nil {
-		return &interserviceResp.NodeAttribute{}, status.Errorf(codes.Internal, err.Error())
+		return &interserviceResp.NodeAttribute{}, status.Error(codes.Internal, err.Error())
 	}
 
 	// Async check if the node exits with project filters
@@ -230,7 +230,7 @@ func (s *CfgMgmtServer) GetAttributes(
 				"No node attributes for given Node ID")
 		}
 
-		return &interserviceResp.NodeAttribute{}, status.Errorf(codes.Internal, err.Error())
+		return &interserviceResp.NodeAttribute{}, status.Error(codes.Internal, err.Error())
 	}
 
 	nodeExists := <-nodeExistsChan
@@ -270,7 +270,7 @@ func (s *CfgMgmtServer) GetMissingNodeDurationCounts(
 
 	countedDurations, err := s.client.GetMissingNodeDurationCounts(request.Durations)
 	if err != nil {
-		return &interserviceResp.MissingNodeDurationCounts{}, status.Errorf(codes.Internal, err.Error())
+		return &interserviceResp.MissingNodeDurationCounts{}, status.Error(codes.Internal, err.Error())
 	}
 
 	responseCountedDurations := make([]*interserviceResp.CountedDuration, len(countedDurations))
@@ -478,12 +478,12 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*ext
 	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	if _, filterRequested := filters["status"]; filterRequested {
