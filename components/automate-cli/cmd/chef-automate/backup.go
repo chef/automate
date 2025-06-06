@@ -57,6 +57,7 @@ const (
 			echo ".skip_migration file does not exist"
 		fi
 		`
+	OS_SNAPSHOT_URL = "http://localhost:10144/_snapshot?pretty"
 )
 
 type BackupFromBashtion interface {
@@ -70,15 +71,16 @@ var backupCmdFlags = struct {
 	noProgress     bool
 	requestTimeout int64
 
-	baseBackupDir  string
-	channel        string
-	overrideOrigin string
-	hartifactsPath string
-	upgrade        bool
-	skipPreflight  bool
-	skipBootstrap  bool
-	airgap         string
-	yes            bool
+	baseBackupDir       string
+	channel             string
+	overrideOrigin      string
+	hartifactsPath      string
+	upgrade             bool
+	skipPreflight       bool
+	skipBootstrap       bool
+	airgap              string
+	yes                 bool
+	verifyRestoreConfig bool
 
 	createWaitTimeout    int64
 	listWaitTimeout      int64
@@ -101,6 +103,28 @@ var backupCmdFlags = struct {
 	patchConfigPath string
 	setConfigPath   string
 }{}
+
+type osSnapshot struct {
+	Es6Compliance *caXservice `json:"chef-automate-es6-compliance-service"`
+	Es6Erchef     *caXservice `json:"chef-automate-es6-automate-cs-oc-erchef"`
+	Es6EventFeed  *caXservice `json:"chef-automate-es6-event-feed-service"`
+	Es6Ingest     *caXservice `json:"chef-automate-es6-ingest-service"`
+	Es5Compliance *caXservice `json:"chef-automate-es5-compliance-service"`
+	Es5Erchef     *caXservice `json:"chef-automate-es5-automate-cs-oc-erchef"`
+	Es5EventFeed  *caXservice `json:"chef-automate-es5-event-feed-service"`
+	Es5Ingest     *caXservice `json:"chef-automate-es5-ingest-service"`
+}
+
+type caXservice struct {
+	Type     string    `json:"type"`
+	Settings *settings `json:"settings"`
+}
+
+type settings struct {
+	Location string `json:"location"`
+	BasePath string `json:"base_path"`
+	Bucket   string `json:"bucket"`
+}
 
 func init() {
 	integrityBackupCmd.AddCommand(integrityBackupValidateCmd)
@@ -151,6 +175,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.setConfigPath, "set-config", "", "Path to set config if required")
+	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.verifyRestoreConfig, "verify-restore-config", "", false, "Verifies automate and opensearch configs when restoring a backup")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
 	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
@@ -342,6 +367,28 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 		os.Exit(0)
 	}
 	if strings.Contains(cmd.CommandPath(), "restore") {
+		if isA2HARBFileExist() {
+			var allowRestore bool
+			var er error
+			if backupCmdFlags.verifyRestoreConfig {
+				sshConfig := &SSHConfig{
+					sshUser:    infra.Outputs.SSHUser.Value,
+					sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+					sshPort:    infra.Outputs.SSHPort.Value,
+				}
+				sshUtil := NewSSHUtil(sshConfig)
+				pullConfig := NewPullConfigs(infra, sshUtil)
+				allowRestore, er = compareBackupPaths(infra, sshUtil, pullConfig)
+				if er != nil {
+					return er
+				}
+				if !allowRestore {
+					return errors.New("There is discrepancy in the config paths. Restore operation will fail. Please correct the backup paths before proceeding to restore the backup")
+				}
+				fmt.Println("Configuration looks good. Please proceed to restore the backup without passing --verify-restore-config")
+				return nil
+			}
+		}
 		if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
 			yes, err := writer.Confirm(strings.TrimSpace(a2AlreadyDeployedMessage))
 			if err != nil {
@@ -1463,4 +1510,248 @@ func cleanUpRestoreTask(isSkipMigrationFileExist bool) {
 			return
 		}
 	}
+}
+func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConfig PullConfigs) (bool, error) {
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	if automateIps == nil || len(automateIps) < 1 {
+		return false, errors.New("Automate private IPs are empty")
+	}
+	sshUtil.getSSHConfig().hostIP = automateIps[0]
+
+	a2ConfigMap, _, err := pullConfig.pullAutomateConfigs(false)
+	if err != nil {
+		return false, err
+	}
+	if len(a2ConfigMap) == 0 {
+		return false, errors.New("no automate configs found")
+	}
+
+	backupType, backupLocation, err := determineBkpConfig(a2ConfigMap, "", "objectStorage", "fileStorage")
+	logrus.Debugf("Backuptype: %s and BackupLocation: %s", backupType, backupLocation)
+	if err != nil {
+		return false, err
+	}
+
+	automateBackupPath, err := pullConfig.getBackupPathFromAutomateConfig(a2ConfigMap, backupLocation)
+	if err != nil {
+		return false, err
+	}
+	logrus.Debugf("Backup path set for opensearch settings in automate config: %s", automateBackupPath)
+
+	snapshotServiceBackupPath, allowRestore, err := compareSnapshotLocationOfServices(backupLocation, sshUtil)
+	if err != nil {
+		return false, err
+	}
+	if !allowRestore {
+		return false, errors.New("there is discrepancy in indices of snapshot locations of services. Indices of all snapshots should be the same. ")
+	}
+	logrus.Debugf("SnapshotServiceBackupPath: %s", snapshotServiceBackupPath)
+
+	if backupType == "fileStorage" {
+		osPath, err := pullConfig.getBackupPathFromOpensearchConfig()
+		if err != nil {
+			return false, err
+		}
+		logrus.Debugf("Path set in opensearch config: %s", osPath)
+
+		if automateBackupPath != osPath {
+			err := fmt.Errorf("there is discrepancy in the backup paths. All backup paths should point to the same location. Backup path configured for opensearch settings in automate config: %s, path_repo configured in opensearch config: %s. Please check the paths listed and ensure to configure all backup paths to point to the same destination. ", automateBackupPath, osPath)
+			return false, err
+		}
+	}
+	if snapshotServiceBackupPath == "" {
+		return true, nil
+	}
+	if automateBackupPath != snapshotServiceBackupPath {
+		err := fmt.Errorf("there is discrepancy in the backup paths. All backup paths should point to the same location. Backup path configured for opensearch settings in automate config: %s,  Path for indices of snapshot locations of services: %s. Please check the paths listed and ensure to configure all backup paths to point to the same destination. ", automateBackupPath, snapshotServiceBackupPath)
+		return false, err
+	}
+	return true, nil
+}
+
+func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (string, bool, error) {
+
+	var isEs5Service, isEs6Service, allowRestore bool
+	var snapshotEs5ServicePath, snapshotEs6ServicePath string
+	osSnapshot, err := getSnapshotLocationsOfServices(sshUtil)
+
+	if err != nil {
+		return "", false, err
+	}
+
+    es6SSIndices := []caXservice{}
+	if osSnapshot.Es6Compliance != nil {
+		es6SSIndices = append(es6SSIndices, *osSnapshot.Es6Compliance)
+	}
+	if osSnapshot.Es6Erchef != nil {	
+		es6SSIndices = append(es6SSIndices, *osSnapshot.Es6Erchef)
+	}
+	if osSnapshot.Es6EventFeed != nil {
+		es6SSIndices = append(es6SSIndices, *osSnapshot.Es6EventFeed)
+	}
+	if osSnapshot.Es6Ingest != nil {
+		es6SSIndices = append(es6SSIndices, *osSnapshot.Es6Ingest)
+	}
+
+	es5SSIndices := []caXservice{}
+	if osSnapshot.Es5Compliance != nil {
+		es5SSIndices = append(es5SSIndices, *osSnapshot.Es5Compliance)
+	}
+	if osSnapshot.Es5Erchef != nil {	
+		es5SSIndices = append(es5SSIndices, *osSnapshot.Es5Erchef)
+	}
+	if osSnapshot.Es5EventFeed != nil {
+		es5SSIndices = append(es5SSIndices, *osSnapshot.Es5EventFeed)
+	}
+	if osSnapshot.Es5Ingest != nil {
+		es5SSIndices = append(es5SSIndices, *osSnapshot.Es5Ingest)
+	}
+
+	if len(es6SSIndices) > 0 {
+		isEs6Service = true
+	} else {
+		isEs6Service = false
+	}
+
+	if len(es5SSIndices) > 0 {
+		isEs5Service = true
+	} else {
+		isEs5Service = false
+	}
+
+	if !isEs5Service && !isEs6Service {
+		logrus.Debug("no snapshots found in the cluster")
+		allowRestore = true
+		return "", allowRestore, nil
+	} else {
+		
+		if isEs6Service {
+			isBackupTypeProper, err := compareBackupTypesOfIndices(es6SSIndices, backupLocation)
+				if err != nil {
+					return "", false, err
+				}
+			if isBackupTypeProper {		
+				snapshotEs6ServicePath, allowRestore, err = compareSnapshotPathofIndices(es6SSIndices, backupLocation)
+				if err != nil {
+					return "", false, err
+				}
+			}
+		}
+		if isEs5Service {
+			isBackupTypeProper, err := compareBackupTypesOfIndices(es5SSIndices, backupLocation)
+			if err != nil {
+				return "", false, err
+			}
+			if isBackupTypeProper {		
+				snapshotEs5ServicePath, allowRestore, err = compareSnapshotPathofIndices(es5SSIndices, backupLocation)
+				if err != nil {
+					return "", false, err
+				}
+			}
+		}
+		logrus.Debugf("isEs5Service: %t, isEs6Service: %t, snapshotEs5ServicePath: %s,  snapshotEs6ServicePath: %s",
+			isEs5Service, isEs6Service, snapshotEs5ServicePath, snapshotEs6ServicePath)
+
+		if snapshotEs5ServicePath == snapshotEs6ServicePath {
+			allowRestore = true
+			return snapshotEs6ServicePath, allowRestore, nil
+		}
+		logrus.Debugf("Response from compareSnapshotLocationOfServices. allowRestore flag: %t, isEs5Service flag: %t, isEs6Service: %t, snapshotEs5ServicePath: %s,  snapshotEs6ServicePath: %s",
+			allowRestore, isEs5Service, isEs6Service, snapshotEs5ServicePath, snapshotEs6ServicePath)
+
+		if isEs5Service && isEs6Service && snapshotEs5ServicePath == snapshotEs6ServicePath {
+			return snapshotEs6ServicePath, allowRestore, nil
+		} else if isEs6Service && !isEs5Service {
+			return snapshotEs6ServicePath, allowRestore, nil
+		} else {
+			return snapshotEs5ServicePath, allowRestore, nil
+		}
+	}
+}
+
+func getSnapshotLocationsOfServices(sshUtil SSHUtil) (*osSnapshot, error) {
+
+	// Execute curl command for OS snapshots on Automate server
+	resp, err := sshUtil.connectAndExecuteCommandOnRemote(fmt.Sprintf("curl -s %s", OS_SNAPSHOT_URL), false)
+	if err != nil {
+		return nil, err
+	}
+
+	logrus.Debug("response from curl for snapshot locations of services: ")
+	logrus.Debug(resp)
+
+	logrus.Debug("Unmarshalling GET response...")
+	var oss osSnapshot
+	err = json.Unmarshal([]byte(resp), &oss)
+	if err != nil {
+		return nil, err
+	}
+	return &oss, nil
+}
+
+func getSnapshotPathDetails(snapshotPath string) string {
+	parts := strings.Split(snapshotPath, "/automate-elasticsearch-data")
+	if len(parts) > 0 {
+		return parts[0]
+	}
+	return ""
+}
+
+func compareBackupTypesOfIndices(snapshotIndices []caXservice, backupLocation string) (bool, error) {
+	for _, snapshotIndice := range snapshotIndices {
+		if snapshotIndice.Type != backupLocation {
+			return false, getErrorForIncorrectBackupType(backupLocation)
+		}
+	}
+	return true, nil
+}
+
+func getErrorForIncorrectBackupType(backupLocation string, ) error {
+	var err error
+	if backupLocation == "fs" {
+		err = fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_file_system/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
+	} else if backupLocation == "s3" || backupLocation == "gcs" {
+		err = fmt.Errorf("discrepancy in the backup types. Backup type of all indices should be %s. Refer `https://docs.chef.io/automate/ha_backup_restore_object_storage/#troubleshooting` to do a clean up of the snapshot repo", backupLocation)
+	} else {
+		err = fmt.Errorf("not supported backup type: %s", backupLocation)
+	}
+	return err
+}
+
+func compareSnapshotPathofIndices(snapshotIndices []caXservice, backupLocation string) (string, bool, error) {
+	var allowRestore bool
+	var snapshotServicePath string
+	if backupLocation == "fs" {
+		snapshotServicePath = getSnapshotPathDetails(snapshotIndices[0].Settings.Location)
+		for _, snapshotIndice := range snapshotIndices {
+			if getSnapshotPathDetails(snapshotIndice.Settings.Location) != snapshotServicePath {
+				allowRestore = false
+				return "", false, getErrorForIncorrectSnapshotPath(backupLocation)
+			}
+		}
+	} else if backupLocation == "s3" || backupLocation == "gcs" {
+		snapshotServicePath = getSnapshotPathDetails(snapshotIndices[0].Settings.BasePath)
+		for _, snapshotIndice := range snapshotIndices {
+			if getSnapshotPathDetails(snapshotIndice.Settings.BasePath) != snapshotServicePath {
+				allowRestore = false
+				return "", false, getErrorForIncorrectSnapshotPath(backupLocation)
+			}
+		}
+	} else {
+		err := fmt.Errorf("not supported backup type: %s", backupLocation)
+		return "", false, err
+	}
+	return snapshotServicePath, allowRestore, nil
+}
+
+func getErrorForIncorrectSnapshotPath(backupLocation string) error {
+	var err error
+	if backupLocation == "fs" {
+		err = fmt.Errorf("discrepancy in the snapshot paths. Snapshot paths of all indices should be same. Refer `https://docs.chef.io/automate/ha_backup_restore_file_system/#troubleshooting` to do a clean up of the snapshot repo")
+	} else if backupLocation == "s3" || backupLocation == "gcs" {
+		err = fmt.Errorf("discrepancy in the snapshot paths. Snapshot paths of all indices should be same. Refer `https://docs.chef.io/automate/ha_backup_restore_object_storage/#troubleshooting` to do a clean up of the snapshot repo")
+	} else {
+		err = fmt.Errorf("not supported backup type: %s", backupLocation)
+	}
+	return err
 }
