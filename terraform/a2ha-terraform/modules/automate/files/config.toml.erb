@@ -3,7 +3,7 @@
 
 [global.v1]
   fqdn = "<%= overrides[:automate_fqdn] %>"
-
+  
   [global.v1.external.opensearch]
 <% if overrides[:setup_managed_services] == true && overrides[:setup_self_managed_services] == false-%>
   enable = true
@@ -2738,6 +2738,9 @@ rM2p0kk=
 <% else %>
   [auth_n.v1.sys.service]
     a1_data_collector_token = "<%= overrides[:automate_dc_token] %>"
+  [global.v1.external.automate.ssl]
+    server_name = "<%= overrides[:automate_fqdn] %>"
+    root_cert = """<%= tls_cert %>"""
 <% end %>
 
 # Deployment service configuration.
@@ -2774,6 +2777,9 @@ rM2p0kk=
     cert = """<%= tls_cert %>"""
     key = """<%= tls_key %>"""
 <% end %>
+
+[cs_nginx.v1.sys.ngx.http]
+  ssl_verify_depth = 5 
 
 <% if overrides[:teams_port] != 10128 %>
 [teams.v1.sys.service]
