@@ -148,7 +148,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 		if err != nil {
 			_, ok := err.(*manifest.CannotParseError)
 			if ok {
-				return nil, status.Errorf(codes.InvalidArgument, err.Error())
+				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
 
 			return nil, err

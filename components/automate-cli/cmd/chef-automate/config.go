@@ -1099,7 +1099,7 @@ func setConfigForPostgresqlAndOpensearch(remoteService string, timestamp string,
 		return err
 	}
 
-	writer.Printf(output + "\n")
+	writer.Print(output + "\n")
 	printConfigSuccessMessage(setting, remoteService, sshUtil.getSSHConfig().hostIP, writer)
 
 	return nil

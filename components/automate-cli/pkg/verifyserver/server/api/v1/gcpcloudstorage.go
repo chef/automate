@@ -17,7 +17,7 @@ func (h *Handler) GetGCPCloudStorageConfig(c *fiber.Ctx) error {
 	gcpConfigRequest := new(models.GCPCloudStorageConfigRequest)
 	if err := c.BodyParser(&gcpConfigRequest); err != nil {
 		errString := fmt.Sprintf("GCP config request body parsing failed: %v", err.Error())
-		h.Logger.Error(fmt.Errorf(errString))
+		h.Logger.Error(fmt.Errorf("%s", errString))
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 

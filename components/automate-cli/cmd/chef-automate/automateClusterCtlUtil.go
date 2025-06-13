@@ -52,7 +52,7 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	c.Stderr = io.MultiWriter(&stderr)
 	err := c.Run()
 	if err != nil {
-		writer.Printf(stderr.String())
+		writer.Print(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, helpDocs)
 	}
 	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
@@ -116,7 +116,7 @@ func tailFile(logFilePath string, executed chan struct{}) {
 	time.Sleep(1 * time.Second)
 	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
 	if err != nil {
-		writer.Printf(err.Error())
+		writer.Print(err.Error())
 		return
 	}
 	var spinning bool = false

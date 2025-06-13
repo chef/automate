@@ -101,7 +101,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 	req *api.GetProjectReq) (*api.GetProjectResp, error) {
 	err := validate.RequiredID(req, "project")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	p, err := s.store.GetProject(ctx, req.Id)
@@ -125,7 +125,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
 	err := validate.RequiredName(req, "project")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
@@ -163,7 +163,7 @@ func (s *ProjectState) UpdateProject(ctx context.Context,
 
 	err := validate.RequiredIDandName(req, "project")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
@@ -352,7 +352,7 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 
 	err := validate.RequiredID(req, "project")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err = s.validateProjectDelete(ctx, req.Id)
@@ -467,11 +467,11 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
 	err := validate.RequiredID(req, "rule")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	err = confirmRequiredProjectID(req.ProjectId, "rule")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.ProjectId, req.Id)
@@ -528,7 +528,7 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
 	err := validate.RequiredID(req, "project")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	resp, statusResp, err := s.store.ListRulesForProject(ctx, req.Id)
@@ -564,11 +564,11 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
 	err := validate.RequiredID(req, "rule")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	err = confirmRequiredProjectID(req.ProjectId, "rule")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err = s.store.DeleteRule(ctx, req.ProjectId, req.Id)

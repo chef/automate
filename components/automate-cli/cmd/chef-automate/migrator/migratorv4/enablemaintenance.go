@@ -52,7 +52,7 @@ func (em *EnableMaintenance) showTurningOn() {
 }
 
 func (em *EnableMaintenance) showSuccess() {
-	em.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned ON successfully")
+	em.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + fmt.Sprint(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned ON successfully")
 	em.spinner.Stop()
 	em.writer.Println("")
 }
@@ -71,7 +71,7 @@ func (em *EnableMaintenance) showTurningOff() {
 }
 
 func (em *EnableMaintenance) showOffSuccess() {
-	em.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned OFF successfully")
+	em.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + fmt.Sprint(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned OFF successfully")
 	em.spinner.Stop()
 	em.writer.Println("")
 }

@@ -42,7 +42,7 @@ func (depth *ControlDepth) getTrendResults(trendType string,
 		for _, wrappedTrendBucket := range trendBucketsAggResult.Buckets {
 			endTimeAsTime, err := time.Parse(time.RFC3339, *wrappedTrendBucket.KeyAsString)
 			if err != nil {
-				logrus.Errorf(fmt.Sprintf("%s - could not parse time", myName))
+				logrus.Error(fmt.Sprintf("%s - could not parse time", myName))
 				return mapOfTrends, err
 			}
 

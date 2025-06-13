@@ -304,8 +304,8 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 	return profile, errorutils.ProcessNotFound(nil, profile.Name)
 }
 
-//GetProfileSummaryByProfileId across nodes - report 8 - top
-//this is the summary that appears at the top of the page when you select a profile from profiles list at the moment
+// GetProfileSummaryByProfileId across nodes - report 8 - top
+// this is the summary that appears at the top of the page when you select a profile from profiles list at the moment
 // this one does not immediately need to be deep aware as the only things that are used from it in a2 api are version, maintainer and license
 // todo - deep filtering - this should be made depth aware as this still needs to be consumed by api users
 // todo - do we need to handle waiver info in here too?
@@ -565,7 +565,7 @@ func (backend *ES2Backend) getControlsMetadata(profileId string) (map[string]Con
 }
 
 // TODO: header with amount of results
-//GetAllProfilesFromNodes - list all of the profiles from scan data
+// GetAllProfilesFromNodes - list all of the profiles from scan data
 func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filters map[string][]string, sort_field string,
 	sort_asc bool) ([]*reportingapi.ProfileMin, *reportingapi.ProfileCounts, error) {
 	myName := "GetAllProfilesFromNodes"
@@ -725,7 +725,7 @@ func computeStatus(failed int32, passed int32, skipped int32, waived int32) stri
 func (backend ES2Backend) StoreProfile(profile inspec.Profile) error {
 	// we reject storing a profile where the sha sum is missing
 	if profile.Sha256 == "" {
-		return fmt.Errorf("profile " + profile.Name + " does not include the required sha256 sum")
+		return fmt.Errorf("%s", "profile "+profile.Name+" does not include the required sha256 sum")
 	}
 
 	client, err := backend.ES2Client()

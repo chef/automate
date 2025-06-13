@@ -450,7 +450,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 			writer.Errorf("%v", err)
 			return err
 		}
-		writer.Printf(output + "\n")
+		writer.Print(output + "\n")
 	}
 	return nil
 }

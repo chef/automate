@@ -63,14 +63,14 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 		for err := range merge(errChannels...) {
 			if err != nil {
 				if megaErr != nil {
-					megaErr = fmt.Errorf(err.Error() + " " + megaErr.Error())
+					megaErr = fmt.Errorf("%s", err.Error()+" "+megaErr.Error())
 				} else {
 					megaErr = err
 				}
 			}
 		}
 		if megaErr != nil {
-			msg.FinishProcessingCompliance(status.Errorf(codes.Internal, megaErr.Error()))
+			msg.FinishProcessingCompliance(status.Error(codes.Internal, megaErr.Error()))
 		} else {
 			message.Propagate(out, &msg)
 		}

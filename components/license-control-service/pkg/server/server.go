@@ -167,7 +167,7 @@ func (s *LicenseControlServer) Update(ctx context.Context, req *lc.UpdateRequest
 		// modify the underlying license library to return
 		// typed errors.
 		// https://godoc.org/google.golang.org/grpc/codes
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	licensedPeriod := licensedPeriod(license)
@@ -187,7 +187,7 @@ func (s *LicenseControlServer) Update(ctx context.Context, req *lc.UpdateRequest
 			license.Id,
 			time.Unix(licensedPeriod.end.GetSeconds(), 0).UTC().Format(time.RFC3339))
 		logctx.Warn(msg)
-		return nil, status.Errorf(codes.InvalidArgument, msg)
+		return nil, status.Error(codes.InvalidArgument, msg)
 	}
 
 	logctx.Info("Applying license")

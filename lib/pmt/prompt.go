@@ -414,7 +414,7 @@ func (p *PromptImp) InputStringRegexErrMsg(label string, regexCheck string, errM
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			return fmt.Errorf(errMsg)
+			return fmt.Errorf("%s", errMsg)
 		}
 		return nil
 	}
@@ -437,7 +437,7 @@ func (p *PromptImp) InputStringRegexDefaultErrMsg(label string, regexCheck strin
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			return fmt.Errorf(errMsg)
+			return fmt.Errorf("%s", errMsg)
 		}
 		return nil
 	}
@@ -516,7 +516,7 @@ func (p *PromptImp) InputPasswordRegexErrMsg(label string, regexCheck string, er
 	validate := func(input string) error {
 		var check = regexp.MustCompile(regexCheck).MatchString
 		if !check(input) {
-			return fmt.Errorf(errMsg)
+			return fmt.Errorf("%s", errMsg)
 		}
 		return nil
 	}

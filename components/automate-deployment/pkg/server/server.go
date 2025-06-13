@@ -2029,7 +2029,7 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 
 	_, ok := err.(*manifest.NoSuchManifestError)
 	if ok {
-		return nil, status.Errorf(codes.NotFound, errors.Wrap(err, "No manifest for the specified version or channel could be found").Error())
+		return nil, status.Error(codes.NotFound, errors.Wrap(err, "No manifest for the specified version or channel could be found").Error())
 	}
 	if err != nil {
 		return nil, err

@@ -644,7 +644,7 @@ func TestSyncConfigToAllNodes(t *testing.T) {
 	})
 }
 
-func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
+func TestExecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 	t.Run("save config in bastion", func(t *testing.T) {
 
 		mnu := &MockNodeUtilsImpl{
@@ -800,7 +800,7 @@ func TestexecuteCmdInAllNodeTypesAndCaptureOutput(t *testing.T) {
 	})
 }
 
-func TestexecuteCmdInAllNodeTypesAndCaptureOutputToSaveConfigInBastionBeforeNodeModify(t *testing.T) {
+func TestExecuteCmdInAllNodeTypesAndCaptureOutputToSaveConfigInBastionBeforeNodeModify(t *testing.T) {
 
 	t.Run("save config in bastion", func(t *testing.T) {
 

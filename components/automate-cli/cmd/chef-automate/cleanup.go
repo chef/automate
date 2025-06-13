@@ -175,7 +175,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 				if len(appendString) > 0 {
 					err = executeCommand("/bin/sh", []string{"-c", appendString}, "")
 					if err != nil {
-						writer.Errorf(err.Error())
+						writer.Error(err.Error())
 						return err
 					}
 				}
