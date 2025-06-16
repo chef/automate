@@ -39,7 +39,7 @@ To make the service healthy, ensure the chef server can curl the data collector 
 ### Rate limiter ingestion issues on data collector endpoint
 
 ```bash
-Sep 24 22:33:20 rp000134186 hab: automate-gateway.default(O): time="2024-09-24T22:33:20-05:00" level=error 
+Sep 24 22:33:20 <SERVER> hab: automate-gateway.default(O): time="2024-09-24T22:33:20-05:00" level=error
 msg="resource=collector-requests cur=960 max=960: Resource limit exceeded" grpc_port=2001 hostname=127.0.0.1 https_port=2000 null_backend_socket=/hab/svc/automate-gateway/var/null_backend.sock
 ```
 
@@ -72,7 +72,7 @@ Reference: [Chef Automate Configuration](https://docs.chef.io/automate/configura
 ### Queue is full errors on data collector endpoint
 
 ```bash
-Sep 30 00:04:43 rp000134186 hab: ingest-service.default(O): time="2024-09-30T00:04:43-05:00" level=error msg="Chef run ingestion failure" 
+Sep 30 00:04:43 <SERVER> hab: ingest-service.default(O): time="2024-09-30T00:04:43-05:00" level=error msg="Chef run ingestion failure"
 error="Message rejected because queue is full"
 ```
 
@@ -122,7 +122,7 @@ The restore command fails when other users or services access the nodes' databas
 
 - Stop the services on all the frontend `chef-automate stop` .
 
-Stopping the service on all frontend node will able to drop the database while running the restore command. 
+Stopping the service on all frontend node will able to drop the database while running the restore command.
 
 ### Issue: Cached Artifact not found in Offline Mode
 
@@ -171,7 +171,7 @@ Ensure that the access key, secret key, and endpoints are correct. If you are us
 ```bash
 chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "https://s3.amazonaws.com"
 ```
-In the above command we need to update `--s3-access-key`, `--s3-secret-key` and `--s3-endpoint` 
+In the above command we need to update `--s3-access-key`, `--s3-secret-key` and `--s3-endpoint`
 
 ### Issue: HAB Access Error
 
@@ -229,7 +229,7 @@ UnknownError: Unable to determine error cause: Command did not exit gracefully.
 
 ### Issue: knife-ec-restore during migration: Failed to restore synchronous operations
 
-- While running the restore command, if you are getting this error in logs: 
+- While running the restore command, if you are getting this error in logs:
 `Failed to restore synchronous operations`
 follow either of the methods below.
 
