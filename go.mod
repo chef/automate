@@ -55,7 +55,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/crunchy v0.4.0
 	github.com/nats-io/nats-streaming-server v0.24.6
-	github.com/nats-io/nats.go v1.31.0
+	github.com/nats-io/nats.go v1.39.1
 	github.com/nats-io/stan.go v0.10.2
 	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.68.0
@@ -113,7 +113,7 @@ require (
 	github.com/hashicorp/go-version v1.7.0
 	github.com/prashantv/gostub v1.1.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
-	go.uber.org/automaxprocs v1.5.3
+	go.uber.org/automaxprocs v1.6.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241219192143-6b3ec007d9bb
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241219192143-6b3ec007d9bb
 )
@@ -193,7 +193,7 @@ require (
 	github.com/moby/term v0.5.0 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nats-io/jwt/v2 v2.5.8 // indirect
+	github.com/nats-io/jwt/v2 v2.7.3 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.22.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
@@ -233,7 +233,7 @@ require (
 	go.uber.org/zap/exp v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/time v0.6.0 // indirect
+	golang.org/x/time v0.10.0 // indirect
 	pluginrpc.com/pluginrpc v0.5.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
@@ -287,7 +287,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -301,8 +301,8 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/nats-io/nats-server/v2 v2.9.25
-	github.com/nats-io/nkeys v0.4.7 // indirect
+	github.com/nats-io/nats-server/v2 v2.10.27
+	github.com/nats-io/nkeys v0.4.10 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/peterh/liner v1.2.2 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
