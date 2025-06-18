@@ -302,6 +302,17 @@ chef-automate backup create
 
 ### Restore
 
+#### Pre-Restore Validation
+
+Run the restore command with the --verify-restore-config flag to validate the configuration settings before initiating the restore process.
+To perform the pre-check, run the following command from the bastion host:
+
+`chef-automate backup restore s3://bucket_name/path_to_backups/BACKUP_ID --verify-restore-config`
+
+The verification process ensures that the backup and restore configurations are correct and identifies potential issues so they can be addressed in advance.
+
+#### Run Restore
+
 Restore a backup from external object storage.
 
 1. Check the status of the Automate HA cluster from the bastion host.
@@ -315,7 +326,7 @@ Restore a backup from external object storage.
    For S3:
 
    ```sh
-   chef-automate backup restore s3://BUCKET_NAME/PATH/TO/BACKUPS/BACKUP_ID --skip-preflight --s3-access-key "ACCESS_KEY" --s3-secret-key "SECRET_KEY"
+   chef-automate backup restore s3://BUCKET_NAME/PATH_TO_BACKUPS/BACKUP_ID --skip-preflight --s3-access-key "ACCESS_KEY" --s3-secret-key "SECRET_KEY"
    ```
 
    For GCS:
