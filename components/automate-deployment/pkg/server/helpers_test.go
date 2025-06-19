@@ -52,10 +52,11 @@ func TestForGetContentForLogRotateConfigFile(t *testing.T) {
 	rotate 10
 	copytruncate
 	missingok
+	dateformat -%Y%m%d%s
 }
 `
 
-		actualString := LogRotateConf(pathString, "dateext", maxSizeString, rotateString, "copytruncate", "missingok")
+		actualString := LogRotateConf(pathString, "dateext", maxSizeString, rotateString, "copytruncate", "missingok", "dateformat -%Y%m%d%s")
 
 		assert.Equal(t, actualString, expectedString)
 

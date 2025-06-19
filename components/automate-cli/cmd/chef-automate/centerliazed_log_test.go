@@ -83,6 +83,7 @@ func TestGetScriptCommandsForConfigChangedLogging(t *testing.T) {
 	copytruncate
 	compress
 	dateext
+	dateformat -%Y%m%d%s
 }
 " > /etc/logrotate.d/automate'`,
 		}, {
@@ -126,6 +127,7 @@ if \$programname == \"bash\" then Testing1/automate.log
 	copytruncate
 	compress
 	dateext
+	dateformat -%Y%m%d%s
 }
 " > /etc/logrotate.d/automate'; 
  sudo systemctl restart rsyslog.service;`,
@@ -238,6 +240,7 @@ if \$programname == \"bash\" then Testing1/automate.log
 	missingok
 	copytruncate
 	dateext
+	dateformat -%Y%m%d%s
 }
 " > /etc/logrotate.d/automate'; 
  sudo systemctl restart rsyslog.service;`,
@@ -267,6 +270,7 @@ if \$programname == \"bash\" then Testing/automate.log
 	missingok
 	copytruncate
 	dateext
+	dateformat -%Y%m%d%s
 }
 " > /etc/logrotate.d/automate'; 
  sudo systemctl restart rsyslog.service;`,
