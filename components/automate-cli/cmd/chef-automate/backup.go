@@ -43,6 +43,15 @@ or all services are down (chef-automate stop) before retrying the restore.`
 
 var allPassedFlags string = ""
 
+var (
+        Reset  = "\033[0m"
+        Green  = "\033[32m"
+        Yellow = "\033[33m"
+        Blue   = "\033[34m"
+		Magenta = "\033[35m"
+		Cyan   = "\033[36m"
+    )
+
 const (
 	AUTOMATE_CMD_STOP                    = "sudo systemctl stop chef-automate"
 	AUTOMATE_CMD_START                   = "sudo systemctl start chef-automate"
@@ -383,9 +392,9 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 					return er
 				}
 				if !allowRestore {
-					fmt.Println("\n[Attention] Restore operation is likely to fail due to incorrect configuration.")
+					fmt.Println(Yellow + "\033[1mIncorrect configuration\033[0m" + Reset)
 				} else {
-					fmt.Println("Configuration looks good. Please proceed to restore the backup without passing --verify-restore-config")
+					fmt.Println(Green + "\033[1mThe configuration looks good. Please proceed with restoring the backup without using the --verify-restore-config flag\033[0m" + Reset)
 				}
 				return nil
 			}
@@ -1529,6 +1538,8 @@ func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConf
 
 	backupType, backupLocation, err := determineBkpConfig(a2ConfigMap, "", "objectStorage", "fileStorage")
 	logrus.Debugf("Backuptype: %s and BackupLocation: %s", backupType, backupLocation)
+	modeOfDeployment := GetModeOfDeployment()
+	logrus.Debugf("Mode of deployment: %s", modeOfDeployment)
 	if err != nil {
 		return false, err
 	}
@@ -1539,7 +1550,7 @@ func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConf
 	}
 	logrus.Debugf("Backup path set for opensearch settings in automate config: %s", automateBackupPath)
 
-	snapshotServiceBackupPath, allowRestore, err := compareSnapshotLocationOfServices(backupLocation, sshUtil)
+	snapshotServiceBackupPath, allowRestore, err := compareSnapshotLocationOfServices(backupLocation, modeOfDeployment, sshUtil)
 	if err != nil {
 		return false, err
 	}
@@ -1547,7 +1558,17 @@ func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConf
 	if snapshotServiceBackupPath != "" {
 		logrus.Debugf("SnapshotServiceBackupPath: %s", snapshotServiceBackupPath)
 		if automateBackupPath != snapshotServiceBackupPath {
-			fmt.Printf("[ERROR] There is discrepancy in the backup paths. All backup paths should point to the same location. Backup path configured for opensearch settings in automate config: %s,  Path for indices of snapshot locations of services: %s. Please check the paths listed and ensure to configure all backup paths to point to the same destination.\n", automateBackupPath, snapshotServiceBackupPath)
+			fmt.Printf("\n%s\033[1m[ERROR] Issues Identified \033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mThere is a discrepancy in the backup paths.\033[0m%s\n", Magenta, Reset)
+			fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mThe backup path (global.v1.external.opensearch) present in the Opensearch configuration of the Automate node is %s\033[0m%s\n", Magenta, Reset, automateBackupPath)
+			fmt.Printf("%s\033[1mThe path present in the snapshot settings of the Opensearch cluster is %s\033[0m%s\n", Magenta, Reset, snapshotServiceBackupPath)
+			fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mAll backup paths should point to the same location.\033[0m%s\n", Magenta, Reset)
+			fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mTo correct the listed paths, refer %s\033[0m%s\n", Blue, getTroubleshootingLink(backupLocation, modeOfDeployment), Reset)
+			fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
 			allowRestore = false
 			return allowRestore, nil
 		}
@@ -1561,7 +1582,17 @@ func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConf
 		logrus.Debugf("Path set in opensearch config: %s", osPath)
 
 		if automateBackupPath != osPath {
-			fmt.Printf("[ERROR] There is discrepancy in the backup paths. All backup paths should point to the same location. Backup path configured for opensearch settings in automate config: %s, path_repo configured in opensearch config: %s. Please check the paths listed and ensure to configure all backup paths to point to the same destination.\n", automateBackupPath, osPath)
+			fmt.Printf("\n%s\033[1m[ERROR] Issues Identified \033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mThere is a discrepancy in the backup paths.\033[0m%s\n", Magenta, Reset)
+			fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mThe backup path (global.v1.external.opensearch) present in the Opensearch configuration of the Automate node is %s\033[0m%s\n", Magenta, Reset, automateBackupPath)
+			fmt.Printf("%s\033[1mThe back up path (path.repo) configured in the Opensearch node configuration is  %s\033[0m%s\n", Magenta, Reset, snapshotServiceBackupPath)
+			fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mAll backup paths should point to the same location.\033[0m%s\n", Magenta, Reset)
+			fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+			fmt.Printf("%s\033[1mTo correct the listed paths, refer %s\033[0m%s\n", Blue, getTroubleshootingLink(backupLocation, modeOfDeployment), Reset)
+			fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
 			allowRestore = false
 			return allowRestore, nil
 		}
@@ -1575,7 +1606,7 @@ func compareBackupPaths(infra *AutomateHAInfraDetails, sshUtil SSHUtil, pullConf
 	return allowRestore, nil
 }
 
-func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (string, bool, error) {
+func compareSnapshotLocationOfServices(backupLocation string, modeOfDeployment string, sshUtil SSHUtil) (string, bool, error) {
 
 	var isEs5Service, isEs6Service, allowRestore bool
 	var snapshotEs5ServicePath, snapshotEs6ServicePath string
@@ -1633,24 +1664,24 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 		return "", allowRestore, nil
 	} else {
 		if isEs6Service {
-			isBackupTypeProper, err := compareBackupTypesOfIndices(es6SSIndices, backupLocation)
+			isBackupTypeProper, err := compareBackupTypesOfIndices(es6SSIndices, backupLocation, modeOfDeployment)
 			if err != nil {
 				return "", false, err
 			}
 			if isBackupTypeProper {
-				snapshotEs6ServicePath, err = compareSnapshotPathofIndices(es6SSIndices, backupLocation)
+				snapshotEs6ServicePath, err = compareSnapshotPathofIndices(es6SSIndices, backupLocation, modeOfDeployment)
 				if err != nil {
 					return "", false, err
 				}
 			}
 		}
 		if isEs5Service {
-			isBackupTypeProper, err := compareBackupTypesOfIndices(es5SSIndices, backupLocation)
+			isBackupTypeProper, err := compareBackupTypesOfIndices(es5SSIndices, backupLocation, modeOfDeployment)
 			if err != nil {
 				return "", false, err
 			}
 			if isBackupTypeProper {
-				snapshotEs5ServicePath, err = compareSnapshotPathofIndices(es5SSIndices, backupLocation)
+				snapshotEs5ServicePath, err = compareSnapshotPathofIndices(es5SSIndices, backupLocation, modeOfDeployment)
 				if err != nil {
 					return "", false, err
 				}
@@ -1677,7 +1708,7 @@ func compareSnapshotLocationOfServices(backupLocation string, sshUtil SSHUtil) (
 			return snapshotEs5ServicePath, allowRestore, nil
 		} else {
 			allowRestore = false
-			return "", allowRestore, getErrorForIncorrectSnapshotPath(backupLocation)
+			return "", allowRestore, getErrorForIncorrectSnapshotPath(backupLocation, modeOfDeployment)
 		}
 	}
 }
@@ -1710,44 +1741,50 @@ func getSnapshotPathDetails(snapshotPath string) string {
 	return ""
 }
 
-func compareBackupTypesOfIndices(snapshotIndices []caXservice, backupLocation string) (bool, error) {
+func compareBackupTypesOfIndices(snapshotIndices []caXservice, backupLocation string, modeOfDeployment string) (bool, error) {
 	for _, snapshotIndice := range snapshotIndices {
 		if snapshotIndice.Type != backupLocation {
-			return false, getErrorForIncorrectBackupType(backupLocation)
+			return false, getErrorForIncorrectBackupType(backupLocation, modeOfDeployment)
 		}
 	}
 	return true, nil
 }
 
-func getErrorForIncorrectBackupType(backupLocation string) error {
+func getErrorForIncorrectBackupType(backupLocation string, modeOfDeployment string) error {
 	var err error
-	modeOfDeployment := GetModeOfDeployment()
 	if backupLocation == "fs" {
-		fmt.Printf("[ERROR] There is discrepancy in the backup types. Backup type of all indices should be %s. Refer `" + getTroubleshootingLink(backupLocation, modeOfDeployment) + "` to do a clean up of the snapshot repo\n", backupLocation)
+		fmt.Printf("\n%s\033[1m[ERROR] Issues Identified \033[0m%s\n", Cyan, Reset)
 		err = nil
 	} else if backupLocation == "s3" || backupLocation == "gcs" {
-		fmt.Printf("[ERROR] There is discrepancy in the backup types. Backup type of all indices should be %s. Refer `" + getTroubleshootingLink(backupLocation, modeOfDeployment) + "` to do a clean up of the snapshot repo\n", backupLocation)
+		fmt.Printf("\n%s\033[1m[WARNING] Issues Identified \033[0m%s\n", Cyan, Reset)
 		err = nil
 	} else {
 		err = fmt.Errorf("not supported backup type: %s", backupLocation)
 	}
+	fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
+	fmt.Printf("%s\033[1mThere is discrepancy in the backup types.\033[0m%s\n", Magenta, Reset)
+	fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+	fmt.Printf("%s\033[1mThe backup type for all snapshots in the OpenSearch cluster should be the same.\033[0m%s\n", Magenta, Reset)
+	fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+	fmt.Printf("%s\033[1mTo clean up the snapshot repository in the Automate node, refer %s\033[0m%s\n", Blue, getTroubleshootingLink(backupLocation, modeOfDeployment), Reset)
+	fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
 	return err
 }
 
-func compareSnapshotPathofIndices(snapshotIndices []caXservice, backupLocation string) (string, error) {
+func compareSnapshotPathofIndices(snapshotIndices []caXservice, backupLocation string, modeOfDeployment string) (string, error) {
 	var snapshotServicePath string
 	if backupLocation == "fs" {
 		snapshotServicePath = getSnapshotPathDetails(snapshotIndices[0].Settings.Location)
 		for _, snapshotIndice := range snapshotIndices {
 			if getSnapshotPathDetails(snapshotIndice.Settings.Location) != snapshotServicePath {
-				return "", getErrorForIncorrectSnapshotPath(backupLocation)
+				return "", getErrorForIncorrectSnapshotPath(backupLocation, modeOfDeployment)
 			}
 		}
 	} else if backupLocation == "s3" || backupLocation == "gcs" {
 		snapshotServicePath = getSnapshotPathDetails(snapshotIndices[0].Settings.BasePath)
 		for _, snapshotIndice := range snapshotIndices {
 			if getSnapshotPathDetails(snapshotIndice.Settings.BasePath) != snapshotServicePath {
-				return "", getErrorForIncorrectSnapshotPath(backupLocation)
+				return "", getErrorForIncorrectSnapshotPath(backupLocation, modeOfDeployment)
 			}
 		}
 	} else {
@@ -1757,19 +1794,25 @@ func compareSnapshotPathofIndices(snapshotIndices []caXservice, backupLocation s
 	return snapshotServicePath, nil
 }
 
-func getErrorForIncorrectSnapshotPath(backupLocation string) error {
+func getErrorForIncorrectSnapshotPath(backupLocation string, modeOfDeployment string) error {
 	var err error
-	modeOfDeployment := GetModeOfDeployment()
-		if backupLocation == "fs" {
-			fmt.Println("[ERROR] There is discrepancy in the snapshot paths. Snapshot paths of all indices should be same. Refer `" + getTroubleshootingLink(backupLocation, modeOfDeployment) + "` to do a clean up of the snapshot repo")
-			err = nil
-		} else if backupLocation == "s3" || backupLocation == "gcs" {
-			fmt.Println("[WARNING] There is discrepancy in the snapshot paths. Snapshot paths of all indices should be same. Refer `" + getTroubleshootingLink(backupLocation, modeOfDeployment) + "` to do a clean up of the snapshot repo")
-			err = nil
-		} else {
-			err = fmt.Errorf("not supported backup type: %s", backupLocation)
-		}
-	return err
+	if backupLocation == "fs" {
+		fmt.Printf("\n%s\033[1m[ERROR] Issues Identified \033[0m%s\n", Cyan, Reset)
+		err = nil
+	} else if backupLocation == "s3" || backupLocation == "gcs" {
+		fmt.Printf("\n%s\033[1m[WARNING] Issues Identified \033[0m%s\n", Cyan, Reset)
+		err = nil
+	} else {
+		err = fmt.Errorf("not supported backup type: %s", backupLocation)
+	}
+	fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
+	fmt.Printf("%s\033[1mThere is discrepancy in the snapshot paths.\033[0m%s\n", Magenta, Reset)
+	fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+	fmt.Printf("%s\033[1mThe path of all snapshots configured in the OpenSearch cluster should be the same..\033[0m%s\n", Magenta, Reset)
+	fmt.Printf("%s\033[1m-----------------------------------------------------------------------------------------------------------------------------------------------------\033[0m%s\n", Cyan, Reset)
+	fmt.Printf("%s\033[1mTo clean up the snapshot repository in the Automate node, refer %s\033[0m%s\n", Blue, getTroubleshootingLink(backupLocation, modeOfDeployment), Reset)
+	fmt.Printf("%s\033[1m=====================================================================================================================================================\033[0m%s\n", Cyan, Reset)
+	return err 
 }
 
 func getTroubleshootingLink(backupLocation string, modeOfDeployment string) (string) {
