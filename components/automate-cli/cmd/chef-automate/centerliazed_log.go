@@ -131,10 +131,10 @@ func configLogrotate(req *shared.Log) string {
 
 	if req.GetCompressRotatedLogs().GetValue() == true {
 		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress", "dateext")
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress", "dateext", "dateformat -%Y%m%d%s")
 	} else {
 		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "dateext")
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "dateext", "dateformat -%Y%m%d%s")
 	}
 	// Write the byteSlice to file
 	logrus.Infof("log rotated file content created")
