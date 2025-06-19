@@ -199,7 +199,7 @@ func init() {
 }
 
 var sshCommand = &cobra.Command{
-	Use:   "ssh",
+	Use:   "ha-ssh",
 	Short: "SSH into Automate HA servers",
 	Long:  "SSH into Automate HA servers",
 	Annotations: map[string]string{
