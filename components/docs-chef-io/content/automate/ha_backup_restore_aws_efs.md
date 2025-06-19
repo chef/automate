@@ -121,6 +121,16 @@ Configure the OpenSearch `path.repo` attribute.
     chef-automate backup create
     ```
 
+### Pre-Restore Validation
+
+Run the restore command with the --verify-restore-config flag to perform a pre-check. This ensures all backup and restore-related configurations are set correctly before execution.
+Running the verification identifies potential issues early, enabling you to resolve them before starting the restore process. Discovering these issues during the restore operation makes them harder to diagnose, as errors only appear in logs after the restore attempt fails.
+This flag proactively minimizes the risk of restore failures and ensures a smoother, more efficient, and reliable restore process.
+
+To perform the pre-check, execute the following command from the bastion host:
+
+`chef-automate backup restore <BACKUP-ID> -b /mnt/automate_backups/backups --verify-restore-config`
+
 ### Restoring the EFS Backed-up Data
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
