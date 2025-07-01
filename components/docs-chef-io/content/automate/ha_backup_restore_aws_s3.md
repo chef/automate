@@ -140,13 +140,24 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 ### Restore
 
+#### Pre-Restore Validation
+
+Run the restore command with the --verify-restore-config flag to validate the configuration settings before initiating the restore process.
+To perform the pre-check, run the following command from the bastion host:
+
+`chef-automate backup restore s3://bucket_name/path_to_backups/BACKUP_ID --verify-restore-config`
+
+The verification process ensures that the backup and restore configurations are correct and identifies potential issues so they can be addressed in advance.
+
+#### Run Restore
+
 To restore backed-up data of the Chef Automate High Availability (HA) using External AWS S3, follow the steps given below:
 
 - Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
 - Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
-- Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path_to_backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
 - In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --airgap-bundle </path/to/bundle> --skip-preflight`.
 

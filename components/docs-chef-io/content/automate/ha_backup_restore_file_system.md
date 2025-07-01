@@ -129,6 +129,17 @@ chef-automate backup create
 
 ### Restore
 
+#### Pre-Restore Validation
+
+Run the restore command with the --verify-restore-config flag to validate the configuration settings before initiating the restore process.
+To perform the pre-check, run the following command from the bastion host:
+
+`chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --verify-restore-config`
+
+The verification process ensures that the backup and restore configurations are correct and identifies potential issues so they can be addressed in advance.
+
+#### Run Restore
+
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
 - Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
