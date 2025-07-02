@@ -1,4 +1,4 @@
-Try these steps if Chef Automate returns an error while restoring data.
+Follow the steps below if Chef Automate encounters an error during data restoration.
 
 1. Check the Chef Automate status.
 
@@ -6,26 +6,28 @@ Try these steps if Chef Automate returns an error while restoring data.
    chef-automate status
    ```
 
-1. Check the status of your Habitat service on the Automate node.
+2. Check the status of your Habitat service on the Automate node.
 
    ```sh
    hab svc status
    ```
 
-1. If the deployment services are not healthy, reload them.
+3. If the deployment services are not healthy, reload them.
 
     ```sh
     hab svc load chef/deployment-service
     ```
 
-Now check the status of the Automate node and then try running the restore command from the bastion host.
+4. Check the status of the Automate node, and then attempt to run the restore command from the bastion host.
 
-1. How to change the `base_path` or `path`. The steps for the File System backup are as shown below:
+5. To change the `base_path` or `path`, follow the steps below for performing a backup.
 
-   - While at the time of deployment `backup_mount` default value will be `/mnt/automate_backups`
-   - In case, if you modify the `backup_mount` in `config.toml` before deployment, then the deployment process will do the configuration with the updated value
-   - In case, you changed the `backup_mount` value post-deployment, then we need to patch the configuration manually to all the frontend and backend nodes, for example, if you change the `backup_mount` to `/bkp/backps`
-   - Update the FE nodes with the below template, use the command  `chef-automate config patch fe.toml --fe`
+   * File System
+
+      * During deployment, the `backup_mount` is default set to `/mnt/automate_backups`.
+      * The deployment process will automatically apply the updated path if you update the `backup_mount` value in the `config.toml` file before deployment.
+      * If the `backup_mount` value is changed after deployment (e.g., to /bkp/backps), you must manually patch the configuration on all frontend and backend nodes.
+      * Update the FE nodes using the template below. To update the configuration, use the command  `chef-automate config patch fe.toml --fe`.
 
       ```sh
          [global.v1.backups]
@@ -36,22 +38,22 @@ Now check the status of the Automate node and then try running the restore comma
                path = "/bkp/backps"
       ```
 
-   - Update the OpenSearch node with the below template, use the command  `chef-automate config patch os.toml --os`
+      * Update the OpenSearch nodes using the template provided below. Use the `chef-automate config patch os.toml --os` command to update the Opensearch node configs.
 
       ```sh
       [path]
          repo = "/bkp/backps"
       ```
 
-      - Run the curl request to one of the automate frontend node
+      * Run the curl request against one of the Automate frontend nodes.
 
         ```sh
         curl localhost:10144/_snapshot?pretty
         ```
 
-         - If the response is empty `{}`, then we are good
+         * If the response is an empty JSON object `{}`, no changes are required to the snapshot settings in the OpenSearch cluster.
 
-         - If the response has json output, then it should have correct value for the `backup_mount`, refer the `location` value in the response. It should start with the `/bkp/backps`
+         * If you see a JSON response similar to the example below, check that the `backup_mount` setting is correctly configured. Use the `location` value in the response to verify. It should start with `/bkp/backps`.
 
         ```sh
         {
@@ -82,7 +84,7 @@ Now check the status of the Automate node and then try running the restore comma
          }
         ```
 
-         - If the pre string in the `location` is not match with `backup_mount`, then we need to to delete the existing snapshots. use below script to delete the snapshot from the one of the automate frontend node.
+         * If the prefix in the `location` value does not match the `backup_mount`, the existing snapshots must be deleted. Use the script below to delete the snapshots from the one of the Automate frontend nodes.
 
          ```sh
             snapshot=$(curl -XGET http://localhost:10144/_snapshot?pretty | jq 'keys[]')
@@ -92,7 +94,7 @@ Now check the status of the Automate node and then try running the restore comma
             done
          ```
 
-         - The above scritp requires the `jq` needs to be installed, You can install from the airgap bundle, please use command on the one of the automate frontend node to locate the `jq` package.
+         * The above script requires `jq` to be installed, You can install it from the airgap bundle. To locate the `jq` package, run the command below on one of the Automate frontend nodes.
 
          ```sh
          ls -ltrh /hab/cache/artifacts/ | grep jq
@@ -101,16 +103,16 @@ Now check the status of the Automate node and then try running the restore comma
          -rw-r--r--. 1 ec2-user ec2-user  730K Dec  8 08:55 core-jq-static-1.6-20190703002933-x86_64-linux.hart
          ```
 
-         - In case of multiple `jq` version, then install the latest one. use the below command to install the `jq` package to the automate frontend node
+         * If multiple versions of `jq` are available, install the latest one. Use the command below to install the `jq` package on one of the Automate frontend nodes.
 
          ```sh
          hab pkg install /hab/cache/artifacts/core-jq-static-1.6-20190703002933-x86_64-linux.hart -bf
          ```
 
-1. Below steps for object storage as a backup option
+   * Object Storage
 
-      - While at the time of deployment `backup_config` will be `object_storage`
-      - To use the `object_storage`, we are using below template at the time of deployment
+      * During deployment, the `backup_config` should be set to `object_storage`.
+      * To use `object_storage`, we use the following template during deployment.
 
       ```sh
          [object_storage.config]
@@ -123,8 +125,8 @@ Now check the status of the Automate node and then try running the restore comma
           region = ""
       ```
 
-      - If you configured pre deployment, then we are good
-      - If you want to change the `bucket` or `base_path`, then use the below template for Frontend nodes
+      * If you configured it before deployment, then you are all set.
+      * If you want to change the `bucket` or `base_path`, use the following template for Frontend nodes.
 
       ```sh
       [global.v1]
@@ -136,17 +138,17 @@ Now check the status of the Automate node and then try running the restore comma
             base_path = "automate"
       ```
 
-      - You can choose any value for the variable `base_path`. `base_path` patch is only required for the frontend node.
-      - Use the command to apply the above template `chef-automate config patch frontend.toml --fe`
-      - Post the configuration patch, and use the curl request to validate
+      * You can assign any value to the `base_path` variable. The `base_path` configuration is required only for the Frontend nodes.
+      * Use the command `chef-automate config patch frontend.toml --fe` to apply the above template and update the configuration.
+      * Use the following curl request to validate the configuration.
 
          ```sh
          curl localhost:10144/_snapshot?pretty
          ```
 
-      - If the response is empty `{}`, then we are good
+      * If the response is an empty JSON object ({}), the configuration is valid.
 
-      - If the response has JSON output, then it should have the correct value for the `base_path`
+      * If the response contains a JSON output similar to the example below, it should have the correct value for the `base_path`.
 
          ```sh
          {
@@ -189,4 +191,4 @@ Now check the status of the Automate node and then try running the restore comma
          }
          ```
 
-         - In case of `base_path` value is not matching, then we have to delete the existing `snapshot`. please refer to the steps from the file system.
+         * If the `base_path` value does not match, you must delete the existing snapshots. Please take a look at the File System troubleshooting steps for guidance.
