@@ -120,7 +120,7 @@ type IsAuthorizedReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m IsAuthorizedReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -226,7 +226,7 @@ type GetVersionReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetVersionReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -406,7 +406,7 @@ type ProjectsAuthorizedReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProjectsAuthorizedReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -547,7 +547,7 @@ type ProjectsAuthorizedRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProjectsAuthorizedRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -712,7 +712,7 @@ type FilterAuthorizedPairsReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterAuthorizedPairsReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -850,7 +850,7 @@ type FilterAuthorizedPairsRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterAuthorizedPairsRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -972,7 +972,7 @@ type PairMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PairMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1103,7 +1103,7 @@ type FilterAuthorizedProjectsReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterAuthorizedProjectsReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1208,7 +1208,7 @@ type FilterAuthorizedProjectsRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterAuthorizedProjectsRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1375,7 +1375,7 @@ type ValidateProjectAssignmentReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ValidateProjectAssignmentReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1482,7 +1482,7 @@ type ValidateProjectAssignmentRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ValidateProjectAssignmentRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
