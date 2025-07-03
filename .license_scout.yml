@@ -1518,6 +1518,12 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/cncf-tags/container-device-interface/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: tags.cncf.io/container-device-interface
+  - license_content: https://raw.githubusercontent.com/antithesishq/antithesis-sdk-go/refs/heads/main/LICENSE
+    license_id: MIT
+    name: github.com/antithesishq/antithesis-sdk-go
+  - license_content: https://raw.githubusercontent.com/google/go-tpm-tools/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/google/go-tpm-tools
 
 exceptions:
   habitat:
@@ -2104,4 +2110,6 @@ exceptions:
   - name: sigs.k8s.io/structured-merge-diff/v4
     reason: Exception made by Chef Legal
   - name: tags.cncf.io/container-device-interface/specs-go
+    reason: Exception made by Chef Legal
+  - name: github.com/google/go-tpm-tools
     reason: Exception made by Chef Legal
