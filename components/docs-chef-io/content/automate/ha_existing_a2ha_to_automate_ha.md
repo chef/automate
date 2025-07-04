@@ -96,12 +96,23 @@ done
     sudo chef-automate stop
     ```
 
-1. Add the OpenSearch credentials to the applied config.
+1. Add the OpenSearch/Postgresql credentials to the applied config.
 
     - If using Chef Managed OpenSearch, add the config below into `current_config.toml` (unless you have changed the credentials).
 
         ```bash
         [global.v1.external.opensearch.auth.basic_auth]
+            username = "admin"
+            password = "admin"
+        ```
+
+    - If using Chef Managed Postgresql, add the config below into `current_config.toml` (unless you have changed the credentials).
+
+        ```bash
+        [global.v1.external.postgresql.auth.password.superuser]
+            username = "admin"
+            password = "admin"
+        [global.v1.external.postgresql.auth.password.dbuser]
             username = "admin"
             password = "admin"
         ```
