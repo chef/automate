@@ -80,7 +80,7 @@ type EmailMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m EmailMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -179,7 +179,7 @@ type GetUsersReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetUsersReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -283,7 +283,7 @@ type UserMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UserMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -400,7 +400,7 @@ type CreateUserReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateUserReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -528,7 +528,7 @@ type UpdateUserReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateUserReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -658,7 +658,7 @@ type UpdateSelfReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateSelfReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -760,7 +760,7 @@ type DeleteUserRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteUserRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -904,7 +904,7 @@ type UsersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UsersMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

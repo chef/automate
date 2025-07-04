@@ -720,9 +720,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/devigned/tab/master/LICENSE
     license_id: MIT
     name: github.com/devigned/tab
-  - license_content: https://raw.githubusercontent.com/dgraph-io/badger/refs/heads/main/LICENSE
-    license_id: Apache-2.0
-    name: github.com/dgraph-io/badger/v3
   - license_content: https://raw.githubusercontent.com/dgraph-io/ristretto/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/dgraph-io/ristretto
@@ -1524,6 +1521,36 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/google/go-tpm-tools/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/google/go-tpm-tools
+  - license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: cloud.google.com/go/bigtable
+  - license_content: https://raw.githubusercontent.com/GoogleCloudPlatform/opentelemetry-operations-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/cloudmock
+  - license_content: https://github.com/OneOfOne/xxhash/raw/refs/heads/master/LICENSE
+    license_id: Apache-2.0
+    name: github.com/OneOfOne/xxhash
+  - license_content: https://github.com/hypermodeinc/badger/raw/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/dgraph-io/badger/v4
+  - license_content: https://github.com/hypermodeinc/ristretto/raw/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/dgraph-io/ristretto/v2
+  - license_content: https://github.com/envoyproxy/go-control-plane/raw/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: github.com/envoyproxy/go-control-plane/ratelimit
+  - license_content: https://github.com/hashicorp/hcl/raw/refs/heads/main/LICENSE
+    license_id: MPL-2.0
+    name: github.com/hashicorp/hcl
+  - license_content: https://github.com/magiconair/properties/raw/refs/heads/main/LICENSE.md
+    license_id: BSD-2-Clause
+    name: github.com/magiconair/properties
+  - license_content: https://github.com/santhosh-tekuri/jsonschema/raw/refs/heads/boon/LICENSE
+    license_id: Apache-2.0
+    name: github.com/santhosh-tekuri/jsonschema/v5
+  - license_content: https://raw.githubusercontent.com/open-telemetry/opentelemetry-go/refs/heads/main/LICENSE
+    license_id: Apache-2.0
+    name: go.opentelemetry.io/otel/exporters/stdout/stdoutmetric
 
 exceptions:
   habitat:
@@ -2112,4 +2139,12 @@ exceptions:
   - name: tags.cncf.io/container-device-interface/specs-go
     reason: Exception made by Chef Legal
   - name: github.com/google/go-tpm-tools
+    reason: Exception made by Chef Legal
+  - name: cloud.google.com/go/bigtable
+    reason: Exception made by Chef Legal
+  - name: github.com/OneOfOne/xxhash
+    reason: Exception made by Chef Legal
+  - name: github.com/santhosh-tekuri/jsonschema/v5
+    reason: Exception made by Chef Legal
+  - name: github.com/golang/snappy
     reason: Exception made by Chef Legal

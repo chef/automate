@@ -109,7 +109,7 @@ type PolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -213,7 +213,7 @@ type RoleMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RoleMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -423,7 +423,7 @@ type CreatePolicyReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreatePolicyReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -529,7 +529,7 @@ type DeletePolicyReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeletePolicyReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -629,7 +629,7 @@ type DeletePolicyRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeletePolicyRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -824,7 +824,7 @@ type StatementMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m StatementMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -930,7 +930,7 @@ type ListPoliciesReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListPoliciesReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1064,7 +1064,7 @@ type ListPoliciesRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListPoliciesRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1165,7 +1165,7 @@ type GetPolicyReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetPolicyReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1366,7 +1366,7 @@ type UpdatePolicyReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdatePolicyReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1501,7 +1501,7 @@ type ReplacePolicyMembersReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ReplacePolicyMembersReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1605,7 +1605,7 @@ type ReplacePolicyMembersRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ReplacePolicyMembersRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1751,7 +1751,7 @@ type AddPolicyMembersReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AddPolicyMembersReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1855,7 +1855,7 @@ type AddPolicyMembersRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AddPolicyMembersRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1959,7 +1959,7 @@ type VersionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m VersionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2059,7 +2059,7 @@ type GetPolicyVersionReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetPolicyVersionReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2190,7 +2190,7 @@ type GetPolicyVersionRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetPolicyVersionRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2291,7 +2291,7 @@ type ListRolesReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRolesReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2425,7 +2425,7 @@ type ListRolesRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRolesRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2527,7 +2527,7 @@ type DeleteRoleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteRoleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2627,7 +2627,7 @@ type DeleteRoleRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteRoleRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2794,7 +2794,7 @@ type UpdateRoleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateRoleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2898,7 +2898,7 @@ type ListPolicyMembersReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListPolicyMembersReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3000,7 +3000,7 @@ type ListPolicyMembersRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListPolicyMembersRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3146,7 +3146,7 @@ type RemovePolicyMembersReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RemovePolicyMembersReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3250,7 +3250,7 @@ type RemovePolicyMembersRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RemovePolicyMembersRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3356,7 +3356,7 @@ type MigrateToV2ReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m MigrateToV2ReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3456,7 +3456,7 @@ type MigrateToV2RespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m MigrateToV2RespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3555,7 +3555,7 @@ type ResetToV1ReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ResetToV1ReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3655,7 +3655,7 @@ type ResetToV1RespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ResetToV1RespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3756,7 +3756,7 @@ type GetRoleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetRoleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3932,7 +3932,7 @@ type CreateRoleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateRoleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -4047,7 +4047,7 @@ type PurgeSubjectFromPoliciesReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PurgeSubjectFromPoliciesReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -4152,7 +4152,7 @@ type PurgeSubjectFromPoliciesRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PurgeSubjectFromPoliciesRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

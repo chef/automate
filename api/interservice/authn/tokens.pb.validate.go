@@ -117,7 +117,7 @@ type CreateTokenReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateTokenReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -260,7 +260,7 @@ type CreateTokenWithValueReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateTokenWithValueReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -401,7 +401,7 @@ type UpdateTokenReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateTokenReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -513,7 +513,7 @@ type TokenMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TokenMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -645,7 +645,7 @@ type TokensMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TokensMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -745,7 +745,7 @@ type ValueMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ValueMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -846,7 +846,7 @@ type GetTokenReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetTokenReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -945,7 +945,7 @@ type GetTokensReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetTokensReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1047,7 +1047,7 @@ type DeleteTokenReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteTokenReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1147,7 +1147,7 @@ type DeleteTokenRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteTokenRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

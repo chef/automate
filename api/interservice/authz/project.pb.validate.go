@@ -77,7 +77,7 @@ type ProjectMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProjectMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -192,7 +192,7 @@ type CreateProjectReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateProjectReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -323,7 +323,7 @@ type CreateProjectRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateProjectRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -427,7 +427,7 @@ type GetProjectReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetProjectReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -556,7 +556,7 @@ type GetProjectRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetProjectRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -656,7 +656,7 @@ type ListProjectsReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListProjectsReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -790,7 +790,7 @@ type ListProjectsRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListProjectsRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -894,7 +894,7 @@ type UpdateProjectReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateProjectReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1023,7 +1023,7 @@ type UpdateProjectRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateProjectRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1127,7 +1127,7 @@ type DeleteProjectReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteProjectReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1227,7 +1227,7 @@ type DeleteProjectRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteProjectRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1329,7 +1329,7 @@ type ApplyRulesStartReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplyRulesStartReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1431,7 +1431,7 @@ type ApplyRulesStartRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplyRulesStartRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1533,7 +1533,7 @@ type ApplyRulesCancelReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplyRulesCancelReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1635,7 +1635,7 @@ type ApplyRulesCancelRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplyRulesCancelRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1737,7 +1737,7 @@ type ApplyRulesStatusReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplyRulesStatusReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1878,7 +1878,7 @@ type ApplyRulesStatusRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplyRulesStatusRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1980,7 +1980,7 @@ type ListRulesForAllProjectsReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRulesForAllProjectsReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2128,7 +2128,7 @@ type ListRulesForAllProjectsRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRulesForAllProjectsRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2264,7 +2264,7 @@ type ProjectRulesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProjectRulesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2409,7 +2409,7 @@ type ProjectRuleMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProjectRuleMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2512,7 +2512,7 @@ type ConditionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ConditionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2674,7 +2674,7 @@ type CreateRuleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateRuleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2805,7 +2805,7 @@ type CreateRuleRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreateRuleRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2958,7 +2958,7 @@ type UpdateRuleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateRuleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3087,7 +3087,7 @@ type UpdateRuleRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdateRuleRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3190,7 +3190,7 @@ type GetRuleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetRuleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3318,7 +3318,7 @@ type GetRuleRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetRuleRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3419,7 +3419,7 @@ type ListRulesReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRulesReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3553,7 +3553,7 @@ type ListRulesRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRulesRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3655,7 +3655,7 @@ type ListRulesForProjectReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRulesForProjectReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3793,7 +3793,7 @@ type ListRulesForProjectRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListRulesForProjectRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3899,7 +3899,7 @@ type DeleteRuleReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteRuleReqMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3999,7 +3999,7 @@ type DeleteRuleRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeleteRuleRespMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
