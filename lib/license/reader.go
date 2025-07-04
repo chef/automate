@@ -13,6 +13,7 @@ package license
 
 import (
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
@@ -22,7 +23,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	jwt "github.com/golang-jwt/jwt"
+	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
@@ -42,7 +43,7 @@ type ParsedLicense struct {
 
 type licenseWithClaims struct {
 	ParsedLicense
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // GetKeySha256 fetches the SHA256 of the public key from the JWT encoded license
@@ -55,8 +56,8 @@ func GetKeySha256(jwtLicense string) (string, error) {
 		return "", errors.New("Not Valid JWT String")
 	}
 
-	// Use JWT package base64 decoder
-	data, err := jwt.DecodeSegment(jwtParts[1])
+	// Use base64.RawURLEncoding to decode the JWT payload
+	data, err := base64.RawURLEncoding.DecodeString(jwtParts[1])
 	if err != nil {
 		return "", err
 	}
