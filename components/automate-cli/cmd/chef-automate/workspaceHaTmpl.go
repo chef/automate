@@ -2,7 +2,7 @@ package main
 
 var workspaceCommandHelpDocs = `
 Usage:
-    chef-automate workspace [OPTIONS] SUBCOMMAND [ARG] ...
+    chef-automate ha-workspace [OPTIONS] SUBCOMMAND [ARG] ...
 Parameters:
     SUBCOMMAND                       subcommand
     [ARG] ...                        subcommand arguments
