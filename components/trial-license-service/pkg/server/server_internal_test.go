@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"strings"
 	"testing"
 
-	jwt "github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -255,7 +255,8 @@ func testLicense() string {
 	if err := json.NewEncoder(&buf).Encode(payload); err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("hdr.%s.sign", jwt.EncodeSegment(buf.Bytes()))
+	// jwt.EncodeSegment was removed in v5; use base64.RawURLEncoding.EncodeToString
+	return fmt.Sprintf("hdr.%s.sign", base64.RawURLEncoding.EncodeToString(buf.Bytes()))
 }
 
 func (*successFetcher) RequestLicense(context.Context, string) (*license.TrialLicense, error) {

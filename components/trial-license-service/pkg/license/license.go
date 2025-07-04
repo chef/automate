@@ -4,6 +4,7 @@ package license
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	jwt "github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
 )
 
@@ -101,7 +101,8 @@ func (tl *TrialLicense) ID() (string, error) {
 		return "", errors.New("invalid JWT")
 	}
 
-	data, err := jwt.DecodeSegment(parts[1])
+	//data, err := jwt.DecodeSegment(parts[1])
+	data, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return "", errors.Wrap(err, "base64url-decode JWT payload")
 	}

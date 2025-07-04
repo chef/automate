@@ -108,7 +108,7 @@ require (
 	github.com/dexidp/dex/api/v2 v2.0.0
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/utils v1.1.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang/protobuf v1.5.4
 	github.com/hashicorp/go-version v1.7.0
 	github.com/prashantv/gostub v1.1.0
@@ -178,7 +178,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/google/cel-go v0.22.1 // indirect
