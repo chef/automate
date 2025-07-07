@@ -220,7 +220,10 @@
                 <hr class="divider-constraints" />
                 <div class="json-container">
                   <div class="scroll">
-                    <app-json-tree-table class="json-tree-container" [hidden]="hasattributes? false : true" #tree
+                    <div *ngIf="invalidTagsJson" class="error-message">
+                      <p class="text-danger">Some tags contain invalid or unsafe characters.</p>
+                    </div>
+                    <app-json-tree-table *ngIf="!invalidTagsJson" class="json-tree-container" [hidden]="hasattributes? false : true" #tree
                       [json]="attributes">
                     </app-json-tree-table>
                     <div *ngIf="!hasattributes" class="img-section">

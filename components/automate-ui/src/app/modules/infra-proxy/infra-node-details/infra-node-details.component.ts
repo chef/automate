@@ -120,6 +120,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public nodeAttributesLoading = true;
   public hasattributes = true;
   public openEditAttr = false;
+  public invalidTagsJson = false;
   public isGetNode = true;
   public openAttributeModal = new EventEmitter<boolean>();
 
@@ -211,7 +212,13 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       // load runlist according to the environment
       this.loadNodeRunlists(this.InfraNode.environment);
       // load attributes
-      this.attributes = (node.normal_attributes && JSON.parse(node.normal_attributes)) || {};
+      const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
+      const parsedAttributes = node.normal_attributes ? JSON.parse(node.normal_attributes) : {};
+      this.attributes = parsedAttributes;
+
+      if (parsedAttributes.tags && Array.isArray(parsedAttributes.tags)) {
+        this.invalidTagsJson = parsedAttributes.tags.some(tag => htmlTagsRegex.test(tag));
+      }
       this.hasattributes = Object.keys(
         JSON.parse(node.normal_attributes)).length > 0 ? true : false;
     });
@@ -531,7 +538,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   handleTagsChange(event: Event){
     const inputElement = event.target as HTMLInputElement;
-    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}|<>]/;
+    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
     const hasHtmlTags = htmlTagsRegex.test(inputElement.value);
     this.isHtmlTags = hasHtmlTags;
   }

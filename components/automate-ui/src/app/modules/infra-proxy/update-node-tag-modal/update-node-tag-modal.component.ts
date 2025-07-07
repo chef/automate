@@ -35,6 +35,7 @@ export class UpdateNodeTagModalComponent implements OnInit, OnDestroy {
   public inputTxt = '';
   public tags: string[] = [];
   public updatingTags = false;
+  public isHtmlTags:boolean = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -101,5 +102,12 @@ export class UpdateNodeTagModalComponent implements OnInit, OnDestroy {
     this.inputTxt = '';
     this.tags = [];
     this.conflictErrorEvent.emit(false);
+  }
+
+  handleTagsChange(event: Event){
+    const inputElement = event.target as HTMLInputElement;
+    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
+    const hasHtmlTags = htmlTagsRegex.test(inputElement.value);
+    this.isHtmlTags = hasHtmlTags;
   }
 }

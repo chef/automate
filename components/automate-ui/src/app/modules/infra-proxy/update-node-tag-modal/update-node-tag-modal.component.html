@@ -10,14 +10,18 @@
       <hr class="divider-constraint" />
 
       <div class="tag-input">
-        <input 
+        <input
         chefInput
         type="text"
         firstFocus
         id="update-tag-input"
         autocomplete="off"
         data-cy="update-node-tag"
+        (keyup)="handleTagsChange($event)"
         [(ngModel)]="inputTxt"/>
+        <p *ngIf='isHtmlTags' class="tag-note error">
+          Error: special characters and HTML tags are not allowed. Please remove them and try again.
+        </p>
         <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
         <div class="button-bar-box">
           <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
@@ -26,7 +30,7 @@
             id="update-button-modal"
             (click)="addTags()"
             data-cy="update-node-tag-button"
-            [disabled]="conflictError || updatingTags || (inputTxt === '')">
+            [disabled]="conflictError || updatingTags || isHtmlTags || (inputTxt === '')">
             <chef-loading-spinner *ngIf="updatingTags"></chef-loading-spinner>
             <span *ngIf="updatingTags">Updating...</span>
             <span *ngIf="!updatingTags">Update Tags</span>

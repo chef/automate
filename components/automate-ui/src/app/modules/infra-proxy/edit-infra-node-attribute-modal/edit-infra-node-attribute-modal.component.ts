@@ -33,6 +33,7 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
   public creating = false;
   public conflictError = false;
   public attrParseError = false;
+  public invalidTagsError = false;
   public isLoading = true;
   public visible = false;
   public updateSuccessful = false;
@@ -77,6 +78,17 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
           this.closeEditModal();
         }
       });
+
+    // Listen to form value changes
+    this.attributeForm.controls['default']?.valueChanges.subscribe(value => {
+      this.validateJsonInput(value);
+    });
+
+    // Validate initial value if present
+    const initialValue = this.attributeForm.controls['default']?.value;
+    if (initialValue) {
+      this.validateJsonInput(initialValue);
+    }
   }
 
   ngOnChanges(): void {
@@ -106,11 +118,34 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
 
   onChangeDefaultJson(event: { target: { value: string } } | any) {
     const newValue = event.target.value;
+    this.validateJsonInput(newValue);
+  }
+
+  // Validates the input string
+  validateJsonInput(value: string): void {
+    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
+
     try {
-      JSON.parse(newValue);
+      const parsed = JSON.parse(value);
       this.attrParseError = false;
-    } catch (ex) {
+
+      // Check if parsed has tags and validate each tag
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        Array.isArray(parsed.tags)
+      ) {
+        const hasInvalidTag = parsed.tags.some((tag: any) => {
+          return typeof tag !== 'string' || htmlTagsRegex.test(tag);
+        });
+
+        this.invalidTagsError = hasInvalidTag;
+      } else {
+        this.invalidTagsError = true; // `tags` is missing or not an array
+      }
+    } catch {
       this.attrParseError = true;
+      this.invalidTagsError = false; // Skip tag validation if JSON is invalid
     }
   }
 
@@ -127,7 +162,8 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
 
     nodeAttr = { ...nodeAttr,
       attributes: JSON.parse(
-          this.attributeForm.controls['default'].value.replace(/\r?\n|\r/g, ''))
+        this.attributeForm.controls['default'].value.replace(/\r?\n|\r/g, '')
+      )
     };
 
     this.store.dispatch(new UpdateNodeAttributes(nodeAttr));

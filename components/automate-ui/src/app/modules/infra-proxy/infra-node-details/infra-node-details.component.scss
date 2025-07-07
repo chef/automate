@@ -273,7 +273,7 @@ div#button-env {
   font-size: 13px;
 }
 
-// ng-select 
+// ng-select
 ::ng-deep {
   .ng-select .ng-select-container {
     font-size: 14px;
@@ -456,4 +456,16 @@ div#button-env {
 
 .error{
   color: red;
+}
+
+.error-message {
+  background-color: #fff3cd;
+  padding: 10px;
+  border-left: 4px solid #ffc107;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+p.text-danger {
+  margin-top: 1em;
 }
