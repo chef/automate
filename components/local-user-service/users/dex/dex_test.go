@@ -17,6 +17,7 @@ import (
 )
 
 type dexAPI struct {
+	api.UnimplementedDexServer
 	usrs []*api.Password
 }
 
