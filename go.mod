@@ -104,7 +104,7 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/bufbuild/buf v1.48.0
 	github.com/chef/automate/api/external v0.0.0-20240828051912-8c022fa4f66b
-	github.com/dexidp/dex v2.35.0+incompatible
+	github.com/dexidp/dex v2.38.0+incompatible
 	github.com/dexidp/dex/api/v2 v2.0.0
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/utils v1.1.0
