@@ -51,6 +51,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 import { Org } from '../../../entities/orgs/org.model';
 import { getStatus as gtStatus, orgFromRoute } from '../../../entities/orgs/org.selectors';
 import { GetOrg } from '../../../entities/orgs/org.actions';
+import { HTML_TAGS_REGEX } from '../../../shared/utils/regex-utils';
 
 export type InfraNodeTabName = 'details' | 'runList' | 'attributes';
 
@@ -212,12 +213,11 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       // load runlist according to the environment
       this.loadNodeRunlists(this.InfraNode.environment);
       // load attributes
-      const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
       const parsedAttributes = node.normal_attributes ? JSON.parse(node.normal_attributes) : {};
       this.attributes = parsedAttributes;
 
       if (parsedAttributes.tags && Array.isArray(parsedAttributes.tags)) {
-        this.invalidTagsJson = parsedAttributes.tags.some(tag => htmlTagsRegex.test(tag));
+        this.invalidTagsJson = parsedAttributes.tags.some(tag => HTML_TAGS_REGEX.test(tag));
       }
       this.hasattributes = Object.keys(
         JSON.parse(node.normal_attributes)).length > 0 ? true : false;
@@ -538,8 +538,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   handleTagsChange(event: Event){
     const inputElement = event.target as HTMLInputElement;
-    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
-    const hasHtmlTags = htmlTagsRegex.test(inputElement.value);
+    const hasHtmlTags = HTML_TAGS_REGEX.test(inputElement.value);
     this.isHtmlTags = hasHtmlTags;
   }
 }

@@ -13,6 +13,7 @@ import {
 } from '../../../entities/infra-nodes/infra-nodes.actions';
 import { EntityStatus } from '../../../entities/entities';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { HTML_TAGS_REGEX } from '../../../shared/utils/regex-utils';
 
 @Component({
   selector: 'app-update-node-tag-modal',
@@ -106,8 +107,7 @@ export class UpdateNodeTagModalComponent implements OnInit, OnDestroy {
 
   handleTagsChange(event: Event){
     const inputElement = event.target as HTMLInputElement;
-    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
-    const hasHtmlTags = htmlTagsRegex.test(inputElement.value);
+    const hasHtmlTags = HTML_TAGS_REGEX.test(inputElement.value);
     this.isHtmlTags = hasHtmlTags;
   }
 }

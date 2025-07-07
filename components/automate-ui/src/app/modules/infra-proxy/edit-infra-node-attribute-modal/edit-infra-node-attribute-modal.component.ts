@@ -13,6 +13,7 @@ import { InfraNodeAttribute } from '../../../entities/infra-nodes/infra-nodes.mo
 import { UpdateNodeAttributes, GetNode } from '../../../entities/infra-nodes/infra-nodes.actions';
 import { Utilities } from '../../../helpers/utilities/utilities';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { HTML_TAGS_REGEX } from '../../../shared/utils/regex-utils';
 
 @Component({
   selector: 'app-edit-infra-node-attribute-modal',
@@ -123,7 +124,6 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
 
   // Validates the input string
   validateJsonInput(value: string): void {
-    const htmlTagsRegex = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
 
     try {
       const parsed = JSON.parse(value);
@@ -136,7 +136,7 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
         Array.isArray(parsed.tags)
       ) {
         const hasInvalidTag = parsed.tags.some((tag: any) => {
-          return typeof tag !== 'string' || htmlTagsRegex.test(tag);
+          return typeof tag !== 'string' || HTML_TAGS_REGEX.test(tag);
         });
 
         this.invalidTagsError = hasInvalidTag;
