@@ -157,6 +157,12 @@ Find the following config in the **current_config.toml** file and update it to l
 [global.v1.external.opensearch.auth.basic_auth]
     username = "admin"
     password = "admin"
+[global.v1.external.postgresql.auth.password.superuser]
+    username = "admin"
+    password = "admin"
+[global.v1.external.postgresql.auth.password.dbuser]
+    username = "admin"
+    password = "admin"
 ```
 
 AND

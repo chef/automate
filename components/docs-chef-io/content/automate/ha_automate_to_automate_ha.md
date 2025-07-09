@@ -102,6 +102,17 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment **(but
     password = "admin"
     ```
 
+    From Automate **4.x.y** version onwards, Postgresql credentials are not stored in the `config`. Add the Postgresql password to the generated config above. For example:
+
+    ```bash
+    [global.v1.external.postgresql.auth.password.superuser]
+        username = "admin"
+        password = "admin"
+    [global.v1.external.postgresql.auth.password.dbuser]
+        username = "admin"
+        password = "admin"
+    ```
+
     {{< warning >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
@@ -203,6 +214,17 @@ Follow the steps below when migrating to On-Premises or Cloud HA deployment **(b
     [global.v1.external.opensearch.auth.basic_auth]
     username = "admin"
     password = "admin"
+    ```
+
+    From Automate **4.x.y** version onwards, Postgresql credentials are not stored in the `config`. Add the Postgresql password to the generated config above. For example:
+
+    ```bash
+    [global.v1.external.postgresql.auth.password.superuser]
+        username = "admin"
+        password = "admin"
+    [global.v1.external.postgresql.auth.password.dbuser]
+        username = "admin"
+        password = "admin"
     ```
 
     {{< warning >}}
@@ -374,6 +396,17 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     [global.v1.external.opensearch.auth.basic_auth]
     username = "admin"
     password = "admin"
+    ```
+
+    From Automate **4.x.y** version onwards, Postgresql credentials are not stored in the `config`. Add the Postgresql password to the generated config above. For example:
+
+    ```bash
+    [global.v1.external.postgresql.auth.password.superuser]
+        username = "admin"
+        password = "admin"
+    [global.v1.external.postgresql.auth.password.dbuser]
+        username = "admin"
+        password = "admin"
     ```
 
     {{< warning >}}
