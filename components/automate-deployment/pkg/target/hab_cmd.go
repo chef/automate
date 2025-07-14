@@ -22,6 +22,8 @@ var stdHabOptions = []command.Opt{
 	command.Envvar("HAB_NONINTERACTIVE", "true"),
 	// Don't prompt for license acceptance
 	command.Envvar("HAB_LICENSE", "accept-no-persist"),
+
+	command.Envvar("HAB_BLDR_URL", "https://bldr.acceptance.habitat.sh"),
 }
 
 const (

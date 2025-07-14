@@ -13,6 +13,10 @@ env:
   PGGSSENCMODE: "disable"
 
 expeditor:
+#  secrets:
+#    HAB_AUTH_TOKEN:
+#      path: account/static/habitat/chef-ci
+#      field: auth_token # Production Builder
   defaults:
     executor:
       docker:
@@ -50,6 +54,9 @@ steps:
       GITHUB_TOKEN:
         account: github/chef
         field: token
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
     executor:
       docker:
 
@@ -83,6 +90,9 @@ steps:
       OPENSEARCH_NODE1_KEY_PEM:
         path: secret/a2/a2ha/opensearch
         field: node1-key.pem
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
     executor:
       linux:
         privileged: true
@@ -105,6 +115,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
     executor:
       docker:
 
@@ -820,6 +833,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "upgrade acceptance -> master"
   command:
@@ -833,6 +849,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "upgrade current -> master"
   command:
@@ -846,6 +865,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "upgrade current -> master (with latest hab)"
   command:
@@ -860,6 +882,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "manual upgrade current -> master"
   command:
@@ -873,6 +898,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "deep upgrades"
   command:
