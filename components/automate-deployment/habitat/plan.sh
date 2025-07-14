@@ -18,7 +18,7 @@ pkg_deps=(
   # 
   # IF YOU UPDATE THIS PIN YOU MUST ALSO UPDATE .expeditor/create-manifest.rb
   core/hab/1.6.1205/20241107140309
-  core/net-tools
+  core/net-tools/2.10/20250529012700
   core/procps-ng
   core/util-linux
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
