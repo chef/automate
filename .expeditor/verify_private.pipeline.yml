@@ -615,8 +615,6 @@ steps:
         - HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN}
 
 - label: "v3 to v4 upgrade"
-  env:
-  - HAB_AUTH_TOKEN= "\$HAB_AUTH_TOKEN"
   command:
   - export HAB_AUTH_TOKEN= "\$HAB_AUTH_TOKEN" && integration/run_test integration/tests/v3_to_v4_upgrade.sh
   timeout_in_minutes: 30
