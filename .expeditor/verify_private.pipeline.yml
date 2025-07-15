@@ -611,6 +611,8 @@ steps:
     executor:
       linux:
         privileged: true
+        environment:
+        - HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN}
 
 - label: "v3 to v4 upgrade"
   command:
@@ -627,6 +629,8 @@ steps:
     executor:
       linux:
         privileged: true
+        environment:
+        - HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN}
 
 - label: "iam v1 to v2 force-upgrade"
   command:
