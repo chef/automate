@@ -22,6 +22,8 @@ do_deploy() {
 
     download_cli "${OLD_VERSION}" "${cli_bin}"
 
+    export HAB_AUTH_TOKEN="${HAB_AUTH_TOKEN}"
+
     #shellcheck disable=SC2154
     "${cli_bin}" deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
