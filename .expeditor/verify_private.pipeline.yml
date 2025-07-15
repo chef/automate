@@ -206,6 +206,7 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+        
 
 - label: "data-feed-service"
   command:
@@ -385,7 +386,7 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
-      secrets:
+    secrets:
       HAB_AUTH_TOKEN:
         path: account/static/habitat/chef-ci
         field: auth_token     
