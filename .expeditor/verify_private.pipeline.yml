@@ -270,6 +270,9 @@ steps:
       HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
         account: aws/chef-cd
         field: session_token
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       docker:
         privileged: true
@@ -315,6 +318,9 @@ steps:
       HAB_STUDIO_SECRET_A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       docker:
         privileged: true
@@ -345,6 +351,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "secrets-service"
   command:
@@ -358,6 +367,11 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token    
+
 
 - label: "event-feed-service"
   command:
@@ -371,6 +385,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+      secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token     
 
 - label: "es-sidecar-service"
   command:
@@ -387,6 +405,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "ingest-service"
   command:
@@ -404,6 +426,10 @@ steps:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
         - REST_SERVICE=https://localhost:10122
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "compliance-service"
   command:
@@ -420,6 +446,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "config-mgmt-service"
   command:
@@ -436,6 +466,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "event-service"
   command:
@@ -449,6 +483,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "event-gateway"
   command:
@@ -462,6 +500,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "pg-sidecar-service"
   command:
@@ -482,6 +524,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "infra-proxy-service"
   command:
@@ -499,6 +545,10 @@ steps:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
         - CONTAINER_HOSTNAME=localhost
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 #
 # The following tests all use the integration test framework for
@@ -529,6 +579,9 @@ steps:
       CYPRESS_AUTOMATE_INFRA_ADMIN_KEY:
         path: secret/a2/testing/infra_admin_key
         field: data
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -542,6 +595,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -555,6 +611,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -569,6 +628,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -582,6 +644,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -595,6 +660,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
     executor:
       linux:
         privileged: true
@@ -608,6 +676,10 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token 
+         
     executor:
       linux:
         privileged: true
@@ -621,6 +693,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -658,6 +733,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "product airgap"
   command:
@@ -671,6 +749,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "product dev"
   command:
@@ -684,6 +765,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "airgap upgrade"
   command:
@@ -697,6 +781,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "airgap ow upgrade"
   command:
@@ -710,6 +797,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "airgap backup"
   command:
@@ -723,6 +813,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "chef server"
   command:
@@ -736,6 +829,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "chef server only"
   command:
@@ -749,6 +845,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "ha chef server"
   command:
@@ -763,6 +862,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "backup to s3"
   command:
@@ -788,6 +890,9 @@ steps:
       AWS_SESSION_TOKEN:
         account: aws/chef-cd
         field: session_token
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "backup to gcs"
   command:
@@ -1070,6 +1175,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
