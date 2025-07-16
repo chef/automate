@@ -433,6 +433,8 @@ inherit() {
 source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
 export A2_ROOT_DIR="$source_dir/../"
 
+export HAB_AUTH_TOKEN=$HAB_AUTH_TOKEN
+
 # Load the shared code
 # shellcheck source=./helpers/log.sh
 source "${source_dir}/helpers/log.sh"
