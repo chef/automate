@@ -281,12 +281,7 @@ func (c *habCmd) SupTerm(ctx context.Context) error {
 }
 
 func standardHabOptions() []command.Opt {
-	if os.Getenv("HAB_AUTH_TOKEN") != "" {
-		// If the HAB_AUTH_TOKEN is set, we add it to the standard options
-		stdHabOptions = append(stdHabOptions, command.Envvar("HAB_AUTH_TOKEN", os.Getenv("HAB_AUTH_TOKEN")))
-	}
 	cmdOpts := make([]command.Opt, len(stdHabOptions))
-
 	copy(cmdOpts, stdHabOptions)
 	return cmdOpts
 }
