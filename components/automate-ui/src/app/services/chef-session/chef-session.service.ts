@@ -4,7 +4,7 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter, retryWhen, delay, catchError } from 'rxjs/operators';
+import { map, mergeMap, filter, catchError } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 import { BroadcastChannel } from 'broadcast-channel';
 
@@ -87,10 +87,10 @@ export class ChefSessionService {
           this.isRefreshing = true;
           return this.refresh();
         }),
-        retryWhen(error => {
-          this.isRefreshing = false;
-          return error.pipe(delay(500));  // retry in 500ms if errored
-        })
+        // retryWhen(error => {
+        //   this.isRefreshing = false;
+        //   return error.pipe(delay(500));  // retry in 500ms if errored
+        // })
       ).subscribe(
         token => {
           this.ingestIDToken(token);
