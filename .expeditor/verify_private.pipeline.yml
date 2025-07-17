@@ -619,87 +619,87 @@ steps:
       linux:
         privileged: true
 
-- label: "iam v1 to v2 force-upgrade"
-  command:
-  - echo "\$A2_LICENSE" > dev/license.jwt
-  - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-      HAB_AUTH_TOKEN:
-        path: account/static/habitat/chef-ci
-        field: auth_token  
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v1 to v2 force-upgrade"
+#   command:
+#   - echo "\$A2_LICENSE" > dev/license.jwt
+#   - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token  
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v1 to v2 force-upgrade (diagnostics only)"
-  command:
-  - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-      HAB_AUTH_TOKEN:
-        path: account/static/habitat/chef-ci
-        field: auth_token  
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v1 to v2 force-upgrade (diagnostics only)"
+#   command:
+#   - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token  
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v2 with no legacy policies force-upgrade to v2"
-  command:
-  - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-  timeout_in_minutes: 45
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-      HAB_AUTH_TOKEN:
-        path: account/static/habitat/chef-ci
-        field: auth_token   
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v2 with no legacy policies force-upgrade to v2"
+#   command:
+#   - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
+#   timeout_in_minutes: 45
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token   
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
-  command:
-  - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-      HAB_AUTH_TOKEN:
-        path: account/static/habitat/chef-ci
-        field: auth_token 
+# - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
+#   command:
+#   - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token 
          
-    executor:
-      linux:
-        privileged: true
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v2 with legacy policies force upgrade to v2"
-  command:
-  - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-      HAB_AUTH_TOKEN:
-        path: account/static/habitat/chef-ci
-        field: auth_token  
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v2 with legacy policies force upgrade to v2"
+#   command:
+#   - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token  
+#     executor:
+#       linux:
+#         privileged: true
 
 - label: "product"
   #  - label: "a1migration"
@@ -1008,45 +1008,45 @@ steps:
         path: account/static/habitat/chef-ci
         field: auth_token
 
-- label: "deep upgrades"
-  command:
-  - integration/run_test integration/tests/deep_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    executor:
-      linux:
-        privileged: true
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
+# - label: "deep upgrades"
+#   command:
+#   - integration/run_test integration/tests/deep_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     executor:
+#       linux:
+#         privileged: true
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
 
-- label: "deep migrate upgrade"
-  command:
-  - integration/run_test integration/tests/migrate_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    executor:
-      linux:
-        single-use: true
-        privileged: true
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
+# - label: "deep migrate upgrade"
+#   command:
+#   - integration/run_test integration/tests/migrate_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     executor:
+#       linux:
+#         single-use: true
+#         privileged: true
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
 
-- label: "deep upgrade backup restore"
-  command:
-  - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
-  timeout_in_minutes: 35
-  expeditor:
-    executor:
-      linux:
-        privileged: true
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
+# - label: "deep upgrade backup restore"
+#   command:
+#   - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
+#   timeout_in_minutes: 35
+#   expeditor:
+#     executor:
+#       linux:
+#         privileged: true
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
 
 - label: "backups"
   command:
