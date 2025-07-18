@@ -12,6 +12,9 @@ steps:
         GITHUB_TOKEN:
           account: github/chef
           field: token
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
       accounts:
         - aws/chef-cd
       executor:
