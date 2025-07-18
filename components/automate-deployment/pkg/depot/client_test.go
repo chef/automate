@@ -39,34 +39,34 @@ func TestFetchTDeps(t *testing.T) {
 func TestDownloadPackage(t *testing.T) {
 	c := depot.NewClient()
 	buf := sha256.New()
-	pkg := mustPkg("core/cacerts/2018.03.07/20180418223647")
+	pkg := mustPkg("core/cacerts/2021.10.26/20240105224256")
 	header, err := c.DownloadPackage(&pkg, buf)
 	require.NoError(t, err)
 	assert.Equal(t, &depot.HartHeader{
 		FormatVersion: "HART-1",
-		KeyName:       "core-20180119235000",
+		KeyName:       "core-20231114082941",
 	}, header)
-	assert.Equal(t, "5267e42b32c9dd12f3baabd818e538f97ce171b6516cf19804a0f63bcd711183", hex.EncodeToString(buf.Sum(nil)))
+	assert.Equal(t, "c670af129e8d72e4ec973887a3ace0d17e0c9db5e1b53f32a37477dd3caeb819", hex.EncodeToString(buf.Sum(nil)))
 }
 
 func TestDownloadOriginKey(t *testing.T) {
 	c := depot.NewClient()
-	pkg := mustPkg("core/cacerts/2018.03.07/20180418223647")
+	pkg := mustPkg("core/cacerts/2021.10.26/20240105224256")
 	header, err := c.DownloadPackage(&pkg, ioutil.Discard)
 	require.NoError(t, err)
 	buf := sha256.New()
 	err = c.DownloadOriginKey(header.KeyName, buf)
 	require.NoError(t, err)
-	assert.Equal(t, "ecbf088a7a77e0e09e9d3ebf79eb6820f92c5cd455598efea501ba62ad3fdaa9", hex.EncodeToString(buf.Sum(nil)))
+	assert.Equal(t, "1abe8edb6292fd23ee81016ae8103eea909410ef29f69000e098674f7345cac1", hex.EncodeToString(buf.Sum(nil)))
 }
 
 func TestDownloadOriginKeyWithDash(t *testing.T) {
 	c := depot.NewClient()
-	pkg := mustPkg("chef-fips/automate-debug/0.1.0/20180822195139")
+	pkg := mustPkg("chef/automate-debug/0.1.0/20250617103704")
 	header, err := c.DownloadPackage(&pkg, ioutil.Discard)
 	require.NoError(t, err)
 	buf := sha256.New()
 	err = c.DownloadOriginKey(header.KeyName, buf)
 	require.NoError(t, err)
-	assert.Equal(t, "f774733be6c35f2c65324c7529bc34339e79783d17370fb78e97d136ff052092", hex.EncodeToString(buf.Sum(nil)))
+	assert.Equal(t, "8aefb8c21814dabe00279c8b5dcfdcf19bd9f9886d90d7e9dc7bf0de5402997f", hex.EncodeToString(buf.Sum(nil)))
 }

@@ -17,6 +17,8 @@ do_deploy() {
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
 
+    export HAB_AUTH_TOKEN=$HAB_AUTH_TOKEN
+
     # we make sure to use the CLI for the old version of Automate we want to deploy
     local cli_bin="/bin/chef-automate-${OLD_VERSION}"
 

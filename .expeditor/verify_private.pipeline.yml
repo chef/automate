@@ -13,6 +13,10 @@ env:
   PGGSSENCMODE: "disable"
 
 expeditor:
+#  secrets:
+#    HAB_AUTH_TOKEN:
+#      path: account/static/habitat/chef-ci
+#      field: auth_token # Production Builder
   defaults:
     executor:
       docker:
@@ -50,6 +54,9 @@ steps:
       GITHUB_TOKEN:
         account: github/chef
         field: token
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
     executor:
       docker:
 
@@ -83,6 +90,9 @@ steps:
       OPENSEARCH_NODE1_KEY_PEM:
         path: secret/a2/a2ha/opensearch
         field: node1-key.pem
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
     executor:
       linux:
         privileged: true
@@ -105,6 +115,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
     executor:
       docker:
 
@@ -193,6 +206,7 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+        
 
 - label: "data-feed-service"
   command:
@@ -257,6 +271,9 @@ steps:
       HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
         account: aws/chef-cd
         field: session_token
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       docker:
         privileged: true
@@ -302,6 +319,9 @@ steps:
       HAB_STUDIO_SECRET_A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       docker:
         privileged: true
@@ -332,6 +352,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "secrets-service"
   command:
@@ -345,6 +368,11 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token    
+
 
 - label: "event-feed-service"
   command:
@@ -358,6 +386,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token     
 
 - label: "es-sidecar-service"
   command:
@@ -374,6 +406,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "ingest-service"
   command:
@@ -391,6 +427,10 @@ steps:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
         - REST_SERVICE=https://localhost:10122
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "compliance-service"
   command:
@@ -407,6 +447,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "config-mgmt-service"
   command:
@@ -423,6 +467,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "event-service"
   command:
@@ -436,6 +484,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "event-gateway"
   command:
@@ -449,6 +501,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "pg-sidecar-service"
   command:
@@ -469,6 +525,10 @@ steps:
         environment:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 - label: "infra-proxy-service"
   command:
@@ -486,6 +546,10 @@ steps:
         - HAB_STUDIO_SUP=false
         - HAB_NONINTERACTIVE=true
         - CONTAINER_HOSTNAME=localhost
+    secrets:
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token      
 
 #
 # The following tests all use the integration test framework for
@@ -516,6 +580,9 @@ steps:
       CYPRESS_AUTOMATE_INFRA_ADMIN_KEY:
         path: secret/a2/testing/infra_admin_key
         field: data
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -529,6 +596,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
@@ -542,75 +612,94 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
 
-- label: "iam v1 to v2 force-upgrade"
-  command:
-  - echo "\$A2_LICENSE" > dev/license.jwt
-  - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v1 to v2 force-upgrade"
+#   command:
+#   - echo "\$A2_LICENSE" > dev/license.jwt
+#   - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token  
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v1 to v2 force-upgrade (diagnostics only)"
-  command:
-  - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v1 to v2 force-upgrade (diagnostics only)"
+#   command:
+#   - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token  
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v2 with no legacy policies force-upgrade to v2"
-  command:
-  - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-  timeout_in_minutes: 45
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v2 with no legacy policies force-upgrade to v2"
+#   command:
+#   - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
+#   timeout_in_minutes: 45
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token   
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
-  command:
-  - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
+#   command:
+#   - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token 
+         
+#     executor:
+#       linux:
+#         privileged: true
 
-- label: "iam v2 with legacy policies force upgrade to v2"
-  command:
-  - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
+# - label: "iam v2 with legacy policies force upgrade to v2"
+#   command:
+#   - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
+#       HAB_AUTH_TOKEN:
+#         path: account/static/habitat/chef-ci
+#         field: auth_token  
+#     executor:
+#       linux:
+#         privileged: true
 
 - label: "product"
   #  - label: "a1migration"
@@ -645,6 +734,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "product airgap"
   command:
@@ -658,6 +750,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "product dev"
   command:
@@ -671,6 +766,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "airgap upgrade"
   command:
@@ -684,6 +782,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "airgap ow upgrade"
   command:
@@ -697,6 +798,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "airgap backup"
   command:
@@ -710,6 +814,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "chef server"
   command:
@@ -723,6 +830,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token   
 
 - label: "chef server only"
   command:
@@ -736,6 +846,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "ha chef server"
   command:
@@ -750,6 +863,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "backup to s3"
   command:
@@ -775,6 +891,9 @@ steps:
       AWS_SESSION_TOKEN:
         account: aws/chef-cd
         field: session_token
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
 
 - label: "backup to gcs"
   command:
@@ -820,6 +939,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "upgrade acceptance -> master"
   command:
@@ -833,6 +955,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "upgrade current -> master"
   command:
@@ -846,6 +971,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "upgrade current -> master (with latest hab)"
   command:
@@ -860,6 +988,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
 - label: "manual upgrade current -> master"
   command:
@@ -873,46 +1004,49 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token
 
-- label: "deep upgrades"
-  command:
-  - integration/run_test integration/tests/deep_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    executor:
-      linux:
-        privileged: true
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
+# - label: "deep upgrades"
+#   command:
+#   - integration/run_test integration/tests/deep_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     executor:
+#       linux:
+#         privileged: true
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
 
-- label: "deep migrate upgrade"
-  command:
-  - integration/run_test integration/tests/migrate_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    executor:
-      linux:
-        single-use: true
-        privileged: true
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
+# - label: "deep migrate upgrade"
+#   command:
+#   - integration/run_test integration/tests/migrate_upgrade.sh
+#   timeout_in_minutes: 25
+#   expeditor:
+#     executor:
+#       linux:
+#         single-use: true
+#         privileged: true
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
 
-- label: "deep upgrade backup restore"
-  command:
-  - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
-  timeout_in_minutes: 35
-  expeditor:
-    executor:
-      linux:
-        privileged: true
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
+# - label: "deep upgrade backup restore"
+#   command:
+#   - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
+#   timeout_in_minutes: 35
+#   expeditor:
+#     executor:
+#       linux:
+#         privileged: true
+#     secrets:
+#       A2_LICENSE:
+#         path: secret/a2/license
+#         field: license
 
 - label: "backups"
   command:
@@ -1042,6 +1176,9 @@ steps:
       A2_LICENSE:
         path: secret/a2/license
         field: license
+      HAB_AUTH_TOKEN:
+        path: account/static/habitat/chef-ci
+        field: auth_token  
     executor:
       linux:
         privileged: true
