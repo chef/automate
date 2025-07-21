@@ -14,10 +14,10 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
-  core/bash/5.1/20240105214248
-  chef/automate-platform-tools/0.1.0/20241212061203
+  core/bash
+  chef/automate-platform-tools
   # We need to pin here to get a build from unstable
-  habitat/builder-api/10315/20240913162802
+  habitat/builder-api/10688/20250701143308
 )
 
 pkg_binds=(
