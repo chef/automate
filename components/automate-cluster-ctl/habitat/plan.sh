@@ -9,23 +9,23 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 
 pkg_deps=(
-  core/ruby31/3.1.6/20240912144513
-  core/aws-cli/1.31.4/20240106034739
+  core/ruby31
+  core/aws-cli
   # chef/inspec/4.56.61
-  core/bash/5.1/20240105214248
-  core/coreutils/8.32/20240105213308
-  core/cacerts/2021.10.26/20240105224256
-  core/findutils/4.9.0/20240105220908
-  core/gawk/5.1.0/20240105214723
-  core/gzip/1.13/20240105221940
-  core/jq-static/1.6/20240107004905
-  core/openssh/7.9p1/20240106022237
-  core/make/4.3/20240105222044
-  core/curl/8.7.1/20240614090648
-  core/terraform1/1.5.7/20240106055300
+  core/bash/5.1
+  core/coreutils
+  core/cacerts
+  core/findutils
+  core/gawk
+  core/gzip
+  core/jq-static
+  core/openssh
+  core/make
+  core/curl
+  core/terraform1
   core/hab/1.6.1243/20241227194506
-  core/openssl/1.0.2zi/20240105224424
-  core/rsync/3.2.3/20240107034222
+  core/openssl
+  core/rsync
   
 #   core/openssh ( core/openssh/7.9p1/20220311132702 core/openssh/7.9p1/20230816095218 )
 #   core/openssl ( core/openssl/1.0.2zf/20230816063107 core/openssl/1.0.2zb/20220311111046 )
@@ -33,7 +33,7 @@ pkg_deps=(
 )
 
 pkg_build_deps=(
-  core/gcc/9.5.0/20240105175314
+  core/gcc
 )
 
 pkg_bin_dirs=(bin)
