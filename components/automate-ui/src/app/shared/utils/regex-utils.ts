@@ -1,1 +1,1 @@
-export const HTML_TAGS_REGEX = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>]/;
+export const HTML_TAGS_REGEX = /<\/?[^>]+(>|$)|[!@#$%^&*().?":{}+|<>~'`\\|/;]/;
