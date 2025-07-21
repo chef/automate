@@ -22,9 +22,9 @@ pkg_deps=(
   chef/automate-platform-tools
   # Pin postgresql, sqitch_pg, and postgresql client until automate-postgresql
   # is updated.
-  core/postgresql13/13.21/20250711150030 # for psql and pg_dump
-  core/postgresql13-client/13.21/20250711152541
-  core/sqitch/1.4.1/20250721113948
+  core/postgresql13 # for psql and pg_dump
+  core/postgresql13-client
+  core/sqitch
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
