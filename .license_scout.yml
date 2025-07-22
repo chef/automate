@@ -1566,6 +1566,8 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: core/coreutils
     reason: Exception made by Chef Legal
+  - name: core/cpanminus
+    reason: Exception made by Chef Legal for build tooling
   - name: core/findutils
     reason: Exception made by Chef Legal
   - name: core/gawk
