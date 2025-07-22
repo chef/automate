@@ -1695,6 +1695,8 @@ exceptions:
   - name: core/ruby3_1
     reason: Ruby license (previously shipped in Automate 1)
   - name : core/libmpc   
+    reason: Exception made by Chef Legal
+  - name : core/tzdata
     reason: Exception made by Chef Legal    
 
   ruby:
