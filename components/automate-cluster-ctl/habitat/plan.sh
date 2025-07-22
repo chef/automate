@@ -9,10 +9,10 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 
 pkg_deps=(
-  core/ruby31
+  core/ruby3_1
   core/aws-cli
   # chef/inspec/4.56.61
-  core/bash/5.1
+  core/bash
   core/coreutils
   core/cacerts
   core/findutils
