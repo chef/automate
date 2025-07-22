@@ -33,16 +33,16 @@ pkg_binds_optional=(
 )
 #Adding it to use compliance with firejail
 pkg_svc_user=root
-inspec_release="chef/inspec/4.56.61/20240809111842"
+inspec_release="chef/inspec/5.22.83/20250714113927"
 pkg_deps=(
-  core/coreutils/8.32/20240105213308
-  chef/automate-platform-tools/0.1.0/20241212061203
+  core/coreutils
+  chef/automate-platform-tools
   "${inspec_release}"
-  chef/mlsa/1.0.1/20240125084021
-  core/grpcurl/1.8.5/20240109144108              # Used in habitat/hooks/health_check
-  core/jq-static/1.6/20240107004905           # Used in habitat/hooks/health_check
-  core/bash/5.1/20240105214248
-  core/firejail/0.9.72/20240109161319
+  chef/mlsa
+  core/grpcurl             # Used in habitat/hooks/health_check
+  core/jq-static           # Used in habitat/hooks/health_check
+  core/bash
+  core/firejail
 )
 
 if [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
