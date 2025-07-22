@@ -22,7 +22,7 @@ pkg_deps=(
   core/openssh
   core/make
   core/curl
-  core/terraform1
+  core/terraform
   core/hab/1.6.1243/20241227194506
   core/openssl
   core/rsync
