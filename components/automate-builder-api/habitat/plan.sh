@@ -4,7 +4,6 @@
 #stable channel
 
 
-
 pkg_name="automate-builder-api"
 pkg_description="Wrapper package for habitat/builder-api"
 pkg_origin="chef"
