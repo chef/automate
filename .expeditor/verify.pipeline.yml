@@ -629,6 +629,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -657,6 +661,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -686,6 +694,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -713,6 +725,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -740,6 +756,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -767,6 +787,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -794,6 +818,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -821,6 +849,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -848,6 +880,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -875,6 +911,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -902,6 +942,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
@@ -929,6 +973,10 @@ steps:
         linux:
           single-use: true
           privileged: true
+      secrets:
+        HAB_AUTH_TOKEN:
+          path: account/static/habitat/chef-ci
+          field: auth_token
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
