@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 
 
-gem "test-kitchen"
-gem "berkshelf"
-gem "kitchen-vagrant"
+gem "test-kitchen", ">= 2.5.2"
+gem "berkshelf", ">= 7.0.10"
+gem "kitchen-vagrant", ">= 1.7.0"
 gem "rack", "= 2.2.8.1"
