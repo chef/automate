@@ -3,6 +3,7 @@ import { ContentItem } from '../../../entities/cds/cds.model';
 import { reduce, first, tail, concat, isEmpty, reverse } from 'lodash/fp';
 
 @Component({
+  standalone: false,
   selector: 'app-card-table',
   templateUrl: './card-table.component.html',
   styleUrls: ['./card-table.component.scss']

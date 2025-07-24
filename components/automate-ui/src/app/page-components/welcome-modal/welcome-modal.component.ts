@@ -16,6 +16,7 @@ import { triggerWelcome } from '../../entities/license/license.selectors';
 const SHOW_AT_START_PREF_KEY = 'show-welcome-modal-on-startup';
 
 @Component({
+  standalone: false,
   selector: 'app-welcome-modal',
   templateUrl: './welcome-modal.component.html',
   styleUrls: ['./welcome-modal.component.scss']

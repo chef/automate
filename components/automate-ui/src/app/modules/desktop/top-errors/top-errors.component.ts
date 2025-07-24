@@ -10,6 +10,7 @@ import {
 } from '../../../entities/desktop/desktop.model';
 
 @Component({
+  standalone: false,
   selector: 'app-top-errors',
   templateUrl: './top-errors.component.html',
   styleUrls: ['./top-errors.component.scss']

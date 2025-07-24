@@ -13,6 +13,7 @@ import { roleFromRoute, getStatus } from '../../../entities/roles/role.selectors
 import { Role } from '../../../entities/roles/role.model';
 
 @Component({
+  standalone: false,
   selector: 'app-role-details',
   templateUrl: './role-details.component.html',
   styleUrls: ['./role-details.component.scss']

@@ -30,6 +30,7 @@ import {
 const TEAM_ADD_USERS_ROUTE = /^\/settings\/teams\/.*\/add-users$/;
 
 @Component({
+  standalone: false,
   selector: 'app-team-add-users',
   templateUrl: './team-add-users.component.html',
   styleUrls: ['./team-add-users.component.scss']

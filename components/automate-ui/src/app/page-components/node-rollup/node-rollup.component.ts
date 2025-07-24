@@ -14,6 +14,7 @@ import {
 import { RollupState } from '../../types/types';
 
 @Component({
+  standalone: false,
   selector: 'app-node-rollup',
   templateUrl: './node-rollup.component.html',
   styleUrls: ['./node-rollup.component.scss'],

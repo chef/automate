@@ -7,6 +7,7 @@ import {
 // import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-search-bar',
   templateUrl: './infra-search-bar.component.html',
   styleUrls: ['./infra-search-bar.component.scss']

@@ -9,6 +9,7 @@ import { PolicyFile } from '../../../entities/policy-files/policy-file.model';
 import { PolicyFileRequests } from '../../../entities/policy-files/policy-file.requests';
 
 @Component({
+  standalone: false,
   selector: 'app-included-policies-details',
   templateUrl: './included-policies-details.component.html',
   styleUrls: ['./included-policies-details.component.scss']

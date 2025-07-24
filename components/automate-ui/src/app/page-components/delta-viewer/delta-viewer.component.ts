@@ -4,6 +4,7 @@ import * as Diff2Html from 'diff2html';
 
 
 @Component({
+  standalone: false,
   selector: 'app-delta-viewer',
   templateUrl: './delta-viewer.component.html',
   styleUrls: ['./delta-viewer.component.scss']

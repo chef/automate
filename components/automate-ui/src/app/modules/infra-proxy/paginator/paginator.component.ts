@@ -12,6 +12,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
+  standalone: false,
   selector: 'app-paginator',
   templateUrl: './paginator.component.html',
   styleUrls: ['./paginator.component.scss'],

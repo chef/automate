@@ -46,6 +46,7 @@ import { EntityStatus } from '../../entities/entities';
 import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
+  standalone: false,
   selector: 'app-client-runs',
   templateUrl: './client-runs.component.html',
   styleUrls: ['./client-runs.component.scss']

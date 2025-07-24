@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'selectedStatus'})
+@Pipe({
+  standalone: false,name: 'selectedStatus'})
 
 // ToDo eng-ex figure out if this is the same or can be combined with status-selector.pipe
 export class SelectedStatusPipe implements PipeTransform {

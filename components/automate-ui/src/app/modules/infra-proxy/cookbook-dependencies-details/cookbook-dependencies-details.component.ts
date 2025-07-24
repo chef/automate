@@ -16,6 +16,7 @@ import { CookbookDetailsRequests } from '../../../entities/cookbooks/cookbook-de
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-cookbook-dependencies-details',
   templateUrl: './cookbook-dependencies-details.component.html',
   styleUrls: ['./cookbook-dependencies-details.component.scss']

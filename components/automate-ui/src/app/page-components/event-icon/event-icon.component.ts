@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-event-icon',
   templateUrl: './event-icon.component.html',
   styleUrls: ['./event-icon.component.scss']

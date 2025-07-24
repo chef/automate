@@ -26,6 +26,7 @@ import {
 import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
+  standalone: false,
   selector: 'app-event-feed',
   templateUrl: './event-feed.component.html',
   styleUrls: ['./event-feed.component.scss']

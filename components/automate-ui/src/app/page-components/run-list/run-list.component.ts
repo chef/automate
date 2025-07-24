@@ -43,6 +43,7 @@ class RunListRollupStatus {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-run-list',
   templateUrl: './run-list.component.html',
   styleUrls: ['./run-list.component.scss'],

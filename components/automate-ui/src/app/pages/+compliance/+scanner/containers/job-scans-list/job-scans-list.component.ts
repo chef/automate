@@ -11,6 +11,7 @@ import * as actions from '../../state/scanner.actions';
 import { DateTime } from '../../../../../helpers/datetime/datetime';
 
 @Component({
+  standalone: false,
   templateUrl: './job-scans-list.component.html',
   styleUrls: ['./job-scans-list.component.scss']
 })

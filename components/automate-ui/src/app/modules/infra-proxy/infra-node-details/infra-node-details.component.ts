@@ -56,6 +56,7 @@ import { HTML_TAGS_REGEX } from '../../../shared/utils/regex-utils';
 export type InfraNodeTabName = 'details' | 'runList' | 'attributes';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-node-details',
   templateUrl: './infra-node-details.component.html',
   styleUrls: ['./infra-node-details.component.scss']

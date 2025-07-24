@@ -9,6 +9,7 @@ import { RunHistoryStore } from '../../../services/run-history-store/run-history
 import { NodeRun } from '../../../types/types';
 
 @Component({
+  standalone: false,
   selector: 'app-desktop-detail',
   templateUrl: './desktop-detail.component.html',
   styleUrls: ['./desktop-detail.component.scss']

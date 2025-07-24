@@ -2,6 +2,7 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Component({
+  standalone: false,
   selector: 'app-gcp-integration-form',
   templateUrl: './gcp-form.component.html',
   styleUrls: ['./gcp-form.component.scss'],

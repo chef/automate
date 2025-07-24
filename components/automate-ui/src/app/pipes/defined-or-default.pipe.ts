@@ -9,6 +9,7 @@ import { isNil } from 'lodash';
     + false | or return '--'
     + undefined | or: 'Missing' return 'Missing' */
 @Pipe({
+  standalone: false,
   name: 'definedOrDefault'
 })
 export class DefinedOrDefaultPipe implements PipeTransform {

@@ -14,6 +14,7 @@ import { Credential } from '../../../../../entities/credentials/credential.model
 import { pending, EntityStatus } from '../../../../../entities/entities';
 
 @Component({
+  standalone: false,
   templateUrl: './nodes-add.component.html',
   styleUrls: ['./nodes-add.component.scss']
 })

@@ -20,6 +20,7 @@ import {
 import { UserPreferencesService } from '../../services/user-preferences/user-preferences.service';
 
 @Component({
+  standalone: false,
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: [ './profile.component.scss' ]

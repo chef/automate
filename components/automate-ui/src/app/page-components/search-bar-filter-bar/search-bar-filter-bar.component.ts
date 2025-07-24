@@ -7,6 +7,7 @@ import {
 import { Chicklet } from '../../types/types';
 
 @Component({
+  standalone: false,
   selector: 'app-search-bar-filter-bar',
   templateUrl: './search-bar-filter-bar.component.html',
   styleUrls: ['./search-bar-filter-bar.component.scss']

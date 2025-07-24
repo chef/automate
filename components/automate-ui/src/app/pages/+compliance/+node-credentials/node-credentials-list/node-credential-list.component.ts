@@ -27,6 +27,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-node-credential-list',
   templateUrl: './node-credential-list.component.html',
   styleUrls: ['./node-credential-list.component.scss']

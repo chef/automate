@@ -10,6 +10,7 @@ import { concat,
          map } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'chef-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],

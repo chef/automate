@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChange } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: '[chef-guitar-string-section]',
   templateUrl: './guitar-string-section.component.html',
   styleUrls: ['./guitar-string-section.component.scss']

@@ -42,6 +42,7 @@ export enum Step {
 }
 
 @Component({
+  standalone: false,
   templateUrl: './job-add.component.html',
   styleUrls: ['./job-add.component.scss']
 })

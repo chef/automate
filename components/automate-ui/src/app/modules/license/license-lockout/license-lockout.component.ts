@@ -18,6 +18,7 @@ import { SessionStorageService } from '../../../services/storage/sessionstorage.
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-license-lockout',
   templateUrl: './license-lockout.component.html',
   styleUrls: ['./license-lockout.component.scss']

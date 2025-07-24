@@ -11,6 +11,7 @@ import { EntityStatus, pendingState } from '../../../entities/entities';
 import { ApplyStatus, FetchStatus, LicenseStatus, parsedExpirationDate } from '../../../entities/license/license.model';
 
 @Component({
+  standalone: false,
   selector: 'app-license-apply',
   templateUrl: './license-apply.component.html',
   styleUrls: ['./license-apply.component.scss']

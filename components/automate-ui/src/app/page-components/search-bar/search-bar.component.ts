@@ -18,6 +18,7 @@ import {
 } from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'app-search-bar',
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss']

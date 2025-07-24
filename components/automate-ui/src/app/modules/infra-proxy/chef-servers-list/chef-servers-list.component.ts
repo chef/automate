@@ -22,6 +22,7 @@ import { CreateServer, GetServers, DeleteServer } from '../../../entities/server
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-chef-servers-list',
   templateUrl: './chef-servers-list.component.html',
   styleUrls: ['./chef-servers-list.component.scss']

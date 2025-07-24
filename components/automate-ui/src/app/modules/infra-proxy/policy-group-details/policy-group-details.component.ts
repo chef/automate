@@ -21,6 +21,7 @@ import { GetOrg } from '../../../entities/orgs/org.actions';
 export type PolicyGroupTabName = 'policyfiles' | 'nodes';
 
 @Component({
+  standalone: false,
   selector: 'app-policy-group-details',
   templateUrl: './policy-group-details.component.html',
   styleUrls: ['./policy-group-details.component.scss']

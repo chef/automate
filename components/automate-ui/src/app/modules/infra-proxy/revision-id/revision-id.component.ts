@@ -23,6 +23,7 @@ import { Revision } from '../../../entities/revisions/revision.model';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-revision-id',
   templateUrl: './revision-id.component.html',
   styleUrls: ['./revision-id.component.scss']

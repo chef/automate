@@ -41,6 +41,7 @@ import { AppConfigService } from '../../../services/app-config/app-config.servic
 import { DownloadReportsService } from '../../../entities/download-reports/download-reports.service';
 
 @Component({
+  standalone: false,
   templateUrl: './reporting.component.html',
   styleUrls: ['./reporting.component.scss'],
   providers: [SuggestionsService]

@@ -15,6 +15,7 @@ import { ResetKey } from '../../../entities/clients/client.model';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-reset-client-key',
   templateUrl: './reset-client-key.component.html',
   styleUrls: ['./reset-client-key.component.scss']

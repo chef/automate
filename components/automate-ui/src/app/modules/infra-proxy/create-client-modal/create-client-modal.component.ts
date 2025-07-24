@@ -14,6 +14,7 @@ import { Utilities } from '../../../helpers/utilities/utilities';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-create-client-modal',
   templateUrl: './create-client-modal.component.html',
   styleUrls: ['./create-client-modal.component.scss']

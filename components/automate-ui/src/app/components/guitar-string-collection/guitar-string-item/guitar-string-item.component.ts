@@ -2,6 +2,7 @@ import { Component, Input, OnInit,
   OnChanges, SimpleChange } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: '[chef-guitar-string-item]',
   templateUrl: './guitar-string-item.component.html',
   styleUrls: ['./guitar-string-item.component.scss']

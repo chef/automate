@@ -14,6 +14,7 @@ export interface ResourceCheckedSection {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-resource-dropdown',
   templateUrl: './resource-dropdown.component.html',
   styleUrls: ['./resource-dropdown.component.scss']

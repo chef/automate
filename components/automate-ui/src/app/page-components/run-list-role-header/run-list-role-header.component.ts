@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Item } from '../run-list/run-list.component';
 
 @Component({
+  standalone: false,
   selector: 'app-run-list-role-header',
   templateUrl: './run-list-role-header.component.html',
   styleUrls: ['./run-list-role-header.component.scss']

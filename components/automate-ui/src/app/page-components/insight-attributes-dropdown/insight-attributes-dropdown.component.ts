@@ -3,6 +3,7 @@ import { DesktopColumnOption, DesktopColumnOptionUpdate } from '../../entities/d
 import { cloneDeep, isEqual } from 'lodash/fp';
 
 @Component({
+  standalone: false,
   selector: 'app-insight-attributes-dropdown',
   templateUrl: './insight-attributes-dropdown.component.html',
   styleUrls: ['./insight-attributes-dropdown.component.scss']

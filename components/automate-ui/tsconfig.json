@@ -19,7 +19,7 @@
     "module": "ES2022",
     "useDefineForClassFields": false,
     "lib": [
-      "ES2022",
+      "ES2023",
       "dom"
     ],
     "noImplicitAny": false,
@@ -32,5 +32,5 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  
+
 }

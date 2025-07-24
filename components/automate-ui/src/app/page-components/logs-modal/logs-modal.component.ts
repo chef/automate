@@ -5,6 +5,7 @@ import { saveAs } from 'file-saver';
 import { DateTime } from '../../helpers/datetime/datetime';
 
 @Component({
+  standalone: false,
   selector: 'app-logs-modal',
   templateUrl: './logs-modal.component.html',
   styleUrls: ['./logs-modal.component.scss']

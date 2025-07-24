@@ -14,6 +14,7 @@ import { SortJobList } from './job-list.actions';
 import { JobOrder } from './job-list.reducer';
 
 @Component({
+  standalone: false,
   templateUrl: './job-list.component.html',
   styleUrls: ['./job-list.component.scss']
 })

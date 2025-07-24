@@ -14,6 +14,7 @@ import * as moment from 'moment/moment';
 type Tab = 'Node Status' | 'Profile Status';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-overview',
   templateUrl: './reporting-overview.component.html',
   styleUrls: [ './reporting-overview.component.scss' ],

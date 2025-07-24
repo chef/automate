@@ -35,6 +35,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { ServiceGroupsRequests } from '../../entities/service-groups/service-groups.requests';
 
 @Component({
+  standalone: false,
   selector: 'app-service-groups',
   templateUrl: './service-groups.component.html',
   styleUrls: ['./service-groups.component.scss']

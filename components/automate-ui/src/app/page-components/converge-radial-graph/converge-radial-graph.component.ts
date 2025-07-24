@@ -5,6 +5,7 @@ import { isEmpty } from 'lodash';
 import { NodeCount } from '../../types/types';
 
 @Component({
+  standalone: false,
   selector: 'app-converge-radial-graph',
   templateUrl: './converge-radial-graph.component.html',
   styleUrls: ['./converge-radial-graph.component.scss']

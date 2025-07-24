@@ -16,6 +16,7 @@ import { GetControlDetail } from '../../../../entities/control-details/control-d
 import { controlDetailStatus, controlDetailList, controlsList } from '../../../../entities/control-details/control-details.selectors';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-node',
   templateUrl: './reporting-node.component.html',
   styleUrls: ['./reporting-node.component.scss']

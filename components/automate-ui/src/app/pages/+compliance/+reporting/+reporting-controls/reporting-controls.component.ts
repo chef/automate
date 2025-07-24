@@ -7,6 +7,7 @@ import { DateTime } from '../../../../helpers/datetime/datetime';
 import { ReportQueryService, ReportDataService, ReportQuery } from '../../shared/reporting';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-controls',
   templateUrl: './reporting-controls.component.html',
   styleUrls: [ './reporting-controls.component.scss' ]

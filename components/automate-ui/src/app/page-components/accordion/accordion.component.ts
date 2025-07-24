@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 @Component({
+  standalone: false,
   selector: 'app-accordion',
   templateUrl: './accordion.component.html',
   styleUrls: ['./accordion.component.scss'],

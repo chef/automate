@@ -9,6 +9,7 @@ import {
 } from '../../../entities/desktop/desktop.model';
 
 @Component({
+  standalone: false,
   selector: 'app-check-in-time-series',
   templateUrl: './check-in-time-series.component.html',
   styleUrls: ['./check-in-time-series.component.scss']

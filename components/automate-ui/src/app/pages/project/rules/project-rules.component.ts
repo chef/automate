@@ -37,6 +37,7 @@ interface KVCondition {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-project-rules',
   templateUrl: './project-rules.component.html',
   styleUrls: ['./project-rules.component.scss']

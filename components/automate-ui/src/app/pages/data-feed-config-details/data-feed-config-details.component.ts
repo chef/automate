@@ -20,6 +20,7 @@ enum UrlTestState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-data-feed-config-details',
   templateUrl: './data-feed-config-details.component.html',
   styleUrls: ['./data-feed-config-details.component.scss']

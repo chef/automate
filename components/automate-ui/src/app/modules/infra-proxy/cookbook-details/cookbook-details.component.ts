@@ -31,6 +31,7 @@ import { GetCookbookDetails } from '../../../entities/cookbooks/cookbook-details
 export type CookbookDetailsTab = 'content' | 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-cookbook-details',
   templateUrl: './cookbook-details.component.html',
   styleUrls: ['./cookbook-details.component.scss']

@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 let UID = 0;
 
 @Component({
+  standalone: false,
   selector: 'app-overview-failures',
   templateUrl: './overview-failures.component.html',
   styleUrls: ['./overview-failures.component.scss']

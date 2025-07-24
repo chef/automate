@@ -40,6 +40,7 @@ enum UrlTestState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-create-notification-modal',
   templateUrl: './create-notification-modal.component.html',
   styleUrls: ['./create-notification-modal.component.scss']

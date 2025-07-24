@@ -9,6 +9,7 @@ import { LicenseUsageService } from '../../services/license-usage/license-usage.
 
 
 @Component({
+  standalone: false,
   selector: 'app-signin',
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.scss']

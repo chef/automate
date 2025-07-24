@@ -10,6 +10,7 @@ import { previousRoute } from '../../route.selectors';
 import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
+  standalone: false,
   selector: 'app-node-details',
   templateUrl: './node-details.component.html',
   styleUrls: ['./node-details.component.scss']
