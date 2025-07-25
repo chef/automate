@@ -14,16 +14,16 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_svc_user="root"
 
 pkg_deps=(
-  core/coreutils/8.32/20240105213308
-  core/bash/5.1/20240105214248
-  chef/mlsa/1.0.1/20240125084021
-  chef/automate-platform-tools/0.1.0/20241212061203
+  core/coreutils
+  core/bash
+  chef/mlsa
+  chef/automate-platform-tools
   # We need to pin here to get a build from unstable
-  habitat/builder-api-proxy/9639/20240722052815
+  habitat/builder-api-proxy/10092/20250703135906
 )
 
 pkg_build_deps=(
-  core/gcc/9.5.0/20240105175314
+  core/gcc
 )
 
 pkg_binds=(
