@@ -15,7 +15,7 @@ hab pkg install -b core/git core/ruby/3.0.6/20240108025751 core/jq-static core/s
 
 git config --global --add safe.directory /go/src/github.com/chef/automate
 git config --global --add safe.directory '*'
-hab pkg install -b "core/go1_24/1.24.3"
+hab pkg install -b "core/go1_24/1.24.4"
 
 echo "Checking Go Dependencies And Vendored Protos"
 go mod verify

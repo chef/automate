@@ -15,7 +15,7 @@ desired_golang_version() {
 
 install_hab_go() {
     local ident
-    ident="core/go1_24/1.24.3"
+    ident="core/go1_24/1.24.4"
     hab pkg install "$ident" --channel LTS-2024
     hab pkg binlink "$ident" go --force
     hab pkg binlink "$ident" gofmt --force

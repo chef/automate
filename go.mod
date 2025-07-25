@@ -1,6 +1,6 @@
 module github.com/chef/automate
 
-go 1.24.3
+go 1.24.4
 
 require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
