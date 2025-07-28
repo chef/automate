@@ -633,9 +633,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/containerd/containerd/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/containerd/api
-  - license_content: https://raw.githubusercontent.com/containerd/fifo/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/containerd/fifo
   - license_content: https://raw.githubusercontent.com/containerd/go-cni/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/go-cni
