@@ -313,11 +313,6 @@ control 'iam-api-1' do
   end
 
   describe "users API" do
-    TEST_USER = {
-        id: USER_ID,
-        name: "display name !#$#",
-        password: "chefautomate"
-    }
 
     describe "when the user is not yet created" do
       after(:each) do
@@ -964,18 +959,19 @@ control 'iam-api-1' do
     end
 
     context "when there are multiple rules for multiple projects" do
+
       custom_project_id = "inspec-project-mult-projects-#{TIMESTAMP}"
       custom_project_id_2 = "inspec-project-mult-projects-2-#{TIMESTAMP}"
 
-      let(:custom_rule_1) { CUSTOM_RULE_1.merge(project_id: custom_project_id) }
-      let(:custom_rule_2) { CUSTOM_RULE_2.merge(project_id: custom_project_id) }
-      let(:custom_rule_3) { CUSTOM_RULE_3.merge(project_id: custom_project_id_2) }
-
-      let(:staged_custom_rule_1) { staged(custom_rule_1) }
-      let(:staged_custom_rule_2) { staged(custom_rule_2) }
-      let(:staged_custom_rule_3) { staged(custom_rule_3) }
-
       before(:all) do
+        @custom_rule_1 = CUSTOM_RULE_1.merge(project_id: custom_project_id)
+        @custom_rule_2 = CUSTOM_RULE_2.merge(project_id: custom_project_id)
+        @custom_rule_3 = CUSTOM_RULE_3.merge(project_id: custom_project_id_2)
+
+        @staged_custom_rule_1 = staged(@custom_rule_1)
+        @staged_custom_rule_2 = staged(@custom_rule_2)
+        @staged_custom_rule_3 = staged(@custom_rule_3)
+
         resp = automate_api_request({
           endpoint: "/apis/iam/v2/projects",
           http_method: 'POST',
@@ -1001,33 +997,33 @@ control 'iam-api-1' do
         resp = automate_api_request({
           endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules",
           http_method: 'POST',
-          request_body: custom_rule_1.to_json
+          request_body: @custom_rule_1.to_json
         })
         expect(resp.http_status).to eq 200
 
         resp = automate_api_request({
           endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules",
           http_method: 'POST',
-          request_body: custom_rule_2.to_json
+          request_body: @custom_rule_2.to_json
         })
         expect(resp.http_status).to eq 200
 
         resp = automate_api_request({
           endpoint: "/apis/iam/v2/projects/#{custom_project_id_2}/rules",
           http_method: 'POST',
-          request_body: custom_rule_3.to_json
+          request_body: @custom_rule_3.to_json
         })
         expect(resp.http_status).to eq 200
       end
 
       after(:all) do
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_rule_1[:project_id]}/rules/#{custom_rule_1[:id]}", http_method: 'DELETE'})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{@custom_rule_1[:project_id]}/rules/#{@custom_rule_1[:id]}", http_method: 'DELETE'})
         expect(resp.http_status.to_s).to match(/200|404/)
 
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_rule_2[:project_id]}/rules/#{custom_rule_2[:id]}", http_method: 'DELETE'})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{@custom_rule_2[:project_id]}/rules/#{@custom_rule_2[:id]}", http_method: 'DELETE'})
         expect(resp.http_status.to_s).to match(/200|404/)
 
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_rule_3[:project_id]}/rules/#{custom_rule_3[:id]}", http_method: 'DELETE'})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{@custom_rule_3[:project_id]}/rules/#{@custom_rule_3[:id]}", http_method: 'DELETE'})
         expect(resp.http_status.to_s).to match(/200|404/)
 
         resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id}", http_method: 'DELETE'})
@@ -1035,20 +1031,21 @@ control 'iam-api-1' do
 
         resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id_2}", http_method: 'DELETE'})
         expect(resp.http_status.to_s).to match(/200|404/)
-
       end
+
 
       it "GET /iam/v2/projects/:project_id/rules/:id returns a specific rule" do
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_rule_1[:project_id]}/rules/#{custom_rule_1[:id]}"})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{@custom_rule_1[:project_id]}/rules/#{@custom_rule_1[:id]}"})
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule_1)
+        expect(resp.parsed_response_body[:rule]).to eq(@staged_custom_rule_1)
       end
+
 
       it "GET /iam/v2/projects/:id/rules returns any staged rules and applied rules with no staged changes for the project" do
         updated_rule = {
-          id: custom_rule_2[:id],
+          id: @custom_rule_2[:id],
           name: "updated display name",
-          project_id: custom_rule_2[:project_id],
+          project_id: @custom_rule_2[:project_id],
           type: "EVENT",
           conditions: [
             {
@@ -1060,9 +1057,9 @@ control 'iam-api-1' do
         }
 
         staged_updated_rule = {
-          id: custom_rule_2[:id],
+          id: @custom_rule_2[:id],
           name: "updated display name",
-          project_id: custom_rule_2[:project_id],
+          project_id: @custom_rule_2[:project_id],
           type: "EVENT",
           conditions: [
             {
@@ -1075,7 +1072,7 @@ control 'iam-api-1' do
         }
 
         resp = automate_api_request({
-          endpoint: "/apis/iam/v2/projects/#{custom_rule_2[:project_id]}/rules/#{custom_rule_2[:id]}",
+          endpoint: "/apis/iam/v2/projects/#{@custom_rule_2[:project_id]}/rules/#{@custom_rule_2[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         })
@@ -1084,15 +1081,16 @@ control 'iam-api-1' do
 
         resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules"})
         expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rules]).to match_array([staged_custom_rule_1, staged_updated_rule])
+        expect(resp.parsed_response_body[:rules]).to match_array([@staged_custom_rule_1, staged_updated_rule])
         expect(resp.parsed_response_body[:status]).to eq("EDITS_PENDING")
       end
 
+
       it "PUT /iam/v2/projects/:project_id/rules/:id updates the rule" do
         updated_rule = {
-          id: custom_rule_1[:id],
+          id: @custom_rule_1[:id],
           name: "updated display name",
-          project_id: custom_rule_1[:project_id],
+          project_id: @custom_rule_1[:project_id],
           type: "NODE",
           conditions: [
             {
@@ -1104,9 +1102,9 @@ control 'iam-api-1' do
         }
 
         staged_updated_rule = {
-          id: custom_rule_1[:id],
+          id: @custom_rule_1[:id],
           name: "updated display name",
-          project_id: custom_rule_1[:project_id],
+          project_id: @custom_rule_1[:project_id],
           type: "NODE",
           conditions: [
             {
@@ -1119,24 +1117,25 @@ control 'iam-api-1' do
         }
 
         resp = automate_api_request({
-          endpoint: "/apis/iam/v2/projects/#{custom_rule_1[:project_id]}/rules/#{custom_rule_1[:id]}",
+          endpoint: "/apis/iam/v2/projects/#{@custom_rule_1[:project_id]}/rules/#{@custom_rule_1[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         })
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
 
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_rule_1[:project_id]}/rules/#{custom_rule_1[:id]}"})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{@custom_rule_1[:project_id]}/rules/#{@custom_rule_1[:id]}"})
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(staged_updated_rule)
       end
 
+
       it "DELETE /iam/v2/projects/:project_id/rules/:id deletes the specific rule" do
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules/#{custom_rule_1[:id]}", http_method: 'DELETE'})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules/#{@custom_rule_1[:id]}", http_method: 'DELETE'})
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(nil)
 
-        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules/#{custom_rule_1[:id]}"})
+        resp = automate_api_request({endpoint: "/apis/iam/v2/projects/#{custom_project_id}/rules/#{@custom_rule_1[:id]}"})
         expect(resp.http_status).to eq 404
       end
     end
