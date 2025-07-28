@@ -35,7 +35,7 @@ pkg_binds_optional=(
 pkg_svc_user=root
 inspec_release="chef/inspec/5.22.83/20250714113927"
 pkg_deps=(
-  core/coreutils
+  core/coreutils/9.4/20250528165939
   chef/automate-platform-tools
   "${inspec_release}"
   chef/mlsa
