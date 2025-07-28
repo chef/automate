@@ -264,11 +264,12 @@ input {
 div.chef-dropdown.mat-mdc-select-panel {
   min-width: max-content;
   position: absolute;
-  top: -2.5rem;
+  top: -2rem;
   padding: 0;
   border-radius: 5px !important;
-  right: 0.8rem;
   font-size: 14px;
+  width: 390px;
+  left: -14px;
 }
 
 .three-dot-column {
