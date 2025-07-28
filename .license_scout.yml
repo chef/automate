@@ -621,9 +621,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/cncf/xds/main/LICENSE
     license_id: Apache-2.0
     name: github.com/cncf/xds/go
-  - license_content: https://raw.githubusercontent.com/cockroachdb/datadriven/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/cockroachdb/datadriven
   - license_content: https://raw.githubusercontent.com/containerd/aufs/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/aufs
