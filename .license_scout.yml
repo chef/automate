@@ -630,9 +630,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/containerd/cgroups/master/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/cgroups
-  - license_content: https://raw.githubusercontent.com/containerd/console/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/containerd/console
   - license_content: https://raw.githubusercontent.com/containerd/containerd/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/containerd/api
