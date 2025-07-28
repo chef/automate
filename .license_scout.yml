@@ -660,12 +660,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/containers/ocicrypt/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containers/ocicrypt
-  - license_content: https://raw.githubusercontent.com/etcd-io/etcd/main/LICENSE
-    license_id: Apache-2.0
-    name: github.com/coreos/etcd
-  - license_content: https://raw.githubusercontent.com/coreos/go-etcd/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/coreos/go-etcd
   - license_content: https://raw.githubusercontent.com/coreos/go-semver/main/LICENSE
     license_id: Apache-2.0
     name: github.com/coreos/go-semver
@@ -798,9 +792,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/go-playground/validator/master/LICENSE
     license_id: MIT
     name: github.com/go-playground/validator/v10
-  - license_content: https://raw.githubusercontent.com/go-redis/redis/master/LICENSE
-    license_id: BSD-2-Clause
-    name: github.com/go-redis/redis
   - license_content: https://raw.githubusercontent.com/go-sql-driver/mysql/master/LICENSE
     license_id: MPL-2.0
     name: github.com/go-sql-driver/mysql
@@ -915,9 +906,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/gordonklaus/ineffassign/master/LICENSE
     license_id: MIT
     name: github.com/gordonklaus/ineffassign
-  - license_content: https://raw.githubusercontent.com/gorilla/context/master/LICENSE
-    license_id: BSD-3-Clause
-    name: github.com/gorilla/context
   - license_content: https://raw.githubusercontent.com/gorilla/websocket/master/LICENSE
     license_id: BSD-2-Clause
     name: github.com/gorilla/websocket
@@ -1107,12 +1095,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/onsi/gomega/master/LICENSE
     license_id: MIT
     name: github.com/onsi/gomega
-  - license_content: https://raw.githubusercontent.com/opencontainers/runc/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/opencontainers/runc
-  - license_content: https://raw.githubusercontent.com/opencontainers/runtime-tools/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/opencontainers/runtime-tools
   - license_content: https://raw.githubusercontent.com/opencontainers/selinux/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/opencontainers/selinux
@@ -1161,9 +1143,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/sagikazarmark/crypt/refs/heads/fork/LICENSE
     license_id: MIT
     name: github.com/sagikazarmark/crypt
-  - license_content: https://raw.githubusercontent.com/satori/go.uuid/master/LICENSE
-    license_id: MIT
-    name: github.com/satori/go.uuid
   - license_content: https://raw.githubusercontent.com/savsgio/dictpool/master/LICENSE
     license_id: Apache-2.0
     name: github.com/savsgio/dictpool
@@ -1197,12 +1176,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/stretchr/testify/master/LICENSE
     license_id: MIT
     name: github.com/stretchr/testify
-  - license_content: https://raw.githubusercontent.com/syndtr/gocapability/master/LICENSE
-    license_id: BSD-2-Clause
-    name: github.com/syndtr/gocapability
-  - license_content: https://raw.githubusercontent.com/testcontainers/testcontainers-go/master/LICENSE
-    license_id: MIT
-    name: github.com/testcontainers/testcontainers-go
   - license_content: https://raw.githubusercontent.com/tinylib/msgp/master/LICENSE
     license_id: MIT
     name: github.com/tinylib/msgp
@@ -1218,9 +1191,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/ugorji/go/master/LICENSE
     license_id: MIT
     name: github.com/ugorji/go
-  - license_content: https://raw.githubusercontent.com/urfave/cli/master/LICENSE
-    license_id: MIT
-    name: github.com/urfave/cli
   - license_content: https://raw.githubusercontent.com/veraison/go-cose/refs/heads/main/LICENSE
     license_id: MPL-2.0
     name: github.com/veraison/go-cose
@@ -1254,18 +1224,12 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/xeipuuv/gojsonreference/master/LICENSE-APACHE-2.0.txt
     license_id: Apache-2.0
     name: github.com/xeipuuv/gojsonreference
-  - license_content: https://raw.githubusercontent.com/xeipuuv/gojsonschema/master/LICENSE-APACHE-2.0.txt
-    license_id: Apache-2.0
-    name: github.com/xeipuuv/gojsonschema
   - license_content: https://raw.githubusercontent.com/xhit/go-str2duration/refs/heads/master/LICENSE
     license_id: BSD-3-Clause
     name: github.com/xhit/go-str2duration/v2
   - license_content: https://raw.githubusercontent.com/xiang90/probing/master/LICENSE
     license_id: BSD-2-Clause
     name: github.com/xiang90/probing
-  - license_content: https://raw.githubusercontent.com/xordataexchange/crypt/master/LICENSE
-    license_id: MIT
-    name: github.com/xordataexchange/crypt
   - license_content: https://raw.githubusercontent.com/youmark/pkcs8/master/LICENSE
     license_id: MIT
     name: github.com/youmark/pkcs8
@@ -1395,9 +1359,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/alecthomas/kingpin/master/COPYING
     license_id: MIT
     name: gopkg.in/alecthomas/kingpin.v2
-  - license_content: https://raw.githubusercontent.com/go-asn1-ber/asn1-ber/v1.2/LICENSE
-    license_id: MIT
-    name: gopkg.in/asn1-ber.v1
   - license_content: https://raw.githubusercontent.com/go-check/check/v1/LICENSE
     license_id: BSD-2-Clause
     name: gopkg.in/check.v1
@@ -1410,9 +1371,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/go-inf/inf/refs/tags/v0.9.1/LICENSE
     license_id: Gocov-Authors
     name: gopkg.in/inf.v0
-  - license_content: https://raw.githubusercontent.com/go-ldap/ldap/v2.5.1/LICENSE
-    license_id: MIT
-    name: gopkg.in/ldap.v2
   - license_content: https://raw.githubusercontent.com/go-mgo/mgo/v2/LICENSE
     license_id: BSD-3-Clause
     name: gopkg.in/mgo.v2
@@ -1458,9 +1416,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/kubernetes/kubernetes/refs/heads/master/LICENSE
     license_id: Apache-2.0
     name: k8s.io/klog/v2
-  - license_content: https://raw.githubusercontent.com/kubernetes/kubernetes/master/LICENSE
-    license_id: Apache-2.0
-    name: k8s.io/kubernetes
   - license_content: https://raw.githubusercontent.com/kubernetes/kubernetes/refs/heads/master/LICENSE
     license_id: Apache-2.0
     name: k8s.io/utils
@@ -1488,9 +1443,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/kubernetes-sigs/structured-merge-diff/refs/heads/master/LICENSE
     license_id: Apache-2.0
     name: sigs.k8s.io/structured-merge-diff/v4
-  - license_content: https://raw.githubusercontent.com/kubernetes-sigs/testing_frameworks/master/LICENSE
-    license_id: Apache-2.0
-    name: sigs.k8s.io/testing_frameworks
   - license_content: https://raw.githubusercontent.com/kubernetes-sigs/yaml/master/LICENSE
     license_id: MIT
     name: sigs.k8s.io/yaml
