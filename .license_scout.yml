@@ -636,9 +636,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/containerd/go-cni/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/go-cni
-  - license_content: https://raw.githubusercontent.com/containerd/go-runc/master/LICENSE
-    license_id: Apache-2.0
-    name: github.com/containerd/go-runc
   - license_content: https://raw.githubusercontent.com/containerd/imgcrypt/refs/heads/main/LICENSE
     license_id: Apache-2.0
     name: github.com/containerd/imgcrypt
