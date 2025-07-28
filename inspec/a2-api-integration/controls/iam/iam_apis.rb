@@ -10,7 +10,13 @@ title 'iam REST API integration tests'
 control 'iam-api-1' do
   title 'iam endpoints'
   desc 'Verify behavior of all the endpoints under the "iam" namespace'
-
+  # Helper method to add status: 'STAGED' to a rule hash
+  def staged(rule)
+    resp_rule = rule.clone
+    resp_rule[:status] = 'STAGED'
+    resp_rule
+  end
+  
   TOKEN_ID = "iam-1-token-#{TIMESTAMP}"
   TOKEN_ID_2 = "iam-1-token-2-#{TIMESTAMP}"
   TOKEN_ID_3 = "iam-1-token-3-#{TIMESTAMP}"
@@ -863,12 +869,6 @@ control 'iam-api-1' do
   end
 
   describe "project rules API" do
-
-    def staged(rule)
-      resp_rule = rule.clone
-      resp_rule[:status] = 'STAGED'
-      resp_rule
-    end
 
     context "when the project does not exist" do
       describe "GET /iam/v2/projects/:id/rules" do
