@@ -23,7 +23,7 @@ pkg_deps=(
   core/make
   core/curl
   core/terraform
-  core/hab/1.6.1243/20241227194506
+  core/hab/1.6.1215/20241115182310
   core/openssl
   core/rsync
   

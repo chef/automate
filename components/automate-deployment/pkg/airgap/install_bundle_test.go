@@ -26,7 +26,7 @@ const sampleManifest = `
 		"core/hab-sup/1.6.1205/20241107150331",
 		"core/hab-launcher/16260/20220603161305"
 	],
-	"hab_build": "core/hab/1.6.1243/20241227194506",
+	"hab_build": "core/hab/1.6.1215/20241115182310",
 	"git_sha": "095673404808228c12df1ee71b2494a67a1368e0",
 	"packages": [
 	  "core/rsync/3.2.3/20240107034222"

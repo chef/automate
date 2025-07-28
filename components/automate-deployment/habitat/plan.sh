@@ -17,7 +17,7 @@ pkg_deps=(
   # runtime by Habitat.
   # 
   # IF YOU UPDATE THIS PIN YOU MUST ALSO UPDATE .expeditor/create-manifest.rb
-  core/hab/1.6.1243/20241227194506
+  core/hab/1.6.1215/20241115182310
   core/net-tools
   core/procps-ng
   core/util-linux
