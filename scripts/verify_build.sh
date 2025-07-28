@@ -25,7 +25,7 @@ export HAB_LICENSE="accept-no-persist"
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
 log_section_start "install ruby"
-sudo -E hab pkg install core/ruby -c stable
+sudo -E hab pkg install core/ruby3_1/3.1.7/20250723122650 -c LTS-2024
 export PATH
 PATH="$(hab pkg path core/ruby)/bin:$PATH"
 sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
