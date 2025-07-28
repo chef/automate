@@ -7,7 +7,9 @@ title 'iam project filtering integration tests'
 
 control 'iam-project-filtering-1' do
   title 'project filtering using the role API as an example'
-
+  DENY_POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
+  POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
+  
   CUSTOM_PROJECT_ID_1 = "inspec-custom-project-role-test-1-#{TIMESTAMP}"
   CUSTOM_PROJECT_ID_2 = "inspec-custom-project-role-test-2-#{TIMESTAMP}"
   CUSTOM_ROLE_ID_1 = "inspec-custom-role-1-#{TIMESTAMP}"
@@ -150,8 +152,6 @@ control 'iam-project-filtering-1' do
     # end
 
     describe 'roles with deny statements' do
-      DENY_POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
-      POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
 
       before(:all) do
         resp = automate_api_request({

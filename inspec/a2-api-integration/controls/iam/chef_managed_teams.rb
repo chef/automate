@@ -8,11 +8,11 @@ title 'iam chef-managed teams'
 control 'iam-chef-managed-teams-1' do
   title 'verifies existence of chef-managed teams, which correspond to chef-managed policies'
 
+  ADMINS = 'admins'
+  EDITORS = 'editors'
+  VIEWERS = 'viewers'
+  
   describe 'teams' do
-    ADMINS = 'admins'
-    EDITORS = 'editors'
-    VIEWERS = 'viewers'
-
     it 'list includes chef-managed teams' do
       resp = automate_api_request({
         endpoint: '/apis/iam/v2/teams'
