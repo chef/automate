@@ -558,9 +558,6 @@ fallbacks:
   - license_content: https://raw.githubusercontent.com/arbovm/levenshtein/refs/heads/master/LICENSE
     license_id: BSD-3-Clause
     name: github.com/arbovm/levenshtein
-  - license_content: https://raw.githubusercontent.com/armon/consul-api/master/LICENSE
-    license_id: MPL-2.0
-    name: github.com/armon/consul-api
   - license_content: https://raw.githubusercontent.com/aws/aws-sdk-go/main/LICENSE.txt
     license_id: Apache-2.0
     name: github.com/aws/aws-sdk-go
