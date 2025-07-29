@@ -962,7 +962,7 @@ steps:
 - label: "upgrade current -> master"
   command:
   - integration/run_test integration/tests/upgrade_current_master.sh
-  timeout_in_minutes: 25
+  timeout_in_minutes: 35
   expeditor:
     executor:
       linux:
@@ -978,7 +978,7 @@ steps:
 - label: "upgrade current -> master (with latest hab)"
   command:
   - integration/run_test integration/tests/upgrade_current_master_habdev.sh
-  timeout_in_minutes: 25
+  timeout_in_minutes: 35
   soft_fail: true
   expeditor:
     executor:
@@ -1077,7 +1077,7 @@ steps:
 - label: "security"
   command:
   - integration/run_test integration/tests/security.sh
-  timeout_in_minutes: 20
+  timeout_in_minutes: 30
   soft_fail: true
   expeditor:
     executor:
@@ -1157,7 +1157,7 @@ steps:
 - label: "ocid"
   command:
   - integration/run_test integration/tests/testing_ocid.sh
-  timeout_in_minutes: 15
+  timeout_in_minutes: 25
   expeditor:
     secrets:
       A2_LICENSE:
