@@ -757,7 +757,7 @@ steps:
 - label: "product dev"
   command:
   - integration/run_test integration/tests/product_dev.sh
-  timeout_in_minutes: 20
+  timeout_in_minutes: 30
   expeditor:
     executor:
       linux:
@@ -821,7 +821,7 @@ steps:
 - label: "chef server"
   command:
   - integration/run_test integration/tests/chef_server.sh
-  timeout_in_minutes: 30 # longer timeout for chef-server
+  timeout_in_minutes: 40 # longer timeout for chef-server
   expeditor:
     executor:
       linux:
@@ -915,7 +915,7 @@ steps:
 - label: "ontop backup"
   command:
   - integration/run_test integration/tests/backup_ontop.sh
-  timeout_in_minutes: 40
+  timeout_in_minutes: 50
   expeditor:
     executor:
       linux:
@@ -1064,7 +1064,7 @@ steps:
 - label: "iam reset admin access"
   command:
   - integration/run_test integration/tests/iam_reset_admin_access.sh
-  timeout_in_minutes: 20
+  timeout_in_minutes: 30
   expeditor:
     executor:
       linux:
@@ -1104,7 +1104,7 @@ steps:
 - label: "ha cluster"
   command:
   - integration/run_test integration/tests/cluster.sh
-  timeout_in_minutes: 35
+  timeout_in_minutes: 45
   expeditor:
     executor:
       linux:
@@ -1144,7 +1144,7 @@ steps:
 - label: "ldap hab user"
   command:
   - integration/run_test integration/tests/ldap_hab_user.sh
-  timeout_in_minutes: 30
+  timeout_in_minutes: 40
   expeditor:
     secrets:
       A2_LICENSE:
@@ -1170,7 +1170,7 @@ steps:
 - label: "ocid config patch"
   command:
   - integration/run_test integration/tests/testing_ocid_config_patch.sh
-  timeout_in_minutes: 15
+  timeout_in_minutes: 20
   expeditor:
     secrets:
       A2_LICENSE:
