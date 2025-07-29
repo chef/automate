@@ -15,8 +15,7 @@ do_deploy() {
         --enable-chef-server \
         --admin-password chefautomate \
         --accept-terms-and-mlsa \
-        --debug \
-        --wait-for-healthy
+        --debug
 
    do_apply_license     
 }
