@@ -31,6 +31,7 @@ channel = "current"
 You can disable automatic upgrades by changing the `upgrade_strategy` setting to `none` in your `config.toml`:
 
 ```toml
+[deployment.v1.svc]
 upgrade_strategy = "none"
 ```
 
