@@ -43,7 +43,7 @@
     "@ngrx/router-store": "^17.2.0",
     "@ngrx/store": "^17.2.0",
     "@ngrx/store-devtools": "^17.2.0",
-    "broadcast-channel": "^7.0.0",
+    "broadcast-channel": "^7.1.0",
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.37.0",
     "d3": "^7.9.0",
