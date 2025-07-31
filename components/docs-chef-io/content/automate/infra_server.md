@@ -66,7 +66,7 @@ A single-host installation that contains Chef Infra Server and Chef Automate req
 Install Chef Automate and Chef Infra Server on the same host with this command:
 
 ```shell
-sudo chef-automate deploy --product automate --product infra-server
+sudo chef-automate deploy --product automate --product infra-server --accept-terms-and-mlsa
 ```
 
 Then, [set up knife]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
