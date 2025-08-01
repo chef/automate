@@ -3,7 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefCheckbox, MockChefError, MockChefFormField, MockChefInput, MockChefModal, MockChefPage, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefTr } from 'app/testing/mock-components';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent, FieldName } from './policy-add-members.component';
@@ -21,23 +21,23 @@ describe('PolicyAddMembersComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
-                MockComponent({ selector: 'chef-page' }),
-                MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-                MockComponent({ selector: 'chef-form-field' }),
-                MockComponent({ selector: 'chef-error'}),
-                MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-                MockComponent({ selector: 'chef-input'}),
-                MockComponent({ selector: 'chef-table' }),
-                MockComponent({ selector: 'chef-thead' }),
-                MockComponent({ selector: 'chef-tr' }),
-                MockComponent({ selector: 'chef-th' }),
-                MockComponent({ selector: 'chef-tbody' }),
-                MockComponent({ selector: 'chef-td' }),
-                MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] }),
-                MockComponent({ selector: 'a', inputs: ['routerLink'] }),
                 PolicyAddMembersComponent
             ],
             imports: [
+                MockChefPage,
+                MockChefModal,
+                MockChefFormField,
+                MockChefError,
+                MockChefButton,
+                MockChefInput,
+                MockChefTable,
+                MockChefThead,
+                MockChefTr,
+                MockChefTh,
+                MockChefTbody,
+                MockChefTd,
+                MockChefCheckbox,
+                MockComponent({ selector: 'a', inputs: ['routerLink'] }),
                 ChefPipesModule,
                 ReactiveFormsModule,
                 RouterTestingModule,

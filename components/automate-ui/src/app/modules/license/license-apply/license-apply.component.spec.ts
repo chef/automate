@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Store, StoreModule } from '@ngrx/store';
-import * as moment from 'moment/moment';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import moment from 'moment';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefCheckbox, MockChefError, MockChefFormField, MockChefIcon, MockChefLoadingSpinner, MockChefModal } from 'app/testing/mock-components';
 import { using } from 'app/testing/spec-helpers';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { HttpStatus } from 'app/types/types';
@@ -35,7 +37,9 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
       start: '2018-03-19T20:49:32.590686519Z',
       end: licenseEndDate.format()
     },
-    customer_name: 'user <test@chef.io> - TRIAL'
+    customer_name: 'user <test@chef.io> - TRIAL',
+    grace_period: false,
+    license_type: 'trial'
   };
 }
 
@@ -157,31 +161,32 @@ describe('LicenseApplyComponent', () => {
         ReactiveFormsModule,
         StoreModule.forRoot({
           licenseStatus: reducer
-        }, { runtimeChecks })
-      ],
-      declarations: [
-        LicenseApplyComponent,
+        }, { runtimeChecks }),
         MockComponent({ selector: 'app-telemetry-checkbox' }),
         MockComponent({ selector: 'chef-alert' }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked', 'disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible', 'locked'] }),
+        MockChefButton,
+        MockChefCheckbox,
+        MockChefError,
+        MockChefFormField,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefModal,
         MockComponent({ selector: 'chef-trap-focus' })
+      ],
+      declarations: [
+        LicenseApplyComponent
       ],
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },
         { provide: TelemetryService, useValue: {} }
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
     const fixture = TestBed.createComponent(LicenseApplyComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
     const store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
+    fixture.detectChanges();
     return { state: reducer(), store };
   }
 

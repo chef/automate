@@ -1,8 +1,9 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 // import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading } from 'app/testing/mock-components';
 import { Router } from '@angular/router';
 import { StoreModule, Store } from '@ngrx/store';
 
@@ -26,22 +27,6 @@ class MockTelemetryService {
 }
 
 const declarations: any[] = [
-  MockComponent({ selector: 'chef-icon' }),
-  MockComponent({ selector: 'mat-select' }),
-  MockComponent({ selector: 'mat-option' }),
-  MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-  MockComponent({ selector: 'chef-breadcrumbs' }),
-  MockComponent({ selector: 'chef-page-header' }),
-  MockComponent({ selector: 'chef-heading' }),
-  MockComponent({ selector: 'chef-subheading' }),
-  MockComponent({ selector: 'chef-loading-spinner' }),
-  MockComponent({
-    selector: 'app-delete-infra-object-modal',
-    inputs: [ 'visible', 'objectNoun', 'objectName'],
-    outputs: ['close', 'deleteClicked']
-  }),
-  MockComponent({ selector: 'chef-button'}),
-  MockComponent({ selector: 'app-create-databag-item-modal', inputs: ['openEvent']}),
   DataBagsDetailsComponent
 ];
 const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';
@@ -82,9 +67,25 @@ describe('DataBagsDetailsComponent', () => {
       ],
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+        MockChefIcon,
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockChefBreadcrumb,
+        MockChefBreadcrumbs,
+        MockChefPageHeader,
+        MockChefHeading,
+        MockChefSubheading,
+        MockChefLoadingSpinner,
+        MockComponent({
+          selector: 'app-delete-infra-object-modal',
+          inputs: [ 'visible', 'objectNoun', 'objectName'],
+          outputs: ['close', 'deleteClicked']
+        }),
+        MockChefButton,
+        MockComponent({ selector: 'app-create-databag-item-modal', inputs: ['openEvent']})
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
     })
       .compileComponents();
   }));

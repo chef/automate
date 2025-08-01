@@ -9,6 +9,7 @@ import { LicenseUsageService } from './services/license-usage/license-usage.serv
   standalone: false
 })
 export class AppComponent {
+  title = 'automate-ui';
   library_url: string;
 
   constructor(private licenseUsageService: LicenseUsageService) {

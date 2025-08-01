@@ -57,7 +57,7 @@ export class PaginatorComponent implements OnInit, OnChanges {
 
   setPageSizeOptions(setPageSizeOptionsInput: string) {
     if (setPageSizeOptionsInput) {
-      this.pageSizeOptions = setPageSizeOptionsInput.split(',').map(str => +str);
+      this.pageSizeOptions = (setPageSizeOptionsInput ?? '').split(',').map(str => +str);
     }
   }
 }

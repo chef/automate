@@ -13,7 +13,7 @@ class MockRouter {
 }
 
 class MockNodesService {
-  response: Observable<Node[]> = observableOf<Node[]>(null);
+  response: Observable<Node[]> = observableOf<Node[]>([]);
 
   constructor() {}
 
@@ -143,7 +143,7 @@ describe('NodeNoRunsDetailsResolverService', () => {
 
   describe('null node list is returned', () => {
     beforeEach(() => {
-        nodesService.setResponse(observableOf<Node[]>(null));
+        nodesService.setResponse(observableOf<Node[]>([]));
     });
 
     it('should return an empty Node with the node ID requested with', (done) => {

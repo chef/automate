@@ -4,7 +4,7 @@
 @import "./assets/chef-ui-library/collection/assets/fonts/material-icons/material-design-icons";
 @import "./assets/chef-ui-library/collection/styles/variables.example";
 @import "./app/styles/chef-theme";
-@import "@ng-select/ng-select/themes/default.theme";
+@import "@ng-select/ng-select/scss/default.theme";
 
 #app-content-wrapper {
   chef-side-panel {
@@ -256,7 +256,7 @@ input {
     top: -2.25rem;
     padding: 0;
     border-radius: 5px !important;
-    right: -2.5rem;
+    right: 0;
     font-size: 14px;
   }
 }

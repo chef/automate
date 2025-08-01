@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
-import { first, filter, takeUntil, pluck } from 'rxjs/operators';
+import { first, filter, takeUntil, pluck, defaultIfEmpty } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
 import { environment as env } from '../../../../environments/environment';
@@ -182,7 +182,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
           this.readFileUrl = encodeURIComponent(this.readFile?.url);
           this.http.get(
             `${env.infra_proxy_url}/servers/${this.serverId}/orgs/${this.orgId}/cookbooks/${this.cookbookName}/${this.currentVersion}/file-content?url=${this.readFileUrl}`)
-            .pipe(first())
+            .pipe(first(), defaultIfEmpty({}))
             .subscribe
             (fileContent => {
               this.readFileContent = fileContent;
@@ -226,7 +226,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
     this.contentUrl = encodeURIComponent(activeContent.url);
     this.http.get(
       `${env.infra_proxy_url}/servers/${this.serverId}/orgs/${this.orgId}/cookbooks/${this.cookbookName}/${this.currentVersion}/file-content?url=${this.contentUrl}`)
-      .pipe(first())
+      .pipe(first(), defaultIfEmpty({}))
       .subscribe
       (fileContent => {
         this.urlContent = fileContent;

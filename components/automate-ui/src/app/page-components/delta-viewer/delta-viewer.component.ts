@@ -13,6 +13,9 @@ export class DeltaViewerComponent {
   @Input() delta: string;
 
   get diffHtml(): SafeHtml {
+    if (!this.delta) {
+      return '';
+    }
     const str = this.delta.split('\\n').join('\n');
     const html = Diff2Html.html(str);
     return this.sanitizer.sanitize(1,html);

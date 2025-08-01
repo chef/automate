@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefBreadcrumb, MockChefLoadingSpinner, MockChefPageHeader, MockChefTabSelector, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefTr } from 'app/testing/mock-components';
 import { Store, StoreModule } from '@ngrx/store';
 import {
   NgrxStateAtom,
@@ -43,29 +45,28 @@ describe('PolicyGroupDetailsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-breadcrumb' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-tab-selector',
-          inputs: ['value', 'routerLink', 'fragment']
-        }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         PolicyGroupDetailsComponent
       ],
       providers: [
         FeatureFlagsService
       ],
       imports: [
+        MockChefPageHeader,
+        MockChefBreadcrumb,
+        MockChefLoadingSpinner,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockChefTabSelector,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         RouterTestingModule,
         HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   });

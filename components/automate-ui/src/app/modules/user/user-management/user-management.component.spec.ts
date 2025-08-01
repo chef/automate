@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefHeading, MockChefPageHeader, MockChefSubheading } from 'app/testing/mock-components';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { UserManagementComponent } from './user-management.component';
@@ -19,6 +19,14 @@ describe('UserManagementComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [
+        UserManagementComponent
+      ],
+      providers: [
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
+      ],
+      imports: [
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
         MockComponent({ selector: 'app-user-table',
             inputs: [
               'addButtonText',
@@ -29,21 +37,13 @@ describe('UserManagementComponent', () => {
               'showEmptyMessage',
               'showTable'
             ] }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-subheading' }),
+        MockChefPageHeader,
+        MockChefHeading,
+        MockChefSubheading,
         MockComponent({ selector: 'app-create-user-modal', inputs: ['openEvent'] }),
         MockComponent({ selector: 'app-delete-object-modal',
                         inputs: ['default', 'visible', 'objectNoun', 'objectName'],
-                        outputs: ['close', 'deleteClicked'] }),
-        UserManagementComponent
-      ],
-      providers: [
-        FeatureFlagsService,
-        { provide: TelemetryService, useClass: MockTelemetryService }
-      ],
-      imports: [
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+                        outputs: ['close', 'deleteClicked'] })
       ]
     }).compileComponents();
   }));

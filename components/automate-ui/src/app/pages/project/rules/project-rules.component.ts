@@ -283,7 +283,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
             // Convert values string to storage format
           values: op === 'EQUALS'
             ? [c.values.trim()]
-            : c.values.split(',').map(v => v.trim())
+            : (c.values ?? '').split(',').map(v => v.trim())
         };
       });
     return {

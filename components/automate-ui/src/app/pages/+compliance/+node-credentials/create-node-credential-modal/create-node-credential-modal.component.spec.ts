@@ -2,7 +2,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefCheckbox, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefToolbar } from 'app/testing/mock-components';
 import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
 import { CreateNodeCredentialModalComponent } from './create-node-credential-modal.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -24,14 +24,7 @@ describe('CreateNodeCredentialModalComponent', () => {
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        CreateNodeCredentialModalComponent,
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] })
+        CreateNodeCredentialModalComponent
       ],
       providers: [
         FeatureFlagsService,
@@ -39,6 +32,13 @@ describe('CreateNodeCredentialModalComponent', () => {
         { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
+        MockChefButton,
+        MockChefLoadingSpinner,
+        MockChefFormField,
+        MockChefCheckbox,
+        MockChefError,
+        MockChefToolbar,
+        MockChefModal,
         ReactiveFormsModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ]

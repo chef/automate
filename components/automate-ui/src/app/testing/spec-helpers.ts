@@ -48,7 +48,7 @@ export function using(values: any[], func: Function) {
     if (Object.prototype.toString.call(values[i]) !== '[object Array]') {
       values[i] = [values[i]];
     }
-    func.apply(this, values[i]);
+    func.apply(null, values[i]);
   }
 }
 
@@ -76,7 +76,7 @@ export function checkFirstPerm(
     return;
   }
   const firstCheckItem = permsFromLandingComp[0];
-  const [ path, verb ] = permsFromTemplate.split(',');
+  const [ path, verb ] = (permsFromTemplate ?? '').split(',');
   // If permsFromTemplate path is more than 30 characters,
   // verb will be undefined. We will be unable to test the verb
   // and need to mark firstCheckItem[1] as undefined to pass test.

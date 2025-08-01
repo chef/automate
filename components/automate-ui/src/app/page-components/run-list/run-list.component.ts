@@ -32,6 +32,9 @@ export class Item {
   }
 
   cookbookName(): string {
+    if (!this.name) {
+      return '';
+    }
     return this.name.split('::')[0];
   }
 }

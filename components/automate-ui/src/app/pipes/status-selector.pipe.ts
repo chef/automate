@@ -4,7 +4,8 @@ import {
 } from '../types/types';
 
 @Pipe({
-  standalone: false,name: 'statusSelector'})
+  standalone: false, name: 'statusSelector'
+})
 export class StatusSelectorPipe implements PipeTransform {
     constructor() {}
 

@@ -10,6 +10,7 @@ import { AbridgedNodeRun, NodeHistoryCountsFilter, NodeRunsCount } from '../../t
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
 import { NodeHistoryFilter } from '../../types/types';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefIcon } from 'app/testing/mock-components';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
@@ -32,13 +33,15 @@ describe('RunHistoryComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MockChefIcon
+      ],
       declarations: [
         RunHistoryComponent,
         DateSelectorComponent,
         StatusSelectorPipe,
         ChefStatusIconPipe,
-        DatetimePipe,
-        MockComponent({selector: 'chef-icon'})
+        DatetimePipe
       ],
       providers: [
         RunHistoryStore,

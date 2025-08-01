@@ -3,7 +3,7 @@ import { Component,
          Output,
          EventEmitter,
          ChangeDetectionStrategy } from '@angular/core';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { concat,
          range,
          rangeRight,
@@ -35,10 +35,28 @@ export class CalendarComponent {
 
   @Input()
   set date(input: any) {
-    const date = moment.isMoment(input) ? input : moment.utc(input);
-    this._date = date;
-    this._month = moment.months(date.month());
-    this._year = date.year();
+    if (input == null || input === '') {
+      this._date = moment.utc();
+      this._month = moment.months(this._date.month());
+      this._year = this._date.year();
+      return;
+    }
+    try {
+      const date = moment.isMoment(input) ? input : moment.utc(input);
+      if (!date.isValid()) {
+        this._date = moment.utc();
+        this._month = moment.months(this._date.month());
+        this._year = this._date.year();
+        return;
+      }
+      this._date = date;
+      this._month = moment.months(date.month());
+      this._year = date.year();
+    } catch (error) {
+      this._date = moment.utc();
+      this._month = moment.months(this._date.month());
+      this._year = this._date.year();
+    }
   }
   get date() {
     return this._date;
@@ -46,8 +64,20 @@ export class CalendarComponent {
 
   @Input()
   set selected(input: any) {
-    const date = moment.isMoment(input) ? input : moment.utc(input);
-    this._selected = date;
+    if (input == null || input === '') {
+      this._selected = moment.utc();
+      return;
+    }
+    try {
+      const date = moment.isMoment(input) ? input : moment.utc(input);
+      if (!date.isValid()) {
+        this._selected = moment.utc();
+        return;
+      }
+      this._selected = date;
+    } catch (error) {
+      this._selected = moment.utc();
+    }
   }
   get selected() {
     return this._selected;
@@ -55,6 +85,9 @@ export class CalendarComponent {
 
   @Input()
   set month(input: string) {
+    if (input == null || input === '') {
+      return;
+    }
     // Set the month on the internal date.
     this.date.month(input);
     // Set the normalized internal month to its string
@@ -67,6 +100,9 @@ export class CalendarComponent {
 
   @Input()
   set year(input: number | string) {
+    if (input == null) {
+      return;
+    }
     this._year = parseInt(input.toString(), 10);
     this.date.year(this._year);
   }

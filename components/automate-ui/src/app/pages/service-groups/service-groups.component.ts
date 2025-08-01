@@ -333,6 +333,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   formatParameters(queryParams): Chicklet[] {
+    if (!queryParams || !queryParams.keys) {
+      return [];
+    }
     return queryParams.keys.reduce((list, key) => {
       return list.concat(queryParams.getAll(key).map(value => ({ type: key, text: value })));
     }, []);
@@ -546,6 +549,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      if (!params || !params.keys) {
+        return [];
+      }
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
         return list.concat(paramValues.map(value => ({type: key, text: value})));

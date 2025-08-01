@@ -4,7 +4,7 @@ import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { PagePickerComponent } from './page-picker.component';
 import { using } from 'app/testing/spec-helpers';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 
 describe('PagePickerComponent', () => {
   let component: PagePickerComponent;

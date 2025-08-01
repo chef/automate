@@ -78,7 +78,7 @@ export class LogsModalComponent implements OnChanges {
         return this.nodeRun.error.backtrace.join('\n');
       }
     }
-    return null;
+    return undefined;
   }
 
   closeModal() {

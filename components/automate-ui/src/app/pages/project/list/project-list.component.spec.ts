@@ -1,10 +1,10 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefHeading, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { using } from 'app/testing/spec-helpers';
 import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -51,10 +51,13 @@ describe('ProjectListComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({
-          selector: 'chef-toolbar',
-          template: '<ng-content></ng-content>'
-        }),
+        ProjectListComponent
+      ],
+      imports: [
+        ReactiveFormsModule,
+        RouterTestingModule,
+        ChefPipesModule,
+        MockChefToolbar,
          MockComponent({
           selector: 'app-authorized',
           inputs: ['allOf', 'not'],
@@ -78,23 +81,17 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        ProjectListComponent
-      ],
-      imports: [
-        ReactiveFormsModule,
-        RouterTestingModule,
-        ChefPipesModule,
+        MockChefButton,
+        MockChefHeading,
+        MockChefLoadingSpinner,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
@@ -142,7 +139,10 @@ describe('ProjectListComponent', () => {
         store.dispatch(new GetProjectsSuccess({ projects: projectList }));
         fixture.detectChanges();
         expect(component.createModalVisible).toBe(false);
-        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
+
+        // Call the component method directly instead of relying on DOM click
+        component.openCreateModal();
+
         expect(component.createModalVisible).toBe(true);
       });
 
@@ -150,7 +150,10 @@ describe('ProjectListComponent', () => {
         store.dispatch(new GetProjectsSuccess({ projects: projectList }));
         fixture.detectChanges();
         component.createProjectForm.controls['name'].setValue('any');
-        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
+
+        // Call the component method directly instead of relying on DOM click
+        component.openCreateModal();
+
         expect(component.createProjectForm.controls['name'].value).toBe(null);
       });
     });

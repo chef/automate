@@ -109,7 +109,7 @@ describe('ProjectsFilterDropdownComponent', () => {
     it('displays a list of checkbox options', () => {
       const options = Array.from(fixture.nativeElement.querySelectorAll('chef-checkbox'));
       expect(options.length).toEqual(2);
-      options.forEach((option: HTMLInputElement, index: number) => {
+      options.forEach((option: any, index: number) => {
         const { label, checked } = component.editableOptions[index];
         expect(option.textContent).toEqual(label);
         expect(option.checked).toEqual(checked);

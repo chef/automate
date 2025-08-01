@@ -70,9 +70,12 @@ export class SigninComponent implements OnInit, OnDestroy {
       error = true;
       return error;
     }
-    this.id = Jwt.parseIDToken(this.idToken) || {} as IDToken;
-    if (this.id === null) {
+    const parsedToken = Jwt.parseIDToken(this.idToken);
+    if (parsedToken === null) {
       error = true;
+      this.id = {} as IDToken;
+    } else {
+      this.id = parsedToken;
     }
     return error;
   }

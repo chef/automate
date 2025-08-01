@@ -1,7 +1,7 @@
 import { waitForAsync, TestBed } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { concat } from 'lodash/fp';
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
@@ -198,7 +198,7 @@ describe('AuthorizedComponent setPermissions', () => {
     const methods = ['get', 'put', 'post', 'delete', 'patch'];
     return <CheckObj>{
       endpoint: path || `/${faker.lorem.word()}/${faker.lorem.word()}/${faker.lorem.word()}`,
-      verb: method || faker.random.arrayElement(methods),
+      verb: method || faker.helpers.arrayElement(methods),
       paramList: paramList || []
     };
   }
@@ -308,8 +308,8 @@ describe('AuthorizedComponent real round trip', () => {
         expect(visible).toBe(false);
 
         done();
-      });
-    });
+      }, AuthorizedChecker.DebounceTime + 1);
+    }, AuthorizedChecker.DebounceTime + 1);
   });
 
 });

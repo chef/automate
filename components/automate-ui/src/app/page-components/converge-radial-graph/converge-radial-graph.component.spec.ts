@@ -10,12 +10,14 @@ describe('ConvergeRadialGraphComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ConvergeRadialGraphComponent,
+      imports: [
         MockComponent({
           selector: 'chef-radial-chart',
           inputs: ['chartData', 'chartColors', 'labelIcon', 'labelText', 'dimensions']
         })
+      ],
+      declarations: [
+        ConvergeRadialGraphComponent
       ],
       providers: [ ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockAppProjectsDropdown, MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefInput, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSubheading, MockChefTabSelector } from 'app/testing/mock-components';
 import {
   NgrxStateAtom,
   ngrxReducers,
@@ -30,7 +30,7 @@ class MockTelemetryService {
   track() { }
 }
 
-const declarations: any[] = [
+const mockComponents: any[] = [
   MockComponent({ selector: 'app-user-table',
     inputs: [
       'baseUrl',
@@ -45,22 +45,19 @@ const declarations: any[] = [
     ]
   }),
   MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-  MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-  MockComponent({ selector: 'chef-breadcrumbs' }),
-  MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-  MockComponent({ selector: 'chef-error' }),
-  MockComponent({ selector: 'chef-form-field' }),
-  MockComponent({ selector: 'chef-input' }),
-  MockComponent({ selector: 'chef-page-header' }),
-  MockComponent({ selector: 'chef-option' }),
-  MockComponent({ selector: 'chef-heading' }),
-  MockComponent({ selector: 'chef-subheading' }),
-  MockComponent({ selector: 'chef-loading-spinner' }),
-  MockComponent({ selector: 'app-projects-dropdown', inputs: ['checkedProjectIDs'] }),
-  MockComponent({ selector: 'chef-tab-selector',
-    inputs: ['value', 'routerLink', 'fragment']
-  }),
-  TeamDetailsComponent
+  MockChefBreadcrumb,
+  MockChefBreadcrumbs,
+  MockChefButton,
+  MockChefError,
+  MockChefFormField,
+  MockChefInput,
+  MockChefPageHeader,
+  MockChefOption,
+  MockChefHeading,
+  MockChefSubheading,
+  MockChefLoadingSpinner,
+  MockAppProjectsDropdown,
+  MockChefTabSelector
 ];
 const targetId = 'a-team-uuid-01';
 const someTeam: Team = {
@@ -93,12 +90,15 @@ describe('TeamDetailsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations,
+      declarations: [
+        TeamDetailsComponent
+      ],
       providers: [
         FeatureFlagsService,
         { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
+        ...mockComponents,
         ReactiveFormsModule,
         RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })

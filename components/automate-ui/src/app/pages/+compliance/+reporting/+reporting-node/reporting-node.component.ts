@@ -10,7 +10,7 @@ import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/repo
 import moment from 'moment';
 import { DateTime } from '../../../../helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout.facade';
-import { takeUntil, first, finalize } from 'rxjs/operators';
+import { takeUntil, first, finalize, defaultIfEmpty } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
 import { GetControlDetail } from '../../../../entities/control-details/control-details.action';
 import { controlDetailStatus, controlDetailList, controlsList } from '../../../../entities/control-details/control-details.selectors';
@@ -304,7 +304,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   private setActiveReport(report: any) {
     const reportQuery = this.reportQueryService.getReportQueryForReport(report);
     this.statsService.getNodeHeader(report.id, reportQuery)
-      .pipe(first())
+      .pipe(first(), defaultIfEmpty({}))
       .subscribe(data => {
         this.reportLoading = false;
         this.layoutFacade.ShowPageLoading(false);
@@ -338,7 +338,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       const reportQuery = this.reportQueryService.getReportQueryForReport(report);
       this.statsService.getControlsList(report.id, reportQuery, this.pageIndex,
         this.perPage, this.activeStatusFilter)
-      .pipe(first())
+      .pipe(first(), defaultIfEmpty({}))
       .subscribe(data => {
         this.controlsLoading = false;
         this.layoutFacade.ShowPageLoading(false);

@@ -207,6 +207,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      if (!params || !params.keys) {
+        return [];
+      }
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
         return list.concat(paramValues.map(value => ({type: key, text: value})));

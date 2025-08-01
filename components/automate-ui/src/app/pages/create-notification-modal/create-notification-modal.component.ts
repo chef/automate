@@ -8,7 +8,7 @@ import {
 import { combineLatest, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
-import { first, filter, takeUntil } from 'rxjs/operators';
+import { first, filter, takeUntil, defaultIfEmpty } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Regex } from '../../helpers/auth/regex';
@@ -164,14 +164,14 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
     if (targetUrl && targetUsername.length && targetPassword.length) {
       this.notificationRuleRequests.testHookWithUsernamePassword(
         targetUrl, targetUsername, targetPassword
-        ).pipe(first())
+        ).pipe(first(), defaultIfEmpty({}))
         .subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)
         );
     } else {
       this.notificationRuleRequests.testHookWithNoCreds(targetUrl)
-        .pipe(first())
+        .pipe(first(), defaultIfEmpty({}))
         .subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)

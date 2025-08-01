@@ -105,6 +105,7 @@ export class LicenseApplyComponent implements AfterViewInit {
     if (pendingState(state) || !this.applyingLicense) { return; }
 
     this.applyingLicense = false; // round-trip complete
+    this.clearErrors(); // Clear any previous error states
 
     if (state.status === EntityStatus.loadingSuccess) {
       this.licenseApplied = true;

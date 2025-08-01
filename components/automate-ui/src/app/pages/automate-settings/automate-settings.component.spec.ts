@@ -73,11 +73,11 @@ describe('AutomateSettingsComponent', () => {
           MatSelectModule,
           BrowserAnimationsModule,
           HttpClientTestingModule,
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
         ],
         declarations: [
-          AutomateSettingsComponent,
-          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
+          AutomateSettingsComponent
         ],
         providers: [
           FormBuilder,
@@ -128,11 +128,11 @@ describe('AutomateSettingsComponent', () => {
           MatSelectModule,
           BrowserAnimationsModule,
           HttpClientTestingModule,
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
         ],
         declarations: [
-          AutomateSettingsComponent,
-          MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
+          AutomateSettingsComponent
         ],
         providers: [
           FormBuilder,
