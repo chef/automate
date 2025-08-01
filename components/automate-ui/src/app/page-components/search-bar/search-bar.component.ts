@@ -18,6 +18,7 @@ import {
 } from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'app-search-bar',
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss']
@@ -291,7 +292,8 @@ export class SearchBarComponent implements OnChanges {
         case '':
           return 'Filter nodes by …';
         default:
-          const normal_type = this.selectedCategoryType.text.replace(
+          const categoryText = this.selectedCategoryType?.text || '';
+          const normal_type = categoryText.replace(
             '_name', '').split('_').join(' ');
           return `Enter ${normal_type} name`;
       }

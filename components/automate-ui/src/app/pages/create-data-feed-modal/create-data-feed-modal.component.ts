@@ -10,6 +10,7 @@ enum UrlTestState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-create-data-feed-modal',
   templateUrl: './create-data-feed-modal.component.html',
   styleUrls: ['./create-data-feed-modal.component.scss']

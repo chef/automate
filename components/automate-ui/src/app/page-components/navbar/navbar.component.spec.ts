@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 import { NavbarComponent } from './navbar.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefIcon } from 'app/testing/mock-components';
 import { using } from 'app/testing/spec-helpers';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -44,17 +45,17 @@ describe('NavbarComponent', () => {
           }, {
             initialState: { policies: PolicyEntityInitialState },
             runtimeChecks
-          })
-        ],
-        declarations: [
-          NavbarComponent,
+          }),
           MockComponent({ selector: 'app-profile' }),
           MockComponent({ selector: 'app-projects-filter' }),
-          MockComponent({ selector: 'chef-icon' }),
+          MockChefIcon,
           MockComponent({ selector: 'chef-tooltip' }),
           MockComponent({ selector: 'app-authorized',
                           inputs: ['allOf', 'anyOf'],
                           template: '<ng-content></ng-content>' })
+        ],
+        declarations: [
+          NavbarComponent
         ],
         providers: [
           FeatureFlagsService,
@@ -106,17 +107,17 @@ describe('NavbarComponent', () => {
           }, {
             initialState: { policies: PolicyEntityInitialState },
             runtimeChecks
-          })
-        ],
-        declarations: [
-          NavbarComponent,
+          }),
           MockComponent({ selector: 'app-profile' }),
           MockComponent({ selector: 'app-projects-filter' }),
-          MockComponent({ selector: 'chef-icon' }),
+          MockChefIcon,
           MockComponent({ selector: 'chef-tooltip' }),
           MockComponent({ selector: 'app-authorized',
                           inputs: ['allOf', 'anyOf'],
                           template: '<ng-content></ng-content>' })
+        ],
+        declarations: [
+          NavbarComponent
         ],
         providers: [
           FeatureFlagsService,

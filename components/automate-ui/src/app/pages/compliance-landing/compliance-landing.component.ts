@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RoutePerms } from '../../components/landing/landing.component';
 
 @Component({
+  standalone: false,
   selector: 'app-compliance-landing',
   template: '<app-landing [routePerms]="routeList"></app-landing>',
   styleUrls: []

@@ -5,9 +5,11 @@ import { LicenseUsageService } from './services/license-usage/license-usage.serv
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  standalone: false
 })
 export class AppComponent {
+  title = 'automate-ui';
   library_url: string;
 
   constructor(private licenseUsageService: LicenseUsageService) {

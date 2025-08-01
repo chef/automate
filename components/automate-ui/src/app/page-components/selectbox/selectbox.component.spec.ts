@@ -9,6 +9,7 @@ import { ngrxReducers, NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { EventEmitter } from '@angular/core';
 // import { By } from '@angular/platform-browser';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton } from 'app/testing/mock-components';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 
@@ -20,10 +21,7 @@ describe('SelectboxComponent', () => {
   beforeEach( () => {
     TestBed.configureTestingModule({
       declarations: [
-        SelectboxComponent,
-        MockComponent({ selector: 'chef-button', inputs: ['disabled']}),
-        MockComponent({ selector: 'ul'}),
-        MockComponent({ selector: 'li'})
+        SelectboxComponent
       ],
       providers: [
         HttpClient,
@@ -34,7 +32,10 @@ describe('SelectboxComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         InfiniteScrollDirective,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockChefButton,
+        MockComponent({ selector: 'ul'}),
+        MockComponent({ selector: 'li'})
       ],
       schemas: []
     }).compileComponents();

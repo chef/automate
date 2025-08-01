@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReportingSearchbarComponent } from './reporting-searchbar.component';
 import { using } from 'app/testing/spec-helpers';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import {
   ReportQueryService, SuggestionsService, StatsService
 } from 'app/pages/+compliance/shared/reporting';

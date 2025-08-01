@@ -43,6 +43,7 @@ export enum UrlTestState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-data-feed',
   templateUrl: './data-feed.component.html',
   styleUrls: ['./data-feed.component.scss']

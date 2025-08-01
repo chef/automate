@@ -7,6 +7,7 @@ import { ApplyRulesStatus, ApplyRulesStatusState } from '../../entities/projects
 import { ProjectService } from '../../entities/projects/project.service';
 
 @Component({
+  standalone: false,
   selector: 'app-process-progress-bar',
   templateUrl: './process-progress-bar.component.html',
   styleUrls: ['./process-progress-bar.component.scss'],

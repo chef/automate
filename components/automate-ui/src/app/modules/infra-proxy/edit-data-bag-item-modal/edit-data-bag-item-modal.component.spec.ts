@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefModal } from 'app/testing/mock-components';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
@@ -19,10 +20,6 @@ describe('EditDataBagItemModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
         EditDataBagItemModalComponent
       ],
       providers: [
@@ -30,7 +27,11 @@ describe('EditDataBagItemModalComponent', () => {
       ],
       imports: [
         ReactiveFormsModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockChefModal,
+        MockChefButton,
+        MockChefError,
+        MockChefFormField
       ]
     })
     .compileComponents();

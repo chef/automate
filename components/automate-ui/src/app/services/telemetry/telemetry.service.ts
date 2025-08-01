@@ -206,7 +206,7 @@ export class TelemetryService {
       });
 
       analytics.sanitizeDomainURL = this.sanitizeDomainURL;
-      analytics.addSourceMiddleware(this.middleware);
+      analytics.addSourceMiddleware(this.middleware.bind(this));
       // For segment the first call we need to make must be identify().
       // In the calls below we might as well call analytics.identify() and
       // analytics.group() but we would like to ensure that we call analytics
@@ -430,18 +430,27 @@ export class TelemetryService {
   }
 
   sanitizeDomainURL(url) {
-    let restByDot: any;
-    let firstByDot: string;
-    [firstByDot, ...restByDot] = url.split('.');
-    restByDot = restByDot.join('.');
-    if (restByDot.indexOf('/') > -1) {
-      let [firstBySlash, ...restBySlash] = restByDot.split('/');
-      restBySlash = restBySlash.join('/');
-      firstBySlash = '***';
-      return firstByDot + '.' + firstBySlash + '/' + restBySlash;
-    } else {
-      restByDot = '***';
-      return firstByDot + '.' + restByDot;
+    if (!url || typeof url !== 'string') {
+      return '';
+    }
+
+    try {
+      let restByDot: any;
+      let firstByDot: string;
+      [firstByDot, ...restByDot] = url.split('.');
+      restByDot = restByDot.join('.');
+      if (restByDot.indexOf('/') > -1) {
+        let [firstBySlash, ...restBySlash] = restByDot.split('/');
+        restBySlash = restBySlash.join('/');
+        firstBySlash = '***';
+        return firstByDot + '.' + firstBySlash + '/' + restBySlash;
+      } else {
+        restByDot = '***';
+        return firstByDot + '.' + restByDot;
+      }
+    } catch (error) {
+      console.warn('Error sanitizing domain URL:', error);
+      return '';
     }
   }
 
@@ -449,10 +458,10 @@ export class TelemetryService {
     if (payload && payload.obj && payload.obj.context && payload.obj.context.page) {
       const page = payload.obj.context.page;
       if (page.referrer) {
-        page.referrer = analytics.sanitizeDomainURL(page.referrer);
+        page.referrer = this.sanitizeDomainURL(page.referrer);
       }
       if (page.url) {
-        page.url = analytics.sanitizeDomainURL(page.url);
+        page.url = this.sanitizeDomainURL(page.url);
       }
     }
     next(payload);

@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { UserTableComponent } from './user-table.component';
 
 const baseUrl = '/some/path';
 
 @Component({
+  standalone: false,
   selector: 'app-test-user-table-wrapper',
   template: '<app-user-table [baseUrl]="baseUrl"></app-user-table>'
 })
@@ -21,20 +23,20 @@ describe('UserTableComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        MockChefButton,
+        MockChefTable,
+        MockChefTh,
+        MockChefTr,
+        MockChefTd,
+        MockChefThead,
+        MockChefTbody,
+        MockChefToolbar,
+        MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),
+        MockComponent({ selector: 'mat-option' }),
+        MockComponent({ selector: 'mat-select' })
       ],
       declarations: [
-        MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-toolbar' }),
         UserTableComponent,
         TestUserTableComponent
       ]

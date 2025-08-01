@@ -75,6 +75,11 @@ export function stringToMember(memberString: string): Member {
     displayName: '',
     displayType: ''
   };
+
+  if (!memberString) {
+    return member;
+  }
+
   if (memberString.split('').pop() === ':') {
     member.type = Type.Unknown;
     return member;

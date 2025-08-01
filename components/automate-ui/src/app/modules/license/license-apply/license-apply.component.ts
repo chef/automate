@@ -11,6 +11,7 @@ import { EntityStatus, pendingState } from '../../../entities/entities';
 import { ApplyStatus, FetchStatus, LicenseStatus, parsedExpirationDate } from '../../../entities/license/license.model';
 
 @Component({
+  standalone: false,
   selector: 'app-license-apply',
   templateUrl: './license-apply.component.html',
   styleUrls: ['./license-apply.component.scss']
@@ -104,6 +105,7 @@ export class LicenseApplyComponent implements AfterViewInit {
     if (pendingState(state) || !this.applyingLicense) { return; }
 
     this.applyingLicense = false; // round-trip complete
+    this.clearErrors(); // Clear any previous error states
 
     if (state.status === EntityStatus.loadingSuccess) {
       this.licenseApplied = true;

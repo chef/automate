@@ -34,6 +34,7 @@ import { Regex } from '../../../helpers/auth/regex';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-nodes',
   templateUrl: './infra-nodes.component.html',
   styleUrls: ['./infra-nodes.component.scss']

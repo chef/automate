@@ -40,6 +40,7 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
 export type InfraRoleTabName = 'runList' | 'attributes';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-role-details',
   templateUrl: './infra-role-details.component.html',
   styleUrls: ['./infra-role-details.component.scss']

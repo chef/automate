@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { NodeDetailsService } from '../../services/node-details/node-details.service';
 
 @Component({
+  standalone: false,
   selector: 'app-resource-item',
   templateUrl: './resource-item.component.html',
   styleUrls: ['./resource-item.component.scss']

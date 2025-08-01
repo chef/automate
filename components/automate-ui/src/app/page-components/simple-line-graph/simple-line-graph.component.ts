@@ -14,6 +14,7 @@ export interface MarginObject {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-simple-line-graph',
   templateUrl: './simple-line-graph.component.html',
   styleUrls: ['./simple-line-graph.component.scss']

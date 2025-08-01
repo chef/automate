@@ -7,7 +7,7 @@ import { StatsService } from './stats.service';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 const COMPLIANCE_URL = environment.compliance_url;
 

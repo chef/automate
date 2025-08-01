@@ -36,6 +36,7 @@ export enum IntegrationTypes {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-data-feed-create',
   templateUrl: './data-feed-create.component.html',
   styleUrls: ['./data-feed-create.component.scss']

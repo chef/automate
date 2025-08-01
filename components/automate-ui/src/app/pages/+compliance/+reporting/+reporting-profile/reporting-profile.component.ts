@@ -15,6 +15,7 @@ import { FilterC } from '../../+reporting/types';
 import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout.facade';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-profile',
   templateUrl: './reporting-profile.component.html',
   styleUrls: [ './reporting-profile.component.scss' ]

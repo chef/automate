@@ -2,6 +2,7 @@ import { Component, Input, Output, OnChanges, SimpleChanges, EventEmitter } from
 import { ContentItem } from '../../../entities/cds/cds.model';
 
 @Component({
+  standalone: false,
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss']

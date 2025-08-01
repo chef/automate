@@ -14,6 +14,7 @@ import { LayoutFacadeService, Sidebar } from '../../../entities/layout/layout.fa
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-policy-list',
   templateUrl: './policy-list.component.html',
   styleUrls: ['./policy-list.component.scss']

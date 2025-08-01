@@ -69,7 +69,8 @@ export class ManagerEffects {
     this.actions$.pipe(
     ofType(ROUTER_NAVIGATION),
     filter((action: RouterNavigationAction) => {
-      return action.payload.routerState.url.split('?')[0] === '/settings/node-integrations';
+      const url = action.payload.routerState?.url || '';
+      return url.split('?')[0] === '/settings/node-integrations';
     }),
     map((action: RouterNavigationAction) => {
       const queryParams = action.payload.routerState['queryParams'];

@@ -10,6 +10,7 @@ import * as actions from '../../state/scanner.actions';
 import { NodeTotals } from '../../../../../entities/nodes/nodes.model';
 
 @Component({
+  standalone: false,
   templateUrl: './nodes-list.component.html',
   styleUrls: ['./nodes-list.component.scss']
 })

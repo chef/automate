@@ -14,6 +14,7 @@ import {
 import { GetOrg, UpdateOrg } from '../../../entities/orgs/org.actions';
 
 @Component({
+  standalone: false,
   selector: 'app-org-edit',
   templateUrl: './org-edit.component.html',
   styleUrls: ['./org-edit.component.scss']

@@ -15,6 +15,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-nodes',
   templateUrl: './reporting-nodes.component.html',
   styleUrls: [ './reporting-nodes.component.scss' ]

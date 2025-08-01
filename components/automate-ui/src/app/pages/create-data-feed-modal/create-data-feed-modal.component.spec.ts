@@ -3,7 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefToolbar } from 'app/testing/mock-components';
 import { CreateDataFeedModalComponent } from './create-data-feed-modal.component';
 
 describe('CreateChefServerModalComponent', () => {
@@ -13,19 +13,16 @@ describe('CreateChefServerModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal',
-          inputs: ['visible'],
-          outputs: ['close']
-        }),
         CreateDataFeedModalComponent
       ],
       imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        MockChefButton,
+        MockChefLoadingSpinner,
+        MockChefFormField,
+        MockChefError,
+        MockChefToolbar,
+        MockChefModal
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

@@ -15,6 +15,7 @@ import {
 } from '../../../entities/cookbooks/cookbook.selectors';
 
 @Component({
+  standalone: false,
   selector: 'app-cookbooks',
   templateUrl: './cookbooks.component.html',
   styleUrls: ['./cookbooks.component.scss']

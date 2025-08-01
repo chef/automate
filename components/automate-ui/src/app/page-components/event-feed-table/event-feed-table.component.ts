@@ -9,6 +9,7 @@ import { DateTime } from '../../helpers/datetime/datetime';
 
 const ENTITY_TYPE_TAG = 'event-type';
 @Component({
+  standalone: false,
   selector: 'app-event-feed-table',
   templateUrl: './event-feed-table.component.html',
   styleUrls: ['./event-feed-table.component.scss']
