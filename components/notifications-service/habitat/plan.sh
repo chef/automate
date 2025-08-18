@@ -1,5 +1,3 @@
-#stable channel
-
 
 pkg_repo=a2
 pkg_name=notifications-service
@@ -19,21 +17,23 @@ pkg_deps=(
 )
 pkg_build_deps=(
   core/git/2.33.1/20240614092831
+  core/git
+  core/cacerts
 
   # Node(kallol) 2022-01-28:
   #
   # We have seen failures with notification service http request
   # with external services. This is because the erlang version was bumped to
   # v23.2. Hence pinning the version till we have a fix.
-  core/erlang25/25.0.4/20240108042737
+  core/erlang26/26.2.2/20241017154809
 
   # NOTE(ssd) 2019-07-03: PIN PIN PIN
   #
   # elixir 1.9.0 shipped with a number of changes to how releases
   # work. This appears to have broken the build. Pinning until we can
   # sort out the required changes.
-  core/elixir/1.14.0/20240108043326
-  core/glibc/2.35/20240105171810
+  core/elixir/1.17.3/20241204123504
+  core/glibc
 )
 
 pkg_binds=(
@@ -81,6 +81,8 @@ do_prepare() {
   export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
   export MIX_HOME="${CACHE_PATH}/.mix"
   export HEX_HOME="${CACHE_PATH}/.hex"
+  mkdir -p "/etc/ssl/certs"
+  cp $(hab pkg path core/cacerts)/ssl/certs/cacert.pem "/etc/ssl/certs/ca-certificates.crt"
   mix local.hex --force
   mix local.rebar --force
   fix_interpreter "${MIX_HOME}/*" core/coreutils bin/env
