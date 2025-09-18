@@ -31,6 +31,8 @@ Chef Automate requires
 * `useradd`
 * `curl` or `wget`
 * The shell that starts Chef Automate should have a max open files setting of at least 65535
+* The root user should have a umask of 0022
+* The /etc/passwd file should have a permission setting of 0644
 
 Commercial support for Chef Automate is available for platforms that satisfy these
 criteria.
