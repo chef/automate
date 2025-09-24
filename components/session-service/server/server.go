@@ -838,14 +838,24 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	relayState, err := generateRelayState()
-	if err != nil {
-		s.log.Errorf("couldn't generate random relay state: %s", err)
-		httpError(w, http.StatusInternalServerError)
-		return
+	// Get client state and use it as relay state if provided
+	clientState := r.FormValue("state")
+	var relayState string
+	var err error
+
+	if clientState != "" {
+		relayState = clientState
+	} else {
+		relayState, err = generateRelayState()
+		if err != nil {
+			s.log.Errorf("couldn't generate random relay state: %s", err)
+			httpError(w, http.StatusInternalServerError)
+			return
+		}
 	}
-	// take state we've gotten from the client, store it
-	if clientState := r.FormValue("state"); clientState != "" {
+
+	// Store client state only if it's different from relay state
+	if clientState != "" && clientState != relayState {
 		s.log.Debugf("storing clientState %s", clientState)
 		if err := sess.PutString(w, clientStateKeyPrefix+relayState, clientState); err != nil {
 			http.Error(w, "failed to set client state", http.StatusInternalServerError)
