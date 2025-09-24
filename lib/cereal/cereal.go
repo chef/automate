@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
@@ -710,7 +711,7 @@ func NewManager(b Driver, opts ...ManagerOpt) (*Manager, error) {
 	}
 
 	if v, ok := b.(SchedulerDriver); ok {
-		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
+		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor, logger.NewLogrusStandardLogger())
 	}
 
 	if intervalSuggester, ok := b.(IntervalSuggester); ok {
@@ -748,7 +749,7 @@ type TaskExecutorOpts struct {
 // registeredExecutor is responsible for polling for and executing
 // tasks using the given task executor.
 //
-// Tasks are polled for based on
+// # Tasks are polled for based on
 //
 // - a time-based interval, and
 // - in-process notifications that are sent when we think there
@@ -761,7 +762,6 @@ type TaskExecutorOpts struct {
 // The task worker will repeatedly dequeue tasks until none are
 // available. To ensure our queue grows in response to load, if a task
 // is found in the queue, another task worker will be spawned.
-//
 type registeredExecutor struct {
 	name     string
 	executor TaskExecutor
