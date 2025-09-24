@@ -285,6 +285,11 @@ func (s *ChefIngestServer) VersionComparision(index string) (bool, *backend.Inde
 		return false, nil, status.Errorf(codes.Internal, "failed to fetch settings for index %s: %s", index, err)
 	}
 
+	if versionSettings.Settings.Index.Version.UpgradedString == "" {
+		log.WithFields(log.Fields{"index": index}).Info("Upgraded version is empty")
+		return false, nil, nil
+	}
+
 	// Is reindexing needed?
 	if versionSettings.Settings.Index.Version.CreatedString == versionSettings.Settings.Index.Version.UpgradedString {
 		return false, nil, nil
