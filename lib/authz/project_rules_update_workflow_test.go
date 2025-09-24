@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/cerealtest"
+	"github.com/chef/automate/lib/logger"
 )
 
 const (
@@ -25,7 +26,7 @@ func TestWorkflowOnStart(t *testing.T) {
 	workflowParams := DomainProjectUpdateWorkflowParameters{
 		ProjectUpdateID: projectUpdateID,
 	}
-	executor := NewWorkflowExecutorForDomainService(svcName)
+	executor := NewWorkflowExecutorForDomainService(svcName, logger.NewTestLogger())
 
 	t.Run("launches StartProjectTagUpdater for service", func(t *testing.T) {
 		instance := cerealtest.
@@ -52,7 +53,7 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 	workflowParams := DomainProjectUpdateWorkflowParameters{
 		ProjectUpdateID: projectUpdateID,
 	}
-	executor := NewWorkflowExecutorForDomainService(svcName)
+	executor := NewWorkflowExecutorForDomainService(svcName, logger.NewTestLogger())
 
 	t.Run("when StartProjectTagUpdater completes", func(t *testing.T) {
 		curPayload := DomainProjectUpdateWorkflowPayload{
@@ -309,7 +310,7 @@ func TestWorkflowOnCancel(t *testing.T) {
 	workflowParams := DomainProjectUpdateWorkflowParameters{
 		ProjectUpdateID: projectUpdateID,
 	}
-	executor := NewWorkflowExecutorForDomainService(svcName)
+	executor := NewWorkflowExecutorForDomainService(svcName, logger.NewTestLogger())
 	jobIDs := []string{"idA", "idB"}
 
 	t.Run("starts CancelUpdateProjectTags task", func(t *testing.T) {

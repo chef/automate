@@ -111,7 +111,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants.EnumInProgress)
 		}
 		l.Info("Setting up IAM data basics...")
-		err = legacy.MigrateToV2(ctx, db, migrateV1Policies)
+		err = legacy.MigrateToV2(ctx, db, migrateV1Policies, l)
 		if err != nil {
 			statusErr := legacy.RecordMigrationStatus(ctx, constants.EnumFailed, db)
 			if statusErr != nil {

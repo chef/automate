@@ -10,6 +10,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/logger"
 )
 
 const (
@@ -21,8 +22,8 @@ const (
 var ErrNoJobIDs = errors.New("0 Job IDs returned")
 
 type DomainProjectUpdateWorkflowExecutor struct {
-	PollInterval time.Duration
-
+	PollInterval                    time.Duration
+	log                             logger.Logger
 	cancelUpdateProjectTagsTaskName cereal.TaskName
 	startProjectTagUpdaterTaskName  cereal.TaskName
 	projectTagUpdaterStatusTaskName cereal.TaskName
@@ -52,13 +53,13 @@ type StatusParameters struct {
 func (m *DomainProjectUpdateWorkflowExecutor) OnStart(
 	w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 
-	logrus.Info("OnStart for domain")
+	m.log.Info("OnStart for domain")
 	params := DomainProjectUpdateWorkflowParameters{}
 	if err := w.GetParameters(&params); err != nil {
 		return w.Fail(err)
 	}
 
-	logrus.Debugf("Started DomainProjectUpdateWorkflow for %s",
+	m.log.Debugf("Started DomainProjectUpdateWorkflow for %s",
 		params.ProjectUpdateID)
 	if err := w.EnqueueTask(m.startProjectTagUpdaterTaskName, nil); err != nil {
 		return w.Fail(err)
@@ -73,7 +74,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 
 	payload := DomainProjectUpdateWorkflowPayload{}
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Error("Failed to deserialize payload")
+		m.log.WithError(err).Error("Failed to deserialize payload")
 		return w.Fail(err)
 	}
 
@@ -86,7 +87,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 	case m.startProjectTagUpdaterTaskName:
 		result := StartResult{}
 		if err := ev.Result.Get(&result); err != nil {
-			logrus.WithError(err).Errorf(
+			m.log.WithError(err).Errorf(
 				"Failed to deserialize %s result", m.startProjectTagUpdaterTaskName)
 			return w.Fail(err)
 		}
@@ -99,7 +100,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 		}
 		if len(result.JobIDs) <= 0 {
 			err := ErrNoJobIDs
-			logrus.WithError(err).Errorf(
+			m.log.WithError(err).Errorf(
 				"Failed to deserialize %s result", m.startProjectTagUpdaterTaskName)
 			return w.Fail(err)
 		}
@@ -151,7 +152,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnCancel(
 	w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
 	payload := DomainProjectUpdateWorkflowPayload{}
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Errorf("Failed to launch %s", m.cancelUpdateProjectTagsTaskName)
+		m.log.WithError(err).Errorf("Failed to launch %s", m.cancelUpdateProjectTagsTaskName)
 		return w.Fail(err)
 	}
 
@@ -276,10 +277,10 @@ func CancelUpdateProjectTagsTaskName(svcName string) cereal.TaskName {
 	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, cancelUpdateProjectTagsTaskName))
 }
 
-func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpdateWorkflowExecutor {
+func NewWorkflowExecutorForDomainService(domainService string, log logger.Logger) *DomainProjectUpdateWorkflowExecutor {
 	return &DomainProjectUpdateWorkflowExecutor{
-		PollInterval: 10 * time.Second,
-
+		PollInterval:                    10 * time.Second,
+		log:                             log,
 		cancelUpdateProjectTagsTaskName: CancelUpdateProjectTagsTaskName(domainService),
 		startProjectTagUpdaterTaskName:  StartProjectTagUpdaterTaskName(domainService),
 		projectTagUpdaterStatusTaskName: ProjectTagUpdaterStatusTaskName(domainService),

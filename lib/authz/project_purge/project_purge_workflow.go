@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/logger"
 )
 
 const (
@@ -18,6 +19,7 @@ const (
 
 type DomainProjectPurgeWorkflowExecutor struct {
 	purgeProjectForDomainTaskName cereal.TaskName
+	log                           logger.Logger
 }
 
 type DomainProjectPurgeWorkflowParameters struct {
@@ -31,13 +33,13 @@ type DomainProjectPurgeWorkflowPayload struct {
 func (m *DomainProjectPurgeWorkflowExecutor) OnStart(
 	w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 
-	logrus.Infof("OnStart for DomainProjectPurgeWorkflowExecutor for domain %s", m.purgeProjectForDomainTaskName)
+	m.log.Infof("OnStart for DomainProjectPurgeWorkflowExecutor for domain %s", m.purgeProjectForDomainTaskName)
 	params := DomainProjectPurgeWorkflowParameters{}
 	if err := w.GetParameters(&params); err != nil {
 		return w.Fail(err)
 	}
 
-	logrus.Debugf("Started DomainProjectPurgeWorkflow for %s",
+	m.log.Debugf("Started DomainProjectPurgeWorkflow for %s",
 		params.ProjectID)
 	taskParams := DomainProjectPurgeTaskParams{ProjectID: params.ProjectID}
 	if err := w.EnqueueTask(m.purgeProjectForDomainTaskName, taskParams); err != nil {
@@ -51,7 +53,7 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnTaskComplete(
 
 	payload := DomainProjectPurgeWorkflowPayload{}
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Error("Failed to deserialize payload")
+		m.log.WithError(err).Error("Failed to deserialize payload")
 		return w.Fail(err)
 	}
 
@@ -63,7 +65,7 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnTaskComplete(
 	switch ev.TaskName {
 	case m.purgeProjectForDomainTaskName:
 		if errToLog := ev.Result.Err(); errToLog != nil {
-			logrus.WithError(errToLog).Error("failed to purge project, retrying")
+			m.log.WithError(errToLog).Error("failed to purge project, retrying")
 			payload.ConsecutiveJobCheckFailures++
 			if err := w.EnqueueTask(
 				m.purgeProjectForDomainTaskName, DomainProjectPurgeTaskParams{ProjectID: params.ProjectID},
@@ -116,9 +118,10 @@ func StartProjectPurgeTaskName(svcName string) string {
 	return fmt.Sprintf("%s/%s", svcName, purgeProjectForDomain)
 }
 
-func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectPurgeWorkflowExecutor {
+func NewWorkflowExecutorForDomainService(domainService string, log logger.Logger) *DomainProjectPurgeWorkflowExecutor {
 	return &DomainProjectPurgeWorkflowExecutor{
 		purgeProjectForDomainTaskName: cereal.NewTaskName(StartProjectPurgeTaskName(domainService)),
+		log:                           log,
 	}
 }
 
