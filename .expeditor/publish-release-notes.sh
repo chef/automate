@@ -73,6 +73,7 @@ This release uses:
 - OpenSearch:
 - Nginx:
 - Haproxy:
+- Dex:
 
 ## Supported External Chef Products
 
@@ -81,6 +82,14 @@ This release supports the following external chef products:
 - Chef Inspec version: 4.3.2+
 - Chef Infra Client: 17.0.242+
 - Chef Habitat: 0.81+
+
+## Supported Framework Versions
+
+This release is built on the following framework versions:
+
+- GoLang: 1.15
+- OpenJDK: 11.0.17+8
+- Angular: 11.2.6
 
 View the [package manifest](https://packages.chef.io/manifests/current/automate/latest_semver.json) for the latest release.
 
