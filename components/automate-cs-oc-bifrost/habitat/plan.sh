@@ -8,7 +8,7 @@ pkg_description="Wrapper package for chef/oc_bifrost"
 pkg_origin="chef"
 
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="15.10.33"
+pkg_version="15.10.41"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -18,7 +18,7 @@ pkg_deps=(
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_bifrost/15.10.33/20250220084439"
+  "${vendor_origin}/oc_bifrost/15.10.41/20250721060841"
 )
 
 pkg_binds=(
