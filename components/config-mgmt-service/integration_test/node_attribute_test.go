@@ -87,7 +87,7 @@ func TestNodeAttributeWithOneNodeAttribute(t *testing.T) {
 }
 
 // TODO: NEED TO BE FIXED WAS BREAKING AFTER OPENSEARCH CHANGES.
-/* func TestNodeAttributeWithTableDriven(t *testing.T) {
+func TestNodeAttributeWithTableDriven(t *testing.T) {
 	ctx := context.Background()
 	var (
 		idPrefix   = "MOCK-UUID-"
@@ -188,7 +188,7 @@ func TestNodeAttributeWithOneNodeAttribute(t *testing.T) {
 		})
 		index++
 	}
-} */
+}
 
 func TestNodeAttributeProjectFilter(t *testing.T) {
 	nodeID := newUUID()
