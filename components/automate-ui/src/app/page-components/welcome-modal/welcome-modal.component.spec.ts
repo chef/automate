@@ -4,7 +4,7 @@ import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefCheckbox } from 'app/testing/mock-components';
 import { WelcomeModalComponent } from './welcome-modal.component';
 import { LocalStorageService } from '../../services/storage/localstorage.service';
 import { SessionStorageService } from '../../services/storage/sessionstorage.service';
@@ -39,12 +39,12 @@ describe('WelcomeModalComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        WelcomeModalComponent,
-        MockComponent({ selector: 'app-telemetry-component' }),
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked', 'disabled'] })
+        WelcomeModalComponent
       ],
       imports: [
         HttpClientTestingModule,
+        MockComponent({ selector: 'app-telemetry-component' }),
+        MockChefCheckbox,
         StoreModule.forRoot({
           licenseStatus: welcomeReducer
         }, { runtimeChecks })

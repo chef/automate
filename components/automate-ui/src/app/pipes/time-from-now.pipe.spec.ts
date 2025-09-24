@@ -1,4 +1,4 @@
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 import { TimeFromNowPipe } from './time-from-now.pipe';
 

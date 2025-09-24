@@ -3,6 +3,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefIcon, MockChefInput, MockChefLoadingSpinner, MockChefPage, MockChefPageHeader, MockChefSubheading, MockChefTabSelector, MockChefToolbar } from 'app/testing/mock-components';
+import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -33,45 +35,6 @@ describe('ProjectRulesComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({
-          selector: 'chef-toolbar',
-          template: '<ng-content></ng-content>'
-        }),
-         MockComponent({
-          selector: 'app-authorized',
-          inputs: ['allOf', 'not'],
-          template: '<ng-content></ng-content>'
-        }),
-        MockComponent({
-          selector: 'app-delete-object-modal',
-          inputs: ['visible', 'objectNoun', 'objectName'],
-          outputs: ['close', 'deleteClicked']
-        }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-form-field'}),
-        MockComponent({ selector: 'chef-breadcrumbs'}),
-        MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-        MockComponent({ selector: 'chef-tab-selector', inputs: ['value'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-input', inputs: ['value'] }),
-        MockComponent({ selector: 'chef-error'}),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-page',
-          inputs: [
-            'subheading',
-            'confirm-btn-text',
-            'heading',
-            'disable-confirm',
-            'page-loading',
-            'confirm-loading'
-          ],
-          outputs: ['confirm', 'close']
-        }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
         ProjectRulesComponent
       ],
       imports: [
@@ -91,12 +54,39 @@ describe('ProjectRulesComponent', () => {
             previousRoute: {},
             navigationId: 0
           })
-        }, { runtimeChecks })
+        }, { runtimeChecks }),
+        MockChefToolbar,
+         MockComponent({
+          selector: 'app-authorized',
+          inputs: ['allOf', 'not'],
+          template: '<ng-content></ng-content>'
+        }),
+        MockComponent({
+          selector: 'app-delete-object-modal',
+          inputs: ['visible', 'objectNoun', 'objectName'],
+          outputs: ['close', 'deleteClicked']
+        }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockChefFormField,
+        MockChefBreadcrumbs,
+        MockChefBreadcrumb,
+        MockChefTabSelector,
+        MockChefButton,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefInput,
+        MockChefError,
+        MockChefLoadingSpinner,
+        MockChefPage,
+        MockChefPageHeader,
+        MockChefSubheading
       ],
       providers: [
         FeatureFlagsService,
         { provide: TelemetryService, useClass: MockTelemetryService }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));
 

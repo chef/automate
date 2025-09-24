@@ -10,6 +10,7 @@ import { LayoutFacadeService, Sidebar } from '../../../../entities/layout/layout
 import { saveAs } from 'file-saver';
 
 @Component({
+  standalone: false,
   selector: 'app-profile-details',
   templateUrl: './profile-details.component.html',
   styleUrls: ['./profile-details.component.scss'],

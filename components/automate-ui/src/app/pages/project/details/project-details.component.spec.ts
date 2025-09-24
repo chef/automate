@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSubheading, MockChefTabSelector, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -65,10 +65,13 @@ describe('ProjectDetailsComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({
-          selector: 'chef-toolbar',
-          template: '<ng-content></ng-content>'
-        }),
+        ProjectDetailsComponent
+      ],
+      imports: [
+        ReactiveFormsModule,
+        RouterTestingModule,
+        ChefPipesModule,
+        MockChefToolbar,
         MockComponent({
           selector: 'app-authorized',
           inputs: ['allOf', 'not'],
@@ -81,30 +84,24 @@ describe('ProjectDetailsComponent', () => {
         }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-breadcrumbs' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-        MockComponent({ selector: 'chef-tab-selector', inputs: ['value'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
+        MockChefFormField,
+        MockChefBreadcrumbs,
+        MockChefError,
+        MockChefBreadcrumb,
+        MockChefTabSelector,
+        MockChefButton,
+        MockChefHeading,
+        MockChefLoadingSpinner,
+        MockChefOption,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        ProjectDetailsComponent
-      ],
-      imports: [
-        ReactiveFormsModule,
-        RouterTestingModule,
-        ChefPipesModule,
         StoreModule.forRoot({
           ...ngrxReducers,
           router: () => ({

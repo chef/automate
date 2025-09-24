@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { Subject, Observable } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefError, MockChefFormField, MockChefIcon, MockChefInput, MockChefLoadingSpinner, MockChefModal, MockChefOption, MockChefPageHeader, MockChefTabSelector } from 'app/testing/mock-components';
 import {
   NgrxStateAtom,
   ngrxReducers,
@@ -91,26 +91,26 @@ describe('UserDetailsComponent', () => {
           RouterTestingModule,
           FormsModule,
           ReactiveFormsModule,
-          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
-        ],
-        declarations: [
-          MockComponent({ selector: 'chef-loading-spinner' }),
+          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+          MockChefLoadingSpinner,
           MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-          MockComponent({ selector: 'chef-breadcrumbs' }),
-          MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
-          MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
+          MockChefBreadcrumbs,
+          MockChefBreadcrumb,
+          MockChefButton,
           MockComponent({ selector: 'app-mini-table', inputs: ['tableData'] }),
-          MockComponent({ selector: 'chef-error' }),
-          MockComponent({ selector: 'chef-form-field' }),
-          MockComponent({ selector: 'chef-icon' }),
-          MockComponent({ selector: 'chef-input' }),
-          MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-          MockComponent({ selector: 'chef-page-header' }),
-          MockComponent({ selector: 'chef-tab-selector', inputs: ['value']}),
-          MockComponent({ selector: 'chef-option' }),
+          MockChefError,
+          MockChefFormField,
+          MockChefIcon,
+          MockChefInput,
+          MockChefModal,
+          MockChefPageHeader,
+          MockChefTabSelector,
+          MockChefOption,
           MockComponent({ selector: 'app-authorized',
                           inputs: ['allOf'],
-                          template: '<ng-content></ng-content>' }),
+                          template: '<ng-content></ng-content>' })
+        ],
+        declarations: [
           UserDetailsComponent
         ],
         providers: [
@@ -255,26 +255,26 @@ describe('UserDetailsComponent', () => {
           RouterTestingModule,
           FormsModule,
           ReactiveFormsModule,
-          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
-        ],
-        declarations: [
-          MockComponent({ selector: 'chef-loading-spinner' }),
+          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+          MockChefLoadingSpinner,
           MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-          MockComponent({ selector: 'chef-breadcrumbs' }),
-          MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
-          MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
+          MockChefBreadcrumbs,
+          MockChefBreadcrumb,
+          MockChefButton,
           MockComponent({ selector: 'app-mini-table', inputs: ['tableData'] }),
-          MockComponent({ selector: 'chef-error' }),
-          MockComponent({ selector: 'chef-form-field' }),
-          MockComponent({ selector: 'chef-icon' }),
-          MockComponent({ selector: 'chef-input' }),
-          MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-          MockComponent({ selector: 'chef-page-header' }),
-          MockComponent({ selector: 'chef-tab-selector', inputs: ['value']}),
-          MockComponent({ selector: 'chef-option' }),
+          MockChefError,
+          MockChefFormField,
+          MockChefIcon,
+          MockChefInput,
+          MockChefModal,
+          MockChefPageHeader,
+          MockChefTabSelector,
+          MockChefOption,
           MockComponent({ selector: 'app-authorized',
                           inputs: ['allOf'],
-                          template: '<ng-content></ng-content>' }),
+                          template: '<ng-content></ng-content>' })
+        ],
+        declarations: [
           UserDetailsComponent
         ],
         providers: [

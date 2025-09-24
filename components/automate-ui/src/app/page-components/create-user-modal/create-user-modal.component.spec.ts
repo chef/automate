@@ -2,7 +2,7 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefToolbar } from 'app/testing/mock-components';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { CreateUserModalComponent } from './create-user-modal.component';
 import { EventEmitter } from '@angular/core';
@@ -20,16 +20,16 @@ describe('CreateUserModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-toolbar' }),
         CreateUserModalComponent
       ],
       imports: [
         ReactiveFormsModule,
+        MockChefModal,
+        MockChefButton,
+        MockChefError,
+        MockChefFormField,
+        MockChefLoadingSpinner,
+        MockChefToolbar,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import moment from 'moment';
 
 @Component({
+  standalone: false,
   selector: 'app-demo-calendar',
   templateUrl: './demo-calendar.component.html',
   styleUrls: ['./demo-calendar.component.scss']

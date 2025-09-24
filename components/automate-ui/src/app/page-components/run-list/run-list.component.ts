@@ -32,6 +32,9 @@ export class Item {
   }
 
   cookbookName(): string {
+    if (!this.name) {
+      return '';
+    }
     return this.name.split('::')[0];
   }
 }
@@ -43,6 +46,7 @@ class RunListRollupStatus {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-run-list',
   templateUrl: './run-list.component.html',
   styleUrls: ['./run-list.component.scss'],

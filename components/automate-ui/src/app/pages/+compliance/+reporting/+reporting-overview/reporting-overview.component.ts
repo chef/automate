@@ -9,11 +9,12 @@ import {
 } from '../../shared/reporting';
 import { ActivatedRoute, Router } from '@angular/router';
 import { union } from 'lodash/fp';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 type Tab = 'Node Status' | 'Profile Status';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-overview',
   templateUrl: './reporting-overview.component.html',
   styleUrls: [ './reporting-overview.component.scss' ],

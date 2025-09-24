@@ -4,6 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 import { TimeFromNowPipe } from '../../../pipes/time-from-now.pipe';
 
 @Component({
+  standalone: false,
   selector: 'app-daily-check-in',
   templateUrl: './daily-check-in.component.html',
   styleUrls: ['./daily-check-in.component.scss']

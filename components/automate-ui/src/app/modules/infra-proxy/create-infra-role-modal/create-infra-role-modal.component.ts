@@ -32,6 +32,7 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
 const CREATE_TAB_NAME = 'roleTab';
 
 @Component({
+  standalone: false,
   selector: 'app-create-infra-role-modal',
   templateUrl: './create-infra-role-modal.component.html',
   styleUrls: ['./create-infra-role-modal.component.scss']

@@ -7,7 +7,7 @@ import { runtimeChecks, ngrxReducers, NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IntegrationsListComponent } from './integrations-list.component';
-import { MatOptionSelectionChange } from '@angular/material/core/option';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { DeleteManager } from 'app/entities/managers/manager.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 

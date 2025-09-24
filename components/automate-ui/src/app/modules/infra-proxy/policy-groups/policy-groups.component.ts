@@ -21,6 +21,7 @@ import {
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-policy-groups',
   templateUrl: './policy-groups.component.html',
   styleUrls: ['./policy-groups.component.scss']

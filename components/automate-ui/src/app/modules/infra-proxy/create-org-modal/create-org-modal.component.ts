@@ -12,6 +12,7 @@ import { ProjectConstants } from '../../../entities/projects/project.model';
 import { Utilities } from '../../../helpers/utilities/utilities';
 
 @Component({
+  standalone: false,
   selector: 'app-create-org-modal',
   templateUrl: './create-org-modal.component.html',
   styleUrls: ['./create-org-modal.component.scss']

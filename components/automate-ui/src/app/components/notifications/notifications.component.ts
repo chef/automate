@@ -8,6 +8,7 @@ import { Notification, Type } from '../../entities/notifications/notification.mo
 import { DeleteNotification } from '../../entities/notifications/notification.actions';
 
 @Component({
+  standalone: false,
   selector: 'app-chef-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']

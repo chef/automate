@@ -10,6 +10,7 @@ import { ProjectsFilterOption } from '../../services/projects-filter/projects-fi
 import { ResourceCheckedSection } from '../../components/resource-dropdown/resource-dropdown.component';
 
 @Component({
+  standalone: false,
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
   styleUrls: ['./projects-dropdown.component.scss']

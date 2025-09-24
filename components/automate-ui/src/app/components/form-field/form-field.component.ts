@@ -8,6 +8,7 @@ import { Component,
 import { ErrorDirective } from '../error/error.directive';
 
 @Component({
+  standalone: false,
   selector: 'chef-form-field',
   templateUrl: './form-field.component.html',
   styleUrls: ['./form-field.component.scss',

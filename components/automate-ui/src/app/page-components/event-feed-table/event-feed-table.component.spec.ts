@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { EventFeedTableComponent } from './event-feed-table.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefIcon } from 'app/testing/mock-components';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import { Observable, of as observableOf } from 'rxjs';
@@ -9,7 +10,7 @@ import {
   ChefEventCollection,
   ChefEvent
 } from '../../types/types';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 class MockEventFeedService {
@@ -29,15 +30,15 @@ describe('EventFeedTableComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        ChefPipesModule
-      ],
-      declarations: [
-        EventFeedTableComponent,
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-button' }),
+        ChefPipesModule,
+        MockChefIcon,
+        MockChefButton,
         MockComponent({ selector: 'app-event-icon', inputs: ['group', 'type', 'task'] }),
         MockComponent({ selector: 'chef-click-outside'}),
         MockComponent({ selector: 'chef-side-panel', inputs: ['visible']})
+      ],
+      declarations: [
+        EventFeedTableComponent
       ],
       providers: [
         { provide: EventFeedService, useValue: mockEventFeedService }

@@ -39,6 +39,7 @@ export class CookbookDependencyList {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-policy-file-details',
   templateUrl: './policy-file-details.component.html',
   styleUrls: ['./policy-file-details.component.scss']

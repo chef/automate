@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-tab',
   template: `
   <div [hidden]="!active" class="test">

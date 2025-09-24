@@ -16,6 +16,7 @@ import { Credential } from '../../../../../entities/credentials/credential.model
 import { GetNodeCredential, ResetStore } from '../../../../../entities/node-credentials/node-credential.actions';
 
 @Component({
+  standalone: false,
   templateUrl: './nodes-edit.component.html',
   styleUrls: ['./nodes-edit.component.scss']
 })

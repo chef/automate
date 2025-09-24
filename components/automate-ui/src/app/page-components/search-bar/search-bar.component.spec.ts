@@ -1,9 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { SearchBarComponent } from './search-bar.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefIcon } from 'app/testing/mock-components';
 import { List } from 'immutable';
 import { Chicklet } from '../../types/types';
 import { SimpleChange } from '@angular/core';
+import { first } from 'rxjs/operators';
 
 describe('SearchBarComponent', () => {
   let component: SearchBarComponent;
@@ -12,9 +14,11 @@ describe('SearchBarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        SearchBarComponent,
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-button' })
+        SearchBarComponent
+      ],
+      imports: [
+        MockChefIcon,
+        MockChefButton
       ]
     });
 
@@ -262,7 +266,7 @@ describe('SearchBarComponent', () => {
       it('ensure a request for suggestions is made', (done) => {
         component.selectedCategoryType = component.categories[0];
 
-        component.suggestValues.subscribe(({detail: {type: type, text: text}}) => {
+        component.suggestValues.pipe(first()).subscribe(({detail: {type: type, text: text}}) => {
           expect(text).toEqual('boba');
           expect(type).toEqual('attribute');
           done();

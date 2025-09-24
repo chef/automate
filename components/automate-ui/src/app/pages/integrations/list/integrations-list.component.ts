@@ -15,6 +15,7 @@ import { routeParams } from '../../../route.selectors';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-integrations',
   templateUrl: './integrations-list.component.html',
   styleUrls: ['./integrations-list.component.scss']

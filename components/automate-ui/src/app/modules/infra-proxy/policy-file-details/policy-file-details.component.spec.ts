@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Store, StoreModule } from '@ngrx/store';
+import { of } from 'rxjs';
 import {
   NgrxStateAtom,
   ngrxReducers,
@@ -13,9 +14,11 @@ import {
   defaultRouterState,
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { PolicyFileDetailsComponent } from './policy-file-details.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSubheading, MockChefTabSelector, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyFileSuccess } from 'app/entities/policy-files/policy-file.action';
 import { By } from '@angular/platform-browser';
@@ -47,34 +50,6 @@ describe('PolicyFileDetailsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'chef-button',
-          inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'chef-tab-selector',
-          inputs: ['value', 'routerLink', 'fragment']
-        }),
-        MockComponent({
-          selector: 'app-revision-id',
-          inputs: ['serverId'],
-          outputs: ['close']
-        }),
         PolicyFileDetailsComponent
       ],
       providers: [
@@ -85,7 +60,32 @@ describe('PolicyFileDetailsComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockChefButton,
+        MockComponent({ selector: 'mat-select' }),
+        MockChefTh,
+        MockChefTd,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefOption,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockChefTabSelector,
+        MockComponent({
+          selector: 'app-revision-id',
+          inputs: ['serverId'],
+          outputs: ['close']
+        })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
@@ -97,10 +97,46 @@ describe('PolicyFileDetailsComponent', () => {
     spyOn(router, 'navigate').and.stub();
     store = TestBed.inject(Store);
 
+    // Mock all store selectors to prevent EmptyError
+    spyOn(store, 'select').and.callFake((selector) => {
+      const selectorString = selector.toString();
+
+      // Route selectors
+      if (selectorString.includes('routeURL')) {
+        return of(`infrastructure/chef-servers/${server_id}/org/${org_id}/policy-files/${name}`);
+      }
+      if (selectorString.includes('routeParams')) {
+        return of({ id: server_id, 'org-id': org_id, 'name': name });
+      }
+
+      // Entity status selectors
+      if (selectorString.includes('Status') || selectorString.includes('getStatus')) {
+        return of(EntityStatus.notLoaded);
+      }
+
+      // Data selectors
+      if (selectorString.includes('policyFile')) {
+        return of('');
+      }
+
+      // Default fallback
+      return of('');
+    });
+
+    spyOn(store, 'dispatch');
+
     fixture = TestBed.createComponent(PolicyFileDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     element = fixture.debugElement;
+  });
+
+  afterEach(() => {
+    // Ensure proper cleanup to prevent memory leaks
+    if (component && component.ngOnDestroy) {
+      component.ngOnDestroy();
+    }
+    fixture.destroy();
   });
 
   const policyFile: PolicyFile = {

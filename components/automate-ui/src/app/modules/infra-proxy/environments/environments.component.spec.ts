@@ -5,6 +5,7 @@ import { EnvironmentsComponent } from './environments.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefError, MockChefFormField, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -26,42 +27,40 @@ describe('EnvironmentsComponent ', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'app-create-environment-modal',
-        inputs: ['openEvent', 'server_Id', 'org_Id', 'currentPage', 'environmentsList'] }),
-        MockComponent({ selector: 'app-delete-infra-object-modal',
-        inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
-        outputs: ['close', 'deleteClicked'] }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         EnvironmentsComponent
       ],
       providers: [
         { provide: TelemetryService, useClass: MockTelemetryService },
-        FeatureFlagsService
+        FeatureFlagsService,
       ],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockComponent({ selector: 'app-create-environment-modal',
+        inputs: ['openEvent', 'server_Id', 'org_Id', 'currentPage', 'environmentsList'] }),
+        MockComponent({ selector: 'app-delete-infra-object-modal',
+        inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
+        outputs: ['close', 'deleteClicked'] }),
+        MockChefTh,
+        MockChefTd,
+        MockChefError,
+        MockChefFormField,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

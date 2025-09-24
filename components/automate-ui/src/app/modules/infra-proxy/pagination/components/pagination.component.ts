@@ -10,6 +10,7 @@ import { OnInit,
 import paginate from '../pagination.util';
 
 @Component({
+  standalone: false,
   selector: 'app-pagination',
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.scss'],

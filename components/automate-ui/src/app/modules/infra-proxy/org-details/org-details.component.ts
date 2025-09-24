@@ -21,6 +21,7 @@ import { ProjectConstants } from '../../../entities/projects/project.model';
 const ORG_DETAILS_TAB_NAME = 'orgDetailsTab';
 
 @Component({
+  standalone: false,
   selector: 'app-org-details',
   templateUrl: './org-details.component.html',
   styleUrls: ['./org-details.component.scss']

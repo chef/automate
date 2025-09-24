@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-overview-severity',
   templateUrl: './overview-severity.component.html',
   styleUrls: ['./overview-severity.component.scss']

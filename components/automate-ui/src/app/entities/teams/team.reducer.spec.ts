@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { cloneDeep, difference, keys, times } from 'lodash/fp';
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { using } from 'app/testing/spec-helpers';
 import { EntityStatus } from 'app/entities/entities';
@@ -159,9 +159,9 @@ describe('teamStatusEntityReducer', () => {
 
   describe('CREATE', () => {
     const createPayload: CreateTeamPayload = {
-      name: faker.random.word('name'),
-      id: faker.random.word('id'),
-      projects: [faker.random.word('project')]
+      name: faker.lorem.word(),
+      id: faker.lorem.word(),
+      projects: [faker.lorem.word()]
     };
 
     const action = new CreateTeam(createPayload);
@@ -295,8 +295,8 @@ describe('teamStatusEntityReducer', () => {
     const payload: TeamUserMgmtPayload = {
       id: teamId,
       membership_ids: [
-        faker.random.uuid(),
-        faker.random.uuid()
+        faker.string.uuid(),
+        faker.string.uuid()
       ]
     };
     const action = new AddTeamUsers(payload);
@@ -323,11 +323,11 @@ describe('teamStatusEntityReducer', () => {
     ], function (state: TeamEntityState, description: string) {
       it('adds users from the payload to the state for ' + description, () => {
         const userIDArray = [
-          faker.random.uuid(),
-          faker.random.uuid()
+          faker.string.uuid(),
+          faker.string.uuid()
         ];
         const payload: TeamUserMgmtPayload = {
-          id: faker.random.uuid(),
+          id: faker.string.uuid(),
           membership_ids: userIDArray
         };
         const action = new AddTeamUsersSuccess(payload);
@@ -354,7 +354,7 @@ describe('teamStatusEntityReducer', () => {
     const payload: TeamUserMgmtPayload = {
       id: teamId,
       membership_ids: [
-        faker.random.uuid()
+        faker.string.uuid()
       ]
     };
     const action = new RemoveTeamUsers(payload);
@@ -376,7 +376,7 @@ describe('teamStatusEntityReducer', () => {
     const multipleState = genStateWithUserIDs(4);
     using([
       [initialState, 'for initial state with no inputs returns initial state', []],
-      [genArbitraryState(), 'for non-present user returns initial state', [faker.random.uuid()]],
+        [genArbitraryState(), 'for non-present user returns initial state', [faker.string.uuid()]],
       [multipleState, 'removes single user from team',  multipleState.userIDs[0]],
       [multipleState, 'removes multiple users from team',  multipleState.userIDs.slice(0, 2)],
       [multipleState, 'removes all users from team',  multipleState.userIDs]
@@ -384,7 +384,7 @@ describe('teamStatusEntityReducer', () => {
       it(description, () => {
         const resultingUsers = difference(state.userIDs, usersToRemove);
         const payload: TeamUserMgmtPayload = {
-          id: faker.random.uuid(),
+          id: faker.string.uuid(),
           membership_ids: resultingUsers
         };
         const action = new RemoveTeamUsersSuccess(payload);
@@ -406,23 +406,23 @@ describe('teamStatusEntityReducer', () => {
 
   function genTeam(teamId?: string): Team {
     return {
-      id: teamId || faker.random.uuid(),
-      name: faker.random.word('string'),
-      guid: faker.random.uuid(),
-      projects: [faker.random.word('string')]
+      id: teamId || faker.string.uuid(),
+      name: faker.lorem.word(),
+      guid: faker.string.uuid(),
+      projects: [faker.lorem.word()]
     };
   }
 
   function genTeamUserMgmtPayload(teamId?: string): TeamUserMgmtPayload {
     return {
-      id: teamId || faker.random.uuid(),
-      membership_ids: [faker.random.uuid(), faker.random.uuid(), faker.random.uuid()]
+      id: teamId || faker.string.uuid(),
+      membership_ids: [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()]
     };
   }
 
   function genArbitraryState(teamId?: string): TeamEntityState {
     const newState: TeamEntityState = cloneDeep(initialState);
-    const existingTeamId = teamId || faker.random.uuid();
+    const existingTeamId = teamId || faker.string.uuid();
     newState.entities[existingTeamId] = genTeam(existingTeamId);
     const newTeam2 = genTeam();
     newState.entities[newTeam2.id] = genTeam(newTeam2.id);
@@ -433,9 +433,9 @@ describe('teamStatusEntityReducer', () => {
 
   function genStateWithUserIDs(numberOfMembers: number): TeamEntityState {
     const newState: TeamEntityState = cloneDeep(initialState);
-    const existingTeamId = faker.random.uuid();
+    const existingTeamId = faker.string.uuid();
     newState.entities[existingTeamId] = genTeam(existingTeamId);
-    newState.userIDs = times(() => faker.random.uuid(), numberOfMembers);
+    newState.userIDs = times(() => faker.string.uuid(), numberOfMembers);
     return newState;
   }
 });

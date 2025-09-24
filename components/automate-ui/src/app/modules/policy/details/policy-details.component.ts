@@ -23,6 +23,7 @@ export type PolicyTabName = 'definition' | 'members';
 const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 
 @Component({
+  standalone: false,
   selector: 'app-policy-details',
   templateUrl: './policy-details.component.html',
   styleUrls: ['./policy-details.component.scss']

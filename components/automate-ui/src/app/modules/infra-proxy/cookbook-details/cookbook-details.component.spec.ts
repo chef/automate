@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSnippet, MockChefSubheading, MockChefToolbar } from 'app/testing/mock-components';
 import { environment as env } from 'environments/environment';
 import { StoreModule, Store } from '@ngrx/store';
 import {
@@ -23,17 +24,6 @@ import { CookbookDetailsComponent } from './cookbook-details.component';
 
 
 const declarations: any[] = [
-  MockComponent({ selector: 'chef-heading' }),
-  MockComponent({ selector: 'chef-icon' }),
-  MockComponent({ selector: 'chef-loading-spinner' }),
-  MockComponent({ selector: 'mat-select' }),
-  MockComponent({ selector: 'mat-option' }),
-  MockComponent({ selector: 'chef-page-header' }),
-  MockComponent({ selector: 'chef-subheading' }),
-  MockComponent({ selector: 'chef-toolbar' }),
-  MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-  MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-  MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
   CookbookDetailsComponent
 ];
 const server_id = '6e98f609-586d-4816-a6de-e841e659b11d';
@@ -99,7 +89,18 @@ describe('CookbookDetailsComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockChefSnippet
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
