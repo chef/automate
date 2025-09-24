@@ -129,6 +129,8 @@ sudo chef-automate config patch config.toml
 
 You can configure Chef Automate to use PostgreSQL and OpenSearch clusters that are not deployed via Chef Automate. The directions below are intended for use only during the initial deployment of Chef Automate.
 
+This information is provided as a courtesy and does not indicate support for custom configuration in an Automate system. If you need redundancy in your Automate installation, speak to your Sales or Customer Success contacts about the Automate HA product.
+
 #### Configuring External OpenSearch
 
 {{< note >}}
