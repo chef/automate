@@ -525,16 +525,18 @@ Add the following section to your Automate configuration TOML:
 
 ```toml
 [dex.v1.sys.cipher]
-enable_legacy_rsa = true      # Enables legacy RSA key exchange ciphers (GODEBUG=tlsrsakex=1)
-enable_legacy_3des = true    # Enables legacy 3DES ciphers (GODEBUG=tls3des=1)
+enable_legacy_rsa = true
+enable_legacy_3des = true
 ```
 
-- If both are set to `true`, both legacy RSA key exchange and 3DES ciphers are enabled (GODEBUG=tlsrsakex=1,tls3des=1).
-- If only `enable_legacy_rsa` is `true`, only legacy RSA key exchange ciphers are enabled (GODEBUG=tlsrsakex=1).
-- If only `enable_legacy_3des` is `true`, only legacy 3DES ciphers are enabled (GODEBUG=tls3des=1).
-- If both are `false` or unset, no legacy ciphers are enabled (GODEBUG is unset).
+Set the following values:
 
-**Note:** Only set these options if you require compatibility with legacy LDAP servers. Enabling legacy ciphers may reduce the security of TLS connections. Legacy ciphers should only be used as a temporary measure. You should work with your LDAP server administrators to upgrade your servers to support more secure cipher suites as soon as possible.
+- `enable_legacy_rsa`: Enable legacy RSA key exchange ciphers. Set to true to enable. Default: false.
+- `enable_legacy_3des`: Enable legacy 3DES ciphers. Set to true to enable. Default: false.
+
+When both are true, legacy RSA and 3DES ciphers are enabled (GODEBUG=tlsrsakex=1,tls3des=1).
+When one is true, that cipher type is enabled (GODEBUG=tlsrsakex=1 or GODEBUG=tls3des=1).
+When both are false or unset, legacy ciphers are not enabled (GODEBUG is unset).
 
 ### Troubleshooting
 
