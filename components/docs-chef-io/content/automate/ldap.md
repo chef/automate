@@ -958,19 +958,17 @@ attribute, multiple queries will be executed, and their results combined.
 
 #### TLS Handshake Failure After Upgrade
 
-If you encounter errors like:
+If you encounter errors like the following one after upgrading Chef Automate, and you can still authenticate using `ldapsearch` but not through Automate, your LDAP server may require legacy RSA or 3DES ciphers for TLS connections:
 
 ```
 automate-dex.default(O): time="..." level=error msg="Failed to login user: failed to connect: LDAP Result Code 200 \"Network Error\": remote error: tls: handshake failure"
 ```
 
-after upgrading Chef Automate, and you can still authenticate using `ldapsearch` but not through Automate, your LDAP server may require legacy RSA or 3DES ciphers for TLS connections.
-
 **Solution:**
 
 Enable legacy cipher support in Automate Dex by following the instructions in the [Chef Automate Configuration Documentation: Legacy Cipher Support](https://docs.chef.io/automate/configuration/#legacy-cipher-support).
 
-This allows Automate Dex to connect to older LDAP servers using the required ciphers. See the configuration docs for supported ciphers and step-by-step instructions.
+This allows Automate Dex to connect to older LDAP servers using the required ciphers. See the configuration documentation for supported ciphers and step-by-step instructions.
 
 #### Other Common Issues
 
