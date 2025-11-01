@@ -341,7 +341,8 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # large_client_header_buffers_number = 4
 # sendfile = "on"
 # ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL:!EXPORT:AES256-GCM-SHA384"
-# ssl_protocols = "TLSv1.2"
+# ssl_ciphersuites = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+# ssl_protocols = "TLSv1.2 TLSv1.3"
 # tcp_nodelay = "on"
 # tcp_nopush = "on"
 # enable_csp_header = false
@@ -358,6 +359,174 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # server_name = "<your Chef Automate server name>"
 # cert = "-----BEGIN CERTIFICATE-----\n<your load balancer cert>\n-----END CERTIFICATE-----\n"
 # key = "-----BEGIN RSA PRIVATE KEY-----\n<your load balancer private key>\n-----END RSA PRIVATE KEY-----\n"
+```
+
+#### TLS/SSL Protocol and Cipher Configuration
+
+Chef Automate supports TLS 1.2 and TLS 1.3 protocols for secure communication. You can configure both protocols and their respective ciphers.
+
+##### Supported TLS Versions
+
+- **TLSv1.2** (Recommended for compatibility)
+- **TLSv1.3** (Recommended for maximum security)
+
+{{< warning >}}
+**Deprecated Protocols**: SSLv2, SSLv3, TLSv1, and TLSv1.1 are deprecated and non-functional. These protocols are not supported by modern OpenSSL versions (1.1.0+) and will not work even if configured. Use only TLSv1.2 and TLSv1.3.
+{{< /warning >}}
+
+##### TLS 1.3 Cipher Suites
+
+TLS 1.3 uses the `ssl_ciphersuites` directive (separate from TLS 1.2's `ssl_ciphers`). When TLS 1.3 is enabled, you must specify cipher suites.
+
+**Default TLS 1.3 Cipher Suites:**
+
+```toml
+[load_balancer.v1.sys.ngx.http]
+ssl_protocols = "TLSv1.3"
+ssl_ciphersuites = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+```
+
+**Supported TLS 1.3 Cipher Suites:**
+
+- `TLS_AES_256_GCM_SHA384` - AES-256 with GCM mode (most secure)
+- `TLS_CHACHA20_POLY1305_SHA256` - ChaCha20-Poly1305 (optimized for mobile devices)
+- `TLS_AES_128_GCM_SHA256` - AES-128 with GCM mode (faster performance)
+
+{{< note >}}
+TLS 1.3 cipher suites use underscores in their names (e.g., `TLS_AES_256_GCM_SHA384`) and are separated by colons. Do not use hyphens or spaces.
+{{< /note >}}
+
+##### TLS 1.2 Ciphers
+
+TLS 1.2 uses the `ssl_ciphers` directive (separate from TLS 1.3's `ssl_ciphersuites`).
+
+**Default TLS 1.2 Ciphers:**
+
+```toml
+[load_balancer.v1.sys.ngx.http]
+ssl_protocols = "TLSv1.2"
+ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"
+```
+
+{{< note >}}
+TLS 1.2 ciphers use hyphens in their names (e.g., `ECDHE-RSA-AES256-GCM-SHA384`) and are separated by colons. Do not use semicolons or spaces.
+{{< /note >}}
+
+##### Dual TLS 1.2 and TLS 1.3 Configuration (Recommended)
+
+For maximum compatibility and security, enable both protocols:
+
+```toml
+[load_balancer.v1.sys.ngx.http]
+ssl_protocols = "TLSv1.2 TLSv1.3"
+ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305"
+ssl_ciphersuites = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+```
+
+Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+
+##### Configuration Examples
+
+**Example 1: TLS 1.3 Only (Maximum Security)**
+
+```toml
+[load_balancer.v1.sys.ngx.http]
+ssl_protocols = "TLSv1.3"
+ssl_ciphersuites = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"
+```
+
+**Example 2: TLS 1.2 Only (Legacy Compatibility)**
+
+```toml
+[load_balancer.v1.sys.ngx.http]
+ssl_protocols = "TLSv1.2"
+ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+```
+
+**Example 3: Both Protocols (Production - Recommended)**
+
+```toml
+[load_balancer.v1.sys.ngx.http]
+ssl_protocols = "TLSv1.2 TLSv1.3"
+ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305"
+ssl_ciphersuites = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+```
+
+##### Configuration Validation
+
+Chef Automate validates TLS/SSL configuration and provides error messages for common issues:
+
+**Common Configuration Errors:**
+
+1. **Empty ciphers when TLS 1.2 is enabled:**
+   ```
+   Error: ssl_ciphers cannot be empty when TLSv1.2 is enabled
+   ```
+   
+2. **Empty cipher suites when TLS 1.3 is enabled:**
+   ```
+   Error: ssl_ciphersuites cannot be empty when TLSv1.3 is enabled
+   ```
+
+3. **Invalid protocol format:**
+   ```
+   Error: 'TLS1.3' contains invalid protocol versions. Use 'TLSv1.3'
+   ```
+
+4. **Invalid separator in ciphers:**
+   ```
+   Error: ssl_ciphers should not contain spaces. Use colons (:) to separate cipher names
+   ```
+
+5. **Wrong format for TLS 1.3 cipher suites:**
+   ```
+   Error: 'TLS-AES-256-GCM-SHA384' contains invalid characters. Use underscores: TLS_AES_256_GCM_SHA384
+   ```
+
+**Configuration Warnings:**
+
+Chef Automate issues warnings for suboptimal configurations:
+
+1. **Deprecated protocols configured:**
+   ```
+   WARNING: ssl_protocols 'TLSv1.1 TLSv1.2' contains deprecated and non-functional protocol versions (SSLv2, SSLv3, TLSv1, TLSv1.1). These protocols are not supported by OpenSSL 1.1.0+ and will not work. Use only TLSv1.2 and TLSv1.3.
+   ```
+
+2. **Cipher suites configured without TLS 1.3:**
+   ```
+   WARNING: ssl_ciphersuites is configured, but ssl_protocols does not include TLSv1.3. The ssl_ciphersuites directive will be ignored by NGINX.
+   ```
+
+3. **TLS 1.2 ciphers configured without TLS 1.2:**
+   ```
+   WARNING: ssl_ciphers is configured, but ssl_protocols does not include TLSv1.2. The ssl_ciphers directive will be ignored by NGINX.
+   ```
+
+##### Testing TLS Configuration
+
+After applying TLS configuration, verify it's working correctly:
+
+**Test TLS 1.3 connection:**
+
+```bash
+openssl s_client -connect your-automate-fqdn:443 -tls1_3
+```
+
+**Test TLS 1.2 connection:**
+
+```bash
+openssl s_client -connect your-automate-fqdn:443 -tls1_2
+```
+
+**Check negotiated cipher:**
+
+```bash
+openssl s_client -connect your-automate-fqdn:443 -tls1_3 | grep "Cipher"
+```
+
+Expected output for TLS 1.3:
+```
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
 ```
 
 #### Buffer Size
