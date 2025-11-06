@@ -48,16 +48,16 @@ Before proceeding, make sure you have the following prerequisites in place:
    - **VPC**: Select the VPC in which you have your automate cluster.
    - **Subnets**: Select all three private subnets available in your VPC.
    - **Security groups**: Select a security block with incoming access from your VPC CIDR range.
-7. In **Fine-grained access control**,
-   - Enable **Fine-grained access control**
-   - Choose **Create master user**
-   - Enter the **Master username** and **Master password** you want to create
-8. In **Access policy**,
-   - Select **Configure domain level access policy**
-   - Choose action **Allow**.
+7. In **Fine-grained access control**:
+   - Enable **Fine-grained access control**.
+   - Choose **Create master user**.
+   - Enter the **Master username** and **Master password** you want to create.
+8. In **Access policy**:
+   - Select **Configure domain level access policy**.
+   - Select **Allow**.
 9. Configure the remaining settings per your requirements, such as the number of nodes and storage options.
-10.Review all the settings and make sure they are accurate.
-11.Click the **Confirm** button to start the cluster creation process.
+10. Review all the settings and ensure they are accurate.
+11. Select **Confirm** to start the cluster creation process.
 
 ## Step 4: Wait for the Amazon OpenSearch Cluster to be Created
 
@@ -70,7 +70,7 @@ You can obtain the necessary connection details once the Amazon OpenSearch 1.3 c
 
 1. Go to the Amazon OpenSearch Service dashboard.
 2. Find and select your newly created cluster from the list.
-3. In the cluster details view, navigate to the **Endpoint** tab.
+3. In the cluster details view, select the **Endpoint** tab.
 4. Here, you will find the following connection details:
    - **Domain name**: This is the domain name we gave for this OpenSearch cluster.
    - **Domain URL**: This is the endpoint or hostname of your OpenSearch cluster. It will look something like `my-opensearch-cluster-1234567890.us-east-1.es.amazonaws.com`.
