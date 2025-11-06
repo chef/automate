@@ -35,7 +35,7 @@ Before proceeding, make sure you have the following prerequisites in place:
 ## Step 2: Navigate to the Amazon OpenSearch Service Dashboard
 
 1. Once logged in to the AWS Management Console, search for **OpenSearch** in the search bar at the top of the page.
-2. Click on the **Amazon OpenSearch Service** service from the search results to open the Amazon OpenSearch Service dashboard.
+2. Select the **Amazon OpenSearch Service** service from the search results to open the Amazon OpenSearch Service dashboard.
 
 ## Step 3: Create a New Amazon OpenSearch 1.3 Cluster
 
