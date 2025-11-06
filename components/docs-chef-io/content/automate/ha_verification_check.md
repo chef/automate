@@ -33,6 +33,12 @@ chef-automate verify --config config.toml
 
 The above command will trigger the `config.toml` file with config, the one you want to deploy.
 
+To view detailed debug logs in the console, you can use the debug flag:
+
+```bash
+chef-automate verify --config config.toml -d
+```
+
 The post deployment CLI command is as follows:
 
 ```bash
@@ -75,4 +81,28 @@ An example of a checks performed are shown in the below image:
 
 The above image shows the checks performed for Automate node. The checks in the above image are also performed on all the nodes in Automate HA, i.e., Chef Server, PostgreSQL, OpenSearch, and Chef Automate (the one showed above).
 
-THe verify command checks all the nodes in Automate HA and with that it also provides the remediation steps for failures.
+The verify command checks all the nodes in Automate HA and it also provides the remediation steps for failures.
+
+## Additional Verification in System Logs
+
+In addition to running the chef-automate verify command, you can inspect system logs for deeper insights into the verification service.
+
+### On the Bastion Host
+
+To view logs related to the automate-verify service on the bastion host, use:
+
+```bash
+journalctl -u automate-verify
+```
+
+This helps identify which API checks may have failed during verification.
+
+### On Individual Nodes
+
+Based on the failed API identified from the bastion logs, you can run the same command on the corresponding node to validate the service response:
+
+```bash
+journalctl -u automate-verify
+```
+
+This provides node-level visibility into the verification process and helps when troubleshooting specific failures.

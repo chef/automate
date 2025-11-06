@@ -99,6 +99,7 @@ Eg: `chef-automate node add --postgresql-ips 10.0.1.42 --opensearch-ips 10.0.1.4
 Notice, both OpenSearch and PostgreSQL IPs are same
 - Similarly for frontend services (Automate and Chef Server), add both services in the same command with the same IPs
 Eg: `chef-automate node add --automate-ips 10.0.1.52 --chef-server-ips 10.0.1.52`
+- Adding a new PostgreSQL node to the cluster may lead to increased replication lag on follower nodes because multiple nodes will concurrently attempt to sync data from the leader.
 {{< /note >}}
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.

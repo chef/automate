@@ -70,17 +70,17 @@ We do not support **Chef Manage** integration in the ongoing Automate version.
 
 Current Automate HA integrates with the following non-Chef tools:
 
-**In AWS Deployment**
+#### In AWS Deployment
 
--   **SQL Database:** External not supported
--   **NoSQL Database:** External not supported
--   **Load Balancer:** External not supported
+- **SQL Database:** External not supported
+- **NoSQL Database:** External not supported
+- **Load Balancer:** External not supported
 
-**In AWS Managed Services**
+#### In AWS Managed Services
 
--   **SQL Database:** AWS RDS PostgreSQL: 13.18
--   **NoSQL Database:** AWS OpenSearch: 1.3
--   **Load Balancer:** External not supported
+- **SQL Database:** AWS RDS PostgreSQL: 13.22-R2
+- **NoSQL Database:** AWS OpenSearch: 1.3
+- **Load Balancer:** External not supported
 
 ## Hardware Requirements
 

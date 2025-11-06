@@ -76,10 +76,10 @@ We do not support **Chef Manage** integration in the ongoing Automate version.
 
 Current Automate HA integrates with the following non-Chef tools:
 
-- **SQL Database:** PostgreSQL: 13.18
-- **NoSQL Database:** OpenSearch: 1.3.7
-- **Load Balancer:** 
-  - [Kemp LoadMaster](https://kemptechnologies.com/?_gl=1*jfw3dz*_gcl_au*MTIzMDA0NzAwNC4xNzM4NjA3NTQ3*_ga*MTk4NzcyMzc0My4xNzM4NjA3NTQ3*_ga_9JSNBCSF54*MTc0NDYxNTI1MS4xNC4xLjE3NDQ2MzQ4NTcuMzUuMC4w) (Preferred)
+- **SQL Database:** PostgreSQL: 13.22
+- **NoSQL Database:** OpenSearch: 1.3.20
+- **Load Balancer:**
+  - [Progress Kemp LoadMaster](https://kemptechnologies.com/?_gl=1*jfw3dz*_gcl_au*MTIzMDA0NzAwNC4xNzM4NjA3NTQ3*_ga*MTk4NzcyMzc0My4xNzM4NjA3NTQ3*_ga_9JSNBCSF54*MTc0NDYxNTI1MS4xNC4xLjE3NDQ2MzQ4NTcuMzUuMC4w) (Preferred)
   - NGINX: 1.21.3
   - HA Proxy: 2.2.18
   - AWS Application Load Balancer
@@ -216,15 +216,15 @@ Set up the databases with password-based authentication.
 
 ### AWS Managed
 
-- AWS RDS PostgreSQL: 13.14
+- AWS RDS PostgreSQL: 13.22-R2
 - AWS OpenSearch: 1.3
 
 Configure the backup only with **S3** when using AWS managed databases.
 
 ### Customer Managed
 
-- PostgreSQL: 13.14
-- OpenSearch: 1.3.7
+- PostgreSQL: 13.22
+- OpenSearch: 1.3.20
 
 ## Upgrade
 
