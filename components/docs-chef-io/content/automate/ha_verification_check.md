@@ -81,9 +81,9 @@ An example of a checks performed are shown in the below image:
 
 The above image shows the checks performed for Automate node. The checks in the above image are also performed on all the nodes in Automate HA, i.e., Chef Server, PostgreSQL, OpenSearch, and Chef Automate (the one showed above).
 
-The verify command checks all the nodes in Automate HA and with that it also provides the remediation steps for failures.
+The verify command checks all the nodes in Automate HA and it also provides the remediation steps for failures.
 
-## Additional Verification via System Logs
+## Additional Verification in System Logs
 
 In addition to running the chef-automate verify command, you can inspect system logs for deeper insights into the verification service.
 
@@ -105,4 +105,4 @@ Based on the failed API identified from the bastion logs, you can run the same c
 journalctl -u automate-verify
 ```
 
-This provides node-level visibility into the verification process and helps in troubleshooting specific failures.
+This provides node-level visibility into the verification process and helps when troubleshooting specific failures.
