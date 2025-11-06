@@ -24,8 +24,8 @@ Below is our guide on the steps required to create an Amazon RDS PostgreSQL inst
 
 Before proceeding, make sure you have the following prerequisites in place:
 
-- An active AWS account
-- Sufficient permissions to create Amazon RDS instances
+1. An active AWS account
+2. Sufficient permissions to create Amazon RDS instances
 
 ## Step 1: Sign in to the AWS Management Console
 
@@ -56,8 +56,8 @@ Before proceeding, make sure you have the following prerequisites in place:
     - In **DB subnet group**, choose any private subnet available in your VPC.
     - In **Public Access** select **NO**
 9. Configure the remaining settings as per your requirements.
-10. Review all the settings and make sure they are accurate.
-11. Click on the **Create database** button to start the creation process.
+10.Review all the settings and make sure they are accurate.
+11.Click on the **Create database** button to start the creation process.
 
 ## Step 4: Wait for the Amazon RDS Instance to be Created
 
