@@ -505,6 +505,41 @@ and then run `chef-automate config patch </path/to/your-file.toml>` to deploy yo
   x_xss_protection = "0"
 ```
 
+### Legacy Cipher Support
+
+Automate Dex can be configured to support legacy RSA and 3DES ciphers to connect with an LDAP/SAML server through the Dex client.
+
+#### Supported Ciphers
+
+When legacy cipher support is enabled, the following ciphers are allowed:
+
+- TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009C)
+- TLS_RSA_WITH_AES_256_GCM_SHA384 (0x009D)
+- TLS_RSA_WITH_AES_128_CBC_SHA (0x002F)
+- TLS_RSA_WITH_AES_256_CBC_SHA (0x0035)
+- TLS_RSA_WITH_AES_128_CBC_SHA256 (0x003C)
+
+#### How to Enable Legacy Cipher Support
+
+Add the following section to your Automate configuration TOML:
+
+```toml
+[dex.v1.sys.cipher]
+enable_legacy_rsa = true
+enable_legacy_3des = true
+```
+
+Set the following values:
+
+- `enable_legacy_rsa`: Enable legacy RSA key exchange ciphers. Set to true to enable. Default: false.
+- `enable_legacy_3des`: Enable legacy 3DES ciphers. Set to true to enable. Default: false.
+
+When both are true, legacy RSA and 3DES ciphers are enabled (GODEBUG=tlsrsakex=1,tls3des=1).
+
+When one is true, that cipher type is enabled (GODEBUG=tlsrsakex=1 or GODEBUG=tls3des=1).
+
+When both are false or unset, legacy ciphers are not enabled (GODEBUG is unset).
+
 ### Troubleshooting
 
 Common syntax errors may cause issues in configuration files:
