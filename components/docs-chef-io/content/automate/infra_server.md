@@ -20,12 +20,6 @@ Chef Automate will not deploy the Chef Manage add-on for Chef Infra Server.
 
 {{< /warning >}}
 
-{{< warning >}}
-
-Supermarket cannot authenticate users on Chef Infra Server deployed
-with Chef Automate.
-
-{{< /warning >}}
 
 {{< warning >}}
 
