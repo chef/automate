@@ -1698,6 +1698,8 @@ exceptions:
     reason: Exception made by Chef Legal
   - name : core/tzdata
     reason: Exception made by Chef Legal    
+  - name: core/tzdata
+    reason: Added to supress license_scout error in verify_private
 
   ruby:
   - name: highline
