@@ -2,6 +2,7 @@ import { Component, Input, HostBinding } from '@angular/core';
 import { isEmpty } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'app-cl-api-prop, api-prop',
   templateUrl: './cl-api-prop.component.html',
   styleUrls: ['./cl-api-prop.component.scss']

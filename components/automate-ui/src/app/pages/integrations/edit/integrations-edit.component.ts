@@ -26,6 +26,7 @@ import { integrationsEditState } from './integrations-edit.selectors';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-integrations-edit',
   templateUrl: './integrations-edit.component.html',
   styleUrls: ['./integrations-edit.component.scss']

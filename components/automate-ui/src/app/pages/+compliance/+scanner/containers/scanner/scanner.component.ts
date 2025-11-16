@@ -6,6 +6,7 @@ import { LayoutFacadeService, Sidebar } from '../../../../../entities/layout/lay
 import * as selectors from '../../state/scanner.selectors';
 
 @Component({
+  standalone: false,
   templateUrl: './scanner.component.html',
   styleUrls: ['./scanner.component.scss']
 })

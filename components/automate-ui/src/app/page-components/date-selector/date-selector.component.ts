@@ -3,6 +3,7 @@ import { HistorySelection } from '../../helpers/history-selection/history-select
 import { find } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'app-date-selector',
   templateUrl: './date-selector.component.html',
   styleUrls: ['./date-selector.component.scss']

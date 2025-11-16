@@ -34,6 +34,7 @@ interface Profile {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-profiles-overview',
   templateUrl: './profile-overview.component.html',
   styleUrls: ['./profile-overview.component.scss'],

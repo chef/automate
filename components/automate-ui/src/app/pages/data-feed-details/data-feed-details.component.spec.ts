@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -37,7 +37,7 @@ describe('DataFeedDetailsComponent', () => {
           BrowserAnimationsModule,
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })
         ],
-        schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+        schemas: [ CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA ]
       })
       .compileComponents();
     }));

@@ -3,6 +3,7 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefModal } from 'app/testing/mock-components';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal.component';
 import { EventEmitter } from '@angular/core';
@@ -16,12 +17,12 @@ describe('DeleteInfraObjectModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
         DeleteInfraObjectModalComponent
       ],
       imports: [
+        MockChefModal,
+        MockChefButton,
+        MockChefError,
         MatSelectModule,
         ReactiveFormsModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })

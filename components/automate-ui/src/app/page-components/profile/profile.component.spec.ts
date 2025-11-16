@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Observable, Subject, of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefModal } from 'app/testing/mock-components';
 import { StoreModule } from '@ngrx/store';
 import {
   ngrxReducers,
@@ -46,11 +47,11 @@ describe('ProfileComponent', () => {
       TestBed.configureTestingModule({
         imports: [
           RouterTestingModule,
-          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+          MockComponent({ selector: 'app-welcome-modal' }),
+          MockChefModal
         ],
         declarations: [
-          MockComponent({ selector: 'app-welcome-modal' }),
-          MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
           ProfileComponent
         ],
         providers: [
@@ -241,11 +242,11 @@ describe('ProfileComponent', () => {
       TestBed.configureTestingModule({
         imports: [
           RouterTestingModule,
-          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks }),
+          MockComponent({ selector: 'app-welcome-modal' }),
+          MockChefModal
         ],
         declarations: [
-          MockComponent({ selector: 'app-welcome-modal' }),
-          MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
           ProfileComponent
         ],
         providers: [

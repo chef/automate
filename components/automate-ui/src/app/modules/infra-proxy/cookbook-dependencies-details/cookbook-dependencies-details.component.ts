@@ -6,7 +6,7 @@ import {
   HostBinding
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { first } from 'rxjs/operators';
+import { defaultIfEmpty, first } from 'rxjs/operators';
 import { environment as env } from '../../../../environments/environment';
 import {
   CookbookDetails,
@@ -16,6 +16,7 @@ import { CookbookDetailsRequests } from '../../../entities/cookbooks/cookbook-de
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-cookbook-dependencies-details',
   templateUrl: './cookbook-dependencies-details.component.html',
   styleUrls: ['./cookbook-dependencies-details.component.scss']
@@ -96,7 +97,7 @@ export class CookbookDependenciesDetailsComponent {
           this.readFileUrl = encodeURIComponent(this.readFile?.url);
           this.http.get(
             `${env.infra_proxy_url}/servers/${this.serverId}/orgs/${this.orgId}/cookbooks/${this.cookbookName}/${this.cookbookVersion}/file-content?url=${this.readFileUrl}`)
-            .pipe(first())
+            .pipe(first(), defaultIfEmpty({}))
             .subscribe
             (fileContent => {
               this.readFileContent = fileContent;

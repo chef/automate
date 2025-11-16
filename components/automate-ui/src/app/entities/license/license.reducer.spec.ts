@@ -38,7 +38,9 @@ describe('licenseStatusEntityReducer', () => {
       start: '2018-02-14T00:00:00.000Z',
       end: '2020-02-14T23:59:59.000Z'
     },
-    customer_name: 'Chef Dev'
+    customer_name: 'Chef Dev',
+    grace_period: false,
+    license_type: 'commercial'
   };
 
   describe('LicenseStatus action types', () => {

@@ -3,7 +3,7 @@ import { Store, select } from '@ngrx/store';
 import { get, toUpper, pick } from 'lodash/fp';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { MatOptionSelectionChange } from '@angular/material/core';
 
 import { NgrxStateAtom } from '../../../../ngrx.reducers';
@@ -27,6 +27,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-node-credential-list',
   templateUrl: './node-credential-list.component.html',
   styleUrls: ['./node-credential-list.component.scss']

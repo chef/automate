@@ -15,6 +15,7 @@ import { clientRunsState } from '../../../entities/client-runs/client-runs.selec
 import { NodeFilter } from '../../../entities/client-runs/client-runs.model';
 
 @Component({
+  standalone: false,
   selector: 'app-insight',
   templateUrl: './insight.component.html',
   styleUrls: ['./insight.component.scss']

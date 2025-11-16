@@ -14,6 +14,7 @@ import { allPerms } from '../../entities/userperms/userperms.selectors';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-pending-edits-bar',
   templateUrl: './pending-edits-bar.component.html',
   styleUrls: ['./pending-edits-bar.component.scss'],

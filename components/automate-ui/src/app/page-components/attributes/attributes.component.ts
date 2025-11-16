@@ -12,6 +12,7 @@ import { JsonTreeComponent } from '../json-tree/json-tree.component';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-attributes',
   templateUrl: './attributes.component.html',
   styleUrls: ['./attributes.component.scss'],

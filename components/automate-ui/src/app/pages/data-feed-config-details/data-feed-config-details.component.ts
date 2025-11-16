@@ -20,6 +20,7 @@ enum UrlTestState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-data-feed-config-details',
   templateUrl: './data-feed-config-details.component.html',
   styleUrls: ['./data-feed-config-details.component.scss']
@@ -66,13 +67,17 @@ export class DataFeedConfigDetailsComponent implements OnInit {
   }
 
   covertFeedInterval(feedInterval: string): string {
+    if (!feedInterval) {
+      return '';
+    }
+
     // let output: string[] = []
       const SplitFeedInterval = feedInterval.split('');
       this.findArrayIndexAndRaplaceName(SplitFeedInterval, 'h', ' Hour ,');
       this.findArrayIndexAndRaplaceName(SplitFeedInterval, 'm', ' Minute ,');
       this.findArrayIndexAndRaplaceName(SplitFeedInterval, 's', ' Seconds ,');
       const SplitIntoTime = SplitFeedInterval.join('');
-      SplitIntoTime.split(',').forEach((v) => {
+      (SplitIntoTime ?? '').split(',').forEach((v) => {
         this.pushDataInArray('Hour', v);
         this.pushDataInArray('Minute', v);
         this.pushDataInArray('Seconds', v);

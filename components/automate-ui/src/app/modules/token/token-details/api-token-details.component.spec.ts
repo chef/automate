@@ -1,10 +1,11 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockAppProjectsDropdown, MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefInput, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefRadio, MockChefSubheading, MockChefTabSelector } from 'app/testing/mock-components';
 import {
   NgrxStateAtom,
   ngrxReducers,
@@ -49,24 +50,6 @@ describe('ApiTokenDetailsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'app-admin-sidebar' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-        MockComponent({ selector: 'chef-breadcrumbs' }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-input' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-radio', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'app-projects-dropdown', inputs: ['checkedProjectIDs'] }),
-        MockComponent({ selector: 'chef-tab-selector',
-          inputs: ['value', 'routerLink', 'fragment']
-        }),
         ApiTokenDetailsComponent
       ],
       providers: [
@@ -74,11 +57,29 @@ describe('ApiTokenDetailsComponent', () => {
         { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
+        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-time' }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockChefBreadcrumb,
+        MockChefBreadcrumbs,
+        MockChefButton,
+        MockChefError,
+        MockChefFormField,
+        MockChefInput,
+        MockChefPageHeader,
+        MockChefOption,
+        MockChefRadio,
+        MockChefHeading,
+        MockChefSubheading,
+        MockChefLoadingSpinner,
+        MockAppProjectsDropdown,
+        MockChefTabSelector,
         ReactiveFormsModule,
         RouterTestingModule,
         ChefPipesModule,
         StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));
 

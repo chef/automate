@@ -32,6 +32,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 
 export type ChefServerTabName = 'orgs' | 'details';
 @Component({
+  standalone: false,
   selector: 'app-chef-server-details',
   templateUrl: './chef-server-details.component.html',
   styleUrls: ['./chef-server-details.component.scss']

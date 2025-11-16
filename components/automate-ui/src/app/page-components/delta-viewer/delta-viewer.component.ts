@@ -4,6 +4,7 @@ import * as Diff2Html from 'diff2html';
 
 
 @Component({
+  standalone: false,
   selector: 'app-delta-viewer',
   templateUrl: './delta-viewer.component.html',
   styleUrls: ['./delta-viewer.component.scss']
@@ -12,6 +13,9 @@ export class DeltaViewerComponent {
   @Input() delta: string;
 
   get diffHtml(): SafeHtml {
+    if (!this.delta) {
+      return '';
+    }
     const str = this.delta.split('\\n').join('\n');
     const html = Diff2Html.html(str);
     return this.sanitizer.sanitize(1,html);

@@ -12,7 +12,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefCheckbox, MockChefTooltip, MockChefDropdown } from 'app/testing/mock-components';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { Node } from 'app/entities/client-runs/client-runs.model';
@@ -130,14 +130,14 @@ describe('ClientRunsTable', () => {
           RouterTestingModule,
           ChefPipesModule,
           StoreModule.forRoot({
-          }, { runtimeChecks })
+          }, { runtimeChecks }),
+          MockDisallowedAuthorizedComponent,
+          MockChefTooltip,
+          MockChefDropdown
         ],
         declarations: [
           ClientRunsTableComponent,
-          DeletableNodeControlComponent,
-          MockDisallowedAuthorizedComponent,
-          MockComponent({ selector: 'chef-tooltip' }),
-          MockComponent({ selector: 'chef-dropdown' })
+          DeletableNodeControlComponent
         ],
         providers: [
         ],
@@ -231,15 +231,15 @@ describe('ClientRunsTable', () => {
           RouterTestingModule,
           ChefPipesModule,
           StoreModule.forRoot({
-          }, { runtimeChecks })
+          }, { runtimeChecks }),
+          MockAllowedAuthorizedComponent,
+          MockChefTooltip,
+          MockChefCheckbox,
+          MockChefDropdown
         ],
         declarations: [
           ClientRunsTableComponent,
-          DeletableNodeControlComponent,
-          MockAllowedAuthorizedComponent,
-          MockComponent({ selector: 'chef-tooltip' }),
-          MockComponent({ selector: 'chef-checkbox' }),
-          MockComponent({ selector: 'chef-dropdown' })
+          DeletableNodeControlComponent
         ],
         providers: [
         ],
@@ -312,12 +312,12 @@ describe('ClientRunsTable', () => {
 
           fixture.detectChanges();
 
-          expect(checkbox.nativeElement.checked).toEqual(true);
+          expect(checkbox.componentInstance.checked).toEqual(true);
 
           const headerCheckbox = element.query(By.css('.delete-checkbox.header'));
           expect(headerCheckbox).not.toBeNull();
 
-          expect(headerCheckbox.nativeElement.indeterminate).toEqual(true);
+          expect(headerCheckbox.componentInstance.indeterminate).toEqual(true);
       });
 
       it('column header checkbox is checked when all nodes are selected', () => {
@@ -343,8 +343,8 @@ describe('ClientRunsTable', () => {
 
         fixture.detectChanges();
 
-        expect(headerCheckbox.nativeElement.checked).toEqual(true);
-        expect(headerCheckbox.nativeElement.indeterminate).toEqual(false);
+        expect(headerCheckbox.componentInstance.checked).toEqual(true);
+        expect(headerCheckbox.componentInstance.indeterminate).toEqual(false);
       });
 
       it('column header checkbox is unchecked when no nodes are checked', () => {
@@ -364,8 +364,8 @@ describe('ClientRunsTable', () => {
 
         fixture.detectChanges();
 
-        expect(headerCheckbox.nativeElement.checked).toEqual(false);
-        expect(headerCheckbox.nativeElement.indeterminate).toEqual(false);
+        expect(headerCheckbox.componentInstance.checked).toEqual(false);
+        expect(headerCheckbox.componentInstance.indeterminate).toEqual(false);
       });
 
       it('column header checkbox is disabled when there are no deletable nodes', () => {
@@ -384,8 +384,8 @@ describe('ClientRunsTable', () => {
 
         fixture.detectChanges();
 
-        expect(headerCheckbox.nativeElement.disabled).toEqual(true);
-        expect(headerCheckbox.nativeElement.indeterminate).toEqual(false);
+        expect(headerCheckbox.componentInstance.disabled).toEqual(true);
+        expect(headerCheckbox.componentInstance.indeterminate).toEqual(false);
       });
 
       it('when the column header checkbox is checked all nodes are selected', () => {
@@ -406,9 +406,9 @@ describe('ClientRunsTable', () => {
 
         fixture.detectChanges();
 
-        expect(headerCheckbox.nativeElement.disabled).toEqual(false);
-        expect(headerCheckbox.nativeElement.indeterminate).toEqual(false);
-        expect(headerCheckbox.nativeElement.checked).toEqual(true);
+        expect(headerCheckbox.componentInstance.disabled).toEqual(false);
+        expect(headerCheckbox.componentInstance.indeterminate).toEqual(false);
+        expect(headerCheckbox.componentInstance.checked).toEqual(true);
 
         const checkboxes: DebugElement[] =
           element.queryAll(By.css('.delete-checkbox.row'));
@@ -416,7 +416,7 @@ describe('ClientRunsTable', () => {
         expect(checkboxes.length).toEqual(2);
 
         checkboxes.forEach((checkbox) => {
-          expect(checkbox.nativeElement.checked).toEqual(true);
+          expect(checkbox.componentInstance.checked).toEqual(true);
         });
 
         // when the column header checkbox is unchecked when all nodes are selected
@@ -426,7 +426,7 @@ describe('ClientRunsTable', () => {
         fixture.detectChanges();
 
         checkboxes.forEach((checkbox) => {
-          expect(checkbox.nativeElement.checked).toEqual(false);
+          expect(checkbox.componentInstance.checked).toEqual(false);
         });
       });
     });

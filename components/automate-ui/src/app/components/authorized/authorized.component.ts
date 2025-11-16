@@ -18,6 +18,7 @@ import { allPerms } from '../../entities/userperms/userperms.selectors';
 export type Check = [string, string] | [string, string, string | string[]];
 
 @Component({
+  standalone: false,
   selector: 'app-authorized',
   template: '<ng-content *ngIf="visible"></ng-content>'
 })

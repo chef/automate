@@ -3,7 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefHeading, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
@@ -26,10 +26,11 @@ describe('ProcessProgressBarComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({
-          selector: 'chef-toolbar',
-          template: '<ng-content></ng-content>'
-        }),
+        ProcessProgressBarComponent
+      ],
+      imports: [
+        ReactiveFormsModule,
+        MockChefToolbar,
          MockComponent({
           selector: 'app-authorized',
           inputs: ['allOf', 'not'],
@@ -53,21 +54,17 @@ describe('ProcessProgressBarComponent', () => {
         MockComponent({ selector: 'mat-progress-bar', inputs: ['mode', 'value', 'bufferValue'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        ProcessProgressBarComponent
-      ],
-      imports: [
-        ReactiveFormsModule,
+        MockChefButton,
+        MockChefHeading,
+        MockChefLoadingSpinner,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
         RouterTestingModule,
         ChefPipesModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })

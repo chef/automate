@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { clamp, isEqual } from 'lodash/fp';
 import { RRule } from 'rrule';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';
 
@@ -42,6 +42,7 @@ export enum Step {
 }
 
 @Component({
+  standalone: false,
   templateUrl: './job-add.component.html',
   styleUrls: ['./job-add.component.scss']
 })

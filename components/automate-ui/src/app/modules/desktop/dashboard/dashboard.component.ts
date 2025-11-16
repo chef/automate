@@ -55,6 +55,7 @@ import {
 } from '../../../entities/desktop/desktop.model';
 
 @Component({
+  standalone: false,
   selector: 'app-desktop-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

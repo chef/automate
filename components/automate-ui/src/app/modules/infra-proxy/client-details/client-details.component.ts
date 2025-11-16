@@ -14,6 +14,7 @@ import { Org } from '../../../entities/orgs/org.model';
 export type ClientTabName = 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-client-details',
   templateUrl: './client-details.component.html',
   styleUrls: ['./client-details.component.scss']

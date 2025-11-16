@@ -5,6 +5,7 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { SigninComponent } from './signin.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefCheckbox } from 'app/testing/mock-components';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { CallbackResponse, SigninService } from 'app/services/signin/signin.service';
@@ -44,10 +45,10 @@ describe('SigninComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        RouterTestingModule.withRoutes([{ path: '**', component: SigninComponent }]) // match all
+        RouterTestingModule.withRoutes([{ path: '**', component: SigninComponent }]), // match all
+        MockChefCheckbox
       ],
       declarations: [
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] }),
         SigninComponent
       ],
       providers: [

@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-manual-upgrade-banner',
   templateUrl: './manual-upgrade-banner.component.html',
   styleUrls: ['./manual-upgrade-banner.component.scss']

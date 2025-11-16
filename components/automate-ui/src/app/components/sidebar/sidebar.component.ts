@@ -5,6 +5,7 @@ import { LayoutFacadeService } from '../../entities/layout/layout.facade';
 import { MenuItemGroup } from '../../entities/layout/layout.model';
 
 @Component({
+  standalone: false,
   selector: 'chef-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']

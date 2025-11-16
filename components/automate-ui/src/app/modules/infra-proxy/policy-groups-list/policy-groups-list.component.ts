@@ -5,6 +5,7 @@ import {
   SimpleChanges } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-policy-groups-list',
   templateUrl: './policy-groups-list.component.html'
 })

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DateSelectorComponent } from './date-selector.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefIcon } from 'app/testing/mock-components';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('DateSelectorComponent', () => {
@@ -10,8 +11,10 @@ describe('DateSelectorComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DateSelectorComponent,
-        MockComponent({selector: 'chef-icon'})
+        DateSelectorComponent
+      ],
+      imports: [
+        MockChefIcon
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

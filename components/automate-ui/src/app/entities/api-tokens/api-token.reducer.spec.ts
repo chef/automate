@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { cloneDeep, filter, keys } from 'lodash/fp';
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { using } from 'app/testing/spec-helpers';
 import { EntityStatus } from '../entities';
@@ -160,7 +160,7 @@ describe('apiTokenStatusEntityReducer', () => {
   describe('Toggle Token Active', () => {
 
     it('toggles active status of token', () => {
-      const targetId = faker.random.uuid();
+      const targetId = faker.string.uuid();
       const state = genArbitraryState(targetId);
       const token = { ...state.entities[targetId], active: !state.entities[targetId].active };
       // ensure we have a copy!
@@ -174,7 +174,7 @@ describe('apiTokenStatusEntityReducer', () => {
     });
 
     it('does not otherwise affect tokens present', () => {
-      const targetId = faker.random.uuid();
+      const targetId = faker.string.uuid();
       const state = genArbitraryState(targetId);
       const token = Object.assign({}, state.entities[targetId]);
       token.active = !token.active;
@@ -253,10 +253,10 @@ describe('apiTokenStatusEntityReducer', () => {
 
   function genToken(tokenId?: string): ApiToken {
     return {
-      id: tokenId ? tokenId : faker.random.uuid(),
+      id: tokenId ? tokenId : faker.string.uuid(),
       value: faker.lorem.word(),
       name: faker.lorem.words(),
-      active: faker.random.boolean(),
+      active: faker.datatype.boolean(),
       created_at: faker.date.past().toISOString(),
       updated_at: faker.date.recent().toISOString(),
       projects: [] // TODO add values when we expose projects in UI
@@ -265,7 +265,7 @@ describe('apiTokenStatusEntityReducer', () => {
 
   function genArbitraryState(tokenId?: string): ApiTokenEntityState {
     const newState: ApiTokenEntityState = cloneDeep(initialState);
-    const existingTokenId = tokenId ? tokenId : faker.random.uuid();
+    const existingTokenId = tokenId ? tokenId : faker.string.uuid();
     newState.entities[existingTokenId] = genToken(existingTokenId);
     const newToken2 = genToken();
     newState.entities[newToken2.id] = genToken(newToken2.id);

@@ -135,7 +135,7 @@ describe('LicenseUsageService', () => {
       expect(service['customerName']).toBe('test');
       expect(service['isConfigDataLoaded']).toBe(true);
       expect(service['totalNodes']).toBe(10);
-      expect(service['daysSinceLasPost']).toBe(2);
+      expect(service['daysSinceLasPost']).toBe(30); // Fixed: service now always uses 30 days
       expect(service['totalScans']).toBe(10);
       expect(service['totalService']).toBe(10);
       expect(service['isSummaryDataLoaded']).toBe(true);

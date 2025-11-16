@@ -24,6 +24,7 @@ export class CookbookConstraintGrid {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-edit-environment-attribute-modal',
   templateUrl: './edit-environment-attribute-modal.component.html',
   styleUrls: ['./edit-environment-attribute-modal.component.scss']

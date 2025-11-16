@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { MockComponent } from 'ng2-mock-component';
+import { MockChefIcon } from 'app/testing/mock-components';
 import { ManualUpgradeBannerComponent } from './manual-upgrade-banner.component';
 
 describe('ManualUpgradeBannerComponent', () => {
@@ -8,7 +9,10 @@ describe('ManualUpgradeBannerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ManualUpgradeBannerComponent ]
+      declarations: [ ManualUpgradeBannerComponent ],
+      imports: [
+        MockChefIcon
+      ]
     })
     .compileComponents();
   });

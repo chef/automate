@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Pipe({
+  standalone: false,
   name: 'castFormGroup',
   pure: true
 })

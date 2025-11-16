@@ -4,6 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { DataFeedComponent, UrlTestState } from './data-feed.component';
@@ -35,34 +36,7 @@ describe('DataFeedComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         DataFeedCreateComponent,
-        DataFeedComponent,
-        MockComponent({
-        selector: 'app-create-data-feed-modal',
-        inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
-        outputs: ['close', 'createClicked']
-        }),
-        MockComponent({ selector: 'app-delete-object-modal',
-        inputs: ['default', 'visible', 'objectNoun', 'objectName'],
-        outputs: ['close', 'deleteClicked'] }),
-        MockComponent({ selector: 'chef-button',
-                inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] })
+        DataFeedComponent
       ],
       providers: [
         FeatureFlagsService,
@@ -75,7 +49,33 @@ describe('DataFeedComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockComponent({
+        selector: 'app-create-data-feed-modal',
+        inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
+        outputs: ['close', 'createClicked']
+        }),
+        MockComponent({ selector: 'app-delete-object-modal',
+        inputs: ['default', 'visible', 'objectNoun', 'objectName'],
+        outputs: ['close', 'deleteClicked'] }),
+        MockChefButton,
+        MockChefError,
+        MockChefFormField,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefLoadingSpinner, MockChefModal } from 'app/testing/mock-components';
 import { EventEmitter } from '@angular/core';
 import { ResetNodeKeyComponent } from './reset-node-key.component';
 import { StoreModule, Store } from '@ngrx/store';
@@ -22,15 +23,15 @@ describe('ResetNodeKeyComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner'}),
         ResetNodeKeyComponent ],
         providers: [
           { provide: TelemetryService, useClass: MockTelemetryService }
         ],
         imports: [
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+          MockChefModal,
+          MockChefButton,
+          MockChefLoadingSpinner
         ]
     })
     .compileComponents();

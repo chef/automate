@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
@@ -283,7 +283,7 @@ describe('AuthorizedComponent', () => {
     const methods = ['get', 'put', 'post', 'delete', 'patch'];
     return [
       path || `/${faker.lorem.word()}/${faker.lorem.word()}/${faker.lorem.word()}`,
-      method || faker.random.arrayElement(methods),
+      method || faker.helpers.arrayElement(methods),
       paramList || []
     ];
   }

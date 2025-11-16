@@ -9,6 +9,12 @@ class MockTelemetryService {
 }
 
 xdescribe('UIComponent', () => {
+  // Placeholder test to prevent "describe with no children" error
+  it('should be implemented when authn is added', () => {
+    // TODO: Add back in when we have authn
+    expect(true).toBe(true);
+  });
+
   // let session: ChefSessionService;
   //
   // beforeEach(() => {
@@ -32,7 +38,8 @@ xdescribe('UIComponent', () => {
   //   session = TestBed.inject(ChefSessionService);
   // });
 
-  describe('UI Component', () => {
+  // TODO: Add back in when we have authn
+  // describe('UI Component', () => {
   //
   //   describe('when user is not logged in', () => {
   //     beforeEach(() => {
@@ -59,6 +66,6 @@ xdescribe('UIComponent', () => {
   //       expect(session.logout).not.toHaveBeenCalled();
   //     });
   //   });
-  });
+  // });
 });
 // TODO: Add back in when we have authn

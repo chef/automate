@@ -20,6 +20,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
 
 @Component({
+  standalone: false,
   selector: 'app-create-user-modal',
   templateUrl: './create-user-modal.component.html',
   styleUrls: ['./create-user-modal.component.scss']

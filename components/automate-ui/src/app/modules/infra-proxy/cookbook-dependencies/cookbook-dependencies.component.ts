@@ -13,6 +13,7 @@ import {
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-cookbook-dependencies',
   templateUrl: './cookbook-dependencies.component.html',
   styleUrls: ['./cookbook-dependencies.component.scss']

@@ -29,6 +29,7 @@ import {
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-create-databag-item-modal',
   templateUrl: './create-databag-item-modal.component.html',
   styleUrls: ['./create-databag-item-modal.component.scss']

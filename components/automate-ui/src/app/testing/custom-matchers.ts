@@ -1,7 +1,7 @@
 export const customMatchers: jasmine.CustomMatcherFactories = {
 
   // Affirms the element contains a sub-element at the given CSS path.
-  toContainPath: function (_util, _customEqualityTesters) {
+  toContainPath: function () {
     return {
       compare: function (element: HTMLElement, path: string) {
         const result = {

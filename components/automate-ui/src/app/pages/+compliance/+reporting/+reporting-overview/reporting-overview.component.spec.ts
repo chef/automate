@@ -4,7 +4,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { of as observableOf } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { Router } from '@angular/router';
 import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -68,7 +68,7 @@ describe('ReportingOverviewComponent', () => {
     it('valid date', () => {
       spyOn(router, 'navigate');
 
-      component.onDateChanged(moment('2019-09-05', 'YYYY-MM-DD'));
+      component.onDateChanged(moment.utc('2019-09-05', 'YYYY-MM-DD'));
 
       expect(router.navigate).toHaveBeenCalledWith([],
         {queryParams: { end_time: '2019-09-05' }});

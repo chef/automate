@@ -57,6 +57,7 @@ import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 //    }
 
 @Directive({
+  standalone: true,
   selector: '[formControl],[formControlName]'
 })
 export class FormControlDirective implements OnInit, OnDestroy, OnChanges {

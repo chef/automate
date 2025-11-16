@@ -2,6 +2,7 @@ import { Component, ContentChildren, EventEmitter, Output, QueryList } from '@an
 import { InfraTabComponent } from './infra-tab/infra-tab.component';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-tab-change',
   templateUrl: './infra-tab-change.component.html',
   styleUrls: ['./infra-tab-change.component.scss']

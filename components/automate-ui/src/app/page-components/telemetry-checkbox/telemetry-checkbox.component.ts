@@ -6,6 +6,7 @@ import { ChefSessionService } from '../../services/chef-session/chef-session.ser
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-telemetry-checkbox',
   templateUrl: './telemetry-checkbox.component.html',
   styleUrls: ['./telemetry-checkbox.component.scss']
