@@ -440,14 +440,12 @@ END WHILE
 **Initial State**: 2847 packages installed
 
 **Pass 1**:
-
 - Running services: 45
 - Whitelist: 1247 protected packages
 - To delete: 1345 packages
 - After deletion: 1502 packages remain
 
 **Pass 2**:
-
 - Whitelist rebuilds with current state
 - Some dependencies of deleted packages are now unused
 - To delete: 255 newly identified unused packages
