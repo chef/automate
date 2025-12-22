@@ -125,22 +125,6 @@ openssl s_client -connect your-automate-fqdn:443 -tls1     # Should fail
 openssl s_client -connect your-automate-fqdn:443 -tls1_1   # Should fail
 ```
 
-### Security Compliance
-
-#### Compliance Checklist
-
-Use this checklist to verify TLS/SSL security compliance:
-
-- [ ] TLS 1.2 and/or TLS 1.3 enabled
-- [ ] SSLv2, SSLv3, TLSv1, and TLSv1.1 explicitly disabled
-- [ ] Strong ciphers configured
-- [ ] Weak ciphers excluded
-- [ ] Forward secrecy enabled
-- [ ] Valid certificate from trusted CA
-- [ ] Certificate key size >= 2048-bit RSA or 256-bit ECDSA
-- [ ] Certificate expiration monitoring in place
-
-
 ## Ensuring autocomplete remains disabled on the login screen.
 
 A configuration maintained in Chef Automate's nginx.conf file determines the autocomplete functionality.

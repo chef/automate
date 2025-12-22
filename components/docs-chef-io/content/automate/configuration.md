@@ -412,7 +412,7 @@ ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-E
 TLS 1.2 ciphers use hyphens in their names (e.g., `ECDHE-RSA-AES256-GCM-SHA384`) and are separated by colons. Do not use semicolons or spaces.
 {{< /note >}}
 
-##### Dual TLS 1.2 and TLS 1.3 Configuration (Recommended)
+##### Dual TLS 1.2 and TLS 1.3 Configuration
 
 For maximum compatibility and security, enable both protocols:
 
@@ -443,7 +443,7 @@ ssl_protocols = "TLSv1.2"
 ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
 ```
 
-**Example 3: Both Protocols (Production - Recommended)**
+**Example 3: Both Protocols
 
 ```toml
 [load_balancer.v1.sys.ngx.http]
