@@ -16,6 +16,14 @@ gh_repo = "automate"
 
 Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate *4.x*.
 
+## How does the upgrade work?
+
+The way this upgrade works is that Elasticsearch is stopped and OpenSearch is started on the same data directory.
+
+Opensearch in 4.0.54 is compatible with the indexes Elasticsearch creates in 3.0.49.
+
+So, because there is no migration process, the only wait should be while OpenSearch starts, verifies the index shards, and opens the indexes.
+
 ## Upgrade Journey
 
 Please choose the following upgrade journey based on your current version of Chef Automate. All of these upgrades are manual upgrades.
