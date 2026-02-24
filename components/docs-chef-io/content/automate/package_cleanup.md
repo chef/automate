@@ -15,6 +15,8 @@ gh_repo = "automate"
 
 The `chef-automate package-cleanup` command helps maintain your Chef Automate installation by identifying and removing unused Habitat packages. Over time, as Chef Automate is upgraded and services are updated, old package versions accumulate on the system, consuming valuable disk space. This command provides a safe, automated way to reclaim that space while protecting essential packages and active services.
 
+This command supports both standalone and high availability (HA) deployments.
+
 ## Overview
 
 The package cleanup process works through several stages to ensure system safety:
@@ -38,14 +40,39 @@ Consider running package cleanup in these scenarios:
 - Before creating system backups to reduce backup size
 - After testing new features that required additional packages
 
+## Deployment Modes
+
+### Standalone Deployments
+
+In standalone deployments, the command runs locally and cleans up packages on a single node.
+
+### High Availability (HA) Deployments
+
+In HA deployments, the command automatically detects the HA environment and orchestrates cleanup across all nodes via SSH from the bastion host in the following order:
+
+1. Bastion node
+2. Automate frontend nodes
+3. Chef Server frontend nodes
+4. PostgreSQL backend nodes (self-managed only)
+5. OpenSearch backend nodes (self-managed only)
+
+{{< note >}}
+- For AWS managed deployments using Amazon RDS or Amazon OpenSearch Service, those node types are automatically skipped.
+- Previous versions of Habitat core packages (`hab`, `hab-sup`, `hab-launcher`) are not removed from PostgreSQL and OpenSearch backend nodes.
+{{< /note >}}
+
 ## Prerequisites
 
 The following are some prerequisites to be aware of:
 
-- Root or sudo access to the Chef Automate system
+- Root or sudo access to the Chef Automate system (or bastion host for HA)
 - Chef Automate must be running
 - There must be sufficient disk I/O capacity for the cleanup operation
 - Recommended: Take a system backup before the cleanup
+
+For HA deployments, additionally:
+
+- SSH connectivity from the bastion to all HA nodes
 
 ## Basic Usage
 
@@ -342,6 +369,20 @@ Packages to delete in this pass:
 * Auditing the cleanup process for compliance
 * Debugging whitelist protection logic
 
+## High Availability (HA) Usage
+
+In HA deployments, run the command from the bastion host:
+
+```bash
+# Preview cleanup across all HA nodes
+sudo chef-automate package-cleanup --dry-run
+
+# Execute cleanup across all HA nodes
+sudo chef-automate package-cleanup
+```
+
+Each node shows its own cleanup summary. Add `--verbose` for detailed output per node.
+
 ## Command Options
 
 | Flag | Shorthand | Description | Default |
@@ -597,6 +638,10 @@ If disk space doesn't free up as expected:
    # Check log directory size
    sudo du -sh /hab/svc/*/logs
    ```
+
+### HA-Specific Troubleshooting
+
+For HA deployments, if SSH connection fails to remote nodes, verify SSH connectivity from the bastion host. The command is idempotent and can be safely re-run if it fails midway.
 
 ## Safety Mechanisms
 
