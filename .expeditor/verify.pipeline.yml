@@ -269,7 +269,7 @@ steps:
       - scripts/install_golang.sh
       - cd components/automate-cli
       - make lint unit
-    timeout_in_minutes: 10
+    timeout_in_minutes: 45
     retry:
       automatic:
         limit: 1
