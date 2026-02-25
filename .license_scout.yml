@@ -1728,6 +1728,16 @@ exceptions:
     reason: Exception made by Chef Legal
   - name: yallist
     reason: Exception made by Chef Legal
+  - name: sax
+    reason: Exception made by Chef Legal
+  - name: tar
+    reason: Exception made by Chef Legal
+  - name: isexe
+    reason: Exception made by Chef Legal
+  - name: minimatch
+    reason: Exception made by Chef Legal
+  - name: minipass
+    reason: Exception made by Chef Legal
 
   golang:
   - name: buf.build/gen/go/bufbuild/bufplugin/connectrpc/go
