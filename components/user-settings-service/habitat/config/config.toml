@@ -2,6 +2,10 @@
 host = "127.0.0.1"
 port = {{cfg.service.port}}
 
+[log]
+format = "{{cfg.log.format}}"
+level = "{{cfg.log.level}}"
+
 [postgres]
 database = "{{cfg.storage.database}}"
 schema_path = "{{pkg.path}}/schema"
