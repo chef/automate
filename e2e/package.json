@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cypress": "^4.12.1"
+    "cypress": "^13.0.0"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^4.1.0",
