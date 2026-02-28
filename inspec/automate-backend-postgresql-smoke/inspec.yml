@@ -1,7 +1,7 @@
 name: automate-backend-postgresql-smoke
 title: InSpec Profile
 maintainer: Chef Software, Inc.
-copyright: Chef Software, Inc.
+copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 copyright_email: success@chef.io
 license: All Rights Reserved
 summary: An InSpec Compliance Profile for testing PostgreSQL backends

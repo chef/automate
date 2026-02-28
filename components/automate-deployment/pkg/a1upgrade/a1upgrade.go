@@ -1,5 +1,5 @@
 /*
-Copyright © 2018 Chef Software
+Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 The a1upgrade package represents an A1 -> A2 upgrade. It is intended to extract
 the A1 configuration and data and merge it into a deployable A2 deploy

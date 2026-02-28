@@ -21,7 +21,7 @@ const complianceProfileInspecYamlTemplateStr = `
 name: {{ .Name }}
 title: {{ .Name }}
 maintainer: Chef Software, Inc.
-copyright: Chef Software, Inc.
+copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 copyright_email: support@chef.io
 license: Proprietary, All rights reserved
 summary: Integration Diagnostic Test

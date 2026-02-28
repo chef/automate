@@ -1,5 +1,5 @@
 # encoding: utf-8
-# copyright: 2020, Chef Software, Inc.
+# copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 # license: All rights reserved
 
 # This test suite is meant to verify APIs return 403 or not, given legacy policy permissions.

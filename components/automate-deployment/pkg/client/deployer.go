@@ -1,4 +1,4 @@
-// Copyright © 2017 Chef Software
+// Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 // Package client contains all the business logic of the command line deployment
 // tool. It knows how to talk to Habitat and the grpc client to communicate

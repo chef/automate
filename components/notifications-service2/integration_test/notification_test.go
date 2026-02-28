@@ -478,7 +478,7 @@ EXAMPLE EXCEPTION MESSAGE
 		assert.Equal(t, "123abc", profileActual.SHA256)
 		assert.Equal(t, "automate@chef.io", profileActual.Maintainer)
 		assert.Equal(t, "Apache 2.0", profileActual.License)
-		assert.Equal(t, "Chef Software, Inc.", profileActual.Copyright)
+		assert.Equal(t, "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.", profileActual.Copyright)
 		assert.Equal(t, "legal@chef.io", profileActual.CopyrightEmail)
 		assert.Equal(t, 1, profileActual.NumberOfControls)
 
@@ -696,7 +696,7 @@ func TestNotificationDispatchWithOneWebhookAlertRuleForAllEvents(t *testing.T) {
 		assert.Equal(t, "123abc", profileActual.SHA256)
 		assert.Equal(t, "automate@chef.io", profileActual.Maintainer)
 		assert.Equal(t, "Apache 2.0", profileActual.License)
-		assert.Equal(t, "Chef Software, Inc.", profileActual.Copyright)
+		assert.Equal(t, "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.", profileActual.Copyright)
 		assert.Equal(t, "legal@chef.io", profileActual.CopyrightEmail)
 		assert.Equal(t, 1, profileActual.NumberOfControls)
 
@@ -928,7 +928,7 @@ func complianceFailureEvent() *api.Event {
 						Version:        "5.23.42",
 						Summary:        "An example profile for integration testing",
 						Maintainer:     "automate@chef.io",
-						Copyright:      "Chef Software, Inc.",
+						Copyright:      "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
 						CopyrightEmail: "legal@chef.io",
 						License:        "Apache 2.0",
 						Sha256:         "123abc",

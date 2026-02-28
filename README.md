@@ -89,3 +89,6 @@ At this stage in development, the Go libraries and other APIs found in
 this repository are not intended for use outside of Chef Automate. If
 you think part of this repository would help and would like to depend
 on it, please open a GitHub issue so we can discuss it.
+
+# Copyright
+See [COPYRIGHT.md](./COPYRIGHT.md).

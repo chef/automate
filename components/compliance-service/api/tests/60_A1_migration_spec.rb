@@ -182,7 +182,7 @@ describe File.basename(__FILE__) do
         {
           "name": "mylinux-success",
           "title": "My Demo Linux successful profile",
-          "copyright": "Chef Software, Inc.",
+          "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
           "copyrightEmail": "support@chef.io",
           "summary": "Demonstrates the use of InSpec Compliance Profile",
           "version": "1.0.0",

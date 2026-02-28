@@ -1,4 +1,4 @@
-// Copyright:: Copyright 2019, Chef Software Inc.
+// Copyright:: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 //
 // package version holds version information for Automate
 // services. The version data is passed via build-time linker flags.

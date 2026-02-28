@@ -1,7 +1,7 @@
 name: a2-migrate-from-v1-integration
 title: InSpec Profile
 maintainer: Chef Software, Inc.
-copyright: Chef Software, Inc.
+copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 copyright_email: engineering@chef.io
 license: All Rights Reserved
 summary: Automate 2.0 Upgrade from Automate 1.x Integration Tests
