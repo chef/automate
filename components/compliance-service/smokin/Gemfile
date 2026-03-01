@@ -3,6 +3,6 @@ source "https://rubygems.org"
 
 
 gem "test-kitchen"
-gem "berkshelf"
+gem "berkshelf", ">= 7.0.10"
 gem "kitchen-vagrant"
 gem "rack", "= 2.2.8.1"
