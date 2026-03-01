@@ -7,10 +7,10 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type moveProjectToGraveyardWorkflowExecutor struct {
+	log logger.Logger
 }
 
 type moveProjectToGraveyardWorkflowExecutorParams struct {
@@ -22,20 +22,20 @@ type moveProjectToGraveyardWorkflowExecutorPayload struct {
 
 // NewMoveProjectToGraveyardWorkflowExecutor returns a workflow executor that
 // will retry on ErrTaskLost but fail on any other error.
-func NewMoveProjectToGraveyardWorkflowExecutor() cereal.WorkflowExecutor {
-	return &moveProjectToGraveyardWorkflowExecutor{}
+func NewMoveProjectToGraveyardWorkflowExecutor(log logger.Logger) cereal.WorkflowExecutor {
+	return &moveProjectToGraveyardWorkflowExecutor{log: log}
 }
 
 func (s *moveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 	var params moveProjectToGraveyardWorkflowExecutorParams
 	err := w.GetParameters(&params)
 	if err != nil {
-		logrus.WithError(err).Error("failed to get move to graveyard parameters")
+		s.log.WithError(err).Error("failed to get move to graveyard parameters")
 		return w.Fail(err)
 	}
 
 	if err := w.EnqueueTask(moveProjectToGraveyardTaskName, moveProjectToGraveyardParams{ProjectID: params.ProjectID}); err != nil {
-		logrus.WithError(err).Errorf("failed to enqueue move to graveyard task %s", moveProjectToGraveyardTaskName)
+		s.log.WithError(err).Errorf("failed to enqueue move to graveyard task %s", moveProjectToGraveyardTaskName)
 		return w.Fail(err)
 	}
 	return w.Continue(nil)
@@ -47,7 +47,7 @@ func (s *moveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstan
 func (s *moveProjectToGraveyardWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 	payload := moveProjectToGraveyardWorkflowExecutorPayload{}
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Error("Failed to deserialize move project to graveyard payload")
+		s.log.WithError(err).Error("Failed to deserialize move project to graveyard payload")
 		return w.Fail(err)
 	}
 
@@ -61,7 +61,7 @@ func (s *moveProjectToGraveyardWorkflowExecutor) OnTaskComplete(w cereal.Workflo
 		if taskErr := ev.Result.Err(); taskErr != nil {
 			// if we lost the task, run the move to graveyard again
 			if taskErr == cereal.ErrTaskLost {
-				logrus.WithError(taskErr).Error("the task was lost, retrying")
+				s.log.WithError(taskErr).Error("the task was lost, retrying")
 				if err := w.EnqueueTask(
 					moveProjectToGraveyardTaskName, moveProjectToGraveyardParams{ProjectID: params.ProjectID}); err != nil {
 					return w.Fail(err)
