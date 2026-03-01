@@ -8,7 +8,7 @@ pkg_description="Wrapper package for chef/ocid"
 pkg_origin="chef"
 
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="15.10.36"
+pkg_version="15.10.41"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -23,7 +23,7 @@ pkg_deps=(
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_id/15.10.36/20250415203700"
+  "${vendor_origin}/oc_id/15.10.41/20250721060645"
 )
 
 pkg_binds=(

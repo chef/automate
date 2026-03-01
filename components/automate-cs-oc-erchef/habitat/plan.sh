@@ -11,7 +11,7 @@ pkg_svc_user=root
 pkg_svc_group=root
 
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="15.10.33"
+pkg_version="15.10.41"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -23,7 +23,7 @@ pkg_deps=(
   #"${local_platform_tools_origin:-chef}/automate-platform-tools"
   chef/automate-platform-tools
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_erchef/15.10.33/20250220084556"
+  "${vendor_origin}/oc_erchef/15.10.41/20250721060926"
 )
 
 pkg_build_deps=(
