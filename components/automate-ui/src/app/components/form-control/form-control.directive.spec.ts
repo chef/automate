@@ -9,7 +9,9 @@ const originalValue = 'originalValue';
 const newValue = 'newValue';
 
 @Component({
-  template: '<input [formControl]="control" [resetOrigin]="origin" />'
+  template: '<input [formControl]="control" [resetOrigin]="origin" />',
+  standalone: true,
+  imports: [ReactiveFormsModule, FormControlDirective]
 })
 class InputFormControlHostComponent {
   control: FormControl = new FormControl(originalValue);
@@ -21,7 +23,9 @@ class InputFormControlHostComponent {
     <form [formGroup]="form">
       <input formControlName="control" [resetOrigin]="origin" />
     </form>
-  `
+  `,
+  standalone: true,
+  imports: [ReactiveFormsModule, FormControlDirective]
 })
 class InputFormControlNameHostComponent {
   form: FormGroup = new FormGroup({
@@ -36,7 +40,9 @@ class InputFormControlNameHostComponent {
       <option value="${originalValue}">${originalValue}</option>
       <option value="${newValue}">${newValue}</option>
     </select>
-  `
+  `,
+  standalone: true,
+  imports: [ReactiveFormsModule, FormControlDirective]
 })
 class SelectFormControlHostComponent {
   control: FormControl = new FormControl(originalValue);
@@ -51,7 +57,9 @@ class SelectFormControlHostComponent {
         <option value="${newValue}">${newValue}</option>
       </select>
     </form>
-  `
+  `,
+  standalone: true,
+  imports: [ReactiveFormsModule, FormControlDirective]
 })
 class SelectFormControlNameHostComponent {
   form: FormGroup = new FormGroup({
@@ -82,11 +90,9 @@ using(scenarios, (host, selector, eventName) => {
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
-          ReactiveFormsModule
+          host
         ],
         declarations: [
-          host,
-          FormControlDirective
         ]
       })
         .compileComponents();

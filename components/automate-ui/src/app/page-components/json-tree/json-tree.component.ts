@@ -4,6 +4,7 @@ import * as jsonTree from './vendor/json-tree';
 // TODO:eng-ex: This might do better as a service or module.
 //              Unclear because there is styling on the javascript but no template.
 @Component({
+  standalone: false,
   selector: 'app-json-tree',
   template: '<div id="tree-container"></div>',
   styleUrls: ['./json-tree.component.scss']

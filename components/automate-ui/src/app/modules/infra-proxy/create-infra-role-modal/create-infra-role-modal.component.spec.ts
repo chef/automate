@@ -3,6 +3,7 @@ import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefToolbar } from 'app/testing/mock-components';
 import { CreateInfraRoleModalComponent } from './create-infra-role-modal.component';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { CreateRoleSuccess, CreateRoleFailure, CreateRolePayload } from 'app/entities/infra-roles/infra-role.action';
@@ -27,16 +28,6 @@ describe('CreateInfraRoleModalComponent', () => {
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'app-infra-tab-change' }),
-        MockComponent({ selector: 'app-infra-tab', inputs: ['active', 'disabled'] }),
-        MockComponent({ selector: 'chef-modal',
-          inputs: ['visible']
-        }),
         CreateInfraRoleModalComponent
       ],
       providers: [
@@ -44,6 +35,14 @@ describe('CreateInfraRoleModalComponent', () => {
         HttpClient, HttpHandler
       ],
       imports: [
+        MockChefButton,
+        MockChefLoadingSpinner,
+        MockChefFormField,
+        MockChefError,
+        MockChefToolbar,
+        MockComponent({ selector: 'app-infra-tab-change' }),
+        MockComponent({ selector: 'app-infra-tab', inputs: ['active', 'disabled'] }),
+        MockChefModal,
         ReactiveFormsModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ]

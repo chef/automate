@@ -7,6 +7,7 @@ import { LicenseFacadeService, LicenseApplyReason } from '../../../entities/lice
 import { Notification } from '../../../entities/notifications/notification.model';
 
 @Component({
+  standalone: false,
   selector: 'app-license-notifications',
   templateUrl: './license-notifications.component.html',
   styleUrls: ['./license-notifications.component.scss']

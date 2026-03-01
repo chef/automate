@@ -26,6 +26,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 export type ProjectTabName = 'rules' | 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-project-details',
   templateUrl: './project-details.component.html',
   styleUrls: ['./project-details.component.scss']

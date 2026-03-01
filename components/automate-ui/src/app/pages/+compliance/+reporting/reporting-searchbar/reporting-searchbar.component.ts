@@ -23,6 +23,7 @@ import {
 import { DateTime } from '../../../../helpers/datetime/datetime';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-searchbar',
   templateUrl: './reporting-searchbar.component.html',
   styleUrls: ['./reporting-searchbar.component.scss']

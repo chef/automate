@@ -27,8 +27,10 @@ describe('ClientRunsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ClientRunsComponent,
+      imports: [
+        RouterTestingModule,
+        HttpClientTestingModule,
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
         MockComponent({ selector: 'app-client-runs-search-bar' }),
         MockComponent({ selector: 'app-client-runs-table', inputs: ['nodeCount'] }),
         MockComponent({ selector: 'app-node-rollup', inputs: ['name', 'count', 'active'] }),
@@ -37,15 +39,13 @@ describe('ClientRunsComponent', () => {
         MockComponent({ selector: 'chef-sidebar-entry '}),
         MockComponent({ selector: 'app-server-org-filter-sidebar'})
       ],
+      declarations: [
+        ClientRunsComponent
+      ],
       providers: [
         { provide: TelemetryService, useClass: MockTelemetryService },
         ClientRunsRequests,
         FeatureFlagsService
-      ],
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

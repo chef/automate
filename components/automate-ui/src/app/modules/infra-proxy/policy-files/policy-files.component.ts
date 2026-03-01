@@ -17,6 +17,7 @@ import {
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-policy-files',
   templateUrl: './policy-files.component.html',
   styleUrls: ['./policy-files.component.scss']

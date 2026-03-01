@@ -14,6 +14,7 @@ import { Role } from '../../../entities/roles/role.model';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-roles-list',
   templateUrl: './roles-list.component.html',
   styleUrls: ['./roles-list.component.scss']

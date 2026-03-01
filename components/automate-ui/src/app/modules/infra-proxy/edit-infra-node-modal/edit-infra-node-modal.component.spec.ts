@@ -1,6 +1,7 @@
 import { ReactiveFormsModule } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefToolbar } from 'app/testing/mock-components';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { EventEmitter } from '@angular/core';
@@ -22,14 +23,6 @@ describe('EditInfraNodeModalComponent', () => {
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal',
-          inputs: ['visible']
-        }),
         EditInfraNodeModalComponent
       ],
       providers: [
@@ -38,7 +31,13 @@ describe('EditInfraNodeModalComponent', () => {
       ],
       imports: [
         ReactiveFormsModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockChefButton,
+        MockChefLoadingSpinner,
+        MockChefFormField,
+        MockChefError,
+        MockChefToolbar,
+        MockChefModal
       ]
     })
     .compileComponents();

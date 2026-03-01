@@ -277,16 +277,17 @@ a, a:visited {
   width: 1em;
   float: right;
   height: auto;
-  padding: 1em 0em 0em 0em;
+  padding: 3px 0px 0px 0px;
+  margin-left: 5px;
 }
 
 .binIcon {
   width: 1em;
   float: right;
   height: auto;
-  padding: 1em 0em 0em 0em;
+  padding: 3px 0px 0px 0px;
+  margin-left: 5px;
 }
-
 
 .chef-control-menu {
   width: 8.5em;
@@ -304,6 +305,16 @@ a, a:visited {
 
 ::ng-deep .mat-option {
   width: 171px;
+}
+
+::ng-deep .chef-control-menu.mat-mdc-select-panel {
+  min-width: max-content;
+  position: absolute;
+  top: -2.25rem;
+  padding: 0;
+  border-radius: 5px !important;
+  right: 34px;
+  font-size: 14px;
 }
 
 .eyeChange:hover {

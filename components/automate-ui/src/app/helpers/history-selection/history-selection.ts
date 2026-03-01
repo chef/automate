@@ -1,5 +1,5 @@
 // TODO eng-ex discuss if this should be turned into a module
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { Injectable } from '@angular/core';
 
 type Moment = moment.Moment;

@@ -19,6 +19,7 @@ import { Utilities } from '../../../helpers/utilities/utilities';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-data-bag-item-modal',
   templateUrl: './edit-data-bag-item-modal.component.html',
   styleUrls: ['./edit-data-bag-item-modal.component.scss']

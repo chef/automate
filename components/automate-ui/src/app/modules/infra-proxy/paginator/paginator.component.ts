@@ -12,6 +12,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
+  standalone: false,
   selector: 'app-paginator',
   templateUrl: './paginator.component.html',
   styleUrls: ['./paginator.component.scss'],
@@ -56,7 +57,7 @@ export class PaginatorComponent implements OnInit, OnChanges {
 
   setPageSizeOptions(setPageSizeOptionsInput: string) {
     if (setPageSizeOptionsInput) {
-      this.pageSizeOptions = setPageSizeOptionsInput.split(',').map(str => +str);
+      this.pageSizeOptions = (setPageSizeOptionsInput ?? '').split(',').map(str => +str);
     }
   }
 }

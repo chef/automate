@@ -13,6 +13,7 @@ import { includes } from 'lodash/fp';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-reporting-profiles',
   templateUrl: './reporting-profiles.component.html',
   styleUrls: [ './reporting-profiles.component.scss' ]

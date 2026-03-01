@@ -1,4 +1,4 @@
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 import { DatetimePipe } from './datetime.pipe';
 
@@ -24,7 +24,7 @@ describe('DatetimePipe', () => {
   });
 
   it('returns a formatted string when given a Date', () => {
-    const datetime = new Date(2018, 3, 9);
+    const datetime = new Date('2018-04-09T12:00:00.000Z');
     const formatStr = 'YYYY, MMMM D';
     const result = pipe.transform(datetime, formatStr);
     expect(result).toEqual('2018, April 9');

@@ -3,7 +3,9 @@ import {
   SelectedStatus
 } from '../types/types';
 
-@Pipe({name: 'statusSelector'})
+@Pipe({
+  standalone: false, name: 'statusSelector'
+})
 export class StatusSelectorPipe implements PipeTransform {
     constructor() {}
 

@@ -7,7 +7,7 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ClientDetailsComponent } from './client-details.component';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefButton, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSnippet, MockChefSubheading, MockChefTabSelector, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 describe('ClientDetailsComponent', () => {
   let component: ClientDetailsComponent;
   let fixture: ComponentFixture<ClientDetailsComponent>;
@@ -15,37 +15,33 @@ describe('ClientDetailsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'chef-button',
-          inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-snippet',
-          inputs: ['code'] }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'chef-tab-selector',
-          inputs: ['value', 'routerLink', 'fragment']
-        }),
-        MockComponent({ selector: 'app-reset-client-key', inputs: ['openEvent'] }),
         ClientDetailsComponent
       ],
       providers: [
         FeatureFlagsService
       ],
       imports: [
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockChefButton,
+        MockComponent({ selector: 'mat-select' }),
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefOption,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefSnippet,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockChefSnippet,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockChefTabSelector,
+        MockComponent({ selector: 'app-reset-client-key', inputs: ['openEvent'] }),
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,

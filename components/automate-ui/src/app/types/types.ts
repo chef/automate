@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 export type Status = 'success' | 'failure' | 'missing' | 'skipped';
 export type Compliance = 'compliant' | 'uncompliant' | 'skipped';

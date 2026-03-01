@@ -4,6 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { Utilities } from '../../../helpers/utilities/utilities';
 
 @Component({
+  standalone: false,
   selector: 'app-create-chef-server-modal',
   templateUrl: './create-chef-server-modal.component.html',
   styleUrls: ['./create-chef-server-modal.component.scss']

@@ -27,12 +27,13 @@ const testResources = [genResourceList(
               [objectNounPlural]="'hummingbirds'"
               (onDropdownClosing)="onClosing($event)">
               Description here...
-            </app-resource-dropdown>`
+            </app-resource-dropdown>`,
+  standalone: false
 })
-
 class TestHostComponent {
   resources = testResources;
   resourceIDs: string[];
+  resourcesUpdatedEvent = new EventEmitter<boolean>();
 
   onClosing(resourceIDs: string[]): void {
     this.resourceIDs = resourceIDs;
@@ -51,9 +52,12 @@ describe('HostedMessageModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [ ChefPipesModule ],
+      imports: [
+        ChefPipesModule,
+        FormsModule,
+        MockComponent({ selector: 'input', inputs: ['ngModel'] })
+      ],
       declarations: [
-      MockComponent({ selector: 'input', inputs: ['ngModel'] }),
         TestHostComponent,
         ResourceDropdownComponent
       ],

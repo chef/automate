@@ -18,6 +18,7 @@ import * as O from 'fp-ts/lib/Option';
 import { pipe } from 'fp-ts/lib/pipeable';
 
 @Component({
+  standalone: false,
   selector: 'app-tree-table',
   templateUrl: './tree-table.component.html',
   styleUrls: ['./tree-table.component.scss']

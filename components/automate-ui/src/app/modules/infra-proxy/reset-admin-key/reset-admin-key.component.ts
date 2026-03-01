@@ -13,6 +13,7 @@ import {
 import { UpdateAdminKey } from '../../../entities/reset-admin-key/reset-admin-key.actions';
 
 @Component({
+  standalone: false,
   selector: 'app-reset-admin-key',
   templateUrl: './reset-admin-key.component.html',
   styleUrls: ['./reset-admin-key.component.scss']

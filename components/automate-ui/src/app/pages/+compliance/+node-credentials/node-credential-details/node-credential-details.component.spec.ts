@@ -7,6 +7,7 @@ import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { NodeCredentialDetailsScreenComponent } from './node-credential-details.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefBreadcrumb, MockChefBreadcrumbs, MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { GetNodeCredential, UpdateNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
 import { NodeCredential, NodeCredentialTypes, SaveNodeCredential, NodeObject } from 'app/entities/node-credentials/node-credential.model';
 import { Router } from '@angular/router';
@@ -43,37 +44,6 @@ describe('NodeCredentialDetailsScreenComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({
-          selector: 'app-authorized',
-          inputs: ['allOf']
-        }),
-        MockComponent({
-          selector: 'app-create-org-modal',
-          inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
-          outputs: ['close', 'createClicked']
-        }),
-        MockComponent({ selector: 'chef-button',
-          inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-        MockComponent({ selector: 'chef-breadcrumbs' }),
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         NodeCredentialDetailsScreenComponent
       ],
       providers: [
@@ -85,6 +55,36 @@ describe('NodeCredentialDetailsScreenComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
+        MockComponent({
+          selector: 'app-authorized',
+          inputs: ['allOf']
+        }),
+        MockComponent({
+          selector: 'app-create-org-modal',
+          inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
+          outputs: ['close', 'createClicked']
+        }),
+        MockChefButton,
+        MockComponent({ selector: 'mat-select' }),
+        MockChefError,
+        MockChefFormField,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefOption,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockChefBreadcrumb,
+        MockChefBreadcrumbs,
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

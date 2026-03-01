@@ -9,6 +9,7 @@ import {
 } from '../../../entities/desktop/desktop.model';
 
 @Component({
+  standalone: false,
   selector: 'app-unknown-desktop-duration-counts',
   templateUrl: './unknown-desktop-duration-counts.component.html',
   styleUrls: ['./unknown-desktop-duration-counts.component.scss']

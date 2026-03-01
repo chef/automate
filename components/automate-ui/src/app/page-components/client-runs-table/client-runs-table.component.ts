@@ -16,6 +16,7 @@ import {
 
 import { SortDirection } from '../../types/types';
 @Component({
+  standalone: false,
   selector: 'app-client-runs-table',
   templateUrl: './client-runs-table.component.html',
   styleUrls: ['./client-runs-table.component.scss'],

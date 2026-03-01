@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
+  standalone: false,
   name: 'iamType'
 })
 export class IamTypePipe implements PipeTransform {

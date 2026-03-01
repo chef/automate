@@ -41,6 +41,7 @@ import { AppConfigService } from '../../../services/app-config/app-config.servic
 import { DownloadReportsService } from '../../../entities/download-reports/download-reports.service';
 
 @Component({
+  standalone: false,
   templateUrl: './reporting.component.html',
   styleUrls: ['./reporting.component.scss'],
   providers: [SuggestionsService]
@@ -206,6 +207,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      if (!params || !params.keys) {
+        return [];
+      }
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
         return list.concat(paramValues.map(value => ({type: key, text: value})));

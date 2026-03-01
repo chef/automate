@@ -17,7 +17,7 @@ import {
   RespEventCount,
   GuitarStringCollection
 } from '../../types/types';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { find } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -38,16 +38,16 @@ describe('EventFeedGuitarStringsComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        EventFeedGuitarStringsComponent,
-        MockComponent({ selector: 'chef-guitar-string-collection', inputs: ['height']}),
-        MockComponent({ selector: ':svg:g',
-          inputs: ['y', 'eventType', 'action', 'start', 'end', 'y',
-            'index', 'space', 'iconRadius', 'width', 'multiple', 'task' ]})
+        EventFeedGuitarStringsComponent
       ],
       providers: [
         EventFeedService
       ],
       imports: [
+        MockComponent({ selector: 'chef-guitar-string-collection', inputs: ['height']}),
+        MockComponent({ selector: ':svg:g',
+          inputs: ['y', 'eventType', 'action', 'start', 'end', 'y',
+            'index', 'space', 'iconRadius', 'width', 'multiple', 'task' ]}),
         ChefPipesModule,
         StoreModule.forRoot({
           'event_feed': combineReducers(eventFeed.eventFeedReducer)

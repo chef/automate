@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefCheckbox, MockChefError, MockChefFormField, MockChefModal, MockChefSnippet } from 'app/testing/mock-components';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
@@ -24,12 +25,6 @@ describe('CreateClientModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked']}),
-        MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
         CreateClientModalComponent
       ],
       providers: [
@@ -37,7 +32,13 @@ describe('CreateClientModalComponent', () => {
       ],
       imports: [
         ReactiveFormsModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockChefModal,
+        MockChefButton,
+        MockChefError,
+        MockChefFormField,
+        MockChefCheckbox,
+        MockChefSnippet
       ]
     })
     .compileComponents();

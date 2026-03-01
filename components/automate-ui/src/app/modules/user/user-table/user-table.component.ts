@@ -3,6 +3,7 @@ import { MatOptionSelectionChange } from '@angular/material/core';
 import { User } from '../../../entities/users/user.model';
 
 @Component({
+  standalone: false,
   selector: 'app-user-table',
   templateUrl: './user-table.component.html',
   styleUrls: ['./user-table.component.scss']

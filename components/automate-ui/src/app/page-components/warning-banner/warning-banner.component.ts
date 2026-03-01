@@ -2,6 +2,7 @@ import { Component, OnInit, HostBinding, Output, EventEmitter } from '@angular/c
 import { AppConfigService } from '../../services/app-config/app-config.service';
 
 @Component({
+  standalone: false,
   selector: 'app-warning-banner',
   templateUrl: './warning-banner.component.html',
   styleUrls: ['./warning-banner.component.scss']

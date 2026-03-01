@@ -8,6 +8,7 @@ import { OrgDetailsComponent } from './org-details.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -23,23 +24,6 @@ describe('OrgDetailsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'app-tabs' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
         OrgDetailsComponent
       ],
       providers: [
@@ -50,7 +34,24 @@ describe('OrgDetailsComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'app-tabs' }),
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' })
       ]
     })
     .compileComponents();

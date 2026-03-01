@@ -17,6 +17,7 @@ import {
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-data-bags-list',
   templateUrl: './data-bags-list.component.html',
   styleUrls: ['./data-bags-list.component.scss']

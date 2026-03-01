@@ -9,6 +9,7 @@ import { ManagerSearchFields } from '../../entities/managers/manager.actions';
 import * as selectors from '../../entities/managers/manager.selectors';
 import { Manager } from '../../entities/managers/manager.model';
 @Component({
+  standalone: false,
   selector: 'chef-job-nodes-form',
   templateUrl: './job-nodes-form.component.html',
   styleUrls: ['./job-nodes-form.component.scss']

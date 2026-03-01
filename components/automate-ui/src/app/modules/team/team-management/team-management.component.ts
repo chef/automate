@@ -23,6 +23,7 @@ import { ProjectConstants } from '../../../entities/projects/project.model';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-team-management',
   templateUrl: './team-management.component.html',
   styleUrls: ['./team-management.component.scss']
