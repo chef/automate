@@ -82,11 +82,19 @@ In Azure AD, add Chef Automate as a `non-gallery application`, and then configur
 Enter `https://{{< example_fqdn "automate" >}}/dex/callback` as the value for both _Identifier (Entity ID)_ and _Reply URL (Assertion Consumer Service URL)_.
 
 You may use the default claims provided by Azure AD.
-Remember to edit the Chef Automate configuration in `config.toml` to reflect this claims information.
+Remember to edit the Chef Automate configuration in `config.toml` to reflect this claims information. 
 
-Download the _Certificate (Base64)_ in Azure AD and take note of the _Login URL_ of use in the Chef Automate configuration.
+{{< note >}}
+If your claims look like a long URL as shown in the example below, those are exactly the values you would need to use in the Chef Automate configuration.
+{{< /note >}}
 
-After configuring Azure AD, edit your Chef Automate `config.toml` configuration file to reflect the values entered in the Azure AD interface.
+Download the Certificate (Base64) used to sign SAML responses from Azure AD and take note of the _Login URL_. These items will be used in the next step.
+
+{{< note >}}
+Chef Automate cannot use an _idP URL_. For clarity, a _Login URL_ begins with "login.", not "myapps".
+{{< /note >}}
+
+After configuring Azure AD, edit your Chef Automate `config.toml` configuration file to reflect the values found in the Azure AD interface.
 
 The minimal configuration snippet in `config.toml` will looks like:
 
