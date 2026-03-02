@@ -19,7 +19,7 @@ This command provides a safe, automated way to reclaim that space while protecti
 
 This command supports both standalone and high availability (HA) deployments.
 
-## When to run package cleanup
+## When to run a package cleanup
 
 Consider running package cleanup in these scenarios:
 
@@ -43,6 +43,8 @@ The package cleanup command has the following syntax:
 ```bash
 sudo chef-automate package-cleanup [options]
 ```
+
+### Command options
 
 The following options are available with the `package-cleanup` command:
 
@@ -117,63 +119,106 @@ To clean up your Habitat packages, follow these steps:
 
 ## Best practices
 
-### Always do a dry-run first
+- Always do a dry-run first:
 
-```bash
-# Preview before cleanup
-sudo chef-automate package-cleanup --dry-run
+  ```bash
+  # Preview before cleanup
+  sudo chef-automate package-cleanup --dry-run
 
-# Review output carefully, then proceed
-sudo chef-automate package-cleanup
-```
+  # Review output carefully, then proceed
+  sudo chef-automate package-cleanup
+  ```
 
-### Schedule regular cleanups
+- Schedule regular cleanups
 
-Add to your maintenance schedule:
+  ```bash
+  # Monthly cleanup (in cron)
+  0 2 1 * * /bin/chef-automate package-cleanup
+  ```
 
-```bash
-# Monthly cleanup (in cron)
-0 2 1 * * /bin/chef-automate package-cleanup
-```
+- Check disk space before and after:
 
-### Monitor disk space
+  ```bash
+  # Before
+  df -h /hab/pkgs
 
-Check disk space before and after:
+  # Run cleanup
+  sudo chef-automate package-cleanup
 
-```bash
-# Before
-df -h /hab/pkgs
+  # After
+  df -h /hab/pkgs
+  ```
 
-# Run cleanup
-sudo chef-automate package-cleanup
+- Stop unnecessary services before cleanup to maximize space reclamation:
 
-# After
-df -h /hab/pkgs
-```
+  ```bash
+  # Stop old services no longer needed
+  sudo hab svc unload chef/old-service
 
-### Combine with service management
+  # Then run cleanup
+  sudo chef-automate package-cleanup
+  ```
 
-Stop unnecessary services before cleanup to maximize space reclamation:
+- Create a backup before major cleanups
 
-```bash
-# Stop old services no longer needed
-sudo hab svc unload chef/old-service
+  ```bash
+  # Create backup before cleanup
+  sudo chef-automate backup create
 
-# Then run cleanup
-sudo chef-automate package-cleanup
-```
+  # Then proceed with cleanup
+  sudo chef-automate package-cleanup
+  ```
 
-### Backup before major cleanups
+## What the cleanup process does
 
-Always take a backup:
+The Habitat package cleanup process performs the following tasks:
 
-```bash
-# Create backup before cleanup
-sudo chef-automate backup create
+1. Gets the list of current running services (`hab svc status`).
+1. Builds a list of protected packages.
 
-# Then proceed with cleanup
-sudo chef-automate package-cleanup
-```
+    This protected packages list includes:
+
+    - All packages currently running as Habitat services.
+    - Core Habitat components required for system operations. These are the Habitat binary, Habitat Supervisor, and Habitat launcher.
+    - The Automate CLI.
+    - All packages that are dependencies of running services, including transitive dependencies.
+
+1. Gets all installed packages with the `hab pkg list --all` command.
+1. Identifies all packages not included in the protected packages list.
+1. Deletes any unused packages with the `hab pkg uninstall` command.
+1. Repeats the cleanup process until no more unused packages are found.
+
+### Multi-pass cleanup process
+
+The package cleanup uses an iterative multi-pass approach to handle complex dependency chains safely.
+
+When packages are deleted, their dependencies may become unused. A single-pass cleanup might miss these newly orphaned packages. The multi-pass approach ensures complete cleanup:
+
+1. **Pass 1**: Removes the first batch of unused packages
+1. **Allowlist Rebuild**: Recalculates running services and dependencies
+1. **Pass 2**: Identifies newly unused packages (former dependencies of deleted packages)
+1. **Iteration**: Continues until no more unused packages are found
+
+### Package cleanup in standalone deployments
+
+In standalone deployments, the command runs locally and cleans up packages on a single node.
+
+### Package cleanup in high availability deployments
+
+In high availability (HA) deployments, the command automatically detects the HA environment and orchestrates cleanup across all nodes using SSH from the bastion host and in the following order:
+
+1. Bastion host
+1. Chef Automate frontend nodes
+1. Chef Infra Server frontend nodes
+1. PostgreSQL backend nodes (self-managed only)
+1. OpenSearch backend nodes (self-managed only)
+
+{{< note >}}
+
+- For AWS managed deployments using Amazon RDS or Amazon OpenSearch Service, those node types are automatically skipped.
+- Previous versions of Habitat core packages (`hab`, `hab-sup`, `hab-launcher`) are not removed from PostgreSQL and OpenSearch backend nodes.
+
+{{< /note >}}
 
 ## Troubleshooting
 
@@ -262,57 +307,6 @@ If disk space doesn't free up as expected:
 
 For HA deployments, if the SSH connection between the bastion host and remote nodes fails, verify SSH connectivity from the bastion host.
 The `package-cleanup` command is idempotent and can be safely re-run if it fails midway.
-
-## What the cleanup process does
-
-The Habitat package cleanup process performs the following tasks:
-
-1. Gets the list of current running services (`hab svc status`).
-1. Builds a list of protected packages.
-
-    This protected packages list includes:
-
-    - All packages currently running as Habitat services.
-    - Core Habitat components required for system operations. These are the Habitat binary, Habitat Supervisor, and Habitat launcher.
-    - The Automate CLI.
-    - All packages that are dependencies of running services, including transitive dependencies.
-
-1. Gets all installed packages with the `hab pkg list --all` command.
-1. Identifies all packages not included in the protected packages list.
-1. Deletes any unused packages with the `hab pkg uninstall` command.
-1. Repeats the cleanup process until no more unused packages are found.
-
-### Multi-pass cleanup process
-
-The package cleanup uses an iterative multi-pass approach to handle complex dependency chains safely.
-
-When packages are deleted, their dependencies may become unused. A single-pass cleanup might miss these newly orphaned packages. The multi-pass approach ensures complete cleanup:
-
-1. **Pass 1**: Removes the first batch of unused packages
-1. **Allowlist Rebuild**: Recalculates running services and dependencies
-1. **Pass 2**: Identifies newly unused packages (former dependencies of deleted packages)
-1. **Iteration**: Continues until no more unused packages are found
-
-### Package cleanup in standalone deployments
-
-In standalone deployments, the command runs locally and cleans up packages on a single node.
-
-### Package cleanup in high availability deployments
-
-In high availability (HA) deployments, the command automatically detects the HA environment and orchestrates cleanup across all nodes using SSH from the bastion host and in the following order:
-
-1. Bastion host
-1. Chef Automate frontend nodes
-1. Chef Infra Server frontend nodes
-1. PostgreSQL backend nodes (self-managed only)
-1. OpenSearch backend nodes (self-managed only)
-
-{{< note >}}
-
-- For AWS managed deployments using Amazon RDS or Amazon OpenSearch Service, those node types are automatically skipped.
-- Previous versions of Habitat core packages (`hab`, `hab-sup`, `hab-launcher`) are not removed from PostgreSQL and OpenSearch backend nodes.
-
-{{< /note >}}
 
 ## Safety mechanisms
 
