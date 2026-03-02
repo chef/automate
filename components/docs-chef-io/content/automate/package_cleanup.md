@@ -129,7 +129,7 @@ To clean up your Habitat packages, follow these steps:
   sudo chef-automate package-cleanup
   ```
 
-- Schedule regular cleanups
+- Schedule regular cleanups:
 
   ```bash
   # Monthly cleanup (in cron)
@@ -159,7 +159,7 @@ To clean up your Habitat packages, follow these steps:
   sudo chef-automate package-cleanup
   ```
 
-- Create a backup before major cleanups
+- Create a backup before major cleanups:
 
   ```bash
   # Create backup before cleanup
