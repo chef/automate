@@ -73,7 +73,7 @@ To clean up your Habitat packages, follow these steps:
 
 1. Back up your system before cleanup. For more information, see the [standalone backup](/automate/ha_backup_restore/) and [HA backup](/automate/ha_backup_restore/) documentation.
 
-1. Optional: See how much space the Habitat packages occupy:
+1. Optional: If you want to see how much space this process recovers, get the amount of space the Habitat packages currently occupy:
 
     ```sh
     df -h /hab/pkgs
@@ -87,7 +87,7 @@ To clean up your Habitat packages, follow these steps:
 
     Use the `--verbose` option for a more detailed output.
 
-    The dry-run option displays:
+    The `dry-run` option displays:
 
     - The number of currently running services
     - The total number of packages installed
@@ -227,7 +227,7 @@ sudo systemctl status hab-sup
 sudo systemctl restart hab-sup
 ```
 
-### Disk space not reclaimed
+### Disk space isn't reclaimed
 
 If disk space doesn't free up as expected:
 
