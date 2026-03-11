@@ -717,18 +717,14 @@ This produces the uncompressed log file:
 
 Examples:
 
-To download the latest audit log for the current user:
-
 ```shell
+# Download latest/last audit logs
 curl -sS -L \
   -H "Authorization: Bearer <TOKEN>" \
   "https://<FQDN>/api/v1/audit/download" \
   -o audit-last.log.gz
-```
 
-To download audit logs for a specific request ID:
-
-```shell
+# Download audit logs for a specific request_id
 curl -sS -L \
   -H "Authorization: Bearer <TOKEN>" \
   "https://<FQDN>/api/v1/audit/download?request_id=<REQUEST_ID>" \
