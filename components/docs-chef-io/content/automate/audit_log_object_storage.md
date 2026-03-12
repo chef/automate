@@ -699,24 +699,34 @@ Example (completed):
   - `request_id` (optional):
     - If omitted, returns the last requested audit log file for the current user.
     - If provided, returns the audit log file for that specific request ID.
-- Returns: The audit log file, typically in JSON or CSV format.
+- Returns: The audit log file as a gzip-compressed download.
 
 Each request generates a single file containing the audit logs for the full requested time range (up to 30 days).
 
-Examples:
-
-To download the latest audit log for the current user:
+The downloaded audit log file is gzip-compressed (for example, `audit_logs.log.gz`). To extract the log file, run:
 
 ```shell
-curl -sS \
-  -H "Authorization: Bearer <TOKEN>" \
-  "https://<FQDN>/api/v1/audit/download" > audit_logs.json
+gunzip <file-name>.log.gz
 ```
 
-To download audit logs for a specific request ID:
+This produces the uncompressed log file:
+
+```text
+<file-name>.log
+```
+
+Examples:
 
 ```shell
-curl -sS \
+# Download latest/last audit logs
+curl -sS -L \
   -H "Authorization: Bearer <TOKEN>" \
-  "https://<FQDN>/api/v1/audit/download?request_id=a1c977e1-96a1-4a09-85f8-364721ff9f11" > audit_logs.json
+  "https://<FQDN>/api/v1/audit/download" \
+  -o audit-last.log.gz
+
+# Download audit logs for a specific request_id
+curl -sS -L \
+  -H "Authorization: Bearer <TOKEN>" \
+  "https://<FQDN>/api/v1/audit/download?request_id=<REQUEST_ID>" \
+  -o "audit-<REQUEST_ID>.log.gz"
 ```
