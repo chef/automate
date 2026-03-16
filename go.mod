@@ -107,7 +107,7 @@ require (
 	github.com/dexidp/dex v2.38.0+incompatible
 	github.com/dexidp/dex/api/v2 v2.0.0
 	github.com/gofiber/fiber/v2 v2.52.5
-	github.com/gofiber/utils v1.1.0
+	github.com/gofiber/utils v1.2.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang/protobuf v1.5.4
 	github.com/hashicorp/go-version v1.7.0
@@ -352,7 +352,6 @@ require (
 	gopkg.in/ldap.v2 v2.5.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1
-
 )
 
 // https://github.com/dexidp/dex/issues/1578
