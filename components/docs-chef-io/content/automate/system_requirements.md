@@ -40,3 +40,21 @@ criteria.
 Chef Automate supports the current browser versions for Chrome, Edge, and Firefox. Chef
 Automate does not support other browsers and may not be compatible with older browser
 versions.
+
+## Firewall port requirements
+
+#### Chef Server API clients to Automate
+* 443
+
+#### Automate API clients to Automate
+* 443
+
+#### External Opensearch from Automate to the search cluster
+* 10168
+
+#### External Postresql from Automate to the search cluster
+* 5432
+
+#### Scanning from Automate to targets
+* WinRm port
+* ssh port
