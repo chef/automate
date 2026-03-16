@@ -224,6 +224,29 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				if isError {
 					return nil
 				}
+			case "5":
+				ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+				if err != nil {
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
+
+				flags := majorupgradechecklist.ChecklistUpgradeFlags{
+					SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
+					OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
+				}
+				err = ci.RunChecklist(configCmdFlags.timeout, flags)
+				if err != nil {
+					exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
 			default:
 				return status.Errorf(status.UpgradeError, "invalid major version")
 			}
@@ -716,6 +739,21 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 			}
 		}
 	case "3":
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
+			for index, msg := range pendingPostChecklist {
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+			}
+		}
+		err = majorupgradechecklist.SetSeenTrueForExternal()
+		if err != nil {
+			return err
+		}
+	case "5":
 		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
 		if err != nil {
 			return err
