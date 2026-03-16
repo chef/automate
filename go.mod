@@ -84,7 +84,7 @@ require (
 	go.uber.org/zap v1.27.0
 	gocloud.dev v0.22.0
 	golang.org/x/crypto v0.36.0
-	golang.org/x/oauth2 v0.26.0
+	golang.org/x/oauth2 v0.27.0
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.23.0
 	google.golang.org/api v0.215.0
@@ -352,7 +352,6 @@ require (
 	gopkg.in/ldap.v2 v2.5.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1
-
 )
 
 // https://github.com/dexidp/dex/issues/1578
