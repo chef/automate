@@ -100,10 +100,6 @@ subscriptions:
         post_commit: true
     - purge_packages_chef_io_fastly:{{target_channel}}/automate/latest:
         post_commit: true
-    - bash:.expeditor/publish-release-notes.sh:
-        post_commit: true
-    - bash:.expeditor/announce-release.sh:
-        post_commit: true
     - bash:.expeditor/push-git-tag.sh:
         post_commit: true
 
