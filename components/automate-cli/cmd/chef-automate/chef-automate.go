@@ -1,4 +1,4 @@
-// Copyright © 2017 Chef Software
+// Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 // package main contains all the logic for parsing command line options/arguments
 // using Cobra. It also parses config files into the appropriate structs.

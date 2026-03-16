@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# copyright: 2019, Chef Software, Inc.
+# copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 # license: All rights reserved
 
 title 'iam chef-managed teams'

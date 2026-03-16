@@ -188,7 +188,7 @@ The response will return a |json| object similar to:
          "summary": "CIS Ubuntu 14.04 LTS Server Benchmark",
          "description": "# CIS Ubuntu 14.04 LTS Server Benchmark\n\ncopyright",
          "license": "Proprietary, All rights reserved",
-         "copyright": "Chef Software, Inc.",
+         "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
          "copyright_email": "grantmc@chef.io"
         }
      },
@@ -202,7 +202,7 @@ The response will return a |json| object similar to:
          "summary": "Verify that Linux nodes are configured securely",
          "description": "# Basic Linux Compliance Profile\n\ncopyright",
          "license": "Proprietary, All rights reserved",
-         "copyright": "Chef Software, Inc.",
+         "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
          "copyright_email": "grantmc@chef.io"
        },
      ...
@@ -240,7 +240,7 @@ The response will return a |json| object similar to:
      "summary": "Verify that SSH Server and SSH Client are configured securely",
      "description": "# Basic SSH Compliance Profile\n\ncopyright",
      "license": "Proprietary, All rights reserved",
-     "copyright": "Chef Software, Inc.",
+     "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
      "copyright_email": "grantmc@chef.io",
      "rules": {
        "spec/ssh_folder_spec": {
@@ -289,7 +289,7 @@ The response will return a |json| object similar to:
        "summary": "Verify that Linux nodes are configured securely",
        "description": "# Basic Linux Compliance Profile\n\ncopyright",
        "license": "Proprietary, All rights reserved",
-       "copyright": "Chef Software, Inc.",
+       "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
        "copyright_email": "grantmc@chef.io"
        },
      "mysql": {
@@ -301,7 +301,7 @@ The response will return a |json| object similar to:
        "summary": "Verify that MySQL Server is configured securely",
        "description": "# Basic MySQL Compliance Profile\n\ncopyright",
        "license": "Proprietary, All rights reserved",
-       "copyright": "Chef Software, Inc.",
+       "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
        "copyright_email": "grantmc@chef.io"
      },
      ...

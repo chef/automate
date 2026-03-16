@@ -47,7 +47,7 @@ const complianceReportTemplateStr = `
 		"maintainer": "Chef Software",
 		"summary": "Fake test data",
 		"license": "Apache-2.0",
-		"copyright": "Chef Software",
+		"copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
 		"supports": [
 		  {
 			"os-family": "unix"

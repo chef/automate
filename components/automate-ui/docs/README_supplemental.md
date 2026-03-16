@@ -93,9 +93,6 @@ COMMANDS:
 GLOBAL OPTIONS:
    --help, -h     show help
    --version, -v  print the version
-
-COPYRIGHT:
-   Copyright 2017, Chef Software Inc.
 ```
 ## Starting the config-mgmt service
 
@@ -214,3 +211,6 @@ You can then query further:
 $ curl http://localhost:1234/stats/node_counts
 {"success":35,"failure":32,"missing":33,"total":100}
 ```
+
+# Copyright
+See [COPYRIGHT.md](./../../../COPYRIGHT.md).

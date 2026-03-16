@@ -1,5 +1,5 @@
 # encoding: utf-8
-# copyright: 2018, Chef Software, Inc.
+# copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 # license: All rights reserved
 
 # This test suite must ONLY run on iam_v1_force_upgrade_to_v2.sh because it uses old v1 APIs.

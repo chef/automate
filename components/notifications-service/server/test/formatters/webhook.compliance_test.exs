@@ -11,7 +11,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
       automate_failure_url: "https://localhost/compliance/reporting/nodes/deadbeef05",
       failed_critical_profiles: [
         %{attributes: [],
-          copyright: "Chef Software, Inc.",
+          copyright: "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
           copyright_email: "support@chef.io",
           controls: [
             %{code: "control 'basic-3' do\n  impact 0.5\n  title '/etc/ssh should have limited access to 0755'\n  desc '\n    The OpenSSH configuration folder should have restricted\n    access permissions. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users, while leaving them readable for the\n    SSH client.\n  '\n  describe file('/etc/ssh') do\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_readable.by('others') }\n  end\nend\n",
@@ -82,7 +82,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               refs: []
             }
           ],
-          copyright: "Chef Software, Inc.",
+          copyright: "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
           copyright_email: "support@chef.io",
           license: "Proprietary, All rights reserved",
           maintainer: "Chef Software, Inc.",
@@ -153,7 +153,7 @@ defmodule Notifications.Formatters.Webhook.Compliance.Test do
               refs: []
             }
           ],
-          copyright: "Chef Software, Inc.", copyright_email: "support@chef.io",
+          copyright: "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.", copyright_email: "support@chef.io",
           license: "Proprietary, All rights reserved",
           maintainer: "Chef Software, Inc.", name: "ssh", number_of_controls: 3,
           sha256: "f56ef31e9e8be7c9064e84f1db699d3f0175924a0ee4517e3a626c38727ebf93",

@@ -1,5 +1,5 @@
 # encoding: utf-8
-# copyright: 2017, Chef Software, Inc.
+# copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 # license: All rights reserved
 
 title 'Automate 2.0 Docker Compose Smoke Tests'

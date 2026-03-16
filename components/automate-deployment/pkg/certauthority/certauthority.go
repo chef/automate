@@ -1,4 +1,4 @@
-// Copyright © 2017 Chef Software
+// Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 // Package certauthority generates and manages x509 certificates for
 // use in cross-service authentication.

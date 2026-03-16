@@ -1,6 +1,6 @@
 //
 //  Author:: Kyleen MacGugan <kmacgugan@chef.io>
-//  Copyright:: Copyright 2017, Chef Software Inc.
+//  Copyright:: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 //
 
 package integration_test

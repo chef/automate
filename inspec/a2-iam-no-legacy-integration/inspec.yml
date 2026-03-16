@@ -1,7 +1,7 @@
 name: a2-iam-no-legacy-integration
 title: InSpec Automate Integration Profile for IAM v2.1 force-upgrade
 maintainer: Chef Software, Inc.
-copyright: Chef Software, Inc.
+copyright: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 copyright_email: engineering@chef.io
 license: All Rights Reserved
 summary: An InSpec profile for integration testing the force-upgrade to IAM v2.1 with no legacy policies

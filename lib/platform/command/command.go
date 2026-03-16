@@ -1,4 +1,4 @@
-// Copyright © 2018 Chef Software
+// Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 // Package command is a wrapper for os/exec that provides a mock-able
 // interface to make testing easier.

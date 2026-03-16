@@ -12,7 +12,7 @@
       "maintainer": "Chef Software, Inc.",
       "summary": "Demonstrates the use of InSpec Compliance Profile",
       "license": "Apache 2 license",
-      "copyright": "Chef Software, Inc.",
+      "copyright": "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.",
       "copyright_email": "support@chef.io",
       "supports": [
         {

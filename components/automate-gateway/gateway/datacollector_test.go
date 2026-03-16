@@ -2,7 +2,7 @@
 
 //
 //  Author:: Salim Afiune <afiune@chef.io>
-//  Copyright:: Copyright 2018, Chef Software Inc.
+//  Copyright:: Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved. 
 //
 
 package gateway_test
@@ -444,7 +444,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "Demonstrates the use of InSpec Compliance Profile", p1.Summary)
 	assert.Equal(t, "Chef Software, Inc.", p1.Maintainer)
 	assert.Equal(t, "Apache 2 license", p1.License)
-	assert.Equal(t, "Chef Software, Inc.", p1.Copyright)
+	assert.Equal(t, "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.", p1.Copyright)
 	assert.Equal(t, "support@chef.io", p1.CopyrightEmail)
 	assert.Equal(t, "loaded", p1.Status)
 	assert.Equal(t, "", p1.SkipMessage)
@@ -543,7 +543,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "Demonstrates the use of InSpec Compliance Profile", p2.Summary)
 	assert.Equal(t, "Chef Software, Inc.", p2.Maintainer)
 	assert.Equal(t, "Apache 2 license", p2.License)
-	assert.Equal(t, "Chef Software, Inc.", p2.Copyright)
+	assert.Equal(t, "Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.", p2.Copyright)
 	assert.Equal(t, "support@chef.io", p2.CopyrightEmail)
 	assert.Equal(t, "9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487", p2.Sha256)
 	assert.Equal(t, "loaded", p2.Status)

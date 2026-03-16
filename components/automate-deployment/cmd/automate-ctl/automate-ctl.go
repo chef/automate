@@ -1,4 +1,4 @@
-// Copyright © 2018 Chef Software
+// Copyright (c) 2019-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 // automate-ctl is a FAKE version of automate v1's management CLI tool. The
 // fake version exists so we can test and demo a1->a2 upgrade functionality
