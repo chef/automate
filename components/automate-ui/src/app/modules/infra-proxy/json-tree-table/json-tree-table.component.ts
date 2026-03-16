@@ -2,6 +2,7 @@ import { Component, Input, ElementRef, OnChanges } from '@angular/core';
 import * as jsonTree from '../../../page-components/json-tree/vendor/json-tree';
 
 @Component({
+  standalone: false,
   selector: 'app-json-tree-table',
   template: '<div id="tree-container" class="scroll"></div>',
   styleUrls: ['./json-tree-table.component.scss']

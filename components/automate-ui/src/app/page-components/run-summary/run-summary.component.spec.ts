@@ -15,7 +15,9 @@ describe('RunSummaryComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         RunSummaryComponent,
-        DatetimePipe,
+        DatetimePipe
+      ],
+      imports: [
         MockComponent({ selector: 'chef-radial-chart',
                 inputs: ['chartData', 'chartColors', 'labelIcon', 'labelText'] })
       ],

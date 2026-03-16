@@ -62,7 +62,8 @@ describe('ReportingControlsComponent', () => {
         [0.4, 'major'],
         [0.3, 'minor'],
         [0.1, 'minor']
-      ].forEach(([impact, name]: [number, string]) => {
+      ].forEach((item: any) => {
+        const [impact, name] = item;
         expect(component.impactStatus({ impact })).toEqual(name);
       });
     });

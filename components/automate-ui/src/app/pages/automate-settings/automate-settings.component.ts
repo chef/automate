@@ -29,6 +29,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { ProductDeployedService } from '../../services/product-deployed/product-deployed.service';
 
 @Component({
+  standalone: false,
   templateUrl: './automate-settings.component.html',
   styleUrls: ['./automate-settings.component.scss']
 })

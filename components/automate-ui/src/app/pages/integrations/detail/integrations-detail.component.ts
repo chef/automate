@@ -12,6 +12,7 @@ import { ManagerDeleteNodes } from '../../../entities/managers/manager.actions';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-integrations-detail',
   templateUrl: './integrations-detail.component.html',
   styleUrls: ['./integrations-detail.component.scss']

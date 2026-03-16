@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 import { EntityStatus } from '../../entities/entities';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';

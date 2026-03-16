@@ -34,6 +34,7 @@ export interface AvailableType {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-infra-roles',
   templateUrl: './infra-roles.component.html',
   styleUrls: ['./infra-roles.component.scss']

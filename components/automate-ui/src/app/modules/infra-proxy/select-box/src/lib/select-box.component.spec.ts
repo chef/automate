@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefIcon, MockChefLoadingSpinner } from 'app/testing/mock-components';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { By } from '@angular/platform-browser';
@@ -18,16 +19,15 @@ describe('SelectBoxComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'mat-select', inputs: ['value'] }),
-        MockComponent({ selector: 'mat-icon' }),
-        MockComponent({ selector: 'mat-option', inputs: ['value'] }),
-
         SelectBoxComponent
       ],
       imports: [
+        MockChefButton,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockComponent({ selector: 'mat-select', inputs: ['value'] }),
+        MockComponent({ selector: 'mat-icon' }),
+        MockComponent({ selector: 'mat-option', inputs: ['value'] }),
         DragDropModule,
         ScrollingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })

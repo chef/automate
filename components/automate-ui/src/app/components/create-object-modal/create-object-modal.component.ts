@@ -18,6 +18,7 @@ import { Utilities } from '../../helpers/utilities/utilities';
 const INGEST_POLICY_ID = 'ingest-access';
 
 @Component({
+  standalone: false,
   selector: 'app-create-object-modal',
   templateUrl: './create-object-modal.component.html',
   styleUrls: ['./create-object-modal.component.scss']

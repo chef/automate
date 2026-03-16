@@ -25,6 +25,7 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-infra-role-modal',
   templateUrl: './edit-infra-role-modal.component.html',
   styleUrls: ['./edit-infra-role-modal.component.scss']

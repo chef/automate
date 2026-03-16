@@ -9,6 +9,7 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { InfraRoleDetailsComponent } from './infra-role-details.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSubheading, MockChefTabSelector, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 import { RoleAttributes } from 'app/entities/infra-roles/infra-role.model';
 
@@ -55,42 +56,39 @@ describe('InfraRoleDetailsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        RouterTestingModule,
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'chef-button',
-          inputs: ['disabled', 'routerLink'] }),
+        MockChefButton,
         MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
+        MockChefTh,
+        MockChefTd,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefOption,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'chef-tab-selector',
-          inputs: ['value', 'routerLink', 'fragment']
-        }),
+        MockChefTabSelector
+      ],
+      declarations: [
         InfraRoleDetailsComponent,
         JsonTreeTable
       ],
       providers: [
         FeatureFlagsService,
         MockAttributesService
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

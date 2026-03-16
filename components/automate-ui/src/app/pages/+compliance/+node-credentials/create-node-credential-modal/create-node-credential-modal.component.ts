@@ -20,6 +20,7 @@ import { CreateNodeCredential, NodeCredentialsSearch } from '../../../../entitie
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-create-node-credential-modal',
   templateUrl: './create-node-credential-modal.component.html',
   styleUrls: ['./create-node-credential-modal.component.scss']

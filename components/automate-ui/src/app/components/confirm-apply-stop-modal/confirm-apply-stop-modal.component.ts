@@ -3,6 +3,7 @@ import { ApplyRulesStatus } from '../../entities/projects/project.reducer';
 import moment from 'moment';
 
 @Component({
+  standalone: false,
   selector: 'app-confirm-apply-stop-modal',
   templateUrl: './confirm-apply-stop-modal.component.html',
   styleUrls: [ './confirm-apply-stop-modal.component.scss' ]

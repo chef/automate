@@ -10,6 +10,7 @@ import { instanceCredentials } from '../../../entities/credentials/credential.se
 import { SearchCredentials } from '../../../entities/credentials/credential.actions';
 
 @Component({
+  standalone: false,
   selector: 'app-integrations-form',
   templateUrl: './integrations-form.component.html',
   styleUrls: ['./integrations-form.component.scss']

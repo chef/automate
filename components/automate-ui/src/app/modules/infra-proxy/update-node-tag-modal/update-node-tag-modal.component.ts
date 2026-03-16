@@ -16,6 +16,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 import { HTML_TAGS_REGEX } from '../../../shared/utils/regex-utils';
 
 @Component({
+  standalone: false,
   selector: 'app-update-node-tag-modal',
   templateUrl: './update-node-tag-modal.component.html',
   styleUrls: ['./update-node-tag-modal.component.scss']

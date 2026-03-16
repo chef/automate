@@ -4,7 +4,7 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Store, StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefError, MockChefFormField, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { By } from '@angular/platform-browser';
@@ -24,29 +24,6 @@ describe('DataBagsListComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'app-create-data-bag-modal',
-        inputs: ['openEvent', 'server_Id', 'org_Id'] }),
-        MockComponent({ selector: 'app-delete-infra-object-modal',
-        inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
-        outputs: ['close', 'deleteClicked'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
         DataBagsListComponent
       ],
       providers: [
@@ -54,6 +31,29 @@ describe('DataBagsListComponent', () => {
         { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'app-create-data-bag-modal',
+        inputs: ['openEvent', 'server_Id', 'org_Id'] }),
+        MockComponent({ selector: 'app-delete-infra-object-modal',
+        inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
+        outputs: ['close', 'deleteClicked'] }),
+        MockChefError,
+        MockChefFormField,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,

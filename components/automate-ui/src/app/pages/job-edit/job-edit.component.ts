@@ -43,6 +43,7 @@ export enum Step {
 }
 
 @Component({
+  standalone: false,
   templateUrl: './job-edit.component.html',
   styleUrls: ['./job-edit.component.scss']
 })

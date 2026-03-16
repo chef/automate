@@ -3,8 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WarningBannerComponent } from './warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 import { MockComponent } from 'ng2-mock-component';
-
-
+import { MockChefIcon } from 'app/testing/mock-components';
 enum Configs {
   Show = 'true',
   Message = 'this is a test message',
@@ -42,10 +41,12 @@ describe('WarningBannerComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        WarningBannerComponent,
-        MockComponent({ selector: 'chef-icon' })
+        WarningBannerComponent
       ],
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockChefIcon
+      ],
       providers: [
         {provide: AppConfigService, useClass: MockAppConfigService}
       ]

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-confirm-apply-start-modal',
   templateUrl: './confirm-apply-start-modal.component.html',
   styleUrls: [ './confirm-apply-start-modal.component.scss' ]

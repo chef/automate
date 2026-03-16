@@ -81,6 +81,7 @@ export enum IntegrationTypes {
   STORAGE = 'Storage'
 }
 @Component({
+  standalone: false,
   selector: 'app-data-feed-details',
   templateUrl: './data-feed-details.component.html',
   styleUrls: ['./data-feed-details.component.scss'],

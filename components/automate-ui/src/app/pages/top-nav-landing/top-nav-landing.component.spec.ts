@@ -33,15 +33,15 @@ describe('TopNavLandingComponent', () => {
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+          MockComponent({ selector: 'app-landing', inputs: ['routePerms', 'onNotFound'] })
         ],
         providers: [
           FeatureFlagsService,
           { provide: ProductDeployedService, useClass: MockProductDeployedService }
         ],
         declarations: [
-          TopNavLandingComponent,
-          MockComponent({ selector: 'app-landing', inputs: ['routePerms', 'onNotFound'] })
+          TopNavLandingComponent
         ]
       })
       .compileComponents();
@@ -70,15 +70,15 @@ describe('TopNavLandingComponent', () => {
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+          MockComponent({ selector: 'app-landing', inputs: ['routePerms', 'onNotFound'] })
         ],
         providers: [
           FeatureFlagsService,
           { provide: ProductDeployedService, useClass: MockDesktopProductDeployedService }
         ],
         declarations: [
-          TopNavLandingComponent,
-          MockComponent({ selector: 'app-landing', inputs: ['routePerms', 'onNotFound'] })
+          TopNavLandingComponent
         ]
       })
       .compileComponents();

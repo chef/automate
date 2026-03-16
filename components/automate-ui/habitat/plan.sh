@@ -18,7 +18,7 @@ pkg_build_deps=(
   core/git/2.33.1/20240614092831
   core/make/4.3/20240105222044
   #core/node18/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
-  core/node18/18.19.1/20240301044734
+  core/node/22.17.0/20250711112957
   core/rsync/3.2.3/20240107034222
 )
 

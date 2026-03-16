@@ -7,6 +7,7 @@ import moment from 'moment';
  * should work. https://momentjs.com/docs/#/displaying/format/
  */
 @Pipe({
+  standalone: false,
   name: 'datetime'
 })
 export class DatetimePipe implements PipeTransform {

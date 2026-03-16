@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'chef-sidebar-entry',
   templateUrl: './sidebar-entry.component.html',
   styleUrls: ['./sidebar-entry.component.scss']

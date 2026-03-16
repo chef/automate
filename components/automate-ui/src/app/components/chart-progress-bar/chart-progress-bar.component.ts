@@ -4,6 +4,7 @@ import { Styles } from './chart-progress-bar.model';
 let nextId = 0;
 
 @Component({
+  standalone: false,
   selector: 'app-chart-progress-bar',
   templateUrl: './chart-progress-bar.component.html',
   styleUrls: [ './chart-progress-bar.component.scss' ]

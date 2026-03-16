@@ -16,6 +16,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 import { HTML_TAGS_REGEX } from '../../../shared/utils/regex-utils';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-infra-node-attribute-modal',
   templateUrl: './edit-infra-node-attribute-modal.component.html',
   styleUrls: ['./edit-infra-node-attribute-modal.component.scss']

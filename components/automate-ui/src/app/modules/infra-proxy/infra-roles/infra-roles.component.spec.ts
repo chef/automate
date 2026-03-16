@@ -4,6 +4,7 @@ import { InfraRolesComponent } from './infra-roles.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -25,27 +26,6 @@ describe('InfraRolesComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'app-create-infra-role-modal',
-          inputs: ['openEvent', 'rolesList', 'serverId', 'orgId', 'currentPage'] }),
-        MockComponent({ selector: 'app-delete-infra-object-modal',
-          inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
-          outputs: ['close', 'deleteClicked'] }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'mat-option' }),
         InfraRolesComponent
       ],
       providers: [
@@ -56,7 +36,28 @@ describe('InfraRolesComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'app-create-infra-role-modal',
+          inputs: ['openEvent', 'rolesList', 'serverId', 'orgId', 'currentPage'] }),
+        MockComponent({ selector: 'app-delete-infra-object-modal',
+          inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
+          outputs: ['close', 'deleteClicked'] }),
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' })
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })

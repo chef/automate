@@ -46,6 +46,7 @@ export const SELECT_BOX_ACCESSOR: any = {
 };
 
 @Component({
+  standalone: false,
   selector: 'app-select-box',
   templateUrl: './select-box.component.html',
   styleUrls: ['./select-box.component.scss'],

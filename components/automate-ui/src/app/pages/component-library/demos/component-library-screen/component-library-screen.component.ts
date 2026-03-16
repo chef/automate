@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { last, startCase, isUndefined } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'app-component-library-screen',
   templateUrl: './component-library-screen.component.html',
   styleUrls: ['./component-library-screen.component.scss']

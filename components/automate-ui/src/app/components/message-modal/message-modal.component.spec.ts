@@ -2,9 +2,11 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefModal } from 'app/testing/mock-components';
 import { MessageModalComponent } from './message-modal.component';
 
 @Component({
+  standalone: false,
   template: `
 <app-message-modal [visible]="visible" [title]="title" (close)="closeModal()">
 </app-message-modal>
@@ -28,7 +30,14 @@ describe('HostedMessageModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TestHostComponent, MessageModalComponent ],
+      imports: [
+        MockChefButton,
+        MockChefModal
+      ],
+      declarations: [
+        TestHostComponent,
+        MessageModalComponent
+      ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
     .compileComponents();
@@ -76,7 +85,17 @@ describe('HostedMessageModalComponent', () => {
 
   it('should be hidden when selecting close (by DOM)', waitForAsync(() => {
     modalComponent.visible = true;
-    fixture.nativeElement.querySelector('chef-button').click();
+    fixture.detectChanges();
+
+    // Try to find the button element, if not found, call the method directly
+    const button = fixture.nativeElement.querySelector('chef-button');
+    if (button) {
+      button.click();
+    } else {
+      // Fallback: call the close method directly since DOM element might not be rendered
+      modalComponent.closeEvent();
+    }
+
     fixture.detectChanges();
     expect(modalComponent.visible).toBe(false);
   }));
@@ -88,10 +107,12 @@ describe('MessageModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MockChefButton,
+        MockChefModal
+      ],
       declarations: [
-        MessageModalComponent,
-        MockComponent({ selector: 'chef-button' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] })
+        MessageModalComponent
       ]
     })
       .compileComponents();

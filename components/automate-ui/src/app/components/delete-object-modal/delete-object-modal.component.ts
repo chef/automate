@@ -3,6 +3,7 @@ import { User } from '../../entities/users/user.model';
 import { ContinuousPipe } from '../../pipes/continuous.pipe';
 
 @Component({
+  standalone: false,
   selector: 'app-delete-object-modal',
   templateUrl: './delete-object-modal.component.html',
   styleUrls: ['./delete-object-modal.component.scss']

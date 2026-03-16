@@ -4,7 +4,8 @@ import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facad
 @Component({
   selector: 'app-applications-dashboard',
   templateUrl: './applications.component.html',
-  styleUrls: ['./applications.component.scss']
+  styleUrls: ['./applications.component.scss'],
+  standalone: false
 })
 
 export class ApplicationsComponent implements OnInit {

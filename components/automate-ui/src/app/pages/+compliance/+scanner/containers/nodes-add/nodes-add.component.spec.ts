@@ -11,6 +11,7 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { NodesAddComponent } from './nodes-add.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefOption } from 'app/testing/mock-components';
 import { AccordionComponent } from 'app/page-components/accordion/accordion.component';
 import { AccordionItemComponent } from 'app/page-components/accordion/accordion-item/accordion-item.component';
 import { SearchCredentials } from 'app/entities/credentials/credential.actions';
@@ -45,7 +46,7 @@ describe('NodesAddComponent', () => {
           'uniqueFiledName', 'typeValue', 'typeFieldName'
         ], outputs: ['searchData', 'selectData', 'onScrollListData']}),
         MockComponent({ selector: 'chef-select' }),
-        MockComponent({ selector: 'chef-option' })
+        MockChefOption
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

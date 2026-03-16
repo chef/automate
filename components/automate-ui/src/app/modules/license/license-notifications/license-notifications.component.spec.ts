@@ -16,7 +16,7 @@ describe('LicenseNotificationsComponent', () => {
 
   @Injectable()
   class MockLicenseFacadeService extends LicenseFacadeService {
-    notifications$: Observable<Notification[]> = new BehaviorSubject([]);
+    override notifications$: Observable<Notification[]> = new BehaviorSubject([]);
   }
 
   @Injectable()

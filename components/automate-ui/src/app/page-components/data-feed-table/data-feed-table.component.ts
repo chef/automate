@@ -11,6 +11,7 @@ import { NgrxStateAtom } from '../../ngrx.reducers';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-data-feed-table',
   templateUrl: './data-feed-table.component.html',
   styleUrls: ['./data-feed-table.component.scss']

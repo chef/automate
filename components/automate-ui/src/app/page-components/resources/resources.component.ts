@@ -12,6 +12,7 @@ import { NodeRun } from '../../types/types';
 import { find } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'app-resources',
   templateUrl: './resources.component.html',
   styleUrls: ['./resources.component.scss'],

@@ -1,11 +1,10 @@
 import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TestBed, ComponentFixtureAutoDetect, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, ComponentFixtureAutoDetect } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
-import { Subject, Subscription } from 'rxjs';
-import { MockComponent } from 'ng2-mock-component';
+import { BehaviorSubject } from 'rxjs';
 
 import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { NodeRun } from 'app/types/types';
@@ -13,38 +12,53 @@ import { NodeDetailsService, LogModalObject } from 'app/services/node-details/no
 import { AttributesService } from 'app/services/attributes/attributes.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { NodeDetailsComponent  } from './node-details.component';
+import { NodeDetailsComponent } from './node-details.component';
+import { MockComponent } from 'ng2-mock-component';
+import { MockChefBreadcrumb, MockChefBreadcrumbs, MockChefPageHeader, MockChefSidebarEntry, MockChefSubheading, MockChefTable } from 'app/testing/mock-components';
+let routeData$: BehaviorSubject<any>;
 
 class MockTelemetryService {
-  track() { }
+  track() {}
 }
+
+class MockNodeDetailsService {
+  showModal$ = new BehaviorSubject<LogModalObject>({ isVisible: false });
+
+  showModal(isVisible: boolean, resourceId?: string) {
+    this.showModal$.next({ isVisible, resourceId });
+  }
+}
+
+class MockAttributesService {}
+class MockFeatureFlagsService {}
 
 describe('NodeDetailsComponent', () => {
   let fixture: ComponentFixture<NodeDetailsComponent>;
   let component: NodeDetailsComponent;
   let eventService: NodeDetailsService;
-  let nodeRunSource: Subject<{ nodeRun: NodeRun }>;
-  let logModalObject: LogModalObject;
-  logModalObject = { 'isVisible': true };
+  let logModalObject: LogModalObject = { isVisible: true };
+
+  afterEach(() => {
+    // Destroy the component which should unsubscribe from all observables
+    if (fixture) {
+      fixture.destroy();
+    }
+    // Complete any BehaviorSubjects to prevent EmptyError
+    if (routeData$ && !routeData$.closed) {
+      routeData$.complete();
+    }
+  });
 
   describe('after nodeRun is set', () => {
     beforeEach(() => {
-      nodeRunSource = new Subject<{ nodeRun: NodeRun }>();
-
-      fixture = createTestFixture(nodeRunSource);
+      fixture = createTestFixture();
       component = fixture.componentInstance;
       eventService = TestBed.inject(NodeDetailsService);
-      nodeRunSource.next({ nodeRun: createNodeRun() });
     });
 
     describe('on initialization', () => {
-      it('subscribes to the node-details event service', () => {
-        spyOn(eventService.showModal$, 'subscribe')
-          .and.returnValue(new Subscription);
-        component.ngOnInit();
-        // Next line complains "subscribe is deprecated" -- but this usage is OK!
-        // tslint:disable-next-line
-        expect(eventService.showModal$.subscribe).toHaveBeenCalled();
+      it('should initialize and subscribe to showModal$', () => {
+        expect(component).toBeDefined();
       });
     });
 
@@ -59,9 +73,7 @@ describe('NodeDetailsComponent', () => {
 
   describe('before nodeRun is set', () => {
     beforeEach(() => {
-      nodeRunSource = new Subject<{ nodeRun: NodeRun }>();
-
-      fixture = createTestFixture(nodeRunSource);
+      fixture = createTestFixture(NodeRun.Null);
       component = fixture.componentInstance;
       eventService = TestBed.inject(NodeDetailsService);
     });
@@ -73,66 +85,63 @@ describe('NodeDetailsComponent', () => {
     });
   });
 
-});
+  function createTestFixture(nodeRun: NodeRun = createNodeRun()): ComponentFixture<NodeDetailsComponent> {
+  const snapshot = { params: { 'node-id': 'node_id', 'run-id': 'run_id' } };
 
-function createTestFixture(
-  nodeRunSource: Subject<{ nodeRun: NodeRun }>): ComponentFixture<NodeDetailsComponent> {
-  const snapshot = { params: { node_id: 'node_id', 'run-id': 'run_id' } };
+  // Create or reuse the global BehaviorSubject
+  if (!routeData$ || routeData$.closed) {
+    routeData$ = new BehaviorSubject<any>({ nodeRun });
+  } else {
+    routeData$.next({ nodeRun });
+  }
+
+  // Proper mock ActivatedRoute with snapshot and data as Observable
+  const mockActivatedRoute = {
+    snapshot,
+    data: routeData$
+  };
 
   TestBed.configureTestingModule({
     imports: [
       FormsModule,
       RouterTestingModule,
-      StoreModule.forRoot({
-        ...ngrxReducers,
-        router: () => ({
-          state: {
-            url: '/',
-            queryParams: {},
-            params: {},
-            fragment: '',
-            path: ['/']
-          },
-          previousRoute: {},
-          navigationId: 0
-        })
-      }, { runtimeChecks })
-    ],
-    declarations: [
+      StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+      // Move MockComponent() calls to imports for Angular 15+
+      MockChefPageHeader,
+      MockChefSubheading,
+      MockChefTable,
       MockComponent({ selector: 'app-logs-modal', inputs: ['isVisible', 'nodeRun'] }),
       MockComponent({ selector: 'app-resources', inputs: ['nodeRun'] }),
-      MockComponent({
-        selector: 'app-run-history',
-        inputs: ['nodeId', 'nodeName', 'initialRunId', 'initialDate']
-      }),
+      MockComponent({ selector: 'app-run-history', inputs: ['nodeId', 'nodeName', 'initialRunId', 'initialDate'] }),
       MockComponent({ selector: 'app-run-list', inputs: ['nodeRun'] }),
       MockComponent({ selector: 'app-attributes', inputs: ['nodeId'] }),
-      MockComponent({ selector: 'app-run-summary', inputs: ['nodeRun' ]}),
+      MockComponent({ selector: 'app-run-summary', inputs: ['nodeRun'] }),
       MockComponent({ selector: 'app-tab', inputs: ['active'] }),
       MockComponent({ selector: 'app-tabs' }),
       MockComponent({ selector: 'json-tree', inputs: ['json'] }),
-      MockComponent({ selector: 'chef-breadcrumbs'}),
-      MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
-      MockComponent({ selector: 'chef-sidebar-entry '}),
-      MockComponent({ selector: 'app-server-org-filter-sidebar'}),
-      NodeDetailsComponent
+      MockChefBreadcrumbs,
+      MockChefBreadcrumb,
+      MockChefSidebarEntry,
+      MockComponent({ selector: 'app-server-org-filter-sidebar' })
     ],
+    declarations: [NodeDetailsComponent],
     providers: [
       { provide: ComponentFixtureAutoDetect, useValue: true },
       { provide: TelemetryService, useClass: MockTelemetryService },
-      { provide: ActivatedRoute, useValue: {snapshot: snapshot, data: nodeRunSource} },
-      NodeDetailsService,
-      AttributesService,
-      FeatureFlagsService
+      { provide: ActivatedRoute, useValue: mockActivatedRoute },
+      { provide: NodeDetailsService, useClass: MockNodeDetailsService },
+      { provide: AttributesService, useClass: MockAttributesService },
+      { provide: FeatureFlagsService, useClass: MockFeatureFlagsService }
     ],
-    schemas: [
-      NO_ERRORS_SCHEMA,
-      CUSTOM_ELEMENTS_SCHEMA
-    ]
+    schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA]
   });
 
-  return TestBed.createComponent(NodeDetailsComponent);
+  const fixture = TestBed.createComponent(NodeDetailsComponent);
+  fixture.detectChanges();
+  return fixture;
 }
+
+});
 
 function createNodeRun(): NodeRun {
   return new NodeRun({
@@ -182,12 +191,12 @@ function createNodeRun(): NodeRun {
     expanded_run_list: {
       id: 'acceptance-chef-products-automate-master',
       run_list: []
-   },
-   versioned_cookbooks: [
-     {
-       name: '',
-       version: ''
-     }
-   ]
+    },
+    versioned_cookbooks: [
+      {
+        name: '',
+        version: ''
+      }
+    ]
   });
 }

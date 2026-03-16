@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-import * as moment from 'moment/moment';
+import { MockChefButton, MockChefCheckbox, MockChefError, MockChefFormField, MockChefIcon, MockChefLoadingSpinner, MockChefModal } from 'app/testing/mock-components';
+import moment from 'moment';
 import { of as observableOf } from 'rxjs';
 
 import { DateTime } from 'app/helpers/datetime/datetime';
@@ -48,7 +49,9 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
       start: '2018-03-19T20:49:32.590686519Z',
       end: licenseEndDate.format()
     },
-    customer_name: 'user <test@chef.io> - TRIAL'
+    customer_name: 'user <test@chef.io> - TRIAL',
+    grace_period: false,
+    license_type: 'trial'
   };
 }
 
@@ -190,20 +193,20 @@ describe('LicenseLockoutComponent', () => {
         ReactiveFormsModule,
         StoreModule.forRoot({
           licenseStatus: reducer
-        }, { runtimeChecks })
-      ],
-      declarations: [
-        LicenseLockoutComponent,
+        }, { runtimeChecks }),
         MockComponent({ selector: 'app-telemetry-checkbox' }),
         MockComponent({ selector: 'chef-alert' }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked', 'disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible', 'locked'] }),
+        MockChefButton,
+        MockChefCheckbox,
+        MockChefError,
+        MockChefFormField,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefModal,
         MockComponent({ selector: 'chef-trap-focus' })
+      ],
+      declarations: [
+        LicenseLockoutComponent
       ],
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },

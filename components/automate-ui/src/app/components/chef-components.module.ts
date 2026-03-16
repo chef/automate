@@ -73,7 +73,10 @@ import { TimeComponent } from './time/time.component';
     MatSelectModule,
     MatOptionModule,
     MatProgressBarModule,
-    MatButtonModule
+    MatButtonModule,
+
+    // Standalone directives
+    FormControlDirective
   ],
   exports: [
     // Angular Material
@@ -142,7 +145,6 @@ import { TimeComponent } from './time/time.component';
     CreateUserModalComponent,
     DeleteObjectModalComponent,
     ErrorDirective,
-    FormControlDirective,
     FormFieldComponent,
     GuitarStringComponent,
     GuitarStringCollectionComponent,

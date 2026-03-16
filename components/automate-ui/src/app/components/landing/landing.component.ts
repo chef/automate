@@ -31,6 +31,7 @@ export interface RoutePerms {
  */
 
 @Component({
+  standalone: false,
   selector: 'app-landing',
   template: '', // no content
   styleUrls: []

@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { ServicesSidebarComponent } from './services-sidebar.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton } from 'app/testing/mock-components';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
@@ -25,11 +26,11 @@ describe('ServicesSidebarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockChefButton
       ],
       declarations: [
-        ServicesSidebarComponent,
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] })
+        ServicesSidebarComponent
       ],
       providers: [
         { provide: TelemetryService, useClass: MockTelemetryService }
@@ -68,8 +69,11 @@ describe('ServicesSidebarComponent', () => {
         health_check_result: {
           stdout: 'This is the stdout for 300',
           stderr: 'Here is the stderr for 300',
-            exit_status: 2
-          }
+          exit_status: 2
+        },
+        last_event_occurred_at: '2021-01-01T00:00:00Z',
+        last_event_since: '1 day ago',
+        disconnected: false
         },
         {
           id: 400,
@@ -91,7 +95,10 @@ describe('ServicesSidebarComponent', () => {
             stdout: 'This is the stdout for 400',
             stderr: 'Here is the stderr for 400',
             exit_status: 2
-          }
+          },
+          last_event_occurred_at: '2021-01-01T00:00:00Z',
+          last_event_since: '1 day ago',
+          disconnected: false
         },
         {
           id: 500,
@@ -113,7 +120,10 @@ describe('ServicesSidebarComponent', () => {
             stdout: 'This is the stdout for 500',
             stderr: 'Here is the stderr for 500',
             exit_status: 2
-          }
+          },
+          last_event_occurred_at: '2021-01-01T00:00:00Z',
+          last_event_since: '1 day ago',
+          disconnected: false
         }
       ];
 
@@ -127,7 +137,8 @@ describe('ServicesSidebarComponent', () => {
       component.handleToggleCheckbox(400, true);
 
       expect(component.checkedServices.length).toEqual(2);
-      expect(component.checkedServices).toContain(300 && 400);
+      expect(component.checkedServices).toContain(300);
+      expect(component.checkedServices).toContain(400);
     });
 
     it('should remove already selected services from the list', () => {
@@ -140,7 +151,8 @@ describe('ServicesSidebarComponent', () => {
 
       component.handleToggleCheckbox(500, false);
       expect(component.checkedServices.length).toEqual(1);
-      expect(component.checkedServices).not.toContain(300 && 500);
+      expect(component.checkedServices).not.toContain(300);
+      expect(component.checkedServices).not.toContain(500);
     });
 
     it('should update the count of services selected', () => {
@@ -177,7 +189,9 @@ describe('ServicesSidebarComponent', () => {
 
         component.handleSelectAll(true);
         expect(component.checkedServices.length).toEqual(3);
-        expect(component.checkedServices).toContain(300 && 400 && 500);
+        expect(component.checkedServices).toContain(300);
+        expect(component.checkedServices).toContain(400);
+        expect(component.checkedServices).toContain(500);
       });
 
       it('when deselecting, removes all service ids from the checkedServices list', () => {
@@ -215,7 +229,9 @@ describe('ServicesSidebarComponent', () => {
         component.closeDeleteModal();
         expect(component.deleteModalVisible).toBe(false);
         expect(component.checkedServices.length).toEqual(3);
-        expect(component.checkedServices).toContain(300 && 400 && 500);
+        expect(component.checkedServices).toContain(300);
+        expect(component.checkedServices).toContain(400);
+        expect(component.checkedServices).toContain(500);
       });
 
       it('inside delete modal, clicking Delete button should delete services', () => {

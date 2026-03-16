@@ -13,6 +13,7 @@ import { UserPreferencesService } from './services/user-preferences/user-prefere
 import { isNull } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'app-ui',
   templateUrl: './ui.component.html',
   styleUrls: ['./ui.component.scss']

@@ -26,6 +26,7 @@ export interface TrendData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-overview-trend',
   templateUrl: './overview-trend.component.html',
   styleUrls: ['./overview-trend.component.scss']

@@ -21,6 +21,7 @@ const slideDownAnim = trigger('slideDownAnim', [
 ]);
 
 @Component({
+  standalone: false,
   selector: 'app-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],

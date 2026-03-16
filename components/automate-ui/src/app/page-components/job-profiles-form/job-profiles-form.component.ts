@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 
 @Component({
+  standalone: false,
   selector: 'chef-job-profiles-form',
   templateUrl: './job-profiles-form.component.html',
   styleUrls: ['./job-profiles-form.component.scss']

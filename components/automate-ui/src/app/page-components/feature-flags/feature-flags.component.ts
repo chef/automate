@@ -19,6 +19,7 @@ export enum FlagTypes {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-feature-flags',
   templateUrl: './feature-flags.component.html',
   styleUrls: ['./feature-flags.component.scss'],

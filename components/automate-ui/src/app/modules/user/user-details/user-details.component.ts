@@ -41,6 +41,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 export type UserTabName = 'password' | 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-user-details',
   templateUrl: './user-details.component.html',
   styleUrls: ['./user-details.component.scss']

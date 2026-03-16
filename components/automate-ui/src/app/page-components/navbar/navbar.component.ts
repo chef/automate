@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ProductDeployedService } from '../../services/product-deployed/product-deployed.service';
 
 @Component({
+  standalone: false,
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']

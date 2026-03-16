@@ -20,6 +20,7 @@ import { DateTime } from '../../helpers/datetime/datetime';
 import { serviceDeletionStatus } from '../../entities/service-groups/service-groups.selector';
 
 @Component({
+  standalone: false,
   selector: 'app-services-sidebar',
   templateUrl: './services-sidebar.component.html',
   styleUrls: ['./services-sidebar.component.scss']

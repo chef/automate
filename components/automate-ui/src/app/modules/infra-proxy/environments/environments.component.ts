@@ -13,6 +13,7 @@ import { Regex } from '../../../helpers/auth/regex';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-environments',
   templateUrl: './environments.component.html',
   styleUrls: ['./environments.component.scss']

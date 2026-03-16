@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
 import { StoreModule, Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefToolbar } from 'app/testing/mock-components';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { EventEmitter } from '@angular/core';
 import { HttpClient, HttpHandler } from '@angular/common/http';
@@ -34,15 +35,15 @@ describe('CreateDatabagItemModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-toolbar' }),
         CreateDatabagItemModalComponent
       ],
       imports: [
+        MockChefModal,
+        MockChefButton,
+        MockChefError,
+        MockChefFormField,
+        MockChefLoadingSpinner,
+        MockChefToolbar,
         ReactiveFormsModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],

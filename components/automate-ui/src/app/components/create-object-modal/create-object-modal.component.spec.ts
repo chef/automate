@@ -2,10 +2,20 @@ import { EventEmitter, SimpleChange } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
-import { MockComponent } from 'ng2-mock-component';
 
 import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
+import {
+  MockChefButton,
+  MockChefLoadingSpinner,
+  MockChefFormField,
+  MockChefCheckbox,
+  MockChefError,
+  MockChefToolbar,
+  MockChefModal,
+  MockAppResourceDropdown,
+  MockAppProjectsDropdown
+} from 'app/testing/mock-components';
 import { GetPolicies, GetPoliciesSuccessPayload, GetPoliciesSuccess } from 'app/entities/policies/policy.actions';
 import { Policy, IAMType } from 'app/entities/policies/policy.model';
 import { CreateObjectModalComponent } from './create-object-modal.component';
@@ -18,22 +28,20 @@ describe('CreateObjectModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        CreateObjectModalComponent,
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'app-resource-dropdown',
-          inputs: ['resources', 'resourcesUpdated', 'objectNounPlural'] }),
-        MockComponent({ selector: 'app-projects-dropdown',
-          inputs: ['projects', 'projectsUpdated', 'checkedProjectIDs'] })
+        CreateObjectModalComponent
       ],
      imports: [
         ReactiveFormsModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+        MockChefButton,
+        MockChefLoadingSpinner,
+        MockChefFormField,
+        MockChefCheckbox,
+        MockChefError,
+        MockChefToolbar,
+        MockChefModal,
+        MockAppResourceDropdown,
+        MockAppProjectsDropdown
       ]
     }).compileComponents();
     store = TestBed.inject(Store);

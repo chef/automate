@@ -19,6 +19,7 @@ import { TelemetryService } from '../../../../services/telemetry/telemetry.servi
 export type NodeCredentialTabName = 'details' | 'reset';
 
 @Component({
+  standalone: false,
   selector: 'app-node-credential-details-screen',
   templateUrl: './node-credential-details.component.html',
   styleUrls: ['./node-credential-details.component.scss']

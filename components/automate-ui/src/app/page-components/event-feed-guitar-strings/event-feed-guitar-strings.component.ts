@@ -260,6 +260,7 @@ export class GraphicProportions {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-event-feed-guitar-strings',
   templateUrl: './event-feed-guitar-strings.component.html',
   styleUrls: ['./event-feed-guitar-strings.component.scss']

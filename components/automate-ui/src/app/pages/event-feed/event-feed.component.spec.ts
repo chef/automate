@@ -4,6 +4,7 @@ import {
   tick,
   fakeAsync,
 } from "@angular/core/testing";
+import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { EventFeedComponent } from "./event-feed.component";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -15,7 +16,9 @@ import { of } from "rxjs";
 import * as eventFeedActions from "../../services/event-feed/event-feed.actions";
 import * as eventFeedSelectors from "../../services/event-feed/event-feed.selectors";
 import { EventTaskCount } from "../../types/types";
-import * as moment from 'moment';
+import moment from 'moment';
+// @ts-ignore: Ignore TS error for jasmine global usage in test files
+declare const jasmine: any;
 
 describe("EventFeedComponent", () => {
   let component: EventFeedComponent;
@@ -38,7 +41,7 @@ describe("EventFeedComponent", () => {
       },
       queryParamMap: of({ getAll: () => [] }),
     };
-      
+
     mockRouter = {
       navigate: jasmine.createSpy("navigate"),
     };
@@ -55,6 +58,7 @@ describe("EventFeedComponent", () => {
         { provide: LayoutFacadeService, useValue: mockLayoutFacadeService },
         { provide: Router, useValue: mockRouter },
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
     router = TestBed.inject(Router);
   });
@@ -91,10 +95,10 @@ describe("EventFeedComponent", () => {
   });
 
   it("should update router on filter added", () => {
-    const event = { detail: { type: "test", text: "test" } };
+    const event = { detail: { type: "chef_server", text: "test-server" } };
     component.onFilterAdded(event);
-    expect(router.navigate).toHaveBeenCalledWith([], {
-      queryParams: { test: ["test"] },
+    expect(mockRouter.navigate).toHaveBeenCalledWith([], {
+      queryParams: { chef_server: ["test-server"] },
     });
   });
 
@@ -105,7 +109,7 @@ describe("EventFeedComponent", () => {
   });
 
   it("should update router on filter removed", () => {
-    const event = { detail: { type: "test", text: "test" } };
+    const event = { detail: { type: "chef_server", text: "test-server" } };
     component.onFilterRemoved(event);
     expect(mockRouter.navigate).toHaveBeenCalled();
   });
@@ -125,34 +129,36 @@ describe("EventFeedComponent", () => {
   }));
 
   // addFeedDateRangeFilter
-  it("should disable resetTimescale and clear filterTimeScaleDates when date range is within 6 days", () => {
+  it("should enable resetTimescale and set filterTimeScaleDates when date range is within 6 days", () => {
     const dateRange = { start: new Date(), end: new Date() };
     component.selectDateRange(dateRange);
-  
-    expect(component.resetTimescaleDisabled).toBe(true);
-    expect(component.filterTimeScaleDates).toEqual([]);
+
+    expect(component.resetTimescaleDisabled).toBe(false);
+    // Should still create date range even for single day (same start and end date)
+    const expectedDateRange = [moment.utc(dateRange.start).format('YYYY-MM-DD')];
+    expect(component.filterTimeScaleDates).toEqual(expectedDateRange);
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       eventFeedActions.addFeedDateRangeFilter(dateRange.start, dateRange.end)
     );
   });
-  
+
   // addFeedDateRangeFilter
   it("should enable resetTimescale and set filterTimeScaleDates when date range exceeds 6 days", () => {
     const startDate = new Date("2024-05-01");
     const endDate = new Date("2024-05-08");
     const dateRange = { start: startDate, end: endDate };
-  
+
     component.selectDateRange(dateRange);
-  
+
     expect(component.resetTimescaleDisabled).toBe(false);
-    // Mock the expected date range within the function
+    // Mock the expected date range within the function using UTC
     const expectedDateRange = ["2024-05-01", "2024-05-02", "2024-05-03", "2024-05-04", "2024-05-05", "2024-05-06", "2024-05-07", "2024-05-08"];
     expect(component.filterTimeScaleDates).toEqual(expectedDateRange);
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       eventFeedActions.addFeedDateRangeFilter(dateRange.start, dateRange.end)
     );
   });
-  
+
   // setHeadersCountOnFilterTimeScale
   it("should update header counts after a delay", fakeAsync(() => {
     const initialCounts: EventTaskCount = {
@@ -161,9 +167,15 @@ describe("EventFeedComponent", () => {
       create: 4,
       delete: 3,
     };
-    spyOn(eventFeedSelectors, "eventTaskCounts").and.returnValue(
-      of(initialCounts)
-    );
+
+    // Mock the store.select to return the initialCounts when eventTaskCounts selector is called
+    mockStore.select.and.callFake((selector: any) => {
+      if (selector === eventFeedSelectors.eventTaskCounts) {
+        return of(initialCounts);
+      }
+      return of([]);
+    });
+
     component.setHeadersCountOnFilterTimeScale();
     tick(1000);
 
@@ -204,5 +216,5 @@ describe("EventFeedComponent", () => {
     const expectedLength = moment(endDate).diff(startDate, 'days') + 1;
     expect(generatedDates.length).toBe(expectedLength);
   });
-  
+
 });

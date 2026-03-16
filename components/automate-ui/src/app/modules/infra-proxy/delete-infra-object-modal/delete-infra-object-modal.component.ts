@@ -3,6 +3,7 @@ import { User } from '../../../entities/users/user.model';
 import { ContinuousPipe } from '../../../pipes/continuous.pipe';
 
 @Component({
+  standalone: false,
   selector: 'app-delete-infra-object-modal',
   templateUrl: './delete-infra-object-modal.component.html',
   styleUrls: ['./delete-infra-object-modal.component.scss']

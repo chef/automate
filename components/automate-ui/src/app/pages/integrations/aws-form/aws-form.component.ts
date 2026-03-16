@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { get } from 'lodash/fp';
 
 @Component({
+  standalone: false,
   selector: 'app-aws-integration-form',
   templateUrl: './aws-form.component.html',
   styleUrls: ['./aws-form.component.scss'],

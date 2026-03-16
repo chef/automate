@@ -1,5 +1,5 @@
 import { HistorySelection } from './history-selection';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 
 describe('HistorySelection', () => {
   it('contains the correct list of selections for the selector component', () => {

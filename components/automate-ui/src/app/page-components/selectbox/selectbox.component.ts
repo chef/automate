@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-selectbox',
   templateUrl: './selectbox.component.html',
   styleUrls: ['./selectbox.component.scss']

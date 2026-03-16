@@ -1,6 +1,6 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
-
+import { MockChefIcon } from 'app/testing/mock-components';
 import { SidebarEntryComponent } from './sidebar-entry.component';
 
 describe('SidebarEntryComponent', () => {
@@ -10,8 +10,10 @@ describe('SidebarEntryComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        SidebarEntryComponent,
-        MockComponent({ selector: 'chef-icon' }),
+        SidebarEntryComponent
+      ],
+      imports: [
+        MockChefIcon,
         MockComponent({
           selector: 'a',
           inputs: [ 'routerLink', 'routerLinkActiveOptions' ]

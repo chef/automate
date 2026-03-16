@@ -4,6 +4,7 @@ import { PageSizeChangeEvent } from '../../entities/desktop/desktop.model';
 
 
 @Component({
+  standalone: false,
   selector: 'app-page-picker',
   templateUrl: './page-picker.component.html',
   styleUrls: ['./page-picker.component.scss']

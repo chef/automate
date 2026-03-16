@@ -10,10 +10,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { JobNodesFormComponent } from './job-nodes-form.component';
 import { MockComponent } from 'ng2-mock-component';
-
-
-
-
+import { MockChefCheckbox } from 'app/testing/mock-components';
 describe('JobNodesFormComponent', () => {
   let fixture: ComponentFixture<JobNodesFormComponent>;
   let component: JobNodesFormComponent;
@@ -25,11 +22,11 @@ describe('JobNodesFormComponent', () => {
         ChefPipesModule,
         ReactiveFormsModule,
         RouterTestingModule,
+        MockChefCheckbox,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        JobNodesFormComponent,
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] })
+        JobNodesFormComponent
       ],
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },

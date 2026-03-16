@@ -11,6 +11,7 @@ import {
   } from '../../entities/client-runs/client-runs.model';
 
 @Component({
+  standalone: false,
   selector: 'app-deletable-node-control',
   templateUrl: './deletable-node-control.component.html',
   styleUrls: ['./deletable-node-control.component.scss']

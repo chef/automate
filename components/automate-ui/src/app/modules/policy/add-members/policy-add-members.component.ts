@@ -34,6 +34,7 @@ import { TelemetryService } from '../../../services/telemetry/telemetry.service'
 export type FieldName = 'type' | 'identityProvider' | 'name';
 
 @Component({
+  standalone: false,
   selector: 'app-policy-add-members',
   templateUrl: './policy-add-members.component.html',
   styleUrls: ['./policy-add-members.component.scss'],

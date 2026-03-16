@@ -34,6 +34,7 @@ import { CookbookConstraintGrid } from '../edit-environment-attribute-modal/edit
 export type EnvironmentTabName = 'cookbookConstraints' | 'attributes';
 
 @Component({
+  standalone: false,
   selector: 'app-environment-details',
   templateUrl: './environment-details.component.html',
   styleUrls: ['./environment-details.component.scss']

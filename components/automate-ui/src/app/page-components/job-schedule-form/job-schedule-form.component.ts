@@ -4,6 +4,7 @@ import { RRule } from 'rrule';
 import moment from 'moment';
 
 @Component({
+  standalone: false,
   selector: 'chef-job-schedule-form',
   templateUrl: './job-schedule-form.component.html',
   styleUrls: ['./job-schedule-form.component.scss']

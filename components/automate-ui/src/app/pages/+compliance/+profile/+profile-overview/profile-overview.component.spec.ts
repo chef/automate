@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
+import { CommonModule } from '@angular/common';
 import { ProfileOverviewComponent } from './profile-overview.component';
 import {
   CUSTOM_ELEMENTS_SCHEMA,
@@ -12,9 +13,11 @@ import {
 import { Observable, throwError, of as observableOf } from 'rxjs';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
+import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { MockComponent } from 'ng2-mock-component';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
@@ -32,6 +35,16 @@ class MockProfilesService {
   }
 }
 
+class MockAvailableProfilesService {
+  getAllProfiles(): Observable<Array<Object>> {
+    return observableOf([{'name': 'available_profile'}, {'name': 'other_available_profile'}]);
+  }
+
+  installMarketProfile(name: string, version: string): Observable<Object> {
+    return observableOf({ status: 200 });
+  }
+}
+
 class MockUploadService {
   progress: Observable<any> = observableOf('hello');
   sendFile(_file: File): Observable<Object> {
@@ -41,6 +54,11 @@ class MockUploadService {
 
 class MockTelemetryService {
   track() { }
+}
+
+class MockLayoutFacadeService {
+  ShowPageLoading(show: boolean) { }
+  showSidebar(sidebar: any) { }
 }
 
 describe('ProfilesOverviewComponent', () => {
@@ -57,21 +75,25 @@ describe('ProfilesOverviewComponent', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
+          CommonModule,
           RouterTestingModule,
           HttpClientTestingModule,
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-        ],
-        declarations: [
-          ProfileOverviewComponent,
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
           // This returns true for all app-authorized checks on the page.
           MockComponent({ selector: 'app-authorized',
             inputs: ['allOf'],
-            template: '<ng-content *ngIf="true"></ng-content>' })
+            imports: [CommonModule],
+            template: '<div *ngIf="true"><ng-content></ng-content></div>' })
+        ],
+        declarations: [
+          ProfileOverviewComponent
         ],
         providers: [
           {provide: ProfilesService, useClass: MockProfilesService},
+          {provide: AvailableProfilesService, useClass: MockAvailableProfilesService},
           {provide: ChefSessionService, useValue: mockSession},
           {provide: UploadService, useClass: MockUploadService},
+          {provide: LayoutFacadeService, useClass: MockLayoutFacadeService},
           FeatureFlagsService,
           { provide: ProductDeployedService, useValue: new MockProductDeployedService([]) },
           { provide: TelemetryService, useClass: MockTelemetryService }
@@ -418,21 +440,25 @@ describe('ProfilesOverviewComponent', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
+          CommonModule,
           RouterTestingModule,
           HttpClientTestingModule,
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-        ],
-        declarations: [
-          ProfileOverviewComponent,
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
           // This returns false for all app-authorized checks on the page.
           MockComponent({ selector: 'app-authorized',
             inputs: ['allOf'],
-            template: '<ng-content *ngIf="false"></ng-content>' })
+            imports: [CommonModule],
+            template: '<div *ngIf="false"><ng-content></ng-content></div>' })
+        ],
+        declarations: [
+          ProfileOverviewComponent
         ],
         providers: [
           {provide: ProfilesService, useClass: MockProfilesService},
+          {provide: AvailableProfilesService, useClass: MockAvailableProfilesService},
           {provide: ChefSessionService, useValue: mockSession},
           {provide: UploadService, useClass: MockUploadService},
+          {provide: LayoutFacadeService, useClass: MockLayoutFacadeService},
           FeatureFlagsService,
           { provide: ProductDeployedService, useValue: new MockProductDeployedService([]) },
           { provide: TelemetryService, useClass: MockTelemetryService }
@@ -505,19 +531,22 @@ describe('ProfilesOverviewComponent', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
+          CommonModule,
           RouterTestingModule,
           HttpClientTestingModule,
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-        ],
-        declarations: [
-          ProfileOverviewComponent,
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
           // This returns true for all app-authorized checks on the page.
           MockComponent({ selector: 'app-authorized',
             inputs: ['allOf'],
-            template: '<ng-content *ngIf="true"></ng-content>' })
+            imports: [CommonModule],
+            template: '<div *ngIf="true"><ng-content></ng-content></div>' })
+        ],
+        declarations: [
+          ProfileOverviewComponent
         ],
         providers: [
           {provide: ProfilesService, useClass: MockProfilesService},
+          {provide: AvailableProfilesService, useClass: MockAvailableProfilesService},
           {provide: ChefSessionService, useValue: mockSession},
           {provide: UploadService, useClass: MockUploadService},
           FeatureFlagsService,
@@ -593,19 +622,22 @@ describe('ProfilesOverviewComponent', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
+          CommonModule,
           RouterTestingModule,
           HttpClientTestingModule,
-          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-        ],
-        declarations: [
-          ProfileOverviewComponent,
+          StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
           // This returns false for all app-authorized checks on the page.
           MockComponent({ selector: 'app-authorized',
             inputs: ['allOf'],
-            template: '<ng-content *ngIf="false"></ng-content>' })
+            imports: [CommonModule],
+            template: '<div *ngIf="false"><ng-content></ng-content></div>' })
+        ],
+        declarations: [
+          ProfileOverviewComponent
         ],
         providers: [
           {provide: ProfilesService, useClass: MockProfilesService},
+          {provide: AvailableProfilesService, useClass: MockAvailableProfilesService},
           {provide: ChefSessionService, useValue: mockSession},
           {provide: UploadService, useClass: MockUploadService},
           FeatureFlagsService,

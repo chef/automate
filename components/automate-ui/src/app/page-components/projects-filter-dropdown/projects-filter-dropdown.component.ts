@@ -6,6 +6,7 @@ import { ProjectConstants } from '../../entities/projects/project.model';
 const { ALL_PROJECTS_LABEL } = ProjectConstants;
 
 @Component({
+  standalone: false,
   selector: 'app-projects-filter-dropdown',
   templateUrl: './projects-filter-dropdown.component.html',
   styleUrls: [ './projects-filter-dropdown.component.scss' ]

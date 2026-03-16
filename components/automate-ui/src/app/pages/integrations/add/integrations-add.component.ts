@@ -20,6 +20,7 @@ import { Status } from './integration-add.reducer';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-integrations-add',
   templateUrl: './integrations-add.component.html',
   styleUrls: ['./integrations-add.component.scss']

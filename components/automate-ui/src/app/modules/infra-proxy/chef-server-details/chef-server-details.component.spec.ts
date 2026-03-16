@@ -12,6 +12,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { By } from '@angular/platform-browser';
 import { ChefServerDetailsComponent } from './chef-server-details.component';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefHeading, MockChefIcon, MockChefLoadingSpinner, MockChefOption, MockChefPageHeader, MockChefSubheading, MockChefTable, MockChefTbody, MockChefTd, MockChefTh, MockChefThead, MockChefToolbar, MockChefTr } from 'app/testing/mock-components';
 import { using } from 'app/testing/spec-helpers';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
@@ -28,6 +29,13 @@ describe('ChefServerDetailsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
+        ChefServerDetailsComponent
+      ],
+      providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
+        FeatureFlagsService
+      ],
+      imports: [
         MockComponent({
           selector: 'app-authorized',
           inputs: ['allOf']
@@ -37,33 +45,25 @@ describe('ChefServerDetailsComponent', () => {
           inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
           outputs: ['close', 'createClicked']
         }),
-        MockComponent({ selector: 'chef-button',
-          inputs: ['disabled', 'routerLink'] }),
+        MockChefButton,
         MockComponent({ selector: 'mat-select' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
+        MockChefError,
+        MockChefFormField,
+        MockChefHeading,
+        MockChefIcon,
+        MockChefLoadingSpinner,
+        MockChefOption,
+        MockChefPageHeader,
+        MockChefSubheading,
+        MockChefToolbar,
+        MockChefTable,
+        MockChefThead,
+        MockChefTbody,
+        MockChefTr,
+        MockChefTh,
+        MockChefTd,
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        ChefServerDetailsComponent
-      ],
-      providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
-        FeatureFlagsService
-      ],
-      imports: [
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,

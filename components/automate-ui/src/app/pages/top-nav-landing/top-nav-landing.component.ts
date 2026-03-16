@@ -4,6 +4,7 @@ import { LayoutFacadeService } from '../../entities/layout/layout.facade';
 import { ProductDeployedService } from '../../services/product-deployed/product-deployed.service';
 
 @Component({
+  standalone: false,
   selector: 'app-top-nav-landing',
   templateUrl: './top-nav-landing.component.html',
   styleUrls: ['./top-nav-landing.component.scss']

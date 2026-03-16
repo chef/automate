@@ -14,6 +14,7 @@ import { Credential } from '../../../../../entities/credentials/credential.model
 import { pending, EntityStatus } from '../../../../../entities/entities';
 
 @Component({
+  standalone: false,
   templateUrl: './nodes-add.component.html',
   styleUrls: ['./nodes-add.component.scss']
 })
@@ -272,7 +273,7 @@ export class NodesAddComponent implements OnInit, OnDestroy {
       /(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$/
     ].map(r => r.source).join(''));
 
-    return hosts.split(',')
+    return (hosts ?? '').split(',')
       .map(host => host.trim())
       .filter(host => ipv4Regex.test(host) || hostnameRegex.test(host))
       .map(host => {

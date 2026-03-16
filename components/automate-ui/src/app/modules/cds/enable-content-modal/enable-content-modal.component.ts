@@ -7,6 +7,7 @@ import {
 } from '../../../entities/cds/cds.model';
 
 @Component({
+  standalone: false,
   selector: 'app-enable-content-modal',
   templateUrl: './enable-content-modal.component.html',
   styleUrls: ['./enable-content-modal.component.scss']

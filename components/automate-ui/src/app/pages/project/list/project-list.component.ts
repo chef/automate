@@ -23,6 +23,7 @@ import { LoadOptions } from '../../../services/projects-filter/projects-filter.a
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.scss']

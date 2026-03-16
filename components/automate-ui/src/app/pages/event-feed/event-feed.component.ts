@@ -26,6 +26,7 @@ import {
 import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
+  standalone: false,
   selector: 'app-event-feed',
   templateUrl: './event-feed.component.html',
   styleUrls: ['./event-feed.component.scss']
@@ -163,8 +164,9 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     .subscribe((loadedEvents: ChefEvent[]) => {
       if(this.filterTimeScaleDates.length) {
         this.filterDateData = loadedEvents.filter((val)=> {
-          const dateOnly = val.startTime.toString().substring(0, 10)
-          return this.filterTimeScaleDates.includes(dateOnly);
+          // Ensure consistent date formatting using moment with UTC timezone
+          const eventDate = moment.utc(val.startTime).format('YYYY-MM-DD');
+          return this.filterTimeScaleDates.includes(eventDate);
         })
         this.events = this.filterDateData;
         this.setHeadersCountOnFilterTimeScale();
@@ -238,20 +240,25 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     this.store.dispatch(eventFeedActions.loadMoreFeed());
   }
 
-  selectDateRange(dateRange): void {
-    const start = moment(dateRange.start);
-    const end = moment(dateRange.end);
+  resetTimescale() {
+    this.guitarStrings?.resetSliders();
+    this.resetTimescaleDisabled = true;
+    this.filterTimeScaleDates = [];
+  }
 
-    if (start.add(6, 'days').format('l') !== end.format('l')) {
-      this.resetTimescaleDisabled = false;
-      const startDateFrom = moment(dateRange.start).toDate();
-      const endDateTo = moment(dateRange.end).toDate();
-      const dateInRange = this.getAllDatesInRange(startDateFrom, endDateTo)
-      this.filterTimeScaleDates = [...dateInRange];
-    } else {
-      this.resetTimescaleDisabled = true;
-      this.filterTimeScaleDates = []
-    }
+  selectDateRange(dateRange): void {
+    const start = moment.utc(dateRange.start);
+    const end = moment.utc(dateRange.end);
+    const daysDifference = end.diff(start, 'days');
+
+    // Enable reset button whenever a date range is selected
+    this.resetTimescaleDisabled = false;
+
+    // Always filter by the selected date range, regardless of the number of days
+    const startDateFrom = moment.utc(dateRange.start).toDate();
+    const endDateTo = moment.utc(dateRange.end).toDate();
+    const dateInRange = this.getAllDatesInRange(startDateFrom, endDateTo);
+    this.filterTimeScaleDates = [...dateInRange];
 
     this.store.dispatch(eventFeedActions.addFeedDateRangeFilter(dateRange.start, dateRange.end));
   }
@@ -273,6 +280,9 @@ export class EventFeedComponent implements OnInit, OnDestroy {
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      if (!params || !params.keys) {
+        return [];
+      }
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
         return list.concat(paramValues.map(value => ({type: key, text: value})));
@@ -282,12 +292,11 @@ export class EventFeedComponent implements OnInit, OnDestroy {
 
   getAllDatesInRange(startDate: Date, endDate: Date): string[] {
     const dates: string[] = [];
-    const currentDate = moment(startDate);
-    const lastDate = moment(endDate);
+    const currentDate = moment.utc(startDate).startOf('day'); // Start at beginning of day in UTC
+    const lastDate = moment.utc(endDate).startOf('day'); // End at beginning of day in UTC
 
-    while (currentDate.isSameOrBefore(lastDate)) {
-        const convertToDate = currentDate.toDate();
-        const formattedDate =  moment(convertToDate).format('YYYY-MM-DD')
+    while (currentDate.isSameOrBefore(lastDate, 'day')) {
+        const formattedDate = currentDate.format('YYYY-MM-DD');
         dates.push(formattedDate);
         currentDate.add(1, 'days');
     }
@@ -304,10 +313,10 @@ export class EventFeedComponent implements OnInit, OnDestroy {
         takeUntil(this.isDestroyed))
         .subscribe((counts: EventTaskCount) => {
           this.totalTaskCounts = counts.total;
+          this.updateCounts = counts.update;
+          this.createCounts = counts.create;
+          this.deleteCounts = counts.delete;
       });
-      this.updateCounts = this.handleFilterHeaderCount('update');
-      this.createCounts =this.handleFilterHeaderCount('create');
-      this.deleteCounts = this.handleFilterHeaderCount('delete');
     }, 1000)
   }
 }

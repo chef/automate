@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-tab',
   template: `
   <div [hidden]="!active" class="pane">

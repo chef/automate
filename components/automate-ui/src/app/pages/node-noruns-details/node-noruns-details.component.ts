@@ -6,6 +6,7 @@ import {
 import { LayoutFacadeService, Sidebar } from '../../entities/layout/layout.facade';
 
 @Component({
+  standalone: false,
   selector: 'app-node-noruns-details',
   templateUrl: './node-noruns-details.component.html',
   styleUrls: ['./node-noruns-details.component.scss']

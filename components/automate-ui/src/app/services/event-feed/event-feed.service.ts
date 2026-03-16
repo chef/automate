@@ -188,7 +188,8 @@ export class EventFeedService {
       searchParam = this.flattenSearchBar(searchBarWithChildren, searchParam);
     }
 
-    searchParam = searchParam.append('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    // Always use UTC timezone for consistency
+    searchParam = searchParam.append('timezone', 'UTC');
 
     if (filters.hoursBetween) {
       searchParam = searchParam.append('hours_between', filters.hoursBetween.toString());

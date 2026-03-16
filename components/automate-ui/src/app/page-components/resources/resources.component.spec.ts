@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefIcon } from 'app/testing/mock-components';
 import { ChefComponentsModule } from '../../components/chef-components.module';
 import { NodeDetailsService } from '../../services/node-details/node-details.service';
 import { DeltaViewerComponent } from '../delta-viewer/delta-viewer.component';
@@ -15,13 +16,13 @@ describe('ResourcesComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         ChefComponentsModule,
-        ChefPipesModule
+        ChefPipesModule,
+        MockChefIcon
       ],
       declarations: [
         DeltaViewerComponent,
         ResourcesComponent,
-        ResourceItemComponent,
-        MockComponent({selector: 'chef-icon'})
+        ResourceItemComponent
       ],
       providers: [
         NodeDetailsService

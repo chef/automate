@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-overview-status',
   templateUrl: './overview-status.component.html',
   styleUrls: ['./overview-status.component.scss']

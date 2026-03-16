@@ -29,6 +29,7 @@ import { stringToMember } from '../../../entities/policies/policy.model';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
   styleUrls: ['./api-token-list.component.scss']

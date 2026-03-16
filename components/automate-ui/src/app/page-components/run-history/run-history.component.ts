@@ -20,6 +20,7 @@ import {
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 @Component({
+  standalone: false,
   selector: 'app-run-history',
   templateUrl: './run-history.component.html',
   styleUrls: ['./run-history.component.scss'],

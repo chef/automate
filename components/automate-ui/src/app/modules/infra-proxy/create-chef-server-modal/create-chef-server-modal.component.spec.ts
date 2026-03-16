@@ -1,8 +1,9 @@
 import { EventEmitter } from '@angular/core';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefButton, MockChefError, MockChefFormField, MockChefLoadingSpinner, MockChefModal, MockChefOption, MockChefToolbar } from 'app/testing/mock-components';
 import { Regex } from 'app/helpers/auth/regex';
 import { using } from 'app/testing/spec-helpers';
 
@@ -21,23 +22,20 @@ describe('CreateChefServerModalComponent', () => {
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-select' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-modal',
-          inputs: ['visible'],
-          outputs: ['close']
-        }),
         CreateChefServerModalComponent
       ],
       imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        MockChefButton,
+        MockChefLoadingSpinner,
+        MockChefFormField,
+        MockChefError,
+        MockChefToolbar,
+        MockComponent({ selector: 'chef-select' }),
+        MockChefOption,
+        MockChefModal
       ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   }));

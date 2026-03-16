@@ -31,35 +31,54 @@ describe('HttpClientAuthInterceptor', () => {
     });
 
     it('includes auth token in all requests', done => {
-      httpClient.get('/endpoint').subscribe(done);
+      httpClient.get('/endpoint').subscribe(() => {
+        try {
+          expect(httpRequest.request.headers.get('Authorization'))
+            .toEqual(`Bearer ${chefSession.id_token}`);
+          done();
+        } catch (error) {
+          done.fail(error instanceof Error ? error : new Error(String(error)));
+        }
+      });
 
       const httpRequest = httpMock.expectOne('/endpoint');
       httpRequest.flush('response');
-
-      expect(httpRequest.request.headers.get('Authorization'))
-        .toEqual(`Bearer ${chefSession.id_token}`);
     });
 
     it('sets the lax API header all requests', done => {
-      httpClient.get('/endpoint').subscribe(done);
+      httpClient.get('/endpoint').subscribe(() => {
+        try {
+          expect(httpRequest.request.headers.get('Content-Type'))
+            .toEqual('application/json+lax');
+          done();
+        } catch (error) {
+          done.fail(error instanceof Error ? error : new Error(String(error)));
+        }
+      });
 
       const httpRequest = httpMock.expectOne('/endpoint');
       httpRequest.flush('response');
-
-      expect(httpRequest.request.headers.get('Content-Type'))
-        .toEqual('application/json+lax');
     });
 
     it('when a 401 response is intercepted logs out the session', done => {
       spyOn(chefSession, 'logout');
-      httpClient.get('/endpoint').subscribe({ error: done });
+      httpClient.get('/endpoint').subscribe({
+        next: () => done.fail('Should not succeed'),
+        error: (error) => {
+          try {
+            expect(error.status).toBe(401);
+            expect(chefSession.logout).toHaveBeenCalledWith();
+            done();
+          } catch (assertionError) {
+            done.fail(assertionError instanceof Error ? assertionError : new Error(String(assertionError)));
+          }
+        }
+      });
 
       const httpRequest = httpMock.expectOne('/endpoint');
       // Note 2019/06/27 (sr): When using HTTP/2, statusText will always be "OK"
       // so our logic shouldn't depend on it.
       httpRequest.flush('response', { status: 401, statusText: 'OK' });
-
-      expect(chefSession.logout).toHaveBeenCalledWith();
     });
   });
 
@@ -100,14 +119,19 @@ describe('HttpClientAuthInterceptor', () => {
         });
 
         it('includes checked projects', done => {
-          httpClient.get('/endpoint').subscribe(done);
+          httpClient.get('/endpoint').subscribe(() => {
+            try {
+              expect(httpRequest.request.headers.keys()).toContain('projects');
+              expect(httpRequest.request.headers.get('projects'))
+                .toEqual(projectList.filter(p => p.checked).map(p => p.value).join(', '));
+              done();
+            } catch (error) {
+              done.fail(error instanceof Error ? error : new Error(String(error)));
+            }
+          });
 
           const httpRequest = httpMock.expectOne('/endpoint');
           httpRequest.flush('response');
-
-          expect(httpRequest.request.headers.keys()).toContain('projects');
-          expect(httpRequest.request.headers.get('projects'))
-            .toEqual(projectList.filter(p => p.checked).map(p => p.value).join(', '));
         });
       });
     });
@@ -138,12 +162,17 @@ describe('HttpClientAuthInterceptor', () => {
         });
 
         it('does not include projects header', done => {
-          httpClient.get('/endpoint').subscribe(done);
+          httpClient.get('/endpoint').subscribe(() => {
+            try {
+              expect(httpRequest.request.headers.keys()).not.toContain('projects');
+              done();
+            } catch (error) {
+              done.fail(error instanceof Error ? error : new Error(String(error)));
+            }
+          });
 
           const httpRequest = httpMock.expectOne('/endpoint');
           httpRequest.flush('response');
-
-          expect(httpRequest.request.headers.keys()).not.toContain('projects');
         });
       });
     });
@@ -173,29 +202,38 @@ describe('HttpClientAuthInterceptor', () => {
 
         it(description + 'project header when unfiltered flag set to ' + setting, done => {
           const options = { params: { unfiltered: String(setting) } };
-          httpClient.get('/endpoint', options).subscribe(done);
+          httpClient.get('/endpoint', options).subscribe(() => {
+            try {
+              const headerKeys = httpRequest.request.headers.keys();
+              if (setting) {
+                expect(headerKeys).not.toContain('projects');
+              } else {
+                expect(headerKeys).toContain('projects');
+              }
+              done();
+            } catch (error) {
+              done.fail(error instanceof Error ? error : new Error(String(error)));
+            }
+          });
 
           const httpRequest = httpMock.expectOne('/endpoint');
           httpRequest.flush('response');
-
-          const headerKeys = httpRequest.request.headers.keys();
-          if (setting) {
-            expect(headerKeys).not.toContain('projects');
-          } else {
-            expect(headerKeys).toContain('projects');
-          }
         });
 
         it('strips unfiltered param when set to ' + setting, done => {
           const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
-          httpClient.get('/endpoint', options).subscribe(done);
+          httpClient.get('/endpoint', options).subscribe(() => {
+            try {
+              expect(httpRequest.request.params.get('unfiltered')).toBeNull();
+              expect(httpRequest.request.params.get('dummy')).toEqual('foobar');
+              done();
+            } catch (error) {
+              done.fail(error instanceof Error ? error : new Error(String(error)));
+            }
+          });
 
           const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
           httpRequest.flush('response');
-
-          // This assertion is completely redundant with the expectOne above,
-          // but having it adds to clarity.
-          expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
         });
       });
     });

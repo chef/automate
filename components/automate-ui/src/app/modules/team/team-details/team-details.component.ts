@@ -39,6 +39,7 @@ const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 export type TeamTabName = 'users' | 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-team-details',
   templateUrl: './team-details.component.html',
   styleUrls: ['./team-details.component.scss']

@@ -25,6 +25,7 @@ import {
 } from '../../../entities/cds/cds.model';
 
 @Component({
+  standalone: false,
   selector: 'app-desktop-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

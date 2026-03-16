@@ -14,6 +14,7 @@ import { Utilities } from '../../../helpers/utilities/utilities';
 import { CookbookConstraintGrid } from '../create-environment-modal/create-environment-modal.component';
 
 @Component({
+  standalone: false,
   selector: 'app-infra-environment-constraint',
   templateUrl: './infra-environment-constraint.component.html',
   styleUrls: ['./infra-environment-constraint.component.scss']

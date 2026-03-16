@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { get } from 'lodash/fp';
 
 @Component({
+  standalone: false,
   selector: 'app-azure-integration-form',
   templateUrl: './azure-form.component.html',
   styleUrls: ['./azure-form.component.scss'],

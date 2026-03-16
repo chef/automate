@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MockComponent } from 'ng2-mock-component';
+import { MockChefIcon } from 'app/testing/mock-components';
 import { using } from 'app/testing/spec-helpers';
 
 import { ChefNotificationComponent } from './notification.component';
@@ -13,10 +14,12 @@ describe('ChefNotificationComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [ BrowserAnimationsModule ],
+      imports: [
+        BrowserAnimationsModule,
+        MockChefIcon
+      ],
       declarations: [
-        ChefNotificationComponent,
-        MockComponent({ selector: 'chef-icon' })
+        ChefNotificationComponent
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

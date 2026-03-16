@@ -23,6 +23,7 @@ type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-api-token-details',
   templateUrl: './api-token-details.component.html',
   styleUrls: ['./api-token-details.component.scss']

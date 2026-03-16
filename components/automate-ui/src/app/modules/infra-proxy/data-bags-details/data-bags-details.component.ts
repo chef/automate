@@ -24,6 +24,7 @@ import { GetOrg } from '../../../entities/orgs/org.actions';
 export type DataBagsDetailsTab = 'details';
 
 @Component({
+  standalone: false,
   selector: 'app-data-bags-details',
   templateUrl: './data-bags-details.component.html',
   styleUrls: ['./data-bags-details.component.scss']

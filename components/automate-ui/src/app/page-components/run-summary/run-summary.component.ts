@@ -8,6 +8,7 @@ import { NodeRun } from '../../types/types';
 import { DateTime } from '../../helpers/datetime/datetime';
 
 @Component({
+  standalone: false,
   selector: 'app-run-summary',
   templateUrl: './run-summary.component.html',
   styleUrls: ['./run-summary.component.scss'],

@@ -11,6 +11,7 @@ import moment from 'moment';
 import { reject } from 'lodash';
 
 @Component({
+  standalone: false,
   selector: 'app-nodes-list',
   templateUrl: './nodes-list.component.html',
   styleUrls: ['./nodes-list.component.scss']

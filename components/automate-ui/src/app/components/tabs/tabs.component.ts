@@ -2,6 +2,7 @@ import { Component, ContentChildren, EventEmitter, Output, QueryList } from '@an
 import { TabComponent } from '../tab/tab.component';
 
 @Component({
+  standalone: false,
   selector: 'app-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss']
