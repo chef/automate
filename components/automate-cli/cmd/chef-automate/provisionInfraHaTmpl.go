@@ -5,7 +5,7 @@ Usage:
 
 *** this command will only work with automate HA mode with AWS deployment ***
 
-chef-automate provision-infra <config toml file path> [OPTIONS]
+chef-automate provision-infrastructure <config toml file path> [OPTIONS]
 
 config file path:	
 	config toml file path

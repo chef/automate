@@ -2,7 +2,7 @@ package main
 
 var secretsHelpDocs = `
 Usage:
-    chef-automate secrets SUBCOMMAND [ARG] ...
+    chef-automate ha-secrets SUBCOMMAND [ARG] ...
 Parameters:
     SUBCOMMAND                       subcommand
     [ARG] ...                        subcommand arguments
