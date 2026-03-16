@@ -287,7 +287,7 @@ func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
 }
 
 func (p *pg) GetPolicyChangeNotifier(ctx context.Context) (storage.PolicyChangeNotifier, error) {
-	return newPolicyChangeNotifier(ctx, p.conninfo)
+	return newPolicyChangeNotifier(ctx, p.conninfo, p.logger)
 }
 
 func (p *pg) insertCompletePolicy(ctx context.Context, pol *storage.Policy, projects []string, q Querier) error {

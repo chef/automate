@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -76,7 +75,7 @@ func createProjectUpdateID() string {
 	return uuid.String()
 }
 
-func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
+func NewWorkflowExecutor(log logger.Logger) (*patterns.ChainWorkflowExecutor, error) {
 	// This function creates a WorkflowExecutor out of multiple smaller workflow executors.
 	// First, we want the ApplyStagedRules database commit stuff to run. Then, we want
 	// the domain services to update.
@@ -135,13 +134,13 @@ func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
 		if key == serialSubworkflowName {
 			workflowExecutor = project_update_tags.NewSerializedWorkflowExecutor()
 		} else if stringutils.SliceContains(ParallelProjectUpdateDomainServices, key) {
-			workflowExecutor = project_update_tags.NewWorkflowExecutorForDomainService(key)
+			workflowExecutor = project_update_tags.NewWorkflowExecutorForDomainService(key, log)
 		} else {
-			logrus.Errorf("invalid parallel subworkflow %q", key)
+			log.Errorf("invalid parallel subworkflow %q", key)
 			return nil, false
 		}
 
-		logrus.Infof("creating workflow executor for %q", key)
+		log.Infof("creating workflow executor for %q", key)
 		workflowMap[key] = workflowExecutor
 		return workflowExecutor, true
 	})
@@ -185,10 +184,11 @@ type CerealProjectUpdateManager struct {
 	manager      *cereal.Manager
 	workflowName cereal.WorkflowName
 	instanceName string
+	log          logger.Logger
 }
 
 func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logger, s storage.Storage, pr PolicyRefresher) (ProjectUpdateMgr, error) {
-	domainServicesWorkflowExecutor, err := NewWorkflowExecutor()
+	domainServicesWorkflowExecutor, err := NewWorkflowExecutor(log)
 	if err != nil {
 		return nil, err
 	}
@@ -211,6 +211,7 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 		manager:      manager,
 		workflowName: ProjectUpdateWorkflowName,
 		instanceName: ProjectUpdateInstanceName,
+		log:          log,
 	}
 
 	return updateManager, nil
@@ -252,6 +253,7 @@ func (m *CerealProjectUpdateManager) Start() error {
 
 type workflowInstance struct {
 	chain *patterns.ChainWorkflowInstance
+	log   logger.Logger
 }
 
 func (w *workflowInstance) Failed() bool {
@@ -312,7 +314,7 @@ func (w *workflowInstance) PercentageComplete() float64 {
 
 	progress, err := w.collectProgress()
 	if err != nil {
-		logrus.WithError(err).Error("Failed to get progress")
+		w.log.WithError(err).Error("Failed to get progress")
 		return 0
 	}
 
@@ -371,7 +373,7 @@ func (m *CerealProjectUpdateManager) getWorkflowInstance(ctx context.Context) (*
 	if err != nil {
 		return nil, err
 	}
-	return &workflowInstance{chain: chainInstance}, nil
+	return &workflowInstance{chain: chainInstance, log: m.log}, nil
 }
 
 type EmptyProjectUpdateStatus struct{}
@@ -430,7 +432,7 @@ func (w *workflowInstance) collectProgress() (float32, error) {
 	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
 		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
 		if err != nil {
-			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			w.log.WithError(err).Errorf("failed to get subworkflow for %q", d)
 			continue
 		}
 
@@ -438,12 +440,12 @@ func (w *workflowInstance) collectProgress() (float32, error) {
 			state := project_update_tags.SerializedProjectUpdateWorkflowState{}
 			if subWorkflow.IsRunning() {
 				if err := subWorkflow.GetPayload(&state); err != nil {
-					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					w.log.WithError(err).Errorf("failed to get payload for %q", d)
 					continue
 				}
 			} else {
 				if err := subWorkflow.GetResult(&state); err != nil {
-					logrus.WithError(err).Errorf("failed to get result for %q", d)
+					w.log.WithError(err).Errorf("failed to get result for %q", d)
 					continue
 				}
 			}
@@ -462,7 +464,7 @@ func (w *workflowInstance) collectProgress() (float32, error) {
 			payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
 			if subWorkflow.IsRunning() {
 				if err := subWorkflow.GetPayload(&payload); err != nil {
-					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					w.log.WithError(err).Errorf("failed to get payload for %q", d)
 					continue
 				}
 				progress = append(progress, payload.MergedJobStatus.PercentageComplete)
@@ -503,7 +505,7 @@ func (w *workflowInstance) collectRunningJobStatuses() []project_update_tags.Job
 	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
 		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
 		if err != nil {
-			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			w.log.WithError(err).Errorf("failed to get subworkflow for %q", d)
 			continue
 		}
 		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
@@ -511,7 +513,7 @@ func (w *workflowInstance) collectRunningJobStatuses() []project_update_tags.Job
 			if d == serialSubworkflowName {
 				state := project_update_tags.SerializedProjectUpdateWorkflowState{}
 				if err := subWorkflow.GetPayload(&state); err != nil {
-					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					w.log.WithError(err).Errorf("failed to get payload for %q", d)
 					continue
 				}
 				if state.Running.TotalTasks > 0 &&
@@ -530,7 +532,7 @@ func (w *workflowInstance) collectRunningJobStatuses() []project_update_tags.Job
 				}
 			} else {
 				if err := subWorkflow.GetPayload(&payload); err != nil {
-					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					w.log.WithError(err).Errorf("failed to get payload for %q", d)
 					continue
 				}
 				jobStatuses = append(jobStatuses, payload.MergedJobStatus)

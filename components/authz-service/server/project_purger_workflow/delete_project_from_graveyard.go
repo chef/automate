@@ -9,10 +9,10 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type deleteProjectFromGraveyardWorkflowExecutor struct {
+	log logger.Logger
 }
 
 type deleteProjectFromGraveyardWorkflowExecutorParams struct {
@@ -25,20 +25,20 @@ type deleteProjectFromGraveyardWorkflowExecutorPayload struct {
 
 // NewDeleteProjectFromGraveyardWorkflowExecutor returns a workflow executor that
 // is based on the SingleTaskWorkflowExecutor with infinite retry after exponential backoff.
-func NewDeleteProjectFromGraveyardWorkflowExecutor() cereal.WorkflowExecutor {
-	return &deleteProjectFromGraveyardWorkflowExecutor{}
+func NewDeleteProjectFromGraveyardWorkflowExecutor(log logger.Logger) cereal.WorkflowExecutor {
+	return &deleteProjectFromGraveyardWorkflowExecutor{log: log}
 }
 
 func (s *deleteProjectFromGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 	var params deleteProjectFromGraveyardWorkflowExecutorParams
 	err := w.GetParameters(&params)
 	if err != nil {
-		logrus.WithError(err).Error("failed to get delete project from graveyard parameters")
+		s.log.WithError(err).Error("failed to get delete project from graveyard parameters")
 		return w.Fail(err)
 	}
 
 	if err := w.EnqueueTask(deleteProjectFromGraveyardTaskName, deleteProjectFromGraveyardParams{ProjectID: params.ProjectID}); err != nil {
-		logrus.WithError(err).Errorf("failed to enqueue delete project from graveyard task %s", deleteProjectFromGraveyardTaskName)
+		s.log.WithError(err).Errorf("failed to enqueue delete project from graveyard task %s", deleteProjectFromGraveyardTaskName)
 		return w.Fail(err)
 	}
 	return w.Continue(nil)
@@ -47,7 +47,7 @@ func (s *deleteProjectFromGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowIn
 func (s *deleteProjectFromGraveyardWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 	payload := deleteProjectFromGraveyardWorkflowExecutorPayload{}
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Error("Failed to deserialize delete project from graveyard payload")
+		s.log.WithError(err).Error("Failed to deserialize delete project from graveyard payload")
 		return w.Fail(err)
 	}
 
@@ -59,7 +59,7 @@ func (s *deleteProjectFromGraveyardWorkflowExecutor) OnTaskComplete(w cereal.Wor
 	switch ev.TaskName {
 	case deleteProjectFromGraveyardTaskName:
 		if errToLog := ev.Result.Err(); errToLog != nil {
-			logrus.WithError(errToLog).Error("failed to delete project from graveyard, retrying")
+			s.log.WithError(errToLog).Error("failed to delete project from graveyard, retrying")
 			payload.ConsecutiveJobCheckFailures++
 			if err := w.EnqueueTask(
 				deleteProjectFromGraveyardTaskName, deleteProjectFromGraveyardParams{ProjectID: params.ProjectID},

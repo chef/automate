@@ -40,7 +40,7 @@ func TestMigrateToV2(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"empty store/default state": func(t *testing.T) {
-			err := MigrateToV2(ctx, db, true)
+			err := MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			require.NoError(t, err)
 
 			for _, pol := range v2DefaultPolicies() {
@@ -73,7 +73,7 @@ func TestMigrateToV2(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, v1pol)
 
-			err = MigrateToV2(ctx, db, true)
+			err = MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			require.NoError(t, err)
 
 			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
@@ -107,7 +107,7 @@ func TestMigrateToV2(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, v1pol)
 
-			err = MigrateToV2(ctx, db, true)
+			err = MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			require.NoError(t, err)
 
 			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
@@ -137,7 +137,7 @@ func TestMigrateToV2(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, v2pol)
 
-			err = MigrateToV2(ctx, db, true)
+			err = MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
 			require.NoError(t, err)
 			// members should be added to default admin policy
@@ -175,7 +175,7 @@ func TestMigrateToV2(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, validV1pol)
 
-			err = MigrateToV2(ctx, db, true)
+			err = MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			require.NoError(t, err)
 
 			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
@@ -209,7 +209,7 @@ func TestMigrateToV2(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			err = MigrateToV2(ctx, db, true)
+			err = MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			require.NoError(t, err)
 
 			migratedResources := []string{
@@ -255,7 +255,7 @@ func TestMigrateToV2(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			err = MigrateToV2(ctx, db, true)
+			err = MigrateToV2(ctx, db, true, logger.NewTestLogger())
 			require.NoError(t, err)
 
 			for _, id := range policyIDs {
