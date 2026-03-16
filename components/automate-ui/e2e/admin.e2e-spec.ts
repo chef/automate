@@ -420,12 +420,12 @@ describe('Admin pages', () => {
       });
 
       it('displays the id in the header', () => {
-        const idHeader = $('header td:nth-child(1)');
+        const idHeader = $('chef-page-header table tbody tr td:nth-child(1)');
         expect(idHeader.getText()).toBe('some-test-role');
       });
 
       it('displays the type in the header', () => {
-        const typeHeader = $('header td:nth-child(2)');
+        const typeHeader = $('chef-page-header table tbody tr td:nth-child(2)');
         expect(typeHeader.getText()).toBe('Chef-managed');
       });
 
