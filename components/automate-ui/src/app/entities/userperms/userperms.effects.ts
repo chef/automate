@@ -40,7 +40,7 @@ export class UserPermEffects {
   ) { }
 
   // the target limit
-  private freshLimitInMilliseconds = 30000;
+  private freshLimitInMilliseconds = 6000;
 
   // to account for a flurry of IntrospectSome calls almost concurrent
   // with our IntrospectAll call--this will happen frequently!--just
