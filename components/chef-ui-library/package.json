@@ -29,7 +29,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
     "d3": "^7.8.5",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "marked": "^4.0.10",
     "material-design-icons-iconfont": "^6.7.0",
     "prismjs": "^1.29.0",
@@ -38,7 +38,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "set-value": "^4.1.0",
-    "tar": "^7.0.1"
+    "tar": "^7.5.7"
   },
   "devDependencies": {
     "@stencil/core": "^4.16.0",
