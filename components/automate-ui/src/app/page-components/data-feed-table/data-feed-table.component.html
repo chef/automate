@@ -18,7 +18,7 @@
               <mat-select panelClass="chef-control-menu" ></mat-select>
             </chef-button>
             <chef-click-outside omit="column-dropdown-toggle" (clickOutside)="closeColumnDropdown()">
-              <chef-dropdown [attr.visible]="columnDropdownVisible" class="remove_overlap">
+              <chef-dropdown *ngIf="columnDropdownVisible" [attr.visible]="columnDropdownVisible" class="remove_overlap">
                 <chef-checkbox [checked]=serviceShow
                   (change)="checkValue($event,'serviceShow')">
                   Service
