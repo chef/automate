@@ -36,12 +36,13 @@ var licenseCmd = &cobra.Command{
 }
 
 var licenseStatusCmd = &cobra.Command{
-	Use:               "status",
-	Short:             "Retrieve Chef Automate license status",
-	RunE:              runLicenseStatusCmd,
-	PersistentPreRunE: preLicenseCmd,
+	Use:   "status",
+	Short: "Retrieve Chef Automate license status",
+	RunE:  runLicenseStatusCmd,
+	//	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
-		docs.Tag: docs.BastionHost,
+		NoRequireRootAnnotation: NoRequireRootAnnotation,
+		docs.Tag:                docs.BastionHost,
 	},
 }
 
@@ -144,6 +145,14 @@ Deployment Date: %s
 License Type:    %s
 Grace Period:    %t
 `
+var licenseInfoFmtNonRoot = `
+
+Licensed to:     %s
+License ID:      %s
+Expiration Date: %s
+License Type:    %s
+Grace Period:    %t
+`
 
 var startTimeFormat = "start time of the report in yyyy-mm-dd format"
 var endTimeFormat = "end time of the report in yyyy-mm-dd format"
@@ -187,6 +196,16 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 	if response.Set {
 		status.GlobalResult = response
 
+		//if os.Geteuid() != 0 {
+		//	// License information for a current license for Non-root user
+		//	writer.Printf(licenseInfoFmtNonRoot,
+		//		response.CustomerName,
+		//		response.LicenseId,
+		//		time.Unix(response.ExpirationDate.GetSeconds(), 0).UTC().Format(time.RFC3339),
+		//		response.LicenseType,
+		//		response.GracePeriod,
+		//	)
+		//} else {
 		// License information for a current license
 		writer.Printf(licenseInfoFmt,
 			response.CustomerName,
@@ -196,6 +215,7 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 			response.LicenseType,
 			response.GracePeriod,
 		)
+		//}
 
 		// Add notice if license is expired
 		if !response.GracePeriod && time.Now().Unix() > response.ExpirationDate.GetSeconds() {
