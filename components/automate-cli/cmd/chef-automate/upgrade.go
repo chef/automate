@@ -24,6 +24,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv4"
+	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv5"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
@@ -220,6 +221,12 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				}
 			case "4":
 				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, upgradeinspectorv4.NewUpgradeV4Utils(), &fileutils.FileSystemUtils{}, configCmdFlags.timeout)
+				isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
+				if isError {
+					return nil
+				}
+			case "5":
+				upgradeInspector := upgradeinspectorv5.NewUpgradeInspectorV5(writer, upgradeinspectorv5.NewUpgradeV5Utils(), &fileutils.FileSystemUtils{}, configCmdFlags.timeout)
 				isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
 				if isError {
 					return nil

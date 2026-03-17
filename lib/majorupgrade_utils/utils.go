@@ -27,6 +27,14 @@ func IsExternalElasticSearch(timeout int64) bool {
 	return res.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 }
 
+func IsExternalOpenSearch(timeout int64) bool {
+	res, err := client.GetAutomateConfig(timeout)
+	if err != nil {
+		return false
+	}
+	return res.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
+}
+
 func SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
 	currentStatus, err := GetMaintenanceStatus(timeout)
 	if err != nil {
