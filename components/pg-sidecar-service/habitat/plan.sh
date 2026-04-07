@@ -20,10 +20,9 @@ pkg_exposes=(port)
 pkg_deps=(
   chef/mlsa
   chef/automate-platform-tools
-  # Pin postgresql, sqitch, and postgresql client until automate-postgresql
-  # is updated.
-  core/postgresql13/13.21/20250711150030 # for psql and pg_dump
-  core/postgresql13-client/13.21/20250711152541
+  # pg-sidecar-service shells out to psql and pg_dump, which are provided by
+  # the PostgreSQL 14 client package.
+  core/postgresql14-client/14.17/20260316081719
   core/sqitch/1.4.1/20250722100509
 )
 pkg_bin_dirs=(bin)

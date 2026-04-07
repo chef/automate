@@ -20,7 +20,7 @@ const (
 	VERSIONREGEX                   = `(\d+\.\d+\.\d+)`
 	PGVERSIONREGEX                 = `PostgreSQL (\d+\.\d+)`
 	OSVERSIONREGEX                 = `"number"\s*:\s*"([^"]+)"`
-	PGCOREPKG                      = "core/postgresql13 "
+	PGCOREPKG                      = "core/postgresql14-client "
 	AUTOMATE_NAME                  = "Automate"
 	BASTION_NAME                   = "Bastion"
 	CHEF_SERVER_NAME               = "Chef Server"

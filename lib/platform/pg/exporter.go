@@ -18,23 +18,23 @@ import (
 	"github.com/chef/automate/lib/platform/command"
 )
 
-const Pg13Client = "core/postgresql13-client"
+const PgClient = "core/postgresql14-client"
 
 var (
 	// DefaultPGDumpCmd is the command we will run for
 	// pg_dump.This package-level var is provided so a
 	// stub-command can be injected by the tests.
-	DefaultPGDumpCmd = []string{"hab", "pkg", "exec", Pg13Client, "pg_dump"}
+	DefaultPGDumpCmd = []string{"hab", "pkg", "exec", PgClient, "pg_dump"}
 
 	// PGRestoreCmd is the command we will run for
 	// pg_restore. This package-level var is provided so a
 	// stub-command can be injected by the tests.
-	DefaultPGRestoreCmd = []string{"hab", "pkg", "exec", Pg13Client, "pg_restore"}
+	DefaultPGRestoreCmd = []string{"hab", "pkg", "exec", PgClient, "pg_restore"}
 
 	// PSQLCmd is the command we will run for psql. This
 	// package-level var is provided so a stub-command can be
 	// injected by the tests.
-	DefaultPSQLCmd = []string{"hab", "pkg", "exec", Pg13Client, "psql"}
+	DefaultPSQLCmd = []string{"hab", "pkg", "exec", PgClient, "psql"}
 )
 
 func PGDumpCmd() []string {
