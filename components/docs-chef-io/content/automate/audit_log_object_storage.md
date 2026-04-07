@@ -180,35 +180,6 @@ To change the rotation size threshold, patch your Automate configuration.
     sudo chef-automate config patch </PATH/TO/TOML/FILE>
     ```
 
-### Audit log retention
-
-Audit log retention has two parts: local file retention on the Automate node and object storage retention in your S3 or MinIO bucket.
-
-#### Local file retention
-
-- Audit entries are written to `/hab/svc/automate-load-balancer/data/audit.log`.
-- Chef Automate keeps up to 10 rotated files (`audit.1.log` through `audit.10.log`).
-- Default `max_file_size` is `100 MB`.
-- Total potential local storage is about `1.1 GB` (`audit.log` + 10 rotated files at `100 MB` each).
-- When a new rotation occurs after the limit is reached, the oldest file (`audit.10.log`) is overwritten.
-
-To change the rotation size threshold, set `max_file_size`:
-
-```toml
-[global.v1.audit]
-
-  [global.v1.audit.input]
-    max_file_size = "100MB"
-```
-
-#### Object storage retention
-
-- Fluent Bit uploads audit log entries to your configured S3 or MinIO bucket.
-- Chef Automate does not automatically delete objects from object storage.
-- Configure retention in your object storage platform:
-  - AWS S3: [Managing your storage lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
-  - MinIO: [Object Expiration and Tiering (ILM)](https://min.io/docs/minio/linux/administration/object-management/object-lifecycle-management.html)
-
 ### Configure upload behavior
 
 These settings control object size splitting, multipart chunk size, and upload timeouts for collector uploads to S3 or MinIO.
@@ -252,6 +223,58 @@ If you don't set `[global.v1.audit.output]`, Chef Automate uses these defaults:
     sudo chef-automate config patch </PATH/TO/TOML/FILE>
     ```
 
+### Configure audit log retention
+
+Audit log retention has two parts:
+
+- local file retention on the Automate node
+- object storage retention in S3 or MinIO
+
+Local file retention uses log rotation from the load balancer:
+
+- Audit entries are written to `/hab/svc/automate-load-balancer/data/audit.log`.
+- Chef Automate keeps up to 10 rotated files (`audit.1.log` through `audit.10.log`).
+- Default `max_file_size` is `100 MB`.
+- Total potential local storage is about `1.1 GB` (`audit.log` + 10 rotated files at `100 MB` each).
+- When a new rotation occurs after the limit is reached, the oldest file (`audit.10.log`) is overwritten.
+
+Object storage retention uses `[global.v1.audit.retention]`:
+
+- `days`: Number of days to retain objects (`0` disables cleanup/unlimited retention).
+- `schedule_hour`: Cleanup hour (`0`-`23`).
+- `schedule_minute`: Cleanup minute (`0`-`59`).
+
+`enabled` is no longer used. Retention is enabled when `days > 0`.
+
+```toml
+[global.v1.audit]
+
+  [global.v1.audit.retention]
+    days = 30
+    schedule_hour = 2
+    schedule_minute = 0
+```
+
+### Configure requested log retention
+
+Requested log retention controls cleanup of generated requested-log files under `<path_prefix>/requested-logs/` in S3.
+
+Set `requested_logs_retention_duration` in `[global.v1.audit.async]`:
+
+- `"0"`: Disabled/unlimited retention
+- `"1hr"`, `"24hr"`, `"7d"`, `"30d"`: Delete files older than this duration
+
+Default is `"1hr"`, and cleanup runs hourly.
+
+Cleanup uses S3 `LastModified` timestamps. If parsing fails, cleanup is disabled (fail-closed) to avoid accidental deletion.
+
+```toml
+[global.v1.audit]
+
+  [global.v1.audit.async]
+    requested_logs_retention_duration = "1hr"
+```
+
 ## Troubleshooting
 
 - If uploads fail to MinIO with TLS enabled, verify the endpoint scheme (`http://` vs `https://`) matches the `ssl.enabled` setting.
@@ -278,7 +301,7 @@ sudo chef-automate restart-services
 
 ### S3 endpoint configuration for non-default regions
 
-S3 connection failures or `bucket not found` errors can occur when you use `s3.amazonaws.com` for buckets outside `us-east-1`.
+S3 connection failures such as `PermanentRedirect`, `AuthorizationHeaderMalformed`, or `bucket not found` can occur when you use `s3.amazonaws.com` for buckets outside `us-east-1`.
 
 The global endpoint routes to `us-east-1`, so buckets in other regions require a region-specific endpoint.
 
@@ -296,13 +319,13 @@ Audit log storage example:
 
 Common regional endpoints:
 
-| Region | Endpoint |
+|Region|Endpoint|
 |---|---|
-| `us-east-1` | `https://s3.amazonaws.com` or `https://s3.us-east-1.amazonaws.com` |
-| `us-west-2` | `https://s3.us-west-2.amazonaws.com` |
-| `eu-west-1` | `https://s3.eu-west-1.amazonaws.com` |
-| `ap-southeast-1` | `https://s3.ap-southeast-1.amazonaws.com` |
-| `ca-central-1` | `https://s3.ca-central-1.amazonaws.com` |
+|`us-east-1`|`https://s3.amazonaws.com` or `https://s3.us-east-1.amazonaws.com`|
+|`us-west-2`|`https://s3.us-west-2.amazonaws.com`|
+|`eu-west-1`|`https://s3.eu-west-1.amazonaws.com`|
+|`ap-southeast-1`|`https://s3.ap-southeast-1.amazonaws.com`|
+|`ca-central-1`|`https://s3.ca-central-1.amazonaws.com`|
 
 ## Audit log settings reference
 
@@ -338,6 +361,7 @@ For a complete set of log storage settings, see the [reference examples](#audit-
     max_concurrent_workers = 4
     queue_size = 100
     multipart_chunk_size = "10MB"
+    requested_logs_retention_duration = "1hr"
   ```
 
 : `max_concurrent_workers`
@@ -362,6 +386,51 @@ For a complete set of log storage settings, see the [reference examples](#audit-
     Default value: `"10MB"`
 
     Format: `KB`, `MB`, or `GB` suffixes (use `"20MB"`, not `"20M"`).
+
+: `requested_logs_retention_duration`
+  : Retention duration for requested audit log files in object storage.
+
+    Default value: `"1hr"`
+
+    Supported values:
+
+    - `"0"` for disabled/unlimited retention
+    - positive durations ending in `hr` or `d` (for example, `"1hr"`, `"24hr"`, `"7d"`, `"30d"`)
+
+    Cleanup runs hourly and deletes requested-log files older than the configured duration.
+
+`[global.v1.audit.retention]`
+
+: The object storage retention settings have the following defaults:
+
+  ```toml
+  [global.v1.audit.retention]
+    days = 30
+    schedule_hour = 2
+    schedule_minute = 0
+  ```
+
+: `days`
+  : Number of days to retain uploaded audit log objects.
+
+    Default value: `30`
+
+    - `0`: disabled/unlimited retention (no automatic cleanup)
+    - `> 0`: enables cleanup with that retention window
+
+: `schedule_hour`
+  : Cleanup schedule hour (24-hour format).
+
+    Default value: `2`
+
+    Valid range: `0` to `23`
+
+: `schedule_minute`
+  : Cleanup schedule minute.
+
+    Default value: `0`
+
+    Valid range: `0` to `59`
 
 `[global.v1.audit.input]`
 
@@ -546,6 +615,12 @@ The following TOML shows the default audit log settings:
     max_concurrent_workers = 4
     queue_size = 100
     multipart_chunk_size = "10M"
+    requested_logs_retention_duration = "1hr"
+
+  [global.v1.audit.retention]
+    days = 30
+    schedule_hour = 2
+    schedule_minute = 0
 
   [global.v1.audit.storage]
     storage_type = "s3"
@@ -585,6 +660,12 @@ The following example includes all available settings:
     max_concurrent_workers = 4
     queue_size = 100
     multipart_chunk_size = "10M"
+    requested_logs_retention_duration = "1hr"
+
+  [global.v1.audit.retention]
+    days = 30
+    schedule_hour = 2
+    schedule_minute = 0
 
   [global.v1.audit.storage]
     # Use "s3" for AWS S3 or "minio" for MinIO.
@@ -778,6 +859,8 @@ Example (completed):
 
 Each request generates a single file containing the audit logs for the full requested time range (up to 30 days).
 
+Requested log files are retained according to `[global.v1.audit.async].requested_logs_retention_duration`.
+
 The downloaded audit log file is gzip-compressed (for example, `audit_logs.log.gz`). To extract the log file, run:
 
 ```shell
@@ -809,7 +892,8 @@ curl -sS -L \
 ### Requested log retention
 
 - Each request generates a single file for the requested time range (up to 30 days).
-- Generated files are stored temporarily and can be retrieved by `request_id`.
+- Generated files are stored in object storage and can be retrieved by `request_id`.
+- File cleanup uses `[global.v1.audit.async].requested_logs_retention_duration`.
 - Monitor request state with `GET /api/v1/audit/status?request_id=<ID>`.
   - Status values include `processing`, `completed`, and `error`.
 - Download completed files promptly.
