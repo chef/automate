@@ -180,6 +180,35 @@ To change the rotation size threshold, patch your Automate configuration.
     sudo chef-automate config patch </PATH/TO/TOML/FILE>
     ```
 
+### Audit log retention
+
+Audit log retention has two parts: local file retention on the Automate node and object storage retention in your S3 or MinIO bucket.
+
+#### Local file retention
+
+- Audit entries are written to `/hab/svc/automate-load-balancer/data/audit.log`.
+- Chef Automate keeps up to 10 rotated files (`audit.1.log` through `audit.10.log`).
+- Default `max_file_size` is `100 MB`.
+- Total potential local storage is about `1.1 GB` (`audit.log` + 10 rotated files at `100 MB` each).
+- When a new rotation occurs after the limit is reached, the oldest file (`audit.10.log`) is overwritten.
+
+To change the rotation size threshold, set `max_file_size`:
+
+```toml
+[global.v1.audit]
+
+  [global.v1.audit.input]
+    max_file_size = "100MB"
+```
+
+#### Object storage retention
+
+- Fluent Bit uploads audit log entries to your configured S3 or MinIO bucket.
+- Chef Automate does not automatically delete objects from object storage.
+- Configure retention in your object storage platform:
+  - AWS S3: [Managing your storage lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
+  - MinIO: [Object Expiration and Tiering (ILM)](https://min.io/docs/minio/linux/administration/object-management/object-lifecycle-management.html)
+
 ### Configure upload behavior
 
 These settings control object size splitting, multipart chunk size, and upload timeouts for collector uploads to S3 or MinIO.
@@ -228,6 +257,52 @@ If you don't set `[global.v1.audit.output]`, Chef Automate uses these defaults:
 - If uploads fail to MinIO with TLS enabled, verify the endpoint scheme (`http://` vs `https://`) matches the `ssl.enabled` setting.
 - If you use a private CA for MinIO, provide `root_cert` and set `ssl.enabled = true`.
 - If you use AWS IAM roles, omit `access_key` and `secret_key` to use the default AWS credential chain.
+
+### IAM role migration from access keys
+
+If you migrate from `access_key` and `secret_key` to IAM role authentication and still see errors such as `invalid secret key`, stale cached credentials may still be taking priority.
+
+Credentials are resolved in this order:
+
+1. Configuration-based credentials (`[global.v1.backups.s3.credentials]`)
+1. `secrets-helper` cached credentials (`/hab/svc/backup-gateway/data/secrets-helper/`)
+1. IAM instance profile / role (AWS default credential chain)
+
+Because tier-2 cached values can override IAM role credentials, remove the cached files and restart services:
+
+```bash
+sudo rm -f /hab/svc/backup-gateway/data/secrets-helper/backup-gateway.access_key
+sudo rm -f /hab/svc/backup-gateway/data/secrets-helper/backup-gateway.secret_key
+sudo chef-automate restart-services
+```
+
+### S3 endpoint configuration for non-default regions
+
+S3 connection failures or `bucket not found` errors can occur when you use `s3.amazonaws.com` for buckets outside `us-east-1`.
+
+The global endpoint routes to `us-east-1`, so buckets in other regions require a region-specific endpoint.
+
+For non-`us-east-1` regions, use `https://s3.<REGION>.amazonaws.com`.
+
+Audit log storage example:
+
+```toml
+[global.v1.audit.storage]
+  storage_type = "s3"
+  endpoint = "https://s3.us-west-2.amazonaws.com"
+  storage_region = "us-west-2"
+  bucket = "<BUCKET_NAME>"
+```
+
+Common regional endpoints:
+
+| Region | Endpoint |
+|---|---|
+| `us-east-1` | `https://s3.amazonaws.com` or `https://s3.us-east-1.amazonaws.com` |
+| `us-west-2` | `https://s3.us-west-2.amazonaws.com` |
+| `eu-west-1` | `https://s3.eu-west-1.amazonaws.com` |
+| `ap-southeast-1` | `https://s3.ap-southeast-1.amazonaws.com` |
+| `ca-central-1` | `https://s3.ca-central-1.amazonaws.com` |
 
 ## Audit log settings reference
 
@@ -730,3 +805,12 @@ curl -sS -L \
   "https://<FQDN>/api/v1/audit/download?request_id=<REQUEST_ID>" \
   -o "audit-<REQUEST_ID>.log.gz"
 ```
+
+### Requested log retention
+
+- Each request generates a single file for the requested time range (up to 30 days).
+- Generated files are stored temporarily and can be retrieved by `request_id`.
+- Monitor request state with `GET /api/v1/audit/status?request_id=<ID>`.
+  - Status values include `processing`, `completed`, and `error`.
+- Download completed files promptly.
+- For periods longer than 30 days, submit multiple requests with consecutive date ranges.
