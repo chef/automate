@@ -17,7 +17,7 @@ pg_version="13.21"
 ident="20250711150030"
 
 pkg_deps=(
-  core/coreutils/9.4/20250924120257
+  core/coreutils/9.4/20250528165939
   chef/mlsa
   ${vendor_origin}/postgresql13/${pg_version}/${ident}
 )
