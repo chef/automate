@@ -191,10 +191,10 @@ func TestRunStatusFromBastion(t *testing.T) {
 			flags:       &StatusCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, nil, errors.New("Error occured while reading infra details")
+					return nil, nil, errors.New("Error occurred while reading infra details")
 				},
 			},
-			errorWant: errors.New("Error occured while reading infra details"),
+			errorWant: errors.New("Error occurred while reading infra details"),
 		},
 		{
 			description: "Want status of all services",
@@ -216,7 +216,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 			errorWant: nil,
 		},
 		{
-			description: "Want status of all services but error occured while remote execution",
+			description: "Want status of all services but error occurred while remote execution",
 			flags:       &StatusCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -228,11 +228,11 @@ func TestRunStatusFromBastion(t *testing.T) {
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
+					return map[string][]*CmdResult{}, errors.New("Some error occurred while remote execution")
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
-			errorWant: errors.New("Some error occured while remote execution"),
+			errorWant: errors.New("Some error occurred while remote execution"),
 		},
 		{
 			description: "Want status of all services with managed services",
