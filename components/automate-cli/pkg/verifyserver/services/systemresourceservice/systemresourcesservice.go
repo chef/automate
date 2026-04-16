@@ -92,7 +92,7 @@ func (srs *SystemResourcesServiceImpl) CheckCpuSpeed() *models.Checks {
 	cpuSpeed, err := srs.SystemResourceInfo.GetCPUSpeed()
 
 	if err != nil {
-		srs.logger.Error("Error occured while getting cpu speed :", err)
+		srs.logger.Error("Error occurred while getting cpu speed :", err)
 		return srs.GetChecksModel(false, constants.CPU_SPEED_CHECK_TITLE, "", err.Error(), constants.RESOLUTION_MSG)
 	}
 	srs.logger.Debug("CPU speed is : ", cpuSpeed)
@@ -111,7 +111,7 @@ func (srs *SystemResourcesServiceImpl) CheckMemorySize() *models.Checks {
 	srs.logger.Debug("Current memory of system is :", memoryInGB)
 
 	if err != nil {
-		srs.logger.Error("Error occured while getting memory information : ", err.Error())
+		srs.logger.Error("Error occurred while getting memory information : ", err.Error())
 		return srs.GetChecksModel(false, constants.MEMORY_SIZE_CHECK_TITLE, "", err.Error(), constants.RESOLUTION_MSG)
 	}
 	srs.logger.Debugf("Current memory of system is :%vGB", memoryInGB)
