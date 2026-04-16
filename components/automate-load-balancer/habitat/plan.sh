@@ -41,6 +41,7 @@ pkg_build_deps=(
   core/make
   core/coreutils
   core/cacerts
+  core/libxcrypt
 )
 pkg_lib_dirs=(lib)
 pkg_bin_dirs=(sbin)

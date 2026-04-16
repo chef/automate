@@ -4,20 +4,20 @@
 pkg_name="automate-postgresql"
 pkg_description="Wrapper package for core/postgresql"
 pkg_origin="chef"
-pkg_version="13.22.0"
+pkg_version="13.21.0"
 vendor_origin="core"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
 # pinned PG version. We need to also update components/automate-cli/cmd/chef-automate/migration_pg.go (line)
-pg_version="13.22"
+pg_version="13.21"
 
 # pinned PG version. We need to also update components/automate-cli/cmd/chef-automate/migration_pg.go (line)
-ident="20260323164147"
+ident="20250711150030"
 
 pkg_deps=(
-  core/coreutils
+  core/coreutils/9.4/20250924120257
   chef/mlsa
   ${vendor_origin}/postgresql13/${pg_version}/${ident}
 )
