@@ -151,7 +151,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 			}(),
 			mockRestartCmdHelper: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
+					return nil, &SSHConfig{}, errors.New("Error occurred while reading infra details")
 				},
 				isManagedServicesOnFunc: func() bool {
 					return false
@@ -168,7 +168,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return map[string][]*CmdResult{}, nil
 				},
 			},
-			errorWant: errors.New("Error occured while reading infra details"),
+			errorWant: errors.New("Error occurred while reading infra details"),
 		},
 		{
 			description: "Restart all node-types",
@@ -194,11 +194,11 @@ func TestRunRestartFromBastion(t *testing.T) {
 			mockRestartCmdHelper: mockNodeUtils,
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
+					return map[string][]*CmdResult{}, errors.New("Some error occurred while remote execution")
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
-			errorWant: errors.New("Some error occured while remote execution"),
+			errorWant: errors.New("Some error occurred while remote execution"),
 		},
 		{
 			description: "Restarting all services with managed Infra",
