@@ -27,10 +27,10 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 			flags:       &ServiceVersionsCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, nil, errors.New("Error occured while reading infra details")
+					return nil, nil, errors.New("Error occurred while reading infra details")
 				},
 			},
-			errorWant: errors.New("Error occured while reading infra details"),
+			errorWant: errors.New("Error occurred while reading infra details"),
 		},
 		{
 			description: "Want service-versions of all services",
@@ -106,7 +106,7 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 			errorWant: nil,
 		},
 		{
-			description: "Want service-versions of all services but error occured while remote execution",
+			description: "Want service-versions of all services but error occurred while remote execution",
 			flags: &ServiceVersionsCmdFlags{
 				automate:   true,
 				chefServer: true,
@@ -123,11 +123,11 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
 				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
+					return map[string][]*CmdResult{}, errors.New("Some error occurred while remote execution")
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
-			errorWant: errors.New("Some error occured while remote execution"),
+			errorWant: errors.New("Some error occurred while remote execution"),
 		},
 		{
 			description: "Managed services and pg flag provided",
@@ -153,7 +153,7 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 			errorWant: status.Errorf(status.InvalidCommandArgsError, SERVICE_VERSIONS_ERROR_ON_SELF_MANAGED, POSTGRESQL),
 		},
 		{
-			description: "Want service-versions of all services but error occured while remote execution",
+			description: "Want service-versions of all services but error occurred while remote execution",
 			flags: &ServiceVersionsCmdFlags{
 				automate: true,
 			},
@@ -174,11 +174,11 @@ func TestRunServiceVersionsFromBastion(t *testing.T) {
 					}
 					return map[string][]*CmdResult{
 						"1": {cmdResultWithError},
-					}, errors.New("Some error occured while remote execution")
+					}, errors.New("Some error occurred while remote execution")
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
-			errorWant: errors.New("Some error occured while remote execution"),
+			errorWant: errors.New("Some error occurred while remote execution"),
 		},
 		{
 			description: "Want service_versions of backend services with --accept-hab-license",
