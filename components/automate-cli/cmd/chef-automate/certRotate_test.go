@@ -2441,9 +2441,9 @@ func TestPatchConfig(t *testing.T) {
 			ExpectedError: "",
 		},
 		{
-			description: "Error occured while reading infra details on backend",
+			description: "Error occurred while reading infra details on backend",
 			param: &patchFnParameters{
-				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("Error occured while reading infra details")),
+				sshUtil:       getMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("Error occurred while reading infra details")),
 				config:        TestOpensearchAdminAndRootCA,
 				fileName:      "cert-rotate-os.toml",
 				timestamp:     time.Now().Format("20060102150405"),
@@ -2456,7 +2456,7 @@ func TestPatchConfig(t *testing.T) {
 				skipIpsList: []string{},
 			},
 			isError:       true,
-			ExpectedError: "Error occured while reading infra details",
+			ExpectedError: "Error occurred while reading infra details",
 		},
 	}
 	for _, testCase := range testCases {
