@@ -25,7 +25,7 @@ pkg_deps=(
   core/bash
   core/cacerts # fetching manifest over HTTPS
   core/certstrap
-  core/coreutils
+  core/coreutils/9.4/20250924120257
   core/findutils
   core/rsync
   core/tar
