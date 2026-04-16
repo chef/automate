@@ -26,7 +26,7 @@ type testCase struct {
 }
 
 const (
-	DISK_SPACE_CALC_ERR = "error occured while fetching total and/or free disk space"
+	DISK_SPACE_CALC_ERR = "error occurred while fetching total and/or free disk space"
 )
 
 func TestGetCpuCountCheck(t *testing.T) {
@@ -87,10 +87,10 @@ func TestGetCpuSpeedCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "System is not running on supported platform",
-			respWant:            srv.GetChecksModel(false, constants.CPU_SPEED_CHECK_TITLE, "", errors.New("error occured while fetching cpu speed").Error(), constants.RESOLUTION_MSG),
+			respWant:            srv.GetChecksModel(false, constants.CPU_SPEED_CHECK_TITLE, "", errors.New("error occurred while fetching cpu speed").Error(), constants.RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetCPUSpeedFunc: func() (float64, error) {
-					return 0, errors.New("error occured while fetching cpu speed")
+					return 0, errors.New("error occurred while fetching cpu speed")
 				},
 			},
 		},
@@ -129,10 +129,10 @@ func TestGetMemorySizeCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Error while reading memory size",
-			respWant:            srv.GetChecksModel(false, constants.MEMORY_SIZE_CHECK_TITLE, "", "error occured while reading memory size", constants.RESOLUTION_MSG),
+			respWant:            srv.GetChecksModel(false, constants.MEMORY_SIZE_CHECK_TITLE, "", "error occurred while reading memory size", constants.RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetMemoryFunc: func() (float64, error) {
-					return float64(0), errors.New("error occured while reading memory size")
+					return float64(0), errors.New("error occurred while reading memory size")
 				},
 			},
 		},
@@ -217,10 +217,10 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in /var/tmp | error",
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", "error occured while fetching tmp disk space", constants.RESOLUTION_MSG),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Temp"), "", "error occurred while fetching tmp disk space", constants.RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
-					return disk.UsageStat{}, errors.New("error occured while fetching tmp disk space")
+					return disk.UsageStat{}, errors.New("error occurred while fetching tmp disk space")
 				},
 			},
 			mockFileUtils: &fileutils.MockFileSystemUtils{
@@ -606,10 +606,10 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		{
 			testCaseDescription: "Post-deployment hab free space check | error case",
 			nodeType:            enums.NodeTypeAutomate,
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", "error occured while fetching disk space info", constants.RESOLUTION_MSG),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", "error occurred while fetching disk space info", constants.RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
-					return disk.UsageStat{}, errors.New("error occured while fetching disk space info")
+					return disk.UsageStat{}, errors.New("error occurred while fetching disk space info")
 				},
 			},
 			mockFileUtils: &fileutils.MockFileSystemUtils{
