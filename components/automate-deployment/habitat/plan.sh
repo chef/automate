@@ -18,20 +18,20 @@ pkg_deps=(
   # 
   # IF YOU UPDATE THIS PIN YOU MUST ALSO UPDATE .expeditor/create-manifest.rb
   core/hab/1.6.1243/20241227194506
-  core/net-tools
-  core/procps-ng
-  core/util-linux
+  core/net-tools/2.10/20250529012700
+  core/procps-ng/4.0.4/20250528173530
+  core/util-linux/2.38.1/20250528182417
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
-  core/bash
-  core/cacerts # fetching manifest over HTTPS
-  core/certstrap
+  core/bash/5.2.21/20250528165700
+  core/cacerts/2023.12.12/20250528165811 # fetching manifest over HTTPS
+  core/certstrap/1.3.0/20250529005923
   core/coreutils/9.4/20250924120257
-  core/findutils
-  core/rsync
-  core/tar
+  core/findutils/4.9.0/20250528173106
+  core/rsync/3.2.7/20250925044616
+  core/tar/1.35/20250924121242
   chef/mlsa
   # deployment-service uses PostgreSQL client tools for backup and restore.
-  core/postgresql14-client/14.17/20260316081719
+  core/postgresql14-client/14.17/20250924124514
 )
 
 pkg_bin_dirs=(bin)

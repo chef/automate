@@ -58,6 +58,7 @@ pkg_build_deps=(
   core/gcc
   core/make
   core/coreutils
+  core/libxcrypt
 )
 
 pkg_lib_dirs=(lib)
