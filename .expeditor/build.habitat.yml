@@ -1,5 +1,10 @@
 origin: chef
+
 smart_build: true
+
+env:
+  HAB_REFRESH_CHANNEL: "LTS-2024"
+
 studio_secrets:
   GITHUB_TOKEN:
     account: github/chef
