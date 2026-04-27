@@ -39,6 +39,8 @@ pipelines:
       description: Pull Request validation tests requiring access keys
   - habitat/build:
       description: Build the Habitat packages for Chef Automate
+      env:
+        HAB_REFRESH_CHANNEL: "LTS-2024"
   - nightly:
       description: Nightly tests against main
       definition: .expeditor/nightly.pipeline.yml
