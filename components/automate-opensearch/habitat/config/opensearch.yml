@@ -50,7 +50,7 @@ node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
 #
 # Path to directory where to store the data (separate multiple locations by comma):
 #
-path.data: 
+path.data:
   - {{pkg.svc_data_path}}/{{cfg.path.data}}
   - {{pkg.svc_var_path}}
 #
@@ -154,7 +154,7 @@ plugins.security.ssl.http.enabled: true
 plugins.security.ssl.http.pemcert_filepath: node1.pem
 plugins.security.ssl.http.pemkey_filepath: node1-key.pem
 plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
-plugins.security.allow_unsafe_democertificates: true
+plugins.security.allow_unsafe_democertificates: false
 plugins.security.allow_default_init_securityindex: true
 plugins.security.authcz.admin_dn:
   - CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US

@@ -1,4 +1,4 @@
-# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING 
+# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 #
 # If you are modifying this file, you almost surely also want to
 # modify pkg/es/config_request.go. The DefaultConfigRequest() function
@@ -225,7 +225,7 @@
 # ======================== Elasticsearch Plugins Configuration =========================
 [plugins]
   [plugins.security]
-    allow_unsafe_democertificates = true
+    allow_unsafe_democertificates = false
     allow_default_init_securityindex = true
     nodes_dn = "- CN=chefnode,O=Chef Software Inc,L=Seattle,ST=Washington,C=US"
     enable_snapshot_restore_privilege = true

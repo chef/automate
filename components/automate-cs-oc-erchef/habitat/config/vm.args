@@ -16,10 +16,12 @@
 
 ## Enable kernel poll and a few async threads
 +K true
-+A 5
++A 10
+
++P 262144
 
 ## Increase number of concurrent ports/sockets
--env ERL_MAX_PORTS 4096
+-env ERL_MAX_PORTS 65536
 
 ## Add directory for hot patches to the front of the code path
 -pa lib/patches
