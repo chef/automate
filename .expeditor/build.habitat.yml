@@ -1,4 +1,5 @@
 origin: chef
+refresh_channel: "LTS-2024"
 
 smart_build: true
 
