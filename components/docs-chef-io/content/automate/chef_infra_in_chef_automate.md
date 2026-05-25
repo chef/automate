@@ -62,6 +62,7 @@ The list of parameters are as follows:
 | opscode_erchef['strict_search_result_acls']     |FALSE                               | FALSE                                      |``` [erchef.V1.sys.api]```<br>```strict_search_result_acls= false```|
 |opscode_erchef['enable_ibrowse_traces']          |FALSE                                      |FALSE                                |```[erchef.v1.sys.ibrowse]```<br> ```enable_ibrowse_traces = false``` |
 |opscode_erchef['s3_url_expiry_window_size']      | {100, percent}                            |                                     |```[erchef.v1.sys.api]``` <br> ```s3_url_expiry_window_size_percent=100```|
+| opscode_erchef['request_log_rotation_type']     | wrap                                      | wrap                                | ```[erchef.v1.sys.log]```<br>```request_log_rotation_type="wrap"``` |
 | oc_chef_authz['http_queue_max']                 | 200                                       | 200                                 | ```[erchef.v1.sys.authz]```<br>```pool_queue_max=200```            |
 | oc_chef_authz['http_max_count']                 | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_max_size=100```             |
 | oc_chef_authz['http_init_count']                | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_init_size=100```            |
@@ -74,10 +75,12 @@ The list of parameters are as follows:
 | data_collector['ibrowse_options']               | [{connect_timeout, 10000}]                | [{connect_timeout, 10000}]          | ```[erchef.v1.sys.data_collector]```<br>```ibrowse_timeout=10000``` |
 | oc_bifrost['db_pool_queue_max']                 | 50                                        | 50                                  | ```[bifrost.v1.sys.sql]```<br>```pool_queue_max=50```                 |
 | oc_bifrost['extended_perf_log']                 | TRUE                                      | TRUE                                | ```[bifrost.v1.sys.log]```<br>```extended_perf_log=true```            |
+| oc_bifrost['request_log_rotation_type']         | wrap                                      | wrap                                | ```[bifrost.v1.sys.log]```<br>```request_log_rotation_type="wrap"``` |
 | bookshelf['stream_download']                    | TRUE                                      | TRUE                                | ```[bookshelf.v1.sys.bookshelf]```<br>```stream_download=true```      |
 | bookshelf['aws_access_id']                    |                                       |                                 | ```[bookshelf.v1.sys.bookshelf]```<br>```aws_access_id=""```      |
 | bookshelf['aws_secret_key']                    |                                       |                                 | ```[bookshelf.v1.sys.bookshelf]```<br>```aws_secret_key=""```      |
 | bookshelf['log_rotation']                        | 'file_maxbytes':  104857600,<br> 'num_to_keep': 10 |  'file_maxbytes':  104857600,<br> 'num_to_keep': 10 | ```[bookshelf.v1.sys.log]```<br> ```rotation_max_bytes =104857600```<br>```rotation_max_files =10```     |
+| bookshelf['request_log_rotation_type']           | wrap                                      | wrap                                | ```[bookshelf.v1.sys.log]```<br>```request_log_rotation_type="wrap"``` |
 | bookshelf['storage_type']                       | sql                                       | sql                                 | ```[bookshelf.v1.sys.bookshelf]```<br> ```storage_type = "sql"```|
 |bookshelf['vip']                                 |127.0.0.1                                  |127.0.0.1                            |```[bookshelf.v1.sys.bookshelf]```<br> ```virtual_ip = "127.0.0.1"```|
 | oc_chef_wm['health_ping_timeout']               | 400                                       | 400                                 | ```[erchef.v1.sys.health]```<br>```health_ping_timeout=400```         |
